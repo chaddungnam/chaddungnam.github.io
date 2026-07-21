@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datenschutzerklärung — Quirky Ball</title>
+<style>
+  body{margin:0;background:#F5F2EC;color:#1C1C1E;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.75;}
+  main{max-width:720px;margin:0 auto;padding:32px 20px 72px;}
+  nav.langs{font-size:.85rem;margin-bottom:24px;color:#6b675f;}
+  nav.langs a{color:#6b675f;text-decoration:none;margin-right:10px;}
+  nav.langs a:hover{color:#1C1C1E;text-decoration:underline;}
+  nav.langs a.current{color:#1C1C1E;font-weight:600;}
+  h1{font-size:1.55rem;margin:0 0 4px;}
+  p.updated{color:#6b675f;font-size:.9rem;margin:0 0 32px;}
+  h2{font-size:1.15rem;margin:36px 0 10px;padding-top:14px;border-top:1px solid #e3ded3;}
+  p{margin:10px 0;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:4px 0;}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0;}
+  th,td{border:1px solid #e3ded3;background:#fbf9f4;padding:8px 10px;text-align:left;vertical-align:top;}
+  th{background:#f0ece2;}
+  a{color:#b06823;}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid #e3ded3;color:#6b675f;font-size:.85rem;}
+</style>
+</head>
+<body>
+<main>
+  <nav class="langs">
+    <a href="ko.html">한국어</a>
+    <a href="en.html">English</a>
+    <a class="current" href="de.html">Deutsch</a>
+    <a href="ja.html">日本語</a>
+    <a href="index.html?stay=1">Sprachen</a>
+  </nav>
+
+  <h1>Datenschutzerklärung</h1>
+  <p class="updated">Quirky Ball · Gültig ab: 21. Juli 2026</p>
+
+  <h2>1. Überblick und Verantwortlicher</h2>
+  <p>Quirky Ball (im Folgenden „der Dienst") behandelt die personenbezogenen Daten seiner Nutzer mit Sorgfalt und bemüht sich um die Einhaltung geltender Gesetze, insbesondere der EU-Datenschutz-Grundverordnung (DSGVO), des koreanischen Gesetzes zum Schutz personenbezogener Daten sowie einschlägiger US-Bundesstaatengesetze. Diese Datenschutzerklärung erläutert, welche Daten der Dienst erhebt, zu welchen Zwecken sie verwendet werden und wie sie gespeichert und gelöscht werden. Sie ist die vollständige Fassung des in der App angezeigten Datenschutzhinweises (Kurzfassung).</p>
+  <p>Verantwortlicher im Sinne der DSGVO ist der Anbieter des Dienstes, erreichbar unter der unten genannten E-Mail-Adresse.</p>
+
+  <h2>2. Erhobene personenbezogene Daten</h2>
+  <p>Der Dienst kann ohne Registrierung als Gast genutzt werden. Dabei werden folgende Daten erhoben und gespeichert.</p>
+  <table>
+    <tr><th>Datenkategorie</th><th>Zeitpunkt / Art der Erhebung</th><th>Speicherort</th></tr>
+    <tr><td>Gast-Kennung (UID)</td><td>Wird bei der Nutzung des Dienstes automatisch erstellt</td><td>Gerät und Server (Supabase)</td></tr>
+    <tr><td>E-Mail-Adresse, Profilname</td><td>Nur bei (freiwilliger) Verknüpfung eines Google-Kontos</td><td>Server (Supabase Auth)</td></tr>
+    <tr><td>Spieldaten (Punktzahl, Level, Spielverlauf)</td><td>Automatisch während des Spielens erzeugt</td><td>Gerät und Server (Bestleistungen)</td></tr>
+    <tr><td>Nickname, Anzeigecode</td><td>Nickname wird von dir eingegeben; Anzeigecode wird automatisch erstellt</td><td>Gerät und Server (für Bestenlisten)</td></tr>
+    <tr><td>Länderinformation</td><td>Von dir beim Onboarding gewählt (Vorschlag aus dem Gerätegebietsschema; keine genaue Standortbestimmung)</td><td>Gerät und Server (für Länder-Bestenlisten)</td></tr>
+    <tr><td>Wiederherstellungscode</td><td>Automatische Vergabe bei Erstellung eines Gastkontos</td><td>Gerät und Server (Anmeldedaten zur Kontowiederherstellung)</td></tr>
+    <tr><td>Geräte-/Werbekennungen (z. B. ADID)</td><td>Werden vom Werbe-SDK (Google AdMob) bei der Anzeigenauslieferung erhoben</td><td>Systeme des Werbeanbieters (Google)</td></tr>
+    <tr><td>Virtuelle Währung (Stamina, Edelsteine), Spracheinstellung</td><td>Während der Nutzung erzeugt</td><td>Nur Gerät (lokale Speicherung)</td></tr>
+  </table>
+  <p>Der Dienst erhebt keine präzisen Standortdaten, keine Kontakte, keine Fotos und keine sonstigen für den Spielbetrieb nicht erforderlichen Daten; ein separates Analyse-SDK wird nicht verwendet.</p>
+
+  <h2>3. Zwecke und Rechtsgrundlagen der Verarbeitung</h2>
+  <ul>
+    <li>Speicherung des Spielfortschritts und geräteübergreifende Synchronisation bei Verknüpfung mit einem Google-Konto (Art. 6 Abs. 1 lit. b DSGVO)</li>
+    <li>Bereitstellung von Bestenlisten — Anzeige von Nickname/Anzeigecode, Bestleistung und Land (Art. 6 Abs. 1 lit. b DSGVO)</li>
+    <li>Ausspielen von Werbung über Google AdMob — personalisierte Werbung nur auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), nicht personalisierte Werbung auf Grundlage berechtigter Interessen (Art. 6 Abs. 1 lit. f DSGVO)</li>
+    <li>Fehleranalyse und Verbesserung der Dienstqualität (Art. 6 Abs. 1 lit. f DSGVO)</li>
+    <li>Erfüllung rechtlicher Pflichten (Art. 6 Abs. 1 lit. c DSGVO)</li>
+  </ul>
+
+  <h2>4. Weitergabe an Dritte und Auftragsverarbeitung</h2>
+  <p>Der Dienst verkauft die personenbezogenen Daten der Nutzer nicht an Dritte. Für den Betrieb werden folgende externe Dienste eingesetzt; zusätzlich gilt die Datenschutzerklärung des jeweiligen Anbieters.</p>
+  <table>
+    <tr><th>Dienst (Anbieter)</th><th>Zweck</th><th>Betroffene Daten</th></tr>
+    <tr><td>Google AdMob (Google LLC)</td><td>Belohnte und Interstitial-Werbung</td><td>Werbekennung, Geräteinformationen</td></tr>
+    <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Verknüpfung eines Google-Kontos</td><td>E-Mail-Adresse, Profilname</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Backend-Infrastruktur zur Speicherung von Konto-/Punktedaten (Auftragsverarbeiter)</td><td>UID, Nickname, Land, Bestleistungen</td></tr>
+  </table>
+  <ul>
+    <li><a href="https://policies.google.com/privacy">Datenschutzerklärung von Google</a></li>
+    <li><a href="https://support.google.com/admob/answer/6128543">Richtlinien von Google AdMob</a></li>
+    <li><a href="https://supabase.com/privacy">Datenschutzerklärung von Supabase</a></li>
+  </ul>
+
+  <h2>5. Internationale Datenübermittlung</h2>
+  <p>Aufgrund der verwendeten Cloud-Infrastruktur (Supabase, Google) können personenbezogene Daten auf Servern außerhalb deines Landes — einschließlich außerhalb der EU/des EWR — gespeichert und verarbeitet werden. Die Übermittlung erfolgt unter den von diesen Anbietern angewandten Garantien (z. B. Standardvertragsklauseln).</p>
+
+  <h2>6. Aufbewahrungsdauer</h2>
+  <ul>
+    <li>Bei einer beantragten Kontolöschung werden die Daten unverzüglich oder innerhalb einer angemessenen Frist gelöscht.</li>
+    <li>Bestenlisten-Einträge werden nur für die letzten 7 Tage gespeichert und danach automatisch entfernt.</li>
+    <li>Daten, die nur auf deinem Gerät gespeichert sind (virtuelle Währung, Spracheinstellung usw.), werden beim Löschen der App entfernt.</li>
+    <li>Sofern geltendes Recht eine längere Aufbewahrung vorschreibt, können Daten entsprechend länger gespeichert werden.</li>
+  </ul>
+
+  <h2>7. Rechte der Nutzer</h2>
+  <ul>
+    <li>Über den Einstellungsbildschirm kannst du jederzeit deine Kontoinformationen einsehen, deinen Nickname oder dein Land ändern oder die Löschung deines Kontos (einschließlich der personenbezogenen Daten) beantragen.</li>
+    <li><strong>Kontolöschung in der App:</strong> Einstellungen → Konto löschen. Die Löschung entfernt alle Spieldaten auf dem Server und deinem Gerät dauerhaft und kann nicht rückgängig gemacht werden.</li>
+    <li>Auskunfts-, Berichtigungs- oder Löschungsanfragen, die nicht in der App möglich sind, richtest du bitte an die unten genannte E-Mail-Adresse.</li>
+    <li>Nutzer mit Wohnsitz in der EU/dem EWR können die Rechte auf Auskunft, Berichtigung, Löschung, Datenübertragbarkeit, Einschränkung der Verarbeitung und Widerspruch gemäß der DSGVO ausüben. Zudem besteht ein Beschwerderecht bei der zuständigen Datenschutz-Aufsichtsbehörde. Nutzer in Kalifornien können ihre Rechte gemäß dem CCPA ausüben (der Dienst verkauft keine personenbezogenen Daten).</li>
+  </ul>
+
+  <h2>8. Werbung und Einwilligung</h2>
+  <ul>
+    <li>Der Dienst enthält Werbung über Google AdMob; das Ansehen von belohnter Werbung ist freiwillig.</li>
+    <li>Nutzer in einwilligungspflichtigen Regionen (z. B. EWR und Vereinigtes Königreich) durchlaufen beim ersten Start einen Google-UMP-Einwilligungsprozess und können ihre Einwilligung jederzeit im Einstellungsbildschirm ändern oder widerrufen. Bei Ablehnung kann weiterhin nicht personalisierte Werbung angezeigt werden.</li>
+    <li>Google AdMob kann Werbekennungen zur Personalisierung von Anzeigen verwenden. Du kannst die Anzeigenpersonalisierung einschränken oder deine Werbe-ID in den Geräteeinstellungen zurücksetzen (Android: Einstellungen → Google → Werbung).</li>
+  </ul>
+
+  <h2>9. Datenschutz von Kindern</h2>
+  <p>Der Dienst richtet sich nicht gezielt an Kinder unter 13 Jahren (bzw. unter dem höheren Mindestalter, das lokales Recht vorschreibt, z. B. 14 Jahre in Südkorea), und wir erheben wissentlich keine personenbezogenen Daten von Kindern. Werden wir darauf aufmerksam, dass ein Kind unter diesem Alter personenbezogene Daten bereitgestellt hat, löschen wir diese unverzüglich. Eltern oder gesetzliche Vertreter können die Löschung über die unten genannte E-Mail-Adresse beantragen.</p>
+
+  <h2>10. Sicherheit</h2>
+  <p>Der Diensteanbieter trifft angemessene technische und organisatorische Maßnahmen zum Schutz personenbezogener Daten. Sämtliche Kommunikation mit dem Server ist durch TLS-Verschlüsselung geschützt, und der Zugriff auf die Supabase-Datenbank ist durch Row Level Security (RLS) eingeschränkt.</p>
+
+  <h2>11. Kontakt</h2>
+  <p>Bei Fragen oder Anliegen zum Datenschutz wende dich an:</p>
+  <p>E-Mail: <a href="mailto:chkwnsgml3@gmail.com">chkwnsgml3@gmail.com</a></p>
+
+  <h2>12. Gültig ab und Änderungshistorie</h2>
+  <ul>
+    <li>21. Juli 2026 — Erstveröffentlichung dieser Datenschutzerklärung (v1.0)</li>
+  </ul>
+  <p>Diese Erklärung kann an geänderte Rechtslage oder Weiterentwicklungen des Dienstes angepasst werden. Wesentliche Änderungen werden vorab durch einen Hinweis in der App angekündigt.</p>
+
+  <footer>Quirky Ball — Datenschutzerklärung · Gültig ab 21.07.2026</footer>
+</main>
+</body>
+</html>
