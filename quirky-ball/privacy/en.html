@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Quirky Ball</title>
+<style>
+  body{margin:0;background:#F5F2EC;color:#1C1C1E;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.75;}
+  main{max-width:720px;margin:0 auto;padding:32px 20px 72px;}
+  nav.langs{font-size:.85rem;margin-bottom:24px;color:#6b675f;}
+  nav.langs a{color:#6b675f;text-decoration:none;margin-right:10px;}
+  nav.langs a:hover{color:#1C1C1E;text-decoration:underline;}
+  nav.langs a.current{color:#1C1C1E;font-weight:600;}
+  h1{font-size:1.55rem;margin:0 0 4px;}
+  p.updated{color:#6b675f;font-size:.9rem;margin:0 0 32px;}
+  h2{font-size:1.15rem;margin:36px 0 10px;padding-top:14px;border-top:1px solid #e3ded3;}
+  p{margin:10px 0;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:4px 0;}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0;}
+  th,td{border:1px solid #e3ded3;background:#fbf9f4;padding:8px 10px;text-align:left;vertical-align:top;}
+  th{background:#f0ece2;}
+  a{color:#b06823;}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid #e3ded3;color:#6b675f;font-size:.85rem;}
+</style>
+</head>
+<body>
+<main>
+  <nav class="langs">
+    <a href="ko.html">한국어</a>
+    <a class="current" href="en.html">English</a>
+    <a href="de.html">Deutsch</a>
+    <a href="ja.html">日本語</a>
+    <a href="index.html?stay=1">Languages</a>
+  </nav>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Quirky Ball · Effective date: July 21, 2026</p>
+
+  <h2>1. Overview</h2>
+  <p>Quirky Ball (the "Service") takes user privacy seriously and aims to comply with applicable laws, including South Korea's Personal Information Protection Act, the EU General Data Protection Regulation (GDPR), and applicable U.S. state privacy laws. This Privacy Policy explains what information the Service collects, how it is used, and how it is stored and deleted. It is the full version of the privacy notice shown inside the app.</p>
+
+  <h2>2. Information We Collect</h2>
+  <p>You can play as a guest without any sign-up. The Service collects and stores the following information.</p>
+  <table>
+    <tr><th>Item</th><th>When / how</th><th>Where stored</th></tr>
+    <tr><td>Guest identifier (UID)</td><td>Generated automatically when you use the Service</td><td>Device and server (Supabase)</td></tr>
+    <tr><td>Email address, profile name</td><td>Only if you (optionally) link a Google account</td><td>Server (Supabase Auth)</td></tr>
+    <tr><td>Gameplay data (score, level, play history)</td><td>Generated automatically as you play</td><td>Device and server (best records)</td></tr>
+    <tr><td>Nickname, display code</td><td>Nickname entered by you; display code generated automatically</td><td>Device and server (for leaderboards)</td></tr>
+    <tr><td>Country</td><td>Selected by you during onboarding (suggested from device locale; not precise location)</td><td>Device and server (for country leaderboards)</td></tr>
+    <tr><td>Recovery code</td><td>Issued automatically when a guest account is created</td><td>Device and server (account recovery credential)</td></tr>
+    <tr><td>Device/advertising identifiers (e.g., ADID)</td><td>Collected by the ad SDK (Google AdMob) when ads are served</td><td>Ad provider (Google) systems</td></tr>
+    <tr><td>Virtual currency (stamina, gems), language setting</td><td>Generated during use</td><td>Device only (local storage)</td></tr>
+  </table>
+  <p>The Service does not collect precise location, contacts, photos, or other information not required to provide the game, and it does not use a separate analytics SDK.</p>
+
+  <h2>3. Purposes of Use</h2>
+  <ul>
+    <li>Saving your progress and syncing it across devices (when linked to a Google account)</li>
+    <li>Providing leaderboards — showing nickname/display code, best score, and country</li>
+    <li>Serving ads (Google AdMob)</li>
+    <li>Analyzing errors and improving service quality</li>
+    <li>Complying with applicable laws and resolving disputes</li>
+  </ul>
+
+  <h2>4. Third-Party Sharing and Processors</h2>
+  <p>We do not sell users' personal information to third parties. The Service relies on the following external services, and each provider's own privacy policy also applies.</p>
+  <table>
+    <tr><th>Service (provider)</th><th>Purpose</th><th>Related data</th></tr>
+    <tr><td>Google AdMob (Google LLC)</td><td>Rewarded and interstitial ads</td><td>Advertising identifier, device information</td></tr>
+    <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Google account linking</td><td>Email address, profile name</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Backend infrastructure storing account/score data (data processor)</td><td>UID, nickname, country, best records</td></tr>
+  </table>
+  <ul>
+    <li><a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+    <li><a href="https://support.google.com/admob/answer/6128543">Google AdMob policies</a></li>
+    <li><a href="https://supabase.com/privacy">Supabase Privacy Policy</a></li>
+  </ul>
+
+  <h2>5. International Transfers</h2>
+  <p>Because of the cloud infrastructure we use (Supabase, Google), personal information may be stored and processed on servers outside your country. The Service relies on the safeguards and legal frameworks applied by those providers.</p>
+
+  <h2>6. Retention Period</h2>
+  <ul>
+    <li>When you request account deletion, personal information is deleted promptly or within a reasonable period.</li>
+    <li>Leaderboard entries are kept for the most recent 7 days and automatically removed afterward.</li>
+    <li>Data stored only on your device (virtual currency, language setting, etc.) is removed when you delete the app.</li>
+    <li>Data may be retained longer where required by applicable law.</li>
+  </ul>
+
+  <h2>7. Your Rights</h2>
+  <ul>
+    <li>You may view your account info, change your nickname or country, or request account deletion (including deletion of personal information) at any time from the Settings screen.</li>
+    <li><strong>In-app account deletion:</strong> go to Settings → Delete Account. Deletion permanently removes all game data from the server and your device and cannot be undone.</li>
+    <li>For access, correction, or deletion requests that cannot be handled in the app, contact us at the email address below.</li>
+    <li>EU/EEA residents may exercise GDPR rights to access, rectify, erase, and port their data, and to restrict or object to processing. California residents may exercise their CCPA rights (the Service does not sell personal information).</li>
+  </ul>
+
+  <h2>8. Advertising and Consent</h2>
+  <ul>
+    <li>The Service includes ads served by Google AdMob; watching rewarded ads is optional.</li>
+    <li>Users in regions where consent is required (such as the EEA and the UK) are shown a Google UMP consent flow on first launch and can change or withdraw consent at any time in the Settings screen. If you decline, non-personalized ads may still be shown.</li>
+    <li>Google AdMob may use advertising identifiers for ad personalization. You can limit ad personalization or reset your advertising ID in your device settings (Android: Settings → Google → Ads).</li>
+  </ul>
+
+  <h2>9. Children's Privacy</h2>
+  <p>The Service is not directed at children under the age of 13 (or a higher minimum age where required by local law, e.g., 14 in South Korea), and we do not knowingly collect personal information from children. If we become aware that a child below that age has provided personal information, we will delete it promptly. Parents or legal guardians may request deletion via the contact email below.</p>
+
+  <h2>10. Security</h2>
+  <p>The service provider takes reasonable technical and administrative measures to protect personal information. All communication with the server is protected by TLS encryption, and access to the Supabase database is restricted through Row Level Security (RLS).</p>
+
+  <h2>11. Contact</h2>
+  <p>For privacy inquiries or requests, contact:</p>
+  <p>Email: <a href="mailto:chkwnsgml3@gmail.com">chkwnsgml3@gmail.com</a></p>
+
+  <h2>12. Effective Date and Revision History</h2>
+  <ul>
+    <li>July 21, 2026 — Initial publication of this Privacy Policy (v1.0)</li>
+  </ul>
+  <p>This Policy may be updated to reflect legal changes or service improvements. Material changes will be announced in advance through an in-app notice.</p>
+
+  <footer>Quirky Ball — Privacy Policy · Effective July 21, 2026</footer>
+</main>
+</body>
+</html>
