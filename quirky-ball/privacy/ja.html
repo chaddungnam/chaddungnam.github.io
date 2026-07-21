@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プライバシーポリシー — Quirky Ball</title>
+<style>
+  body{margin:0;background:#F5F2EC;color:#1C1C1E;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN","Helvetica Neue",Arial,sans-serif;line-height:1.8;}
+  main{max-width:720px;margin:0 auto;padding:32px 20px 72px;}
+  nav.langs{font-size:.85rem;margin-bottom:24px;color:#6b675f;}
+  nav.langs a{color:#6b675f;text-decoration:none;margin-right:10px;}
+  nav.langs a:hover{color:#1C1C1E;text-decoration:underline;}
+  nav.langs a.current{color:#1C1C1E;font-weight:600;}
+  h1{font-size:1.55rem;margin:0 0 4px;}
+  p.updated{color:#6b675f;font-size:.9rem;margin:0 0 32px;}
+  h2{font-size:1.15rem;margin:36px 0 10px;padding-top:14px;border-top:1px solid #e3ded3;}
+  p{margin:10px 0;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:4px 0;}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;margin:12px 0;}
+  th,td{border:1px solid #e3ded3;background:#fbf9f4;padding:8px 10px;text-align:left;vertical-align:top;}
+  th{background:#f0ece2;}
+  a{color:#b06823;}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid #e3ded3;color:#6b675f;font-size:.85rem;}
+</style>
+</head>
+<body>
+<main>
+  <nav class="langs">
+    <a href="ko.html">한국어</a>
+    <a href="en.html">English</a>
+    <a href="de.html">Deutsch</a>
+    <a class="current" href="ja.html">日本語</a>
+    <a href="index.html?stay=1">言語選択</a>
+  </nav>
+
+  <h1>プライバシーポリシー</h1>
+  <p class="updated">Quirky Ball（クオーキーボール） · 施行日: 2026年7月21日</p>
+
+  <h2>1. 概要</h2>
+  <p>Quirky Ball（以下「本サービス」）は、利用者の個人情報を大切に取り扱い、大韓民国の個人情報保護法、EU一般データ保護規則（GDPR）、米国各州法などの関連法規を遵守するよう努めています。本プライバシーポリシーは、本サービスがどのような情報を収集し、どのような目的で利用し、どのように保管・削除するかを説明するものです。本書は、アプリ内に表示されるプライバシー案内（要約版）の全文版です。</p>
+
+  <h2>2. 収集する個人情報の項目</h2>
+  <p>本サービスは、別途の会員登録手続きなしにゲストとしてすぐにご利用いただけます。その際、以下の情報を収集・保存します。</p>
+  <table>
+    <tr><th>項目</th><th>収集時期/方法</th><th>保存先</th></tr>
+    <tr><td>ゲスト識別子（UID）</td><td>サービス利用時に自動生成</td><td>端末およびサーバー（Supabase）</td></tr>
+    <tr><td>メールアドレス、プロフィール名</td><td>（任意）Googleアカウント連携時のみ</td><td>サーバー（Supabase Auth）</td></tr>
+    <tr><td>ゲームプレイデータ（スコア、レベル、プレイ記録）</td><td>ゲームプレイ時に自動生成</td><td>端末およびサーバー（ベスト記録）</td></tr>
+    <tr><td>ニックネーム、表示コード</td><td>ニックネームは利用者が入力、表示コードは自動生成</td><td>端末およびサーバー（ランキング表示用）</td></tr>
+    <tr><td>国の情報</td><td>オンボーディングで利用者が選択（端末ロケールに基づく提案。精密な位置ではありません）</td><td>端末およびサーバー（ランキングの国別フィルタ用）</td></tr>
+    <tr><td>復旧コード</td><td>ゲストアカウント作成時に自動発行</td><td>端末およびサーバー（アカウント復旧用の認証情報）</td></tr>
+    <tr><td>端末/広告識別子（ADIDなど）</td><td>広告提供時に広告SDK（Google AdMob）が収集</td><td>広告事業者（Google）のシステム</td></tr>
+    <tr><td>仮想通貨（スタミナ、ジェム）、言語設定</td><td>サービス利用中に自動生成</td><td>端末のみ（ローカル保存）</td></tr>
+  </table>
+  <p>本サービスは、精密な位置情報、連絡先、写真などゲーム提供に不要な情報は収集せず、独立した分析（アナリティクス）SDKも使用していません。</p>
+
+  <h2>3. 収集・利用の目的</h2>
+  <ul>
+    <li>ゲームの進行状況の保存および端末間の同期（Googleアカウント連携時）</li>
+    <li>ランキングの提供 — ニックネーム/表示コード、ベストスコア、国の表示</li>
+    <li>広告の提供（Google AdMob）</li>
+    <li>サービスのエラー分析および品質改善</li>
+    <li>関連法規の遵守および紛争への対応</li>
+  </ul>
+
+  <h2>4. 第三者提供および処理委託</h2>
+  <p>本サービスは、利用者の個人情報を第三者に販売しません。ただし、サービス提供のために以下の外部サービスを利用しており、各事業者のプライバシーポリシーが併せて適用されます。</p>
+  <table>
+    <tr><th>サービス（事業者）</th><th>利用目的</th><th>関連する情報</th></tr>
+    <tr><td>Google AdMob（Google LLC）</td><td>リワード広告・インタースティシャル広告の提供</td><td>広告識別子、端末情報</td></tr>
+    <tr><td>Google Sign-In（Google LLC）</td><td>（任意）Googleアカウント連携ログイン</td><td>メールアドレス、プロフィール名</td></tr>
+    <tr><td>Supabase（Supabase Inc.）</td><td>アカウント/スコアデータ保存のためのバックエンドインフラ（処理受託者）</td><td>UID、ニックネーム、国、ベスト記録</td></tr>
+  </table>
+  <ul>
+    <li><a href="https://policies.google.com/privacy">Google プライバシーポリシー</a></li>
+    <li><a href="https://support.google.com/admob/answer/6128543">Google AdMob ポリシー</a></li>
+    <li><a href="https://supabase.com/privacy">Supabase プライバシーポリシー</a></li>
+  </ul>
+
+  <h2>5. 国外移転</h2>
+  <p>サービス運営に利用するクラウドインフラ（Supabase、Google）の特性上、個人情報が国外のサーバーに保存・処理される場合があります。本サービスは、これらの事業者が適用する保護措置および法的枠組みに従います。</p>
+
+  <h2>6. 保有および利用期間</h2>
+  <ul>
+    <li>アカウント削除をリクエストした場合、個人情報は即時または合理的な期間内に削除されます。</li>
+    <li>ランキングの記録は直近7日間のみ保管され、その後自動的に消えます。</li>
+    <li>端末にのみ保存されるデータ（仮想通貨、言語設定など）は、アプリ削除時にあわせて削除されます。</li>
+    <li>関連法規で別途保管が求められる場合は、その期間保管されることがあります。</li>
+  </ul>
+
+  <h2>7. 利用者の権利</h2>
+  <ul>
+    <li>設定画面からいつでもアカウント情報の閲覧、ニックネーム・国の変更、アカウント削除（個人情報の削除を含む）をリクエストできます。</li>
+    <li><strong>アプリ内アカウント削除：</strong>設定 → アカウント削除メニューから直接行えます。削除すると、サーバーと端末上のすべてのゲームデータが完全に消去され、復元できません。</li>
+    <li>アプリ内で対応できない開示・訂正・削除のリクエストは、下記のお問い合わせ先メールアドレスで受け付けます。</li>
+    <li>EU/EEA在住者はGDPRに基づく閲覧・訂正・削除・移転・処理制限・異議申立ての権利を、カリフォルニア在住者はCCPAに基づく権利を行使できます（本サービスは個人情報を販売しません）。</li>
+  </ul>
+
+  <h2>8. 広告および同意</h2>
+  <ul>
+    <li>本サービスはGoogle AdMobによる広告を含み、リワード広告の視聴は任意です。</li>
+    <li>同意が必要な地域（EEA・英国など）の利用者には、初回起動時にGoogle UMPによる同意手続きが表示され、設定画面からいつでも同意を変更・撤回できます。同意しない場合でも、パーソナライズされていない広告が表示されることがあります。</li>
+    <li>Google AdMobは広告のパーソナライズのために広告識別子を使用することがあります。端末の設定（Android: 設定 → Google → 広告）で広告のパーソナライズを制限したり、広告IDをリセットしたりできます。</li>
+  </ul>
+
+  <h2>9. 子供の個人情報</h2>
+  <p>本サービスは、13歳未満（現地法でより高い基準年齢が定められている場合はその年齢。例：韓国では14歳）の子供を主な対象とせず、子供から故意に個人情報を収集しません。該当年齢未満の子供が個人情報を提供したことが判明した場合は、速やかに削除します。保護者の方は、下記のお問い合わせ先から削除をリクエストできます。</p>
+
+  <h2>10. セキュリティ</h2>
+  <p>サービス提供者は、個人情報保護のために合理的な技術的・管理的措置を講じています。サーバーとのすべての通信はTLS暗号化で保護され、SupabaseデータベースへのアクセスはRow Level Security（RLS）により制限されています。</p>
+
+  <h2>11. お問い合わせ先</h2>
+  <p>個人情報に関するお問い合わせ・ご請求は、以下のメールアドレスまでお願いします。</p>
+  <p>メール: <a href="mailto:chkwnsgml3@gmail.com">chkwnsgml3@gmail.com</a></p>
+
+  <h2>12. 施行日および改訂履歴</h2>
+  <ul>
+    <li>2026年7月21日 — 本プライバシーポリシー初版制定・施行（v1.0）</li>
+  </ul>
+  <p>本ポリシーは、法令の変更またはサービスの改善に伴い改訂されることがあります。重要な変更がある場合は、アプリ内のお知らせを通じて事前にご案内します。</p>
+
+  <footer>Quirky Ball — プライバシーポリシー · 施行日 2026-07-21</footer>
+</main>
+</body>
+</html>
