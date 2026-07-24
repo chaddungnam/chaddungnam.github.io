@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quirky Ball — House Duck Studio</title>
+    <meta name="description" content="같은 구슬끼리 합치면 더 쿼키하게 진화! 전 세계 플레이어, 그리고 국가대항전까지 즐기는 머지 퍼즐 게임 Quirky Ball.">
+    <link rel="icon" type="image/png" href="app-icon.png">
+    <style>
+        :root {
+            --cream: #F6F0E0;
+            --cream-deep: #EFE6CE;
+            --paper: #FFFDF6;
+            --ink: #33291C;
+            --ink-soft: #6B5D49;
+            --coral: #E85D2F;
+            --coral-deep: #C94720;
+            --gold: #D99A2B;
+            --teal: #2FA08C;
+            --pink: #E8608A;
+            --blue: #4A7FD4;
+            --yellow: #F2C14E;
+            --shadow-soft: 0 10px 30px rgba(51, 41, 28, 0.10);
+            --shadow-pop: 0 6px 0 rgba(51, 41, 28, 0.12);
+            --radius: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+        /* ── 떠다니는 장식 구슬 (인게임 마블 컬러) ── */
+        .marble {
+            position: absolute; border-radius: 50%;
+            box-shadow: inset -6px -8px 0 rgba(0,0,0,0.08), 0 8px 16px rgba(51,41,28,0.10);
+            animation: bob 5s ease-in-out infinite;
+            pointer-events: none; z-index: 0;
+        }
+        .marble::after {
+            content: ""; position: absolute; top: 18%; left: 20%;
+            width: 28%; height: 20%; border-radius: 50%;
+            background: rgba(255,255,255,0.65); filter: blur(1px);
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-14px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .marble { animation: none; }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ── 히어로 ── */
+        .hero {
+            position: relative; text-align: center;
+            padding: 72px 20px 56px;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(242,193,78,0.25), transparent 40%),
+                radial-gradient(circle at 85% 15%, rgba(232,96,138,0.18), transparent 40%),
+                radial-gradient(circle at 80% 85%, rgba(47,160,140,0.15), transparent 45%),
+                var(--cream);
+        }
+        .hero .logo {
+            width: min(300px, 70vw); height: auto; margin-bottom: 18px;
+            filter: drop-shadow(0 6px 16px rgba(51,41,28,0.18));
+            position: relative; z-index: 1;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 900; letter-spacing: -0.02em;
+            margin-bottom: 12px; position: relative; z-index: 1;
+        }
+        .hero h1 .q { color: var(--coral); }
+        .hero .tagline {
+            font-size: 1.1rem; color: var(--ink-soft); margin-bottom: 28px;
+            position: relative; z-index: 1; font-weight: 500;
+        }
+        .app-icon-hero {
+            width: 128px; height: 128px; border-radius: 28px;
+            box-shadow: var(--shadow-soft), var(--shadow-pop);
+            margin-bottom: 32px; position: relative; z-index: 1;
+        }
+        .btn {
+            display: inline-block; padding: 15px 36px; border-radius: 999px;
+            text-decoration: none; font-weight: 800; font-size: 1rem;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            margin: 6px; position: relative; z-index: 1;
+        }
+        .btn-primary {
+            background: var(--coral); color: #fff;
+            box-shadow: 0 5px 0 var(--coral-deep), var(--shadow-soft);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--coral-deep), var(--shadow-soft); }
+        .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--coral-deep); }
+        .btn-secondary {
+            background: var(--paper); color: var(--ink);
+            box-shadow: 0 4px 0 rgba(51,41,28,0.15), var(--shadow-soft);
+        }
+        .btn-secondary:hover { transform: translateY(-2px); }
+        .btn-secondary:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(51,41,28,0.15); }
+
+        /* ── 섹션 공통 ── */
+        section { padding: 56px 0; position: relative; }
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 900;
+            margin-bottom: 24px; text-align: center; letter-spacing: -0.01em;
+        }
+        h2 .accent { color: var(--coral); }
+
+        .feature-graphic { text-align: center; }
+        .feature-graphic img {
+            max-width: 100%; border-radius: var(--radius);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* ── 게임 특징 카드 ── */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .feature-card {
+            background: var(--paper); border-radius: var(--radius);
+            padding: 26px 22px; box-shadow: var(--shadow-soft);
+            border-bottom: 5px solid var(--cream-deep);
+            text-align: center;
+        }
+        .feature-card .dot {
+            width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 14px;
+            box-shadow: inset -4px -6px 0 rgba(0,0,0,0.10);
+            position: relative;
+        }
+        .feature-card .dot::after {
+            content: ""; position: absolute; top: 16%; left: 18%;
+            width: 30%; height: 22%; border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+        }
+        .feature-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; }
+        .feature-card p { font-size: 0.92rem; color: var(--ink-soft); }
+
+        /* ── 스튜디오 소개 ── */
+        .about {
+            background: var(--paper); border-radius: var(--radius);
+            padding: 40px; box-shadow: var(--shadow-soft);
+            border-bottom: 5px solid var(--cream-deep);
+        }
+        .about p { font-size: 1.05rem; color: var(--ink-soft); text-align: center; line-height: 1.9; }
+        .studio-name { font-weight: 900; color: var(--gold); }
+
+        /* ── 스크린샷 ── */
+        .screenshot-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .shot {
+            background: var(--paper); border-radius: 20px; padding: 8px;
+            box-shadow: var(--shadow-soft); border-bottom: 4px solid var(--cream-deep);
+            transition: transform 0.2s ease;
+        }
+        .shot:hover { transform: translateY(-4px) rotate(-0.5deg); }
+        .shot img { width: 100%; border-radius: 14px; display: block; }
+        .shot p { text-align: center; font-size: 0.82rem; color: var(--ink-soft); padding: 8px 0 4px; font-weight: 600; }
+
+        /* ── 다운로드 ── */
+        .download-box {
+            text-align: center; background: var(--ink); color: var(--cream);
+            border-radius: var(--radius); padding: 48px 24px; box-shadow: var(--shadow-soft);
+            position: relative; overflow: hidden;
+        }
+        .download-box h2 { color: var(--cream); }
+        .download-box .sub { color: #C9BCA4; margin-bottom: 24px; }
+        .download-box .note { color: #8A7D68; font-size: 0.85rem; margin-top: 16px; }
+        .download-box .marble { opacity: 0.25; }
+
+        /* ── 문의/푸터 ── */
+        .contact { text-align: center; }
+        .contact p { color: var(--ink-soft); }
+        .contact a { color: var(--coral); text-decoration: none; font-weight: 700; }
+        .contact a:hover { text-decoration: underline; }
+        footer {
+            text-align: center; padding: 28px 20px;
+            border-top: 2px dashed var(--cream-deep);
+            color: var(--ink-soft); font-size: 0.9rem;
+        }
+        footer a { color: var(--ink-soft); text-decoration: none; margin: 0 12px; font-weight: 600; }
+        footer a:hover { color: var(--coral); }
+
+        @media (max-width: 720px) {
+            .screenshot-grid { grid-template-columns: repeat(2, 1fr); }
+            .about { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 히어로 -->
+    <div class="hero">
+        <div class="marble" style="width:56px;height:56px;background:var(--coral);top:12%;left:8%;animation-delay:0s;"></div>
+        <div class="marble" style="width:36px;height:36px;background:var(--teal);top:22%;right:10%;animation-delay:1.2s;"></div>
+        <div class="marble" style="width:44px;height:44px;background:var(--yellow);bottom:16%;left:14%;animation-delay:2s;"></div>
+        <div class="marble" style="width:28px;height:28px;background:var(--pink);bottom:24%;right:16%;animation-delay:0.6s;"></div>
+        <div class="marble" style="width:22px;height:22px;background:var(--blue);top:46%;left:4%;animation-delay:1.7s;"></div>
+
+        <img src="logo.png" alt="Quirky Ball 로고" class="logo">
+        <h1><span class="q">Quirky</span> Ball</h1>
+        <p class="tagline">같은 구슬끼리 합치면 더 쿼키하게 진화해요!<br>전 세계 플레이어와, 국가대항전으로 겨루는 머지 퍼즐</p>
+        <img src="app-icon.png" alt="Quirky Ball 앱 아이콘" class="app-icon-hero">
+        <div>
+            <a href="#download" class="btn btn-primary">Google Play에서 다운로드</a>
+            <a href="privacy/" class="btn btn-secondary">개인정보처리방침</a>
+        </div>
+    </div>
+
+    <!-- 대표 이미지 -->
+    <section class="feature-graphic container" style="padding-top:40px;">
+        <img src="feature-graphic.png" alt="Quirky Ball 대표 이미지">
+    </section>
+
+    <!-- 게임 특징 -->
+    <section>
+        <div class="container">
+            <h2>이렇게 <span class="accent">즐겨요</span></h2>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="dot" style="background:var(--coral);"></div>
+                    <h3>머지 퍼즐</h3>
+                    <p>같은 구슬끼리 합치면 한 단계 더 큰 구슬로 진화해요. 연쇄가 터지면 점수가 폭발!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="dot" style="background:var(--pink);"></div>
+                    <h3>조커 &amp; 폭탄</h3>
+                    <p>심술궂은 조커 블록과 폭탄 룰렛이 판을 뒤집어요. 운과 실력이 반반!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="dot" style="background:var(--teal);"></div>
+                    <h3>국가대항전</h3>
+                    <p>내 점수가 곧 국가의 평균 점수. 전 세계 국가들과 순위 경쟁을 펼쳐보세요.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="dot" style="background:var(--gold);"></div>
+                    <h3>미션 &amp; 상점</h3>
+                    <p>매일 미션을 클리어하고 젬을 모아 닉네임·국가 변경권으로 꾸며보세요.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 스튜디오 소개 -->
+    <section style="padding-top:0;">
+        <div class="container">
+            <h2>About <span class="accent">House Duck Studio</span></h2>
+            <div class="about">
+                <p>
+                    <span class="studio-name">House Duck Studio</span>는 가볍지만 중독성 있는 게임을 만드는 것을 목표로 합니다.<br><br>
+                    첫 작품 <strong>Quirky Ball</strong>은 구슬을 머지해 점수를 올리고,<br>
+                    전 세계 사람들과 실력을 겨루는 게임입니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 스크린샷 -->
+    <section style="padding-top:0;">
+        <div class="container">
+            <h2><span class="accent">Screenshots</span></h2>
+            <div class="screenshot-grid">
+                <div class="shot"><img src="01_home.png" alt="홈 화면" loading="lazy"><p>홈 화면</p></div>
+                <div class="shot"><img src="02_gameplay.png" alt="게임 플레이" loading="lazy"><p>게임 플레이</p></div>
+                <div class="shot"><img src="03_hard_mode.png" alt="하드 모드" loading="lazy"><p>하드 모드</p></div>
+                <div class="shot"><img src="04_joker_quip.png" alt="조커의 한마디" loading="lazy"><p>조커의 한마디</p></div>
+                <div class="shot"><img src="05_bomb_roulette.png" alt="폭탄 룰렛" loading="lazy"><p>폭탄 룰렛</p></div>
+                <div class="shot"><img src="06_shop.png" alt="상점" loading="lazy"><p>상점</p></div>
+                <div class="shot"><img src="07_ranking.png" alt="랭킹" loading="lazy"><p>랭킹</p></div>
+                <div class="shot"><img src="08_missions.png" alt="미션" loading="lazy"><p>미션</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 다운로드 -->
+    <section id="download" style="padding-top:0;">
+        <div class="container">
+            <div class="download-box">
+                <div class="marble" style="width:60px;height:60px;background:var(--coral);top:-14px;left:-14px;"></div>
+                <div class="marble" style="width:40px;height:40px;background:var(--teal);bottom:-10px;right:-10px;animation-delay:1s;"></div>
+                <h2>지금 <span class="accent">다운로드</span></h2>
+                <p class="sub">Google Play에서 Quirky Ball을 만나보세요!</p>
+                <a href="#" class="btn btn-primary" style="font-size:1.05rem;padding:16px 44px;">Google Play에서 다운로드</a>
+                <p class="note">* 정식 출시 후 링크가 업데이트됩니다</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 문의 -->
+    <section class="contact" style="padding-top:0;">
+        <div class="container">
+            <h2>Contact <span class="accent">Us</span></h2>
+            <p>문의사항이 있으시면 아래 이메일로 연락 주세요.</p>
+            <p style="margin-top:12px; font-size:1.1rem;"><a href="mailto:chkwnsgml3@gmail.com">chkwnsgml3@gmail.com</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 House Duck Studio. All rights reserved.</p>
+        <p style="margin-top:10px;">
+            <a href="privacy/">개인정보처리방침</a>
+            <a href="mailto:chkwnsgml3@gmail.com">문의하기</a>
+        </p>
+    </footer>
+</body>
+</html>
