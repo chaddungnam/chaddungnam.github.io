@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Duck - Indie Game Studio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            line-height: 1.6;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; padding: 60px 0 40px; }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #f4d03f;
+            margin-bottom: 10px;
+        }
+        .tagline { color: #aaa; font-size: 1.1rem; }
+        .games-section { margin-top: 60px; }
+        .section-title {
+            font-size: 1.5rem;
+            color: #f4d03f;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .game-card {
+            background: #16213e;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .game-card:hover { transform: translateY(-5px); }
+        .game-icon {
+            width: 100px;
+            height: 100px;
+            background: #e94560;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+        .game-info h3 {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .game-info p { color: #aaa; margin-bottom: 15px; }
+        .game-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            background: #0f3460;
+            color: #4fbdba;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        footer {
+            text-align: center;
+            padding: 60px 20px 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        a { color: #4fbdba; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            .game-card { flex-direction: column; text-align: center; }
+            .logo { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🦆 House Duck</div>
+            <p class="tagline">작지만 재미있는 게임을 만드는 인디 게임 스튜디오</p>
+        </header>
+
+        <section class="games-section">
+            <h2 class="section-title">🎮 Our Games</h2>
+
+            <a href="quirky-ball/" style="text-decoration: none; color: inherit;">
+                <div class="game-card">
+                    <div class="game-icon">🎯</div>
+                    <div class="game-info">
+                        <h3>Quirky Ball (쿠키볼)</h3>
+                        <p>당신의 두뇌를 움직이게 할 중독성 퍼즐 게임!</p>
+                        <div class="game-tags">
+                            <span class="tag">Puzzle</span>
+                            <span class="tag">Android</span>
+                            <span class="tag">Casual</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2026 House Duck. All rights reserved.</p>
+        <p style="margin-top: 10px;">
+            <a href="quirky-ball/privacy/ko.html">개인정보처리방침</a>
+        </p>
+    </footer>
+</body>
+</html>
