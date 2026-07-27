@@ -1,113 +1,141 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인정보처리방침 - Quirky Ball | House Duck</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
-            color: #eee;
-            line-height: 1.8;
-        }
-        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
-        .back-link { color: #4fbdba; text-decoration: none; font-size: 0.9rem; }
-        header { padding: 30px 0; border-bottom: 1px solid #333; margin-bottom: 30px; }
-        h1 { color: #f4d03f; margin-bottom: 10px; }
-        .date { color: #888; font-size: 0.9rem; }
-        h2 {
-            color: #f4d03f;
-            margin: 30px 0 15px;
-            font-size: 1.2rem;
-        }
-        p { margin-bottom: 15px; color: #ccc; }
-        ul { margin: 10px 0 20px 25px; color: #ccc; }
-        li { margin-bottom: 8px; }
-        .highlight-box {
-            background: #16213e;
-            border-left: 4px solid #e94560;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
-        }
-        a { color: #4fbdba; }
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            font-size: 0.85rem;
-            border-top: 1px solid #333;
-            margin-top: 40px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>개인정보처리방침 — Quirky Ball | House Duck</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, 'Noto Sans KR', sans-serif; background: #1a1a2e; color: #eee; line-height: 1.8; }
+  .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .back-link { color: #4fbdba; text-decoration: none; font-size: 0.9rem; }
+  nav.langs { font-size: 0.85rem; color: #888; }
+  nav.langs a { color: #888; text-decoration: none; margin-right: 10px; }
+  nav.langs a:hover { color: #eee; text-decoration: underline; }
+  nav.langs a.current { color: #f4d03f; font-weight: 600; }
+  header { padding: 30px 0; border-bottom: 1px solid #333; margin-bottom: 30px; }
+  h1 { color: #f4d03f; margin-bottom: 10px; font-size: 1.6rem; }
+  .date { color: #888; font-size: 0.9rem; }
+  h2 { color: #f4d03f; margin: 34px 0 14px; font-size: 1.2rem; }
+  p { margin-bottom: 15px; color: #ccc; }
+  ul, ol { margin: 10px 0 20px 25px; color: #ccc; }
+  li { margin-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 12px 0 20px; }
+  th, td { border: 1px solid #333; padding: 10px 12px; text-align: left; vertical: top; color: #ccc; }
+  th { background: #16213e; color: #eee; }
+  td { background: #141c33; }
+  .highlight-box { background: #16213e; border-left: 4px solid #e94560; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: #ccc; }
+  a { color: #4fbdba; }
+  footer { text-align: center; padding: 40px 20px; color: #666; font-size: 0.85rem; border-top: 1px solid #333; margin-top: 40px; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <a href="../../" class="back-link">← House Duck 홈으로</a>
+<div class="container">
+  <div class="topbar">
+    <a href="../../" class="back-link">← House Duck 홈으로</a>
+    <nav class="langs">
+      <a class="current" href="ko.html">한국어</a>
+      <a href="en.html">English</a>
+      <a href="de.html">Deutsch</a>
+      <a href="ja.html">日本語</a>
+      <a href="../terms/ko.html">이용약관</a>
+    </nav>
+  </div>
 
-        <header>
-            <h1>개인정보처리방침</h1>
-            <p class="date">최종 업데이트: 2026년 7월 27일</p>
-        </header>
+  <header>
+    <h1>개인정보처리방침</h1>
+    <p class="date">Quirky Ball · 시행일: 2026년 7월 27일</p>
+  </header>
 
-        <p><strong>House Duck</strong>(이하 "회사")은 <strong>Quirky Ball</strong>(이하 "본 앱")을 무료 앱으로 제공합니다. 본 서비스는 회사가 무료로 제공하며, 있는 그대로 사용하도록 의도되었습니다.</p>
+  <h2>1. 개요 및 운영자</h2>
+  <p>본 개인정보처리방침은 <strong>House Duck(개인 개발팀)</strong>(이하 "운영자")이 여기서 제공하는 소프트웨어 — 모바일 게임 <strong>Quirky Ball</strong>(이하 "본 서비스") — 에 적용됩니다. 운영자는 회사나 사업자가 아닌 개인 개발팀이며, 운영자는 독일에 거주하고 있습니다.</p>
+  <p>운영자는 이용자의 개인정보를 소중히 다루며, 대한민국 개인정보 보호법, EU 일반개인정볼보호규칙(GDPR), 미국 각주 프라이버시법 등 관련 법규를 준수하기 위해 노력합니다. 본 방침은 본 서비스가 어떤 정보를 수집하고, 어떤 목적으로 이용하며, 어떻게 보관·삭제하는지를 설명합니다. 본 문서는 앱 내에 표시되는 개인정보 안내(요약본)의 전문입니다.</p>
+  <p>GDPR상 개인정보 처리의 책임자(Controller)는 본 서비스의 운영자이며, 아래 명시된 이메일 주소로 연락할 수 있습니다.</p>
 
-        <h2>1. 수집하는 정보</h2>
-        <p>본 앱은 Google AdMob 광고를 표시하기 위해 다음 정보를 수집할 수 있습니다:</p>
-        <ul>
-            <li>광고 ID (Android Advertising ID)</li>
-            <li>기기 정보 (모델, OS 버전)</li>
-            <li>IP 주소</li>
-            <li>앱 사용 데이터</li>
-        </ul>
-        <p>위 정보는 Google AdMob 및 관련 광고 파트너사에 의해 수집되며, <a href="https://policies.google.com/privacy" target="_blank">Google 개인정보처리방침</a>에 따라 관리됩니다.</p>
+  <h2>2. 수집하는 개인정보 항목</h2>
+  <p>본 서비스는 별도의 회원가입 없이 게스트로 바로 이용할 수 있습니다. 이용 과정에서 다음 정보를 수집·저장합니다.</p>
+  <table>
+    <tr><th>항목</th><th>수집 시점 / 방법</th><th>저장 위치</th></tr>
+    <tr><td>게스트 식별자(UID)</td><td>서비스 이용 시 자동 생성</td><td>기기 및 서버(Supabase)</td></tr>
+    <tr><td>이메일 주소, 프로필 이름</td><td>(선택) Google 계정 연동 시에만</td><td>서버(Supabase Auth)</td></tr>
+    <tr><td>게임 플레이 데이터(점수, 레벨, 플레이 기록)</td><td>게임 플레이 중 자동 생성</td><td>기기 및 서버(최고 기록)</td></tr>
+    <tr><td>닉네임, 표시 코드</td><td>닉네임은 이용자가 입력, 표시 코드는 자동 생성</td><td>기기 및 서버(랭킹 표시용)</td></tr>
+    <tr><td>국가 정보</td><td>온볼딩에서 이용자가 선택(기기 로케일 기반 추천이며 정밀 위치 아님)</td><td>기기 및 서버(국가별 랭킹용)</td></tr>
+    <tr><td>기기/광고 식별자(ADID 등)</td><td>광고 제공 시 광고 SDK(Google AdMob)가 수집</td><td>광고 사업자(Google) 시스템</td></tr>
+    <tr><td>가상 재화(스태미나, 젬), 언어 설정</td><td>서비스 이용 중 생성</td><td>기기만(로컬 저장)</td></tr>
+  </table>
+  <p>본 서비스는 정밀 위치 정보, 연락처, 사진 등 게임 제공에 불필요한 정보는 수집하지 않으며, 별도의 분석(애널리틱스) SDK도 사용하지 않습니다.</p>
 
-        <h2>2. 정보 사용 목적</h2>
-        <p>수집된 정보는 다음 목적으로 사용됩니다:</p>
-        <ul>
-            <li>맞춤형 광고 제공</li>
-            <li>광고 효과 측정</li>
-            <li>앱 개선 및 버그 수정</li>
-        </ul>
+  <h2>3. 수집·이용 목적 및 처리 근거</h2>
+  <ul>
+    <li>게임 진행 상황 저장 및 Google 계정 연동 시 기기 간 동기화 (GDPR 제6조 제1항 b호 — 계약 이행)</li>
+    <li>랭킹 제공 — 닉네임/표시 코드, 최고 점수, 국가 표시 (GDPR 제6조 제1항 b호)</li>
+    <li>광고 제공(Google AdMob) — 맞춤형 광고는 동의에 근거(GDPR 제6조 제1항 a호), 비맞춤형 광고는 정당한 이익에 근거(GDPR 제6조 제1항 f호)</li>
+    <li>오류 분석 및 서비스 품질 개선 (GDPR 제6조 제1항 f호)</li>
+    <li>관련 법규 준수 및 분쟁 대응 (GDPR 제6조 제1항 c호)</li>
+  </ul>
 
-        <h2>3. 제3자 제공</h2>
-        <p>회사는 Google AdMob을 통해 광고를 제공합니다. Google은 독립적인 개인정보 처리자이며, Google의 개인정보 처리 관련 자세한 내용은 <a href="https://policies.google.com/privacy" target="_blank">Google 개인정보처리방침</a>을 참조하시기 바랍니다.</p>
+  <h2>4. 제3자 제공 및 처리 위탁</h2>
+  <p>운영자는 이용자의 개인정보를 제3자에게 판매하지 않습니다. 다만 서비스 제공을 위해 다음 외부 서비스를 이용하며, 각 사업자의 개인정보처리방침이 함께 적용됩니다.</p>
+  <table>
+    <tr><th>서비스(사업자)</th><th>이용 목적</th><th>관련 정보</th></tr>
+    <tr><td>Google AdMob (Google LLC)</td><td>보상형·전면 광고 제공</td><td>광고 식별자, 기기 정보</td></tr>
+    <tr><td>Google Sign-In (Google LLC)</td><td>(선택) Google 계정 연동 로그인</td><td>이메일 주소, 프로필 이름</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>계정/점수 데이터 저장을 위한 백엔드 인프라(처리 수탁자)</td><td>UID, 닉네임, 국가, 최고 기록</td></tr>
+  </table>
+  <ul>
+    <li><a href="https://policies.google.com/privacy" target="_blank">Google 개인정보처리방침</a></li>
+    <li><a href="https://support.google.com/admob/answer/6128543" target="_blank">Google AdMob 정책</a></li>
+    <li><a href="https://supabase.com/privacy" target="_blank">Supabase 개인정보처리방침</a></li>
+  </ul>
 
-        <div class="highlight-box">
-            <strong>Google AdMob 파트너 목록:</strong><br>
-            google.com, pub-4999788246757983, DIRECT, f08c47fec0942fa0
-        </div>
+  <h2>5. 국외 이전</h2>
+  <p>서비스 운영에 사용하는 클라우드 인프라(Supabase, Google)의 특성상 개인정보가 이용자의 거주 국가 밖 — EU/EEA 역외를 포함 — 의 서버에 저장·처리될 수 있습니다. 이러한 이전은 해당 사업자들이 적용하는 보호 조치(예: 표준계약조항)와 법적 체계에 따라 이루어집니다.</p>
 
-        <h2>4. 사용자 권리</h2>
-        <p>사용자는 다음 권리를 가집니다:</p>
-        <ul>
-            <li>Android 기기 설정에서 광고 ID 재설정</li>
-            <li>광고 개인화 옵트아웃</li>
-            <li>수집된 데이터에 대한 삭제 요청</li>
-        </ul>
-        <p>데이터 삭제를 원하시면 아래 연락처로 요청해 주세요.</p>
+  <h2>6. 보관 및 이용 기간</h2>
+  <ul>
+    <li>계정 삭제를 요청하면 개인정보는 즉시 또는 합리적인 기간 내에 삭제됩니다.</li>
+    <li>랭킹 기록은 최근 7일간만 보관되며 이후 자동으로 삭제됩니다.</li>
+    <li>기기에만 저장되는 데이터(가상 재화, 언어 설정 등)는 앱 삭제 시 함께 삭제됩니다.</li>
+    <li>관련 법규에서 별도의 보관을 요구하는 경우에는 해당 기간 동안 보관할 수 있습니다.</li>
+  </ul>
 
-        <h2>5. 데이터 보유 및 삭제</h2>
-        <p>수집된 데이터는 Google의 정책에 따라 보관되며, 사용자가 삭제를 요청하는 경우 관련 법규에 따라 신속히 처리합니다.</p>
+  <h2>7. 이용자의 권리 및 삭제 절차</h2>
+  <ul>
+    <li>설정 화면에서 언제든지 계정 정보 열어보기, 닉네임·국가 변경, 계정 삭제(개인정보 삭제 포함)를 요청할 수 있습니다.</li>
+    <li><strong>앱 내 계정 삭제:</strong> 설정 → 계정 삭제 메뉴에서 직접 진행할 수 있습니다. 삭제 시 서버와 기기의 모든 게임 데이터가 영구적으로 삭제되며 복구할 수 없습니다. 자세한 내용은 <a href="delete_ko.html">계정 삭제 안내</a>를 참고하세요.</li>
+    <li>앱 내에서 처리할 수 없는 열어보기·정정·삭제 요청은 아래 문의 이메일로 접수합니다.</li>
+    <li>EU/EEA 거주자는 GDPR에 따라 액세스권, 정정권, 삭제권, 처리 제한권, 데이터 이동권, 반대권을 행사할 수 있으며, 관할 데이터 보호 감독기관에 불만을 제기할 권리가 있습니다. 캘리포니아 거주자는 CCPA상 권리를 행사할 수 있습니다(본 서비스는 개인정보를 판매하지 않습니다).</li>
+  </ul>
 
-        <h2>6. 보안</h2>
-        <p>회사는 사용자 데이터의 안전을 위해 상업적으로 허용되는 보안 수단을 사용합니다. 그러나 인터넷을 통한 전송 방법이나 전자적 저장 방법은 100% 안전하고 신뢰할 수 없으므로 절대적인 보안을 보장할 수는 없습니다.</p>
+  <h2>8. 광고 및 동의</h2>
+  <ul>
+    <li>본 서비스는 Google AdMob 광고를 포함하며, 보상형 광고 시청은 선택 사항입니다.</li>
+    <li>동의가 필요한 지역(EEA, 영국 등)의 이용자에게는 첫 실행 시 Google UMP 동의 절차가 표시되며, 설정 화면에서 언제든지 동의를 변경·철회할 수 있습니다. 동의하지 않아도 맞춤형이 아닌 광고가 표시될 수 있습니다.</li>
+    <li>Google AdMob은 광고 개인화를 위해 광고 식별자를 사용할 수 있습니다. 기기 설정(Android: 설정 → Google → 광고)에서 광고 개인화를 제한하거나 광고 ID를 재설정할 수 있습니다.</li>
+  </ul>
 
-        <h2>7. 어린이 개인정보 보호</h2>
-        <p>본 앱은 13세 미만 어린이를 대상으로 하지 않습니다. 13세 미만 아동의 개인정보를 의도적으로 수집하지 않습니다.</p>
+  <h2>9. 아동의 개인정보</h2>
+  <p>본 서비스는 만 14세 미만(현지 법령에서 더 높은 기준 연령을 정한 경우 해당 연령)의 아동을 대상으로 하지 않으며, 아동의 개인정보를 고의로 수집하지 않습니다. 해당 연령 미만 아동이 개인정보를 제공한 사실을 알게 되면 즉시 삭제합니다. 부모 또는 법정대리인은 아래 문의 이메일로 삭제를 요청할 수 있습니다.</p>
 
-        <h2>8. 정책 변경</h2>
-        <p>본 개인정보처리방침은 수시로 업데이트될 수 있습니다. 변경사항이 있을 경우 이 페이지에 새로운 개인정보처리방침을 게시하여 알려드립니다.</p>
+  <h2>10. 보안</h2>
+  <p>운영자는 개인정보 보호를 위해 합리적인 기술적·관리적 조치를 취하고 있습니다. 서버와의 모든 통신은 TLS 암호화로 보호되며, Supabase 데이터베이스 접근은 Row Level Security(RLS)로 제한됩니다.</p>
 
-        <h2>9. 문의처</h2>
-        <p>본 개인정보처리방침에 대한 질문이나 제안이 있으시면 아래로 연락해 주세요:</p>
-        <p><strong>Email:</strong> <a href="mailto:support@housduck.com">support@housduck.com</a></p>
-    </div>
+  <h2>11. 문의처</h2>
+  <p>개인정보 관련 문의·요청은 아래 이메일로 연락해 주세요.</p>
+  <p><strong>Email:</strong> <a href="mailto:support@houseduck.in">support@houseduck.in</a></p>
 
-    <footer>
-        <p>© 2026 House Duck. All rights reserved.</p>
-    </footer>
+  <h2>12. 시행일 및 개정 이력</h2>
+  <ul>
+    <li>2026년 7월 27일 — House Duck 기준으로 전면 개정·시행 (v2.0)</li>
+    <li>2026년 7월 24일 — 개인정보처리방침 초판 제정·시행 (v1.0)</li>
+  </ul>
+  <p>본 방침은 법령 변경이나 서비스 개선에 따라 개정될 수 있습니다. 중요한 변경이 있는 경우 앱 내 공지를 통해 사전에 안내합니다.</p>
+
+  <footer>
+    <p>© 2026 House Duck. All rights reserved.</p>
+  </footer>
+</div>
 </body>
 </html>

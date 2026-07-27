@@ -1,0 +1,13 @@
+User-agent: Google-adstxt
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://houseduck.in/sitemap.xml
