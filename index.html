@@ -96,6 +96,14 @@
     </style>
 </head>
 <body>
+    <script>
+        (function () {
+            var lang = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+            if (String(lang).toLowerCase().indexOf("ko") !== 0) {
+                window.location.replace("index_en.html");
+            }
+        }());
+    </script>
     <div class="container">
         <header>
             <div class="logo">🦆 House Duck</div>

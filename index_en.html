@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>House Duck - Indie Game Studio</title>
+    <style>
+        :root { --paper:#fffdf6; --cream:#f5f2ec; --ink:#1c1c1e; --muted:#6b675f; --accent:#b06823; }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--cream); color:var(--ink); font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        main { max-width:900px; margin:auto; padding:64px 20px 20px; }
+        header, section, footer { text-align:center; }
+        h1 { margin:0 0 10px; font-size:clamp(2.2rem,8vw,4rem); }
+        h2 { margin:0 0 24px; }
+        .muted { color:var(--muted); }
+        .card { display:flex; gap:24px; align-items:center; text-align:left; padding:28px; background:var(--paper); border:1px solid #e3ded3; border-radius:18px; }
+        .icon { width:96px; height:96px; border-radius:20px; flex:none; }
+        .card h2 { margin:0 0 8px; }
+        .button { display:inline-block; margin-top:18px; padding:12px 22px; border-radius:999px; background:var(--accent); color:#fff; text-decoration:none; font-weight:700; }
+        footer { padding:48px 0 20px; color:var(--muted); font-size:.9rem; }
+        footer a { color:var(--accent); margin:0 8px; }
+        @media (max-width:600px) { .card { flex-direction:column; text-align:center; } }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <h1>House Duck</h1>
+        <p class="muted">An indie game studio making small games with a big personality.</p>
+    </header>
+    <section style="margin-top:56px;">
+        <div class="card">
+            <img class="icon" src="quirky-ball/app-icon.png" alt="Quirky Ball icon">
+            <div>
+                <h2>Quirky Ball</h2>
+                <p class="muted">Merge matching marbles, outsmart the Joker, and compete in global and country leaderboards.</p>
+                <a class="button" href="quirky-ball/index_en.html">Explore Quirky Ball</a>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2026 House Duck. All rights reserved.</p>
+        <p><a href="terms/en.html">Terms of Service</a> · <a href="privacy/en.html">Privacy Policy</a> · <a href="support/">Support</a></p>
+    </footer>
+</main>
+</body>
+</html>

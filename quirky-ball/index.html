@@ -199,6 +199,14 @@
 </style>
 </head>
 <body>
+    <script>
+        (function () {
+            var lang = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+            if (String(lang).toLowerCase().indexOf("ko") !== 0) {
+                window.location.replace("index_en.html");
+            }
+        }());
+    </script>
     <!-- 히어로 -->
     <div class="hero">
         <div class="marble" style="width:56px;height:56px;background:var(--coral);top:12%;left:8%;animation-delay:0s;"></div>
