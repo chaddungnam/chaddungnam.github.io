@@ -64,11 +64,12 @@
     <tr><th>Datenkategorie</th><th>Zeitpunkt / Art der Erhebung</th><th>Speicherort</th></tr>
     <tr><td>Gast-Kennung (UID)</td><td>Wird bei der Nutzung des Dienstes automatisch erstellt</td><td>Gerät und Server (Supabase)</td></tr>
     <tr><td>E-Mail-Adresse, Profilname</td><td>Nur bei (freiwilliger) Verknüpfung eines Google-Kontos</td><td>Server (Supabase Auth)</td></tr>
-    <tr><td>Spieldaten (Punktzahl, Level, Spielverlauf)</td><td>Automatisch während des Spielens erzeugt</td><td>Gerät und Server (Bestleistungen)</td></tr>
+    <tr><td>Spieldaten (Punktzahl, Level, Spielverlauf)</td><td>Automatisch während des Spielens erzeugt</td><td>Gerät und Server (Supabase-Kontostatus und Bestenlisten)</td></tr>
     <tr><td>Nickname, Anzeigecode</td><td>Nickname wird von dir eingegeben; Anzeigecode wird automatisch erstellt</td><td>Gerät und Server (für Bestenlisten)</td></tr>
     <tr><td>Länderinformation</td><td>Von dir beim Onboarding gewählt (Vorschlag aus dem Gerätegebietsschema; keine genaue Standortbestimmung)</td><td>Gerät und Server (für Länder-Bestenlisten)</td></tr>
     <tr><td>Geräte-/Werbekennungen (z. B. ADID)</td><td>Werden vom Werbe-SDK (Google AdMob) bei der Anzeigenauslieferung erhoben</td><td>Systeme des Werbeanbieters (Google)</td></tr>
-    <tr><td>Virtuelle Währung (Stamina, Edelsteine), Spracheinstellung</td><td>Während der Nutzung erzeugt</td><td>Nur Gerät (lokale Speicherung)</td></tr>
+    <tr><td>Virtuelle Währung und Fortschritt (Stamina, Edelsteine, Durchbruch-Tickets, Anwesenheit, Missionen, Shop und Saison)</td><td>Während der Nutzung erstellt oder geändert</td><td>Gerät und Server (Supabase-Kontostatus)</td></tr>
+    <tr><td>Sprache, Lautstärke, Vibration und Bildrate</td><td>Von dir eingestellt</td><td>Nur Gerät (lokale Speicherung)</td></tr>
   </table>
   <p>Der Dienst erhebt keine präzisen Standortdaten, keine Kontakte, keine Fotos und keine sonstigen für den Spielbetrieb nicht erforderlichen Daten; ein separates Analyse-SDK wird nicht verwendet.</p>
 
@@ -87,7 +88,7 @@
     <tr><th>Dienst (Anbieter)</th><th>Zweck</th><th>Betroffene Daten</th></tr>
     <tr><td>Google AdMob (Google LLC)</td><td>Belohnte und Interstitial-Werbung</td><td>Werbekennung, Geräteinformationen</td></tr>
     <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Verknüpfung eines Google-Kontos</td><td>E-Mail-Adresse, Profilname</td></tr>
-    <tr><td>Supabase (Supabase Inc.)</td><td>Backend-Infrastruktur zur Speicherung von Konto-/Punktedaten (Auftragsverarbeiter)</td><td>UID, Nickname, Land, Bestleistungen</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Synchronisierung des Kontostatus, Punktzahlen, Bestenlisten und Kontoverwaltung</td><td>UID, Kontotyp, Nickname, Anzeigecode, Land, Punktzahlen, Level, Spielverlauf, virtuelle Währung, Missionen, Anwesenheit, Shop- und Saisonfortschritt, Abmelde- und letzte Spielzeit</td></tr>
   </table>
   <ul>
     <li><a href="https://policies.google.com/privacy" target="_blank">Datenschutzerklärung von Google</a></li>
@@ -102,7 +103,8 @@
   <ul>
     <li>Bei einer beantragten Kontolöschung werden die Daten unverzüglich oder innerhalb einer angemessenen Frist gelöscht.</li>
     <li>Bestenlisten-Einträge werden nur für die letzten 28 Tage gespeichert und danach automatisch entfernt.</li>
-    <li>Daten, die nur auf deinem Gerät gespeichert sind (virtuelle Währung, Spracheinstellung usw.), werden beim Löschen der App entfernt.</li>
+    <li>Mit dem Server synchronisierte Kontostatus- und Bestenlistendaten werden bei der Kontolöschung gelöscht. Lokale Caches werden bei der Deinstallation oder Zurücksetzung des Kontos gelöscht.</li>
+    <li>Nur auf dem Gerät gespeicherte Einstellungen wie Sprache, Lautstärke, Vibration und Bildrate werden beim Löschen der App entfernt.</li>
     <li>Sofern geltendes Recht eine längere Aufbewahrung vorschreibt, können Daten entsprechend länger gespeichert werden.</li>
   </ul>
 

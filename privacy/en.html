@@ -64,11 +64,12 @@
     <tr><th>Item</th><th>When / how</th><th>Where stored</th></tr>
     <tr><td>Guest identifier (UID)</td><td>Generated automatically when you use the Service</td><td>Device and server (Supabase)</td></tr>
     <tr><td>Email address, profile name</td><td>Only if you (optionally) link a Google account</td><td>Server (Supabase Auth)</td></tr>
-    <tr><td>Gameplay data (score, level, play history)</td><td>Generated automatically as you play</td><td>Device and server (best records)</td></tr>
+    <tr><td>Gameplay data (score, level, play history)</td><td>Generated automatically as you play</td><td>Device and server (Supabase account state and leaderboards)</td></tr>
     <tr><td>Nickname, display code</td><td>Nickname entered by you; display code generated automatically</td><td>Device and server (for leaderboards)</td></tr>
     <tr><td>Country</td><td>Selected by you during onboarding (suggested from device locale; not precise location)</td><td>Device and server (for country leaderboards)</td></tr>
     <tr><td>Device/advertising identifiers (e.g., ADID)</td><td>Collected by the ad SDK (Google AdMob) when ads are served</td><td>Ad provider (Google) systems</td></tr>
-    <tr><td>Virtual currency (stamina, gems), language setting</td><td>Generated during use</td><td>Device only (local storage)</td></tr>
+    <tr><td>Virtual currency and progress (stamina, gems, breakthrough tickets, attendance, missions, shop and season progress)</td><td>Created or changed during use</td><td>Device and server (Supabase account state)</td></tr>
+    <tr><td>Language, volume, vibration and frame-rate settings</td><td>Set by you</td><td>Device only (local storage)</td></tr>
   </table>
   <p>The Service does not collect precise location, contacts, photos, or other information not required to provide the game, and it does not use a separate analytics SDK.</p>
 
@@ -87,7 +88,7 @@
     <tr><th>Service (provider)</th><th>Purpose</th><th>Related data</th></tr>
     <tr><td>Google AdMob (Google LLC)</td><td>Rewarded and interstitial ads</td><td>Advertising identifier, device information</td></tr>
     <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Google account linking</td><td>Email address, profile name</td></tr>
-    <tr><td>Supabase (Supabase Inc.)</td><td>Backend infrastructure storing account/score data (data processor)</td><td>UID, nickname, country, best records</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Account-state sync, scores, leaderboards and account management</td><td>UID, account type, nickname, display code, country, scores, levels, play history, virtual currency, mission, attendance, shop and season progress, logout and last-played times</td></tr>
   </table>
   <ul>
     <li><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></li>
@@ -102,7 +103,8 @@
   <ul>
     <li>When you request account deletion, personal information is deleted promptly or within a reasonable period.</li>
     <li>Leaderboard entries are kept for the most recent 28 days and automatically removed afterward.</li>
-    <li>Data stored only on your device (virtual currency, language setting, etc.) is removed when you delete the app.</li>
+    <li>Account state and leaderboard data synchronized to the server are deleted when you delete your account. Local caches are deleted when the app is uninstalled or the account is reset.</li>
+    <li>Settings stored only on the device, such as language, volume, vibration and frame rate, are deleted when you uninstall the app.</li>
     <li>Data may be retained longer where required by applicable law.</li>
   </ul>
 
