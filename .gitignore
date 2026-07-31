@@ -1,1 +1,24 @@
 .DS_Store
+
+# 공개 웹 저장소에 절대 포함하지 않는 로컬 설정과 인증 정보
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials*
+secrets*
+
+# 앱 빌드, 데이터베이스, 로그 및 임시 백업
+*.apk
+*.aab
+*.zip
+*.db
+*.sqlite*
+*.log
+*.bak
+node_modules/

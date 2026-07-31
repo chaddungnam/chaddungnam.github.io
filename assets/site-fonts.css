@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("/assets/fonts/Montserrat-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Do Hyeon";
+  src: url("/assets/fonts/DoHyeon-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
