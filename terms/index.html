@@ -18,32 +18,16 @@
   ul.langs small { display: block; color: #6b675f; font-size: 0.85rem; margin-top: 2px; }
   h1 { font-family: 'Do Hyeon', 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 400; }
 </style>
-<script>
-// Accept-Language 기반 자동 리다이렉트 — 실패/예외 시 아래 언어 목록이 그대로 표시된다.
-// ?stay=1 이면 리다이렉트하지 않고 목록을 보여준다.
-(function () {
-  try {
-    if (/[?&]stay=1/.test(location.search)) return;
-    var supported = ["ko", "en", "de", "ja"];
-    var langs = navigator.languages || [navigator.language || "en"];
-    for (var i = 0; i < langs.length; i++) {
-      var code = String(langs[i]).toLowerCase().split("-")[0];
-      if (supported.indexOf(code) >= 0) { location.replace(code + ".html"); return; }
-    }
-    location.replace("en.html"); // 지원 언어가 없으면 영어로
-  } catch (e) { /* 목록 표시로 폴 백 */ }
-})();
-</script>
 </head>
 <body>
 <div class="container">
   <h1>House Duck</h1>
-  <p class="sub">Terms of Service — choose your language / 언어를 선택하세요 / Sprache wählen / 言語を選択</p>
+  <p class="sub">Terms are maintained separately for each House Duck game. Current product: Quirky Ball.</p>
   <ul class="langs">
-    <li><a href="ko.html">한국어 — 이용약관<small>House Duck 이용약관 전문</small></a></li>
-    <li><a href="en.html">English — Terms of Service<small>Full terms of service for House Duck software</small></a></li>
-    <li><a href="de.html">Deutsch — Nutzungsbedingungen<small>Vollständige Nutzungsbedingungen für House-Duck-Software</small></a></li>
-    <li><a href="ja.html">日本語 — 利用規約<small>House Duck 利用規約 全文</small></a></li>
+    <li><a href="ko.html">Quirky Ball — 한국어<small>이용약관</small></a></li>
+    <li><a href="en.html">Quirky Ball — English<small>Terms of Service</small></a></li>
+    <li><a href="de.html">Quirky Ball — Deutsch<small>Nutzungsbedingungen</small></a></li>
+    <li><a href="ja.html">Quirky Ball — 日本語<small>利用規約</small></a></li>
   </ul>
 </div>
 </body>

@@ -16,15 +16,15 @@ secret_pattern='-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----|(^|[^A-Za-z0-9])(sk_live_|
 while IFS= read -r path; do
   [[ -z "$path" ]] && continue
 
-  if printf '%s\n' "$path" | grep -Eiq -- "$blocked_path_pattern"; then
+  case "$path" in
+    scripts/check_public_repo.sh|.github/*|SECURITY.md) continue ;;
+  esac
+
+  if [[ "$path" != ".env.example" ]] && printf '%s\n' "$path" | grep -Eiq -- "$blocked_path_pattern"; then
     printf '차단: 공개 저장소에 민감하거나 불필요한 파일이 포함되었습니다: %s\n' "$path" >&2
     failed=1
     continue
   fi
-
-  case "$path" in
-    scripts/check_public_repo.sh|.github/*|SECURITY.md) continue ;;
-  esac
 
   if [[ "$mode" == "--all" ]]; then
     content_command=(cat -- "$path")
