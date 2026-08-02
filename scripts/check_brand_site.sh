@@ -83,5 +83,7 @@ require_token "index_en.html" 'href="/?lang=ko"'
 require_token "quirky-ball/index.html" 'href="index_en.html?lang=en"'
 require_token "quirky-ball/index_en.html" 'href="./?lang=ko"'
 require_css_property ".featured-logo" "height: auto;"
+require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 820px)"
+require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
 
 printf 'brand site contract: PASS\n'
