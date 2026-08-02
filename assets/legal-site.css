@@ -301,7 +301,9 @@ a:hover {
 }
 
 .legal-toc-list a {
-  display: block;
+  display: flex;
+  min-height: 44px;
+  align-items: center;
   padding: 7px 10px;
   border-left: 2px solid transparent;
   color: var(--legal-muted);
