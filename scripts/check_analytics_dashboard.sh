@@ -20,8 +20,14 @@ if rg -n 'supabaseClient\.auth|signInWithOAuth|signInWithPassword|resetPasswordF
 fi
 rg -q 'fetch\(ANALYTICS_FUNCTION_URL' "$dashboard_dir/app.js"
 rg -q 'analytics-dashboard' "$dashboard_dir/app.js"
+rg -q 'projectKey' "$dashboard_dir/app.js"
+rg -q 'distributionKey' "$dashboard_dir/app.js"
+rg -q 'projectPicker' "$dashboard_dir/index.html"
+rg -q 'health' "$dashboard_dir/app.js"
+rg -q 'adEconomics' "$dashboard_dir/app.js"
 rg -q 'verifyGoogleIdToken' "$function_file"
-rg -q 'findAdminUser' "$function_file"
+rg -q 'SUPPORTED_PROJECTS' "$function_file"
+rg -q 'invalid_project' "$function_file"
 rg -q 'SUPABASE_SERVICE_ROLE_KEY' "$function_file"
 rg -q 'analytics_admins' "$function_file"
 

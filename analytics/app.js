@@ -7,6 +7,8 @@ const GOOGLE_TOKEN_STORAGE_KEY = "quirky_ball_google_id_token";
 const state = {
   payload: null,
   rangeDays: 28,
+  projectKey: "",
+  distributionKey: "all",
   loading: false,
   googleIdToken: window.sessionStorage.getItem(GOOGLE_TOKEN_STORAGE_KEY) ?? "",
   googleEmail: "",
@@ -16,6 +18,11 @@ const byId = (id) => document.getElementById(id);
 function setText(id, value) { byId(id).textContent = value; }
 function formatNumber(value) { return typeof value === "number" ? value.toLocaleString("ko-KR") : "—"; }
 function formatRate(value) { return typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—"; }
+function formatDecimal(value, digits = 1) { return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "—"; }
+function formatCurrency(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+}
 function formatDuration(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
   const seconds = Math.max(0, Math.round(value));
@@ -46,9 +53,9 @@ async function readFunctionError(error) {
 
 async function loadDashboard() {
   if (state.loading) return;
-  if (!state.googleIdToken) return;
+  if (!state.googleIdToken || !state.projectKey) return;
   state.loading = true;
-  setMessage("최근 28일 이벤트를 안전하게 집계하는 중...");
+  setMessage(`${state.projectKey === "quirky_ball" ? "Quirky Ball" : state.projectKey} · 최근 ${state.rangeDays}일 이벤트를 안전하게 집계하는 중...`);
   try {
     const response = await fetch(ANALYTICS_FUNCTION_URL, {
       method: "POST",
@@ -57,7 +64,7 @@ async function loadDashboard() {
         ["Author" + "ization"]: "Bearer " + state.googleIdToken,
         "Content-Type": "application/json",
       },
-      body: "{}",
+      body: JSON.stringify({ projectKey: state.projectKey, distributionKey: state.distributionKey, rangeDays: state.rangeDays }),
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -68,7 +75,7 @@ async function loadDashboard() {
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
-    setText("dataStatus", `${updated} 기준 · 최근 28일`);
+    setText("dataStatus", `${updated} 기준 · 최근 ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
     const message = await readFunctionError(error);
@@ -86,14 +93,18 @@ async function loadDashboard() {
 function renderDashboard() {
   const { summary, retention } = state.payload;
   setText("kpiActive", formatNumber(summary.activeInstallsToday));
-  setText("kpiInstalls", formatNumber(summary.installs));
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   setText("kpiGame", formatDuration(summary.avgGameSeconds));
   setText("kpiExit", formatRate(summary.exitRate));
   const d1 = retention?.find((item) => item.day === 1)?.rate;
   const d7 = retention?.find((item) => item.day === 7)?.rate;
   setText("kpiRetention", `${formatRate(d1)} / ${formatRate(d7)}`);
+  const adEconomics = state.payload?.adEconomics ?? {};
+  setText("kpiAdsPerPlayer", formatDecimal(adEconomics.impressionsPerPlayer));
+  setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `${formatNumber(summary.adImpressions)} 노출`);
+  renderHealth(state.payload?.health);
+  renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
   renderHourlyChart();
   renderFunnel();
@@ -101,6 +112,39 @@ function renderDashboard() {
   renderAds();
   renderDailyTable();
   renderInsight();
+}
+
+function distributionLabel(value) {
+  return ({ all: "전체 스토어", google_play: "Google Play", app_store: "iOS", onestore: "원스토어", unknown: "스토어 미지정" })[value] ?? value ?? "전체 스토어";
+}
+
+function renderHealth(health = {}) {
+  const card = byId("healthCard");
+  const status = health.status ?? "insufficient";
+  const icons = { good: "✓", watch: "!", risk: "×", insufficient: "?" };
+  const labels = { good: "상태가 좋아요", watch: "조금 지켜봐요", risk: "확인이 필요해요", insufficient: "아직 데이터가 부족해요" };
+  card.dataset.status = status;
+  setText("healthIcon", icons[status] ?? "?");
+  setText("healthLabel", health.label ?? labels[status] ?? labels.insufficient);
+  setText("healthReason", health.reasons?.[0] ?? "플레이어가 조금 더 쌓이면 게임 상태를 판정할 수 있습니다.");
+  setText("healthScore", typeof health.score === "number" ? `${health.score}/100` : "수집 중");
+}
+
+function renderPlatformSummary(platforms) {
+  const economics = state.payload?.adEconomics ?? {};
+  setText("revenueNote", economics.estimatedRevenueEur == null ? "스토어별 eCPM 단가를 입력하면 수익 추정이 더 정확해집니다." : `초기 단가 가정 · ${formatCurrency(economics.estimatedRevenueEur)}`);
+  const element = byId("platformSummary");
+  if (!platforms.length) {
+    element.innerHTML = '<p class="empty-panel">아직 비교할 광고 데이터가 없습니다.</p>';
+    return;
+  }
+  element.innerHTML = platforms.map((row) => `
+    <div class="platform-row">
+      <div class="platform-name"><strong>${escapeHtml(distributionLabel(row.distributionKey))}</strong><small>${escapeHtml(row.platform || "플랫폼 미지정")}</small></div>
+      <div><span>플레이어</span><strong>${formatNumber(row.activePlayers)}</strong></div>
+      <div><span>광고/플레이어</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
+      <div><span>예상 수익</span><strong>${formatCurrency(row.estimatedRevenueEur)}</strong></div>
+    </div>`).join("");
 }
 
 function renderDailyChart() {
@@ -230,10 +274,11 @@ function decodeGoogleClaims(token) {
   }
 }
 
-function switchView(email = "") {
+function showProjectPicker(email = "") {
   const signedIn = Boolean(state.googleIdToken && email);
   byId("loginPanel").hidden = signedIn;
-  byId("dashboard").hidden = !signedIn;
+  byId("projectPicker").hidden = !signedIn;
+  byId("dashboard").hidden = true;
   if (!signedIn) {
     setText("userEmail", "");
     setText("loginMessage", "");
@@ -241,15 +286,36 @@ function switchView(email = "") {
   }
   state.googleEmail = email;
   setText("userEmail", email);
+}
+
+function selectProject(projectKey) {
+  if (!state.googleIdToken || !projectKey) return;
+  state.projectKey = projectKey;
+  state.payload = null;
+  byId("projectPicker").hidden = true;
+  byId("dashboard").hidden = false;
   loadDashboard();
+}
+
+function returnToProjectPicker() {
+  state.projectKey = "";
+  state.payload = null;
+  byId("dashboard").hidden = true;
+  byId("projectPicker").hidden = false;
 }
 
 function clearGoogleSession() {
   state.googleIdToken = "";
   state.googleEmail = "";
+  state.projectKey = "";
+  state.payload = null;
   window.sessionStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
   window.google?.accounts?.id?.disableAutoSelect?.();
-  switchView();
+  byId("dashboard").hidden = true;
+  byId("projectPicker").hidden = true;
+  byId("loginPanel").hidden = false;
+  setText("userEmail", "");
+  setText("loginMessage", "");
 }
 
 function handleGoogleCredential(response) {
@@ -261,7 +327,7 @@ function handleGoogleCredential(response) {
   state.googleIdToken = response.credential;
   state.googleEmail = claims.email;
   window.sessionStorage.setItem(GOOGLE_TOKEN_STORAGE_KEY, response.credential);
-  switchView(claims.email);
+  showProjectPicker(claims.email);
 }
 
 function waitForGoogleIdentity() {
@@ -298,21 +364,25 @@ async function initializeGoogleLogin() {
   }
   const claims = decodeGoogleClaims(state.googleIdToken);
   if (claims?.email && Number(claims.exp) * 1000 > Date.now()) {
-    switchView(claims.email);
+    showProjectPicker(claims.email);
   } else if (state.googleIdToken) {
     clearGoogleSession();
   }
 }
 
+byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
+byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 byId("logoutButton").addEventListener("click", clearGoogleSession);
 byId("refreshButton").addEventListener("click", loadDashboard);
 document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
   state.rangeDays = Number(button.dataset.range);
   document.querySelectorAll(".range-button").forEach((item) => item.classList.toggle("active", item === button));
-  if (state.payload) {
-    renderDailyChart();
-    renderDailyTable();
-  }
+  if (state.projectKey) loadDashboard();
+}));
+document.querySelectorAll(".distribution-button").forEach((button) => button.addEventListener("click", () => {
+  state.distributionKey = button.dataset.distribution;
+  document.querySelectorAll(".distribution-button").forEach((item) => item.classList.toggle("active", item === button));
+  if (state.projectKey) loadDashboard();
 }));
 
 let resizeTimer;

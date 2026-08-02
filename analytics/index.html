@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Quirky Ball Pulse</title>
+  <title>House Duck Pulse</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app-shell">
     <section id="loginPanel" class="login-panel" aria-labelledby="loginTitle">
-      <div class="brand-mark" aria-hidden="true"><span>Q</span></div>
+      <div class="brand-mark" aria-hidden="true"><span>HD</span></div>
       <p class="eyebrow">HOUSE DUCK / PRIVATE CONSOLE</p>
-      <h1 id="loginTitle">Quirky Ball<br><em>Pulse</em></h1>
-      <p class="login-copy">플레이어가 언제 들어오고, 얼마나 플레이한 뒤 나가는지 한눈에 확인하세요.</p>
+      <h1 id="loginTitle">House Duck<br><em>Pulse</em></h1>
+      <p class="login-copy">게임이 좋은 흐름인지, 어디서 멈추는지 누구나 한눈에 확인하세요.</p>
       <div class="google-login">
         <p class="auth-form-heading">Google 계정으로 로그인</p>
         <p class="auth-form-copy">허용된 Google 계정만 지표를 볼 수 있습니다.</p>
@@ -23,14 +23,27 @@
       <p class="login-note">Google 계정 인증 후 서버에서 관리자 권한을 확인합니다.</p>
     </section>
 
+    <section id="projectPicker" class="project-picker" aria-labelledby="projectPickerTitle" hidden>
+      <p class="eyebrow">HOUSE DUCK / PROJECTS</p>
+      <h1 id="projectPickerTitle">어떤 게임을 볼까요?</h1>
+      <p class="picker-copy">프로젝트를 고르면 그 게임의 플레이와 광고 흐름만 보여드립니다.</p>
+      <button id="projectQuirkyBall" class="project-card" type="button">
+        <span class="project-card-mark" aria-hidden="true">Q</span>
+        <span class="project-card-copy"><strong>Quirky Ball</strong><small>Google Play · 퍼즐 게임</small></span>
+        <span class="project-card-arrow" aria-hidden="true">↗</span>
+      </button>
+      <p class="picker-note">새 게임은 이 화면에 프로젝트로 추가할 수 있습니다.</p>
+    </section>
+
     <section id="dashboard" class="dashboard" hidden>
       <header class="topbar">
         <div>
-          <p class="eyebrow">QUIRKY BALL / FIRST-PARTY ANALYTICS</p>
+          <p class="eyebrow">HOUSE DUCK / FIRST-PARTY ANALYTICS</p>
           <h1>오늘의 플레이 흐름을 한 화면에</h1>
         </div>
         <div class="topbar-actions">
           <span id="userEmail" class="user-pill"></span>
+          <button id="changeProjectButton" class="text-button" type="button">프로젝트 변경</button>
           <button id="refreshButton" class="text-button" type="button">새로고침</button>
           <button id="logoutButton" class="text-button muted" type="button">로그아웃</button>
         </div>
@@ -41,19 +54,34 @@
           <span class="live-dot"></span>
           <span id="dataStatus">지표를 불러오는 중...</span>
         </div>
-        <div class="range-switch" aria-label="조회 기간">
-          <button class="range-button" data-range="7" type="button">최근 7일</button>
-          <button class="range-button active" data-range="28" type="button">최근 28일</button>
+        <div class="toolbar-switches">
+          <div class="range-switch" aria-label="조회 기간">
+            <button class="range-button" data-range="7" type="button">최근 7일</button>
+            <button class="range-button active" data-range="28" type="button">최근 28일</button>
+          </div>
+          <div class="range-switch" aria-label="배포 스토어">
+            <button class="distribution-button active" data-distribution="all" type="button">전체</button>
+            <button class="distribution-button" data-distribution="google_play" type="button">Google Play</button>
+            <button class="distribution-button" data-distribution="app_store" type="button">iOS</button>
+            <button class="distribution-button" data-distribution="onestore" type="button">원스토어</button>
+          </div>
         </div>
       </div>
 
+      <section id="healthCard" class="health-card" aria-live="polite" data-status="insufficient">
+        <div id="healthIcon" class="health-icon" aria-hidden="true">?</div>
+        <div class="health-copy"><p class="eyebrow">TODAY'S PULSE</p><strong id="healthLabel">데이터를 모으는 중</strong><p id="healthReason">플레이어가 조금 더 쌓이면 게임 상태를 판정할 수 있습니다.</p></div>
+        <div class="health-score"><span>상태 점수</span><strong id="healthScore">수집 중</strong></div>
+      </section>
+
       <section class="kpi-grid" aria-label="핵심 지표">
         <article class="kpi-card accent-teal"><span class="kpi-label">오늘 활성 설치</span><strong id="kpiActive">—</strong><span class="kpi-hint">오늘 이벤트를 보낸 설치 수</span></article>
-        <article class="kpi-card accent-coral"><span class="kpi-label">최근 설치</span><strong id="kpiInstalls">—</strong><span class="kpi-hint">선택 기간 내 고유 설치 수</span></article>
         <article class="kpi-card accent-gold"><span class="kpi-label">평균 세션</span><strong id="kpiSession">—</strong><span class="kpi-hint">앱을 켜고 머문 시간</span></article>
         <article class="kpi-card accent-ink"><span class="kpi-label">평균 게임</span><strong id="kpiGame">—</strong><span class="kpi-hint">게임 시작부터 종료까지</span></article>
         <article class="kpi-card accent-coral"><span class="kpi-label">게임 중 이탈</span><strong id="kpiExit">—</strong><span class="kpi-hint">게임 시작 후 결과 없이 종료</span></article>
         <article class="kpi-card accent-teal"><span class="kpi-label">D1 / D7 유지율</span><strong id="kpiRetention">—</strong><span class="kpi-hint">첫 방문 다음 날 / 7일 뒤</span></article>
+        <article class="kpi-card accent-gold"><span class="kpi-label">플레이어당 광고</span><strong id="kpiAdsPerPlayer">—</strong><span class="kpi-hint">선택 기간 평균 광고 노출</span></article>
+        <article class="kpi-card accent-coral"><span class="kpi-label">예상 광고 수익</span><strong id="kpiRevenue">—</strong><span class="kpi-hint">초기 eCPM 가정 기반 추정</span></article>
       </section>
 
       <section class="insight-banner" aria-live="polite">
@@ -88,6 +116,11 @@
         <article class="panel panel-wide">
           <div class="panel-heading"><div><p class="eyebrow">AD HEALTH</p><h2>광고 시청 흐름</h2></div><span id="adTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th>형식</th><th>위치</th><th>시작</th><th>노출</th><th>보상</th></tr></thead><tbody id="adsTable"></tbody></table></div>
+        </article>
+
+        <article class="panel panel-wide">
+          <div class="panel-heading"><div><p class="eyebrow">PLATFORM VIEW</p><h2>스토어별로 비교</h2></div><span id="revenueNote" class="panel-note">—</span></div>
+          <div id="platformSummary" class="platform-summary"></div>
         </article>
 
         <article class="panel panel-wide">
