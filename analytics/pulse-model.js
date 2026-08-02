@@ -10,6 +10,7 @@
     risk: "고쳐야 해요",
     insufficient: "판단 대기",
   };
+  const STATUS_SEVERITY = { good: 0, watch: 1, risk: 2 };
 
   function finiteNumber(value) {
     return typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -88,6 +89,13 @@
     return "주요 플레이 흐름이 안정적이고 좋아요.";
   }
 
+  function worstStatus(healthStatus, metrics) {
+    return Object.values(metrics).reduce((worst, item) => {
+      if (!(item.status in STATUS_SEVERITY)) return worst;
+      return STATUS_SEVERITY[item.status] > STATUS_SEVERITY[worst] ? item.status : worst;
+    }, healthStatus);
+  }
+
   function buildPulseModel(payload = {}) {
     const summary = payload.summary ?? {};
     const retention = payload.retention ?? [];
@@ -116,11 +124,11 @@
 
     const health = payload.health ?? {};
     const healthStatus = ["good", "watch", "risk"].includes(health.status) ? health.status : "watch";
-    const verdictStatus = enoughSamples ? healthStatus : "insufficient";
+    const verdictStatus = enoughSamples ? worstStatus(healthStatus, metrics) : "insufficient";
     const verdict = {
       status: verdictStatus,
       label: STATUS_LABELS[verdictStatus],
-      score: enoughSamples && finiteNumber(health.score) != null ? health.score : null,
+      score: enoughSamples && verdictStatus === healthStatus && finiteNumber(health.score) != null ? health.score : null,
       summary: buildVerdictSummary(verdictStatus, metrics, sessions),
     };
 

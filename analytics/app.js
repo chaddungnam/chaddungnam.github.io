@@ -148,7 +148,7 @@ function renderPulseOverview(model) {
   const card = byId("healthCard");
   card.dataset.status = model.verdict.status;
   setText("healthLabel", model.verdict.label);
-  setText("healthScore", model.verdict.score == null ? "수집 중" : `${model.verdict.score}/100`);
+  setText("healthScore", model.verdict.score == null ? (model.verdict.status === "insufficient" ? "수집 중" : "카드 기준") : `${model.verdict.score}/100`);
   setText("mascotMessage", model.verdict.summary);
   setText("todayAction", model.action);
   byId("signalLights").querySelectorAll("[data-signal]").forEach((signal) => {

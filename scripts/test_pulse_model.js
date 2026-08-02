@@ -63,4 +63,13 @@ const contradictorySummary = buildPulseModel(payload({
 assert.doesNotMatch(contradictorySummary.verdict.summary, /안정적/);
 assert.match(contradictorySummary.verdict.summary, /위험 신호/);
 
+const adOverridesGreenHealth = buildPulseModel(payload({
+  adEconomics: { impressionsPerPlayer: 6.4 },
+  health: { status: "good", score: 88, summary: "플레이 지표는 좋아요." },
+}));
+assert.equal(adOverridesGreenHealth.metrics.ads.status, "risk");
+assert.equal(adOverridesGreenHealth.verdict.status, "risk");
+assert.equal(adOverridesGreenHealth.verdict.score, null);
+assert.match(adOverridesGreenHealth.verdict.summary, /광고/);
+
 console.log("pulse model: PASS");
