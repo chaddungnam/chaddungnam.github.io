@@ -1,8 +1,9 @@
 const SUPABASE_URL = "https://bbgwvpwzkyudbtcgrbtm.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6yAW6MvHsXS9xv8kzu2YKA_D23JWWQ4";
+const PASSWORD_RECOVERY_REDIRECT = "https://houseduck.in/analytics/";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-const state = { payload: null, rangeDays: 28, loading: false };
+const state = { payload: null, rangeDays: 28, loading: false, authMode: "login" };
 const byId = (id) => document.getElementById(id);
 
 function setText(id, value) { byId(id).textContent = value; }
@@ -192,10 +193,29 @@ function renderInsight() {
   setText("insightText", `가장 많이 시작하는 시간은 ${timeText}입니다. 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
 }
 
+function setAuthMode(mode) {
+  state.authMode = mode;
+  byId("loginForm").hidden = mode !== "login";
+  byId("showRecoveryButton").hidden = mode !== "login";
+  byId("recoveryForm").hidden = mode !== "recovery";
+  byId("updatePasswordForm").hidden = mode !== "update";
+}
+
+function isPasswordRecoveryRedirect() {
+  return new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
+}
+
 function switchView(session) {
+  if (session && state.authMode === "update") {
+    byId("loginPanel").hidden = false;
+    byId("dashboard").hidden = true;
+    setAuthMode("update");
+    return;
+  }
   byId("loginPanel").hidden = Boolean(session);
   byId("dashboard").hidden = !session;
   if (!session) {
+    setAuthMode("login");
     byId("loginForm").reset();
     setText("loginMessage", "");
     return;
@@ -203,6 +223,17 @@ function switchView(session) {
   setText("userEmail", session.user.email ?? "로그인 사용자");
   loadDashboard();
 }
+
+byId("showRecoveryButton").addEventListener("click", () => {
+  byId("recoveryEmail").value = byId("email").value.trim();
+  setAuthMode("recovery");
+  setText("loginMessage", "");
+});
+
+byId("backToLoginButton").addEventListener("click", () => {
+  setAuthMode("login");
+  setText("loginMessage", "");
+});
 
 byId("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -214,6 +245,50 @@ byId("loginForm").addEventListener("submit", async (event) => {
     password: byId("password").value,
   });
   if (error) setText("loginMessage", "로그인에 실패했습니다. 이메일·비밀번호 또는 관리자 권한을 확인해 주세요.");
+  button.disabled = false;
+});
+
+byId("recoveryForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button[type=submit]");
+  button.disabled = true;
+  setText("loginMessage", "재설정 이메일을 보내는 중...");
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(byId("recoveryEmail").value.trim(), {
+    redirectTo: PASSWORD_RECOVERY_REDIRECT,
+  });
+  if (error) {
+    setText("loginMessage", "재설정 이메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.");
+  } else {
+    setText("loginMessage", "이메일을 확인하세요. 링크를 누르면 이 페이지에서 새 비밀번호를 설정할 수 있습니다.");
+  }
+  button.disabled = false;
+});
+
+byId("updatePasswordForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const newPasswordValue = byId("newPassword").value;
+  const confirmation = byId("confirmPassword").value;
+  if (newPasswordValue.length < 8) {
+    setText("loginMessage", "비밀번호는 8자 이상이어야 합니다.");
+    return;
+  }
+  if (newPasswordValue !== confirmation) {
+    setText("loginMessage", "두 비밀번호가 일치하지 않습니다.");
+    return;
+  }
+  const button = event.currentTarget.querySelector("button[type=submit]");
+  button.disabled = true;
+  setText("loginMessage", "새 비밀번호를 저장하는 중...");
+  const { error } = await supabaseClient.auth.updateUser({ password: newPasswordValue });
+  if (error) {
+    setText("loginMessage", "비밀번호를 저장하지 못했습니다. 이메일 링크가 만료되었으면 새 링크를 요청해 주세요.");
+    button.disabled = false;
+    return;
+  }
+  await supabaseClient.auth.signOut();
+  window.history.replaceState({}, document.title, window.location.pathname);
+  setAuthMode("login");
+  setText("loginMessage", "비밀번호가 변경되었습니다. 새 비밀번호로 로그인하세요.");
   button.disabled = false;
 });
 
@@ -235,7 +310,22 @@ window.addEventListener("resize", () => {
 });
 
 (async () => {
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      state.authMode = "update";
+      switchView(session);
+      setText("loginMessage", "새 비밀번호를 설정하세요.");
+      return;
+    }
+    if (event === "SIGNED_OUT") state.authMode = "login";
+    switchView(session);
+  });
   const { data } = await supabaseClient.auth.getSession();
-  switchView(data.session);
-  supabaseClient.auth.onAuthStateChange((_event, session) => switchView(session));
+  if (data.session && isPasswordRecoveryRedirect()) {
+    state.authMode = "update";
+    switchView(data.session);
+    setText("loginMessage", "새 비밀번호를 설정하세요.");
+  } else if (state.authMode !== "update") {
+    switchView(data.session);
+  }
 })();

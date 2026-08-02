@@ -77,6 +77,12 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .login-form input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
 .primary-button { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 15px 17px; color: #fff; background: var(--ink); border: 0; border-radius: 12px; font-weight: 800; }
 .primary-button:hover { background: #273253; }
+.secondary-link { margin-top: 16px; padding: 0; color: var(--ink-soft); background: transparent; border: 0; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.secondary-link:hover { color: var(--coral); }
+.auth-form { margin-top: 22px; }
+.auth-form-heading { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.04em; }
+.auth-form-copy { margin: -2px 0 4px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+.auth-back { justify-self: start; margin-top: 5px; }
 .form-message { min-height: 22px; margin: 15px 0 0; color: var(--coral); font-size: 13px; line-height: 1.5; }
 .login-note { margin: 26px 0 0; color: #8990a5; font-size: 11px; }
 
