@@ -577,6 +577,7 @@ button {
 
 .featured-logo {
   width: min(240px, 70%);
+  height: auto;
   margin: 24px 0;
 }
 

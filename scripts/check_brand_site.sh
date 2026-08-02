@@ -22,6 +22,17 @@ reject_token() {
   fi
 }
 
+require_css_property() {
+  local selector="$1"
+  local property="$2"
+  awk -v selector="$selector" -v property="$property" '
+    index($0, selector) == 1 { in_rule = 1; next }
+    in_rule && index($0, property) { found = 1 }
+    in_rule && /}/ { exit }
+    END { exit(found ? 0 : 1) }
+  ' "$repo_dir/assets/brand-site.css" || fail "$selector must include $property to preserve image proportions"
+}
+
 pages=(
   "index.html"
   "index_en.html"
@@ -71,5 +82,6 @@ require_token "index.html" 'href="index_en.html?lang=en"'
 require_token "index_en.html" 'href="/?lang=ko"'
 require_token "quirky-ball/index.html" 'href="index_en.html?lang=en"'
 require_token "quirky-ball/index_en.html" 'href="./?lang=ko"'
+require_css_property ".featured-logo" "height: auto;"
 
 printf 'brand site contract: PASS\n'
