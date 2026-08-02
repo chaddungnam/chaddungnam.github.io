@@ -1,61 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="/assets/site-fonts.css" rel="stylesheet">
-<title>Terms of Service — Quirky Ball | House Duck</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif; background: #F5F2EC; color: #1C1C1E; line-height: 1.8; }
-  .container { max-width: 760px; margin: 0 auto; padding: 32px 20px 72px; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-  .back-link { color: #6b675f; text-decoration: none; font-size: 0.9rem; }
-  .back-link:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs { font-size: 0.85rem; color: #6b675f; }
-  nav.langs a { color: #6b675f; text-decoration: none; margin-right: 10px; }
-  nav.langs a:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs a.current { color: #1C1C1E; font-weight: 600; }
-  header { padding: 0 0 24px; border-bottom: 1px solid #e3ded3; margin-bottom: 24px; }
-  h1 { color: #1C1C1E; margin-bottom: 6px; font-size: 1.55rem; }
-  .date { color: #6b675f; font-size: 0.9rem; }
-  h2 { color: #1C1C1E; margin: 36px 0 10px; padding-top: 14px; border-top: 1px solid #e3ded3; font-size: 1.15rem; }
-  p { margin: 10px 0; color: #1C1C1E; }
-  ul, ol { margin: 10px 0; padding-left: 22px; color: #1C1C1E; }
-  li { margin: 4px 0; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 12px 0; }
-  th, td { border: 1px solid #e3ded3; padding: 8px 10px; text-align: left; vertical-align: top; color: #1C1C1E; }
-  th { background: #f0ece2; }
-  td { background: #fbf9f4; }
-  .highlight-box { background: #fbf9f4; border-left: 4px solid #b06823; padding: 16px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
-  a { color: #b06823; }
-  footer { text-align: center; padding: 24px 20px; color: #6b675f; font-size: 0.85rem; border-top: 1px solid #e3ded3; margin-top: 48px; }
-  h1 { font-family: 'Do Hyeon', 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 400; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/assets/site-fonts.css" rel="stylesheet">
+  <link href="/assets/legal-site.css" rel="stylesheet">
+  <script defer src="/assets/legal-site.js"></script>
+  <title>Terms of Service — Quirky Ball | House Duck</title>
 </head>
-<body>
-<div class="container">
-  <div class="topbar">
-    <a href="../../" class="back-link">← House Duck Home</a>
-    <nav class="langs">
-      <a href="ko.html">한국어</a>
-      <a class="current" href="en.html">English</a>
-      <a href="de.html">Deutsch</a>
-      <a href="ja.html">日本語</a>
-      <a href="../privacy/en.html">Privacy Policy</a>
-    </nav>
-  </div>
+<body class="legal-page" data-document="terms">
+  <a class="skip-link" href="#legal-content">Skip to the document</a>
 
-  <header>
-    <h1>Terms of Service</h1>
-    <p class="date">Quirky Ball · Effective Date: August 1, 2026</p>
+  <header class="legal-site-header">
+    <div class="legal-header-inner">
+      <a class="legal-brand" href="../../" aria-label="House Duck">
+        <span class="legal-duck-mark" aria-hidden="true"></span>
+        <span>HOUSE DUCK</span>
+      </a>
+      <nav class="legal-header-links" aria-label="Related documents">
+        <a href="../index_en.html?lang=en">Quirky Ball</a>
+        <a href="/support/">Support</a>
+      </nav>
+    </div>
   </header>
 
-  <h2>1. Overview and Acceptance</h2>
+  <main class="legal-main" id="legal-content">
+    <!-- 문서 메타데이터 시작: 제목, 시행일, 언어 링크만 수정 -->
+    <section class="legal-hero" aria-labelledby="legal-title">
+      <div>
+        <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
+        <h1 id="legal-title">Terms of Service</h1>
+        <p class="legal-date">Quirky Ball · Effective Date: August 1, 2026</p>
+      </div>
+      <nav class="legal-language-links" aria-label="Document language">
+          <a href="ko.html">한국어</a>
+          <a class="current" aria-current="page" href="en.html">English</a>
+          <a href="de.html">Deutsch</a>
+          <a href="ja.html">日本語</a>
+      </nav>
+    </section>
+    <!-- 문서 메타데이터 끝 -->
+
+    <div class="legal-layout">
+      <aside class="legal-aside" aria-label="Related documents">
+        <a class="legal-back-link" href="../../">← House Duck home</a>
+        <div class="legal-related-block">
+          <p class="legal-aside-label">Related documents</p>
+          <nav class="legal-related-links">
+            <a href="../privacy/en.html">Privacy Policy</a>
+            <a aria-current="page" href="en.html">Terms of Service</a>
+            <a href="../privacy/delete_en.html">Delete account</a>
+          </nav>
+        </div>
+        <nav class="legal-desktop-toc" data-toc-container aria-label="On this page">
+          <p class="legal-aside-label">On this page</p>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </nav>
+        <details class="legal-mobile-toc" data-toc-container>
+          <summary>Open table of contents</summary>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </details>
+      </aside>
+
+      <article class="legal-paper">
+        <!-- 문서 본문 시작: 정책 문구는 이 안에서만 수정 -->
+        <div data-legal-content>
+<h2 id="section-1">1. Overview and Acceptance</h2>
   <p>These Terms of Service (the "Terms") govern the use of the mobile game <strong>Quirky Ball</strong> (the "Software"), provided by <strong>House Duck</strong>, an independent developer based in Germany (the "Operator").</p>
   <p>By downloading, installing, launching, or using the Software, you agree to these Terms and the <a href="../privacy/en.html">Privacy Policy</a>. If you do not agree, you may not use the Software.</p>
 
-  <h2>2. The Service</h2>
+  <h2 id="section-2">2. The Service</h2>
   <p>The Software is a free, advertising-supported mobile puzzle game for Android. It currently offers no in-app purchases using real money and includes the following features:</p>
   <ul>
     <li>Ad-based monetization — rewarded and interstitial ads (Google AdMob)</li>
@@ -65,17 +79,17 @@
   </ul>
   <p>The Operator may introduce optional paid digital content, virtual items, subscriptions, or other paid features in the future. Any such offering will be presented with its price, purchase conditions, and applicable refund information before purchase and will be governed by the payment rules of the applicable app store.</p>
 
-  <h2>3. Age Requirement</h2>
+  <h2 id="section-3">3. Age Requirement</h2>
   <p>The Software may only be used by persons aged 14 or older. Where local law requires a higher minimum age, that age applies. If we learn that a user is below the applicable age, we may delete the related account and data.</p>
 
-  <h2>4. Accounts</h2>
+  <h2 id="section-4">4. Accounts</h2>
   <ul>
     <li>You can play as a guest without any sign-up; in that case a guest identifier (UID) is generated on your device and the server.</li>
     <li>Linking a Google account lets you sync your progress across devices. Linking is optional.</li>
     <li>Guest account data cannot be recovered once the app is deleted. You are responsible for managing your account and progress data.</li>
   </ul>
 
-  <h2>5. Virtual Currency (Stamina &amp; Gems)</h2>
+  <h2 id="section-5">5. Virtual Currency (Stamina &amp; Gems)</h2>
   <ul>
     <li>Stamina and gems are virtual currencies granted free of charge in the game or earned by actions such as watching rewarded ads.</li>
     <li>Virtual currency has no cash or real-world value and cannot be refunded, transferred, or exchanged.</li>
@@ -83,21 +97,21 @@
     <li>The Operator may adjust how virtual currency is earned or spent to keep the game balanced.</li>
   </ul>
 
-  <h2>6. Advertising and Consent</h2>
+  <h2 id="section-6">6. Advertising and Consent</h2>
   <ul>
     <li>The Software displays ads served by Google AdMob; watching rewarded ads is optional.</li>
     <li>Users in regions where consent is required (such as the EEA and the UK) may be shown a Google UMP consent flow. Advertising choices can be managed through the UMP flow and device settings.</li>
     <li>Data processing related to ads is governed by the <a href="../privacy/en.html">Privacy Policy</a>.</li>
   </ul>
 
-  <h2>7. Leaderboards</h2>
+  <h2 id="section-7">7. Leaderboards</h2>
   <ul>
     <li>Leaderboards publicly show your nickname/display code, best score, and country to other users.</li>
     <li>Leaderboard data is stored on Supabase servers, and entries are kept for the most recent 28 days only.</li>
     <li>The Operator may remove inappropriate nicknames or abnormal scores from the leaderboards at its discretion.</li>
   </ul>
 
-  <h2>8. Prohibited Conduct</h2>
+  <h2 id="section-8">8. Prohibited Conduct</h2>
   <p>You must not:</p>
   <ul>
     <li>Manipulate the game using cheats, automation tools, or modified clients</li>
@@ -108,42 +122,53 @@
   </ul>
   <p>In case of violations, the Operator may restrict use, remove leaderboard entries, or delete accounts.</p>
 
-  <h2>9. Intellectual Property</h2>
+  <h2 id="section-9">9. Intellectual Property</h2>
   <p>All intellectual property rights in the Software belong to the Operator. The Operator grants you only a non-transferable, non-exclusive license for personal, non-commercial use.</p>
 
-  <h2>10. Disclaimer of Warranties</h2>
+  <h2 id="section-10">10. Disclaimer of Warranties</h2>
   <p>The Software is currently provided without a mandatory purchase, <strong>"as is"</strong>. The Operator makes no express or implied warranties, including merchantability, fitness for a particular purpose, error-free operation, or uninterrupted availability.</p>
 
-  <h2>11. Limitation of Liability</h2>
+  <h2 id="section-11">11. Limitation of Liability</h2>
   <p>To the extent permitted by applicable law, the Operator is not liable for indirect, incidental, or consequential damages (including data loss or loss of expected profits) arising from the use or inability to use the Software. This does not apply in cases of intent or gross negligence by the Operator.</p>
 
-  <h2>12. Changes and Interruption of Service</h2>
+  <h2 id="section-12">12. Changes and Interruption of Service</h2>
   <p>The Operator may change features of the Software or discontinue providing it, for example for updates, maintenance, or technical reasons. We will make reasonable efforts to announce material changes through an in-app notice or the website.</p>
 
-  <h2>13. Account Deletion and Data</h2>
+  <h2 id="section-13">13. Account Deletion and Data</h2>
   <ul>
     <li>You can delete your account at any time via <strong>Settings → Delete Account</strong> in the app.</li>
     <li>Deletion permanently removes all game data stored on the server and your device (progress data, leaderboard records, Google account linkage, etc.) and cannot be undone. Device-only settings are also lost.</li>
     <li>If you cannot access the app, you can request deletion by email with your nickname and display code. See the <a href="../privacy/delete_en.html">Account Deletion page</a> and the <a href="../privacy/en.html">Privacy Policy</a> for details.</li>
   </ul>
 
-  <h2>14. Changes to These Terms</h2>
+  <h2 id="section-14">14. Changes to These Terms</h2>
   <p>These Terms may be updated to reflect legal changes or service improvements. Material changes will be announced in advance through an in-app notice or this page. Continued use after a change takes effect constitutes acceptance of the updated Terms.</p>
 
-  <h2>15. Governing Law and Contact</h2>
+  <h2 id="section-15">15. Governing Law and Contact</h2>
   <p>These Terms are governed by the laws of Germany (the Operator's place of residence). Mandatory consumer protection provisions of your country of residence remain unaffected where applicable.</p>
   <p>For questions about these Terms, contact:</p>
   <p><strong>Email:</strong> <a href="mailto:support@houseduck.in">support@houseduck.in</a></p>
 
-  <h2>16. Effective Date and Revision History</h2>
+  <h2 id="section-16">16. Effective Date and Revision History</h2>
   <ul>
     <li>August 1, 2026 — Clarified the current free, ad-supported scope and operator description (v1.1)</li>
     <li>July 27, 2026 — Initial publication of these Terms of Service (v1.0)</li>
   </ul>
+        </div>
+        <!-- 문서 본문 끝 -->
 
-  <footer>
-    <p>© 2026 House Duck. All rights reserved.</p>
+        <footer class="legal-document-footer">
+          <p>Official Quirky Ball document · Terms of Service</p>
+        </footer>
+      </article>
+    </div>
+  </main>
+
+  <footer class="legal-site-footer">
+    <div class="legal-site-footer-inner">
+      <p>© <span data-current-year>2026</span> House Duck.</p>
+      <p>Small games. Big personality.</p>
+    </div>
   </footer>
-</div>
 </body>
 </html>

@@ -1,65 +1,80 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="/assets/site-fonts.css" rel="stylesheet">
-<title>プライバシーポリシー — Quirky Ball | House Duck</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif; background: #F5F2EC; color: #1C1C1E; line-height: 1.8; }
-  .container { max-width: 760px; margin: 0 auto; padding: 32px 20px 72px; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-  .back-link { color: #6b675f; text-decoration: none; font-size: 0.9rem; }
-  .back-link:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs { font-size: 0.85rem; color: #6b675f; }
-  nav.langs a { color: #6b675f; text-decoration: none; margin-right: 10px; }
-  nav.langs a:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs a.current { color: #1C1C1E; font-weight: 600; }
-  header { padding: 0 0 24px; border-bottom: 1px solid #e3ded3; margin-bottom: 24px; }
-  h1 { color: #1C1C1E; margin-bottom: 6px; font-size: 1.55rem; }
-  .date { color: #6b675f; font-size: 0.9rem; }
-  h2 { color: #1C1C1E; margin: 36px 0 10px; padding-top: 14px; border-top: 1px solid #e3ded3; font-size: 1.15rem; }
-  p { margin: 10px 0; color: #1C1C1E; }
-  ul, ol { margin: 10px 0; padding-left: 22px; color: #1C1C1E; }
-  li { margin: 4px 0; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 12px 0; }
-  th, td { border: 1px solid #e3ded3; padding: 8px 10px; text-align: left; vertical-align: top; color: #1C1C1E; }
-  th { background: #f0ece2; }
-  td { background: #fbf9f4; }
-  .highlight-box { background: #fbf9f4; border-left: 4px solid #b06823; padding: 16px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
-  a { color: #b06823; }
-  footer { text-align: center; padding: 24px 20px; color: #6b675f; font-size: 0.85rem; border-top: 1px solid #e3ded3; margin-top: 48px; }
-  h1 { font-family: 'Do Hyeon', 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 400; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/assets/site-fonts.css" rel="stylesheet">
+  <link href="/assets/legal-site.css" rel="stylesheet">
+  <script defer src="/assets/legal-site.js"></script>
+  <title>プライバシーポリシー — Quirky Ball | House Duck</title>
 </head>
-<body>
-<div class="container">
-  <div class="topbar">
-    <a href="../../" class="back-link">← House Duck ホームへ</a>
-    <nav class="langs">
-      <a href="ko.html">한국어</a>
-      <a href="en.html">English</a>
-      <a href="de.html">Deutsch</a>
-      <a class="current" href="ja.html">日本語</a>
-      <a href="../terms/ja.html">利用規約</a>
-    </nav>
-  </div>
+<body class="legal-page" data-document="privacy">
+  <a class="skip-link" href="#legal-content">本文へ移動</a>
 
-  <header>
-    <h1>プライバシーポリシー</h1>
-    <p class="date">Quirky Ball（クオーキーボール） · 施行日: 2026年8月1日</p>
+  <header class="legal-site-header">
+    <div class="legal-header-inner">
+      <a class="legal-brand" href="../../" aria-label="House Duck">
+        <span class="legal-duck-mark" aria-hidden="true"></span>
+        <span>HOUSE DUCK</span>
+      </a>
+      <nav class="legal-header-links" aria-label="関連文書">
+        <a href="../index_en.html?lang=en">Quirky Ball</a>
+        <a href="/support/">サポート</a>
+      </nav>
+    </div>
   </header>
 
-  <h2>1. 概要および運営者</h2>
+  <main class="legal-main" id="legal-content">
+    <!-- 문서 메타데이터 시작: 제목, 시행일, 언어 링크만 수정 -->
+    <section class="legal-hero" aria-labelledby="legal-title">
+      <div>
+        <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
+        <h1 id="legal-title">プライバシーポリシー</h1>
+        <p class="legal-date">Quirky Ball（クオーキーボール） · 施行日: 2026年8月1日</p>
+      </div>
+      <nav class="legal-language-links" aria-label="文書の言語">
+          <a href="ko.html">한국어</a>
+          <a href="en.html">English</a>
+          <a href="de.html">Deutsch</a>
+          <a class="current" aria-current="page" href="ja.html">日本語</a>
+      </nav>
+    </section>
+    <!-- 문서 메타데이터 끝 -->
+
+    <div class="legal-layout">
+      <aside class="legal-aside" aria-label="関連文書">
+        <a class="legal-back-link" href="../../">← House Duck ホーム</a>
+        <div class="legal-related-block">
+          <p class="legal-aside-label">関連文書</p>
+          <nav class="legal-related-links">
+            <a aria-current="page" href="ja.html">プライバシーポリシー</a>
+            <a href="../terms/ja.html">利用規約</a>
+            <a href="delete_ja.html">アカウント削除</a>
+          </nav>
+        </div>
+        <nav class="legal-desktop-toc" data-toc-container aria-label="このページの内容">
+          <p class="legal-aside-label">このページの内容</p>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </nav>
+        <details class="legal-mobile-toc" data-toc-container>
+          <summary>目次を開く</summary>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </details>
+      </aside>
+
+      <article class="legal-paper">
+        <!-- 문서 본문 시작: 정책 문구는 이 안에서만 수정 -->
+        <div data-legal-content>
+<h2 id="section-1">1. 概要および運営者</h2>
   <p>本プライバシーポリシーは、ドイツを拠点とする独立開発者 <strong>House Duck</strong>（以下「運営者」）が提供するモバイルゲーム <strong>Quirky Ball</strong>（以下「本サービス」）に適用されます。</p>
   <p>運営者は、利用者の個人情報を大切に取り扱い、大韓民国の個人情報保護法、EU一般データ保護規則（GDPR）、米国各州法などの関連法規を遵守するよう努めています。本ポリシーは、本サービスがどのような情報を収集し、どのような目的で利用し、どのように保管・削除するかを説明するものです。本書は、アプリ内に表示されるプライバシー案内（要約版）の全文版です。</p>
   <p>GDPRにおける管理者（Controller）は本サービスの運営者であり、下記のメールアドレスで連絡できます。</p>
 
-  <h2>2. 収集する個人情報の項目</h2>
+  <h2 id="section-2">2. 収集する個人情報の項目</h2>
   <p>本サービスは、別途の会員登録手続きなしにゲストとしてすぐにご利用いただけます。その際、以下の情報を収集・保存します。</p>
   <p>本サービスは現在、Android向けに無料・広告ベースで提供されており、実際の通貨を使用するアプリ内購入は提供していません。</p>
-  <table>
+  <div class="table-scroll" role="region" aria-label="横にスクロールできる表" tabindex="0">
+    <table>
     <tr><th>項目</th><th>収集時期/方法</th><th>保存先</th></tr>
     <tr><td>ゲスト識別子（UID）</td><td>サービス利用時に自動生成</td><td>端末およびサーバー（Supabase）</td></tr>
     <tr><td>メールアドレス、プロフィール名</td><td>（任意）Googleアカウント連携時のみ</td><td>サーバー（Supabase Auth）</td></tr>
@@ -70,9 +85,10 @@
     <tr><td>仮想通貨・進行状況（スタミナ、ジェム、突破チケット、出席、ミッション、ショップ、シーズン進行）</td><td>サービス利用中に生成・変更</td><td>端末およびサーバー（Supabaseアカウント状態）</td></tr>
     <tr><td>言語・音量・バイブレーション・フレームレート設定</td><td>利用者が設定</td><td>端末のみ（ローカル保存）</td></tr>
   </table>
+  </div>
   <p>本サービスは、精密な位置情報、連絡先、写真などゲーム提供に不要な情報は収集せず、独立した分析（アナリティクス）SDKも使用していません。</p>
 
-  <h2>3. 収集・利用の目的および処理の法的根拠</h2>
+  <h2 id="section-3">3. 収集・利用の目的および処理の法的根拠</h2>
   <ul>
     <li>ゲームの進行状況の保存および端末間の同期（Googleアカウント連携時）（GDPR第6条第1項(b) — 契約の履行）</li>
     <li>ランキングの提供 — ニックネーム/表示コード、ベストスコア、国の表示（GDPR第6条第1項(b)）</li>
@@ -81,24 +97,26 @@
     <li>関連法規の遵守および紛争への対応（GDPR第6条第1項(c)）</li>
   </ul>
 
-  <h2>4. 第三者提供および処理委託</h2>
+  <h2 id="section-4">4. 第三者提供および処理委託</h2>
   <p>本サービスは、利用者の個人情報を第三者に販売しません。ただし、サービス提供のために以下の外部サービスを利用しており、各事業者のプライバシーポリシーが併せて適用されます。</p>
-  <table>
+  <div class="table-scroll" role="region" aria-label="横にスクロールできる表" tabindex="0">
+    <table>
     <tr><th>サービス（事業者）</th><th>利用目的</th><th>関連する情報</th></tr>
     <tr><td>Google AdMob（Google LLC）</td><td>リワード広告・インタースティシャル広告、広告効果測定、分析、不正防止</td><td>IPアドレスから推定されるおおよその位置、アプリ・広告の操作情報、診断情報、広告ID・App Set IDなどの端末/アカウント識別子</td></tr>
     <tr><td>Google Sign-In（Google LLC）</td><td>（任意）Googleアカウント連携ログイン</td><td>メールアドレス、プロフィール名</td></tr>
     <tr><td>Supabase（Supabase Inc.）</td><td>アカウント状態の同期、スコア・ランキングおよびアカウント管理</td><td>UID、アカウント種別、ニックネーム、表示コード、国、スコア・レベル・プレイ記録、仮想通貨、ミッション・出席・ショップ・シーズン進行、ログアウト・最終プレイ時刻</td></tr>
   </table>
+  </div>
   <ul>
     <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google プライバシーポリシー</a></li>
     <li><a href="https://support.google.com/admob/answer/6128543" target="_blank" rel="noopener noreferrer">Google AdMob ポリシー</a></li>
     <li><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase プライバシーポリシー</a></li>
   </ul>
 
-  <h2>5. 国外移転</h2>
+  <h2 id="section-5">5. 国外移転</h2>
   <p>サービス運営に利用するクラウドインフラ（Supabase、Google）の特性上、個人情報が国外のサーバー — EU/EEA域外を含む — に保存・処理される場合があります。これらの移転は、各事業者が適用する保護措置（例：標準契約条項）および法的枠組みに基づいて行われます。</p>
 
-  <h2>6. 保有および利用期間</h2>
+  <h2 id="section-6">6. 保有および利用期間</h2>
   <ul>
     <li>アカウント削除をリクエストした場合、個人情報は即時または合理的な期間内に削除されます。</li>
     <li>プレイ・シーズン・週間の元記録は直近28日間保管され、その後自動的に削除されます。</li>
@@ -107,7 +125,7 @@
     <li>関連法規で別途保管が求められる場合は、その期間保管されることがあります。</li>
   </ul>
 
-  <h2>7. 利用者の権利および削除手続き</h2>
+  <h2 id="section-7">7. 利用者の権利および削除手続き</h2>
   <ul>
     <li>設定画面からいつでもアカウント情報の閲覧、ニックネーム・国の変更、アカウント削除（個人情報の削除を含む）をリクエストできます。</li>
     <li><strong>アプリ内アカウント削除：</strong>設定 → アカウント削除メニューから直接行えます。削除すると、サーバーと端末上のすべてのゲームデータが完全に消去され、復元できません。詳しくは<a href="delete_ja.html">アカウント削除について</a>をご覧ください。</li>
@@ -115,34 +133,45 @@
     <li>EU/EEA在住者はGDPRに基づくアクセス・訂正・削除・データポータビリティ・処理制限・異議申立ての権利を行使でき、管轄のデータ保護監督機関に苦情を申し立てる権利があります。カリフォルニア在住者はCCPAに基づく権利を行使できます（本サービスは個人情報を販売しません）。</li>
   </ul>
 
-  <h2>8. 広告および同意</h2>
+  <h2 id="section-8">8. 広告および同意</h2>
   <ul>
     <li>本サービスはGoogle AdMobによる広告を含み、リワード広告の視聴は任意です。</li>
     <li>同意が必要な地域（EEA・英国など）の利用者には、Google UMPによる同意手続きが表示される場合があります。広告に関する選択は、UMP画面と端末の設定で管理できます。同意しない場合でも、パーソナライズされていない広告が表示されることがあります。</li>
     <li>Google AdMobは広告のパーソナライズのために広告識別子を使用することがあります。端末の設定（Android: 設定 → Google → 広告）で広告のパーソナライズを制限したり、広告IDをリセットしたりできます。</li>
   </ul>
 
-  <h2>9. 子供の個人情報</h2>
+  <h2 id="section-9">9. 子供の個人情報</h2>
   <p>本サービスは、14歳未満（現地法でより高い基準年齢が定められている場合はその年齢）の子供を主な対象とせず、子供から故意に個人情報を収集しません。該当年齢未満の子供が個人情報を提供したことが判明した場合は、速やかに削除します。保護者の方は、下記のお問い合わせ先から削除をリクエストできます。</p>
 
-  <h2>10. セキュリティ</h2>
+  <h2 id="section-10">10. セキュリティ</h2>
   <p>運営者は、個人情報保護のために合理的な技術的・管理的措置を講じています。サーバーとのすべての通信はTLS暗号化で保護され、SupabaseデータベースへのアクセスはRow Level Security（RLS）により制限されています。</p>
 
-  <h2>11. お問い合わせ先</h2>
+  <h2 id="section-11">11. お問い合わせ先</h2>
   <p>個人情報に関するお問い合わせ・ご請求は、以下のメールアドレスまでお願いします。</p>
   <p><strong>メール:</strong> <a href="mailto:support@houseduck.in">support@houseduck.in</a></p>
 
-  <h2>12. 施行日および改訂履歴</h2>
+  <h2 id="section-12">12. 施行日および改訂履歴</h2>
   <ul>
     <li>2026年8月1日 — 広告SDKの処理項目とデータ保管期間を明確化（v2.1）</li>
     <li>2026年7月27日 — House Duck基準で全面改訂・施行（v2.0）</li>
     <li>2026年7月24日 — 本プライバシーポリシー初版制定・施行（v1.0）</li>
   </ul>
   <p>本ポリシーは、法令の変更またはサービスの改善に伴い改訂されることがあります。重要な変更がある場合は、アプリ内のお知らせを通じて事前にご案内します。</p>
+        </div>
+        <!-- 문서 본문 끝 -->
 
-  <footer>
-    <p>© 2026 House Duck. All rights reserved.</p>
+        <footer class="legal-document-footer">
+          <p>Quirky Ball 公式文書 · プライバシーポリシー</p>
+        </footer>
+      </article>
+    </div>
+  </main>
+
+  <footer class="legal-site-footer">
+    <div class="legal-site-footer-inner">
+      <p>© <span data-current-year>2026</span> House Duck.</p>
+      <p>Small games. Big personality.</p>
+    </div>
   </footer>
-</div>
 </body>
 </html>

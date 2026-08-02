@@ -1,61 +1,75 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="/assets/site-fonts.css" rel="stylesheet">
-<title>Nutzungsbedingungen — Quirky Ball | House Duck</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif; background: #F5F2EC; color: #1C1C1E; line-height: 1.8; }
-  .container { max-width: 760px; margin: 0 auto; padding: 32px 20px 72px; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-  .back-link { color: #6b675f; text-decoration: none; font-size: 0.9rem; }
-  .back-link:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs { font-size: 0.85rem; color: #6b675f; }
-  nav.langs a { color: #6b675f; text-decoration: none; margin-right: 10px; }
-  nav.langs a:hover { color: #1C1C1E; text-decoration: underline; }
-  nav.langs a.current { color: #1C1C1E; font-weight: 600; }
-  header { padding: 0 0 24px; border-bottom: 1px solid #e3ded3; margin-bottom: 24px; }
-  h1 { color: #1C1C1E; margin-bottom: 6px; font-size: 1.55rem; }
-  .date { color: #6b675f; font-size: 0.9rem; }
-  h2 { color: #1C1C1E; margin: 36px 0 10px; padding-top: 14px; border-top: 1px solid #e3ded3; font-size: 1.15rem; }
-  p { margin: 10px 0; color: #1C1C1E; }
-  ul, ol { margin: 10px 0; padding-left: 22px; color: #1C1C1E; }
-  li { margin: 4px 0; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 12px 0; }
-  th, td { border: 1px solid #e3ded3; padding: 8px 10px; text-align: left; vertical-align: top; color: #1C1C1E; }
-  th { background: #f0ece2; }
-  td { background: #fbf9f4; }
-  .highlight-box { background: #fbf9f4; border-left: 4px solid #b06823; padding: 16px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
-  a { color: #b06823; }
-  footer { text-align: center; padding: 24px 20px; color: #6b675f; font-size: 0.85rem; border-top: 1px solid #e3ded3; margin-top: 48px; }
-  h1 { font-family: 'Do Hyeon', 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 400; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/assets/site-fonts.css" rel="stylesheet">
+  <link href="/assets/legal-site.css" rel="stylesheet">
+  <script defer src="/assets/legal-site.js"></script>
+  <title>Nutzungsbedingungen — Quirky Ball | House Duck</title>
 </head>
-<body>
-<div class="container">
-  <div class="topbar">
-    <a href="../../" class="back-link">← Zur House-Duck-Startseite</a>
-    <nav class="langs">
-      <a href="ko.html">한국어</a>
-      <a href="en.html">English</a>
-      <a class="current" href="de.html">Deutsch</a>
-      <a href="ja.html">日本語</a>
-      <a href="../privacy/de.html">Datenschutzerklärung</a>
-    </nav>
-  </div>
+<body class="legal-page" data-document="terms">
+  <a class="skip-link" href="#legal-content">Zum Dokument springen</a>
 
-  <header>
-    <h1>Nutzungsbedingungen</h1>
-    <p class="date">Quirky Ball · Datum des Inkrafttretens: 1. August 2026</p>
+  <header class="legal-site-header">
+    <div class="legal-header-inner">
+      <a class="legal-brand" href="../../" aria-label="House Duck">
+        <span class="legal-duck-mark" aria-hidden="true"></span>
+        <span>HOUSE DUCK</span>
+      </a>
+      <nav class="legal-header-links" aria-label="Verwandte Dokumente">
+        <a href="../index_en.html?lang=en">Quirky Ball</a>
+        <a href="/support/">Support</a>
+      </nav>
+    </div>
   </header>
 
-  <h2>1. Überblick und Zustimmung</h2>
+  <main class="legal-main" id="legal-content">
+    <!-- 문서 메타데이터 시작: 제목, 시행일, 언어 링크만 수정 -->
+    <section class="legal-hero" aria-labelledby="legal-title">
+      <div>
+        <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
+        <h1 id="legal-title">Nutzungsbedingungen</h1>
+        <p class="legal-date">Quirky Ball · Datum des Inkrafttretens: 1. August 2026</p>
+      </div>
+      <nav class="legal-language-links" aria-label="Dokumentsprache">
+          <a href="ko.html">한국어</a>
+          <a href="en.html">English</a>
+          <a class="current" aria-current="page" href="de.html">Deutsch</a>
+          <a href="ja.html">日本語</a>
+      </nav>
+    </section>
+    <!-- 문서 메타데이터 끝 -->
+
+    <div class="legal-layout">
+      <aside class="legal-aside" aria-label="Verwandte Dokumente">
+        <a class="legal-back-link" href="../../">← House-Duck-Startseite</a>
+        <div class="legal-related-block">
+          <p class="legal-aside-label">Verwandte Dokumente</p>
+          <nav class="legal-related-links">
+            <a href="../privacy/de.html">Datenschutzerklärung</a>
+            <a aria-current="page" href="de.html">Nutzungsbedingungen</a>
+            <a href="../privacy/delete_de.html">Konto löschen</a>
+          </nav>
+        </div>
+        <nav class="legal-desktop-toc" data-toc-container aria-label="Auf dieser Seite">
+          <p class="legal-aside-label">Auf dieser Seite</p>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </nav>
+        <details class="legal-mobile-toc" data-toc-container>
+          <summary>Inhaltsverzeichnis öffnen</summary>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </details>
+      </aside>
+
+      <article class="legal-paper">
+        <!-- 문서 본문 시작: 정책 문구는 이 안에서만 수정 -->
+        <div data-legal-content>
+<h2 id="section-1">1. Überblick und Zustimmung</h2>
   <p>Diese Nutzungsbedingungen regeln die Nutzung des mobilen Spiels <strong>Quirky Ball</strong> (im Folgenden „die Software"), das von <strong>House Duck</strong>, einem unabhängigen Entwickler mit Sitz in Deutschland (im Folgenden „der Betreiber"), bereitgestellt wird.</p>
   <p>Mit dem Herunterladen, Installieren, Starten oder Nutzen der Software stimmst du diesen Nutzungsbedingungen und der <a href="../privacy/de.html">Datenschutzerklärung</a> zu. Wenn du nicht zustimmst, darfst du die Software nicht nutzen.</p>
 
-  <h2>2. Leistungsumfang</h2>
+  <h2 id="section-2">2. Leistungsumfang</h2>
   <p>Die Software ist ein kostenloses, werbefinanziertes mobiles Puzzle-Spiel für Android. In-App-Käufe mit echtem Geld werden derzeit nicht angeboten. Die Software umfasst:</p>
   <ul>
     <li>Werbebasierte Finanzierung — belohnte Werbung und Interstitial-Werbung (Google AdMob)</li>
@@ -65,17 +79,17 @@
   </ul>
   <p>Der Betreiber kann künftig optionale kostenpflichtige digitale Inhalte, virtuelle Gegenstände, Abonnements oder andere kostenpflichtige Funktionen anbieten. Vor einem solchen Kauf werden Preis, Kaufbedingungen und geltende Erstattungsinformationen angezeigt; außerdem gelten die Zahlungsregeln des jeweiligen App-Stores.</p>
 
-  <h2>3. Mindestalter</h2>
+  <h2 id="section-3">3. Mindestalter</h2>
   <p>Die Software darf nur von Personen ab 14 Jahren genutzt werden. Sofern lokales Recht ein höheres Mindestalter vorschreibt, gilt dieses. Wenn bekannt wird, dass ein Nutzer das geltende Mindestalter unterschreitet, können das betreffende Konto und die zugehörigen Daten gelöscht werden.</p>
 
-  <h2>4. Konten</h2>
+  <h2 id="section-4">4. Konten</h2>
   <ul>
     <li>Die Software kann ohne Registrierung als Gast genutzt werden; dabei wird eine Gast-Kennung (UID) auf deinem Gerät und dem Server erstellt.</li>
     <li>Durch die Verknüpfung eines Google-Kontos kannst du deinen Spielfortschritt geräteübergreifend synchronisieren. Die Verknüpfung ist freiwillig.</li>
     <li>Daten eines Gastkontos können nach dem Löschen der App nicht wiederhergestellt werden. Du bist für die Verwaltung deines Kontos und deiner Fortschrittsdaten verantwortlich.</li>
   </ul>
 
-  <h2>5. Virtuelle Währung (Stamina &amp; Edelsteine)</h2>
+  <h2 id="section-5">5. Virtuelle Währung (Stamina &amp; Edelsteine)</h2>
   <ul>
     <li>Stamina und Edelsteine sind virtuelle Währungen, die im Spiel kostenlos gutgeschrieben oder z. B. durch das Ansehen belohnter Werbung verdient werden.</li>
     <li>Virtuelle Währung hat keinen Bar- oder Sachwert und kann nicht erstattet, übertragen oder umgetauscht werden.</li>
@@ -83,21 +97,21 @@
     <li>Der Betreiber kann die Erwerbs- und Verbrauchsmechaniken der virtuellen Währung zur Wahrung der Spielbalance anpassen.</li>
   </ul>
 
-  <h2>6. Werbung und Einwilligung</h2>
+  <h2 id="section-6">6. Werbung und Einwilligung</h2>
   <ul>
     <li>Die Software zeigt Werbung über Google AdMob; das Ansehen belohnter Werbung ist freiwillig.</li>
     <li>Nutzern in einwilligungspflichtigen Regionen (z. B. EWR und Vereinigtes Königreich) kann ein Google-UMP-Einwilligungsprozess angezeigt werden. Werbeentscheidungen können dort und in den Geräteeinstellungen verwaltet werden.</li>
     <li>Die Datenverarbeitung im Zusammenhang mit Werbung richtet sich nach der <a href="../privacy/de.html">Datenschutzerklärung</a>.</li>
   </ul>
 
-  <h2>7. Bestenlisten</h2>
+  <h2 id="section-7">7. Bestenlisten</h2>
   <ul>
     <li>In den Bestenlisten werden dein Nickname/Anzeigecode, deine Bestleistung und dein Land für andere Nutzer öffentlich angezeigt.</li>
     <li>Bestenlisten-Daten werden auf Supabase-Servern gespeichert; Einträge werden nur für die letzten 28 Tage vorgehalten.</li>
     <li>Der Betreiber kann unangemessene Nicknames oder auffällige Punktzahlen nach eigenem Ermessen aus den Bestenlisten entfernen.</li>
   </ul>
 
-  <h2>8. Verbotenes Verhalten</h2>
+  <h2 id="section-8">8. Verbotenes Verhalten</h2>
   <p>Dir ist untersagt:</p>
   <ul>
     <li>das Spiel mit Cheats, Automatisierungswerkzeugen oder manipulierten Clients zu beeinflussen</li>
@@ -108,42 +122,53 @@
   </ul>
   <p>Bei Verstößen kann der Betreiber die Nutzung einschränken, Bestenlisten-Einträge entfernen oder Konten löschen.</p>
 
-  <h2>9. Geistiges Eigentum</h2>
+  <h2 id="section-9">9. Geistiges Eigentum</h2>
   <p>Alle Rechte an geistigem Eigentum der Software liegen beim Betreiber. Der Betreiber räumt dir lediglich eine nicht übertragbare, nicht ausschließliche Lizenz zur persönlichen, nicht kommerziellen Nutzung ein.</p>
 
-  <h2>10. Gewährleistungsausschluss</h2>
+  <h2 id="section-10">10. Gewährleistungsausschluss</h2>
   <p>Die Software wird derzeit ohne verpflichtenden Kauf und <strong>„wie besehen"</strong> bereitgestellt. Der Betreiber übernimmt keine ausdrückliche oder stillschweigende Gewährleistung, insbesondere nicht für Marktgängigkeit, Eignung für einen bestimmten Zweck, Fehlerfreiheit oder ununterbrochene Verfügbarkeit.</p>
 
-  <h2>11. Haftungsbeschränkung</h2>
+  <h2 id="section-11">11. Haftungsbeschränkung</h2>
   <p>Im gesetzlich zulässigen Umfang haftet der Betreiber nicht für indirekte, beiläufige oder Folgeschäden (einschließlich Datenverlust oder entgangenen Gewinns), die aus der Nutzung oder der Unmöglichkeit der Nutzung der Software entstehen. Dies gilt nicht bei Vorsatz oder grober Fahrlässigkeit des Betreibers.</p>
 
-  <h2>12. Änderung und Einstellung des Dienstes</h2>
+  <h2 id="section-12">12. Änderung und Einstellung des Dienstes</h2>
   <p>Der Betreiber kann Funktionen der Software ändern oder deren Bereitstellung einstellen, etwa aus Gründen von Updates, Wartung oder Technik. Wesentliche Änderungen werden nach Möglichkeit vorab über einen Hinweis in der App oder auf der Website angekündigt.</p>
 
-  <h2>13. Kontolöschung und Daten</h2>
+  <h2 id="section-13">13. Kontolöschung und Daten</h2>
   <ul>
     <li>Du kannst dein Konto jederzeit in der App über <strong>Einstellungen → Konto löschen</strong> löschen.</li>
     <li>Die Löschung entfernt alle auf dem Server und deinem Gerät gespeicherten Spieldaten (Fortschrittsdaten, Bestenlisten-Einträge, Google-Kontoverknüpfung usw.) dauerhaft und kann nicht rückgängig gemacht werden. Nur auf dem Gerät gespeicherte virtuelle Währung und Einstellungen verfallen ebenfalls.</li>
     <li>Wenn du keinen Zugriff auf die App hast, kannst du die Löschung per E-Mail unter Angabe deines Nicknames und Anzeigecodes beantragen. Einzelheiten findest du auf der Seite <a href="../privacy/delete_de.html">Konto löschen</a> und in der <a href="../privacy/de.html">Datenschutzerklärung</a>.</li>
   </ul>
 
-  <h2>14. Änderung dieser Bedingungen</h2>
+  <h2 id="section-14">14. Änderung dieser Bedingungen</h2>
   <p>Diese Nutzungsbedingungen können an geänderte Rechtslage oder Weiterentwicklungen des Dienstes angepasst werden. Wesentliche Änderungen werden vorab über einen Hinweis in der App oder auf dieser Seite angekündigt. Die fortgesetzte Nutzung nach Inkrafttreten einer Änderung gilt als Zustimmung zu den geänderten Bedingungen.</p>
 
-  <h2>15. Anwendbares Recht und Kontakt</h2>
+  <h2 id="section-15">15. Anwendbares Recht und Kontakt</h2>
   <p>Diese Nutzungsbedingungen unterliegen dem Recht Deutschlands (Wohnsitz des Betreibers). Zwingende Verbraucherschutzvorschriften deines Wohnsitzlandes bleiben unberührt, soweit anwendbar.</p>
   <p>Bei Fragen zu diesen Bedingungen wende dich an:</p>
   <p><strong>E-Mail:</strong> <a href="mailto:support@houseduck.in">support@houseduck.in</a></p>
 
-  <h2>16. Gültig ab und Änderungshistorie</h2>
+  <h2 id="section-16">16. Gültig ab und Änderungshistorie</h2>
   <ul>
     <li>1. August 2026 — Aktuellen kostenlosen, werbefinanzierten Umfang und Betreiberbeschreibung präzisiert (v1.1)</li>
     <li>27. Juli 2026 — Erstveröffentlichung dieser Nutzungsbedingungen (v1.0)</li>
   </ul>
+        </div>
+        <!-- 문서 본문 끝 -->
 
-  <footer>
-    <p>© 2026 House Duck. All rights reserved.</p>
+        <footer class="legal-document-footer">
+          <p>Offizielles Quirky-Ball-Dokument · Nutzungsbedingungen</p>
+        </footer>
+      </article>
+    </div>
+  </main>
+
+  <footer class="legal-site-footer">
+    <div class="legal-site-footer-inner">
+      <p>© <span data-current-year>2026</span> House Duck.</p>
+      <p>Small games. Big personality.</p>
+    </div>
   </footer>
-</div>
 </body>
 </html>
