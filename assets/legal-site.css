@@ -428,8 +428,7 @@ a:hover {
   margin: 20px 0;
   padding: 20px 22px;
   border: 1px solid rgba(47, 183, 170, 0.25);
-  border-left: 5px solid var(--legal-teal);
-  border-radius: 0 18px 18px 0;
+  border-radius: 18px;
   background: rgba(47, 183, 170, 0.08);
 }
 
