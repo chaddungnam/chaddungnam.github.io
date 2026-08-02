@@ -107,8 +107,44 @@ function renderDashboard() {
   renderFunnel();
   renderExitBreakdown();
   renderAds();
+  renderPlayerOperations();
   renderDailyTable();
   renderInsight();
+}
+
+function formatServerTime(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
+}
+
+function renderPlayerOperations() {
+  const operations = state.payload?.playerOperations ?? {};
+  const rows = operations.players ?? [];
+  const summary = operations.summary ?? {};
+  setText("playerOpsTotal", operations.available ? `${formatNumber(summary.totalProfiles)}명` : "조회 불가");
+  byId("playerOpsSummary").innerHTML = operations.available
+    ? [
+        ["프로필", summary.totalProfiles],
+        ["미수령 우편", summary.pendingMail],
+        ["친구 처리 대기", summary.pendingFriendActions],
+        ["상태 미생성", summary.missingAccountState],
+      ].map(([label, value]) => `<div class="platform-row"><div class="platform-name"><strong>${escapeHtml(label)}</strong></div><div><strong>${formatNumber(value)}</strong></div></div>`).join("")
+    : '<p class="empty-panel">통합 운영 조회를 사용할 수 없습니다. 서버 마이그레이션 상태를 확인해 주세요.</p>';
+  byId("playerOpsTable").innerHTML = rows.length === 0
+    ? '<tr><td class="empty-row" colspan="10">표시할 사용자 상태가 없습니다.</td></tr>'
+    : rows.map((row) => `<tr>
+        <td><strong>${escapeHtml(row.nickname)}</strong><small>${escapeHtml(row.displayCode || row.accountType)}</small></td>
+        <td>${escapeHtml(row.country)}</td>
+        <td>${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small></td>
+        <td>${formatNumber(row.gems)}</td>
+        <td>${formatNumber(row.stamina)}/${formatNumber(row.staminaMax)}</td>
+        <td>${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
+        <td>${formatNumber(row.pendingMailCount)}</td>
+        <td>${formatNumber(row.friendCount)}<small>대기 ${formatNumber(row.pendingFriendRequestCount + row.unclaimedFriendGiftCount)}</small></td>
+        <td>${formatNumber(row.seasonXp)}</td>
+        <td>${escapeHtml(formatServerTime(row.stateUpdatedAt))}</td>
+      </tr>`).join("");
 }
 
 function distributionLabel(value) {

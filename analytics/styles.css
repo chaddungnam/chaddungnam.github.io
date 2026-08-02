@@ -234,6 +234,7 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .metric-fill.unobserved { background: var(--gold); }
 
 .table-scroll { overflow-x: auto; }
+.table-scroll td small { display: block; margin-top: 3px; color: #8b91a1; font-size: 9px; white-space: nowrap; }
 table { width: 100%; border-collapse: collapse; font-size: 11px; }
 th { padding: 0 12px 12px; color: #9da2b1; font-size: 10px; font-weight: 700; text-align: right; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
