@@ -56,8 +56,9 @@
         </div>
         <div class="toolbar-switches">
           <div class="range-switch" aria-label="조회 기간">
-            <button class="range-button" data-range="7" type="button">최근 7일</button>
-            <button class="range-button active" data-range="28" type="button">최근 28일</button>
+            <button class="range-button" data-range="1" type="button">오늘</button>
+            <button class="range-button active" data-range="7" type="button">최근 7일</button>
+            <button class="range-button" data-range="28" type="button">최근 28일</button>
           </div>
           <div class="range-switch" aria-label="배포 스토어">
             <button class="distribution-button active" data-distribution="all" type="button">전체</button>
@@ -74,14 +75,15 @@
         <div class="health-score"><span>상태 점수</span><strong id="healthScore">수집 중</strong></div>
       </section>
 
-      <section class="kpi-grid" aria-label="핵심 지표">
-        <article class="kpi-card accent-teal"><span class="kpi-label">오늘 활성 설치</span><strong id="kpiActive">—</strong><span class="kpi-hint">오늘 이벤트를 보낸 설치 수</span></article>
-        <article class="kpi-card accent-gold"><span class="kpi-label">평균 세션</span><strong id="kpiSession">—</strong><span class="kpi-hint">앱을 켜고 머문 시간</span></article>
-        <article class="kpi-card accent-ink"><span class="kpi-label">평균 게임</span><strong id="kpiGame">—</strong><span class="kpi-hint">게임 시작부터 종료까지</span></article>
-        <article class="kpi-card accent-coral"><span class="kpi-label">게임 중 이탈</span><strong id="kpiExit">—</strong><span class="kpi-hint">게임 시작 후 결과 없이 종료</span></article>
-        <article class="kpi-card accent-teal"><span class="kpi-label">D1 / D7 유지율</span><strong id="kpiRetention">—</strong><span class="kpi-hint">첫 방문 다음 날 / 7일 뒤</span></article>
-        <article class="kpi-card accent-gold"><span class="kpi-label">플레이어당 광고</span><strong id="kpiAdsPerPlayer">—</strong><span class="kpi-hint">선택 기간 평균 광고 노출</span></article>
-        <article class="kpi-card accent-coral"><span class="kpi-label">예상 광고 수익</span><strong id="kpiRevenue">—</strong><span class="kpi-hint">초기 eCPM 가정 기반 추정</span></article>
+      <section class="kpi-grid pulse-grid" aria-label="핵심 지표 한눈에 보기">
+        <article class="ring-card accent-teal"><div id="ringActive" class="metric-ring"><div><strong id="kpiActive">—</strong><small>명</small></div></div><span class="ring-label">오늘 활성</span><span class="ring-hint">오늘 들어온 플레이어</span></article>
+        <article class="ring-card accent-gold"><div id="ringSession" class="metric-ring"><div><strong id="kpiSession">—</strong></div></div><span class="ring-label">평균 세션</span><span class="ring-hint">앱에 머문 시간</span></article>
+        <article class="ring-card accent-ink"><div id="ringGame" class="metric-ring"><div><strong id="kpiGame">—</strong></div></div><span class="ring-label">평균 게임</span><span class="ring-hint">한 판 플레이 시간</span></article>
+        <article class="ring-card accent-coral"><div id="ringExit" class="metric-ring"><div><strong id="kpiExit">—</strong></div></div><span class="ring-label">게임 중 이탈</span><span class="ring-hint">낮을수록 좋아요</span></article>
+        <article class="ring-card accent-teal"><div id="ringD1" class="metric-ring"><div><strong id="kpiD1">—</strong></div></div><span class="ring-label">D1 유지율</span><span class="ring-hint">다음 날 다시 온 비율</span></article>
+        <article class="ring-card accent-teal"><div id="ringD7" class="metric-ring"><div><strong id="kpiD7">—</strong></div></div><span class="ring-label">D7 유지율</span><span class="ring-hint">7일 뒤 다시 온 비율</span></article>
+        <article class="ring-card accent-gold"><div id="ringAds" class="metric-ring"><div><strong id="kpiAdsPerPlayer">—</strong><small>회</small></div></div><span class="ring-label">플레이어당 광고</span><span class="ring-hint">평균 광고 노출</span></article>
+        <article class="ring-card accent-coral"><div id="ringRevenue" class="metric-ring"><div><strong id="kpiRevenue">—</strong></div></div><span class="ring-label">예상 수익</span><span class="ring-hint">초기 eCPM 추정</span></article>
       </section>
 
       <section class="insight-banner" aria-live="polite">
@@ -94,7 +96,7 @@
 
       <div class="content-grid">
         <article class="panel panel-wide">
-          <div class="panel-heading"><div><p class="eyebrow">DAILY PULSE</p><h2>매일 얼마나 들어왔나</h2></div><div class="legend"><span><i class="legend-teal"></i>활성 설치</span><span><i class="legend-coral"></i>게임 완료</span></div></div>
+          <div class="panel-heading"><div><p class="eyebrow">DAILY PULSE · EUROPE/BERLIN</p><h2>일별 흐름 그래프</h2></div><div class="legend"><span><i class="legend-teal"></i>활성 설치</span><span><i class="legend-coral"></i>게임 완료</span></div></div>
           <div class="chart-wrap"><canvas id="dailyChart" height="240" aria-label="일별 활성 설치와 게임 완료 차트"></canvas></div>
         </article>
 
@@ -123,9 +125,11 @@
           <div id="platformSummary" class="platform-summary"></div>
         </article>
 
-        <article class="panel panel-wide">
-          <div class="panel-heading"><div><p class="eyebrow">DAY BY DAY</p><h2>출시 후 변화를 확인</h2></div></div>
-          <div class="table-scroll"><table><thead><tr><th>날짜</th><th>활성 설치</th><th>세션</th><th>게임 시작</th><th>완료</th><th>중간 이탈</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div>
+        <article class="panel panel-wide collapsible-panel">
+          <details id="dailyDetails" class="collapsible-content">
+            <summary><span><p class="eyebrow">DAY BY DAY</p><strong>출시 후 변화를 자세히 보기</strong></span><span class="collapsible-hint">클릭해서 일별 표 열기</span></summary>
+            <div class="table-scroll"><table><thead><tr><th>날짜</th><th>활성 설치</th><th>세션</th><th>게임 시작</th><th>완료</th><th>중간 이탈</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div>
+          </details>
         </article>
       </div>
 

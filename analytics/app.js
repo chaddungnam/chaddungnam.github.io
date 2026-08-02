@@ -6,7 +6,7 @@ const GOOGLE_TOKEN_STORAGE_KEY = "quirky_ball_google_id_token";
 
 const state = {
   payload: null,
-  rangeDays: 28,
+  rangeDays: 7,
   projectKey: "",
   distributionKey: "all",
   loading: false,
@@ -22,6 +22,14 @@ function formatDecimal(value, digits = 1) { return typeof value === "number" && 
 function formatCurrency(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+}
+function setRingProgress(id, percent) {
+  const ring = byId(id);
+  const progress = typeof percent === "number" && Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
+  ring.style.setProperty("--ring-progress", `${progress}%`);
+}
+function percentageProgress(value, maximum = 1) {
+  return typeof value === "number" && Number.isFinite(value) ? value / maximum * 100 : null;
 }
 function formatDuration(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
@@ -75,7 +83,7 @@ async function loadDashboard() {
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
-    setText("dataStatus", `${updated} 기준 · 최근 ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
+    setText("dataStatus", `${updated} 기준 · 독일 시간 · ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
     const message = await readFunctionError(error);
@@ -98,10 +106,19 @@ function renderDashboard() {
   setText("kpiExit", formatRate(summary.exitRate));
   const d1 = retention?.find((item) => item.day === 1)?.rate;
   const d7 = retention?.find((item) => item.day === 7)?.rate;
-  setText("kpiRetention", `${formatRate(d1)} / ${formatRate(d7)}`);
+  setText("kpiD1", formatRate(d1));
+  setText("kpiD7", formatRate(d7));
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiAdsPerPlayer", formatDecimal(adEconomics.impressionsPerPlayer));
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
+  setRingProgress("ringActive", summary.activeInstallsToday > 0 ? 100 : 0);
+  setRingProgress("ringSession", percentageProgress(summary.avgSessionSeconds, 180));
+  setRingProgress("ringGame", percentageProgress(summary.avgGameSeconds, 180));
+  setRingProgress("ringExit", percentageProgress(summary.exitRate));
+  setRingProgress("ringD1", percentageProgress(d1));
+  setRingProgress("ringD7", percentageProgress(d7));
+  setRingProgress("ringAds", percentageProgress(adEconomics.impressionsPerPlayer, 5));
+  setRingProgress("ringRevenue", adEconomics.estimatedRevenueEur == null ? null : 100);
   setText("adTotal", `${formatNumber(summary.adImpressions)} 노출`);
   renderHealth(state.payload?.health);
   renderPlatformSummary(state.payload?.platforms ?? []);
@@ -126,7 +143,7 @@ function renderHealth(health = {}) {
   card.dataset.status = status;
   setText("healthIcon", icons[status] ?? "?");
   setText("healthLabel", health.label ?? labels[status] ?? labels.insufficient);
-  setText("healthReason", health.reasons?.[0] ?? "플레이어가 조금 더 쌓이면 게임 상태를 판정할 수 있습니다.");
+  setText("healthReason", health.summary ?? "플레이어가 조금 더 쌓이면 게임 상태를 판정할 수 있습니다.");
   setText("healthScore", typeof health.score === "number" ? `${health.score}/100` : "수집 중");
 }
 
