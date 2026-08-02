@@ -431,6 +431,13 @@ a:hover {
   background: rgba(47, 183, 170, 0.08);
 }
 
+.contact-note {
+  margin-top: 14px !important;
+  color: var(--legal-muted);
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
 .delete-steps {
   margin: 16px 0 22px !important;
   padding: 0 !important;
@@ -658,6 +665,7 @@ a:hover {
   .legal-hero h1,
   .language-hero h1 {
     font-size: clamp(2.7rem, 13vw, 4.1rem);
+    overflow-wrap: anywhere;
   }
 
   .legal-language-links {
