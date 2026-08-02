@@ -12,10 +12,12 @@ test -f "$dashboard_dir/app.js"
 test -f "$function_file"
 test -n "$(rg -l 'analytics_admins' "$migration_dir" | head -1)"
 
-rg -q 'signInWithPassword' "$dashboard_dir/app.js"
-rg -q 'resetPasswordForEmail' "$dashboard_dir/app.js"
-rg -q 'updateUser' "$dashboard_dir/app.js"
-rg -q 'PASSWORD_RECOVERY' "$dashboard_dir/app.js"
+rg -q 'signInWithOAuth' "$dashboard_dir/app.js"
+rg -q 'provider: "google"' "$dashboard_dir/app.js"
+if rg -n 'signInWithPassword|resetPasswordForEmail|updateUser|PASSWORD_RECOVERY' "$dashboard_dir/app.js"; then
+  echo "dashboard must not use password recovery auth" >&2
+  exit 1
+fi
 rg -q 'functions\.invoke\("analytics-dashboard"' "$dashboard_dir/app.js"
 rg -q 'analytics-dashboard' "$dashboard_dir/app.js"
 rg -q 'auth\.getUser' "$function_file"

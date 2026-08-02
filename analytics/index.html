@@ -14,31 +14,11 @@
       <p class="eyebrow">HOUSE DUCK / PRIVATE CONSOLE</p>
       <h1 id="loginTitle">Quirky Ball<br><em>Pulse</em></h1>
       <p class="login-copy">플레이어가 언제 들어오고, 얼마나 플레이한 뒤 나가는지 한눈에 확인하세요.</p>
-      <form id="loginForm" class="login-form">
-        <label for="email">관리자 이메일</label>
-        <input id="email" name="email" type="email" autocomplete="username" placeholder="you@example.com" required>
-        <label for="password">비밀번호</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Supabase Auth 비밀번호" required>
-        <button class="primary-button" type="submit">대시보드 로그인 <span aria-hidden="true">↗</span></button>
-      </form>
-      <button id="showRecoveryButton" class="secondary-link" type="button">비밀번호를 잊으셨나요?</button>
-      <form id="recoveryForm" class="login-form auth-form" hidden>
-        <p class="auth-form-heading">비밀번호 재설정</p>
-        <p class="auth-form-copy">입력한 이메일로 재설정 링크를 보냅니다. 링크는 공개 대시보드에서 열립니다.</p>
-        <label for="recoveryEmail">관리자 이메일</label>
-        <input id="recoveryEmail" name="recoveryEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
-        <button class="primary-button" type="submit">재설정 이메일 보내기 <span aria-hidden="true">↗</span></button>
-        <button id="backToLoginButton" class="text-button auth-back" type="button">로그인으로 돌아가기</button>
-      </form>
-      <form id="updatePasswordForm" class="login-form auth-form" hidden>
-        <p class="auth-form-heading">새 비밀번호 설정</p>
-        <p class="auth-form-copy">이메일 링크가 확인되었습니다. 새 비밀번호를 입력하세요.</p>
-        <label for="newPassword">새 비밀번호</label>
-        <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" minlength="8" required>
-        <label for="confirmPassword">새 비밀번호 확인</label>
-        <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
-        <button class="primary-button" type="submit">비밀번호 저장 <span aria-hidden="true">↗</span></button>
-      </form>
+      <div class="google-login">
+        <p class="auth-form-heading">Google 계정으로 로그인</p>
+        <p class="auth-form-copy">Supabase 관리자 허용 목록에 등록된 Google 계정만 지표를 볼 수 있습니다.</p>
+        <button id="googleLoginButton" class="primary-button" type="button"><span class="google-button-label"><span class="google-g" aria-hidden="true">G</span> Google로 로그인</span><span aria-hidden="true">↗</span></button>
+      </div>
       <p id="loginMessage" class="form-message" role="status"></p>
       <p class="login-note">허용 목록에 등록된 계정만 지표를 읽을 수 있습니다.</p>
     </section>
