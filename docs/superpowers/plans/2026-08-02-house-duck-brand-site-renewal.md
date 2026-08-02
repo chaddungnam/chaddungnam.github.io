@@ -210,7 +210,7 @@ git add docs/superpowers/plans/2026-08-02-house-duck-brand-site-renewal.md
 git commit -m "docs: record House Duck site renewal verification"
 ```
 
-- [ ] **Step 6: Integrate without overwriting unrelated work**
+- [x] **Step 6: Integrate without overwriting unrelated work**
 
 Confirm the main checkout's existing analytics changes are preserved. Merge or cherry-pick only
 the brand-site branch commits after the main checkout is clean or those unrelated changes have
