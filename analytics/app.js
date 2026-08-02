@@ -119,7 +119,7 @@ function renderDashboard() {
   setRingProgress("ringD7", percentageProgress(d7));
   setRingProgress("ringAds", percentageProgress(adEconomics.impressionsPerPlayer, 5));
   setRingProgress("ringRevenue", adEconomics.estimatedRevenueEur == null ? null : 100);
-  setText("adTotal", `${formatNumber(summary.adImpressions)} 노출`);
+  setText("adTotal", `${formatNumber(summary.adImpressions)} 노출 · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
   renderHealth(state.payload?.health);
   renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
@@ -149,7 +149,7 @@ function renderHealth(health = {}) {
 
 function renderPlatformSummary(platforms) {
   const economics = state.payload?.adEconomics ?? {};
-  setText("revenueNote", economics.estimatedRevenueEur == null ? "스토어별 eCPM 단가를 입력하면 수익 추정이 더 정확해집니다." : `초기 단가 가정 · ${formatCurrency(economics.estimatedRevenueEur)}`);
+  setText("revenueNote", economics.estimatedRevenueEur == null ? "스토어별 eCPM 단가를 입력하면 수익 추정이 더 정확해집니다." : `테스트 광고 제외 · 초기 단가 가정 ${formatCurrency(economics.estimatedRevenueEur)}`);
   const element = byId("platformSummary");
   if (!platforms.length) {
     element.innerHTML = '<p class="empty-panel">아직 비교할 광고 데이터가 없습니다.</p>';
@@ -225,7 +225,7 @@ function renderHourlyChart() {
 }
 
 function renderFunnel() {
-  const labels = { first_open: "첫 실행", session_start: "세션 시작", game_start: "게임 시작", game_over: "게임 완료", ad_impression: "광고 노출", stamina_blocked: "스태미나 부족" };
+  const labels = { first_open: "첫 실행", session_start: "세션 시작", game_start: "게임 시작", game_over: "게임 완료", game_exit: "중간 종료", fullscreen_ad_impression: "전체화면 광고", ad_impression: "전체 광고 노출" };
   const rows = state.payload?.funnel ?? [];
   const first = Math.max(1, rows[0]?.users ?? 0);
   byId("funnelChart").innerHTML = rows.map((row) => `
@@ -256,8 +256,8 @@ function renderExitBreakdown() {
 function renderAds() {
   const rows = state.payload?.ads ?? [];
   byId("adsTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="5">아직 광고 이벤트가 없습니다.</td></tr>'
-    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.format)}</strong></td><td>${escapeHtml(row.placement)}</td><td>${formatNumber(row.started)}</td><td>${formatNumber(row.impressions)}</td><td>${formatNumber(row.rewards)}</td></tr>`).join("");
+    ? '<tr><td class="empty-row" colspan="8">아직 광고 이벤트가 없습니다.</td></tr>'
+    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.format)}</strong></td><td>${escapeHtml(row.placement)}</td><td>${formatNumber(row.started)}</td><td>${formatNumber(row.impressions)}</td><td>${formatNumber(row.testImpressions)}</td><td>${formatNumber(row.rewards)}</td><td>${formatNumber(row.dismissed)}</td><td>${formatNumber(row.failed)}</td></tr>`).join("");
 }
 
 function renderDailyTable() {
