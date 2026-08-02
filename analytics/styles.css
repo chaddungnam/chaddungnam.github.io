@@ -74,10 +74,8 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .google-login { margin-top: 30px; }
 .auth-form-heading { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.04em; }
 .auth-form-copy { margin: 8px 0 18px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
-.primary-button { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 15px 17px; color: #fff; background: var(--ink); border: 0; border-radius: 12px; font-weight: 800; }
-.primary-button:hover { background: #273253; }
-.google-button-label { display: inline-flex; align-items: center; gap: 10px; }
-.google-g { display: grid; place-items: center; width: 20px; height: 20px; color: #4285f4; background: #fff; border-radius: 50%; font-size: 13px; font-weight: 900; }
+.google-button { min-height: 44px; margin-top: 14px; overflow: hidden; }
+.google-button > div { max-width: 100%; }
 .form-message { min-height: 22px; margin: 15px 0 0; color: var(--coral); font-size: 13px; line-height: 1.5; }
 .login-note { margin: 26px 0 0; color: #8990a5; font-size: 11px; }
 

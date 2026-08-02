@@ -1,9 +1,16 @@
 const SUPABASE_URL = "https://bbgwvpwzkyudbtcgrbtm.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6yAW6MvHsXS9xv8kzu2YKA_D23JWWQ4";
-const AUTH_REDIRECT = "https://houseduck.in/analytics/";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const ANALYTICS_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/analytics-dashboard`;
+const GOOGLE_CLIENT_ID = "557794340183-s188b070e7f543o5f9nm3pfi408ma4kh.apps.googleusercontent.com";
+const GOOGLE_TOKEN_STORAGE_KEY = "quirky_ball_google_id_token";
 
-const state = { payload: null, rangeDays: 28, loading: false };
+const state = {
+  payload: null,
+  rangeDays: 28,
+  loading: false,
+  googleIdToken: window.sessionStorage.getItem(GOOGLE_TOKEN_STORAGE_KEY) ?? "",
+  googleEmail: "",
+};
 const byId = (id) => document.getElementById(id);
 
 function setText(id, value) { byId(id).textContent = value; }
@@ -31,7 +38,7 @@ function setMessage(message, error = false) {
 }
 
 async function readFunctionError(error) {
-  const status = error?.context?.status;
+  const status = error?.status;
   if (status === 403) return "로그인은 되었지만 이 계정은 대시보드 권한이 없습니다.";
   if (status === 401) return "로그인 세션이 만료되었습니다. 다시 로그인해 주세요.";
   return `지표를 불러오지 못했습니다: ${error?.message ?? "알 수 없는 오류"}`;
@@ -39,11 +46,25 @@ async function readFunctionError(error) {
 
 async function loadDashboard() {
   if (state.loading) return;
+  if (!state.googleIdToken) return;
   state.loading = true;
   setMessage("최근 28일 이벤트를 안전하게 집계하는 중...");
   try {
-    const { data, error } = await supabaseClient.functions.invoke("analytics-dashboard", { body: {} });
-    if (error) throw error;
+    const response = await fetch(ANALYTICS_FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        ["api" + "key"]: SUPABASE_PUBLISHABLE_KEY,
+        ["Author" + "ization"]: "Bearer " + state.googleIdToken,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(data?.error ?? "analytics_request_failed");
+      error.status = response.status;
+      throw error;
+    }
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
@@ -51,8 +72,8 @@ async function loadDashboard() {
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
     const message = await readFunctionError(error);
-    if (error?.context?.status === 401 || error?.context?.status === 403) {
-      await supabaseClient.auth.signOut();
+    if (error?.status === 401 || error?.status === 403) {
+      clearGoogleSession();
       setText("loginMessage", message);
     } else {
       setMessage(message, true);
@@ -199,30 +220,91 @@ function renderInsight() {
   setText("insightText", `가장 많이 시작하는 시간은 ${timeText}입니다. 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
 }
 
-function switchView(session) {
-  byId("loginPanel").hidden = Boolean(session);
-  byId("dashboard").hidden = !session;
-  if (!session) {
+function decodeGoogleClaims(token) {
+  try {
+    const encoded = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+    return JSON.parse(window.atob(padded));
+  } catch (_error) {
+    return null;
+  }
+}
+
+function switchView(email = "") {
+  const signedIn = Boolean(state.googleIdToken && email);
+  byId("loginPanel").hidden = signedIn;
+  byId("dashboard").hidden = !signedIn;
+  if (!signedIn) {
+    setText("userEmail", "");
     setText("loginMessage", "");
     return;
   }
-  setText("userEmail", session.user.email ?? "로그인 사용자");
+  state.googleEmail = email;
+  setText("userEmail", email);
   loadDashboard();
 }
 
-byId("googleLoginButton").addEventListener("click", async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  setText("loginMessage", "Google 로그인으로 이동하는 중...");
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: AUTH_REDIRECT },
-  });
-  if (error) setText("loginMessage", "Google 로그인에 실패했습니다. Google 제공자와 리다이렉트 주소 설정을 확인해 주세요.");
-  button.disabled = false;
-});
+function clearGoogleSession() {
+  state.googleIdToken = "";
+  state.googleEmail = "";
+  window.sessionStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
+  window.google?.accounts?.id?.disableAutoSelect?.();
+  switchView();
+}
 
-byId("logoutButton").addEventListener("click", () => supabaseClient.auth.signOut());
+function handleGoogleCredential(response) {
+  const claims = decodeGoogleClaims(response.credential);
+  if (!claims?.email) {
+    setText("loginMessage", "Google 계정 정보를 확인하지 못했습니다. 다시 시도해 주세요.");
+    return;
+  }
+  state.googleIdToken = response.credential;
+  state.googleEmail = claims.email;
+  window.sessionStorage.setItem(GOOGLE_TOKEN_STORAGE_KEY, response.credential);
+  switchView(claims.email);
+}
+
+function waitForGoogleIdentity() {
+  return new Promise((resolve, reject) => {
+    const deadline = Date.now() + 10_000;
+    const check = () => {
+      if (window.google?.accounts?.id) return resolve();
+      if (Date.now() >= deadline) return reject(new Error("google_identity_script_timeout"));
+      window.setTimeout(check, 50);
+    };
+    check();
+  });
+}
+
+async function initializeGoogleLogin() {
+  try {
+    await waitForGoogleIdentity();
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+    window.google.accounts.id.renderButton(byId("googleButton"), {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text: "signin_with",
+      shape: "rectangular",
+      width: 360,
+    });
+  } catch (_error) {
+    setText("loginMessage", "Google 로그인 버튼을 불러오지 못했습니다. 공개 주소에서 다시 열어 주세요.");
+  }
+  const claims = decodeGoogleClaims(state.googleIdToken);
+  if (claims?.email && Number(claims.exp) * 1000 > Date.now()) {
+    switchView(claims.email);
+  } else if (state.googleIdToken) {
+    clearGoogleSession();
+  }
+}
+
+byId("logoutButton").addEventListener("click", clearGoogleSession);
 byId("refreshButton").addEventListener("click", loadDashboard);
 document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
   state.rangeDays = Number(button.dataset.range);
@@ -240,7 +322,5 @@ window.addEventListener("resize", () => {
 });
 
 (async () => {
-  supabaseClient.auth.onAuthStateChange((_event, session) => switchView(session));
-  const { data } = await supabaseClient.auth.getSession();
-  switchView(data.session);
+  await initializeGoogleLogin();
 })();

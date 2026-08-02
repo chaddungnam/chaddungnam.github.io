@@ -12,15 +12,16 @@ test -f "$dashboard_dir/app.js"
 test -f "$function_file"
 test -n "$(rg -l 'analytics_admins' "$migration_dir" | head -1)"
 
-rg -q 'signInWithOAuth' "$dashboard_dir/app.js"
-rg -q 'provider: "google"' "$dashboard_dir/app.js"
-if rg -n 'signInWithPassword|resetPasswordForEmail|updateUser|PASSWORD_RECOVERY' "$dashboard_dir/app.js"; then
-  echo "dashboard must not use password recovery auth" >&2
+rg -q 'google.accounts.id' "$dashboard_dir/app.js"
+rg -q 'GOOGLE_CLIENT_ID' "$dashboard_dir/app.js"
+if rg -n 'supabaseClient\.auth|signInWithOAuth|signInWithPassword|resetPasswordForEmail|updateUser|PASSWORD_RECOVERY' "$dashboard_dir/app.js"; then
+  echo "dashboard must use direct Google identity, not Supabase Auth" >&2
   exit 1
 fi
-rg -q 'functions\.invoke\("analytics-dashboard"' "$dashboard_dir/app.js"
+rg -q 'fetch\(ANALYTICS_FUNCTION_URL' "$dashboard_dir/app.js"
 rg -q 'analytics-dashboard' "$dashboard_dir/app.js"
-rg -q 'auth\.getUser' "$function_file"
+rg -q 'verifyGoogleIdToken' "$function_file"
+rg -q 'findAdminUser' "$function_file"
 rg -q 'SUPABASE_SERVICE_ROLE_KEY' "$function_file"
 rg -q 'analytics_admins' "$function_file"
 

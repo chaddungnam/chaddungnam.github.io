@@ -16,11 +16,11 @@
       <p class="login-copy">플레이어가 언제 들어오고, 얼마나 플레이한 뒤 나가는지 한눈에 확인하세요.</p>
       <div class="google-login">
         <p class="auth-form-heading">Google 계정으로 로그인</p>
-        <p class="auth-form-copy">Supabase 관리자 허용 목록에 등록된 Google 계정만 지표를 볼 수 있습니다.</p>
-        <button id="googleLoginButton" class="primary-button" type="button"><span class="google-button-label"><span class="google-g" aria-hidden="true">G</span> Google로 로그인</span><span aria-hidden="true">↗</span></button>
+        <p class="auth-form-copy">허용된 Google 계정만 지표를 볼 수 있습니다.</p>
+        <div id="googleButton" class="google-button" aria-label="Google로 로그인"></div>
       </div>
       <p id="loginMessage" class="form-message" role="status"></p>
-      <p class="login-note">허용 목록에 등록된 계정만 지표를 읽을 수 있습니다.</p>
+      <p class="login-note">Google 계정 인증 후 서버에서 관리자 권한을 확인합니다.</p>
     </section>
 
     <section id="dashboard" class="dashboard" hidden>
@@ -100,7 +100,7 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="app.js" defer></script>
 </body>
 </html>
