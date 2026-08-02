@@ -28,7 +28,7 @@
 - Consumes: `summary`, `retention`, `adEconomics`, `funnel`, `health`
 - Produces: `PulseModel.buildPulseModel(payload)` returning `metrics`, `journey`, `action`, `verdict`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```javascript
 const assert = require("node:assert/strict");
@@ -44,16 +44,16 @@ assert.equal(model.metrics.completion.status, "good");
 assert.deepEqual(model.journey.map((step) => step.users), [10, 8, 6, 4]);
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `node scripts/test_pulse_model.js`
 Expected: FAIL with `Cannot find module '../analytics/pulse-model.js'`
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Implement the UMD-style `buildPulseModel(payload)` pure function and add static contract checks for its script include and required dashboard IDs.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `node scripts/test_pulse_model.js && bash scripts/check_analytics_dashboard.sh`
 Expected: `pulse model: PASS` and `analytics dashboard contract: PASS`
@@ -69,20 +69,20 @@ Expected: `pulse model: PASS` and `analytics dashboard contract: PASS`
 - Consumes: `PulseModel.buildPulseModel(state.payload)`
 - Produces: `renderPulseOverview(model)` and existing detailed renderers under `operatorDetails`
 
-- [ ] **Step 1: Extend the failing contract test**
+- [x] **Step 1: Extend the failing contract test**
 
 Require `mascotMessage`, `signalLights`, `metricCompletion`, `journeyGraph`, `todayAction`, and `operatorDetails` in `analytics/index.html` and `renderPulseOverview` in `analytics/app.js`.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `bash scripts/check_analytics_dashboard.sh`
 Expected: FAIL because the new IDs and renderer do not exist.
 
-- [ ] **Step 3: Implement the approved layout**
+- [x] **Step 3: Implement the approved layout**
 
 Replace the eight equal ring cards with four question cards, create the CSS duck and status signal, render the four-step journey, keep the small daily canvas visible, and wrap all detailed panels in `<details id="operatorDetails">`.
 
-- [ ] **Step 4: Verify code and visuals**
+- [x] **Step 4: Verify code and visuals**
 
 Run: `node --check analytics/app.js && node --check analytics/pulse-model.js && node scripts/test_pulse_model.js && bash scripts/check_analytics_dashboard.sh && bash scripts/check_public_repo.sh`
 Expected: all commands exit 0 with no secret or direct analytics table access warning.

@@ -23,14 +23,6 @@ function formatCurrency(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
-function setRingProgress(id, percent) {
-  const ring = byId(id);
-  const progress = typeof percent === "number" && Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
-  ring.style.setProperty("--ring-progress", `${progress}%`);
-}
-function percentageProgress(value, maximum = 1) {
-  return typeof value === "number" && Number.isFinite(value) ? value / maximum * 100 : null;
-}
 function formatDuration(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
   const seconds = Math.max(0, Math.round(value));
@@ -100,27 +92,15 @@ async function loadDashboard() {
 
 function renderDashboard() {
   const { summary, retention } = state.payload;
+  const pulseModel = window.PulseModel.buildPulseModel(state.payload);
   setText("kpiActive", formatNumber(summary.activeInstallsToday));
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
-  setText("kpiGame", formatDuration(summary.avgGameSeconds));
-  setText("kpiExit", formatRate(summary.exitRate));
-  const d1 = retention?.find((item) => item.day === 1)?.rate;
   const d7 = retention?.find((item) => item.day === 7)?.rate;
-  setText("kpiD1", formatRate(d1));
-  setText("kpiD7", formatRate(d7));
+  setText("metricD7", formatRate(d7));
   const adEconomics = state.payload?.adEconomics ?? {};
-  setText("kpiAdsPerPlayer", formatDecimal(adEconomics.impressionsPerPlayer));
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
-  setRingProgress("ringActive", summary.activeInstallsToday > 0 ? 100 : 0);
-  setRingProgress("ringSession", percentageProgress(summary.avgSessionSeconds, 180));
-  setRingProgress("ringGame", percentageProgress(summary.avgGameSeconds, 180));
-  setRingProgress("ringExit", percentageProgress(summary.exitRate));
-  setRingProgress("ringD1", percentageProgress(d1));
-  setRingProgress("ringD7", percentageProgress(d7));
-  setRingProgress("ringAds", percentageProgress(adEconomics.impressionsPerPlayer, 5));
-  setRingProgress("ringRevenue", adEconomics.estimatedRevenueEur == null ? null : 100);
   setText("adTotal", `${formatNumber(summary.adImpressions)} 노출 · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
-  renderHealth(state.payload?.health);
+  renderPulseOverview(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
   renderHourlyChart();
@@ -135,16 +115,52 @@ function distributionLabel(value) {
   return ({ all: "전체 스토어", google_play: "Google Play", app_store: "iOS", onestore: "원스토어", unknown: "스토어 미지정" })[value] ?? value ?? "전체 스토어";
 }
 
-function renderHealth(health = {}) {
+function metricProgress(value, target) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value / target * 100)) : 0;
+}
+
+function renderQuestionMetric(key, metric, formattedValue, progress) {
+  const card = byId(`metric${key}Card`);
+  card.dataset.status = metric.status;
+  setText(`metric${key}`, formattedValue);
+  setText(`metric${key}Status`, metric.statusLabel);
+  byId(`metric${key}Bar`).style.width = `${progress}%`;
+}
+
+function renderJourney(journey = []) {
+  const icons = { session_start: "↗", game_start: "▶", game_over: "✓", ad_impression: "AD" };
+  byId("journeyGraph").innerHTML = journey.map((step, index) => {
+    const connector = index === 0 ? "" : `
+      <div class="journey-link" style="--journey-progress:${Math.min(100, Math.max(0, (step.rate ?? 0) * 100))}%">
+        <div><i style="width:${Math.min(100, Math.max(4, (step.rate ?? 0) * 100))}%"></i></div>
+        <small>${step.rate == null ? "연결 없음" : `${formatRate(step.rate)} 남음`}</small>
+      </div>`;
+    return `${connector}
+      <div class="journey-step">
+        <div class="journey-bubble"><strong>${formatNumber(step.users)}</strong><small>${icons[step.event] ?? "명"}</small></div>
+        <strong>${escapeHtml(step.label)}</strong>
+        <small>${escapeHtml(step.description)}</small>
+      </div>`;
+  }).join("");
+}
+
+function renderPulseOverview(model) {
   const card = byId("healthCard");
-  const status = health.status ?? "insufficient";
-  const icons = { good: "✓", watch: "!", risk: "×", insufficient: "?" };
-  const labels = { good: "상태가 좋아요", watch: "조금 지켜봐요", risk: "확인이 필요해요", insufficient: "아직 데이터가 부족해요" };
-  card.dataset.status = status;
-  setText("healthIcon", icons[status] ?? "?");
-  setText("healthLabel", health.label ?? labels[status] ?? labels.insufficient);
-  setText("healthReason", health.summary ?? "플레이어가 조금 더 쌓이면 게임 상태를 판정할 수 있습니다.");
-  setText("healthScore", typeof health.score === "number" ? `${health.score}/100` : "수집 중");
+  card.dataset.status = model.verdict.status;
+  setText("healthLabel", model.verdict.label);
+  setText("healthScore", model.verdict.score == null ? "수집 중" : `${model.verdict.score}/100`);
+  setText("mascotMessage", model.verdict.summary);
+  setText("todayAction", model.action);
+  byId("signalLights").querySelectorAll("[data-signal]").forEach((signal) => {
+    const active = signal.dataset.signal === model.verdict.status;
+    signal.classList.toggle("active", active);
+    signal.setAttribute("aria-current", active ? "true" : "false");
+  });
+  renderQuestionMetric("Duration", model.metrics.duration, formatDuration(model.metrics.duration.value), metricProgress(model.metrics.duration.value, 180));
+  renderQuestionMetric("Completion", model.metrics.completion, formatRate(model.metrics.completion.value), metricProgress(model.metrics.completion.value, 0.65));
+  renderQuestionMetric("Retention", model.metrics.retention, formatRate(model.metrics.retention.value), metricProgress(model.metrics.retention.value, 0.2));
+  renderQuestionMetric("Ads", model.metrics.ads, model.metrics.ads.value == null ? "—" : `${formatDecimal(model.metrics.ads.value)}회`, metricProgress(model.metrics.ads.value, 5));
+  renderJourney(model.journey);
 }
 
 function renderPlatformSummary(platforms) {
@@ -168,7 +184,7 @@ function renderDailyChart() {
   const canvas = byId("dailyChart");
   const rows = selectedDays();
   const width = canvas.clientWidth || 800;
-  const height = 240;
+  const height = canvas.clientHeight || 154;
   const ratio = window.devicePixelRatio || 1;
   canvas.width = width * ratio;
   canvas.height = height * ratio;
@@ -272,8 +288,8 @@ function renderInsight() {
   const hourly = state.payload?.hourly ?? [];
   const topHour = [...hourly].sort((left, right) => right.sessions - left.sessions)[0];
   const exitRate = summary.gamesStarted ? (summary.midGameExits + summary.unobservedGames) / summary.gamesStarted : null;
-  const d1 = summary.retention?.find((item) => item.day === 1)?.rate;
-  if (!summary.installs) {
+  const d1 = state.payload?.retention?.find((item) => item.day === 1)?.rate;
+  if (!(summary.sessions || summary.installs)) {
     setText("insightText", "아직 수집된 이벤트가 없습니다. 테스트 빌드에서 약관 동의 후 게임을 실행하면 여기에 흐름이 나타납니다.");
     return;
   }
