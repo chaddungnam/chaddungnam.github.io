@@ -58,6 +58,13 @@
     return `#/players/${encodeURIComponent(userId)}?return=${encodeURIComponent(returnHash)}`;
   }
 
+  function safeConsoleReturnHash(value) {
+    const hash = String(value || "");
+    return /^#\/(?:analytics|players(?:\/[^?#\u0000-\u0020\u007f]+)?|operations|purchases|cs|audit)(?:\?[^#\u0000-\u0020\u007f]*)?$/.test(hash)
+      ? hash
+      : "#/players";
+  }
+
   function buildAttentionItems(pulse, observedAt = "") {
     const targets = {
       duration: "metricDurationCard",
@@ -95,7 +102,8 @@
     return String(reason || "").trim().length > 0
       && changes && Object.keys(changes).length > 0
       && mutationsEnabled !== false
-      && stateVersion !== null;
+      && Number.isSafeInteger(stateVersion)
+      && stateVersion >= 0;
   }
 
   return {
@@ -105,6 +113,7 @@
     playerDisplayName,
     serializeAnalyticsFilters,
     playerDeepLink,
+    safeConsoleReturnHash,
     buildAttentionItems,
     diffPlayerChanges,
     canSubmitMutation,

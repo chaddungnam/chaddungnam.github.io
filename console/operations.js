@@ -3,6 +3,7 @@
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "계속";
   let bound = false;
+  const pendingRequests = new WeakMap();
 
   function setMessage(value, error = false) {
     byId("operationsMessage").textContent = value;
@@ -32,13 +33,19 @@
   async function submit(form, payload, title, summary) {
     if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
     const button = form.querySelector('button[type="submit"]');
+    const fingerprint = JSON.stringify(payload);
+    const pending = pendingRequests.get(form);
+    const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
+    pendingRequests.set(form, { fingerprint, requestId });
     button.disabled = true;
     try {
-      await root.ConsoleAPI.post("admin-console", { ...payload, requestId: crypto.randomUUID() });
+      await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
+      pendingRequests.delete(form);
       form.reset();
       setMessage(`${title} 작업을 완료했습니다.`);
       await load();
     } catch (error) {
+      if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
       setMessage(`작업을 완료하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
       button.disabled = false;
@@ -53,15 +60,6 @@
   function bind() {
     if (bound) return;
     bound = true;
-    byId("announcementForm").addEventListener("submit", (event) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const values = Object.fromEntries(new FormData(form));
-      submit(form, {
-        action: "announcements.publish", body: values.body.trim(), startsAt: iso(values.startsAt),
-        endsAt: values.endsAt ? iso(values.endsAt) : null, reason: values.reason.trim(),
-      }, "공지 예약", `${values.startsAt}부터${values.endsAt ? ` ${values.endsAt}까지` : " 종료 없이"}\n${values.body}\n사유: ${values.reason}`);
-    });
     byId("rewardMailForm").addEventListener("submit", (event) => {
       event.preventDefault();
       const form = event.currentTarget;

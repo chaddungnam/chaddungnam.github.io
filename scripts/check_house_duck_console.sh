@@ -31,8 +31,12 @@ rg -q 'admin-auth' "$console_dir/app.js"
 rg -q 'name="reason"' "$console_dir/index.html"
 rg -q 'expectedVersion' "$console_dir/players.js"
 rg -q 'mutations_enabled' "$console_dir/players.js"
+rg -q 'safeConsoleReturnHash' "$console_dir/model.js" "$console_dir/players.js"
+rg -q 'pendingRequests' "$console_dir/operations.js"
+rg -q 'id="playerDirection"' "$console_dir/index.html"
 rg -q 'action: "audit.revert"' "$console_dir/audit.js"
-for action in announcements.publish reward_mail.broadcast min_version.update qa_access.set; do
+rg -F -q '다음 게임 빌드 연동 후 활성' "$console_dir/index.html"
+for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done
 

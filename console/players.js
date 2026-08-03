@@ -20,6 +20,7 @@
     state.query = (params.get("query") || "").slice(0, 100);
     state.rangeDays = [0, 1, 7, 28].includes(Number(params.get("rangeDays"))) ? Number(params.get("rangeDays")) : 0;
     state.sort = ["latest_played_at", "best_score", "nickname", "country", "gems", "state_version"].includes(params.get("sort")) ? params.get("sort") : "latest_played_at";
+    state.direction = ["asc", "desc"].includes(params.get("direction")) ? params.get("direction") : "desc";
     state.page = Math.max(1, Number(params.get("page")) || 1);
   }
 
@@ -78,6 +79,7 @@
       state.query = byId("playerSearch").value.trim();
       state.rangeDays = Number(byId("playerRange").value);
       state.sort = byId("playerSort").value;
+      state.direction = byId("playerDirection").value;
       state.page = 1;
       syncListHash();
       loadList();
@@ -101,14 +103,13 @@
     </article>`).join("") : '<p class="empty-panel">아직 변경 기록이 없습니다.</p>';
   }
 
-  function recordRows(records, player, disabled) {
+  function recordRows(records, disabled) {
     return records.length ? records.map((record) => `<tr>
       <td>${escapeHtml(time(record.played_at))}<small>${escapeHtml(record.source)}</small></td>
       <td>${number(record.score)}</td><td>Lv.${number(record.level)}</td><td>${record.excluded ? "제외됨" : "반영 중"}</td>
       <td><details><summary>${disabled ? "보기" : "보정"}</summary><form class="score-form" data-record-id="${record.record_id}">
         <div class="form-pair"><label>점수<input name="score" type="number" min="0" step="1" value="${record.score}" ${disabled ? "disabled" : ""}></label><label>레벨<input name="level" type="number" min="0" step="1" value="${record.level}" ${disabled ? "disabled" : ""}></label></div>
         <label class="check-label"><input name="excluded" type="checkbox" ${record.excluded ? "checked" : ""} ${disabled ? "disabled" : ""}> 랭킹에서 기록 제외</label>
-        <div class="form-pair"><label>대체 최고 점수<input name="replacementBestScore" type="number" min="0" step="1" value="${player.best_score}" ${disabled ? "disabled" : ""}></label><label>대체 최고 레벨<input name="replacementBestLevel" type="number" min="0" step="1" value="${Math.max(0, player.best_level)}" ${disabled ? "disabled" : ""}></label></div>
         <label>보정 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled ? "disabled" : ""}>기록 보정</button>
       </form></details></td>
     </tr>`).join("") : '<tr><td class="empty-row" colspan="5">게임 기록이 없습니다.</td></tr>';
@@ -122,7 +123,7 @@
       <div class="read-only-banner" data-enabled="${enabled}">${enabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
       <div class="admin-card-grid"><form id="economyForm" class="panel admin-form"><p class="eyebrow">ECONOMY</p><h2>재화 직접 조정</h2><div class="economy-grid">${economyFields(player, disabled)}</div><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled ? "disabled" : ""}>변경 내용 확인</button></form>
       <article class="panel player-facts"><p class="eyebrow">ACCOUNT</p><h2>계정 상태</h2><dl><div><dt>최고 점수</dt><dd>${number(player.best_score)}</dd></div><div><dt>최고 레벨</dt><dd>${number(player.best_level)}</dd></div><div><dt>게임 수</dt><dd>${number(player.game_count)}</dd></div><div><dt>대기 우편</dt><dd>${number(data.operations?.pending_mail_count)}</dd></div><div><dt>광고 제거</dt><dd>${player.ads_removed ? "예" : "아니오"}</dd></div><div><dt>QA 상점</dt><dd>${data.operations?.qa_shop_controls_enabled ? "허용" : "미허용"}</dd></div></dl></article></div>
-      <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SCORE RECORDS</p><h2>점수 기록 보정</h2><small>기록은 삭제하지 않고 제외·복구 상태와 보정 이력을 남깁니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>플레이 시각</th><th>점수</th><th>레벨</th><th>랭킹</th><th>처리</th></tr></thead><tbody>${recordRows(data.records || [], player, disabled)}</tbody></table></div></section>
+      <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SCORE RECORDS</p><h2>점수 기록 보정</h2><small>기록은 삭제하지 않으며, 최고 기록은 반영 중인 기록에서 서버가 다시 계산합니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>플레이 시각</th><th>점수</th><th>레벨</th><th>랭킹</th><th>처리</th></tr></thead><tbody>${recordRows(data.records || [], disabled)}</tbody></table></div></section>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PLAYER AUDIT</p><h2>이 플레이어의 변경 기록</h2></div></div><div class="audit-list">${auditHtml(data.audit || [])}</div></section>`;
     byId("copyPlayerId").addEventListener("click", async () => {
       await navigator.clipboard.writeText(userId);
@@ -159,10 +160,9 @@
     const values = Object.fromEntries(new FormData(form));
     const payload = {
       action: "scores.correct", recordId: Number(form.dataset.recordId), score: Number(values.score), level: Number(values.level),
-      excluded: form.elements.excluded.checked, replacementBestScore: Number(values.replacementBestScore),
-      replacementBestLevel: Number(values.replacementBestLevel), reason: String(values.reason || "").trim(), requestId: crypto.randomUUID(),
+      excluded: form.elements.excluded.checked, reason: String(values.reason || "").trim(), requestId: crypto.randomUUID(),
     };
-    if (!payload.reason || !await root.ConsoleApp.confirmChange("점수 기록 보정", `점수 ${payload.score} · 레벨 ${payload.level} · ${payload.excluded ? "랭킹 제외" : "랭킹 반영"}\n대체 최고 ${payload.replacementBestScore} / Lv.${payload.replacementBestLevel}\n사유: ${payload.reason}`)) return;
+    if (!payload.reason || !await root.ConsoleApp.confirmChange("점수 기록 보정", `점수 ${payload.score} · 레벨 ${payload.level} · ${payload.excluded ? "랭킹 제외" : "랭킹 반영"}\n최고 기록은 서버에서 다시 계산\n사유: ${payload.reason}`)) return;
     try {
       await root.ConsoleAPI.post("admin-console", payload);
       message("playerMessage", "점수 기록을 보정했습니다.");
@@ -174,7 +174,7 @@
 
   async function mountDetail(userId) {
     const params = new URLSearchParams(root.location.hash.split("?")[1] || "");
-    byId("playerBackLink").href = params.get("return") || "#/players";
+    byId("playerBackLink").href = root.ConsoleModel.safeConsoleReturnHash(params.get("return"));
     message("playerMessage", "플레이어 상세를 불러오는 중...");
     try {
       const data = await root.ConsoleAPI.post("admin-console", { action: "players.get", userId });
@@ -191,6 +191,7 @@
     byId("playerSearch").value = state.query;
     byId("playerRange").value = String(state.rangeDays);
     byId("playerSort").value = state.sort;
+    byId("playerDirection").value = state.direction;
     loadList();
   }
 

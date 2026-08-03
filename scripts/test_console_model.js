@@ -35,6 +35,10 @@ assert.equal(
   model.playerDeepLink("user/1", "#/analytics?rangeDays=7&sort=gems"),
   "#/players/user%2F1?return=%23%2Fanalytics%3FrangeDays%3D7%26sort%3Dgems",
 );
+assert.equal(model.safeConsoleReturnHash("#/analytics?rangeDays=7"), "#/analytics?rangeDays=7");
+assert.equal(model.safeConsoleReturnHash("#/players/user%2F1?return=%23%2Fcs"), "#/players/user%2F1?return=%23%2Fcs");
+assert.equal(model.safeConsoleReturnHash("javascript:alert(1)"), "#/players");
+assert.equal(model.safeConsoleReturnHash("#/players\njavascript:alert(1)"), "#/players");
 
 assert.deepEqual(model.buildAttentionItems({
   verdict: { status: "risk", summary: "이탈을 확인하세요." },
@@ -57,7 +61,8 @@ assert.deepEqual(model.buildAttentionItems({ verdict: { status: "good" }, metric
 assert.deepEqual(model.diffPlayerChanges({ gems: 10 }, { gems: 12 }), { gems: { before: 10, after: 12 } });
 assert.deepEqual(model.diffPlayerChanges({ gems: 10, recovery_code: "hidden" }, { gems: 10, recovery_code: "changed" }), {});
 assert.equal(model.canSubmitMutation({ reason: "", changes: { gems: 12 } }), false);
-assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 } }), true);
+assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: true, stateVersion: 0 }), true);
+assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: true }), false);
 assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: false, stateVersion: 4 }), false);
 assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: true, stateVersion: null }), false);
 
