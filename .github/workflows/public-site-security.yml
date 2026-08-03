@@ -18,3 +18,12 @@ jobs:
           persist-credentials: false
       - name: Check public repository contents
         run: bash scripts/check_public_repo.sh --all
+      - name: Check House Duck console
+        run: bash scripts/check_house_duck_console.sh
+      - name: Check analytics dashboard
+        run: bash scripts/check_analytics_dashboard.sh
+      - name: Test console models
+        run: |
+          node scripts/test_console_model.js
+          node scripts/test_gmail_model.js
+          node scripts/test_pulse_model.js
