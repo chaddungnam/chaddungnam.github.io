@@ -58,16 +58,28 @@
     return `#/players/${encodeURIComponent(userId)}?return=${encodeURIComponent(returnHash)}`;
   }
 
-  function buildAttentionItems(pulse) {
-    const items = Object.values(pulse?.metrics || {})
-      .filter((metric) => metric?.status === "risk" || metric?.status === "watch")
-      .map((metric) => ({ severity: metric.status, label: metric.description, source: "Pulse" }));
+  function buildAttentionItems(pulse, observedAt = "") {
+    const targets = {
+      duration: "metricDurationCard",
+      completion: "metricCompletionCard",
+      retention: "metricRetentionCard",
+      ads: "metricAdsCard",
+    };
+    const withContext = (item, targetId) => ({
+      ...item,
+      source: "Pulse",
+      ...(observedAt ? { observedAt } : {}),
+      targetId,
+    });
+    const items = Object.entries(pulse?.metrics || {})
+      .filter(([, metric]) => metric?.status === "risk" || metric?.status === "watch")
+      .map(([key, metric]) => withContext({ severity: metric.status, label: metric.description }, targets[key] || "healthCard"));
     if (items.length > 0) return items;
     if (pulse?.verdict?.status === "insufficient") {
-      return [{ severity: "insufficient", label: "플레이 데이터가 더 필요합니다.", source: "Pulse" }];
+      return [withContext({ severity: "insufficient", label: "플레이 데이터가 더 필요합니다." }, "healthCard")];
     }
     if (pulse?.verdict?.status === "risk" || pulse?.verdict?.status === "watch") {
-      return [{ severity: pulse.verdict.status, label: pulse.verdict.summary || "지표를 확인해 주세요.", source: "Pulse" }];
+      return [withContext({ severity: pulse.verdict.status, label: pulse.verdict.summary || "지표를 확인해 주세요." }, "healthCard")];
     }
     return [];
   }

@@ -120,10 +120,14 @@ function formatServerTime(value) {
 }
 
 function renderAttention(pulseModel) {
-  const items = root.ConsoleModel.buildAttentionItems(pulseModel);
+  const items = root.ConsoleModel.buildAttentionItems(pulseModel, state.payload?.generatedAt);
   byId("attentionList").innerHTML = items.length === 0
     ? "<p>현재 Pulse 경고가 없습니다.</p>"
-    : items.map((item) => `<div class="attention-item" data-severity="${escapeHtml(item.severity)}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.source)}</small></div>`).join("");
+    : items.map((item) => `<a class="attention-item" data-severity="${escapeHtml(item.severity)}" data-attention-target="${escapeHtml(item.targetId)}" href="#/analytics?section=${encodeURIComponent(item.targetId)}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.source)} · ${escapeHtml(formatServerTime(item.observedAt))}</small></a>`).join("");
+  byId("attentionList").querySelectorAll("[data-attention-target]").forEach((link) => link.addEventListener("click", (event) => {
+    event.preventDefault();
+    byId(link.dataset.attentionTarget)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
 }
 
 function renderPeriodPlayers() {

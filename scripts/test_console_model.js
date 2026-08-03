@@ -42,9 +42,15 @@ assert.deepEqual(model.buildAttentionItems({
     duration: { status: "good", description: "평균 한 판 시간" },
     retention: { status: "risk", description: "다음 날 다시 온 비율" },
   },
-}), [{ severity: "risk", label: "다음 날 다시 온 비율", source: "Pulse" }]);
+}, "2026-08-03T14:00:00Z"), [{
+  severity: "risk",
+  label: "다음 날 다시 온 비율",
+  source: "Pulse",
+  observedAt: "2026-08-03T14:00:00Z",
+  targetId: "metricRetentionCard",
+}]);
 assert.deepEqual(model.buildAttentionItems({ verdict: { status: "insufficient" }, metrics: {} }), [
-  { severity: "insufficient", label: "플레이 데이터가 더 필요합니다.", source: "Pulse" },
+  { severity: "insufficient", label: "플레이 데이터가 더 필요합니다.", source: "Pulse", targetId: "healthCard" },
 ]);
 assert.deepEqual(model.buildAttentionItems({ verdict: { status: "good" }, metrics: {} }), []);
 
