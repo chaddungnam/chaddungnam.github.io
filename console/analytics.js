@@ -171,7 +171,7 @@ function renderJourney(journey = []) {
     const connector = index === 0 ? "" : `
       <div class="journey-link" style="--journey-progress:${Math.min(100, Math.max(0, (step.rate ?? 0) * 100))}%">
         <div><i style="width:${Math.min(100, Math.max(4, (step.rate ?? 0) * 100))}%"></i></div>
-        <small>${step.rate == null ? "연결 없음" : `${formatRate(step.rate)} 남음`}</small>
+        <small>${step.rate == null ? "연결 없음" : `이전 수 대비 ${formatRate(step.rate)}`}</small>
       </div>`;
     return `${connector}
       <div class="journey-step">
