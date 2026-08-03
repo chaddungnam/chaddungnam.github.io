@@ -4,7 +4,7 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 console_dir="$repo_dir/console"
 
-for path in index.html styles.css model.js auth.js api.js app.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js; do
   test -f "$console_dir/$path"
 done
 
@@ -24,6 +24,13 @@ rg -q '결제 미연동' "$console_dir/index.html"
 rg -q 'sessionStorage' "$console_dir/auth.js"
 rg -q 'X-Admin-Session' "$console_dir/auth.js"
 rg -q 'admin-auth' "$console_dir/app.js"
+rg -q 'name="reason"' "$console_dir/index.html"
+rg -q 'expectedVersion' "$console_dir/players.js"
+rg -q 'mutations_enabled' "$console_dir/players.js"
+rg -q 'action: "audit.revert"' "$console_dir/audit.js"
+for action in announcements.publish reward_mail.broadcast min_version.update qa_access.set; do
+  rg -F -q "action: \"$action\"" "$console_dir/operations.js"
+done
 
 if rg -n -i 'service[_-]?role|admin_challenge|gmail.*access.*token|password\s*=' "$console_dir"; then
   echo "console contains a server secret or secret assignment" >&2
@@ -32,6 +39,11 @@ fi
 
 if rg -n '/rest/v1/(analytics_events|account_states|game_records)' "$console_dir"; then
   echo "console must use secured Edge Functions" >&2
+  exit 1
+fi
+
+if rg -n '기록 삭제|계정 삭제' "$console_dir"; then
+  echo "console must use correction/exclusion language, not destructive deletion" >&2
   exit 1
 fi
 

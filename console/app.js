@@ -19,6 +19,16 @@ const pageTitles = {
 let currentProjectKey = "";
 const byId = (id) => document.getElementById(id);
 
+function confirmChange(title, body) {
+  const dialog = byId("confirmDialog");
+  byId("confirmTitle").textContent = title;
+  byId("confirmBody").textContent = body;
+  dialog.showModal();
+  return new Promise((resolve) => dialog.addEventListener("close", () => resolve(dialog.returnValue === "confirm"), { once: true }));
+}
+
+window.ConsoleApp = { confirmChange };
+
 function showOnly(elementId) {
   ["loginPanel", "challengePanel", "projectPicker", "consoleApp"].forEach((id) => {
     byId(id).hidden = id !== elementId;
@@ -71,10 +81,13 @@ function renderRoute() {
     else link.removeAttribute("aria-current");
   });
   byId("pageTitle").textContent = pageTitles[route.page] || "분석";
-  if (route.page === "player") byId("playerRouteId").textContent = route.userId;
   byId("consoleStatus").textContent = `${byId("pageTitle").textContent} 화면`;
   byId("mainContent").focus({ preventScroll: true });
   if (route.page === "analytics") window.ConsoleAnalytics.mount();
+  if (route.page === "players") window.ConsolePlayers.mountList();
+  if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
+  if (route.page === "operations") window.ConsoleOperations.mount();
+  if (route.page === "audit") window.ConsoleAudit.mount();
 }
 
 function challengeErrorMessage(error) {

@@ -54,4 +54,11 @@ assert.deepEqual(model.buildAttentionItems({ verdict: { status: "insufficient" }
 ]);
 assert.deepEqual(model.buildAttentionItems({ verdict: { status: "good" }, metrics: {} }), []);
 
+assert.deepEqual(model.diffPlayerChanges({ gems: 10 }, { gems: 12 }), { gems: { before: 10, after: 12 } });
+assert.deepEqual(model.diffPlayerChanges({ gems: 10, recovery_code: "hidden" }, { gems: 10, recovery_code: "changed" }), {});
+assert.equal(model.canSubmitMutation({ reason: "", changes: { gems: 12 } }), false);
+assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 } }), true);
+assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: false, stateVersion: 4 }), false);
+assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: true, stateVersion: null }), false);
+
 console.log("console model: PASS");

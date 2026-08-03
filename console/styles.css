@@ -22,6 +22,12 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--teal) 55%, white);
+  outline-offset: 3px;
+}
+
 #challengeForm { display: grid; gap: 12px; margin-top: 28px; }
 #challengeForm label { font-size: 14px; font-weight: 800; }
 #challengeForm input {
@@ -143,6 +149,52 @@ input:focus-visible {
 .empty-state p { max-width: 620px; margin: 0; color: var(--ink-soft); line-height: 1.6; }
 .status-label { padding: 5px 8px; color: var(--ink); background: var(--gold-soft); border-radius: 999px; font-size: 10px; font-weight: 900; }
 
+.read-only-banner { margin-bottom: 14px; padding: 12px 14px; color: #6e5621; background: var(--gold-soft); border: 1px solid rgba(231,185,67,.38); border-radius: 12px; font-size: 12px; font-weight: 800; }
+.read-only-banner[data-enabled="true"] { color: #17665e; background: var(--teal-soft); border-color: rgba(66,189,176,.32); }
+.admin-toolbar { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(140px, .35fr)) auto; align-items: end; gap: 10px; margin-bottom: 14px; padding: 16px; }
+.admin-toolbar label,
+.admin-form label,
+.revert-form label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 10px; font-weight: 800; }
+.admin-toolbar input,
+.admin-toolbar select,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.revert-form input { width: 100%; min-height: 42px; padding: 9px 11px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 12px; }
+.admin-form textarea { min-height: 92px; resize: vertical; }
+.admin-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+.admin-form { display: grid; align-content: start; gap: 12px; }
+.admin-form h2 { margin-bottom: 4px; }
+.form-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.check-label { grid-template-columns: 20px 1fr !important; align-items: center; }
+.check-label input { min-height: 18px; }
+.operations-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.operations-summary article { display: grid; gap: 5px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.operations-summary span { color: var(--ink-soft); font-size: 10px; font-weight: 800; }
+.operations-summary strong { font-size: 20px; }
+.player-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 12px 0; }
+.player-detail-head h2 { margin-bottom: 6px; font-size: 25px; }
+.player-detail-head code { color: var(--ink-soft); font-size: 10px; word-break: break-all; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.detail-actions button,
+.detail-actions a,
+.revert-form button { min-height: 38px; padding: 8px 11px; color: var(--ink); background: var(--teal-soft); border: 0; border-radius: 9px; font-size: 10px; font-weight: 800; text-decoration: none; }
+.economy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.player-facts dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 0; }
+.player-facts dl div { padding: 12px; background: #f7f4ec; border-radius: 10px; }
+.player-facts dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; }
+.player-facts dd { margin: 4px 0 0; font-size: 16px; font-weight: 900; }
+.score-form { display: grid; gap: 9px; min-width: 320px; padding: 12px 0 4px; }
+.audit-list { display: grid; gap: 9px; }
+.audit-item { display: grid; gap: 7px; padding: 13px; background: #f7f4ec; border-left: 4px solid var(--teal); border-radius: 10px; }
+.audit-item[data-success="false"] { border-left-color: var(--coral); }
+.audit-item > div { display: flex; justify-content: space-between; gap: 10px; }
+.audit-item p { margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; }
+.audit-item small { color: var(--ink-soft); font-size: 9px; }
+.audit-item code { padding: 7px; overflow-wrap: anywhere; color: var(--ink); background: rgba(255,255,255,.72); border-radius: 7px; font-size: 9px; white-space: pre-wrap; }
+.revert-form { display: grid; grid-template-columns: minmax(150px, 1fr) auto; align-items: end; gap: 8px; margin-top: 4px; }
+.empty-panel { margin: 0; color: var(--ink-soft); font-size: 12px; }
+
 .confirm-dialog { width: min(440px, calc(100% - 32px)); padding: 0; border: 0; border-radius: 18px; box-shadow: var(--shadow); }
 .confirm-dialog::backdrop { background: rgba(23,32,59,.56); }
 .confirm-dialog form { padding: 26px; }
@@ -170,4 +222,10 @@ input:focus-visible {
   .period-players-panel { padding: 14px; }
   .table-toolbar > div { flex-wrap: wrap; }
   .table-toolbar input { flex-basis: 100%; }
+  .admin-toolbar { grid-template-columns: 1fr; }
+  .admin-card-grid, .operations-summary { grid-template-columns: 1fr; }
+  .form-pair, .economy-grid { grid-template-columns: 1fr; }
+  .player-detail-head { align-items: flex-start; flex-direction: column; }
+  .score-form { min-width: 260px; }
+  .revert-form { grid-template-columns: 1fr; }
 }

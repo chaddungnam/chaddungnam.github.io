@@ -84,6 +84,20 @@
     return [];
   }
 
+  function diffPlayerChanges(current, next) {
+    const allowed = ["gems", "stamina", "stamina_max", "breakthrough_tickets", "speed_boost_tickets"];
+    return Object.fromEntries(allowed
+      .filter((key) => Number.isInteger(next?.[key]) && next[key] >= 0 && current?.[key] !== next[key])
+      .map((key) => [key, { before: current?.[key] ?? 0, after: next[key] }]));
+  }
+
+  function canSubmitMutation({ reason, changes, mutationsEnabled, stateVersion }) {
+    return String(reason || "").trim().length > 0
+      && changes && Object.keys(changes).length > 0
+      && mutationsEnabled !== false
+      && stateVersion !== null;
+  }
+
   return {
     routeFromHash,
     decodeJwtPayload,
@@ -92,5 +106,7 @@
     serializeAnalyticsFilters,
     playerDeepLink,
     buildAttentionItems,
+    diffPlayerChanges,
+    canSubmitMutation,
   };
 });
