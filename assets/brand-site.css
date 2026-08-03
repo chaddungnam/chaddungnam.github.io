@@ -211,6 +211,75 @@ button {
   color: var(--teal-deep);
 }
 
+.language-picker {
+  position: relative;
+  color: var(--navy);
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.language-picker summary {
+  display: inline-flex;
+  min-width: 58px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  cursor: pointer;
+  list-style: none;
+}
+
+.language-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+.language-picker summary::after {
+  content: "▾";
+  color: var(--teal-deep);
+  font-size: 0.72rem;
+}
+
+.language-picker[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.language-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  display: grid;
+  min-width: 172px;
+  overflow: hidden;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-small);
+}
+
+.site-nav .language-menu a {
+  min-height: 42px;
+  padding: 0 11px;
+  border-radius: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.site-nav .language-menu a::after {
+  display: none;
+}
+
+.site-nav .language-menu a:hover,
+.site-nav .language-menu a[aria-current="page"] {
+  color: var(--teal-deep);
+  background: rgba(47, 183, 170, 0.1);
+}
+
 .menu-button {
   display: none;
   width: 48px;
@@ -1176,6 +1245,22 @@ button {
 
   .site-nav a::after {
     display: none;
+  }
+
+  .language-picker summary {
+    width: 100%;
+    min-height: 48px;
+    justify-content: space-between;
+    padding-inline: 12px;
+  }
+
+  .language-menu {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+    margin-top: 5px;
+    border-radius: 12px;
+    box-shadow: none;
   }
 
   .display-title {

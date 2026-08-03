@@ -2,10 +2,23 @@
   "use strict";
 
   var root = document.documentElement;
-  var requestedLanguage = new URLSearchParams(window.location.search).get("lang");
-  var locale = root.dataset.locale || "en";
+  var supportedLanguages = ["ko", "en", "de", "ja"];
 
-  if (requestedLanguage === "ko" || requestedLanguage === "en") {
+  function normalizeLanguage(value) {
+    var language = String(value || "").toLowerCase().split("-")[0];
+    return supportedLanguages.indexOf(language) >= 0 ? language : "";
+  }
+
+  function languageFile(language) {
+    return language === "ko" ? "index.html" : "index_" + language + ".html";
+  }
+
+  var requestedLanguage = normalizeLanguage(
+    new URLSearchParams(window.location.search).get("lang")
+  );
+  var locale = normalizeLanguage(root.dataset.locale) || "en";
+
+  if (requestedLanguage) {
     try {
       window.localStorage.setItem("house_duck_site_language", requestedLanguage);
     } catch (_error) {
@@ -13,21 +26,27 @@
     }
   }
 
-  if (locale === "ko" && requestedLanguage !== "ko") {
-    var savedLanguage = "";
-    try {
-      savedLanguage = window.localStorage.getItem("house_duck_site_language") || "";
-    } catch (_error) {
-      savedLanguage = "";
-    }
+  var savedLanguage = "";
+  try {
+    savedLanguage = normalizeLanguage(
+      window.localStorage.getItem("house_duck_site_language")
+    );
+  } catch (_error) {
+    savedLanguage = "";
+  }
 
-    var browserLanguage = String(
-      (navigator.languages && navigator.languages[0]) || navigator.language || "en"
-    ).toLowerCase();
+  var browserLanguages = navigator.languages && navigator.languages.length
+    ? navigator.languages
+    : [navigator.language || "en"];
+  var browserLanguage = "";
+  for (var languageIndex = 0; languageIndex < browserLanguages.length; languageIndex += 1) {
+    browserLanguage = normalizeLanguage(browserLanguages[languageIndex]);
+    if (browserLanguage) break;
+  }
 
-    if (savedLanguage === "en" || (!savedLanguage && browserLanguage.indexOf("ko") !== 0)) {
-      window.location.replace(root.dataset.englishUrl || "index_en.html");
-    }
+  var targetLanguage = requestedLanguage || savedLanguage || browserLanguage || "en";
+  if (targetLanguage !== locale) {
+    window.location.replace(languageFile(targetLanguage));
   }
 
   document.addEventListener("DOMContentLoaded", function () {

@@ -89,5 +89,6 @@ require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height
 require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
 
 node "$repo_dir/scripts/test_brand_images.js"
+node "$repo_dir/scripts/test_brand_language.js"
 
 printf 'brand site contract: PASS\n'
