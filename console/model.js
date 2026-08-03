@@ -18,6 +18,16 @@
     return { page: pages.has(parts[0]) ? parts[0] : "analytics" };
   }
 
+  function decodeJwtPayload(token) {
+    try {
+      const encoded = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const binary = atob(encoded.padEnd(Math.ceil(encoded.length / 4) * 4, "="));
+      return JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0))));
+    } catch (_error) {
+      return null;
+    }
+  }
+
   function dedupePlayers(rows) {
     const seen = new Set();
     return (Array.isArray(rows) ? rows : []).filter((row) => {
@@ -33,5 +43,42 @@
     return displayCode ? `${nickname} · ${displayCode}` : nickname;
   }
 
-  return { routeFromHash, dedupePlayers, playerDisplayName };
+  function serializeAnalyticsFilters(filters) {
+    const params = new URLSearchParams();
+    params.set("rangeDays", String(filters.rangeDays));
+    params.set("distributionKey", String(filters.distributionKey));
+    params.set("sort", String(filters.sort));
+    params.set("direction", String(filters.direction));
+    params.set("page", String(filters.page));
+    if (String(filters.query || "").trim()) params.set("query", String(filters.query).trim());
+    return params.toString();
+  }
+
+  function playerDeepLink(userId, returnHash) {
+    return `#/players/${encodeURIComponent(userId)}?return=${encodeURIComponent(returnHash)}`;
+  }
+
+  function buildAttentionItems(pulse) {
+    const items = Object.values(pulse?.metrics || {})
+      .filter((metric) => metric?.status === "risk" || metric?.status === "watch")
+      .map((metric) => ({ severity: metric.status, label: metric.description, source: "Pulse" }));
+    if (items.length > 0) return items;
+    if (pulse?.verdict?.status === "insufficient") {
+      return [{ severity: "insufficient", label: "플레이 데이터가 더 필요합니다.", source: "Pulse" }];
+    }
+    if (pulse?.verdict?.status === "risk" || pulse?.verdict?.status === "watch") {
+      return [{ severity: pulse.verdict.status, label: pulse.verdict.summary || "지표를 확인해 주세요.", source: "Pulse" }];
+    }
+    return [];
+  }
+
+  return {
+    routeFromHash,
+    decodeJwtPayload,
+    dedupePlayers,
+    playerDisplayName,
+    serializeAnalyticsFilters,
+    playerDeepLink,
+    buildAttentionItems,
+  };
 });

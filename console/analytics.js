@@ -1,17 +1,14 @@
-const SUPABASE_URL = "https://bbgwvpwzkyudbtcgrbtm.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6yAW6MvHsXS9xv8kzu2YKA_D23JWWQ4";
-const ANALYTICS_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/analytics-dashboard`;
-const GOOGLE_CLIENT_ID = "557794340183-s188b070e7f543o5f9nm3pfi408ma4kh.apps.googleusercontent.com";
-const GOOGLE_TOKEN_STORAGE_KEY = "quirky_ball_google_id_token";
-
+(function attachConsoleAnalytics(root) {
 const state = {
   payload: null,
   rangeDays: 7,
-  projectKey: "",
   distributionKey: "all",
+  playerQuery: "",
+  playerSort: "latest_played_at",
+  playerDirection: "desc",
+  playerPage: 1,
   loading: false,
-  googleIdToken: window.sessionStorage.getItem(GOOGLE_TOKEN_STORAGE_KEY) ?? "",
-  googleEmail: "",
+  mounted: false,
 };
 const byId = (id) => document.getElementById(id);
 
@@ -44,49 +41,52 @@ function setMessage(message, error = false) {
   element.style.color = error ? "var(--coral)" : "";
 }
 
-async function readFunctionError(error) {
-  const status = error?.status;
-  if (status === 403) return "로그인은 되었지만 이 계정은 대시보드 권한이 없습니다.";
-  if (status === 401) return "로그인 세션이 만료되었습니다. 다시 로그인해 주세요.";
+function setFiltersDisabled(disabled) {
+  document.querySelectorAll(".analytics-toolbar button, .period-players-panel button, .period-players-panel input").forEach((control) => {
+    control.disabled = disabled;
+  });
+  if (!disabled) {
+    const totalPages = Math.max(1, Math.ceil(Number(state.payload?.periodPlayerTotal ?? 0) / 50));
+    byId("periodPrevious").disabled = !state.payload || state.playerPage <= 1;
+    byId("periodNext").disabled = !state.payload || state.playerPage >= totalPages;
+  }
+}
+
+function readFunctionError(error) {
+  if (error?.status === 403) return "추가 관리자 확인이 필요합니다.";
+  if (error?.status === 401) return "Google 로그인이 만료되었습니다. 다시 로그인해 주세요.";
   return `지표를 불러오지 못했습니다: ${error?.message ?? "알 수 없는 오류"}`;
 }
 
 async function loadDashboard() {
   if (state.loading) return;
-  if (!state.googleIdToken || !state.projectKey) return;
+  if (!root.ConsoleAuth.isUnlocked()) {
+    root.ConsoleAuth.requireChallenge();
+    return;
+  }
   state.loading = true;
-  setMessage(`${state.projectKey === "quirky_ball" ? "Quirky Ball" : state.projectKey} · 최근 ${state.rangeDays}일 이벤트를 안전하게 집계하는 중...`);
+  setFiltersDisabled(true);
+  setMessage(`Quirky Ball · 최근 ${state.rangeDays}일 이벤트와 플레이 계정을 집계하는 중...`);
   try {
-    const response = await fetch(ANALYTICS_FUNCTION_URL, {
-      method: "POST",
-      headers: {
-        ["api" + "key"]: SUPABASE_PUBLISHABLE_KEY,
-        ["Author" + "ization"]: "Bearer " + state.googleIdToken,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ projectKey: state.projectKey, distributionKey: state.distributionKey, rangeDays: state.rangeDays }),
+    const data = await root.ConsoleAPI.post("analytics-dashboard", {
+      projectKey: "quirky_ball",
+      distributionKey: state.distributionKey,
+      rangeDays: state.rangeDays,
+      playerQuery: state.playerQuery,
+      playerSort: state.playerSort,
+      playerDirection: state.playerDirection,
+      playerPage: state.playerPage,
     });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const error = new Error(data?.error ?? "analytics_request_failed");
-      error.status = response.status;
-      throw error;
-    }
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
     setText("dataStatus", `${updated} 기준 · 독일 시간 · ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
-    const message = await readFunctionError(error);
-    if (error?.status === 401 || error?.status === 403) {
-      clearGoogleSession();
-      setText("loginMessage", message);
-    } else {
-      setMessage(message, true);
-    }
+    setMessage(readFunctionError(error), true);
   } finally {
     state.loading = false;
+    setFiltersDisabled(false);
   }
 }
 
@@ -107,7 +107,8 @@ function renderDashboard() {
   renderFunnel();
   renderExitBreakdown();
   renderAds();
-  renderPlayerOperations();
+  renderAttention(pulseModel);
+  renderPeriodPlayers();
   renderDailyTable();
   renderInsight();
 }
@@ -118,32 +119,33 @@ function formatServerTime(value) {
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
 }
 
-function renderPlayerOperations() {
-  const operations = state.payload?.playerOperations ?? {};
-  const rows = operations.players ?? [];
-  const summary = operations.summary ?? {};
-  setText("playerOpsTotal", operations.available ? `${formatNumber(summary.totalProfiles)}명` : "조회 불가");
-  byId("playerOpsSummary").innerHTML = operations.available
-    ? [
-        ["프로필", summary.totalProfiles],
-        ["미수령 우편", summary.pendingMail],
-        ["친구 처리 대기", summary.pendingFriendActions],
-        ["상태 미생성", summary.missingAccountState],
-      ].map(([label, value]) => `<div class="platform-row"><div class="platform-name"><strong>${escapeHtml(label)}</strong></div><div><strong>${formatNumber(value)}</strong></div></div>`).join("")
-    : '<p class="empty-panel">통합 운영 조회를 사용할 수 없습니다. 서버 마이그레이션 상태를 확인해 주세요.</p>';
-  byId("playerOpsTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="10">표시할 사용자 상태가 없습니다.</td></tr>'
+function renderAttention(pulseModel) {
+  const items = root.ConsoleModel.buildAttentionItems(pulseModel);
+  byId("attentionList").innerHTML = items.length === 0
+    ? "<p>현재 Pulse 경고가 없습니다.</p>"
+    : items.map((item) => `<div class="attention-item" data-severity="${escapeHtml(item.severity)}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.source)}</small></div>`).join("");
+}
+
+function renderPeriodPlayers() {
+  const rows = root.ConsoleModel.dedupePlayers(state.payload?.periodPlayers ?? []);
+  const total = Number(state.payload?.periodPlayerTotal ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / 50));
+  setText("periodPlayerTotal", `${formatNumber(total)}명`);
+  setText("periodPage", `${state.playerPage} / ${totalPages}`);
+  byId("periodPrevious").disabled = state.playerPage <= 1;
+  byId("periodNext").disabled = state.playerPage >= totalPages;
+  byId("periodPlayersTable").innerHTML = rows.length === 0
+    ? '<tr><td class="empty-row" colspan="9">이 기간에 조건과 일치하는 플레이 기록 계정이 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
-        <td><strong>${escapeHtml(row.nickname)}</strong><small>${escapeHtml(row.displayCode || row.accountType)}</small></td>
+        <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName(row))}</strong><small>${escapeHtml(row.accountType)}</small></td>
         <td>${escapeHtml(row.country)}</td>
+        <td>${formatNumber(row.gamesPlayed)}</td>
         <td>${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small></td>
         <td>${formatNumber(row.gems)}</td>
-        <td>${formatNumber(row.stamina)}/${formatNumber(row.staminaMax)}</td>
+        <td>${formatNumber(row.stamina)}</td>
         <td>${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
-        <td>${formatNumber(row.pendingMailCount)}</td>
-        <td>${formatNumber(row.friendCount)}<small>대기 ${formatNumber(row.pendingFriendRequestCount + row.unclaimedFriendGiftCount)}</small></td>
-        <td>${formatNumber(row.seasonXp)}</td>
-        <td>${escapeHtml(formatServerTime(row.stateUpdatedAt))}</td>
+        <td>${escapeHtml(formatServerTime(row.latestPlayedAt))}</td>
+        <td><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">바로 처리</a></td>
       </tr>`).join("");
 }
 
@@ -333,133 +335,111 @@ function renderInsight() {
   setText("insightText", `가장 많이 시작하는 시간은 ${timeText}입니다. 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
 }
 
-function decodeGoogleClaims(token) {
-  try {
-    const encoded = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, "=");
-    return JSON.parse(window.atob(padded));
-  } catch (_error) {
-    return null;
-  }
+function syncFilterHash() {
+  const query = root.ConsoleModel.serializeAnalyticsFilters({
+    rangeDays: state.rangeDays,
+    distributionKey: state.distributionKey,
+    sort: state.playerSort,
+    direction: state.playerDirection,
+    page: state.playerPage,
+    query: state.playerQuery,
+  });
+  root.history.replaceState(null, "", `#/analytics?${query}`);
 }
 
-function showProjectPicker(email = "") {
-  const signedIn = Boolean(state.googleIdToken && email);
-  byId("loginPanel").hidden = signedIn;
-  byId("projectPicker").hidden = !signedIn;
-  byId("dashboard").hidden = true;
-  if (!signedIn) {
-    setText("userEmail", "");
-    setText("loginMessage", "");
-    return;
-  }
-  state.googleEmail = email;
-  setText("userEmail", email);
+function readFilterHash() {
+  const params = new URLSearchParams((root.location.hash.split("?")[1] || ""));
+  const range = Number(params.get("rangeDays"));
+  if ([1, 7, 28].includes(range)) state.rangeDays = range;
+  const distribution = params.get("distributionKey");
+  if (["all", "google_play", "app_store", "onestore"].includes(distribution)) state.distributionKey = distribution;
+  const sort = params.get("sort");
+  if (["latest_played_at", "best_score", "games_played", "nickname", "country", "gems"].includes(sort)) state.playerSort = sort;
+  const direction = params.get("direction");
+  if (direction === "asc" || direction === "desc") state.playerDirection = direction;
+  const page = Number(params.get("page"));
+  if (Number.isInteger(page) && page > 0) state.playerPage = page;
+  state.playerQuery = (params.get("query") || "").slice(0, 100);
 }
 
-function selectProject(projectKey) {
-  if (!state.googleIdToken || !projectKey) return;
-  state.projectKey = projectKey;
-  state.payload = null;
-  byId("projectPicker").hidden = true;
-  byId("dashboard").hidden = false;
-  loadDashboard();
-}
-
-function returnToProjectPicker() {
-  state.projectKey = "";
-  state.payload = null;
-  byId("dashboard").hidden = true;
-  byId("projectPicker").hidden = false;
-}
-
-function clearGoogleSession() {
-  state.googleIdToken = "";
-  state.googleEmail = "";
-  state.projectKey = "";
-  state.payload = null;
-  window.sessionStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
-  window.google?.accounts?.id?.disableAutoSelect?.();
-  byId("dashboard").hidden = true;
-  byId("projectPicker").hidden = true;
-  byId("loginPanel").hidden = false;
-  setText("userEmail", "");
-  setText("loginMessage", "");
-}
-
-function handleGoogleCredential(response) {
-  const claims = decodeGoogleClaims(response.credential);
-  if (!claims?.email) {
-    setText("loginMessage", "Google 계정 정보를 확인하지 못했습니다. 다시 시도해 주세요.");
-    return;
-  }
-  state.googleIdToken = response.credential;
-  state.googleEmail = claims.email;
-  window.sessionStorage.setItem(GOOGLE_TOKEN_STORAGE_KEY, response.credential);
-  showProjectPicker(claims.email);
-}
-
-function waitForGoogleIdentity() {
-  return new Promise((resolve, reject) => {
-    const deadline = Date.now() + 10_000;
-    const check = () => {
-      if (window.google?.accounts?.id) return resolve();
-      if (Date.now() >= deadline) return reject(new Error("google_identity_script_timeout"));
-      window.setTimeout(check, 50);
-    };
-    check();
+function updateFilterControls() {
+  document.querySelectorAll(".range-button").forEach((button) => {
+    const active = Number(button.dataset.range) === state.rangeDays;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  document.querySelectorAll(".distribution-button").forEach((button) => {
+    const active = button.dataset.distribution === state.distributionKey;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  byId("periodPlayerSearch").value = state.playerQuery;
+  document.querySelectorAll("[data-player-sort]").forEach((button) => {
+    button.closest("th").setAttribute("aria-sort", button.dataset.playerSort === state.playerSort ? (state.playerDirection === "asc" ? "ascending" : "descending") : "none");
   });
 }
 
-async function initializeGoogleLogin() {
-  try {
-    await waitForGoogleIdentity();
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-    window.google.accounts.id.renderButton(byId("googleButton"), {
-      type: "standard",
-      theme: "outline",
-      size: "large",
-      text: "signin_with",
-      shape: "rectangular",
-      width: 360,
-    });
-  } catch (_error) {
-    setText("loginMessage", "Google 로그인 버튼을 불러오지 못했습니다. 공개 주소에서 다시 열어 주세요.");
-  }
-  const claims = decodeGoogleClaims(state.googleIdToken);
-  if (claims?.email && Number(claims.exp) * 1000 > Date.now()) {
-    showProjectPicker(claims.email);
-  } else if (state.googleIdToken) {
-    clearGoogleSession();
-  }
+function changeFilters() {
+  updateFilterControls();
+  syncFilterHash();
+  loadDashboard();
 }
 
-byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
-byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
-byId("logoutButton").addEventListener("click", clearGoogleSession);
-byId("refreshButton").addEventListener("click", loadDashboard);
-document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
-  state.rangeDays = Number(button.dataset.range);
-  document.querySelectorAll(".range-button").forEach((item) => item.classList.toggle("active", item === button));
-  if (state.projectKey) loadDashboard();
-}));
-document.querySelectorAll(".distribution-button").forEach((button) => button.addEventListener("click", () => {
-  state.distributionKey = button.dataset.distribution;
-  document.querySelectorAll(".distribution-button").forEach((item) => item.classList.toggle("active", item === button));
-  if (state.projectKey) loadDashboard();
-}));
+function bindControls() {
+  document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
+    state.rangeDays = Number(button.dataset.range);
+    state.playerPage = 1;
+    changeFilters();
+  }));
+  document.querySelectorAll(".distribution-button").forEach((button) => button.addEventListener("click", () => {
+    state.distributionKey = button.dataset.distribution;
+    state.playerPage = 1;
+    changeFilters();
+  }));
+  byId("periodPlayerSearchForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    state.playerQuery = byId("periodPlayerSearch").value.trim();
+    state.playerPage = 1;
+    changeFilters();
+  });
+  byId("periodPlayerReset").addEventListener("click", () => {
+    state.playerQuery = "";
+    state.playerPage = 1;
+    changeFilters();
+  });
+  document.querySelectorAll("[data-player-sort]").forEach((button) => button.addEventListener("click", () => {
+    const nextSort = button.dataset.playerSort;
+    state.playerDirection = state.playerSort === nextSort && state.playerDirection === "desc" ? "asc" : "desc";
+    state.playerSort = nextSort;
+    state.playerPage = 1;
+    changeFilters();
+  }));
+  byId("periodPrevious").addEventListener("click", () => {
+    if (state.playerPage > 1) {
+      state.playerPage -= 1;
+      changeFilters();
+    }
+  });
+  byId("periodNext").addEventListener("click", () => {
+    state.playerPage += 1;
+    changeFilters();
+  });
+  let resizeTimer;
+  root.addEventListener("resize", () => {
+    root.clearTimeout(resizeTimer);
+    resizeTimer = root.setTimeout(() => { if (state.payload) renderDailyChart(); }, 120);
+  });
+}
 
-let resizeTimer;
-window.addEventListener("resize", () => {
-  window.clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(() => { if (state.payload) renderDailyChart(); }, 120);
-});
+function mount() {
+  if (!state.mounted) {
+    readFilterHash();
+    bindControls();
+    state.mounted = true;
+  }
+  updateFilterControls();
+  loadDashboard();
+}
 
-(async () => {
-  await initializeGoogleLogin();
-})();
+root.ConsoleAnalytics = { mount, load: loadDashboard };
+})(window);

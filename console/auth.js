@@ -8,17 +8,8 @@
   let ticketExpiresAt = Number(root.sessionStorage.getItem(TICKET_EXPIRY_KEY) || 0);
   let email = "";
 
-  function decodeClaims(token) {
-    try {
-      const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-      return JSON.parse(decodeURIComponent(escape(atob(payload))));
-    } catch (_error) {
-      return null;
-    }
-  }
-
   function hasValidGoogleIdentity() {
-    const claims = decodeClaims(googleIdToken);
+    const claims = root.ConsoleModel.decodeJwtPayload(googleIdToken);
     if (!claims?.email || Number(claims.exp) * 1_000 <= Date.now()) return false;
     email = claims.email;
     return true;

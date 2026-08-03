@@ -74,6 +74,7 @@ function renderRoute() {
   if (route.page === "player") byId("playerRouteId").textContent = route.userId;
   byId("consoleStatus").textContent = `${byId("pageTitle").textContent} 화면`;
   byId("mainContent").focus({ preventScroll: true });
+  if (route.page === "analytics") window.ConsoleAnalytics.mount();
 }
 
 function challengeErrorMessage(error) {
