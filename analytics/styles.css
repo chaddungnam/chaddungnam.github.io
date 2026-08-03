@@ -168,6 +168,9 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .question-gauge i { display: block; width: 0; height: 100%; background: var(--state); border-radius: inherit; transition: width .25s ease; }
 .question-card > small { display: block; margin-left: 42px; overflow: hidden; color: #8b91a1; font-size: 8px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .question-card > small b { color: var(--ink); }
+.operations-pulse { margin-bottom: 12px; padding: 14px 16px 4px; background: rgba(255,255,255,.45); border: 1px solid var(--line); border-radius: 18px; }
+.operations-pulse .panel-heading { margin-bottom: 10px; }
+.operations-grid { margin-bottom: 8px; }
 
 .visual-overview { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(330px, .85fr); gap: 12px; margin-bottom: 12px; }
 .journey-panel, .trend-panel { min-width: 0; padding: 14px 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; }

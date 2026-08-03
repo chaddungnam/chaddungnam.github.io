@@ -109,8 +109,47 @@ function renderDashboard() {
   renderAds();
   renderAttention(pulseModel);
   renderPeriodPlayers();
+  renderGameMetrics();
   renderDailyTable();
   renderInsight();
+}
+
+function renderGameMetrics() {
+  const current = state.payload?.gameMetrics?.current;
+  if (!current) {
+    setText("operationsFreshAt", "아직 서버 요약이 없습니다.");
+    return;
+  }
+
+  const economy = current.economy ?? {};
+  const stamina = current.stamina ?? {};
+  const seasonPass = current.seasonPass ?? {};
+  const ranking = current.ranking ?? {};
+  const synced = Number(economy.syncedAccounts ?? 0);
+  const profiles = Number(economy.profiles ?? 0);
+  const dailyStarts = Number(state.payload?.summary?.gamesStarted ?? 0) / Math.max(1, state.rangeDays);
+  const history = state.payload?.gameMetrics?.daily ?? [];
+  const previousMedian = history.length > 1 ? Number(history.at(-2)?.payload?.economy?.medianGems) : null;
+  const medianChange = Number.isFinite(previousMedian)
+    ? ` · 전일 ${Number(economy.medianGems ?? 0) - previousMedian >= 0 ? "+" : ""}${formatNumber(Number(economy.medianGems ?? 0) - previousMedian)}`
+    : " · 오늘부터 일별 추적";
+
+  setText("operationsFreshAt", `전체 서버 현재 상태 · ${formatServerTime(history.at(-1)?.refreshed_at)}`);
+  setText("opsGemMedian", `중앙값 ${formatNumber(Number(economy.medianGems ?? 0))}젬`);
+  setText("opsGemDetail", `상위 10% ${formatNumber(Number(economy.p90Gems ?? 0))}젬${medianChange}`);
+  byId("opsGemCoverage").style.width = `${Math.min(100, Number(economy.coverageRate ?? 0) * 100)}%`;
+
+  setText("opsStaminaUse", `하루 ${formatDecimal(dailyStarts)}개`);
+  setText("opsStaminaDetail", `0개 계정 ${formatNumber(Number(stamina.zeroAccounts ?? 0))} · 가득 참 ${formatNumber(Number(stamina.fullAccounts ?? 0))}`);
+  byId("opsStaminaGauge").style.width = `${synced ? Math.max(0, Math.min(100, (synced - Number(stamina.zeroAccounts ?? 0)) / synced * 100)) : 0}%`;
+
+  setText("opsPassRate", formatRate(Number(seasonPass.completionRate ?? 0)));
+  setText("opsPassDetail", `참여 ${formatNumber(Number(seasonPass.participants ?? 0))}명 · 평균 ${formatNumber(Number(seasonPass.averageXp ?? 0))} XP`);
+  byId("opsPassGauge").style.width = `${Math.min(100, Number(seasonPass.completionRate ?? 0) * 100)}%`;
+
+  setText("opsRankingPlayers", `${formatNumber(Number(ranking.participants ?? 0))}명`);
+  setText("opsRankingDetail", `중앙 ${formatNumber(Number(ranking.medianScore ?? 0))}점 · 상위 10% ${formatNumber(Number(ranking.p90Score ?? 0))}점`);
+  byId("opsRankingGauge").style.width = `${profiles ? Math.min(100, Number(ranking.participants ?? 0) / profiles * 100) : 0}%`;
 }
 
 function formatServerTime(value) {

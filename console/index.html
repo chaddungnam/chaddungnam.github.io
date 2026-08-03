@@ -124,6 +124,16 @@
           <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>광고는 적당한가?</h2><p>사람 한 명당 노출</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>테스트 광고 포함 · 수익에서는 제외</small></article>
         </section>
 
+        <section class="operations-pulse" aria-labelledby="operationsPulseTitle">
+          <div class="panel-heading compact-heading"><div><p class="eyebrow">LOW-COST OPERATIONS</p><h2 id="operationsPulseTitle">경제·패스·랭킹 현황</h2><small id="operationsFreshAt">서버 상태를 요약하는 중입니다.</small></div></div>
+          <div class="question-grid operations-grid">
+            <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">◆</span><div><h2>젬 경제</h2><p>서버 동기화 계정 기준</p></div></div><strong id="opsGemMedian" class="question-value">—</strong><div class="question-gauge"><i id="opsGemCoverage"></i></div><small id="opsGemDetail">오늘부터 일별 추적</small></article>
+            <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">⚡</span><div><h2>스태미나 사용</h2><p>게임 시작 기준 추정</p></div></div><strong id="opsStaminaUse" class="question-value">—</strong><div class="question-gauge"><i id="opsStaminaGauge"></i></div><small id="opsStaminaDetail">별도 로그를 쌓지 않습니다.</small></article>
+            <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">▰</span><div><h2>시즌패스</h2><p>현재 시즌 완주율</p></div></div><strong id="opsPassRate" class="question-value">—</strong><div class="question-gauge"><i id="opsPassGauge"></i></div><small id="opsPassDetail">참여 정보 없음</small></article>
+            <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">♛</span><div><h2>주간랭킹</h2><p>현재 시즌 참가자</p></div></div><strong id="opsRankingPlayers" class="question-value">—</strong><div class="question-gauge"><i id="opsRankingGauge"></i></div><small id="opsRankingDetail">기록 정보 없음</small></article>
+          </div>
+        </section>
+
         <section class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
           <div class="panel-heading period-heading"><div><p class="eyebrow">PLAYED IN THIS PERIOD</p><h2 id="periodPlayersTitle">기간 내 플레이 기록 계정</h2><small>선택한 기간에 실제 게임 기록이 있는 계정입니다. 앱만 연 플레이어는 포함되지 않을 수 있습니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
           <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
