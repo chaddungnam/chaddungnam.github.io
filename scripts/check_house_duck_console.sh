@@ -11,6 +11,7 @@ rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.
 rg -F -q 'window.ConsoleCs.mount()' "$console_dir/app.js"
 rg -F -q 'textContent = root.GmailModel.extractMessageText' "$console_dir/cs.js"
 rg -F -q 'root.ConsoleApp.confirmChange("답변 발송 최종 확인"' "$console_dir/cs.js"
+rg -F -q 'return { sent, statusUpdated }' "$console_dir/gmail-api.js"
 
 rg -q 'id="googleButton"' "$console_dir/index.html"
 rg -q '내가 처음 한 게임 이름은?' "$console_dir/index.html"

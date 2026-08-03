@@ -29,6 +29,8 @@ assert.deepEqual(model.listAttachments(multipartPayload), [{
   attachmentId: "att-1",
 }]);
 assert.equal(model.headerValue([{ name: "Subject", value: "Help" }], "subject"), "Help");
+assert.equal(model.mailboxAddress("House Duck <support@houseduck.in>"), "support@houseduck.in");
+assert.equal(model.mailboxAddress('"support@houseduck.in helper" <attacker@example.com>'), "attacker@example.com");
 
 const raw = model.buildReplyRaw({
   from: "support@houseduck.in",
@@ -75,5 +77,9 @@ assert.deepEqual(model.csThreadState({ labelIds: ["s-wait"], latestFromSupport: 
 assert.deepEqual(model.csThreadState({ labelIds: ["s-done"], latestFromSupport: false, latestAt: 1 }, statusIds, 2), { status: "done", urgent: false });
 assert.deepEqual(model.csThreadState({ labelIds: ["s-reply"], latestFromSupport: false, latestAt: 1 }, statusIds, 1 + 25 * 60 * 60 * 1000), { status: "needs_reply", urgent: true });
 assert.equal(model.playerSearchHash("pABCDEFGHJK"), "#/players?query=pABCDEFGHJK&return=%23%2Fcs");
+
+const gmailApiSource = require("node:fs").readFileSync(require.resolve("../console/gmail-api.js"), "utf8");
+assert.match(gmailApiSource, /failedDraft = null;\s*let statusUpdated = true;/);
+assert.match(gmailApiSource, /return \{ sent, statusUpdated \};/);
 
 console.log("gmail model: PASS");

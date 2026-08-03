@@ -163,11 +163,11 @@
     });
   }
 
-  async function setThreadStatus(threadId, status, category = "") {
+  async function setThreadStatus(threadId, status, category = "", knownLabelIds = null) {
     const labels = await ensureCsLabels();
     if (!labels.status[status] || (category && !labels.category[category])) throw new Error("invalid_cs_label");
-    const thread = await getThread(threadId);
-    const current = [...new Set((thread.messages || []).flatMap((message) => message.labelIds || []))];
+    const thread = knownLabelIds ? null : await getThread(threadId);
+    const current = [...new Set(knownLabelIds || (thread.messages || []).flatMap((message) => message.labelIds || []))];
     const statusChange = root.GmailModel.nextStatusLabels(current, labels.status[status], Object.values(labels.status));
     const categoryChange = category
       ? root.GmailModel.nextStatusLabels(current, labels.category[category], Object.values(labels.category))
@@ -190,16 +190,22 @@
     const messageId = root.GmailModel.headerValue(headers, "Message-ID");
     const references = [root.GmailModel.headerValue(headers, "References"), messageId].filter(Boolean).join(" ");
     const raw = root.GmailModel.buildReplyRaw({ ...reply, inReplyTo: messageId, references });
+    let sent;
     try {
-      const sent = await request(["messages", "send"], { method: "POST", body: { raw, threadId: reply.threadId } });
-      failedDraft = null;
-      await setThreadStatus(reply.threadId, "waiting_customer", reply.category || "");
-      return sent;
+      sent = await request(["messages", "send"], { method: "POST", body: { raw, threadId: reply.threadId } });
     } catch (error) {
       failedDraft = reply;
-      if (error?.status === 400 || error?.status === 403) throw new Error("send_as_rejected");
+      if (error?.status === 400 || error?.status === 403) throw new Error("gmail_send_rejected");
       throw error;
     }
+    failedDraft = null;
+    let statusUpdated = true;
+    try {
+      await setThreadStatus(reply.threadId, "waiting_customer", reply.category || "");
+    } catch (_error) {
+      statusUpdated = false;
+    }
+    return { sent, statusUpdated };
   }
 
   function getFailedDraft() {

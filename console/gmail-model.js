@@ -28,6 +28,11 @@
     return String((headers || []).find((header) => String(header?.name || "").toLowerCase() === String(name).toLowerCase())?.value || "");
   }
 
+  function mailboxAddress(value) {
+    const text = String(value || "").trim();
+    return (text.match(/<([^<>]+)>\s*$/)?.[1] || text).trim().toLowerCase();
+  }
+
   function decodedBody(part) {
     const bytes = decodeBase64Url(part?.body?.data);
     return bytes ? decoder.decode(bytes) : "";
@@ -157,6 +162,7 @@
     decodeBase64Url,
     encodeBase64Url,
     headerValue,
+    mailboxAddress,
     extractMessageText,
     listAttachments,
     buildReplyRaw,

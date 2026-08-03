@@ -19,7 +19,7 @@
     const messages = [...(thread?.messages || [])].sort((left, right) => Number(left.internalDate || 0) - Number(right.internalDate || 0));
     const latest = messages.at(-1) || {};
     const labelIds = [...new Set(messages.flatMap((message) => message.labelIds || []))];
-    const latestFromSupport = header(latest, "From").toLowerCase().includes("support@houseduck.in");
+    const latestFromSupport = root.GmailModel.mailboxAddress(header(latest, "From")) === "support@houseduck.in";
     const status = root.GmailModel.csThreadState({ labelIds, latestFromSupport, latestAt: Number(latest.internalDate || 0) }, state.labels.status);
     const category = Object.entries(state.labels.category).find(([, id]) => labelIds.includes(id))?.[0] || "";
     return {
@@ -52,7 +52,7 @@
     try {
       const status = byId("csStatusFilter").value;
       const category = byId("csCategoryFilter").value;
-      const filters = [status ? state.labels.status[status] : "", category ? state.labels.category[category] : ""].filter(Boolean);
+      const filters = [category ? state.labels.category[category] : ""].filter(Boolean);
       const page = await root.GmailAPI.listSupportThreads({
         query: byId("csSearch").value,
         labelIds: filters,
@@ -61,9 +61,13 @@
         newerThanDays: Number(byId("csDateFilter").value),
       });
       const summaries = await Promise.allSettled((page.threads || []).map((thread) => root.GmailAPI.getThreadSummary(thread.id)));
-      state.summaries = summaries.filter((result) => result.status === "fulfilled").map((result) => threadData(result.value));
+      const classified = summaries.filter((result) => result.status === "fulfilled").map((result) => threadData(result.value));
+      await Promise.allSettled(classified
+        .filter((row) => !row.labelIds.includes(state.labels.status[row.status]))
+        .map((row) => root.GmailAPI.setThreadStatus(row.id, row.status, row.category, row.labelIds)));
+      state.summaries = status ? classified.filter((row) => row.status === status) : classified;
       state.nextPageToken = page.nextPageToken || "";
-      renderList(page.resultSizeEstimate || state.summaries.length);
+      renderList(status ? state.summaries.length : page.resultSizeEstimate || state.summaries.length);
       setMessage("목록에는 support@houseduck.in으로 들어온 문의만 표시됩니다.");
     } catch (error) {
       if (error?.message === "gmail_reconnect_required") setConnected(false);
@@ -133,7 +137,7 @@
       renderLabelControls(detail);
       renderMessages(detail);
       await findPlayer(detail);
-      const latestExternal = [...detail.messages].reverse().find((message) => !header(message, "From").toLowerCase().includes("support@houseduck.in")) || detail.latest;
+      const latestExternal = [...detail.messages].reverse().find((message) => root.GmailModel.mailboxAddress(header(message, "From")) !== "support@houseduck.in") || detail.latest;
       byId("csReplyForm").elements.to.value = header(latestExternal, "Reply-To") || header(latestExternal, "From");
       byId("csReplyForm").elements.subject.value = /^re:/i.test(detail.subject) ? detail.subject : `Re: ${detail.subject}`;
       byId("csThreadPanel").classList.add("active");
@@ -192,14 +196,17 @@
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     try {
-      await root.GmailAPI.sendReply(reply);
+      const outcome = await root.GmailAPI.sendReply(reply);
       form.elements.body.value = "";
       form.elements.attachments.value = "";
-      setMessage("답변을 발송하고 상태를 사용자 회신 대기로 바꿨습니다.");
-      await openThread(state.selected.id);
-      await loadList();
+      state.selected.status = "waiting_customer";
+      state.selected.latestFromSupport = true;
+      renderLabelControls(state.selected);
+      setMessage(outcome.statusUpdated
+        ? "답변을 발송하고 상태를 사용자 회신 대기로 바꿨습니다."
+        : "답변은 발송됐습니다. 상태 라벨 변경은 실패했으므로 다시 보내지 말고 문의를 다시 열어 주세요.", !outcome.statusUpdated);
     } catch (error) {
-      setMessage(error?.message === "send_as_rejected" ? "support@houseduck.in 발신 별칭을 확인해 주세요. 작성 내용은 이 화면에 유지했습니다." : `답변을 발송하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+      setMessage(error?.message === "gmail_send_rejected" ? "Gmail이 발송을 거부했습니다. 발신 별칭과 받는 주소를 확인해 주세요. 작성 내용은 유지했습니다." : `답변을 발송하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
       button.disabled = false;
     }
