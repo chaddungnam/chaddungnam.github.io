@@ -4,9 +4,10 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 console_dir="$repo_dir/console"
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js; do
   test -f "$console_dir/$path"
 done
+rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
 
 rg -q 'id="googleButton"' "$console_dir/index.html"
 rg -q '내가 처음 한 게임 이름은?' "$console_dir/index.html"
@@ -34,6 +35,16 @@ done
 
 if rg -n -i 'service[_-]?role|admin_challenge|gmail.*access.*token|password\s*=' "$console_dir"; then
   echo "console contains a server secret or secret assignment" >&2
+  exit 1
+fi
+
+if rg -n 'localStorage|sessionStorage|indexedDB|document\.cookie|console\.(log|warn|error)|/functions/.*gmail' "$console_dir/gmail-api.js" "$console_dir/gmail-model.js"; then
+  echo "Gmail token or mail data must stay in browser memory and out of logs/proxies" >&2
+  exit 1
+fi
+
+if rg -n -P 'https://www\.googleapis\.com/auth/gmail\.(?!modify\b)' "$console_dir/gmail-api.js"; then
+  echo "Gmail scope is broader than gmail.modify" >&2
   exit 1
 fi
 

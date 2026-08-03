@@ -1,5 +1,6 @@
 const assert = require("node:assert/strict");
 const model = require("../console/gmail-model.js");
+const gmailApi = require("../console/gmail-api.js");
 
 const data = (value) => Buffer.from(value, "utf8").toString("base64url");
 const plainPayload = { mimeType: "text/plain", body: { data: data("게임이 실행되지 않아요.") } };
@@ -55,5 +56,16 @@ assert.deepEqual(model.nextStatusLabels(["status-new", "category-bug", "STARRED"
 });
 assert.equal(model.extractDisplayCode("제 코드는 pABCDEFGHJK 입니다."), "pABCDEFGHJK");
 assert.equal(model.extractDisplayCode("UID 11111111-1111-4111-8111-111111111111"), "");
+
+const request = gmailApi.buildGmailRequest("memory-token", ["threads", "a/b"], {
+  query: { maxResults: 100, q: gmailApi.supportSearchQuery("결제") },
+});
+assert.equal(request.url.startsWith("https://gmail.googleapis.com/gmail/v1/users/me/"), true);
+assert.match(request.url, /threads\/a%2Fb/);
+assert.match(request.url, /maxResults=50/);
+assert.match(decodeURIComponent(request.url), /to:support@houseduck\.in/);
+assert.equal(request.url.includes("memory-token"), false);
+assert.equal(request.options.headers.Authorization, "Bearer memory-token");
+assert.equal(gmailApi.supportSearchQuery(""), "to:support@houseduck.in");
 
 console.log("gmail model: PASS");

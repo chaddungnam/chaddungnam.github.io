@@ -131,6 +131,7 @@
 
   function logout() {
     const revokeEmail = email;
+    root.GmailAPI?.disconnect?.();
     googleIdToken = "";
     email = "";
     clearTicket();
