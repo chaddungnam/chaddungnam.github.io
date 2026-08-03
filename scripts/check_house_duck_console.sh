@@ -5,7 +5,9 @@ repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 console_dir="$repo_dir/console"
 
 if ! command -v rg >/dev/null 2>&1; then
-  rg() { grep -E -R "$@"; }
+  rg() {
+    if [[ " $* " == *" -F "* ]]; then grep -R "$@"; else grep -E -R "$@"; fi
+  }
 fi
 
 for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-templates.js cs.js; do
