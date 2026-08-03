@@ -12,6 +12,7 @@
 
 - 정답 평문·해시, `service_role`, Gmail 토큰, 사용자 데이터는 공개 `site_repo`에 넣지 않는다.
 - 기존 Google client ID, `verifyGoogleIdToken()`, Pulse 모델과 CSS를 재사용한다.
+- `admin-auth`와 `analytics-dashboard`는 Google ID 토큰을 자체 검증하므로 기존 Pulse와 같이 `--no-verify-jwt`로 배포한다. Supabase 게이트웨이 검사를 끈 대신 함수 내부 Google 검증·이메일 허용표·관리자 티켓을 모두 통과해야 한다.
 - 외부 프런트엔드 프레임워크와 새 npm 의존성을 추가하지 않는다.
 - Project K와 구매는 실제 연결처럼 꾸미지 않고 `준비 중`·`결제 미연동`으로 표시한다.
 - 분석 플레이어는 `user_id`당 한 행이며 동명이인은 표시 코드로 구분한다.
@@ -312,6 +313,8 @@ Revoke execute from `PUBLIC`, `anon`, and `authenticated`; grant only `service_r
 - [ ] **Step 4: Require the admin ticket in analytics**
 
 Update CORS to permit `x-admin-session`. Verify the Google ID first, then verify the ticket with `ADMIN_SESSION_SECRET` and the same Google subject/email. Return `403 admin_session_required` for missing, expired, or mismatched tickets.
+
+Keep `admin-auth` and `analytics-dashboard` deployment on the repository's established `--no-verify-jwt --use-api --project-ref bbgwvpwzkyudbtcgrbtm --yes` path because their `Authorization` header carries a Google ID token, not a Supabase JWT. Never apply this flag to a function that lacks its own complete credential verification.
 
 - [ ] **Step 5: Fetch the period page**
 

@@ -472,7 +472,7 @@ Apply the CLI-generated migrations through the supported linked-project command 
 
 - [ ] **Step 5: Deploy Edge Functions in safe order**
 
-Deploy `admin-auth` and `admin-console`, then deploy the updated `analytics-dashboard`. Smoke test missing token, wrong Google account, missing challenge ticket, expired ticket, valid read, and mutations-disabled responses. Never log response payloads containing player rows.
+Deploy `admin-auth` and `admin-console`, then deploy the updated `analytics-dashboard`, each with the already verified `--no-verify-jwt --use-api --project-ref bbgwvpwzkyudbtcgrbtm --yes` command path. These functions accept Google ID tokens and therefore must perform Google verification, email allowlisting, and administrator-ticket checks inside the handler. Smoke test missing token, wrong Google account, missing challenge ticket, expired ticket, valid read, and mutations-disabled responses. Never log response payloads containing player rows.
 
 - [ ] **Step 6: Push the public site**
 

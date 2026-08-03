@@ -16,6 +16,7 @@
 - 원본 경쟁 기록은 삭제하지 않고 보정·제외 메타데이터와 감사를 남긴다.
 - 새 앱의 버전 충돌 계약이 배포되기 전까지 실제 수정 UI는 서버 기능 플래그로 비활성화한다.
 - `SECURITY DEFINER`는 `search_path=''`, 명시적 객체명, 실행권한 회수와 service-role/authenticated 최소 grant를 한 묶음으로 적용한다.
+- `admin-console`은 Google ID 토큰과 관리자 티켓을 자체 검증하므로 기존 Pulse와 동일한 `--no-verify-jwt` 배포 경로만 사용한다.
 - 복구 코드, 토큰, 메일, receipt는 운영 응답과 감사 데이터에 넣지 않는다.
 - Supabase migration 파일은 `supabase migration new`로 생성한 실제 경로만 사용한다.
 
