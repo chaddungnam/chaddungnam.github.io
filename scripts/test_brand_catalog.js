@@ -11,6 +11,21 @@ const projectPages = [
   ["project-k/index_de.html", "de"],
   ["project-k/index_ja.html", "ja"]
 ];
+const marketingPages = [
+  ["index.html", "ko"],
+  ["index_en.html", "en"],
+  ["index_de.html", "de"],
+  ["index_ja.html", "ja"],
+  ["quirky-ball/index.html", "ko"],
+  ["quirky-ball/index_en.html", "en"],
+  ["quirky-ball/index_de.html", "de"],
+  ["quirky-ball/index_ja.html", "ja"],
+  ...projectPages,
+  ["story/index.html", "ko"],
+  ["story/index_en.html", "en"],
+  ["story/index_de.html", "de"],
+  ["story/index_ja.html", "ja"]
+];
 
 function read(file) {
   const filePath = path.join(repoDir, file);
@@ -48,6 +63,48 @@ for (const [file, locale] of projectPages) {
     assert.equal(attribute(tag, "width"), "720", `${source} declared width`);
     assert.equal(attribute(tag, "height"), "1280", `${source} declared height`);
   }
+}
+
+for (const [file, locale] of marketingPages) {
+  const html = read(file);
+  assert.match(html, new RegExp(`data-locale="${locale}"`), `${file} locale`);
+  assert.equal((html.match(/data-lang-link=/g) || []).length, 4, `${file} language options`);
+  for (const language of ["ko", "en", "de", "ja"]) {
+    assert.match(html, new RegExp(`hreflang="${language}"`), `${file} ${language} alternate`);
+  }
+
+  const imageTags = html.match(/<img\b[^>]*>/g) || [];
+  for (const tag of imageTags) {
+    const source = attribute(tag, "src");
+    if (!source || /^(?:https?:)?\/\//.test(source)) continue;
+    const imagePath = path.resolve(path.dirname(path.join(repoDir, file)), source.split("?")[0]);
+    assert.ok(fs.existsSync(imagePath), `${file}: missing ${source}`);
+    if (path.extname(imagePath).toLowerCase() !== ".png") continue;
+    const natural = pngSize(imagePath);
+    const width = Number(attribute(tag, "width"));
+    const height = Number(attribute(tag, "height"));
+    assert.ok(width > 0 && height > 0, `${file}: ${source} needs declared dimensions`);
+    assert.ok(Math.abs(width / height - natural.width / natural.height) < 0.001, `${file}: ${source} declared ratio`);
+  }
+}
+
+const storyFacts = {
+  ko: [/1998/, /산업디자인/, /3년/, /한국/, /독일/, /House Duck/i],
+  en: [/1998/, /industrial design/i, /(?:three|3) years/i, /Korea/i, /Germany/i, /House Duck/i],
+  de: [/1998/, /Industriedesign/i, /(?:drei|3) Jahre/i, /Korea/i, /Deutschland/i, /House Duck/i],
+  ja: [/1998/, /(?:インダストリアル|工業)デザイン/, /3年間/, /韓国/, /ドイツ/, /House Duck/i]
+};
+
+for (const [file, locale] of marketingPages.filter(([name]) => name.startsWith("story/"))) {
+  const text = read(file).replace(/<[^>]*>/g, " ");
+  for (const fact of storyFacts[locale]) assert.match(text, fact, `${file} founder fact ${fact}`);
+}
+
+for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
+  const html = read(file);
+  assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
+  assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
+  assert.match(html, /href="[^"]*story\//, `${file} founder story link`);
 }
 
 console.log("brand catalog contract: PASS");

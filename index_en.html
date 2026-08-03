@@ -14,6 +14,9 @@
   <link rel="canonical" href="https://houseduck.in/index_en.html">
   <link rel="alternate" hreflang="ko" href="https://houseduck.in/?lang=ko">
   <link rel="alternate" hreflang="en" href="https://houseduck.in/index_en.html">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/index_de.html">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/index_ja.html">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/index_en.html">
   <link rel="icon" type="image/png" href="quirky-ball/app-icon.png">
   <link rel="stylesheet" href="assets/site-fonts.css">
   <link rel="stylesheet" href="assets/brand-site.css">
@@ -33,9 +36,17 @@
       </button>
       <nav class="site-nav" id="site-navigation" aria-label="Primary navigation" data-site-nav>
         <a href="#games">Games</a>
-        <a href="#studio">Studio</a>
+        <a href="story/index_en.html?lang=en">Story</a>
         <a href="support/">Support</a>
-        <a class="language-link" href="/?lang=ko" lang="ko" data-lang-link="ko">EN / KR</a>
+        <details class="language-picker">
+          <summary aria-label="Choose language">EN</summary>
+          <div class="language-menu">
+            <a href="./?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko">한국어</a>
+            <a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en" aria-current="page">English</a>
+            <a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">Deutsch</a>
+            <a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">日本語</a>
+          </div>
+        </details>
       </nav>
     </div>
   </header>
@@ -48,41 +59,30 @@
           <h1 class="display-title" id="studio-title">SMALL GAMES.<br><span class="accent">BIG PERSONALITY.</span></h1>
           <p class="lead">House Duck makes small games in Germany that stay with you. We add an unexpected personality to familiar rules and shape every first touch into a good moment.</p>
           <div class="button-row">
-            <a class="button button-primary" href="#games">Meet our first game</a>
-            <a class="button button-secondary" href="#studio">How we make games</a>
+            <a class="button button-primary" href="#games">Explore our games</a>
+            <a class="button button-secondary" href="story/index_en.html?lang=en">Meet the maker</a>
           </div>
         </div>
-        <div class="hero-showcase reveal">
-          <img src="quirky-ball/store/feature-graphic.png" width="1024" height="500" alt="Quirky Ball logo with real merge-puzzle gameplay" data-store-asset>
-          <span class="hero-showcase-note" aria-hidden="true">01 · QUIRKY BALL</span>
+        <div class="hero-showcase hero-duo reveal" aria-label="Two House Duck games">
+          <figure class="hero-duo-quirky"><img src="quirky-ball/store/feature-graphic.png" width="1024" height="500" alt="Quirky Ball logo with real merge-puzzle gameplay" data-store-asset></figure>
+          <figure class="hero-duo-k"><img src="project-k/media/decision.png" width="720" height="1280" alt="Real Project K decision scene"></figure>
+          <span class="hero-showcase-note" aria-hidden="true">02 GAMES · ONE HOUSE DUCK</span>
         </div>
       </div>
     </section>
 
-    <section class="section container" id="games" data-section="featured-game" aria-labelledby="featured-game-title">
+    <section class="section container" id="games" data-section="games-catalog" aria-labelledby="featured-game-title">
       <div class="section-heading reveal">
         <div>
-          <p class="section-kicker">01 · Featured game</p>
-          <h2 class="section-title" id="featured-game-title">Our first game<br>carries our character.</h2>
+          <p class="section-kicker">01 · Our games</p>
+          <h2 class="section-title" id="featured-game-title">From a small puzzle<br>to the story of a nation.</h2>
         </div>
-        <p class="lead">A physics merge puzzle that starts simply and tells a different story every run. Meet House Duck's first featured game.</p>
+        <p class="lead">The first game is about the joy in your fingertips. The next is about a world shaped by your choices. Both carry House Duck's point of view.</p>
       </div>
-      <article class="featured-game-card reveal">
-        <div class="featured-game-visual" aria-label="Real Quirky Ball game screens">
-          <img src="quirky-ball/store/01-core.png" width="1080" height="1920" alt="Dropping and merging marbles in Quirky Ball" loading="lazy" data-store-asset>
-          <img src="quirky-ball/store/03-joker.png" width="1080" height="1920" alt="The Joker interrupting a Quirky Ball run" loading="lazy" data-store-asset>
-          <img src="quirky-ball/store/08-ranking.png" width="1080" height="1920" alt="Quirky Ball world ranking" loading="lazy" data-store-asset>
-        </div>
-        <div class="featured-game-content">
-          <span class="status-pill">Preparing for Google Play</span>
-          <img class="featured-logo" src="quirky-ball/logo.png" width="861" height="551" alt="Quirky Ball">
-          <h2>Same marbles.<br>More quirky.</h2>
-          <p>Drop, merge, turn the Joker's mischief around, and climb the worldwide rankings.</p>
-          <div class="button-row">
-            <a class="button button-primary" href="quirky-ball/index_en.html">Explore Quirky Ball</a>
-          </div>
-        </div>
-      </article>
+      <div class="games-catalog">
+        <article class="game-catalog-card game-catalog-quirky reveal"><div class="game-catalog-visual game-catalog-visual-quirky"><img src="quirky-ball/store/01-core.png" width="1080" height="1920" alt="Dropping and merging marbles in Quirky Ball" loading="lazy" data-store-asset><img src="quirky-ball/store/03-joker.png" width="1080" height="1920" alt="The Joker interrupting a Quirky Ball run" loading="lazy" data-store-asset><img src="quirky-ball/store/08-ranking.png" width="1080" height="1920" alt="Quirky Ball world ranking" loading="lazy" data-store-asset></div><div class="game-catalog-copy"><span class="status-pill">Preparing for Google Play</span><img class="featured-logo" src="quirky-ball/logo.png" width="861" height="551" alt="Quirky Ball"><h3>Same marbles.<br>More quirky.</h3><p>A physics merge puzzle about dropping, combining, and turning the Joker's mischief around.</p><a class="text-link" href="quirky-ball/index_en.html?lang=en">Explore the game</a></div></article>
+        <article class="game-catalog-card game-catalog-k reveal"><div class="game-catalog-visual game-catalog-visual-k"><img src="project-k/media/decision.png" width="720" height="1280" alt="Real Project K decision screen" loading="lazy"><img src="project-k/media/world.png" width="720" height="1280" alt="Real Project K world map" loading="lazy"></div><div class="game-catalog-copy"><span class="catalog-k-status">In development</span><p class="catalog-k-name">PROJECT K</p><h3>One signature writes<br>the nation's next scene.</h3><p>A satirical nation-management simulation about choices between propaganda and reality.</p><a class="text-link" href="project-k/index_en.html?lang=en">Explore the project</a></div></article>
+      </div>
     </section>
 
     <section class="section dark-section" id="studio" data-section="studio-values" aria-labelledby="values-title">
@@ -122,18 +122,18 @@
           <h2 id="studio-note-title">From one person's taste to players around the world.</h2>
           <p>House Duck is an independent game studio based in Germany. Starting with Quirky Ball, we are building a steady catalog of small games with a clear point of view.</p>
         </div>
-        <a class="text-link" href="mailto:support@houseduck.in">support@houseduck.in</a>
+        <a class="text-link" href="story/index_en.html?lang=en">Developer story</a>
       </article>
     </section>
 
-    <section class="container" aria-label="Explore Quirky Ball">
+    <section class="container" aria-label="Read the House Duck developer story">
       <div class="closing-card reveal">
         <div>
-          <p class="section-kicker section-kicker-light">Our first release</p>
-          <h2>Step into House Duck's first little world.</h2>
-          <p>A physics puzzle, mischievous characters, and country competition meet inside one small game.</p>
+          <p class="section-kicker section-kicker-light">From QA to creator</p>
+          <h2>From fixing games to building worlds of my own.</h2>
+          <p>From game teams in Korea to a small studio in Germany. Read why House Duck began.</p>
         </div>
-        <a class="button button-primary" href="quirky-ball/index_en.html">Open game page</a>
+        <a class="button button-primary" href="story/index_en.html?lang=en">Read the developer story</a>
       </div>
     </section>
   </main>

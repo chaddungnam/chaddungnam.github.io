@@ -36,12 +36,20 @@ require_css_property() {
 pages=(
   "index.html"
   "index_en.html"
+  "index_de.html"
+  "index_ja.html"
   "quirky-ball/index.html"
   "quirky-ball/index_en.html"
+  "quirky-ball/index_de.html"
+  "quirky-ball/index_ja.html"
   "project-k/index.html"
   "project-k/index_en.html"
   "project-k/index_de.html"
   "project-k/index_ja.html"
+  "story/index.html"
+  "story/index_en.html"
+  "story/index_de.html"
+  "story/index_ja.html"
 )
 
 for page in "${pages[@]}"; do
@@ -71,17 +79,18 @@ for page in project-k/index.html project-k/index_en.html project-k/index_de.html
   require_token "$page" "assets/project-k-site.css"
 done
 
-for page in index.html index_en.html; do
+for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
-  require_token "$page" 'data-section="featured-game"'
+  require_token "$page" 'data-section="games-catalog"'
   require_token "$page" 'data-section="studio-values"'
   require_token "$page" "quirky-ball/store/feature-graphic.png"
   require_token "$page" "quirky-ball/store/01-core.png"
-  require_token "$page" "quirky-ball/store/08-ranking.png"
   require_token "$page" "quirky-ball/logo.png"
+  require_token "$page" "project-k/media/decision.png"
+  require_token "$page" "story/"
 done
 
-for page in quirky-ball/index.html quirky-ball/index_en.html; do
+for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_de.html quirky-ball/index_ja.html; do
   require_token "$page" 'data-page="quirky-ball"'
   require_token "$page" 'data-section="game-loop"'
   require_token "$page" 'data-section="game-features"'
@@ -91,10 +100,13 @@ for page in quirky-ball/index.html quirky-ball/index_en.html; do
   require_token "$page" "store/08-ranking.png"
 done
 
-require_token "index.html" 'href="index_en.html?lang=en"'
-require_token "index_en.html" 'href="/?lang=ko"'
-require_token "quirky-ball/index.html" 'href="index_en.html?lang=en"'
-require_token "quirky-ball/index_en.html" 'href="./?lang=ko"'
+for page in story/index.html story/index_en.html story/index_de.html story/index_ja.html; do
+  require_token "$page" 'data-page="story"'
+  require_token "$page" 'class="story-timeline"'
+  require_token "$page" 'class="story-quote reveal"'
+  require_token "$page" "project-k/media/decision.png"
+done
+
 require_css_property ".featured-logo" "height: auto;"
 require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
 require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
