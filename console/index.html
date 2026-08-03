@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>House Duck Console</title>
+  <link rel="stylesheet" href="../analytics/styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">본문으로 건너뛰기</a>
+
+  <main class="console-entry">
+    <section id="loginPanel" class="login-panel" aria-labelledby="loginTitle">
+      <div class="brand-mark" aria-hidden="true"><span>HD</span></div>
+      <p class="eyebrow">HOUSE DUCK / PRIVATE CONSOLE</p>
+      <h1 id="loginTitle">게임 운영을<br><em>한 화면에서</em></h1>
+      <p class="login-copy">허용된 Google 계정으로 분석, 플레이어, 운영, 문의를 안전하게 관리합니다.</p>
+      <div class="google-login">
+        <p class="auth-form-heading">Google 계정으로 로그인</p>
+        <p class="auth-form-copy">등록된 관리자 계정만 다음 단계로 이동합니다.</p>
+        <div id="googleButton" class="google-button" aria-label="Google로 로그인"></div>
+      </div>
+      <p id="loginMessage" class="form-message" role="status"></p>
+    </section>
+
+    <section id="challengePanel" class="login-panel" aria-labelledby="challengeTitle" hidden>
+      <p class="eyebrow">HOUSE DUCK / SECOND CHECK</p>
+      <h1 id="challengeTitle">관리자 확인</h1>
+      <p id="challengeEmail" class="auth-account"></p>
+      <form id="challengeForm">
+        <label for="challengeAnswer">내가 처음 한 게임 이름은?</label>
+        <input id="challengeAnswer" name="answer" type="password" autocomplete="off" required maxlength="80">
+        <button class="primary-button" type="submit">콘솔 열기</button>
+      </form>
+      <p id="challengeMessage" class="form-message" role="status"></p>
+      <button id="challengeLogout" class="text-button muted" type="button">다른 Google 계정 사용</button>
+    </section>
+
+    <section id="projectPicker" class="project-picker" aria-labelledby="projectPickerTitle" hidden>
+      <p class="eyebrow">HOUSE DUCK / PROJECTS</p>
+      <h1 id="projectPickerTitle">관리할 게임 선택</h1>
+      <p class="picker-copy">Quirky Ball은 전체 기능을 제공하고 Project K는 현재 구조만 준비합니다.</p>
+      <div class="project-grid">
+        <button id="projectQuirkyBall" class="project-card" type="button">
+          <span class="project-card-mark" aria-hidden="true">Q</span>
+          <span class="project-card-copy"><strong>Quirky Ball</strong><small>분석 · 플레이어 · 운영</small></span>
+          <span class="project-card-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button id="projectK" class="project-card project-card-muted" type="button">
+          <span class="project-card-mark" aria-hidden="true">K</span>
+          <span class="project-card-copy"><strong>Project K</strong><small>준비 중 · 껍데기만 제공</small></span>
+          <span class="project-card-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+      <button id="pickerLogout" class="text-button muted" type="button">로그아웃</button>
+    </section>
+  </main>
+
+  <div id="consoleApp" class="console-shell" hidden>
+    <aside class="console-sidebar" aria-label="콘솔 메뉴">
+      <div class="console-brand"><span aria-hidden="true">HD</span><strong>House Duck</strong><small>Console</small></div>
+      <button id="changeProjectButton" class="project-switch" type="button"><span id="currentProject">Quirky Ball</span><small>프로젝트 변경</small></button>
+      <nav id="consoleNav">
+        <a href="#/analytics" data-page="analytics">분석</a>
+        <a href="#/players" data-page="players">플레이어</a>
+        <a href="#/operations" data-page="operations">운영</a>
+        <a href="#/purchases" data-page="purchases">구매</a>
+        <a href="#/cs" data-page="cs">CS</a>
+        <a href="#/audit" data-page="audit">감사 기록</a>
+      </nav>
+      <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
+    </aside>
+
+    <main id="mainContent" class="console-main" tabindex="-1">
+      <header class="console-topbar">
+        <div><p class="eyebrow">HOUSE DUCK / OPERATIONS</p><h1 id="pageTitle">분석</h1></div>
+        <span id="userEmail" class="user-pill"></span>
+      </header>
+
+      <section id="analyticsView" class="route-view" data-route="analytics">
+        <div class="attention-panel">
+          <div><p class="eyebrow">ATTENTION</p><h2>주의 필요</h2></div>
+          <p>지표를 연결하면 확인이 필요한 항목만 이곳에 모입니다.</p>
+        </div>
+        <div class="empty-state"><strong>House Duck Pulse 연결 준비 완료</strong><p>다음 단계에서 기간별 분석과 플레이어 목록을 이 화면으로 옮깁니다.</p></div>
+      </section>
+
+      <section id="playersView" class="route-view" data-route="players" hidden>
+        <div class="empty-state"><strong>플레이어 관리</strong><p>검색·정렬·재화·점수 조정 화면을 연결할 예정입니다.</p></div>
+      </section>
+
+      <section id="operationsView" class="route-view" data-route="operations" hidden>
+        <div class="empty-state"><strong>운영 도구</strong><p>공지, 보상 우편, 최소 버전, QA 권한을 한곳에서 관리합니다.</p></div>
+      </section>
+
+      <section id="purchasesView" class="route-view" data-route="purchases" hidden>
+        <div class="empty-state"><span class="status-label">결제 미연동</span><strong>구매 내역</strong><p>구매자·상품·스토어·상태·환불·권한 정보를 연결할 자리입니다. 가짜 데이터는 표시하지 않습니다.</p></div>
+      </section>
+
+      <section id="csView" class="route-view" data-route="cs" hidden>
+        <div class="empty-state"><strong>고객 문의</strong><p>support@houseduck.in Gmail 연결은 마지막 구현 단계에서 활성화합니다.</p></div>
+      </section>
+
+      <section id="auditView" class="route-view" data-route="audit" hidden>
+        <div class="empty-state"><strong>감사 기록</strong><p>누가 무엇을 왜 바꿨는지 변경 전후 값과 함께 표시합니다.</p></div>
+      </section>
+
+      <section id="projectKView" class="route-view" data-route="project-k" hidden>
+        <div class="empty-state"><span class="status-label">준비 중</span><strong>Project K</strong><p>이중 작업을 피하기 위해 현재는 메뉴와 화면 구조만 제공합니다.</p></div>
+      </section>
+
+      <section id="playerView" class="route-view" data-route="player" hidden>
+        <div class="empty-state"><strong>플레이어 상세</strong><p id="playerRouteId"></p></div>
+      </section>
+      <p id="consoleStatus" class="sr-only" role="status" aria-live="polite"></p>
+    </main>
+  </div>
+
+  <dialog id="confirmDialog" class="confirm-dialog">
+    <form method="dialog">
+      <h2 id="confirmTitle">변경 확인</h2>
+      <p id="confirmBody"></p>
+      <div class="dialog-actions"><button value="cancel" type="submit">취소</button><button class="primary-button" value="confirm" type="submit">확인</button></div>
+    </form>
+  </dialog>
+
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="../analytics/pulse-model.js"></script>
+  <script src="model.js"></script>
+  <script src="auth.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
