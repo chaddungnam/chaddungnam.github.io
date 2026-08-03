@@ -38,6 +38,10 @@ pages=(
   "index_en.html"
   "quirky-ball/index.html"
   "quirky-ball/index_en.html"
+  "project-k/index.html"
+  "project-k/index_en.html"
+  "project-k/index_de.html"
+  "project-k/index_ja.html"
 )
 
 for page in "${pages[@]}"; do
@@ -58,6 +62,13 @@ for page in "${pages[@]}"; do
   reject_token "$page" "fonts.googleapis.com"
   reject_token "$page" "iconify"
   reject_token "$page" "tailwind"
+done
+
+for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do
+  require_token "$page" 'data-page="project-k"'
+  require_token "$page" 'class="language-picker"'
+  require_token "$page" "data-project-k-asset"
+  require_token "$page" "assets/project-k-site.css"
 done
 
 for page in index.html index_en.html; do
@@ -90,5 +101,6 @@ require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
 
 node "$repo_dir/scripts/test_brand_images.js"
 node "$repo_dir/scripts/test_brand_language.js"
+node "$repo_dir/scripts/test_brand_catalog.js"
 
 printf 'brand site contract: PASS\n'
