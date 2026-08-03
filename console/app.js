@@ -87,6 +87,7 @@ function renderRoute() {
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
   if (route.page === "operations") window.ConsoleOperations.mount();
+  if (route.page === "cs") window.ConsoleCs.mount();
   if (route.page === "audit") window.ConsoleAudit.mount();
 }
 
@@ -129,6 +130,7 @@ window.addEventListener("console-auth-change", (event) => renderAuth(event.detai
   window.ConsoleAPI.initialize({ functionBaseUrl: CONSOLE_CONFIG.functionBaseUrl });
   try {
     const authState = await window.ConsoleAuth.initialize(CONSOLE_CONFIG);
+    window.GmailAPI.initialize({ clientId: CONSOLE_CONFIG.clientId });
     renderAuth(authState);
   } catch (_error) {
     renderAuth({ signedIn: false, unlocked: false, email: "" });

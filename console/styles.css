@@ -194,6 +194,28 @@ textarea:focus-visible {
 .audit-item code { padding: 7px; overflow-wrap: anywhere; color: var(--ink); background: rgba(255,255,255,.72); border-radius: 7px; font-size: 9px; white-space: pre-wrap; }
 .revert-form { display: grid; grid-template-columns: minmax(150px, 1fr) auto; align-items: end; gap: 8px; margin-top: 4px; }
 .empty-panel { margin: 0; color: var(--ink-soft); font-size: 12px; }
+.cs-grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(340px, 1.25fr) minmax(280px, .9fr); gap: 14px; align-items: start; }
+.cs-thread-list, .cs-messages { display: grid; gap: 8px; }
+.cs-thread-item { display: grid; gap: 6px; width: 100%; padding: 12px; color: var(--ink); background: #f7f4ec; border: 1px solid transparent; border-radius: 10px; font: inherit; text-align: left; }
+.cs-thread-item:hover, .cs-thread-item:focus-visible { border-color: var(--teal); }
+.cs-thread-item[data-urgent="true"] { border-left: 4px solid var(--coral); }
+.cs-thread-item > span, .cs-message-card > div { display: flex; justify-content: space-between; gap: 8px; }
+.cs-thread-item small, .cs-thread-item p, .cs-thread-item i { margin: 0; color: var(--ink-soft); font-size: 9px; font-style: normal; line-height: 1.4; }
+.cs-thread-item p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-thread-header { margin-bottom: 12px; }
+.cs-thread-header h2 { overflow-wrap: anywhere; }
+.cs-thread-header small { color: var(--ink-soft); }
+.cs-label-controls { display: grid; gap: 8px; margin-bottom: 12px; }
+.cs-label-controls > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cs-label-controls span { width: 34px; color: var(--ink-soft); font-size: 9px; font-weight: 800; }
+.cs-label-controls button, .cs-message-card button { min-height: 34px; padding: 6px 9px; background: white; border: 1px solid var(--line); border-radius: 9px; font-size: 9px; font-weight: 800; }
+.cs-label-controls button[aria-pressed="true"] { color: white; background: var(--teal); border-color: var(--teal); }
+.cs-message-card { display: grid; gap: 9px; padding: 12px; background: #f7f4ec; border-radius: 10px; }
+.cs-message-card small { color: var(--ink-soft); font-size: 9px; }
+.cs-message-card pre { max-height: 360px; margin: 0; overflow: auto; font: inherit; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
+.cs-player-match { display: grid; gap: 7px; margin-top: 12px; padding: 11px; background: var(--teal-soft); border-radius: 10px; }
+.cs-player-match a { color: var(--ink); font-size: 10px; font-weight: 800; }
+.cs-thread-panel .text-button { display: none; }
 
 .confirm-dialog { width: min(440px, calc(100% - 32px)); padding: 0; border: 0; border-radius: 18px; box-shadow: var(--shadow); }
 .confirm-dialog::backdrop { background: rgba(23,32,59,.56); }
@@ -204,6 +226,14 @@ textarea:focus-visible {
 .dialog-actions .primary-button { border: 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+@media (max-width: 1180px) {
+  .cs-grid { grid-template-columns: 1fr; }
+  .cs-thread-panel, .cs-reply-panel { display: none; }
+  .cs-thread-panel.active, .cs-reply-panel.active { display: grid; }
+  .cs-list-panel:has(~ .cs-thread-panel.active) { display: none; }
+  .cs-thread-panel .text-button { display: inline-flex; justify-self: start; }
+}
 
 @media (max-width: 760px) {
   .console-entry { width: min(100% - 24px, 560px); padding: 12px 0 24px; }

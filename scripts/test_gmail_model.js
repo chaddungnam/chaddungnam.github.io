@@ -68,4 +68,12 @@ assert.equal(request.url.includes("memory-token"), false);
 assert.equal(request.options.headers.Authorization, "Bearer memory-token");
 assert.equal(gmailApi.supportSearchQuery(""), "to:support@houseduck.in");
 
+const statusIds = { new: "s-new", needs_reply: "s-reply", waiting_customer: "s-wait", done: "s-done" };
+assert.deepEqual(model.csThreadState({ labelIds: [], latestFromSupport: false, latestAt: 1 }, statusIds, 2), { status: "new", urgent: false });
+assert.deepEqual(model.csThreadState({ labelIds: ["s-wait"], latestFromSupport: false, latestAt: 1 }, statusIds, 2), { status: "needs_reply", urgent: false });
+assert.deepEqual(model.csThreadState({ labelIds: ["s-wait"], latestFromSupport: true, latestAt: 1 }, statusIds, 2), { status: "waiting_customer", urgent: false });
+assert.deepEqual(model.csThreadState({ labelIds: ["s-done"], latestFromSupport: false, latestAt: 1 }, statusIds, 2), { status: "done", urgent: false });
+assert.deepEqual(model.csThreadState({ labelIds: ["s-reply"], latestFromSupport: false, latestAt: 1 }, statusIds, 1 + 25 * 60 * 60 * 1000), { status: "needs_reply", urgent: true });
+assert.equal(model.playerSearchHash("pABCDEFGHJK"), "#/players?query=pABCDEFGHJK&return=%23%2Fcs");
+
 console.log("gmail model: PASS");

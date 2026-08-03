@@ -4,10 +4,13 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 console_dir="$repo_dir/console"
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
+rg -F -q 'window.ConsoleCs.mount()' "$console_dir/app.js"
+rg -F -q 'textContent = root.GmailModel.extractMessageText' "$console_dir/cs.js"
+rg -F -q 'root.ConsoleApp.confirmChange("답변 발송 최종 확인"' "$console_dir/cs.js"
 
 rg -q 'id="googleButton"' "$console_dir/index.html"
 rg -q '내가 처음 한 게임 이름은?' "$console_dir/index.html"

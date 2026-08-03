@@ -142,14 +142,25 @@
     return result;
   }
 
-  async function listSupportThreads({ query = "", labelIds: filters = [], pageToken = "" } = {}) {
+  async function listSupportThreads({ query = "", labelIds: filters = [], pageToken = "", unread = false, newerThanDays = 0 } = {}) {
+    const gmailQuery = [
+      supportSearchQuery(query),
+      unread ? "is:unread" : "",
+      newerThanDays ? `newer_than:${Math.min(365, Math.max(1, Number(newerThanDays)))}d` : "",
+    ].filter(Boolean).join(" ");
     return request(["threads"], {
-      query: { q: supportSearchQuery(query), labelIds: filters, pageToken, maxResults: 20 },
+      query: { q: gmailQuery, labelIds: filters, pageToken, maxResults: 20 },
     });
   }
 
   function getThread(threadId) {
     return request(["threads", threadId], { query: { format: "full" } });
+  }
+
+  function getThreadSummary(threadId) {
+    return request(["threads", threadId], {
+      query: { format: "metadata", metadataHeaders: ["From", "To", "Subject", "Date"] },
+    });
   }
 
   async function setThreadStatus(threadId, status, category = "") {
@@ -203,6 +214,7 @@
     ensureCsLabels,
     listSupportThreads,
     getThread,
+    getThreadSummary,
     setThreadStatus,
     getAttachment,
     sendReply,

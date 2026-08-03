@@ -141,6 +141,18 @@
     return String(text || "").match(/\bp[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{10}\b/i)?.[0].replace(/^P/, "p").toUpperCase().replace(/^P/, "p") || "";
   }
 
+  function csThreadState(thread, statusIds, now = Date.now()) {
+    const labels = new Set(thread?.labelIds || []);
+    let status = Object.entries(statusIds || {}).find(([, id]) => labels.has(id))?.[0] || "new";
+    if (status !== "done" && status !== "new") status = thread?.latestFromSupport ? "waiting_customer" : "needs_reply";
+    const urgent = status === "needs_reply" && Number(now) - Number(thread?.latestAt || now) >= 24 * 60 * 60 * 1000;
+    return { status, urgent };
+  }
+
+  function playerSearchHash(displayCode) {
+    return `#/players?query=${encodeURIComponent(displayCode)}&return=${encodeURIComponent("#/cs")}`;
+  }
+
   return {
     decodeBase64Url,
     encodeBase64Url,
@@ -150,5 +162,7 @@
     buildReplyRaw,
     nextStatusLabels,
     extractDisplayCode,
+    csThreadState,
+    playerSearchHash,
   };
 });

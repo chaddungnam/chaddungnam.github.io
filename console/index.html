@@ -182,7 +182,16 @@
       </section>
 
       <section id="csView" class="route-view" data-route="cs" hidden>
-        <div class="empty-state"><strong>고객 문의</strong><p>support@houseduck.in Gmail 연결은 마지막 구현 단계에서 활성화합니다.</p></div>
+        <section id="gmailConnectPanel" class="empty-state"><span class="status-label">필요할 때만 연결</span><strong>support@houseduck.in 문의 관리</strong><p>Gmail 권한은 이 화면에서만 요청되며 토큰·메일·첨부는 Supabase나 저장소로 전송하지 않습니다.</p><button id="gmailConnectButton" class="primary-button" type="button">Gmail CS 연결</button></section>
+        <div id="csWorkspace" hidden>
+          <form id="csFilterForm" class="panel admin-toolbar" role="search"><label>문의 검색<input id="csSearch" type="search" maxlength="200" placeholder="제목·보낸 사람·내용"></label><label>상태<select id="csStatusFilter"><option value="">전체 상태</option><option value="new">새 문의</option><option value="needs_reply">답변 필요</option><option value="waiting_customer">사용자 회신 대기</option><option value="done">완료</option></select></label><label>분류<select id="csCategoryFilter"><option value="">전체 분류</option><option value="billing">결제</option><option value="account">계정</option><option value="bug">버그</option><option value="other">기타</option></select></label><label>기간<select id="csDateFilter"><option value="0">전체</option><option value="7">7일</option><option value="30">30일</option><option value="90">90일</option></select></label><label class="check-label"><input id="csUnreadFilter" type="checkbox"> 읽지 않음만</label><button class="primary-button" type="submit">조회</button><button id="gmailDisconnectButton" type="button">연결 해제</button></form>
+          <div class="cs-grid">
+            <section class="panel cs-list-panel" aria-labelledby="csListTitle"><div class="panel-heading"><div><p class="eyebrow">SUPPORT INBOX</p><h2 id="csListTitle">문의 목록</h2></div><span id="csResultCount" class="panel-total">—</span></div><div id="csThreadList" class="cs-thread-list"></div><div class="pagination"><button id="csPrevious" type="button">이전</button><button id="csNext" type="button">다음</button></div></section>
+            <section id="csThreadPanel" class="panel cs-thread-panel" tabindex="-1"><button id="csThreadBack" class="text-button" type="button">← 목록</button><div id="csThreadHeader" class="cs-thread-header"><p class="empty-panel">왼쪽에서 문의를 선택해 주세요.</p></div><div id="csLabels" class="cs-label-controls"></div><div id="csMessages" class="cs-messages"></div><div id="csPlayerMatches"></div></section>
+            <section id="csReplyPanel" class="panel cs-reply-panel"><p class="eyebrow">REPLY</p><h2>답변 작성</h2><form id="csReplyForm" class="admin-form"><label>보내는 주소<input name="from" value="support@houseduck.in" readonly></label><label>받는 사람<input name="to" readonly required></label><label>제목<input name="subject" readonly required></label><label>답변 템플릿<select id="csTemplate"><option value="">직접 작성</option><option value="ko">한국어</option><option value="en">English</option><option value="de">Deutsch</option></select></label><label>본문<textarea name="body" maxlength="10000" required></textarea></label><label>첨부<input name="attachments" type="file" multiple></label><button class="primary-button" type="submit">최종 확인 후 발송</button></form></section>
+          </div>
+        </div>
+        <p id="csMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="auditView" class="route-view" data-route="audit" hidden>
@@ -221,6 +230,10 @@
   <script src="players.js"></script>
   <script src="operations.js"></script>
   <script src="audit.js"></script>
+  <script src="gmail-model.js"></script>
+  <script src="gmail-api.js"></script>
+  <script src="cs-templates.js"></script>
+  <script src="cs.js"></script>
   <script src="app.js" defer></script>
 </body>
 </html>
