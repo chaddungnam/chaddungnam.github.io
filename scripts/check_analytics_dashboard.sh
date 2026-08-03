@@ -27,6 +27,8 @@ rg -q 'ConsoleAPI.post\("analytics-dashboard"' "$console_dir/analytics.js"
 rg -q 'playerQuery' "$console_dir/analytics.js"
 rg -q 'playerDeepLink' "$console_dir/analytics.js"
 rg -q 'periodPlayersTable' "$console_dir/index.html"
+rg -q 'operationsPulseTitle' "$console_dir/index.html"
+rg -q 'renderGameMetrics' "$console_dir/analytics.js"
 rg -q 'data-range="1"' "$console_dir/index.html"
 rg -q 'data-range="7"' "$console_dir/index.html"
 rg -q 'data-range="28"' "$console_dir/index.html"
@@ -36,6 +38,8 @@ if [[ -f "$function_file" && -d "$migration_dir" ]]; then
   rg -q 'verifyAdminTicket' "$function_file"
   rg -q 'admin_list_period_players_v1' "$function_file"
   rg -q 'periodPlayerTotal' "$function_file"
+  rg -q 'refresh_admin_daily_game_metrics' "$function_file"
+  rg -q 'admin_daily_game_metrics' "$migration_dir"/*_admin_daily_game_metrics.sql
   rg -q 'Europe/Berlin' "$(dirname "$function_file")/analytics_time.ts"
   rg -q 'admin_list_period_players_v1' "$migration_dir"/*_house_duck_console_auth.sql
 else
