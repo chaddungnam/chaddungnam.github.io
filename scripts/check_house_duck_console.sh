@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -41,11 +41,27 @@ rg -q 'mutations_enabled' "$console_dir/players.js"
 rg -q 'safeConsoleReturnHash' "$console_dir/model.js" "$console_dir/players.js"
 rg -q 'pendingRequests' "$console_dir/operations.js"
 rg -q 'id="playerDirection"' "$console_dir/index.html"
+rg -q 'id="csWeeklyBrief"' "$console_dir/index.html"
+rg -q 'data-cs-view="kanban"' "$console_dir/index.html"
+rg -q 'data-cs-view="calendar"' "$console_dir/index.html"
+rg -q 'id="csKanban"' "$console_dir/index.html"
+rg -q 'id="csCalendar"' "$console_dir/index.html"
+rg -q 'data-calendar-range="week"' "$console_dir/index.html"
+rg -q 'data-calendar-range="month"' "$console_dir/index.html"
+rg -q 'data-calendar-range="year"' "$console_dir/index.html"
+rg -q 'id="csThreadSummary"' "$console_dir/index.html"
+rg -q 'name="templateKey"' "$console_dir/index.html"
+rg -q 'overflow-y: auto' "$console_dir/styles.css"
+rg -F -q 'max-height: min(62vh, 680px)' "$console_dir/styles.css"
 rg -q 'action: "audit.revert"' "$console_dir/audit.js"
 rg -F -q '다음 게임 빌드 연동 후 활성' "$console_dir/index.html"
 for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done
+if rg -q '제목<input name="title"|본문<textarea name="body" maxlength="800"' "$console_dir/index.html"; then
+  echo "reward mail must use fixed localization templates" >&2
+  exit 1
+fi
 
 if rg -n -i 'service[_-]?role|admin_challenge|gmail.*access.*token|password\s*=' "$console_dir"; then
   echo "console contains a server secret or secret assignment" >&2

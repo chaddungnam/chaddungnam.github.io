@@ -162,6 +162,10 @@ textarea:focus-visible {
 .admin-form textarea,
 .revert-form input { width: 100%; min-height: 42px; padding: 9px 11px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 12px; }
 .admin-form textarea { min-height: 92px; resize: vertical; }
+.reward-template-preview { display: grid; gap: 5px; padding: 12px 14px; background: var(--teal-soft); border-left: 4px solid var(--teal); border-radius: 10px; }
+.reward-template-preview strong { font-size: 12px; }
+.reward-template-preview p, .reward-template-preview code { margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.5; }
+.reward-template-preview code { overflow-wrap: anywhere; }
 .admin-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .admin-form { display: grid; align-content: start; gap: 12px; }
 .admin-form h2 { margin-bottom: 4px; }
@@ -194,17 +198,60 @@ textarea:focus-visible {
 .audit-item code { padding: 7px; overflow-wrap: anywhere; color: var(--ink); background: rgba(255,255,255,.72); border-radius: 7px; font-size: 9px; white-space: pre-wrap; }
 .revert-form { display: grid; grid-template-columns: minmax(150px, 1fr) auto; align-items: end; gap: 8px; margin-top: 4px; }
 .empty-panel { margin: 0; color: var(--ink-soft); font-size: 12px; }
-.cs-grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(340px, 1.25fr) minmax(280px, .9fr); gap: 14px; align-items: start; }
-.cs-thread-list, .cs-messages { display: grid; gap: 8px; }
-.cs-thread-item { display: grid; gap: 6px; width: 100%; padding: 12px; color: var(--ink); background: #f7f4ec; border: 1px solid transparent; border-radius: 10px; font: inherit; text-align: left; }
-.cs-thread-item:hover, .cs-thread-item:focus-visible { border-color: var(--teal); }
-.cs-thread-item[data-urgent="true"] { border-left: 4px solid var(--coral); }
+.cs-weekly-brief { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 14px; padding: 18px 20px; background: linear-gradient(120deg, var(--teal-soft), var(--paper) 68%); border: 1px solid rgba(66,189,176,.28); border-radius: 18px; }
+.cs-weekly-brief h2 { margin-bottom: 5px; font-size: 20px; }
+.cs-weekly-brief p { margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; }
+.cs-weekly-brief dl { display: grid; grid-template-columns: repeat(4, minmax(74px, 1fr)); gap: 8px; min-width: min(480px, 52%); margin: 0; }
+.cs-weekly-brief dl div { padding: 10px 12px; background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.9); border-radius: 11px; }
+.cs-weekly-brief dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; }
+.cs-weekly-brief dd { margin: 4px 0 0; font-size: 16px; font-weight: 900; }
+.cs-viewbar { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+.cs-viewbar .panel-total { margin-left: auto; }
+.cs-viewbar .pagination { margin-top: 0; }
+.cs-viewbar .range-switch button { min-height: 38px; }
+.cs-kanban { display: grid; grid-template-columns: repeat(4, minmax(210px, 1fr)); gap: 10px; min-width: 0; margin-bottom: 14px; overflow-x: auto; padding-bottom: 3px; }
+.cs-kanban-column { min-width: 210px; background: rgba(255,255,255,.5); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.cs-kanban-column > header { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 7px; padding: 11px 12px; background: var(--paper); border-bottom: 1px solid var(--line); }
+.cs-kanban-column h2 { margin: 0; font-size: 12px; }
+.cs-kanban-column header b { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; background: white; border-radius: 999px; font-size: 9px; }
+.cs-status-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
+.cs-kanban-column[data-status="needs_reply"] .cs-status-dot { background: var(--coral); }
+.cs-kanban-column[data-status="waiting_customer"] .cs-status-dot { background: var(--teal); }
+.cs-kanban-column[data-status="done"] .cs-status-dot { background: #8c92a3; }
+.cs-kanban-list { display: grid; align-content: start; gap: 1px; max-height: min(62vh, 680px); min-height: 220px; overflow-y: auto; background: var(--line); }
+.cs-thread-item { display: grid; gap: 5px; width: 100%; padding: 12px; color: var(--ink); background: white; border: 0; border-left: 3px solid transparent; border-radius: 0; font: inherit; text-align: left; }
+.cs-thread-item:hover, .cs-thread-item:focus-visible { position: relative; z-index: 1; background: var(--teal-soft); border-left-color: var(--teal); }
+.cs-thread-item[data-selected="true"] { background: var(--gold-soft); border-left-color: var(--gold); }
+.cs-thread-item[data-urgent="true"] { border-left-color: var(--coral); }
 .cs-thread-item > span, .cs-message-card > div { display: flex; justify-content: space-between; gap: 8px; }
+.cs-thread-item b { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .cs-thread-item small, .cs-thread-item p, .cs-thread-item i { margin: 0; color: var(--ink-soft); font-size: 9px; font-style: normal; line-height: 1.4; }
-.cs-thread-item p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-thread-item p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cs-calendar { margin-bottom: 14px; }
+.cs-calendar-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+.cs-calendar-actions { display: flex; align-items: center; gap: 10px; }
+.cs-calendar-actions .pagination { margin-top: 0; }
+.cs-calendar-grid { display: grid; gap: 1px; overflow: hidden; background: var(--line); border: 1px solid var(--line); border-radius: 12px; }
+.cs-calendar-grid[data-range="week"], .cs-calendar-grid[data-range="month"] { grid-template-columns: repeat(7, minmax(90px, 1fr)); overflow-x: auto; }
+.cs-calendar-grid[data-range="year"] { grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 8px; overflow: visible; background: transparent; border: 0; }
+.cs-calendar-cell { min-width: 90px; min-height: 94px; padding: 9px; color: var(--ink); background: white; border: 0; text-align: left; }
+.cs-calendar-cell:hover { background: var(--teal-soft); }
+.cs-calendar-cell[data-outside="true"] { color: #aeb4c6; background: #f7f4ec; }
+.cs-calendar-cell strong, .cs-calendar-cell small { display: block; }
+.cs-calendar-cell strong { margin-bottom: 8px; font-size: 11px; }
+.cs-calendar-cell small { color: var(--ink-soft); font-size: 9px; line-height: 1.5; }
+.cs-calendar-month { display: grid; gap: 6px; min-height: 96px; padding: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 12px; text-align: left; }
+.cs-calendar-month b { font-size: 18px; }
+.cs-calendar-month span { color: var(--ink-soft); font-size: 9px; }
+.cs-detail-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr); gap: 14px; align-items: start; }
+.cs-thread-list, .cs-messages { display: grid; gap: 8px; }
 .cs-thread-header { margin-bottom: 12px; }
 .cs-thread-header h2 { overflow-wrap: anywhere; }
 .cs-thread-header small { color: var(--ink-soft); }
+.cs-thread-summary { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; margin-bottom: 12px; padding: 14px; background: var(--gold-soft); border-left: 4px solid var(--gold); border-radius: 10px; }
+.cs-thread-summary span { grid-row: 1 / 3; align-self: start; padding: 4px 7px; color: white; background: var(--ink); border-radius: 999px; font-size: 8px; font-weight: 900; }
+.cs-thread-summary strong { font-size: 11px; }
+.cs-thread-summary p { margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.55; }
 .cs-label-controls { display: grid; gap: 8px; margin-bottom: 12px; }
 .cs-label-controls > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .cs-label-controls span { width: 34px; color: var(--ink-soft); font-size: 9px; font-weight: 800; }
@@ -228,11 +275,8 @@ textarea:focus-visible {
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
 @media (max-width: 1180px) {
-  .cs-grid { grid-template-columns: 1fr; }
-  .cs-thread-panel, .cs-reply-panel { display: none; }
-  .cs-thread-panel.active, .cs-reply-panel.active { display: grid; }
-  .cs-list-panel:has(~ .cs-thread-panel.active) { display: none; }
-  .cs-thread-panel .text-button { display: inline-flex; justify-self: start; }
+  .cs-kanban { grid-template-columns: repeat(4, minmax(230px, 1fr)); }
+  .cs-detail-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
@@ -254,6 +298,15 @@ textarea:focus-visible {
   .table-toolbar input { flex-basis: 100%; }
   .admin-toolbar { grid-template-columns: 1fr; }
   .admin-card-grid, .operations-summary { grid-template-columns: 1fr; }
+  .cs-weekly-brief { align-items: stretch; flex-direction: column; }
+  .cs-weekly-brief dl { grid-template-columns: repeat(2, 1fr); min-width: 0; }
+  .cs-viewbar { align-items: flex-start; flex-wrap: wrap; }
+  .cs-viewbar .panel-total { margin-left: 0; }
+  .cs-viewbar .pagination { margin-left: auto; }
+  .cs-calendar-head { align-items: flex-start; flex-direction: column; }
+  .cs-calendar-actions { align-items: flex-start; flex-direction: column; }
+  .cs-calendar-grid[data-range="year"] { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+  .cs-thread-panel .text-button { display: inline-flex; justify-self: start; }
   .form-pair, .economy-grid { grid-template-columns: 1fr; }
   .player-detail-head { align-items: flex-start; flex-direction: column; }
   .score-form { min-width: 260px; }

@@ -4,6 +4,15 @@
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "계속";
   let bound = false;
   const pendingRequests = new WeakMap();
+  const templateCopy = {
+    general: ["안내 보상", "House Duck에서 보낸 보상입니다."],
+    compensation: ["불편 보상", "이용 중 불편에 대한 보상을 보내드립니다."],
+    maintenance: ["점검 보상", "점검을 기다려 주셔서 감사합니다."],
+    welcome: ["환영 보상", "Quirky Ball에 오신 것을 환영합니다."],
+    support: ["지원 보상", "문의 확인 후 지급된 보상입니다."],
+    update: ["업데이트 보상", "새 버전을 기다려 주셔서 감사합니다."],
+    launch: ["게임 출시 보상", "Quirky Ball의 첫 출발을 함께해 주셔서 감사합니다."],
+  };
 
   function setMessage(value, error = false) {
     byId("operationsMessage").textContent = value;
@@ -57,6 +66,15 @@
     return Number.isNaN(date.getTime()) ? "" : date.toISOString();
   }
 
+  function renderRewardTemplate() {
+    const key = byId("rewardMailForm").elements.templateKey.value;
+    const template = root.CsIntelligence.rewardTemplate(key);
+    const copy = templateCopy[key];
+    byId("rewardTemplatePreview").innerHTML = template && copy
+      ? `<strong>${escapeHtml(copy[0])}</strong><p>${escapeHtml(copy[1])}</p><code>${escapeHtml(template.titleKey)} · ${escapeHtml(template.bodyKey)}</code>`
+      : '<p>지원하지 않는 문구입니다.</p>';
+  }
+
   function bind() {
     if (bound) return;
     bound = true;
@@ -73,11 +91,16 @@
       const reward = values.kind === "entitlement"
         ? [{ kind: values.kind, item_id: values.rewardValue.trim() }]
         : [{ kind: values.kind, amount: numericReward }];
+      const template = root.CsIntelligence.rewardTemplate(values.templateKey);
+      if (!template) { form.elements.templateKey.setCustomValidity("고정 다국어 문구를 선택해 주세요."); form.reportValidity(); return; }
+      form.elements.templateKey.setCustomValidity("");
       submit(form, {
-        action: "reward_mail.broadcast", title: values.title.trim(), body: values.body.trim(), reward,
+        action: "reward_mail.broadcast", templateKey: template.key, reward,
         expiresAt: iso(values.expiresAt), reason: values.reason.trim(),
-      }, "전체 보상 우편 발송", `모든 플레이어에게 ${values.title} 우편을 보냅니다.\n보상: ${values.kind} ${values.rewardValue}\n사유: ${values.reason}`);
+      }, "전체 보상 우편 발송", `모든 플레이어에게 ${templateCopy[template.key][0]} 우편을 보냅니다.\n${template.titleKey} · ${template.bodyKey}\n보상: ${values.kind} ${values.rewardValue}\n사유: ${values.reason}`);
     });
+    byId("rewardMailForm").elements.templateKey.addEventListener("change", renderRewardTemplate);
+    byId("rewardMailForm").addEventListener("reset", () => root.setTimeout(renderRewardTemplate, 0));
     byId("minVersionForm").addEventListener("submit", (event) => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -98,6 +121,6 @@
     });
   }
 
-  function mount() { bind(); load(); }
+  function mount() { bind(); renderRewardTemplate(); load(); }
   root.ConsoleOperations = { mount };
 })(window);
