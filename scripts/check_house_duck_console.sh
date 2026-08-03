@@ -4,6 +4,10 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 console_dir="$repo_dir/console"
 
+if ! command -v rg >/dev/null 2>&1; then
+  rg() { grep -E -R "$@"; }
+fi
+
 for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
@@ -51,7 +55,8 @@ if rg -n 'localStorage|sessionStorage|indexedDB|document\.cookie|console\.(log|w
   exit 1
 fi
 
-if rg -n -P 'https://www\.googleapis\.com/auth/gmail\.(?!modify\b)' "$console_dir/gmail-api.js"; then
+if rg -n 'https://www\.googleapis\.com/auth/gmail\.' "$console_dir/gmail-api.js" |
+  grep -F -v 'https://www.googleapis.com/auth/gmail.modify'; then
   echo "Gmail scope is broader than gmail.modify" >&2
   exit 1
 fi

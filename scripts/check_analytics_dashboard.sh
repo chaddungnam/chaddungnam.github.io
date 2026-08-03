@@ -13,6 +13,10 @@ fi
 function_file="$game_dir/supabase/functions/analytics-dashboard/index.ts"
 migration_dir="$game_dir/supabase/migrations"
 
+if ! command -v rg >/dev/null 2>&1; then
+  rg() { grep -E -R "$@"; }
+fi
+
 test -f "$legacy_dir/index.html"
 test -f "$legacy_dir/pulse-model.js"
 test -f "$console_dir/analytics.js"
