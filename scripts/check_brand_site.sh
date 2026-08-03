@@ -64,7 +64,9 @@ for page in index.html index_en.html; do
   require_token "$page" 'data-page="studio"'
   require_token "$page" 'data-section="featured-game"'
   require_token "$page" 'data-section="studio-values"'
-  require_token "$page" "quirky-ball/feature-graphic.png"
+  require_token "$page" "quirky-ball/store/feature-graphic.png"
+  require_token "$page" "quirky-ball/store/01-core.png"
+  require_token "$page" "quirky-ball/store/08-ranking.png"
   require_token "$page" "quirky-ball/logo.png"
 done
 
@@ -73,9 +75,9 @@ for page in quirky-ball/index.html quirky-ball/index_en.html; do
   require_token "$page" 'data-section="game-loop"'
   require_token "$page" 'data-section="game-features"'
   require_token "$page" 'data-section="gallery"'
-  require_token "$page" "feature-graphic.png"
-  require_token "$page" "01_home.png"
-  require_token "$page" "07_ranking.png"
+  require_token "$page" "store/feature-graphic.png"
+  require_token "$page" "store/01-core.png"
+  require_token "$page" "store/08-ranking.png"
 done
 
 require_token "index.html" 'href="index_en.html?lang=en"'
@@ -83,7 +85,9 @@ require_token "index_en.html" 'href="/?lang=ko"'
 require_token "quirky-ball/index.html" 'href="index_en.html?lang=en"'
 require_token "quirky-ball/index_en.html" 'href="./?lang=ko"'
 require_css_property ".featured-logo" "height: auto;"
-require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 820px)"
+require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
 require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
+
+node "$repo_dir/scripts/test_brand_images.js"
 
 printf 'brand site contract: PASS\n'
