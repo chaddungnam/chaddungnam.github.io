@@ -30,7 +30,7 @@
       <div>
         <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
         <h1 id="legal-title">Privacy Policy</h1>
-        <p class="legal-date">Quirky Ball · Effective Date: August 1, 2026</p>
+        <p class="legal-date">Quirky Ball · Effective Date: August 3, 2026</p>
       </div>
       <nav class="legal-language-links" aria-label="Document language">
           <a href="ko.html">한국어</a>
@@ -72,7 +72,7 @@
 
   <h2 id="section-2">2. Information We Collect</h2>
   <p>You can play as a guest without any sign-up. The Service collects and stores the following information.</p>
-  <p>The Service is currently offered on Android as a free, advertising-supported game and does not offer in-app purchases using real money.</p>
+  <p>The Service is currently offered on Android as a free, advertising-supported game and does not offer in-app purchases using real money. An iOS version is planned but is not currently available. Before an iOS release, this Policy and the App Store privacy disclosures will be updated for the SDKs and data processing used on iOS.</p>
   <div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0">
     <table>
     <tr><th>Item</th><th>When / how</th><th>Where stored</th></tr>
@@ -82,16 +82,21 @@
     <tr><td>Nickname, display code</td><td>Nickname entered by you; display code generated automatically</td><td>Device and server (for leaderboards)</td></tr>
     <tr><td>Country</td><td>Selected by you during onboarding (suggested from device locale; not precise location)</td><td>Device and server (for country leaderboards)</td></tr>
     <tr><td>Advertising and device data</td><td>The Google Mobile Ads SDK may automatically process IP address (which can estimate approximate location), app and ad interactions, diagnostic information, and device/account identifiers such as the advertising ID and app set ID when serving ads</td><td>Ad provider (Google) systems</td></tr>
-    <tr><td>Virtual currency and progress (stamina, gems, breakthrough tickets, attendance, missions, shop and season progress)</td><td>Created or changed during use</td><td>Device and server (Supabase account state)</td></tr>
+    <tr><td>Virtual currency and progress (stamina, gems, tickets, attendance, missions, shop and season progress)</td><td>Created or changed during use</td><td>Device and server (Supabase account state)</td></tr>
+    <tr><td>Profile customization and rewards (owned/equipped icons, frames and marble skins, mailbox claims and season rewards)</td><td>Created or changed when items are earned, equipped or claimed</td><td>Device and server (Supabase)</td></tr>
+    <tr><td>Friend and social data (friendships, requests, gift send/claim status and public profile)</td><td>Created or changed when you use social features</td><td>Server (Supabase)</td></tr>
+    <tr><td>First-party usage analytics</td><td>After policy acceptance, app/session, game start/end, ad request/impression/reward events, app version, platform and time zone are recorded automatically. Random install and session identifiers are kept separate from the account UID, and the advertising ID is not included in our own analytics events</td><td>Temporary device queue and server (Supabase, up to 28 days)</td></tr>
     <tr><td>Language, volume, vibration and frame-rate settings</td><td>Set by you</td><td>Device only (local storage)</td></tr>
   </table>
   </div>
-  <p>The Service does not collect precise location, contacts, photos, or other information not required to provide the game, and it does not use a separate analytics SDK.</p>
+  <p>The Service does not collect precise location, contacts, photos, or other information not required to provide the game. It does not use a separate third-party analytics SDK, but stores limited first-party usage events in Supabase to understand service quality and feature usage.</p>
 
   <h2 id="section-3">3. Purposes and Legal Bases</h2>
   <ul>
     <li>Saving your progress and syncing it across devices when linked to a Google account (Art. 6(1)(b) GDPR — performance of a contract)</li>
     <li>Providing leaderboards — showing nickname/display code, best score, and country (Art. 6(1)(b) GDPR)</li>
+    <li>Providing friends, gifts, mailbox, season rewards and profile customization (Art. 6(1)(b) GDPR)</li>
+    <li>Improving service reliability and feature usage through account-separated usage statistics (Art. 6(1)(f) GDPR — legitimate interests)</li>
     <li>Serving ads (Google AdMob) — personalized ads based on your consent (Art. 6(1)(a) GDPR), non-personalized ads based on legitimate interests (Art. 6(1)(f) GDPR)</li>
     <li>Analyzing errors and improving service quality (Art. 6(1)(f) GDPR)</li>
     <li>Complying with applicable laws and resolving disputes (Art. 6(1)(c) GDPR)</li>
@@ -104,7 +109,7 @@
     <tr><th>Service (provider)</th><th>Purpose</th><th>Related data</th></tr>
     <tr><td>Google AdMob (Google LLC)</td><td>Rewarded and interstitial ads, ad measurement, analytics, and fraud prevention</td><td>IP-derived approximate location, app and ad interactions, diagnostic information, and device/account identifiers such as advertising ID and app set ID</td></tr>
     <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Google account linking</td><td>Email address, profile name</td></tr>
-    <tr><td>Supabase (Supabase Inc.)</td><td>Account-state sync, scores, leaderboards and account management</td><td>UID, account type, nickname, display code, country, scores, levels, play history, virtual currency, mission, attendance, shop and season progress, logout and last-played times</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Account-state sync, scores and leaderboards, friends and gifts, mailbox and rewards, customization, and first-party usage analytics</td><td>UID, account type, nickname, display code, country, scores, levels and play history, virtual currency, missions, attendance, shop and season progress, friend/gift/mail/customization state, logout and last-played timestamps, plus account-separated install/session analytics identifiers and usage events</td></tr>
   </table>
   </div>
   <ul>
@@ -120,6 +125,7 @@
   <ul>
     <li>When you request account deletion, personal information is deleted promptly or within a reasonable period.</li>
     <li>Raw gameplay, season, and weekly records are kept for the most recent 28 days and automatically removed afterward.</li>
+    <li>First-party usage analytics events, which use identifiers separate from the account UID, are kept for up to 28 days after receipt and then automatically removed.</li>
     <li>Your Supabase Auth account and current account state synchronized to the server are kept until you delete your account and are deleted upon an account-deletion request. Local caches are deleted when the app is uninstalled or the account is reset.</li>
     <li>Settings stored only on the device, such as language, volume, vibration and frame rate, are deleted when you uninstall the app.</li>
     <li>Data may be retained longer where required by applicable law.</li>
@@ -152,6 +158,7 @@
 
   <h2 id="section-12">12. Effective Date and Revision History</h2>
   <ul>
+    <li>August 3, 2026 — Added friends, mailbox, customization, season rewards, first-party analytics, and planned iOS availability (v2.2)</li>
     <li>August 1, 2026 — Clarified advertising SDK data and retention periods (v2.1)</li>
     <li>July 27, 2026 — Fully revised and effective under House Duck (v2.0)</li>
     <li>July 24, 2026 — Initial publication of this Privacy Policy (v1.0)</li>

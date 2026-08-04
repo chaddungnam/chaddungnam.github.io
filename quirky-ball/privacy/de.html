@@ -30,7 +30,7 @@
       <div>
         <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
         <h1 id="legal-title">Datenschutzerklärung</h1>
-        <p class="legal-date">Quirky Ball · Datum des Inkrafttretens: 1. August 2026</p>
+        <p class="legal-date">Quirky Ball · Datum des Inkrafttretens: 3. August 2026</p>
       </div>
       <nav class="legal-language-links" aria-label="Dokumentsprache">
           <a href="ko.html">한국어</a>
@@ -72,7 +72,7 @@
 
   <h2 id="section-2">2. Erhobene personenbezogene Daten</h2>
   <p>Der Dienst kann ohne Registrierung als Gast genutzt werden. Dabei werden folgende Daten erhoben und gespeichert.</p>
-  <p>Der Dienst wird derzeit auf Android kostenlos und werbefinanziert angeboten. In-App-Käufe mit echtem Geld werden derzeit nicht angeboten.</p>
+  <p>Der Dienst wird derzeit auf Android kostenlos und werbefinanziert angeboten. In-App-Käufe mit echtem Geld werden derzeit nicht angeboten. Eine iOS-Version ist geplant, aber derzeit nicht verfügbar. Vor einer iOS-Veröffentlichung werden diese Erklärung und die Datenschutzangaben im App Store an die dort verwendeten SDKs und Datenverarbeitungen angepasst.</p>
   <div class="table-scroll" role="region" aria-label="Scrollbare Tabelle" tabindex="0">
     <table>
     <tr><th>Datenkategorie</th><th>Zeitpunkt / Art der Erhebung</th><th>Speicherort</th></tr>
@@ -82,16 +82,21 @@
     <tr><td>Nickname, Anzeigecode</td><td>Nickname wird von dir eingegeben; Anzeigecode wird automatisch erstellt</td><td>Gerät und Server (für Bestenlisten)</td></tr>
     <tr><td>Länderinformation</td><td>Von dir beim Onboarding gewählt (Vorschlag aus dem Gerätegebietsschema; keine genaue Standortbestimmung)</td><td>Gerät und Server (für Länder-Bestenlisten)</td></tr>
     <tr><td>Werbe- und Gerätedaten</td><td>Das Google Mobile Ads SDK kann bei der Anzeigenauslieferung automatisch die IP-Adresse (zur Schätzung des ungefähren Standorts), App- und Anzeigeninteraktionen, Diagnoseinformationen sowie Geräte-/Kontokennungen wie Werbe-ID und App-Set-ID verarbeiten</td><td>Systeme des Werbeanbieters (Google)</td></tr>
-    <tr><td>Virtuelle Währung und Fortschritt (Stamina, Edelsteine, Durchbruch-Tickets, Anwesenheit, Missionen, Shop und Saison)</td><td>Während der Nutzung erstellt oder geändert</td><td>Gerät und Server (Supabase-Kontostatus)</td></tr>
+    <tr><td>Virtuelle Währung und Fortschritt (Stamina, Edelsteine, Tickets, Anwesenheit, Missionen, Shop und Saison)</td><td>Während der Nutzung erstellt oder geändert</td><td>Gerät und Server (Supabase-Kontostatus)</td></tr>
+    <tr><td>Profilgestaltung und Belohnungen (besessene/ausgerüstete Symbole, Rahmen und Kugel-Skins, Postfach- und Saisonbelohnungen)</td><td>Beim Erhalten, Ausrüsten oder Abholen erstellt oder geändert</td><td>Gerät und Server (Supabase)</td></tr>
+    <tr><td>Freundes- und Sozialdaten (Freundschaften, Anfragen, Versand/Abholung von Geschenken und öffentliches Profil)</td><td>Bei Nutzung der sozialen Funktionen erstellt oder geändert</td><td>Server (Supabase)</td></tr>
+    <tr><td>Eigene Nutzungsanalyse</td><td>Nach Zustimmung werden App-/Sitzungs-, Spielstart/-ende- sowie Anzeigenanfrage/-einblendung/-belohnung-Ereignisse, App-Version, Plattform und Zeitzone automatisch erfasst. Zufällige Installations- und Sitzungskennungen bleiben von der Konto-UID getrennt; die Werbe-ID wird nicht in unsere eigenen Analyseereignisse aufgenommen</td><td>Temporäre Gerätewarteschlange und Server (Supabase, höchstens 28 Tage)</td></tr>
     <tr><td>Sprache, Lautstärke, Vibration und Bildrate</td><td>Von dir eingestellt</td><td>Nur Gerät (lokale Speicherung)</td></tr>
   </table>
   </div>
-  <p>Der Dienst erhebt keine präzisen Standortdaten, keine Kontakte, keine Fotos und keine sonstigen für den Spielbetrieb nicht erforderlichen Daten; ein separates Analyse-SDK wird nicht verwendet.</p>
+  <p>Der Dienst erhebt keine präzisen Standortdaten, keine Kontakte, keine Fotos und keine sonstigen für den Spielbetrieb nicht erforderlichen Daten. Ein separates Analyse-SDK eines Drittanbieters wird nicht verwendet; begrenzte eigene Nutzungsereignisse werden jedoch in Supabase gespeichert, um Dienstqualität und Funktionsnutzung zu verstehen.</p>
 
   <h2 id="section-3">3. Zwecke und Rechtsgrundlagen der Verarbeitung</h2>
   <ul>
     <li>Speicherung des Spielfortschritts und geräteübergreifende Synchronisation bei Verknüpfung mit einem Google-Konto (Art. 6 Abs. 1 lit. b DSGVO)</li>
     <li>Bereitstellung von Bestenlisten — Anzeige von Nickname/Anzeigecode, Bestleistung und Land (Art. 6 Abs. 1 lit. b DSGVO)</li>
+    <li>Bereitstellung von Freunden, Geschenken, Postfach, Saisonbelohnungen und Profilgestaltung (Art. 6 Abs. 1 lit. b DSGVO)</li>
+    <li>Verbesserung von Stabilität und Funktionsnutzung durch vom Konto getrennte Nutzungsstatistiken (Art. 6 Abs. 1 lit. f DSGVO — berechtigtes Interesse)</li>
     <li>Ausspielen von Werbung über Google AdMob — personalisierte Werbung nur auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), nicht personalisierte Werbung auf Grundlage berechtigter Interessen (Art. 6 Abs. 1 lit. f DSGVO)</li>
     <li>Fehleranalyse und Verbesserung der Dienstqualität (Art. 6 Abs. 1 lit. f DSGVO)</li>
     <li>Erfüllung rechtlicher Pflichten (Art. 6 Abs. 1 lit. c DSGVO)</li>
@@ -104,7 +109,7 @@
     <tr><th>Dienst (Anbieter)</th><th>Zweck</th><th>Betroffene Daten</th></tr>
     <tr><td>Google AdMob (Google LLC)</td><td>Belohnte und Interstitial-Werbung, Anzeigenmessung, Analyse und Betrugsprävention</td><td>Aus der IP-Adresse abgeleiteter ungefährer Standort, App- und Anzeigeninteraktionen, Diagnoseinformationen sowie Geräte-/Kontokennungen wie Werbe-ID und App-Set-ID</td></tr>
     <tr><td>Google Sign-In (Google LLC)</td><td>(Optional) Verknüpfung eines Google-Kontos</td><td>E-Mail-Adresse, Profilname</td></tr>
-    <tr><td>Supabase (Supabase Inc.)</td><td>Synchronisierung des Kontostatus, Punktzahlen, Bestenlisten und Kontoverwaltung</td><td>UID, Kontotyp, Nickname, Anzeigecode, Land, Punktzahlen, Level, Spielverlauf, virtuelle Währung, Missionen, Anwesenheit, Shop- und Saisonfortschritt, Abmelde- und letzte Spielzeit</td></tr>
+    <tr><td>Supabase (Supabase Inc.)</td><td>Kontosynchronisierung, Punktzahlen und Bestenlisten, Freunde und Geschenke, Postfach und Belohnungen, Gestaltung sowie eigene Nutzungsanalyse</td><td>UID, Kontotyp, Nickname, Anzeigecode, Land, Punktzahlen, Level und Spielverlauf, virtuelle Währung, Missionen, Anwesenheit, Shop- und Saisonfortschritt, Freundes-/Geschenk-/Postfach-/Gestaltungsstatus, Abmelde- und letzte Spielzeit sowie vom Konto getrennte Installations-/Sitzungskennungen und Nutzungsereignisse</td></tr>
   </table>
   </div>
   <ul>
@@ -120,6 +125,7 @@
   <ul>
     <li>Bei einer beantragten Kontolöschung werden die Daten unverzüglich oder innerhalb einer angemessenen Frist gelöscht.</li>
     <li>Rohe Spiel-, Saison- und Wochendatensätze werden 28 Tage gespeichert und danach automatisch gelöscht.</li>
+    <li>Eigene Nutzungsanalyse-Ereignisse mit von der Konto-UID getrennten Kennungen werden nach Empfang höchstens 28 Tage gespeichert und danach automatisch gelöscht.</li>
     <li>Das Supabase-Auth-Konto und der aktuell mit dem Server synchronisierte Kontostatus werden bis zur Kontolöschung gespeichert und auf eine Löschanfrage hin gelöscht. Lokale Caches werden bei der Deinstallation oder Zurücksetzung des Kontos gelöscht.</li>
     <li>Nur auf dem Gerät gespeicherte Einstellungen wie Sprache, Lautstärke, Vibration und Bildrate werden beim Löschen der App entfernt.</li>
     <li>Sofern geltendes Recht eine längere Aufbewahrung vorschreibt, können Daten entsprechend länger gespeichert werden.</li>
@@ -152,6 +158,7 @@
 
   <h2 id="section-12">12. Gültig ab und Änderungshistorie</h2>
   <ul>
+    <li>3. August 2026 — Freunde, Postfach, Gestaltung, Saisonbelohnungen, eigene Analyse und geplante iOS-Version ergänzt (v2.2)</li>
     <li>1. August 2026 — Datenverarbeitung durch das Werbe-SDK und Aufbewahrungsfristen präzisiert (v2.1)</li>
     <li>27. Juli 2026 — Vollständig überarbeitet und unter House Duck in Kraft getreten (v2.0)</li>
     <li>24. Juli 2026 — Erstveröffentlichung dieser Datenschutzerklärung (v1.0)</li>
