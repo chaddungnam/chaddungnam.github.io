@@ -223,12 +223,15 @@ function renderInsightReasons(model) {
     if (!reason) return;
     byId("insightReasonTitle").textContent = reason.title;
     byId("insightReasonBody").textContent = reason.body;
-    byId("insightReasonDialog").showModal();
+    const dialog = byId("insightReasonDialog");
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
   };
   document.querySelectorAll("[data-metric-why]").forEach((button) => {
     button.onclick = () => open(button.dataset.metricWhy);
   });
-  byId("insightWhyButton").onclick = () => open("insight");
+  const insightButton = byId("insightWhyButton");
+  if (insightButton) insightButton.onclick = () => open("insight");
 }
 
 function renderJourney(journey = []) {

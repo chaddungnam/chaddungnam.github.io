@@ -164,7 +164,7 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .question-top h2 { overflow: hidden; font-size: clamp(11px, 1.15vw, 14px); letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
 .question-top p { margin: 2px 0 0; color: #8b91a1; font-size: 9px; }
 .status-chip { padding: 4px 6px; color: var(--ink); background: color-mix(in srgb, var(--state) 22%, white); border-radius: 99px; font-size: 8px; white-space: nowrap; }
-.metric-why, .insight-why { min-height: 26px; padding: 4px 7px; color: var(--ink); background: rgba(255,255,255,.86); border: 1px solid var(--line); border-radius: 8px; font-size: 9px; font-weight: 900; }
+.metric-why, .insight-why { min-height: 26px; padding: 4px 7px; color: var(--ink); background: color-mix(in srgb, var(--state, var(--teal)) 22%, white); border: 1px solid transparent; border-radius: 99px; font-size: 8px; font-weight: 900; }
 .metric-why { position: absolute; top: 0; right: 0; }
 .insight-line { display: flex; align-items: flex-start; gap: 8px; }
 .insight-line .mascot-extra { flex: 1; }
