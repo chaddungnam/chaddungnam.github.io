@@ -157,12 +157,19 @@ h2 { margin-bottom: 0; font-size: 20px; letter-spacing: -.045em; }
 .question-card[data-status="good"] { --state: var(--teal); }
 .question-card[data-status="watch"] { --state: var(--gold); }
 .question-card[data-status="risk"] { --state: var(--coral); }
-.question-top { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 8px; }
+.question-top { position: relative; display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 8px; padding-right: 28px; }
+.question-top > div { min-width: 0; }
 .question-icon { display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink); background: color-mix(in srgb, var(--state) 24%, white); border-radius: 10px; font-size: 17px; font-weight: 900; }
-.question-icon.ad-icon { font-size: 9px; letter-spacing: -.02em; }
-.question-top h2 { font-size: 14px; letter-spacing: -.04em; }
+.question-icon.ad-icon { font-size: 12px; letter-spacing: -.04em; }
+.question-top h2 { overflow: hidden; font-size: clamp(11px, 1.15vw, 14px); letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
 .question-top p { margin: 2px 0 0; color: #8b91a1; font-size: 9px; }
 .status-chip { padding: 4px 6px; color: var(--ink); background: color-mix(in srgb, var(--state) 22%, white); border-radius: 99px; font-size: 8px; white-space: nowrap; }
+.metric-why, .insight-why { min-height: 26px; padding: 4px 7px; color: var(--ink); background: rgba(255,255,255,.86); border: 1px solid var(--line); border-radius: 8px; font-size: 9px; font-weight: 900; }
+.metric-why { position: absolute; top: 0; right: 0; }
+.insight-line { display: flex; align-items: flex-start; gap: 8px; }
+.insight-line .mascot-extra { flex: 1; }
+.insight-dialog form { padding: 26px; }
+.insight-dialog #insightReasonBody { color: var(--ink-soft); line-height: 1.65; }
 .question-value { display: block; margin: 8px 0 5px 42px; font-size: 22px; letter-spacing: -.07em; }
 .question-gauge { height: 6px; margin: 0 0 5px 42px; overflow: hidden; background: #f0ede5; border-radius: 99px; }
 .question-gauge i { display: block; width: 0; height: 100%; background: var(--state); border-radius: inherit; transition: width .25s ease; }

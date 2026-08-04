@@ -101,6 +101,7 @@ function renderDashboard() {
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `${formatNumber(summary.adImpressions)} 노출 · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
   renderPulseOverview(pulseModel);
+  renderInsightReasons(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
   renderHourlyChart();
@@ -206,6 +207,28 @@ function renderQuestionMetric(key, metric, formattedValue, progress) {
   setText(`metric${key}`, formattedValue);
   setText(`metric${key}Status`, metric.statusLabel);
   byId(`metric${key}Bar`).style.width = `${progress}%`;
+}
+
+function renderInsightReasons(model) {
+  const metrics = model.metrics || {};
+  const reasons = {
+    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 ${formatNumber(state.payload?.summary?.sessions)}회 세션, ${formatNumber(state.payload?.summary?.gamesStarted)}회 게임 시작, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다. 원본 이벤트를 그대로 노출하지 않고 지표 기준으로 설명합니다.` },
+    duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
+    completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 완료 이벤트와 게임 시작 이벤트를 비교해 계산했습니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다. 첫 실행 이후 다음 날 다시 기록된 계정을 기준으로 계산했습니다.` },
+    ads: { title: "광고는 적당한가? · 판단 근거", body: `플레이어 1명당 광고 노출은 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 테스트 광고는 노출에는 포함하지만 예상 수익에서는 제외합니다.` },
+  };
+  const open = (key) => {
+    const reason = reasons[key];
+    if (!reason) return;
+    byId("insightReasonTitle").textContent = reason.title;
+    byId("insightReasonBody").textContent = reason.body;
+    byId("insightReasonDialog").showModal();
+  };
+  document.querySelectorAll("[data-metric-why]").forEach((button) => {
+    button.onclick = () => open(button.dataset.metricWhy);
+  });
+  byId("insightWhyButton").onclick = () => open("insight");
 }
 
 function renderJourney(journey = []) {

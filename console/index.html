@@ -108,7 +108,7 @@
             <p class="eyebrow">오리가 쉽게 알려드려요</p>
             <div class="verdict-line"><span>지금 상태는</span><strong id="healthLabel">판단 대기</strong><b id="healthScore">수집 중</b></div>
             <p id="mascotMessage">플레이어가 조금 더 쌓이면 게임 상태를 판단할 수 있어요.</p>
-            <p id="insightText" class="mascot-extra">데이터가 쌓이면 가장 중요한 변화부터 요약해 드립니다.</p>
+            <div class="insight-line"><p id="insightText" class="mascot-extra">데이터가 쌓이면 가장 중요한 변화부터 요약해 드립니다.</p><button id="insightWhyButton" class="insight-why" type="button">왜?</button></div>
           </div>
           <div id="signalLights" class="signal-lights" aria-label="게임 상태 신호등">
             <span data-signal="good"><i></i><b>좋아요</b></span><span data-signal="watch"><i></i><b>지켜봐요</b></span><span data-signal="risk"><i></i><b>고쳐야 해요</b></span><span data-signal="insufficient"><i></i><b>판단 대기</b></span>
@@ -118,10 +118,10 @@
         </section>
 
         <section class="question-grid" aria-label="게임 상태를 설명하는 네 가지 질문">
-          <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>평균 한 판 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
-          <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>게임 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10명 중 7명쯤이면 좋아요</small></article>
-          <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>다음 날 다시 온 비율</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>7일 뒤 다시 옴 <b id="metricD7">—</b></small></article>
-          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>광고는 적당한가?</h2><p>사람 한 명당 노출</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>테스트 광고 포함 · 수익에서는 제외</small></article>
+          <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>평균 한 판 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="duration" type="button">왜?</button></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
+          <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>게임 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10명 중 7명쯤이면 좋아요</small></article>
+          <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>다음 날 다시 온 비율</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>7일 뒤 다시 옴 <b id="metricD7">—</b></small></article>
+          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>광고는 적당한가?</h2><p>사람 한 명당 노출</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>테스트 광고 포함 · 수익에서는 제외</small></article>
         </section>
 
         <section class="operations-pulse" aria-labelledby="operationsPulseTitle">
@@ -238,6 +238,9 @@
       <p id="confirmBody"></p>
       <div class="dialog-actions"><button value="cancel" type="submit">취소</button><button class="primary-button" value="confirm" type="submit">확인</button></div>
     </form>
+  </dialog>
+  <dialog id="insightReasonDialog" class="confirm-dialog insight-dialog">
+    <form method="dialog"><p class="eyebrow">INSIGHT REASON</p><h2 id="insightReasonTitle">판단 근거</h2><p id="insightReasonBody"></p><div class="dialog-actions"><button value="cancel" type="submit">닫기</button></div></form>
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
