@@ -224,7 +224,7 @@ function renderInsightReasons(model) {
     byId("insightReasonTitle").textContent = reason.title;
     byId("insightReasonBody").textContent = reason.body;
     const dialog = byId("insightReasonDialog");
-    if (typeof dialog.showModal === "function") dialog.showModal();
+    if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
     else dialog.setAttribute("open", "");
   };
   document.querySelectorAll("[data-metric-why]").forEach((button) => {
