@@ -119,9 +119,15 @@
     const player = data.player;
     const enabled = Boolean(data.operations?.mutations_enabled);
     const disabled = !enabled || player.state_version == null;
+    const catalog = Array.isArray(data.catalog) ? data.catalog : [];
+    const owned = new Set((data.entitlements || []).map((item) => item.item_id));
+    const catalogOptions = catalog.map((item) => `<option value="${escapeHtml(item.item_id)}" ${owned.has(item.item_id) ? "disabled" : ""}>${escapeHtml(item.item_id)} · ${escapeHtml(item.item_type)}${owned.has(item.item_id) ? " · 보유 중" : ""}</option>`).join("");
+    const entitlementRows = (data.entitlements || []).map((item) => `<li><span><strong>${escapeHtml(item.item_id)}</strong><small>${escapeHtml(item.item_type)} · ${escapeHtml(item.acquired_source || "-")}</small></span><button type="button" class="secondary-button inventory-revoke" data-item-id="${escapeHtml(item.item_id)}" ${disabled ? "disabled" : ""}>회수</button></li>`).join("");
     byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))}</h2><code>${escapeHtml(userId)}</code></div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/cs?userId=${encodeURIComponent(userId)}">CS에서 보기</a></div></div>
       <div class="read-only-banner" data-enabled="${enabled}">${enabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
       <div class="admin-card-grid"><form id="economyForm" class="panel admin-form"><p class="eyebrow">ECONOMY</p><h2>재화 직접 조정</h2><div class="economy-grid">${economyFields(player, disabled)}</div><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled ? "disabled" : ""}>변경 내용 확인</button></form>
+      <form id="playerMailForm" class="panel admin-form"><p class="eyebrow">TARGETED MAIL</p><h2>이 플레이어에게 우편</h2><label>고정 다국어 문구<select name="templateKey"><option value="general">안내 보상</option><option value="compensation">불편 보상</option><option value="maintenance">점검 보상</option><option value="welcome">환영 보상</option><option value="support">문의 지원 보상</option><option value="update">업데이트 보상</option><option value="launch">출시 기념 보상</option></select></label><div class="form-pair"><label>보상<select name="kind"><option value="gems">젬</option><option value="breakthrough_ticket">배속 티켓</option><option value="entitlement">상점 아이템</option></select></label><label id="playerMailValueLabel">수량<input name="rewardValue" type="number" min="1" required></label></div><label>수령 기한<input name="expiresAt" type="datetime-local" required></label><label>발송 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">이 플레이어에게 발송</button></form>
+      <article class="panel"><p class="eyebrow">INVENTORY</p><h2>소지 아이템</h2><form id="inventoryForm" class="form-pair"><label>상점 아이템<select name="itemId">${catalogOptions || '<option value="">판매 상품 없음</option>'}</select></label><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled || !catalogOptions ? "disabled" : ""}>지급</button></form><ul class="inventory-list">${entitlementRows || '<li class="empty-panel">보유 아이템이 없습니다.</li>'}</ul></article>
       <article class="panel player-facts"><p class="eyebrow">ACCOUNT</p><h2>계정 상태</h2><dl><div><dt>최고 점수</dt><dd>${number(player.best_score)}</dd></div><div><dt>최고 레벨</dt><dd>${number(player.best_level)}</dd></div><div><dt>게임 수</dt><dd>${number(player.game_count)}</dd></div><div><dt>대기 우편</dt><dd>${number(data.operations?.pending_mail_count)}</dd></div><div><dt>광고 제거</dt><dd>${player.ads_removed ? "예" : "아니오"}</dd></div><div><dt>QA 상점</dt><dd>${data.operations?.qa_shop_controls_enabled ? "허용" : "미허용"}</dd></div></dl></article></div>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SCORE RECORDS</p><h2>점수 기록 보정</h2><small>기록은 삭제하지 않으며, 최고 기록은 반영 중인 기록에서 서버가 다시 계산합니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>플레이 시각</th><th>점수</th><th>레벨</th><th>랭킹</th><th>처리</th></tr></thead><tbody>${recordRows(data.records || [], disabled)}</tbody></table></div></section>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PLAYER AUDIT</p><h2>이 플레이어의 변경 기록</h2></div></div><div class="audit-list">${auditHtml(data.audit || [])}</div></section>`;
@@ -130,7 +136,52 @@
       message("playerMessage", "사용자 ID를 복사했습니다.");
     });
     byId("economyForm").addEventListener("submit", (event) => submitEconomy(event, data));
+    byId("playerMailForm").addEventListener("submit", (event) => submitPlayerMail(event, userId));
+    byId("playerMailForm").elements.kind.addEventListener("change", () => {
+      const form = byId("playerMailForm");
+      const label = byId("playerMailValueLabel");
+      const current = form.elements.rewardValue;
+      if (form.elements.kind.value === "entitlement") {
+        const options = catalog.map((item) => `<option value="${escapeHtml(item.item_id)}">${escapeHtml(item.item_id)} · ${escapeHtml(item.item_type)}</option>`).join("");
+        current.outerHTML = `<select name="rewardValue" required>${options}</select>`;
+        label.firstChild.textContent = "상점 아이템";
+      } else {
+        current.outerHTML = '<input name="rewardValue" type="number" min="1" step="1" required>';
+        label.firstChild.textContent = "수량";
+      }
+    });
+    byId("inventoryForm").addEventListener("submit", (event) => submitInventory(event, userId));
+    byId("playerDetail").querySelectorAll(".inventory-revoke").forEach((button) => button.addEventListener("click", () => submitInventory(null, userId, button.dataset.itemId, "revoke")));
     byId("playerDetail").querySelectorAll(".score-form").forEach((form) => form.addEventListener("submit", (event) => submitScore(event, userId)));
+  }
+
+  async function submitPlayerMail(event, userId) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const values = Object.fromEntries(new FormData(form));
+    const amount = Number(values.rewardValue);
+    if (!form.reportValidity() || (values.kind !== "entitlement" && (!Number.isSafeInteger(amount) || amount < 1))) return;
+    const expiresAt = new Date(values.expiresAt);
+    if (Number.isNaN(expiresAt.getTime())) return;
+    const reward = values.kind === "entitlement" ? [{ kind: "entitlement", item_id: values.rewardValue }] : [{ kind: values.kind, amount }];
+    try {
+      await root.ConsoleAPI.post("admin-console", { action: "reward_mail.send", userId, templateKey: values.templateKey, reward, expiresAt: expiresAt.toISOString(), reason: values.reason.trim(), requestId: crypto.randomUUID() });
+      message("playerMessage", "개별 보상 우편을 발송했습니다.");
+      await mountDetail(userId);
+    } catch (error) { message("playerMessage", errorText(error), true); }
+  }
+
+  async function submitInventory(event, userId, itemId = "", operation = "grant") {
+    const form = event?.currentTarget;
+    if (event) event.preventDefault();
+    const selectedItem = itemId || form.elements.itemId.value;
+    const reason = itemId ? "운영자 회수" : form.elements.reason.value.trim();
+    if (!selectedItem || !reason || !await root.ConsoleApp.confirmChange(operation === "revoke" ? "아이템 회수" : "아이템 지급", `${selectedItem}\n사유: ${reason}`)) return;
+    try {
+      await root.ConsoleAPI.post("admin-console", { action: "players.inventory_mutate", userId, itemId: selectedItem, operation, reason, requestId: crypto.randomUUID() });
+      message("playerMessage", operation === "revoke" ? "아이템을 회수했습니다." : "아이템을 지급했습니다.");
+      await mountDetail(userId);
+    } catch (error) { message("playerMessage", errorText(error), true); }
   }
 
   async function submitEconomy(event, data) {
