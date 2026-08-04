@@ -134,6 +134,14 @@
           </div>
         </section>
 
+        <section class="panel ai-brief-panel" aria-labelledby="aiBriefTitle">
+          <div class="panel-heading"><div><p class="eyebrow">AI OPERATING BRIEF</p><h2 id="aiBriefTitle">다음 결정을 같이 판단해요</h2><small>월 수익·iOS 확장·차기작 방향을 현재 집계 지표로 분석합니다.</small></div><span id="aiBriefSource" class="status-label">준비됨</span></div>
+          <div class="ai-brief-actions"><button id="aiBriefRun" class="primary-button" type="button">AI 운영 브리핑 만들기</button><button id="aiBriefOriginal" type="button" hidden>원문 보기</button></div>
+          <div id="aiBriefResult" class="ai-brief-result"><p>버튼을 누르면 이 기기에서 분석합니다. Chrome AI를 사용할 수 없으면 비용 없는 지표 기반 조언으로 안내합니다.</p></div>
+          <pre id="aiBriefOriginalText" class="ai-brief-original" hidden></pre>
+          <p id="aiBriefMessage" class="dashboard-message" role="status"></p>
+        </section>
+
         <section class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
           <div class="panel-heading period-heading"><div><p class="eyebrow">PLAYED IN THIS PERIOD</p><h2 id="periodPlayersTitle">기간 내 플레이 기록 계정</h2><small>선택한 기간에 실제 게임 기록이 있는 계정입니다. 앱만 연 플레이어는 포함되지 않을 수 있습니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
           <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
@@ -248,7 +256,7 @@
   <script src="model.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260804-2"></script>
+  <script src="analytics.js?v=20260804-3"></script>
   <script src="players.js"></script>
   <script src="operations.js"></script>
   <script src="audit.js"></script>

@@ -8,6 +8,7 @@ const state = {
   playerDirection: "desc",
   playerPage: 1,
   loading: false,
+  aiBusy: false,
   mounted: false,
 };
 const byId = (id) => document.getElementById(id);
@@ -404,6 +405,88 @@ function renderInsight() {
   setText("insightText", `가장 많이 시작하는 시간은 ${timeText}입니다. 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
 }
 
+function setAiMessage(value, error = false) {
+  const element = byId("aiBriefMessage");
+  element.textContent = value;
+  element.style.color = error ? "var(--coral)" : "";
+}
+
+function advisorySnapshot() {
+  const summary = state.payload?.summary ?? {};
+  const retention = state.payload?.retention ?? [];
+  const ad = state.payload?.adEconomics ?? {};
+  const d1 = retention.find((item) => item.day === 1)?.rate;
+  const d7 = retention.find((item) => item.day === 7)?.rate;
+  const completion = summary.gamesStarted ? (summary.gameOvers ?? 0) / summary.gamesStarted : null;
+  const exitRate = summary.gamesStarted ? ((summary.midGameExits ?? 0) + (summary.unobservedGames ?? 0)) / summary.gamesStarted : null;
+  const revenue = Number(ad.estimatedRevenueEur);
+  const monthlyRevenue = Number.isFinite(revenue) && state.rangeDays > 0 ? revenue / state.rangeDays * 30 : null;
+  return { sessions: Number(summary.sessions ?? 0), gamesStarted: Number(summary.gamesStarted ?? 0), activePlayers: Number(summary.activeInstallsToday ?? 0), duration: Number(summary.avgSessionSeconds), completion, exitRate, d1, d7, adsPerPlayer: Number(summary.adImpressions) / Math.max(1, Number(summary.activeInstallsToday)), monthlyRevenue };
+}
+
+function fallbackAdvice(snapshot) {
+  const money = snapshot.monthlyRevenue == null ? "수익 추정에 필요한 eCPM 또는 광고 수익 데이터가 아직 부족합니다." : `현재 ${state.rangeDays}일 기준을 30일로 환산하면 보수 ${formatCurrency(snapshot.monthlyRevenue * 0.6)} · 기준 ${formatCurrency(snapshot.monthlyRevenue)} · 상향 ${formatCurrency(snapshot.monthlyRevenue * 1.4)}입니다. 실제 수익 보장은 아니며 eCPM과 필레이트에 따라 달라집니다.`;
+  const iosReady = snapshot.sessions >= 50 && snapshot.completion >= 0.55 && snapshot.d1 >= 0.2 && snapshot.duration >= 90;
+  const ios = iosReady ? "iOS는 소규모 소프트런치를 시작할 수 있습니다. 단, iOS 크래시·결제·개인정보 고지는 별도 실기기 확인 후 열어야 합니다." : `iOS 확장은 아직 보류가 좋습니다. 현재 완료율 ${formatRate(snapshot.completion)}, D1 ${formatRate(snapshot.d1)}, 평균 플레이 ${formatDuration(snapshot.duration)}를 먼저 안정화하세요.`;
+  const next = snapshot.completion != null && snapshot.completion < 0.55 ? "차기작보다 Quirky Ball 첫 1분 난이도와 중간 이탈을 먼저 고치는 편이 수익 가능성이 높습니다." : snapshot.adsPerPlayer > 4 ? "차기작은 강제 광고보다 선택형 보상 광고와 꾸미기 상품을 중심으로 설계하세요. 광고 피로도를 낮춘 뒤 유료 꾸미기·시즌패스를 붙이는 순서가 안전합니다." : "차기작은 짧은 세션의 물리 퍼즐을 유지하되, 수집·꾸미기·주간 목표를 가볍게 더한 반복 구조가 현재 데이터와 가장 잘 맞습니다.";
+  return `월 예상 수익\n${money}\n\niOS 확장 판단\n${ios}\n\n차기작 방향\n${next}`;
+}
+
+function englishPrompt(snapshot) {
+  return `You are a cautious mobile game operations advisor. Use only this aggregated Quirky Ball data: sessions=${snapshot.sessions}, games_started=${snapshot.gamesStarted}, average_session_seconds=${snapshot.duration}, completion_rate=${snapshot.completion}, exit_rate=${snapshot.exitRate}, D1=${snapshot.d1}, D7=${snapshot.d7}, ads_per_active_player=${snapshot.adsPerPlayer}, monthly_ad_revenue_baseline_EUR=${snapshot.monthlyRevenue}. Write concise English advice with exactly three headings: Monthly revenue forecast, iOS expansion decision, Next game direction. Give conservative, actionable recommendations, explicitly say when data is insufficient, never invent metrics, and do not give financial guarantees.`;
+}
+
+async function createChromeAdvice(prompt) {
+  const api = root.LanguageModel;
+  if (!api?.availability || !api?.create) throw new Error("chrome_ai_unavailable");
+  const availability = await api.availability();
+  if (availability === "unavailable") throw new Error("chrome_ai_unavailable");
+  let session;
+  try { session = await api.create({ initialPrompts: [{ role: "system", content: "Give evidence-based mobile game operations advice in English." }] }); }
+  catch (_error) { session = await api.create(); }
+  try { return String(await session.prompt(prompt)).trim(); }
+  finally { session.destroy?.(); }
+}
+
+async function translateToKorean(text) {
+  const api = root.Translator;
+  if (!api?.availability || !api?.create) return null;
+  const options = { sourceLanguage: "en", targetLanguage: "ko" };
+  const availability = await api.availability(options);
+  if (availability === "unavailable") return null;
+  const translator = await api.create(options);
+  try { return String(await translator.translate(text)).trim(); }
+  finally { translator.destroy?.(); }
+}
+
+async function runAiBrief() {
+  if (state.aiBusy || !state.payload) return;
+  state.aiBusy = true;
+  byId("aiBriefRun").disabled = true;
+  setAiMessage("Chrome AI 준비 상태를 확인하는 중...");
+  const snapshot = advisorySnapshot();
+  const fallback = fallbackAdvice(snapshot);
+  try {
+    const original = await createChromeAdvice(englishPrompt(snapshot));
+    const translated = await translateToKorean(original);
+    byId("aiBriefResult").textContent = translated || fallback;
+    byId("aiBriefOriginalText").textContent = original;
+    byId("aiBriefOriginal").hidden = false;
+    byId("aiBriefOriginalText").hidden = true;
+    byId("aiBriefOriginal").textContent = "원문 보기";
+    setText("aiBriefSource", translated ? "Chrome AI 분석" : "Chrome AI + 기본 번역");
+    setAiMessage(translated ? "이 기기에서 분석과 번역을 마쳤습니다." : "영문 분석은 완료했지만 한국어 번역을 지원하지 않아 지표 기반 한국어 요약을 표시합니다.");
+  } catch (_error) {
+    byId("aiBriefResult").textContent = fallback;
+    byId("aiBriefOriginal").hidden = true;
+    setText("aiBriefSource", "지표 기반 조언");
+    setAiMessage("이 Chrome에서 내장 AI를 사용할 수 없어 비용 없는 지표 기반 조언을 표시합니다.");
+  } finally {
+    state.aiBusy = false;
+    byId("aiBriefRun").disabled = false;
+  }
+}
+
 function syncFilterHash() {
   const query = root.ConsoleModel.serializeAnalyticsFilters({
     rangeDays: state.rangeDays,
@@ -455,6 +538,12 @@ function changeFilters() {
 }
 
 function bindControls() {
+  byId("aiBriefRun").addEventListener("click", runAiBrief);
+  byId("aiBriefOriginal").addEventListener("click", () => {
+    const original = byId("aiBriefOriginalText");
+    original.hidden = !original.hidden;
+    byId("aiBriefOriginal").textContent = original.hidden ? "원문 보기" : "원문 숨기기";
+  });
   document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
     state.rangeDays = Number(button.dataset.range);
     state.playerPage = 1;
