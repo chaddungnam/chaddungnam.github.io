@@ -3,6 +3,7 @@
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "계속";
   let bound = false;
+  let rewardCatalog = [];
   const pendingRequests = new WeakMap();
   const templateCopy = {
     general: ["안내 보상", "House Duck에서 보낸 보상입니다."],
@@ -20,6 +21,7 @@
   }
 
   function render(data) {
+    rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
     const config = data.config || {};
     byId("operationsSummary").innerHTML = `<article><span>최소 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article><span>Android 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article><span>플레이어 수정</span><strong>${config.admin_player_mutations_enabled === "true" ? "활성" : "잠김"}</strong></article>`;
     const notices = (data.notices || []).map((notice) => `<article class="audit-item"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code></article>`);
@@ -75,6 +77,19 @@
       : '<p>지원하지 않는 문구입니다.</p>';
   }
 
+  function syncRewardInput() {
+    const form = byId("rewardMailForm");
+    const select = form.elements.rewardValue;
+    const label = byId("rewardValueLabel");
+    if (form.elements.kind.value === "entitlement") {
+      label.firstChild.textContent = "상점 아이템";
+      select.outerHTML = `<select name="rewardValue" required>${rewardCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}">${escapeHtml(item.item_id)} · ${escapeHtml(item.item_type)} · ${escapeHtml(item.rarity || "common")}</option>`).join("")}</select>`;
+    } else {
+      label.firstChild.textContent = "수량";
+      select.outerHTML = '<input name="rewardValue" type="number" min="1" step="1" required>';
+    }
+  }
+
   function bind() {
     if (bound) return;
     bound = true;
@@ -100,6 +115,7 @@
       }, "전체 보상 우편 발송", `모든 플레이어에게 ${templateCopy[template.key][0]} 우편을 보냅니다.\n${template.titleKey} · ${template.bodyKey}\n보상: ${values.kind} ${values.rewardValue}\n사유: ${values.reason}`);
     });
     byId("rewardMailForm").elements.templateKey.addEventListener("change", renderRewardTemplate);
+    byId("rewardMailForm").elements.kind.addEventListener("change", syncRewardInput);
     byId("rewardMailForm").addEventListener("reset", () => root.setTimeout(renderRewardTemplate, 0));
     byId("minVersionForm").addEventListener("submit", (event) => {
       event.preventDefault();
@@ -121,6 +137,6 @@
     });
   }
 
-  function mount() { bind(); renderRewardTemplate(); load(); }
+  function mount() { bind(); renderRewardTemplate(); syncRewardInput(); load(); }
   root.ConsoleOperations = { mount };
 })(window);
