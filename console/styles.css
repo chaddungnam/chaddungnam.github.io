@@ -51,6 +51,18 @@ textarea:focus-visible {
 }
 
 .primary-button:hover { background: var(--coral); }
+.danger-zone { border-color: var(--coral); }
+.danger-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  color: white;
+  background: var(--coral);
+  border: 0;
+  border-radius: 12px;
+  font-weight: 800;
+}
+.danger-button:hover { opacity: 0.85; }
+.danger-button:disabled, .primary-button:disabled { opacity: 0.5; cursor: not-allowed; }
 .auth-account { color: var(--ink-soft); font-size: 13px; }
 .project-grid { display: grid; gap: 12px; }
 .project-card-muted { background: #f3f0e8; }

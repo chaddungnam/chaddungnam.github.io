@@ -130,6 +130,8 @@
       <article class="panel"><p class="eyebrow">INVENTORY</p><h2>소지 아이템</h2><form id="inventoryForm" class="form-pair"><label>상점 아이템<select name="itemId">${catalogOptions || '<option value="">판매 상품 없음</option>'}</select></label><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled || !catalogOptions ? "disabled" : ""}>지급</button></form><ul class="inventory-list">${entitlementRows || '<li class="empty-panel">보유 아이템이 없습니다.</li>'}</ul></article>
       <article class="panel player-facts"><p class="eyebrow">ACCOUNT</p><h2>계정 상태</h2><dl><div><dt>최고 점수</dt><dd>${number(player.best_score)}</dd></div><div><dt>최고 레벨</dt><dd>${number(player.best_level)}</dd></div><div><dt>게임 수</dt><dd>${number(player.game_count)}</dd></div><div><dt>대기 우편</dt><dd>${number(data.operations?.pending_mail_count)}</dd></div><div><dt>광고 제거</dt><dd>${player.ads_removed ? "예" : "아니오"}</dd></div><div><dt>QA 상점</dt><dd>${data.operations?.qa_shop_controls_enabled ? "허용" : "미허용"}</dd></div></dl></article></div>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SCORE RECORDS</p><h2>점수 기록 보정</h2><small>기록은 삭제하지 않으며, 최고 기록은 반영 중인 기록에서 서버가 다시 계산합니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>플레이 시각</th><th>점수</th><th>레벨</th><th>랭킹</th><th>처리</th></tr></thead><tbody>${recordRows(data.records || [], disabled)}</tbody></table></div></section>
+      <section class="panel danger-zone"><div class="panel-heading"><div><p class="eyebrow">DANGER ZONE</p><h2>플레이어 데이터 초기화</h2><small>재화·인벤토리·우편함·시즌패스·친구 관계를 모두 지우고 닉네임·표시코드·국가·최고기록을 초기화합니다. 게임 기록(랭킹)은 남지만 닉네임이 비어 표시됩니다. 되돌릴 수 없습니다. 다음 실행 시 자동으로 로그아웃됩니다(새 클라이언트 배포 불필요).</small></div></div>
+      <form id="wipeForm"><label>초기화 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="danger-button" type="submit" ${disabled ? "disabled" : ""}>이 플레이어 데이터 초기화</button></form></section>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PLAYER AUDIT</p><h2>이 플레이어의 변경 기록</h2></div></div><div class="audit-list">${auditHtml(data.audit || [])}</div></section>`;
     byId("copyPlayerId").addEventListener("click", async () => {
       await navigator.clipboard.writeText(userId);
@@ -153,6 +155,23 @@
     byId("inventoryForm").addEventListener("submit", (event) => submitInventory(event, userId));
     byId("playerDetail").querySelectorAll(".inventory-revoke").forEach((button) => button.addEventListener("click", () => submitInventory(null, userId, button.dataset.itemId, "revoke")));
     byId("playerDetail").querySelectorAll(".score-form").forEach((form) => form.addEventListener("submit", (event) => submitScore(event, userId)));
+    byId("wipeForm").addEventListener("submit", (event) => submitWipe(event, userId, player));
+  }
+
+  async function submitWipe(event, userId, player) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const reason = form.elements.reason.value.trim();
+    const displayName = root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code });
+    if (!reason) { message("playerMessage", "초기화 사유를 입력해 주세요.", true); return; }
+    if (!await root.ConsoleApp.confirmChange("플레이어 데이터 초기화", `${displayName} (${userId})\n재화·인벤토리·우편함·시즌패스·친구 관계를 모두 지우고 프로필을 초기화합니다.\n되돌릴 수 없습니다.\n사유: ${reason}`)) return;
+    try {
+      await root.ConsoleAPI.post("admin-console", { action: "players.wipe", userId, reason, requestId: crypto.randomUUID() });
+      message("playerMessage", "플레이어 데이터를 초기화했습니다.");
+    } catch (error) {
+      message("playerMessage", errorText(error), true);
+    }
+    await mountDetail(userId);
   }
 
   async function submitPlayerMail(event, userId) {
