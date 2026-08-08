@@ -134,40 +134,29 @@ button {
   letter-spacing: -0.035em;
 }
 
+.brand-lockup > span:not(.duck-mark) {
+  display: block;
+  width: 154px;
+  height: 36px;
+  overflow: hidden;
+  background: url("/assets/house-duck-wordmark.png") center / contain no-repeat;
+  font-size: 0;
+}
+
 .duck-mark {
-  position: relative;
   display: inline-block;
   width: 42px;
   height: 42px;
   flex: 0 0 auto;
-  border: 2px solid var(--navy);
-  border-radius: 50% 50% 38% 42%;
-  background: var(--gold);
-  box-shadow: 3px 4px 0 var(--navy);
+  background: url("/assets/house-duck-logo.png") center / contain no-repeat;
 }
 
 .duck-mark::before {
-  position: absolute;
-  top: 15px;
-  right: -11px;
-  width: 18px;
-  height: 10px;
-  content: "";
-  border: 2px solid var(--navy);
-  border-left: 0;
-  border-radius: 0 999px 999px 0;
-  background: var(--coral);
+  display: none;
 }
 
 .duck-mark::after {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 6px;
-  height: 6px;
-  content: "";
-  border-radius: 50%;
-  background: var(--navy);
+  display: none;
 }
 
 .site-nav {

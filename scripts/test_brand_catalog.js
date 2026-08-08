@@ -99,8 +99,18 @@ for (const [file] of marketingPages) {
 
 for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
   const html = read(file);
+  const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
   assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
+  assert.match(html, /European Restroom Map/, `${file} non-game project`);
+  assert.match(html, /assets\/house-duck-logo\.png/, `${file} House Duck PNG logo`);
+  assert.match(html, /assets\/house-duck-wordmark\.png/, `${file} House Duck PNG wordmark`);
+  assert.match(html, /data-theme-toggle/, `${file} light and dark mode control`);
+  assert.match(html, /data-post-tab="latest"/, `${file} latest-post tab`);
+  assert.match(html, /data-post-tab="popular"/, `${file} popular-post tab`);
+  assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
+  assert.match(html, /class="post-preview-image/, `${file} post preview image`);
+  assert.doesNotMatch(publicText, /Kronberg|Germany|Deutschland|독일|ドイツ/i, `${file} should not foreground the founder's location`);
 }
 
 for (const [file, locale] of legacyStoryPages) {

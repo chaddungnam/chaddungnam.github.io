@@ -3,6 +3,18 @@
 
   var root = document.documentElement;
   var supportedLanguages = ["ko", "en", "de", "ja"];
+  var savedTheme = "";
+
+  try {
+    savedTheme = window.localStorage.getItem("house_duck_theme") || "";
+  } catch (_error) {
+    savedTheme = "";
+  }
+
+  var initialTheme = savedTheme === "light" || savedTheme === "dark"
+    ? savedTheme
+    : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  root.dataset.theme = initialTheme;
 
   function normalizeLanguage(value) {
     var language = String(value || "").toLowerCase().split("-")[0];
@@ -51,6 +63,41 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     root.classList.add("js-ready");
+
+    function setTheme(theme) {
+      root.dataset.theme = theme;
+      var themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = theme === "dark" ? "#111a2b" : "#f7f3e8";
+      document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
+        button.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+        button.setAttribute("aria-pressed", String(theme === "dark"));
+      });
+    }
+
+    setTheme(initialTheme);
+    document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+        setTheme(nextTheme);
+        try {
+          window.localStorage.setItem("house_duck_theme", nextTheme);
+        } catch (_error) {
+          // Theme switching still works when storage is blocked.
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-post-tab]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var selected = button.dataset.postTab;
+        document.querySelectorAll("[data-post-tab]").forEach(function (tab) {
+          tab.setAttribute("aria-selected", String(tab === button));
+        });
+        document.querySelectorAll("[data-post-panel]").forEach(function (panel) {
+          panel.hidden = panel.dataset.postPanel !== selected;
+        });
+      });
+    });
 
     document.querySelectorAll("[data-current-year]").forEach(function (node) {
       node.textContent = String(new Date().getFullYear());

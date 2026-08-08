@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f0e0">
+  <meta name="theme-color" content="#f7f3e8">
   <meta name="description" content="[##_desc_##]">
   <title>[##_page_title_##]</title>
   <link rel="stylesheet" href="./style.css">
@@ -17,18 +17,19 @@
     <header class="site-header">
       <div class="header-inner shell">
         <a class="brand" href="https://houseduck.tistory.com/" aria-label="House Duck Journal 홈">
-          <span class="duck-mark" aria-hidden="true"></span>
-          <span class="brand-copy"><strong>HOUSE DUCK</strong><small>JOURNAL</small></span>
+          <img class="brand-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt="">
+          <span class="brand-copy"><img class="brand-wordmark-image" src="./images/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"><small>JOURNAL</small></span>
         </a>
 
         <nav class="desktop-nav" aria-label="주요 메뉴">
           <a href="https://houseduck.in/">Studio</a>
-          <a href="https://houseduck.in/#games">Projects</a>
+          <a href="https://houseduck.in/#projects">Projects</a>
           <a href="https://houseduck.tistory.com/" aria-current="page">Journal</a>
           <a href="[##_taglog_link_##]">Tags</a>
         </nav>
 
         <div class="header-actions">
+          <button class="theme-toggle" type="button" aria-label="다크 모드로 전환" aria-pressed="false" data-theme-toggle><span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span></button>
           <s_search>
             <div class="search-box" role="search">
               <label class="screen-reader-only" for="journal-search">블로그 검색</label>
@@ -43,7 +44,7 @@
             <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
             <div class="mobile-menu-panel">
               <a href="https://houseduck.in/">House Duck Studio</a>
-              <a href="https://houseduck.in/#games">Projects</a>
+              <a href="https://houseduck.in/#projects">Projects</a>
               <a href="https://houseduck.tistory.com/">Journal</a>
               <a href="[##_taglog_link_##]">Tags</a>
               <a href="[##_rss_url_##]">RSS</a>
@@ -57,15 +58,46 @@
     <main id="main-content">
       <section class="journal-hero shell" aria-labelledby="journal-title">
         <div class="hero-copy">
-          <p class="eyebrow">BUILDING IN PUBLIC · FROM KRONBERG</p>
+          <p class="eyebrow">GAMES, APPS &amp; USEFUL THINGS · BUILDING IN PUBLIC</p>
           <h1 id="journal-title">작은 것에<br><span>큰 개성을 담는 과정.</span></h1>
           <p>게임과 새로운 프로젝트를 만들며 부딪히고, 고치고, 끝내 완성해 가는 House Duck의 공식 제작 저널입니다.</p>
         </div>
         <div class="hero-stamp" aria-hidden="true">
-          <span class="duck-mark duck-mark-large"></span>
+          <img class="hero-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt="">
           <strong>NOTES<br>FROM THE<br>WORKSHOP</strong>
         </div>
       </section>
+
+      <s_sidebar>
+        <s_sidebar_element>
+          <section class="post-discovery shell" aria-labelledby="post-discovery-title">
+            <div class="discovery-heading">
+              <div><p class="eyebrow">READ THE JOURNAL</p><h2 id="post-discovery-title">포스트 한눈에 보기.</h2></div>
+              <div class="post-tabs" role="tablist" aria-label="포스트 정렬"><button class="post-tab" type="button" role="tab" aria-selected="true" data-post-tab="latest">최신순</button><button class="post-tab" type="button" role="tab" aria-selected="false" data-post-tab="popular">인기순</button></div>
+            </div>
+            <div class="post-discovery-panel" role="tabpanel" data-post-panel="latest">
+              <div class="post-discovery-grid">
+                <s_rctps_rep>
+                  <article class="discovery-card">
+                    <a class="discovery-media" href="[##_rctps_rep_link_##]" tabindex="-1" aria-hidden="true"><span class="discovery-placeholder"><img src="./images/house-duck-logo.png" width="512" height="512" alt=""></span><s_rctps_rep_thumbnail><img src="[##_rctps_rep_thumbnail_##]" alt="" loading="lazy"></s_rctps_rep_thumbnail></a>
+                    <div><time>[##_rctps_rep_simple_date_##]</time><h3><a href="[##_rctps_rep_link_##]">[##_rctps_rep_title_##]</a></h3></div>
+                  </article>
+                </s_rctps_rep>
+              </div>
+            </div>
+            <div class="post-discovery-panel" role="tabpanel" data-post-panel="popular" hidden>
+              <div class="post-discovery-grid">
+                <s_rctps_popular_rep>
+                  <article class="discovery-card">
+                    <a class="discovery-media" href="[##_rctps_rep_link_##]" tabindex="-1" aria-hidden="true"><span class="discovery-placeholder"><img src="./images/house-duck-logo.png" width="512" height="512" alt=""></span><s_rctps_rep_thumbnail><img src="[##_rctps_rep_thumbnail_##]" alt="" loading="lazy"></s_rctps_rep_thumbnail></a>
+                    <div><time>[##_rctps_rep_simple_date_##]</time><h3><a href="[##_rctps_rep_link_##]">[##_rctps_rep_title_##]</a></h3></div>
+                  </article>
+                </s_rctps_popular_rep>
+              </div>
+            </div>
+          </section>
+        </s_sidebar_element>
+      </s_sidebar>
 
       <s_list>
         <section class="collection-head shell" aria-labelledby="collection-title">
@@ -78,7 +110,7 @@
         </section>
         <s_list_empty>
           <section class="empty-state shell">
-            <span class="duck-mark" aria-hidden="true"></span>
+            <img class="placeholder-duck" src="./images/house-duck-logo.png" width="512" height="512" alt="">
             <h2>아직 이 목록에 글이 없습니다.</h2>
             <p>새로운 제작 기록을 준비하고 있습니다.</p>
             <a class="button" href="https://houseduck.tistory.com/">전체 글 보기</a>
@@ -88,7 +120,7 @@
           <s_list_rep>
             <article class="post-card">
               <a class="card-media" href="[##_list_rep_link_##]" tabindex="-1" aria-hidden="true">
-                <span class="card-placeholder"><span class="duck-mark" aria-hidden="true"></span></span>
+                <span class="card-placeholder"><img class="placeholder-duck" src="./images/house-duck-logo.png" width="512" height="512" alt=""></span>
                 <s_list_rep_thumbnail><img class="card-image" src="[##_list_rep_thumbnail_url_##]" alt="" loading="lazy"></s_list_rep_thumbnail>
               </a>
               <div class="card-body">
@@ -150,7 +182,7 @@
           <s_index_article_rep>
             <article class="post-card">
               <a class="card-media" href="[##_article_rep_link_##]" tabindex="-1" aria-hidden="true">
-                <span class="card-placeholder"><span class="duck-mark" aria-hidden="true"></span></span>
+                <span class="card-placeholder"><img class="placeholder-duck" src="./images/house-duck-logo.png" width="512" height="512" alt=""></span>
                 <s_article_rep_thumbnail><img class="card-image" src="[##_article_rep_thumbnail_url_##]" alt="" loading="lazy"></s_article_rep_thumbnail>
               </a>
               <div class="card-body">
@@ -257,8 +289,8 @@
 
     <footer class="site-footer">
       <div class="footer-inner shell">
-        <div><span class="duck-mark" aria-hidden="true"></span><strong>HOUSE DUCK<br>JOURNAL</strong></div>
-        <p>Small things. Big personality.<br>Made independently in Kronberg, Germany.</p>
+        <div><img class="footer-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt=""><span><img class="footer-wordmark-image" src="./images/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"><strong>JOURNAL</strong></span></div>
+        <p>Games, apps and useful things.<br>The honest process behind the work.</p>
         <nav aria-label="푸터 메뉴"><a href="https://houseduck.in/">Studio</a><a href="[##_taglog_link_##]">Tags</a><a href="[##_rss_url_##]">RSS</a></nav>
       </div>
       <p class="copyright">© House Duck. Powered by Tistory.</p>

@@ -94,11 +94,19 @@ done
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
   require_token "$page" 'data-section="games-catalog"'
-  require_token "$page" 'data-section="studio-values"'
+  require_token "$page" 'data-section="journal-posts"'
+  require_token "$page" 'assets/studio-home.css'
+  require_token "$page" 'assets/house-duck-logo.png'
+  require_token "$page" 'assets/house-duck-wordmark.png'
+  require_token "$page" 'data-theme-toggle'
+  require_token "$page" 'data-post-tab="latest"'
+  require_token "$page" 'data-post-tab="popular"'
+  require_token "$page" 'data-post-feed'
   require_token "$page" "quirky-ball/store/feature-graphic.png"
   require_token "$page" "quirky-ball/store/01-core.png"
   require_token "$page" "quirky-ball/logo.png"
   require_token "$page" "project-k/media/decision.png"
+  require_token "$page" "European Restroom Map"
   require_token "$page" "https://houseduck.tistory.com/"
 done
 
@@ -117,6 +125,8 @@ if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
 fi
 
 require_css_property ".featured-logo" "height: auto;"
+require_token "assets/brand-site.css" 'url("/assets/house-duck-logo.png")'
+require_token "assets/brand-site.css" 'url("/assets/house-duck-wordmark.png")'
 require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
 require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
 
