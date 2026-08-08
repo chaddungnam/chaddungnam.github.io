@@ -197,7 +197,31 @@
       </section>
 
       <section id="purchasesView" class="route-view" data-route="purchases" hidden>
-        <div class="empty-state"><span class="status-label">결제 미연동</span><strong>구매 내역</strong><p>구매자·상품·스토어·상태·환불·권한 정보를 연결할 자리입니다. 가짜 데이터는 표시하지 않습니다.</p></div>
+        <div id="purchaseSyncStatus" class="purchase-sync-note" role="status">
+          <span class="status-label">자동 동기화 미연동</span>
+          <div><strong>스토어 환불 알림은 아직 자동으로 들어오지 않습니다.</strong><p>서버에 실제로 기록된 구매·환불만 표시합니다. 가짜 결제 데이터와 자동 제재는 사용하지 않습니다.</p></div>
+        </div>
+        <form id="purchaseFilterForm" class="panel admin-toolbar" role="search">
+          <label>기간<select id="purchaseRange"><option value="30">최근 30일</option><option value="90">최근 90일</option><option value="0">전체</option></select></label>
+          <label>스토어<select id="purchasePlatform"><option value="">전체</option><option value="android">Google Play</option><option value="ios">App Store</option></select></label>
+          <label>상태<select id="purchaseStatus"><option value="">전체</option><option value="pending">확인 중</option><option value="purchased">결제 완료</option><option value="refunded">환불</option><option value="chargeback">결제 취소</option><option value="cancelled">취소</option><option value="revoked">권한 회수</option></select></label>
+          <label>상품<select id="purchaseProduct"><option value="">전체</option><option value="remove_ads">광고 제거</option><option value="elite_package">엘리트 패키지</option><option value="yakwon_bundle">약원 패키지</option></select></label>
+          <label>검색<input id="purchaseQuery" type="search" maxlength="100" placeholder="사용자 ID · 주문번호 뒤 6자리"></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <section id="purchaseSummary" class="purchase-summary" aria-label="구매·환불 요약">
+          <article><span>전체</span><strong data-purchase-summary="total">—</strong></article>
+          <article><span>결제 완료</span><strong data-purchase-summary="purchased">—</strong></article>
+          <article><span>환불</span><strong data-purchase-summary="refunded">—</strong></article>
+          <article><span>결제 취소</span><strong data-purchase-summary="chargebacks">—</strong></article>
+          <article><span>환불 비율</span><strong data-purchase-summary="refundRate">—</strong></article>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">REAL STORE RECORDS</p><h2>구매·환불 기록</h2><small>반복 환불 표시는 검토 신호일 뿐 제재 근거가 아닙니다.</small></div><span id="purchaseTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>처리 시각</th><th>사용자</th><th>상품</th><th>스토어</th><th>금액</th><th>상태</th><th>권한</th><th>사유</th><th>검토</th></tr></thead><tbody id="purchasesTable"></tbody></table></div>
+          <div class="pagination"><button id="purchasesPrevious" type="button">이전</button><span id="purchasesPage">1 / 1</span><button id="purchasesNext" type="button">다음</button></div>
+        </section>
+        <p id="purchasesMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="csView" class="route-view" data-route="cs" hidden>
@@ -259,6 +283,8 @@
   <script src="analytics.js?v=20260804-3"></script>
   <script src="players.js"></script>
   <script src="operations.js"></script>
+  <script src="purchases-model.js"></script>
+  <script src="purchases.js"></script>
   <script src="audit.js"></script>
   <script src="gmail-model.js"></script>
   <script src="gmail-api.js"></script>

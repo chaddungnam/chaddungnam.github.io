@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -27,11 +27,18 @@ rg -q 'data-route="analytics"' "$console_dir/index.html"
 rg -q 'data-route="players"' "$console_dir/index.html"
 rg -q 'data-route="operations"' "$console_dir/index.html"
 rg -q 'data-route="purchases"' "$console_dir/index.html"
+rg -q 'id="purchaseFilterForm"' "$console_dir/index.html"
+rg -q 'id="purchaseSummary"' "$console_dir/index.html"
+rg -q 'id="purchasesTable"' "$console_dir/index.html"
+rg -q 'id="purchaseSyncStatus"' "$console_dir/index.html"
+rg -F -q 'window.ConsolePurchases.mount()' "$console_dir/app.js"
+rg -F -q 'action: "purchases.list"' "$console_dir/purchases.js"
+rg -F -q 'rangeDays: Number(byId("purchaseRange").value)' "$console_dir/purchases.js"
 rg -q 'data-route="cs"' "$console_dir/index.html"
 rg -q 'data-route="audit"' "$console_dir/index.html"
 rg -q 'Project K' "$console_dir/index.html"
 rg -q '준비 중' "$console_dir/index.html"
-rg -q '결제 미연동' "$console_dir/index.html"
+rg -q '자동 동기화 미연동' "$console_dir/index.html"
 rg -q 'sessionStorage' "$console_dir/auth.js"
 rg -q 'X-Admin-Session' "$console_dir/auth.js"
 rg -q 'admin-auth' "$console_dir/app.js"

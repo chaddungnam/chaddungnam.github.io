@@ -87,6 +87,7 @@ function renderRoute() {
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
   if (route.page === "operations") window.ConsoleOperations.mount();
+  if (route.page === "purchases") window.ConsolePurchases.mount();
   if (route.page === "cs") window.ConsoleCs.mount();
   if (route.page === "audit") window.ConsoleAudit.mount();
 }

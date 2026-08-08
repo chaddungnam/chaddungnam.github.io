@@ -163,6 +163,18 @@ textarea:focus-visible {
 
 .read-only-banner { margin-bottom: 14px; padding: 12px 14px; color: #6e5621; background: var(--gold-soft); border: 1px solid rgba(231,185,67,.38); border-radius: 12px; font-size: 12px; font-weight: 800; }
 .read-only-banner[data-enabled="true"] { color: #17665e; background: var(--teal-soft); border-color: rgba(66,189,176,.32); }
+.purchase-sync-note { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding: 15px 16px; color: #6e5621; background: var(--gold-soft); border: 1px solid rgba(231,185,67,.38); border-radius: 14px; }
+.purchase-sync-note strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 12px; }
+.purchase-sync-note p { margin: 0; font-size: 10px; line-height: 1.55; }
+.purchase-sync-note[data-connected="true"] { color: #17665e; background: var(--teal-soft); border-color: rgba(66,189,176,.32); }
+.purchase-summary { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.purchase-summary article { display: grid; gap: 6px; padding: 15px 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.purchase-summary span { color: var(--ink-soft); font-size: 9px; font-weight: 800; }
+.purchase-summary strong { color: var(--ink); font-size: 22px; }
+.purchase-status, .purchase-review-flag { font-size: 9px; font-weight: 900; white-space: nowrap; }
+.purchase-status-purchased { color: #17665e; }
+.purchase-status-refunded, .purchase-status-chargeback, .purchase-status-revoked, .purchase-review-flag { color: #a93f34; }
+.empty-table-cell { padding: 30px 14px !important; color: var(--ink-soft); text-align: center; }
 .admin-toolbar { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(140px, .35fr)) auto; align-items: end; gap: 10px; margin-bottom: 14px; padding: 16px; }
 .admin-toolbar label,
 .admin-form label,
@@ -315,6 +327,8 @@ textarea:focus-visible {
   .table-toolbar > div { flex-wrap: wrap; }
   .table-toolbar input { flex-basis: 100%; }
   .admin-toolbar { grid-template-columns: 1fr; }
+  .purchase-sync-note { flex-direction: column; }
+  .purchase-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-card-grid, .operations-summary { grid-template-columns: 1fr; }
   .cs-weekly-brief { align-items: stretch; flex-direction: column; }
   .cs-weekly-brief dl { grid-template-columns: repeat(2, 1fr); min-width: 0; }
