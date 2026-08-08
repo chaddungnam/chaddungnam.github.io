@@ -92,9 +92,12 @@ for (const [file, locale] of marketingPages) {
 
 for (const [file] of marketingPages) {
   const html = read(file);
-  assert.match(html, /href="https:\/\/houseduck\.tistory\.com\/"/, `${file} Blog link`);
+  const blogUrl = /^index(?:_[a-z]{2})?\.html$/.test(file)
+    ? "https://blog.houseduck.in/"
+    : "https://houseduck.tistory.com/";
+  assert.ok(html.includes(`href="${blogUrl}"`), `${file} Blog link`);
   assert.doesNotMatch(html, /href="[^"]*story\//, `${file} must not link to the founder story`);
-  assert.doesNotMatch(html, /href="https:\/\/houseduck\.tistory\.com\/"[^>]*target="_blank"/, `${file} Blog link stays in the same tab`);
+  assert.doesNotMatch(html, new RegExp(`href="${blogUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*target="_blank"`), `${file} Blog link stays in the same tab`);
 }
 
 for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
@@ -112,6 +115,9 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
   assert.match(html, /class="post-preview-image/, `${file} post preview image`);
   assert.match(html, /class="studio-status-panel/, `${file} practical current-status panel`);
   assert.match(html, /class="project-compact-grid/, `${file} compact project grid`);
+  assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} custom-domain Blog link`);
+  assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation calls the journal Blog`);
+  assert.match(publicText, /02 · Blog/, `${file} Blog section label`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(publicText, /Kronberg|Germany|Deutschland|독일|ドイツ/i, `${file} should not foreground the founder's location`);
 }

@@ -35,24 +35,6 @@
     });
   });
 
-  document.querySelectorAll("[data-post-tab]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const selected = button.dataset.postTab;
-      document.querySelectorAll("[data-post-tab]").forEach((tab) => {
-        tab.setAttribute("aria-selected", String(tab === button));
-      });
-      document.querySelectorAll("[data-post-panel]").forEach((panel) => {
-        panel.hidden = panel.dataset.postPanel !== selected;
-      });
-    });
-  });
-
-  document.querySelectorAll(".post-discovery-grid").forEach((grid) => {
-    if (!grid.querySelector(".discovery-card")) {
-      grid.innerHTML = '<p class="post-discovery-empty">글이 게시되면 이곳에 미리보기 이미지와 함께 표시됩니다.</p>';
-    }
-  });
-
   const mobileMenu = document.querySelector(".mobile-menu");
   if (mobileMenu) {
     mobileMenu.addEventListener("click", (event) => {

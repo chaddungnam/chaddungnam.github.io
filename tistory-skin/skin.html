@@ -16,16 +16,16 @@
   <s_t3>
     <header class="site-header">
       <div class="header-inner shell">
-        <a class="brand" href="https://houseduck.tistory.com/" aria-label="House Duck Journal 홈">
+        <a class="brand" href="[##_blog_link_##]" aria-label="House Duck Blog 홈">
           <img class="brand-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt="">
-          <span class="brand-copy"><img class="brand-wordmark-image" src="./images/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"><small>JOURNAL</small></span>
+          <span class="brand-copy"><img class="brand-wordmark-image" src="./images/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></span>
         </a>
 
         <nav class="desktop-nav" aria-label="주요 메뉴">
           <a href="https://houseduck.in/">Studio</a>
           <a href="https://houseduck.in/#projects">Projects</a>
-          <a href="https://houseduck.tistory.com/" aria-current="page">Journal</a>
-          <a href="[##_taglog_link_##]">Tags</a>
+          <a href="[##_blog_link_##]" aria-current="page">Blog</a>
+          <details class="category-menu"><summary>Categories</summary><div class="category-menu-panel">[##_category_##]<a class="category-tags-link" href="[##_taglog_link_##]">All tags</a></div></details>
         </nav>
 
         <div class="header-actions">
@@ -45,10 +45,10 @@
             <div class="mobile-menu-panel">
               <a href="https://houseduck.in/">House Duck Studio</a>
               <a href="https://houseduck.in/#projects">Projects</a>
-              <a href="https://houseduck.tistory.com/">Journal</a>
+              <a href="[##_blog_link_##]">Blog</a>
               <a href="[##_taglog_link_##]">Tags</a>
               <a href="[##_rss_url_##]">RSS</a>
-              <div class="category-tree">[##_category_##]</div>
+              <div class="category-tree"><strong>Categories</strong>[##_category_##]</div>
             </div>
           </details>
         </div>
@@ -65,37 +65,6 @@
         <div class="journal-status-strip" aria-label="저널 안내"><span><strong>FOCUS</strong> Games · Apps · Tools</span><span><strong>LANGUAGE</strong> Korean original</span><span><strong>FORMAT</strong> Build logs · Decisions</span></div>
       </section>
 
-      <s_sidebar>
-        <s_sidebar_element>
-          <section class="post-discovery shell" aria-labelledby="post-discovery-title">
-            <div class="discovery-heading">
-              <div><p class="eyebrow">READ THE JOURNAL</p><h2 id="post-discovery-title">포스트 한눈에 보기.</h2></div>
-              <div class="post-tabs" role="tablist" aria-label="포스트 정렬"><button class="post-tab" type="button" role="tab" aria-selected="true" data-post-tab="latest">최신순</button><button class="post-tab" type="button" role="tab" aria-selected="false" data-post-tab="popular">인기순</button></div>
-            </div>
-            <div class="post-discovery-panel" role="tabpanel" data-post-panel="latest">
-              <div class="post-discovery-grid">
-                <s_rctps_rep>
-                  <article class="discovery-card">
-                    <a class="discovery-media" href="[##_rctps_rep_link_##]" tabindex="-1" aria-hidden="true"><span class="discovery-placeholder"><img src="./images/house-duck-logo.png" width="512" height="512" alt=""></span><s_rctps_rep_thumbnail><img src="[##_rctps_rep_thumbnail_##]" alt="" loading="lazy"></s_rctps_rep_thumbnail></a>
-                    <div><time>[##_rctps_rep_simple_date_##]</time><h3><a href="[##_rctps_rep_link_##]">[##_rctps_rep_title_##]</a></h3></div>
-                  </article>
-                </s_rctps_rep>
-              </div>
-            </div>
-            <div class="post-discovery-panel" role="tabpanel" data-post-panel="popular" hidden>
-              <div class="post-discovery-grid">
-                <s_rctps_popular_rep>
-                  <article class="discovery-card">
-                    <a class="discovery-media" href="[##_rctps_rep_link_##]" tabindex="-1" aria-hidden="true"><span class="discovery-placeholder"><img src="./images/house-duck-logo.png" width="512" height="512" alt=""></span><s_rctps_rep_thumbnail><img src="[##_rctps_rep_thumbnail_##]" alt="" loading="lazy"></s_rctps_rep_thumbnail></a>
-                    <div><time>[##_rctps_rep_simple_date_##]</time><h3><a href="[##_rctps_rep_link_##]">[##_rctps_rep_title_##]</a></h3></div>
-                  </article>
-                </s_rctps_popular_rep>
-              </div>
-            </div>
-          </section>
-        </s_sidebar_element>
-      </s_sidebar>
-
       <s_list>
         <section class="collection-head shell" aria-labelledby="collection-title">
           <div>
@@ -110,28 +79,9 @@
             <img class="placeholder-duck" src="./images/house-duck-logo.png" width="512" height="512" alt="">
             <h2>아직 이 목록에 글이 없습니다.</h2>
             <p>새로운 제작 기록을 준비하고 있습니다.</p>
-            <a class="button" href="https://houseduck.tistory.com/">전체 글 보기</a>
+            <a class="button" href="[##_blog_link_##]">전체 글 보기</a>
           </section>
         </s_list_empty>
-        <div class="post-grid shell list-grid [##_list_style_##]">
-          <s_list_rep>
-            <article class="post-card">
-              <a class="card-media" href="[##_list_rep_link_##]" tabindex="-1" aria-hidden="true">
-                <span class="card-placeholder"><img class="placeholder-duck" src="./images/house-duck-logo.png" width="512" height="512" alt=""></span>
-                <s_list_rep_thumbnail><img class="card-image" src="[##_list_rep_thumbnail_url_##]" alt="" loading="lazy"></s_list_rep_thumbnail>
-              </a>
-              <div class="card-body">
-                <div class="card-meta">
-                  <a href="[##_list_rep_category_link_##]">[##_list_rep_category_##]</a>
-                  <time>[##_list_rep_regdate_##]</time>
-                </div>
-                <h2><a href="[##_list_rep_link_##]">[##_list_rep_title_##]</a></h2>
-                <p>[##_list_rep_summary_##]</p>
-                <a class="read-link" href="[##_list_rep_link_##]">Read story <span aria-hidden="true">↗</span></a>
-              </div>
-            </article>
-          </s_list_rep>
-        </div>
       </s_list>
 
       <div id="post-stream" class="post-grid shell">
@@ -152,6 +102,7 @@
           </s_index_article_rep>
           <s_permalink_article_rep>
             <article class="article-shell">
+              <a class="article-index-link" href="[##_blog_link_##]">← 포스트 한눈에 보기</a>
               <header class="article-header">
                 <p class="eyebrow">HOUSE DUCK NOTICE</p>
                 <h1>[##_notice_rep_title_##]</h1>
@@ -199,6 +150,7 @@
 
           <s_permalink_article_rep>
             <article class="article-shell">
+              <a class="article-index-link" href="[##_blog_link_##]">← 포스트 한눈에 보기</a>
               <header class="article-header">
                 <a class="article-category" href="[##_article_rep_category_link_##]">[##_article_rep_category_##]</a>
                 <h1>[##_article_rep_title_##]</h1>

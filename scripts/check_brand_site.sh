@@ -106,6 +106,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" "quirky-ball/store/01-core.png"
   require_token "$page" "project-k/media/decision.png"
   require_token "$page" "European Restroom Map"
+  require_token "$page" "https://blog.houseduck.in/"
   require_token "$page" "https://houseduck.tistory.com/"
 done
 

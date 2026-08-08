@@ -59,21 +59,19 @@ for (const token of requiredTokens) {
 }
 
 assert.match(html, /href="https:\/\/houseduck\.in\/"/, "missing House Duck home link");
-assert.match(html, /href="https:\/\/houseduck\.tistory\.com\/"/, "public navigation needs an HTTPS-safe Blog link");
+assert.match(html, /href="\[##_blog_link_##\]"/, "public navigation must follow Tistory's configured custom Blog domain");
 assert.match(html, /name="\[#\#_search_name_##\]"/, "search input must use Tistory's field name");
 assert.match(html, /onkey(?:down|press)="[^"]*\[#\#_search_onclick_submit_##\]/, "Enter must submit search");
 assert.match(html, /onclick="\[#\#_search_onclick_submit_##\]"/, "search button must submit search");
 assert.match(html, /tistory_admin\/lib\/jquery\/jquery-1\.12\.4\.min\.js/, "Tistory controls need the bundled jQuery runtime");
 assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels");
 assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
-assert.match(html, /data-post-tab="latest"/, "skin needs a latest-post tab");
-assert.match(html, /data-post-tab="popular"/, "skin needs a popular-post tab");
-assert.match(html, /<s_rctps_popular_rep>/, "popular tab must use Tistory's real popular-post data");
-assert.match(html, /<s_rctps_rep_thumbnail>/, "post tabs need one preview image per post when available");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /images\/house-duck-wordmark\.png/, "skin must use the House Duck PNG wordmark");
-assert.match(html, /class="journal-status-strip/, "skin needs a compact current-status strip");
-assert.doesNotMatch(html, /class="hero-stamp/, "skin must not use the oversized decorative hero stamp");
+assert.match(html, /<details class="category-menu"[\s\S]*?\[##_category_##\][\s\S]*?<\/details>/, "desktop navigation needs Tistory categories");
+assert.equal((html.match(/class="article-index-link"/g) || []).length, 2, "post and notice pages need one compact index link each");
+assert.doesNotMatch(html, /class="post-discovery|<s_list_rep>|<small>JOURNAL<\/small>/, "list pages must not duplicate discovery, article cards, or offset the header wordmark");
+assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-index-link\s*\{[^}]*display:\s*none/, "mobile post pages must start directly with the article");
 assert.match(css, /@media\s*\(max-width:/, "skin needs a mobile breakpoint");
 assert.match(css, /prefers-reduced-motion/, "skin must respect reduced motion");
 assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color schemes");
@@ -81,7 +79,6 @@ assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark them
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.match(script, /house_duck_theme/, "theme choice must persist between visits");
-assert.match(script, /data-post-tab/, "post tabs must be interactive");
 
 const assetReferences = [...html.matchAll(/(?:href|src)="\.\/([^"?#]+)"/g)].map((match) => match[1]);
 for (const asset of assetReferences) {
