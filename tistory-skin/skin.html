@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f0e0">
+  <meta name="description" content="[##_desc_##]">
+  <title>[##_page_title_##]</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="//t1.daumcdn.net/tistory_admin/lib/jquery/jquery-1.12.4.min.js"></script>
+  <script defer src="./images/script.js"></script>
+</head>
+<body id="[##_body_id_##]">
+  <a class="skip-link" href="#main-content">본문으로 바로가기</a>
+
+  <s_t3>
+    <header class="site-header">
+      <div class="header-inner shell">
+        <a class="brand" href="[##_blog_link_##]" aria-label="House Duck Journal 홈">
+          <span class="duck-mark" aria-hidden="true"></span>
+          <span class="brand-copy"><strong>HOUSE DUCK</strong><small>JOURNAL</small></span>
+        </a>
+
+        <nav class="desktop-nav" aria-label="주요 메뉴">
+          <a href="https://houseduck.in/">Studio</a>
+          <a href="https://houseduck.in/#games">Projects</a>
+          <a href="[##_blog_link_##]" aria-current="page">Journal</a>
+          <a href="[##_taglog_link_##]">Tags</a>
+        </nav>
+
+        <div class="header-actions">
+          <s_search>
+            <div class="search-box" role="search">
+              <label class="screen-reader-only" for="journal-search">블로그 검색</label>
+              <input id="journal-search" type="search" name="[##_search_name_##]" value="[##_search_text_##]" placeholder="Search journal" autocomplete="off" onkeydown="if (event.key === 'Enter') { [##_search_onclick_submit_##] }">
+              <button type="button" aria-label="검색" onclick="[##_search_onclick_submit_##]">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+              </button>
+            </div>
+          </s_search>
+
+          <details class="mobile-menu">
+            <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
+            <div class="mobile-menu-panel">
+              <a href="https://houseduck.in/">House Duck Studio</a>
+              <a href="https://houseduck.in/#games">Projects</a>
+              <a href="[##_blog_link_##]">Journal</a>
+              <a href="[##_taglog_link_##]">Tags</a>
+              <a href="[##_rss_url_##]">RSS</a>
+              <div class="category-tree">[##_category_##]</div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="journal-hero shell" aria-labelledby="journal-title">
+        <div class="hero-copy">
+          <p class="eyebrow">BUILDING IN PUBLIC · FROM KRONBERG</p>
+          <h1 id="journal-title">작은 것에<br><span>큰 개성을 담는 과정.</span></h1>
+          <p>게임과 새로운 프로젝트를 만들며 부딪히고, 고치고, 끝내 완성해 가는 House Duck의 공식 제작 저널입니다.</p>
+        </div>
+        <div class="hero-stamp" aria-hidden="true">
+          <span class="duck-mark duck-mark-large"></span>
+          <strong>NOTES<br>FROM THE<br>WORKSHOP</strong>
+        </div>
+      </section>
+
+      <s_list>
+        <section class="collection-head shell" aria-labelledby="collection-title">
+          <div>
+            <p class="eyebrow">JOURNAL INDEX</p>
+            <h2 id="collection-title">[##_list_conform_##]</h2>
+            <p>[##_list_description_##]</p>
+          </div>
+          <strong>[##_list_count_##]<small> posts</small></strong>
+        </section>
+        <s_list_empty>
+          <section class="empty-state shell">
+            <span class="duck-mark" aria-hidden="true"></span>
+            <h2>아직 이 목록에 글이 없습니다.</h2>
+            <p>새로운 제작 기록을 준비하고 있습니다.</p>
+            <a class="button" href="[##_blog_link_##]">전체 글 보기</a>
+          </section>
+        </s_list_empty>
+        <div class="post-grid shell list-grid [##_list_style_##]">
+          <s_list_rep>
+            <article class="post-card">
+              <a class="card-media" href="[##_list_rep_link_##]" tabindex="-1" aria-hidden="true">
+                <span class="card-placeholder"><span class="duck-mark" aria-hidden="true"></span></span>
+                <s_list_rep_thumbnail><img class="card-image" src="[##_list_rep_thumbnail_url_##]" alt="" loading="lazy"></s_list_rep_thumbnail>
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <a href="[##_list_rep_category_link_##]">[##_list_rep_category_##]</a>
+                  <time>[##_list_rep_regdate_##]</time>
+                </div>
+                <h2><a href="[##_list_rep_link_##]">[##_list_rep_title_##]</a></h2>
+                <p>[##_list_rep_summary_##]</p>
+                <a class="read-link" href="[##_list_rep_link_##]">Read story <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+          </s_list_rep>
+        </div>
+      </s_list>
+
+      <div id="post-stream" class="post-grid shell">
+        <s_notice_rep>
+          <s_index_article_rep>
+            <article class="post-card notice-card">
+              <a class="card-media" href="[##_notice_rep_link_##]" tabindex="-1" aria-hidden="true">
+                <span class="card-placeholder"><strong>NOTICE</strong></span>
+                <s_notice_rep_thumbnail><img class="card-image" src="[##_notice_rep_thumbnail_url_##]" alt="" loading="lazy"></s_notice_rep_thumbnail>
+              </a>
+              <div class="card-body">
+                <div class="card-meta"><span>NOTICE</span><time>[##_notice_rep_simple_date_##]</time></div>
+                <h2><a href="[##_notice_rep_link_##]">[##_notice_rep_title_##]</a></h2>
+                <p>[##_notice_rep_summary_##]</p>
+                <a class="read-link" href="[##_notice_rep_link_##]">Read notice <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+          </s_index_article_rep>
+          <s_permalink_article_rep>
+            <article class="article-shell">
+              <header class="article-header">
+                <p class="eyebrow">HOUSE DUCK NOTICE</p>
+                <h1>[##_notice_rep_title_##]</h1>
+                <time>[##_notice_rep_date_##]</time>
+              </header>
+              <div class="article-body">[##_notice_rep_desc_##]</div>
+            </article>
+          </s_permalink_article_rep>
+        </s_notice_rep>
+
+        <s_article_rep>
+          <s_article_protected>
+            <article class="protected-card">
+              <p class="eyebrow">PROTECTED NOTE</p>
+              <h1>[##_article_rep_title_##]</h1>
+              <p>보호된 글입니다. 비밀번호를 입력해 주세요.</p>
+              <div class="protected-form">
+                <label for="[##_article_password_##]">비밀번호</label>
+                <input id="[##_article_password_##]" name="[##_article_password_##]" type="password" maxlength="16" onkeydown="if (event.key === 'Enter') { [##_article_dissolve_##] }">
+                <button type="button" onclick="[##_article_dissolve_##]">확인</button>
+              </div>
+            </article>
+          </s_article_protected>
+
+          <s_index_article_rep>
+            <article class="post-card">
+              <a class="card-media" href="[##_article_rep_link_##]" tabindex="-1" aria-hidden="true">
+                <span class="card-placeholder"><span class="duck-mark" aria-hidden="true"></span></span>
+                <s_article_rep_thumbnail><img class="card-image" src="[##_article_rep_thumbnail_url_##]" alt="" loading="lazy"></s_article_rep_thumbnail>
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <a href="[##_article_rep_category_link_##]">[##_article_rep_category_##]</a>
+                  <time>[##_article_rep_simple_date_##]</time>
+                </div>
+                <h2><a href="[##_article_rep_link_##]">[##_article_rep_title_##]</a></h2>
+                <p>[##_article_rep_summary_##]</p>
+                <div class="card-footer">
+                  <a class="read-link" href="[##_article_rep_link_##]">Read story <span aria-hidden="true">↗</span></a>
+                  <s_rp_count><span class="comment-count">[##_article_rep_rp_cnt_##] comments</span></s_rp_count>
+                </div>
+              </div>
+            </article>
+          </s_index_article_rep>
+
+          <s_permalink_article_rep>
+            <article class="article-shell">
+              <header class="article-header">
+                <a class="article-category" href="[##_article_rep_category_link_##]">[##_article_rep_category_##]</a>
+                <h1>[##_article_rep_title_##]</h1>
+                <div class="article-meta"><time>[##_article_rep_date_##]</time><span>House Duck Journal</span></div>
+                <s_article_rep_thumbnail>
+                  <figure class="article-cover"><img src="[##_article_rep_thumbnail_raw_url_##]" alt="" fetchpriority="high"></figure>
+                </s_article_rep_thumbnail>
+                <s_ad_div>
+                  <nav class="owner-tools" aria-label="글 관리">
+                    <a href="[##_s_ad_m_link_##]">수정</a>
+                    <button type="button" onclick="[##_s_ad_s2_onclick_##]">[##_s_ad_s2_label_##]</button>
+                    <button type="button" onclick="[##_s_ad_d_onclick_##]">삭제</button>
+                  </nav>
+                </s_ad_div>
+              </header>
+
+              <aside class="translation-note">
+                <strong>Translation note</strong>
+                <span>이 글의 원문은 한국어입니다. 자동 번역에서는 표현이 자연스럽지 않을 수 있습니다.</span>
+              </aside>
+
+              <div class="article-body">[##_article_rep_desc_##]</div>
+
+              <s_tag_label>
+                <footer class="article-tags"><strong>Tagged</strong>[##_tag_label_rep_##]</footer>
+              </s_tag_label>
+
+              <s_article_related>
+                <section class="related-posts" aria-labelledby="related-title">
+                  <div class="section-heading"><p class="eyebrow">KEEP READING</p><h2 id="related-title">같은 작업실에서</h2></div>
+                  <div class="related-grid">
+                    <s_article_related_rep>
+                      <a class="related-card [##_article_related_rep_type_##]" href="[##_article_related_rep_link_##]">
+                        <s_article_related_rep_thumbnail><img src="[##_article_related_rep_thumbnail_link_##]" alt="" loading="lazy"></s_article_related_rep_thumbnail>
+                        <strong>[##_article_related_rep_title_##]</strong><time>[##_article_related_rep_date_##]</time>
+                      </a>
+                    </s_article_related_rep>
+                  </div>
+                </section>
+              </s_article_related>
+
+              <nav class="post-neighbors" aria-label="이전 글과 다음 글">
+                <s_article_prev><a href="[##_article_prev_link_##]"><small>Previous</small><strong>[##_article_prev_title_##]</strong></a></s_article_prev>
+                <s_article_next><a href="[##_article_next_link_##]"><small>Next</small><strong>[##_article_next_title_##]</strong></a></s_article_next>
+              </nav>
+
+              <s_rp>
+                <section class="comments" aria-label="댓글">[##_comment_group_##]</section>
+              </s_rp>
+            </article>
+          </s_permalink_article_rep>
+        </s_article_rep>
+      </div>
+
+      <s_page_rep>
+        <article class="article-shell page-shell">
+          <header class="article-header"><p class="eyebrow">HOUSE DUCK</p><h1>[##_article_rep_title_##]</h1></header>
+          <div class="article-body">[##_article_rep_desc_##]</div>
+        </article>
+      </s_page_rep>
+
+      <s_tag>
+        <section class="tag-page shell" aria-labelledby="tag-page-title">
+          <p class="eyebrow">JOURNAL TOPICS</p>
+          <h1 id="tag-page-title">태그로 제작 과정을 찾아보세요.</h1>
+          <div class="tag-cloud"><s_tag_rep><a class="[##_tag_class_##]" href="[##_tag_link_##]">#[##_tag_name_##]</a></s_tag_rep></div>
+        </section>
+      </s_tag>
+
+      <s_guest>
+        <section class="guestbook article-shell" aria-labelledby="guestbook-title">
+          <header class="article-header"><p class="eyebrow">FROM READERS</p><h1 id="guestbook-title">방명록</h1></header>
+          [##_guestbook_group_##]
+        </section>
+      </s_guest>
+
+      <s_paging>
+        <nav class="pagination shell" aria-label="페이지 이동">
+          <a [##_prev_page_##] class="page-arrow [##_no_more_prev_##]" aria-label="이전 페이지">←</a>
+          <span><s_paging_rep><a [##_paging_rep_link_##] class="page-number">[##_paging_rep_link_num_##]</a></s_paging_rep></span>
+          <a [##_next_page_##] class="page-arrow [##_no_more_next_##]" aria-label="다음 페이지">→</a>
+        </nav>
+      </s_paging>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner shell">
+        <div><span class="duck-mark" aria-hidden="true"></span><strong>HOUSE DUCK<br>JOURNAL</strong></div>
+        <p>Small things. Big personality.<br>Made independently in Kronberg, Germany.</p>
+        <nav aria-label="푸터 메뉴"><a href="https://houseduck.in/">Studio</a><a href="[##_taglog_link_##]">Tags</a><a href="[##_rss_url_##]">RSS</a></nav>
+      </div>
+      <p class="copyright">© House Duck. Powered by Tistory.</p>
+    </footer>
+  </s_t3>
+</body>
+</html>

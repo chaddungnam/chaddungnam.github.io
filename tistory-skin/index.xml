@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+  <information>
+    <name>House Duck Journal</name>
+    <version>1.0.0</version>
+    <description><![CDATA[House Duck의 공식 제작 저널을 위한 반응형 에디토리얼 스킨입니다.]]></description>
+    <license><![CDATA[House Duck private brand skin. Redistribution is not permitted.]]></license>
+  </information>
+  <author>
+    <name>House Duck</name>
+    <homepage>https://houseduck.in</homepage>
+  </author>
+  <default>
+    <recentEntries>6</recentEntries>
+    <recentComments>5</recentComments>
+    <recentTrackbacks>0</recentTrackbacks>
+    <itemsOnGuestbook>10</itemsOnGuestbook>
+    <tagsInCloud>40</tagsInCloud>
+    <sortInCloud>2</sortInCloud>
+    <expandComment>0</expandComment>
+    <expandTrackback>0</expandTrackback>
+    <lengthOfRecentNotice>36</lengthOfRecentNotice>
+    <lengthOfRecentEntry>36</lengthOfRecentEntry>
+    <lengthOfRecentComment>48</lengthOfRecentComment>
+    <lengthOfRecentTrackback>0</lengthOfRecentTrackback>
+    <lengthOfLink>48</lengthOfLink>
+    <entriesOnPage>8</entriesOnPage>
+    <entriesOnList>10</entriesOnList>
+    <showListOnCategory>1</showListOnCategory>
+    <showListOnArchive>1</showListOnArchive>
+    <showListLock>0</showListLock>
+    <tree>
+      <color>756956</color>
+      <bgColor>fffdf7</bgColor>
+      <activeColor>172541</activeColor>
+      <activeBgColor>f4c84a</activeBgColor>
+      <labelLength>32</labelLength>
+      <showValue>1</showValue>
+    </tree>
+    <contentWidth>760</contentWidth>
+  </default>
+</skin>

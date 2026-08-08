@@ -33,7 +33,7 @@ require_css_property() {
   ' "$repo_dir/assets/brand-site.css" || fail "$selector must include $property to preserve image proportions"
 }
 
-pages=(
+content_pages=(
   "index.html"
   "index_en.html"
   "index_de.html"
@@ -46,13 +46,16 @@ pages=(
   "project-k/index_en.html"
   "project-k/index_de.html"
   "project-k/index_ja.html"
+)
+
+redirect_pages=(
   "story/index.html"
   "story/index_en.html"
   "story/index_de.html"
   "story/index_ja.html"
 )
 
-for page in "${pages[@]}"; do
+for page in "${content_pages[@]}"; do
   test -s "$repo_dir/$page" || fail "$page does not exist"
   require_token "$page" "assets/brand-site.css"
   require_token "$page" "assets/brand-site.js"
@@ -65,11 +68,20 @@ for page in "${pages[@]}"; do
   require_token "$page" "terms/"
   require_token "$page" "support"
   require_token "$page" "data-current-year"
+  require_token "$page" "https://blog.houseduck.in/"
 
   reject_token "$page" "cdn."
   reject_token "$page" "fonts.googleapis.com"
   reject_token "$page" "iconify"
   reject_token "$page" "tailwind"
+done
+
+for page in "${redirect_pages[@]}"; do
+  test -s "$repo_dir/$page" || fail "$page does not exist"
+  require_token "$page" 'data-page="blog-redirect"'
+  require_token "$page" 'http-equiv="refresh" content="0; url=https://blog.houseduck.in/"'
+  require_token "$page" 'rel="canonical" href="https://blog.houseduck.in/"'
+  require_token "$page" 'href="https://blog.houseduck.in/"'
 done
 
 for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do
@@ -87,7 +99,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" "quirky-ball/store/01-core.png"
   require_token "$page" "quirky-ball/logo.png"
   require_token "$page" "project-k/media/decision.png"
-  require_token "$page" "story/"
+  require_token "$page" "https://blog.houseduck.in/"
 done
 
 for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_de.html quirky-ball/index_ja.html; do
@@ -100,12 +112,9 @@ for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_d
   require_token "$page" "store/08-ranking.png"
 done
 
-for page in story/index.html story/index_en.html story/index_de.html story/index_ja.html; do
-  require_token "$page" 'data-page="story"'
-  require_token "$page" 'class="story-timeline"'
-  require_token "$page" 'class="story-quote reveal"'
-  require_token "$page" "project-k/media/decision.png"
-done
+if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
+  fail "sitemap.xml still publishes founder-story URLs"
+fi
 
 require_css_property ".featured-logo" "height: auto;"
 require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
