@@ -34,6 +34,17 @@ for locale in "${locales[@]}"; do
     failed=1
   fi
 
+  case "$locale" in
+    ko) product_term='엘리트 패키지'; rights_term='정당한 환불 요청' ;;
+    en) product_term='Elite Package'; rights_term='legitimate refund request' ;;
+    de) product_term='Elite-Paket'; rights_term='berechtigter Erstattungsantrag' ;;
+    ja) product_term='エリートパッケージ'; rights_term='正当な返金申請' ;;
+  esac
+  if ! rg -q "$product_term" "$terms" || ! rg -q "$rights_term" "$terms"; then
+    printf 'Terms page misses current product or lawful-refund protection: %s\n' "$terms" >&2
+    failed=1
+  fi
+
   if ! rg -qi 'Apple|애플|アップル' "$privacy" || ! rg -qi 'StoreKit|Google Play Billing' "$privacy"; then
     printf 'Privacy page misses Apple sign-in or store purchase processing: %s\n' "$privacy" >&2
     failed=1
