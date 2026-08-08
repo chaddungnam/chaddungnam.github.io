@@ -100,7 +100,7 @@ a:hover {
 .legal-main,
 .legal-site-footer-inner,
 .language-main {
-  width: min(100% - (var(--legal-gutter) * 2), var(--legal-page));
+  width: min(calc(100% - (var(--legal-gutter) * 2)), var(--legal-page));
   margin-inline: auto;
 }
 
