@@ -693,7 +693,7 @@ a:hover {
   }
 
   .legal-paper {
-    margin-inline: calc(var(--legal-gutter) * -0.35);
+    margin-inline: 0;
     padding: 28px 22px 34px;
     border-radius: 24px;
   }
