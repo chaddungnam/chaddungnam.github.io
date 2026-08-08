@@ -52,6 +52,7 @@ for (const token of requiredTokens) {
 }
 
 assert.match(html, /href="https:\/\/houseduck\.in\/"/, "missing House Duck home link");
+assert.match(html, /href="https:\/\/houseduck\.tistory\.com\/"/, "public navigation needs an HTTPS-safe Blog link");
 assert.match(html, /name="\[#\#_search_name_##\]"/, "search input must use Tistory's field name");
 assert.match(html, /onkey(?:down|press)="[^"]*\[#\#_search_onclick_submit_##\]/, "Enter must submit search");
 assert.match(html, /onclick="\[#\#_search_onclick_submit_##\]"/, "search button must submit search");
