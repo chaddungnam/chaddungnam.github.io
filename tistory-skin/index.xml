@@ -2,8 +2,8 @@
 <skin>
   <information>
     <name>House Duck Journal</name>
-    <version>1.1.0</version>
-    <description><![CDATA[House Duck의 공식 제작 저널을 위한 반응형 라이트·다크 에디토리얼 스킨입니다.]]></description>
+    <version>1.2.0</version>
+    <description><![CDATA[House Duck의 공식 제작 저널을 위한 다크 우선 반응형 개발 저널 스킨입니다.]]></description>
     <license><![CDATA[House Duck private brand skin. Redistribution is not permitted.]]></license>
   </information>
   <author>
@@ -30,10 +30,10 @@
     <showListOnArchive>1</showListOnArchive>
     <showListLock>0</showListLock>
     <tree>
-      <color>756956</color>
-      <bgColor>fffdf7</bgColor>
-      <activeColor>172541</activeColor>
-      <activeBgColor>f4c84a</activeBgColor>
+      <color>aab6c8</color>
+      <bgColor>131f33</bgColor>
+      <activeColor>10264d</activeColor>
+      <activeBgColor>ffc341</activeBgColor>
       <labelLength>32</labelLength>
       <showValue>1</showValue>
     </tree>

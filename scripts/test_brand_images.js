@@ -5,7 +5,9 @@ const fs = require("fs");
 const path = require("path");
 
 const repoDir = path.resolve(__dirname, "..");
-const css = fs.readFileSync(path.join(repoDir, "assets/brand-site.css"), "utf8");
+const css = ["assets/brand-site.css", "assets/studio-home.css"]
+  .map((file) => fs.readFileSync(path.join(repoDir, file), "utf8"))
+  .join("\n");
 const pages = [
   { file: "index.html", expected: 4, prefix: "quirky-ball/store/" },
   { file: "index_en.html", expected: 4, prefix: "quirky-ball/store/" },
@@ -65,7 +67,7 @@ for (const page of pages) {
   }
 }
 
-for (const selector of [".hero-showcase img", ".featured-game-visual img", ".game-logo", ".game-visual img", ".shot img"]) {
+for (const selector of [".hero-showcase img", ".featured-game-visual img", ".game-logo", ".game-visual img", ".shot img", ".project-phone", ".project-visual-k img"]) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const rule = css.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`));
   if (!rule || !/height:\s*auto\s*;/.test(rule[1]) || !/object-fit:\s*contain\s*;/.test(rule[1])) {

@@ -13,7 +13,7 @@
 
   var initialTheme = savedTheme === "light" || savedTheme === "dark"
     ? savedTheme
-    : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    : "dark";
   root.dataset.theme = initialTheme;
 
   function normalizeLanguage(value) {
@@ -67,7 +67,7 @@
     function setTheme(theme) {
       root.dataset.theme = theme;
       var themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = theme === "dark" ? "#111a2b" : "#f7f3e8";
+      if (themeColor) themeColor.content = theme === "dark" ? "#0d1525" : "#f3f1ea";
       document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
         button.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
         button.setAttribute("aria-pressed", String(theme === "dark"));

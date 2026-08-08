@@ -104,7 +104,6 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-post-feed'
   require_token "$page" "quirky-ball/store/feature-graphic.png"
   require_token "$page" "quirky-ball/store/01-core.png"
-  require_token "$page" "quirky-ball/logo.png"
   require_token "$page" "project-k/media/decision.png"
   require_token "$page" "European Restroom Map"
   require_token "$page" "https://houseduck.tistory.com/"
@@ -133,5 +132,6 @@ require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
 node "$repo_dir/scripts/test_brand_images.js"
 node "$repo_dir/scripts/test_brand_language.js"
 node "$repo_dir/scripts/test_brand_catalog.js"
+node "$repo_dir/scripts/test_default_theme.js"
 
 printf 'brand site contract: PASS\n'

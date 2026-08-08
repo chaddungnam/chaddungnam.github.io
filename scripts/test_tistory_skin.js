@@ -72,6 +72,8 @@ assert.match(html, /<s_rctps_popular_rep>/, "popular tab must use Tistory's real
 assert.match(html, /<s_rctps_rep_thumbnail>/, "post tabs need one preview image per post when available");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /images\/house-duck-wordmark\.png/, "skin must use the House Duck PNG wordmark");
+assert.match(html, /class="journal-status-strip/, "skin needs a compact current-status strip");
+assert.doesNotMatch(html, /class="hero-stamp/, "skin must not use the oversized decorative hero stamp");
 assert.match(css, /@media\s*\(max-width:/, "skin needs a mobile breakpoint");
 assert.match(css, /prefers-reduced-motion/, "skin must respect reduced motion");
 assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color schemes");

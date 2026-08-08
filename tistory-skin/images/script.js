@@ -10,12 +10,12 @@
   }
   const initialTheme = savedTheme === "light" || savedTheme === "dark"
     ? savedTheme
-    : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    : "dark";
 
   function setTheme(theme) {
     root.dataset.theme = theme;
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.content = theme === "dark" ? "#111a2b" : "#f7f3e8";
+    if (themeColor) themeColor.content = theme === "dark" ? "#0d1525" : "#f3f1ea";
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
       button.setAttribute("aria-pressed", String(theme === "dark"));
       button.setAttribute("aria-label", theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환");

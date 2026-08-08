@@ -110,6 +110,9 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
   assert.match(html, /data-post-tab="popular"/, `${file} popular-post tab`);
   assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
   assert.match(html, /class="post-preview-image/, `${file} post preview image`);
+  assert.match(html, /class="studio-status-panel/, `${file} practical current-status panel`);
+  assert.match(html, /class="project-compact-grid/, `${file} compact project grid`);
+  assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(publicText, /Kronberg|Germany|Deutschland|독일|ドイツ/i, `${file} should not foreground the founder's location`);
 }
 
