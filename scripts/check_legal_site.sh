@@ -45,9 +45,7 @@ for page in "${localized_pages[@]}" "${selector_pages[@]}" "support/index.html";
   test -s "$repo_dir/$page" || fail "$page does not exist"
   require_token "$page" "/assets/legal-site.css"
   require_token "$page" "/assets/legal-site.js"
-  if [[ "$page" != impressum/* ]]; then
-    require_token "$page" 'class="skip-link"'
-  fi
+  require_token "$page" 'class="skip-link"'
   require_token "$page" "<main"
   require_token "$page" "data-current-year"
   reject_token "$page" "<style"
@@ -74,9 +72,6 @@ for locale in ko en de ja; do
 done
 
 for page in "${localized_pages[@]}" "support/index.html"; do
-  if [[ "$page" == impressum/* ]]; then
-    continue
-  fi
   require_token "$page" "문서 본문 시작"
   require_token "$page" "문서 본문 끝"
   require_token "$page" "data-legal-content"
@@ -86,6 +81,12 @@ test -s "$repo_dir/impressum/index.html" || fail "impressum/index.html does not 
 
 for page in "${localized_pages[@]}"; do
   require_token "$page" "data-toc-list"
+done
+
+for locale in ko en de ja; do
+  for language in ko en de ja; do
+    require_token "impressum/$locale.html" "$language.html"
+  done
 done
 
 printf 'legal site contract: PASS\n'
