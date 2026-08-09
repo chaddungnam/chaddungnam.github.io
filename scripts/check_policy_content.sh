@@ -5,6 +5,10 @@ repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 failed=0
 locales=(ko en de ja)
 
+if ! command -v rg >/dev/null 2>&1; then
+  rg() { grep -ER "$@"; }
+fi
+
 for locale in "${locales[@]}"; do
   privacy="$repo_dir/privacy/$locale.html"
   terms="$repo_dir/quirky-ball/terms/$locale.html"
