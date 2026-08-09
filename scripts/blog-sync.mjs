@@ -1,9 +1,16 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SITE_ORIGIN = "https://houseduck.in";
 const BLOG_ORIGIN = "https://blog.houseduck.in";
+const LOCALES = {
+  kr: { lang: "ko", label: "한국어", back: "모든 포스트", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
+  en: { lang: "en", label: "English", back: "All posts", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", original: "Read the Korean original", auto: true },
+  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", original: "Koreanisches Original lesen", auto: true },
+  ja: { lang: "ja", label: "日本語", back: "すべての記事", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", original: "韓国語の原文を読む", auto: true },
+};
 
 function decodeEntities(value) {
   const named = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
@@ -77,35 +84,52 @@ export function parseRss(xml) {
       image: imageMatch ? decodeEntities(imageMatch[1]) : "",
       category: textOnly(tagValue(block, "category")),
       publishedAt: Number.isNaN(publishedAt.valueOf()) ? new Date(0) : publishedAt,
+      sourceHash: createHash("sha256").update(`${title}\n${bodyHtml}`).digest("hex"),
     };
   }).filter((post) => post.title && post.originalUrl);
 }
 
-function renderKoreanPage(post) {
-  const canonical = `${SITE_ORIGIN}/blog/kr/${encodeURIComponent(post.slug)}/`;
-  const published = new Intl.DateTimeFormat("ko-KR", { dateStyle: "long" }).format(post.publishedAt);
+function alternateLinks(post, availableLocales) {
+  const links = availableLocales.map((locale) => {
+    const href = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`;
+    return `  <link rel="alternate" hreflang="${LOCALES[locale].lang}" href="${href}">`;
+  });
+  links.push(`  <link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/${encodeURIComponent(post.slug)}/">`);
+  return links.join("\n");
+}
+
+function localizedDate(date, locale) {
+  const tags = { kr: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
+  return new Intl.DateTimeFormat(tags[locale], { dateStyle: "long" }).format(date);
+}
+
+function renderPostPage(post, locale, content, availableLocales) {
+  const copy = LOCALES[locale];
+  const canonical = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`;
+  const translatedLabel = copy.auto ? "AUTOMATIC TRANSLATION" : "KOREAN ORIGINAL";
   return `<!doctype html>
-<html lang="ko" data-theme="dark">
+<html lang="${copy.lang}" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="${escapeHtml(post.summary)}">
+  <meta name="description" content="${escapeHtml(content.summary)}">
   <meta name="theme-color" content="#0d1525">
   <link rel="canonical" href="${canonical}">
+${alternateLinks(post, availableLocales)}
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/blog-mirror.css">
   <script defer src="/assets/blog-mirror.js"></script>
-  <title>${escapeHtml(post.title)} — House Duck Blog</title>
+  <title>${escapeHtml(content.title)} — House Duck Blog</title>
 </head>
 <body>
-  <a class="skip-link" href="#post-content">본문으로 건너뛰기</a>
-  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/kr/">Blog</a><button type="button" data-theme-toggle aria-label="라이트 모드로 전환">☾</button></nav></header>
+  <a class="skip-link" href="#post-content">Skip to content</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/${locale}/">Blog</a><button type="button" data-theme-toggle aria-label="Switch color theme">☾</button></nav></header>
   <main class="mirror-main" id="post-content">
-    <a class="mirror-back" href="/blog/kr/">← 모든 포스트</a>
+    <a class="mirror-back" href="/blog/${locale}/">← ${copy.back}</a>
     <article>
-      <header class="mirror-post-header"><p>HOUSE DUCK · KOREAN ORIGINAL</p><h1>${escapeHtml(post.title)}</h1><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(published)}</time></header>
-      <aside class="mirror-note"><strong>한국어 원문</strong><span>이 페이지는 House Duck이 작성한 원문입니다. <a href="${escapeHtml(post.originalUrl)}">티스토리에서 보기</a></span></aside>
-      <div class="mirror-body">${post.bodyHtml}</div>
+      <header class="mirror-post-header"><p>HOUSE DUCK · ${translatedLabel}</p><h1>${escapeHtml(content.title)}</h1><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time></header>
+      <aside class="mirror-note"><strong>${copy.noteTitle}</strong><span>${copy.note} <a href="${escapeHtml(post.originalUrl)}">${copy.original}</a></span></aside>
+      <div class="mirror-body">${content.body_html}</div>
     </article>
   </main>
   <footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer>
@@ -113,10 +137,30 @@ function renderKoreanPage(post) {
 </html>\n`;
 }
 
+function renderIndexPage(posts, locale) {
+  const copy = LOCALES[locale];
+  const cards = posts.map(({ post, content }) => `<article><a href="/blog/${locale}/${encodeURIComponent(post.slug)}/">${post.image ? `<img src="${escapeHtml(post.image)}" alt="" loading="lazy">` : ""}<div><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time><h2>${escapeHtml(content.title)}</h2><p>${escapeHtml(content.summary)}</p></div></a></article>`).join("\n");
+  return `<!doctype html>
+<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1525"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/"><link rel="stylesheet" href="/assets/site-fonts.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="Switch color theme">☾</button></nav></header><main class="mirror-index"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>Build notes.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
+}
+
+export function buildTranslationSource(posts) {
+  return {
+    posts: posts.map((post) => ({
+      slug: post.slug,
+      source_hash: post.sourceHash,
+      title: post.title,
+      summary: post.summary,
+      body_html: post.bodyHtml,
+    })),
+  };
+}
+
 export async function syncFromXml(xml, options) {
   const outRoot = path.resolve(options.outRoot);
   const now = options.now || new Date().toISOString();
   const posts = parseRss(xml).sort((a, b) => b.publishedAt - a.publishedAt);
+  const translations = options.translations?.posts || {};
   const feed = {
     updated_at: now,
     posts: posts.slice(0, 12).map((post) => ({
@@ -132,11 +176,35 @@ export async function syncFromXml(xml, options) {
 
   await mkdir(path.join(outRoot, "assets"), { recursive: true });
   await writeFile(path.join(outRoot, "assets", "blog-feed.json"), `${JSON.stringify(feed, null, 2)}\n`);
+  const sitemapUrls = [];
+  const localeIndexes = Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, []]));
   for (const post of posts) {
-    const directory = path.join(outRoot, "blog", "kr", post.slug);
-    await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, "index.html"), renderKoreanPage(post));
+    const cachedTranslation = translations[post.slug];
+    const contentByLocale = {
+      kr: { title: post.title, summary: post.summary, body_html: post.bodyHtml },
+      ...(cachedTranslation?.source_hash === post.sourceHash ? cachedTranslation : {}),
+    };
+    const availableLocales = Object.keys(LOCALES).filter((locale) => {
+      const content = contentByLocale[locale];
+      return content && content.title && content.body_html;
+    });
+    for (const locale of availableLocales) {
+      const directory = path.join(outRoot, "blog", locale, post.slug);
+      await mkdir(directory, { recursive: true });
+      await writeFile(path.join(directory, "index.html"), renderPostPage(post, locale, contentByLocale[locale], availableLocales));
+      localeIndexes[locale].push({ post, content: contentByLocale[locale] });
+      sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`, lastmod: post.publishedAt.toISOString().slice(0, 10) });
+    }
   }
+  for (const locale of Object.keys(LOCALES)) {
+    const directory = path.join(outRoot, "blog", locale);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, "index.html"), renderIndexPage(localeIndexes[locale], locale));
+    sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/`, lastmod: now.slice(0, 10) });
+  }
+  // ponytail: RSS is the archive source for now; add a manifest only if Tistory starts dropping older posts.
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(({ loc, lastmod }) => `  <url><loc>${escapeHtml(loc)}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}\n</urlset>\n`;
+  await writeFile(path.join(outRoot, "sitemap-blog.xml"), sitemap);
   return feed;
 }
 
@@ -149,13 +217,27 @@ async function runCli() {
   const outRoot = valueOf("--out-root", process.cwd());
   const rssFile = valueOf("--rss");
   const rssUrl = valueOf("--rss-url", "https://houseduck.tistory.com/rss");
+  const translationsFile = valueOf("--translations");
+  const sourceOut = valueOf("--source-out");
   const xml = rssFile
     ? await readFile(path.resolve(rssFile), "utf8")
     : await fetch(rssUrl).then((response) => {
       if (!response.ok) throw new Error(`RSS fetch failed: ${response.status}`);
       return response.text();
     });
-  await syncFromXml(xml, { outRoot });
+  let translations = {};
+  if (translationsFile) {
+    try {
+      translations = JSON.parse(await readFile(path.resolve(translationsFile), "utf8"));
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+  }
+  const posts = parseRss(xml);
+  if (sourceOut) {
+    await writeFile(path.resolve(sourceOut), `${JSON.stringify(buildTranslationSource(posts), null, 2)}\n`);
+  }
+  await syncFromXml(xml, { outRoot, translations });
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

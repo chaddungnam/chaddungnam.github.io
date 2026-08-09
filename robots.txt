@@ -11,3 +11,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://houseduck.in/sitemap.xml
+Sitemap: https://houseduck.in/sitemap-blog.xml
