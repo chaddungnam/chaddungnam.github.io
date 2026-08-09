@@ -134,4 +134,10 @@ for (const [file, locale] of legacyStoryPages) {
 
 assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "sitemap must not publish founder-story URLs");
 
+const studioCss = read("assets/studio-home.css");
+assert.match(studioCss, /@keyframes studio-grid-shift/, "studio background should have restrained motion");
+assert.match(studioCss, /@keyframes studio-status-pulse/, "live build status should visibly breathe");
+assert.match(studioCss, /\.post-preview-link/, "synchronized post cards should be fully clickable");
+assert.match(studioCss, /prefers-reduced-motion:\s*reduce[\s\S]*animation/, "studio motion must respect reduced-motion settings");
+
 console.log("brand catalog contract: PASS");

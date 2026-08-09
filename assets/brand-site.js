@@ -1,6 +1,48 @@
 (function () {
   "use strict";
 
+  function escapeMarkup(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function safeHttpsUrl(value) {
+    try {
+      var parsed = new URL(String(value || ""));
+      return parsed.protocol === "https:" ? parsed.href : "";
+    } catch (_error) {
+      return "";
+    }
+  }
+
+  function buildPostCards(posts, locale) {
+    var localeKey = locale === "ko" ? "kr" : locale;
+    var dateLocales = { ko: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
+    return (Array.isArray(posts) ? posts : []).slice(0, 3).map(function (post) {
+      var localized = post.localized && (post.localized[localeKey] || post.localized.kr) || post;
+      var link = safeHttpsUrl(localized.url || post.url);
+      if (!link) return "";
+      var image = safeHttpsUrl(post.image);
+      var published = new Date(post.published_at);
+      var date = Number.isNaN(published.valueOf())
+        ? "HOUSE DUCK BLOG"
+        : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
+      return '<article class="post-preview-card"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
+        (image ? '<img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy">' : "") +
+        '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3>' + escapeMarkup(localized.title) +
+        '</h3><p>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
+    }).join("");
+  }
+
+  if (typeof module === "object" && module.exports) {
+    module.exports = { buildPostCards: buildPostCards };
+  }
+  if (typeof document === "undefined") return;
+
   var root = document.documentElement;
   var supportedLanguages = ["ko", "en", "de", "ja"];
   var savedTheme = "";
@@ -102,6 +144,27 @@
     document.querySelectorAll("[data-current-year]").forEach(function (node) {
       node.textContent = String(new Date().getFullYear());
     });
+
+    var postFeed = document.querySelector("[data-post-feed]");
+    var latestGrid = postFeed && postFeed.querySelector('[data-post-panel="latest"] .post-preview-grid');
+    if (latestGrid) {
+      postFeed.setAttribute("aria-busy", "true");
+      fetch("/assets/blog-feed.json", { cache: "no-cache" })
+        .then(function (response) {
+          if (!response.ok) throw new Error("Blog feed unavailable");
+          return response.json();
+        })
+        .then(function (feed) {
+          var cards = buildPostCards(feed.posts, locale);
+          if (cards) latestGrid.innerHTML = cards;
+        })
+        .catch(function () {
+          // The authored fallback remains visible while the next sync runs.
+        })
+        .finally(function () {
+          postFeed.removeAttribute("aria-busy");
+        });
+    }
 
     var nav = document.querySelector("[data-site-nav]");
     var menuButton = document.querySelector("[data-menu-button]");

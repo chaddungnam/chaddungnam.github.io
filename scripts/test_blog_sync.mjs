@@ -60,6 +60,28 @@ try {
       published_at: "2026-08-09T07:32:44.000Z",
       url: "https://houseduck.in/blog/kr/first-post/",
       original_url: "https://blog.houseduck.in/entry/first-post",
+      localized: {
+        kr: {
+          title: "첫 번째 제작 기록",
+          summary: "아이디어를 실제 제품으로 만든 첫 기록입니다.",
+          url: "https://houseduck.in/blog/kr/first-post/",
+        },
+        en: {
+          title: "The first build log",
+          summary: "The first record of turning an idea into a real product.",
+          url: "https://houseduck.in/blog/en/first-post/",
+        },
+        de: {
+          title: "Der erste Entwicklungsbericht",
+          summary: "Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.",
+          url: "https://houseduck.in/blog/de/first-post/",
+        },
+        ja: {
+          title: "最初の開発記録",
+          summary: "アイデアを実際の製品にした最初の記録です。",
+          url: "https://houseduck.in/blog/ja/first-post/",
+        },
+      },
     }],
   });
 

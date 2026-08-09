@@ -156,6 +156,16 @@ export function buildTranslationSource(posts) {
   };
 }
 
+function contentByLocale(post, translations) {
+  const cached = translations[post.slug];
+  return {
+    kr: { title: post.title, summary: post.summary, body_html: post.bodyHtml },
+    ...(cached?.source_hash === post.sourceHash
+      ? Object.fromEntries(Object.keys(LOCALES).flatMap((locale) => cached[locale] ? [[locale, cached[locale]]] : []))
+      : {}),
+  };
+}
+
 export async function syncFromXml(xml, options) {
   const outRoot = path.resolve(options.outRoot);
   const now = options.now || new Date().toISOString();
@@ -163,15 +173,23 @@ export async function syncFromXml(xml, options) {
   const translations = options.translations?.posts || {};
   const feed = {
     updated_at: now,
-    posts: posts.slice(0, 12).map((post) => ({
-      slug: post.slug,
-      title: post.title,
-      summary: post.summary,
-      image: post.image,
-      published_at: post.publishedAt.toISOString(),
-      url: `${SITE_ORIGIN}/blog/kr/${encodeURIComponent(post.slug)}/`,
-      original_url: post.originalUrl,
-    })),
+    posts: posts.slice(0, 12).map((post) => {
+      const localized = Object.fromEntries(Object.entries(contentByLocale(post, translations)).map(([locale, content]) => [locale, {
+        title: content.title,
+        summary: content.summary,
+        url: `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`,
+      }]));
+      return {
+        slug: post.slug,
+        title: post.title,
+        summary: post.summary,
+        image: post.image,
+        published_at: post.publishedAt.toISOString(),
+        url: `${SITE_ORIGIN}/blog/kr/${encodeURIComponent(post.slug)}/`,
+        original_url: post.originalUrl,
+        localized,
+      };
+    }),
   };
 
   await mkdir(path.join(outRoot, "assets"), { recursive: true });
@@ -179,20 +197,16 @@ export async function syncFromXml(xml, options) {
   const sitemapUrls = [];
   const localeIndexes = Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, []]));
   for (const post of posts) {
-    const cachedTranslation = translations[post.slug];
-    const contentByLocale = {
-      kr: { title: post.title, summary: post.summary, body_html: post.bodyHtml },
-      ...(cachedTranslation?.source_hash === post.sourceHash ? cachedTranslation : {}),
-    };
+    const localizedContent = contentByLocale(post, translations);
     const availableLocales = Object.keys(LOCALES).filter((locale) => {
-      const content = contentByLocale[locale];
+      const content = localizedContent[locale];
       return content && content.title && content.body_html;
     });
     for (const locale of availableLocales) {
       const directory = path.join(outRoot, "blog", locale, post.slug);
       await mkdir(directory, { recursive: true });
-      await writeFile(path.join(directory, "index.html"), renderPostPage(post, locale, contentByLocale[locale], availableLocales));
-      localeIndexes[locale].push({ post, content: contentByLocale[locale] });
+      await writeFile(path.join(directory, "index.html"), renderPostPage(post, locale, localizedContent[locale], availableLocales));
+      localeIndexes[locale].push({ post, content: localizedContent[locale] });
       sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`, lastmod: post.publishedAt.toISOString().slice(0, 10) });
     }
   }
