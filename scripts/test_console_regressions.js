@@ -25,6 +25,11 @@ assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the ini
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
 assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.indexOf('<script src="app.js" defer></script>'), "the UI state helper must load before the console app");
 
+const playersSource = read("console/players.js");
+assert.match(playersSource, /icon_jakwon_tongue[\s\S]*yakwon 프로필/, "the admin inventory list must expose the retired yakwon profile item");
+assert.match(playersSource, /skin_jakwon[\s\S]*yakwon 구슬/, "the admin inventory list must expose the retired yakwon marble item");
+assert.match(playersSource, /const grantCatalog = catalog\.concat\(ADMIN_GRANT_ITEMS\.filter/, "admin-only grant items must not leak into the active store/mail catalog");
+
 const robots = read("robots.txt");
 for (const agent of ["Google-adstxt", "Mediapartners-Google", "Googlebot", "*"]) {
   const rules = rulesFor(robots, agent);

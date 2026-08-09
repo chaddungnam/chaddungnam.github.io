@@ -1,4 +1,8 @@
 (function attachConsolePlayers(root) {
+  const ADMIN_GRANT_ITEMS = [
+    { item_id: "icon_jakwon_tongue", item_type: "profile_icon", admin_label: "yakwon 프로필" },
+    { item_id: "skin_jakwon", item_type: "marble_skin", admin_label: "yakwon 구슬" },
+  ];
   const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", page: 1, loading: false, bound: false };
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
@@ -121,7 +125,8 @@
     const disabled = !enabled || player.state_version == null;
     const catalog = Array.isArray(data.catalog) ? data.catalog : [];
     const owned = new Set((data.entitlements || []).map((item) => item.item_id));
-    const catalogOptions = catalog.map((item) => `<option value="${escapeHtml(item.item_id)}" ${owned.has(item.item_id) ? "disabled" : ""}>${escapeHtml(item.item_id)} · ${escapeHtml(item.item_type)}${owned.has(item.item_id) ? " · 보유 중" : ""}</option>`).join("");
+    const grantCatalog = catalog.concat(ADMIN_GRANT_ITEMS.filter((item) => !catalog.some((entry) => entry.item_id === item.item_id)));
+    const catalogOptions = grantCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}" ${owned.has(item.item_id) ? "disabled" : ""}>${escapeHtml(item.admin_label || item.item_id)} · ${escapeHtml(item.item_type)}${owned.has(item.item_id) ? " · 보유 중" : ""}</option>`).join("");
     const entitlementRows = (data.entitlements || []).map((item) => `<li><span><strong>${escapeHtml(item.item_id)}</strong><small>${escapeHtml(item.item_type)} · ${escapeHtml(item.acquired_source || "-")}</small></span><button type="button" class="secondary-button inventory-revoke" data-item-id="${escapeHtml(item.item_id)}" ${disabled ? "disabled" : ""}>회수</button></li>`).join("");
     byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))}</h2><code>${escapeHtml(userId)}</code></div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/cs?userId=${encodeURIComponent(userId)}">CS에서 보기</a></div></div>
       <div class="read-only-banner" data-enabled="${enabled}">${enabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
