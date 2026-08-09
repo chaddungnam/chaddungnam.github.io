@@ -39,7 +39,7 @@ BRANDS = {
     "Quirky Ball": ("Quirky Ball", "쿼키볼", "퀄키볼"),
     "House Duck": ("House Duck", "하우스덕"),
     "Project K": ("Project K", "프로젝트 K"),
-    "Godot": ("Godot",),
+    "Godot": ("Godot(고도)", "Godot"),
 }
 NUMBER_TOKEN_PREFIX = "__HD_NUMBER_"
 NUMBER_PATTERN = re.compile(r"(?<!\d)[+-]\d+|\d+")
@@ -264,8 +264,10 @@ def visible_content(post):
 def validate_visible_text(source_visible, translated_visible):
     if HANGUL.search(translated_visible):
         raise ValueError("translation still contains Korean visible text")
-    for canonical, variants in BRANDS.items():
-        required = sum(source_visible.count(variant) for variant in variants)
+    _protected_source, protected_brands = protect_brands(source_visible)
+    required_by_brand = {canonical: count for _token, canonical, count in protected_brands}
+    for canonical in BRANDS:
+        required = required_by_brand.get(canonical, 0)
         if translated_visible.count(canonical) < required:
             raise ValueError(f"translation changed protected brand term: {canonical}")
 

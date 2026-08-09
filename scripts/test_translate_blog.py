@@ -457,6 +457,24 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(result["summary"], "Project K")
         self.assertEqual(result["body_html"], "<p>Quirky Ball</p><p>Godot</p>")
 
+    def test_protects_korean_godot_pronunciation_as_one_brand(self):
+        post = {**self.post, "body_html": "<p>Godot(고도)</p>"}
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            self.assertNotIn("고도", model_input["fragments"][0]["text"])
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": model_input["fragments"],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(result["body_html"], "<p>Godot</p>")
+
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
         source = {"translation_version": 5, "posts": [self.post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
