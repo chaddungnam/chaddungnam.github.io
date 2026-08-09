@@ -2,6 +2,7 @@ import copy
 import importlib.util
 import json
 import pathlib
+import re
 import tempfile
 import unittest
 from urllib.error import URLError
@@ -195,8 +196,69 @@ class BlogTranslationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing=.*3.*added=.*30"):
             self.module.validate_translation(source, {**translated, "title": "A record of 30 years"})
 
+    def test_gemini_cannot_change_source_numbers(self):
+        post = {
+            "slug": "numbered-post",
+            "source_hash": "numbered-hash",
+            "title": "3년 기록",
+            "summary": "2026년 8월 9일 시작",
+            "body_html": "<p>1번과 19번</p>",
+        }
+        token_pattern = re.compile(r"__HD_NUMBER_[A-Z0-9_]+__")
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            serialized = json.dumps(model_input, ensure_ascii=False)
+            for number in ("2026", "19"):
+                self.assertNotIn(number, serialized)
+            protected_tokens = token_pattern.findall(serialized)
+            self.assertEqual(len(protected_tokens), len(set(protected_tokens)))
+            translated_fragments = []
+            for fragment in model_input["fragments"]:
+                tokens = token_pattern.findall(fragment["text"])
+                translated_fragments.append({"id": fragment["id"], "text": "Numbers " + " ".join(tokens)})
+            return 200, gemini_response({
+                "title": "Record " + " ".join(token_pattern.findall(model_input["title"])),
+                "summary": "Started " + " ".join(token_pattern.findall(model_input["summary"])),
+                "fragments": translated_fragments,
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+        self.assertEqual(result["title"], "Record 3")
+        self.assertEqual(result["summary"], "Started 2026 8 9")
+        self.assertEqual(result["body_html"], "<p>Numbers 1 19</p>")
+
+    def test_rejects_a_dropped_number_token(self):
+        post = {**self.post, "title": "3년 기록"}
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            return 200, gemini_response({
+                "title": "Record",
+                "summary": "First summary",
+                "fragments": model_input["fragments"],
+            })
+
+        with self.assertRaisesRegex(ValueError, "changed a protected number token"):
+            self.module.gemini_translator(
+                "test-key", request_json=request_json, sleep=lambda _seconds: None
+            )(post, "en")
+
+    def test_allows_localized_date_order(self):
+        protected, numbers = self.module.protect_numbers("2026년 8월 9일")
+        tokens = re.findall(r"__HD_NUMBER_[A-Z]+__", protected)
+        self.assertEqual(self.module.restore_numbers(f"{tokens[1]}/{tokens[2]}/{tokens[0]}", numbers), "8/9/2026")
+
+    def test_rejects_changed_number_signs(self):
+        source = {"title": "Range", "summary": "Temperature", "body_html": "<p>-5 to +10</p>"}
+        translated = {"title": "Range", "summary": "Temperature", "body_html": "<p>5 to 10</p>"}
+        with self.assertRaisesRegex(ValueError, "changed a number"):
+            self.module.validate_translation(source, translated)
+
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
-        source = {"translation_version": 4, "posts": [self.post]}
+        source = {"translation_version": 5, "posts": [self.post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
         before = copy.deepcopy(existing)
 
@@ -210,11 +272,11 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(existing, before)
 
     def test_source_hash_version_and_review_state_control_regeneration(self):
-        source = {"translation_version": 4, "posts": [self.post]}
+        source = {"translation_version": 5, "posts": [self.post]}
         valid_locale = {**self.english, "reviewed": True, "summary_reviewed": True}
         current = {"posts": {"first-post": {
             "source_hash": "new-hash",
-            "translation_version": 4,
+            "translation_version": 5,
             "en": valid_locale,
             "de": valid_locale,
             "ja": valid_locale,
@@ -234,7 +296,7 @@ class BlogTranslationTest(unittest.TestCase):
         oversized = {**self.post, "body_html": f"<p>{'가' * (self.module.MAX_POST_CHARS + 1)}</p>"}
         with self.assertRaises(ValueError):
             self.module.update_cache(
-                {"translation_version": 4, "posts": [oversized]},
+                {"translation_version": 5, "posts": [oversized]},
                 {"posts": {}},
                 lambda _post, _locale: self.english,
             )
@@ -242,7 +304,7 @@ class BlogTranslationTest(unittest.TestCase):
         posts = [{**self.post, "slug": f"post-{index}", "source_hash": str(index)} for index in range(self.module.MAX_CHANGED_POSTS + 1)]
         with self.assertRaises(ValueError):
             self.module.update_cache(
-                {"translation_version": 4, "posts": posts},
+                {"translation_version": 5, "posts": posts},
                 {"posts": {}},
                 lambda _post, _locale: self.english,
             )
