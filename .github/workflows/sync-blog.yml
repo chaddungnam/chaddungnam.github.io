@@ -31,23 +31,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Cache translation models
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/argos-translate
-          key: argos-ko-en-de-ja-v1
-      - name: Install offline translator
-        run: python -m pip install argostranslate==1.11.0
-      - name: Fetch, translate, and render posts
+      - name: Fetch Tistory RSS once
         run: |
           mkdir -p .tmp
-          node scripts/blog-sync.mjs --rss-url https://houseduck.tistory.com/rss --out-root . --source-out .tmp/blog-source.json --translations assets/blog-translations.json
+          curl --fail --silent --show-error --location https://houseduck.tistory.com/rss --output .tmp/rss.xml
+          node scripts/blog-sync.mjs --rss .tmp/rss.xml --out-root . --source-out .tmp/blog-source.json --translations assets/blog-translations.json
+      - name: Translate changed posts
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
           python scripts/translate_blog.py --input .tmp/blog-source.json --output assets/blog-translations.json
-          node scripts/blog-sync.mjs --rss-url https://houseduck.tistory.com/rss --out-root . --translations assets/blog-translations.json
+      - name: Render validated translations
+        run: node scripts/blog-sync.mjs --rss .tmp/rss.xml --out-root . --translations assets/blog-translations.json
       - name: Verify generated blog
         run: |
           node scripts/test_blog_sync.mjs
           python scripts/test_translate_blog.py
+          python scripts/test_blog_translation_regressions.py
+          node scripts/test_blog_mirror.js
+          npm run test:blog-security
       - name: Publish changed posts
         run: |
           git config user.name "github-actions[bot]"

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,13 +6,13 @@ import sanitizeHtmlLibrary from "sanitize-html";
 
 const SITE_ORIGIN = "https://houseduck.in";
 const BLOG_ORIGIN = "https://blog.houseduck.in";
-const TRANSLATION_PIPELINE_VERSION = 3;
+const TRANSLATION_PIPELINE_VERSION = 4;
 const YOUTUBE_EMBED_HOSTS = new Set(["youtube.com", "www.youtube.com", "www.youtube-nocookie.com"]);
 const LOCALES = {
   kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
-  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", pendingTitle: "Full translation under review", pending: "The reviewed summary appears first. The complete Korean original is shown below and can be translated with your browser.", pendingSummary: "This article is being reviewed. Read the Korean original for the complete story.", sourceTitle: "Complete Korean original", original: "Read the Korean original", auto: true },
-  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", pendingTitle: "Vollständige Übersetzung wird geprüft", pending: "Zuerst erscheint die geprüfte Zusammenfassung. Darunter steht der vollständige koreanische Originaltext, den Ihr Browser übersetzen kann.", pendingSummary: "Dieser Beitrag wird geprüft. Die vollständige Geschichte finden Sie im koreanischen Original.", sourceTitle: "Vollständiger koreanischer Originaltext", original: "Koreanisches Original lesen", auto: true },
-  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", pendingTitle: "本文の翻訳を確認中", pending: "確認済みの要約を先に表示し、その下に韓国語の原文全文を掲載しています。ブラウザの翻訳機能も利用できます。", pendingSummary: "この記事は確認中です。全文は韓国語の原文でお読みいただけます。", sourceTitle: "韓国語の原文全文", original: "韓国語の原文を読む", auto: true },
+  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", original: "Read the Korean original", auto: true },
+  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", original: "Koreanisches Original lesen", auto: true },
+  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", original: "韓国語の原文を読む", auto: true },
 };
 
 function decodeEntities(value) {
@@ -212,13 +212,8 @@ function originalViewUrl(value) {
 function renderPostPage(post, locale, content, availableLocales) {
   const copy = LOCALES[locale];
   const canonical = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`;
-  const reviewed = locale === "kr" || content.reviewed === true;
-  const translatedLabel = !copy.auto ? "KOREAN ORIGINAL" : reviewed ? "AUTOMATIC TRANSLATION" : "TRANSLATION REVIEW";
-  const noteTitle = reviewed ? copy.noteTitle : copy.pendingTitle;
-  const note = reviewed ? copy.note : copy.pending;
-  const bodyHtml = reviewed
-    ? sanitizeHtml(content.body_html)
-    : `<p>${escapeHtml(content.summary)}</p><section class="mirror-source" lang="ko"><h2>${copy.sourceTitle}</h2>${sanitizeHtml(post.bodyHtml)}</section>`;
+  const translatedLabel = copy.auto ? "AUTOMATIC TRANSLATION" : "KOREAN ORIGINAL";
+  const bodyHtml = sanitizeHtml(content.body_html);
   return `<!doctype html>
 <html lang="${copy.lang}" data-theme="dark">
 <head>
@@ -240,7 +235,7 @@ ${alternateLinks(post, availableLocales)}
     <a class="mirror-back" href="/blog/${locale}/">← ${copy.back}</a>
     <article>
       <header class="mirror-post-header"><p>HOUSE DUCK · ${translatedLabel}</p><h1>${escapeHtml(content.title)}</h1><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time></header>
-      <aside class="mirror-note"><strong>${noteTitle}</strong><span>${note} <a href="${escapeHtml(originalViewUrl(post.originalUrl))}">${copy.original}</a></span></aside>
+      <aside class="mirror-note"><strong>${copy.noteTitle}</strong><span>${copy.note} <a href="${escapeHtml(originalViewUrl(post.originalUrl))}">${copy.original}</a></span></aside>
       <div class="mirror-body">${bodyHtml}</div>
     </article>
   </main>
@@ -279,15 +274,8 @@ function contentByLocale(post, translations) {
     ...(cacheMatches
       ? Object.fromEntries(Object.keys(LOCALES).flatMap((locale) => {
         const content = cached[locale];
-        const summaryReviewed = content?.reviewed === true || content?.summary_reviewed === true;
-        return locale !== "kr" && content?.title && content?.summary
-          ? [[locale, {
-            ...content,
-            summary: summaryReviewed ? content.summary : LOCALES[locale].pendingSummary,
-            body_html: content.reviewed === true ? content.body_html : "",
-            reviewed: content.reviewed === true,
-            summary_reviewed: summaryReviewed,
-          }]]
+        return locale !== "kr" && content?.title && content?.summary && content?.body_html && content?.reviewed === true
+          ? [[locale, content]]
           : [];
       }))
       : {}),
@@ -327,6 +315,7 @@ export async function syncFromXml(xml, options) {
   const localeIndexes = Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, []]));
   for (const post of posts) {
     const localizedContent = contentByLocale(post, translations);
+    await Promise.all(Object.keys(LOCALES).map((locale) => rm(path.join(outRoot, "blog", locale, post.slug), { recursive: true, force: true })));
     const availableLocales = Object.keys(LOCALES).filter((locale) => {
       const content = localizedContent[locale];
       return content && content.title && content.summary;
@@ -379,6 +368,7 @@ async function runCli() {
     }
   }
   const posts = parseRss(xml);
+  if (posts.length === 0) throw new Error("RSS parsed zero posts; refusing to overwrite generated blog");
   if (sourceOut) {
     await writeFile(path.resolve(sourceOut), `${JSON.stringify(buildTranslationSource(posts), null, 2)}\n`);
   }

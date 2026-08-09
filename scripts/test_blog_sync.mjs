@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +19,7 @@ const outputRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-sync-"));
 try {
   const posts = blogSync.parseRss(fixture);
   assert.equal(posts.length, 1);
+  assert.equal(blogSync.buildTranslationSource(posts).translation_version, 4);
   assert.deepEqual(
     {
       title: posts[0].title,
@@ -34,6 +36,33 @@ try {
   );
   assert.doesNotMatch(posts[0].bodyHtml, /<script|onerror=/i);
 
+  const failClosedRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-fail-closed-"));
+  try {
+    const invalidRss = path.join(failClosedRoot, "rss.html");
+    const protectedFiles = [
+      path.join(failClosedRoot, "source.json"),
+      path.join(failClosedRoot, "assets", "blog-feed.json"),
+      path.join(failClosedRoot, "blog", "kr", "index.html"),
+      path.join(failClosedRoot, "sitemap-blog.xml"),
+    ];
+    await writeFile(invalidRss, "<!doctype html><title>Temporary upstream error</title>");
+    for (const file of protectedFiles) {
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, "preserve me");
+    }
+    const result = spawnSync(process.execPath, [
+      path.join(here, "blog-sync.mjs"),
+      "--rss", invalidRss,
+      "--out-root", failClosedRoot,
+      "--source-out", protectedFiles[0],
+    ], { encoding: "utf8" });
+    assert.equal(result.status, 1, "CLI must reject an RSS response that parses zero posts");
+    assert.match(result.stderr, /zero posts/i);
+    for (const file of protectedFiles) assert.equal(await readFile(file, "utf8"), "preserve me");
+  } finally {
+    await rm(failClosedRoot, { recursive: true, force: true });
+  }
+
   await blogSync.syncFromXml(fixture, {
     outRoot: outputRoot,
     now: "2026-08-09T08:00:00.000Z",
@@ -41,7 +70,7 @@ try {
       posts: {
         "first-post": {
           source_hash: posts[0].sourceHash,
-          translation_version: 3,
+          translation_version: 4,
           en: { title: "The first build log", summary: "The first record of turning an idea into a real product.", body_html: "<p>The first record of turning an idea into a real product.</p>", reviewed: true },
           de: { title: "Der erste Entwicklungsbericht", summary: "Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.", body_html: "<p>Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.</p>", reviewed: true },
           ja: { title: "最初の開発記録", summary: "アイデアを実際の製品にした最初の記録です。", body_html: "<p>アイデアを実際の製品にした最初の記録です。</p>", reviewed: true },
@@ -104,24 +133,32 @@ try {
 
   const pendingRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-pending-"));
   try {
+    const staleEnglishDirectory = path.join(pendingRoot, "blog", "en", "first-post");
+    const archivedEnglishPage = path.join(pendingRoot, "blog", "en", "archive-post", "index.html");
+    await mkdir(staleEnglishDirectory, { recursive: true });
+    await mkdir(path.dirname(archivedEnglishPage), { recursive: true });
+    await writeFile(path.join(staleEnglishDirectory, "index.html"), "stale partial translation");
+    await writeFile(archivedEnglishPage, "archived translation");
     await blogSync.syncFromXml(fixture, {
       outRoot: pendingRoot,
       translations: { posts: { "first-post": {
         source_hash: posts[0].sourceHash,
-        translation_version: 3,
+        translation_version: 4,
         en: { title: "The first build log", summary: "COOKIE HALLUCINATION SUMMARY", body_html: "<p>COOKIE HALLUCINATION BODY</p>" },
         de: { title: "Der erste Entwicklungsbericht", summary: "Eine geprüfte Zusammenfassung.", summary_reviewed: true, body_html: "<p>HALLUCINATED BODY</p>" },
       } } },
     });
-    const pendingPage = await readFile(path.join(pendingRoot, "blog", "en", "first-post", "index.html"), "utf8");
-    assert.match(pendingPage, /Full translation under review/);
-    assert.match(pendingPage, /This article is being reviewed/);
-    assert.match(pendingPage, /<section class="mirror-source" lang="ko">/);
-    assert.match(pendingPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
-    assert.doesNotMatch(pendingPage, /COOKIE HALLUCINATION/);
-    const reviewedSummaryPage = await readFile(path.join(pendingRoot, "blog", "de", "first-post", "index.html"), "utf8");
-    assert.match(reviewedSummaryPage, /Eine geprüfte Zusammenfassung/);
-    assert.doesNotMatch(reviewedSummaryPage, /HALLUCINATED BODY/);
+    await assert.rejects(
+      readFile(path.join(pendingRoot, "blog", "en", "first-post", "index.html"), "utf8"),
+      (error) => error.code === "ENOENT",
+      "an unreviewed translation must not publish a partial or Korean fallback article",
+    );
+    await assert.rejects(
+      readFile(path.join(pendingRoot, "blog", "de", "first-post", "index.html"), "utf8"),
+      (error) => error.code === "ENOENT",
+      "a reviewed summary alone must not publish without a reviewed full body",
+    );
+    assert.equal(await readFile(archivedEnglishPage, "utf8"), "archived translation", "RSS sync must preserve posts outside the current feed window");
   } finally {
     await rm(pendingRoot, { recursive: true, force: true });
   }
