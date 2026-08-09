@@ -191,8 +191,10 @@ def validate_translation(source, translated):
     if HANGUL.search(translated_visible):
         raise ValueError("translation still contains Korean visible text")
     source_visible = visible_content(source)
-    if Counter(re.findall(r"\d+", translated_visible)) != Counter(re.findall(r"\d+", source_visible)):
-        raise ValueError("translation changed a number")
+    source_numbers = Counter(re.findall(r"\d+", source_visible))
+    translated_numbers = Counter(re.findall(r"\d+", translated_visible))
+    if translated_numbers != source_numbers:
+        raise ValueError(f"translation changed a number: missing={dict(source_numbers - translated_numbers)}, added={dict(translated_numbers - source_numbers)}")
     for canonical, variants in BRANDS.items():
         required = sum(source_visible.count(variant) for variant in variants)
         if translated_visible.count(canonical) < required:
@@ -310,7 +312,10 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
             "summary": value.get("summary"),
             "body_html": fragmenter.render(value.get("fragments")),
         }
-        validate_translation(post, translated)
+        try:
+            validate_translation(post, translated)
+        except ValueError as error:
+            raise ValueError(f"{locale}: {error}") from error
         return {**translated, "reviewed": True, "summary_reviewed": True}
 
     return translate

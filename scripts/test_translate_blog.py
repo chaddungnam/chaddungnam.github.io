@@ -192,7 +192,7 @@ class BlogTranslationTest(unittest.TestCase):
             "body_html": "<p>1.000 won, 3,5 hours, class of 17</p>",
         }
         self.module.validate_translation(source, translated)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "missing=.*3.*added=.*30"):
             self.module.validate_translation(source, {**translated, "title": "A record of 30 years"})
 
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
