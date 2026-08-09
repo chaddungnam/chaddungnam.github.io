@@ -49,7 +49,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/blog-feed.json assets/blog-translations.json blog sitemap-blog.xml
+          git add assets/blog-feed.json assets/blog-locales.js assets/blog-translations.json blog sitemap-blog.xml
           git diff --cached --quiet && exit 0
           git commit -m "chore(blog): sync Tistory posts"
           git push

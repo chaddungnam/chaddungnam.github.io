@@ -66,6 +66,8 @@ assert.match(html, /onclick="\[#\#_search_onclick_submit_##\]"/, "search button 
 assert.match(html, /tistory_admin\/lib\/jquery\/jquery-1\.12\.4\.min\.js/, "Tistory controls need the bundled jQuery runtime");
 assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels");
 assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
+assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
+assert.match(html, /data-translation-link/, "article needs a visible translated-version link");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /images\/house-duck-wordmark\.png/, "skin must use the House Duck PNG wordmark");
 assert.match(html, /<details class="category-menu"[\s\S]*?\[##_category_##\][\s\S]*?<\/details>/, "desktop navigation needs Tistory categories");
@@ -76,9 +78,14 @@ assert.match(css, /@media\s*\(max-width:/, "skin needs a mobile breakpoint");
 assert.match(css, /prefers-reduced-motion/, "skin must respect reduced motion");
 assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color schemes");
 assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark theme");
+assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
+assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
+assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(2\.35rem,\s*5vw,\s*4\.8rem\)/, "desktop article titles must stay practical");
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.match(script, /house_duck_theme/, "theme choice must persist between visits");
+assert.match(script, /HOUSE_DUCK_BLOG_LOCALES/, "skin must route readers through the generated locale manifest");
+assert.match(script, /original/, "Korean original view must bypass automatic redirection");
 
 const assetReferences = [...html.matchAll(/(?:href|src)="\.\/([^"?#]+)"/g)].map((match) => match[1]);
 for (const asset of assetReferences) {

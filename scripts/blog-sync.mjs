@@ -103,6 +103,12 @@ function localizedDate(date, locale) {
   return new Intl.DateTimeFormat(tags[locale], { dateStyle: "long" }).format(date);
 }
 
+function originalViewUrl(value) {
+  const url = new URL(value);
+  url.searchParams.set("original", "1");
+  return url.href;
+}
+
 function renderPostPage(post, locale, content, availableLocales) {
   const copy = LOCALES[locale];
   const canonical = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`;
@@ -128,7 +134,7 @@ ${alternateLinks(post, availableLocales)}
     <a class="mirror-back" href="/blog/${locale}/">← ${copy.back}</a>
     <article>
       <header class="mirror-post-header"><p>HOUSE DUCK · ${translatedLabel}</p><h1>${escapeHtml(content.title)}</h1><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time></header>
-      <aside class="mirror-note"><strong>${copy.noteTitle}</strong><span>${copy.note} <a href="${escapeHtml(post.originalUrl)}">${copy.original}</a></span></aside>
+      <aside class="mirror-note"><strong>${copy.noteTitle}</strong><span>${copy.note} <a href="${escapeHtml(originalViewUrl(post.originalUrl))}">${copy.original}</a></span></aside>
       <div class="mirror-body">${content.body_html}</div>
     </article>
   </main>
@@ -140,8 +146,9 @@ ${alternateLinks(post, availableLocales)}
 function renderIndexPage(posts, locale) {
   const copy = LOCALES[locale];
   const cards = posts.map(({ post, content }) => `<article><a href="/blog/${locale}/${encodeURIComponent(post.slug)}/">${post.image ? `<img src="${escapeHtml(post.image)}" alt="" loading="lazy">` : ""}<div><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time><h2>${escapeHtml(content.title)}</h2><p>${escapeHtml(content.summary)}</p></div></a></article>`).join("\n");
+  const alternates = Object.entries(LOCALES).map(([key, value]) => `<link rel="alternate" hreflang="${value.lang}" href="${SITE_ORIGIN}/blog/${key}/">`).join("");
   return `<!doctype html>
-<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1525"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/"><link rel="stylesheet" href="/assets/site-fonts.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="Switch color theme">☾</button></nav></header><main class="mirror-index"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>Build notes.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
+<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1525"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="stylesheet" href="/assets/site-fonts.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="Switch color theme">☾</button></nav></header><main class="mirror-index"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>Build notes.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
 }
 
 export function buildTranslationSource(posts) {
@@ -195,6 +202,7 @@ export async function syncFromXml(xml, options) {
   await mkdir(path.join(outRoot, "assets"), { recursive: true });
   await writeFile(path.join(outRoot, "assets", "blog-feed.json"), `${JSON.stringify(feed, null, 2)}\n`);
   const sitemapUrls = [];
+  const localeManifest = { posts: {} };
   const localeIndexes = Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, []]));
   for (const post of posts) {
     const localizedContent = contentByLocale(post, translations);
@@ -202,6 +210,7 @@ export async function syncFromXml(xml, options) {
       const content = localizedContent[locale];
       return content && content.title && content.body_html;
     });
+    localeManifest.posts[post.slug] = Object.fromEntries(availableLocales.map((locale) => [locale, `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`]));
     for (const locale of availableLocales) {
       const directory = path.join(outRoot, "blog", locale, post.slug);
       await mkdir(directory, { recursive: true });
@@ -216,6 +225,7 @@ export async function syncFromXml(xml, options) {
     await writeFile(path.join(directory, "index.html"), renderIndexPage(localeIndexes[locale], locale));
     sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/`, lastmod: now.slice(0, 10) });
   }
+  await writeFile(path.join(outRoot, "assets", "blog-locales.js"), `window.HOUSE_DUCK_BLOG_LOCALES=${JSON.stringify(localeManifest)};\n`);
   // ponytail: RSS is the archive source for now; add a manifest only if Tistory starts dropping older posts.
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(({ loc, lastmod }) => `  <url><loc>${escapeHtml(loc)}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}\n</urlset>\n`;
   await writeFile(path.join(outRoot, "sitemap-blog.xml"), sitemap);

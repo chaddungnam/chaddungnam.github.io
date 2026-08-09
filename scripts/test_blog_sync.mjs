@@ -90,6 +90,7 @@ try {
   assert.match(koreanPage, /rel="canonical" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
   assert.match(koreanPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
   assert.match(koreanPage, /한국어 원문/);
+  assert.match(koreanPage, /https:\/\/blog\.houseduck\.in\/entry\/first-post\?original=1/);
   assert.doesNotMatch(koreanPage, /<script>alert|onerror=/i);
 
   const englishPage = await readFile(path.join(outputRoot, "blog", "en", "first-post", "index.html"), "utf8");
@@ -104,6 +105,10 @@ try {
     const indexPage = await readFile(path.join(outputRoot, "blog", locale, "index.html"), "utf8");
     assert.match(indexPage, new RegExp(`/blog/${locale}/first-post/`));
   }
+
+  const localeManifest = await readFile(path.join(outputRoot, "assets", "blog-locales.js"), "utf8");
+  assert.match(localeManifest, /window\.HOUSE_DUCK_BLOG_LOCALES/);
+  assert.match(localeManifest, /"de":"https:\/\/houseduck\.in\/blog\/de\/first-post\/"/);
 
   const blogSitemap = await readFile(path.join(outputRoot, "sitemap-blog.xml"), "utf8");
   for (const locale of ["kr", "en", "de", "ja"]) {

@@ -24,4 +24,5 @@ secrets*
 *.bak
 node_modules/
 .superdesign/
+.tmp/
 .worktrees/

@@ -49,4 +49,25 @@
   if (stream && !stream.querySelector(".post-card")) {
     stream.innerHTML = '<section class="empty-state"><span class="duck-mark" aria-hidden="true"></span><h2>첫 제작 기록을 준비하고 있습니다.</h2><p>House Duck이 만드는 과정이 곧 이곳에 쌓입니다.</p></section>';
   }
+
+  if (typeof location === "undefined" || typeof navigator === "undefined") return;
+  const language = String((navigator.languages && navigator.languages[0]) || navigator.language || "ko").toLowerCase().split("-")[0];
+  const locale = { en: "en", de: "de", ja: "ja" }[language];
+  const slug = decodeURIComponent(location.pathname.split("/").filter(Boolean).pop() || "");
+  const localeEntry = window.HOUSE_DUCK_BLOG_LOCALES && window.HOUSE_DUCK_BLOG_LOCALES.posts && window.HOUSE_DUCK_BLOG_LOCALES.posts[slug];
+  const translatedUrl = locale && localeEntry && localeEntry[locale];
+  const translationLink = document.querySelector("[data-translation-link]");
+  if (translatedUrl && translationLink) {
+    translationLink.href = translatedUrl;
+    translationLink.hidden = false;
+  }
+
+  const originalRequested = new URLSearchParams(location.search).get("original") === "1";
+  const isPublicArticle = document.body.id === "tt-body-page" && /^(?:blog\.houseduck\.in|houseduck\.tistory\.com)$/.test(location.hostname);
+  const isPublicIndex = document.body.id === "tt-body-index" && location.pathname === "/" && /^(?:blog\.houseduck\.in|houseduck\.tistory\.com)$/.test(location.hostname);
+  const isSearchBot = /bot|crawler|spider|google|bing|yandex|baidu/i.test(navigator.userAgent || "");
+  const destination = isPublicArticle ? translatedUrl : (isPublicIndex && locale ? `https://houseduck.in/blog/${locale}/` : "");
+  if (destination && !originalRequested && !isSearchBot) {
+    location.replace(destination);
+  }
 })();
