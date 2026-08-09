@@ -21,7 +21,7 @@ from urllib.request import Request, urlopen
 TARGETS = ("en", "de", "ja")
 TARGET_NAMES = {"en": "English", "de": "German", "ja": "Japanese"}
 TRANSLATION_PIPELINE_VERSION = 5
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
 MAX_POST_CHARS = 100_000
 MAX_CHANGED_POSTS = 12
 MAX_FRAGMENTS_PER_REQUEST = 80
@@ -79,7 +79,7 @@ def restore_numbers(value, numbers):
     if not isinstance(value, str):
         raise ValueError("Gemini returned non-text number content")
     if re.search(r"\d", value):
-        raise ValueError("Gemini added an unprotected number")
+        raise ValueError(f"Gemini added an unprotected number: {NUMBER_PATTERN.findall(value)!r}")
     for token, _number in numbers:
         if value.count(token) != 1:
             raise ValueError(f"Gemini changed a protected number token: {token}")

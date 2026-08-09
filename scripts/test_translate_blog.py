@@ -80,7 +80,7 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(result, {**self.english, "reviewed": True, "summary_reviewed": True})
         self.assertEqual(len(calls), 1)
         url, headers, payload = calls[0]
-        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent")
+        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent")
         self.assertEqual(headers["x-goog-api-key"], "test-key")
         self.assertNotIn("test-key", url)
         self.assertEqual(payload["generationConfig"]["responseMimeType"], "application/json")
@@ -321,7 +321,7 @@ class BlogTranslationTest(unittest.TestCase):
             value["fragments"][0]["text"] = "COVID-19"
             return 200, gemini_response(value)
 
-        with self.assertRaisesRegex(ValueError, "unprotected number"):
+        with self.assertRaisesRegex(ValueError, r"unprotected number.*19"):
             self.module.gemini_translator(
                 "test-key", request_json=request_json, sleep=lambda _seconds: None
             )(self.post, "en")
