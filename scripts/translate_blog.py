@@ -527,8 +527,15 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
             for contract_attempt in range(MAX_CONTRACT_ATTEMPTS):
                 correction = "" if contract_error is None else (
                     " Your previous response failed validation. Regenerate the whole batch. "
-                    "Preserve every protected token exactly, return no literal digits or Korean text, and leave no field empty."
+                    "Return no literal digits or Korean text, and leave no field empty."
                 )
+                if contract_error and ("number token" in str(contract_error) or "brand" in str(contract_error)):
+                    correction += (
+                        " Your previous response violated token ownership. In every output fragment, use only the protected tokens "
+                        "from the input fragment with the same ID, each with the same count. Never move, swap, copy, or replace "
+                        "tokens between fields or fragment IDs, including identical fragments. Tokens in context are read-only "
+                        "and must never appear in output."
+                    )
                 if contract_error and str(contract_error).startswith("translation still contains Korean visible text in "):
                     correction += f" Remove Hangul from these fields: {str(contract_error).partition(' in ')[2]}."
                 if contract_error and "calendar year token translated as a duration" in str(contract_error):
@@ -542,7 +549,12 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                         "Use context_before and context_after only as context; do not return them. "
                         + name_instruction
                         + terminology_instruction
-                        + "Keep every fragment ID and its order exactly. Preserve every __HD_NUMBER_...__, __HD_YEAR_...__, and __HD_BRAND_...__ token in title, summary, and fragments exactly once. "
+                        + "Keep every fragment ID and its order exactly. Protected tokens are owned by their input field. "
+                        "For title, summary, and each fragment ID separately, output exactly the same __HD_NUMBER_...__, "
+                        "__HD_YEAR_...__, and __HD_BRAND_...__ tokens with the same counts as that same input field or fragment ID. "
+                        "Never move, swap, copy, or replace tokens between fields or fragment IDs. A fragment with no protected token "
+                        "must return none. Even identical fragments have independent tokens. Tokens in context_before and context_after "
+                        "are read-only context and must never appear in output. "
                         "Every __HD_YEAR_...__ token is a calendar year, never a duration in years. "
                         "Never write digits outside those tokens; use digit-free wording such as COVID instead of COVID-19. "
                         "Return only the requested JSON. Do not add, omit, summarize, or explain anything."

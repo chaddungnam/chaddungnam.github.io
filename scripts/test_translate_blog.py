@@ -347,6 +347,39 @@ class BlogTranslationTest(unittest.TestCase):
                 "test-key", request_json=request_json, sleep=lambda _seconds: None
             )(post, "en")
 
+    def test_retries_tokens_moved_between_identical_fragments(self):
+        post = {**self.post, "body_html": "<p>2.5d</p><p>2.5d</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            prompt = payload["systemInstruction"]["parts"][0]["text"]
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            fragments = model_input["fragments"]
+            if attempts == 2:
+                self.assertIn("same ID", prompt)
+                self.assertIn("identical fragments", prompt)
+                self.assertIn("context", prompt)
+            response_fragments = [
+                {"id": fragment["id"], "text": fragment["text"]}
+                for fragment in fragments
+            ]
+            if attempts == 1:
+                response_fragments[1]["text"] = response_fragments[0]["text"]
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": response_fragments,
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(result["body_html"], "<p>2.5d</p><p>2.5d</p>")
+
     def test_allows_localized_date_order(self):
         protected, numbers = self.module.protect_numbers("2026년 8월 9일")
         tokens = re.findall(r"__HD_(?:YEAR|NUMBER)_[A-Z]+__", protected)
