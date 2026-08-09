@@ -20,4 +20,8 @@ assert.deepEqual(entries, [
   { id: "contact", text: "11. Contact" },
 ]);
 
+assert.equal(legalSite.resolveTheme("light"), "light");
+assert.equal(legalSite.resolveTheme("dark"), "dark");
+assert.equal(legalSite.resolveTheme("system"), "dark");
+
 console.log("legal navigation model: PASS");
