@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>House Duck</title>
+    <item>
+      <title>첫 번째 제작 기록</title>
+      <link>https://houseduck.tistory.com/entry/first-post</link>
+      <description>&lt;p&gt;아이디어를 실제 제품으로 만든 첫 기록입니다.&lt;/p&gt;&lt;img src=&quot;https://blog.kakaocdn.net/example.png&quot; onerror=&quot;alert(1)&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;</description>
+      <category>Build Log</category>
+      <pubDate>Sun, 9 Aug 2026 16:32:44 +0900</pubDate>
+    </item>
+  </channel>
+</rss>
