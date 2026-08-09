@@ -393,12 +393,15 @@ class BlogTranslationTest(unittest.TestCase):
                     nonlocal attempts
                     attempts += 1
                     model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+                    translated_text = invalid_text if attempts == 1 else valid_text
+                    if attempts > 1 and source_text == "House Duck":
+                        translated_text = model_input["fragments"][0]["text"]
                     return 200, gemini_response({
                         "title": "First log",
                         "summary": "First summary",
                         "fragments": [{
                             "id": model_input["fragments"][0]["id"],
-                            "text": invalid_text if attempts == 1 else valid_text,
+                            "text": translated_text,
                         }],
                     })
 
@@ -409,6 +412,50 @@ class BlogTranslationTest(unittest.TestCase):
                 self.assertEqual(attempts, 2)
                 self.assertEqual(delays, [7])
                 self.assertEqual(result["body_html"], f"<p>{valid_text}</p>")
+
+    def test_hides_brand_terms_from_gemini_and_restores_canonical_names(self):
+        post = {
+            **self.post,
+            "title": "하우스덕",
+            "summary": "프로젝트 K",
+            "body_html": "<p>쿼키볼</p><p>Godot</p>",
+        }
+        attempts = 0
+        delays = []
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            serialized = json.dumps(model_input, ensure_ascii=False)
+            for raw_brand in ("하우스덕", "프로젝트 K", "쿼키볼", "Godot"):
+                self.assertNotIn(raw_brand, serialized)
+                self.assertNotIn(raw_brand, payload["systemInstruction"]["parts"][0]["text"])
+            self.assertNotIn("Quirky Ball", payload["systemInstruction"]["parts"][0]["text"])
+            for leaked_identity in ("QUIRKY_BALL", "HOUSE_DUCK", "PROJECT_K", "GODOT"):
+                self.assertNotIn(leaked_identity, serialized)
+            self.assertRegex(model_input["title"], r"^__HD_BRAND_[A-Z_]+__$")
+            self.assertRegex(model_input["summary"], r"^__HD_BRAND_[A-Z_]+__$")
+            self.assertRegex(model_input["fragments"][0]["text"], r"^__HD_BRAND_[A-Z_]+__$")
+            self.assertRegex(model_input["fragments"][1]["text"], r"^__HD_BRAND_[A-Z_]+__$")
+            fragments = copy.deepcopy(model_input["fragments"])
+            if attempts == 1:
+                fragments[0]["text"] += " Quirky Ball"
+            return 200, gemini_response({
+                "title": model_input["title"],
+                "summary": model_input["summary"],
+                "fragments": fragments,
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=delays.append
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(delays, [7])
+        self.assertEqual(result["title"], "House Duck")
+        self.assertEqual(result["summary"], "Project K")
+        self.assertEqual(result["body_html"], "<p>Quirky Ball</p><p>Godot</p>")
 
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
         source = {"translation_version": 5, "posts": [self.post]}
