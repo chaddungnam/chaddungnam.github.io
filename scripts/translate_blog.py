@@ -21,7 +21,7 @@ from urllib.request import Request, urlopen
 TARGETS = ("en", "de", "ja")
 TARGET_NAMES = {"en": "English", "de": "German", "ja": "Japanese"}
 TRANSLATION_PIPELINE_VERSION = 5
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
 MAX_POST_CHARS = 100_000
 MAX_CHANGED_POSTS = 12
 RETRYABLE_STATUSES = {429, 500, 502, 503, 504}
