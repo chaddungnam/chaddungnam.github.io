@@ -16,6 +16,26 @@
     });
   }
 
+  function hydrateOpenGraphImages(documentRef) {
+    documentRef.querySelectorAll('[data-ke-type="opengraph"][data-og-image]').forEach(function (card) {
+      var slot = card.querySelector(".og-image");
+      if (!slot || slot.tagName === "IMG") return;
+      var source;
+      try {
+        source = new URL(card.dataset.ogImage);
+      } catch (_error) {
+        return;
+      }
+      if (source.protocol !== "https:") return;
+      var image = documentRef.createElement("img");
+      image.src = source.href;
+      image.alt = "";
+      image.loading = "lazy";
+      image.className = "og-image";
+      slot.replaceWith(image);
+    });
+  }
+
   function init(documentRef) {
     var saved = "";
     try {
@@ -24,6 +44,7 @@
       saved = "";
     }
     applyTheme(documentRef, saved);
+    hydrateOpenGraphImages(documentRef);
     documentRef.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
       button.addEventListener("click", function () {
         var theme = documentRef.documentElement.dataset.theme === "dark" ? "light" : "dark";
@@ -38,14 +59,9 @@
     documentRef.querySelectorAll("[data-current-year]").forEach(function (node) {
       node.textContent = String(new Date().getFullYear());
     });
-    documentRef.querySelectorAll(".mirror-body iframe").forEach(function (frame) {
-      var width = Number(frame.getAttribute("width"));
-      var height = Number(frame.getAttribute("height"));
-      if (width > 0 && height > 0) frame.style.aspectRatio = width + " / " + height;
-    });
   }
 
-  var api = { resolveTheme: resolveTheme, init: init };
+  var api = { resolveTheme: resolveTheme, hydrateOpenGraphImages: hydrateOpenGraphImages, init: init };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (root && root.document) {
     if (root.document.readyState === "loading") root.document.addEventListener("DOMContentLoaded", function () { init(root.document); }, { once: true });

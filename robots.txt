@@ -1,14 +1,22 @@
 User-agent: Google-adstxt
 Allow: /
+Disallow: /console/
+Disallow: /analytics/
 
 User-agent: Mediapartners-Google
 Allow: /
+Disallow: /console/
+Disallow: /analytics/
 
 User-agent: Googlebot
 Allow: /
+Disallow: /console/
+Disallow: /analytics/
 
 User-agent: *
 Allow: /
+Disallow: /console/
+Disallow: /analytics/
 
 Sitemap: https://houseduck.in/sitemap.xml
 Sitemap: https://houseduck.in/sitemap-blog.xml

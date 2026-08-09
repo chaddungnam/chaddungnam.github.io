@@ -16,7 +16,7 @@
   };
 
   function setMessage(value, error = false) {
-    byId("operationsMessage").textContent = value;
+    root.ConsoleUiState.setMessage(byId("operationsMessage"), value, error);
     byId("operationsMessage").style.color = error ? "var(--coral)" : "";
   }
 
@@ -42,14 +42,14 @@
   }
 
   async function submit(form, payload, title, summary) {
-    if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
-    const button = form.querySelector('button[type="submit"]');
-    const fingerprint = JSON.stringify(payload);
-    const pending = pendingRequests.get(form);
-    const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
-    pendingRequests.set(form, { fingerprint, requestId });
-    button.disabled = true;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
     try {
+      if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
+      const fingerprint = JSON.stringify(payload);
+      const pending = pendingRequests.get(form);
+      const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
+      pendingRequests.set(form, { fingerprint, requestId });
       await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
       pendingRequests.delete(form);
       form.reset();
@@ -59,7 +59,7 @@
       if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
       setMessage(`작업을 완료하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
-      button.disabled = false;
+      finishRequest();
     }
   }
 

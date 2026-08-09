@@ -9,12 +9,45 @@ from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
+import re
 import tempfile
 
 
 TARGETS = ("en", "de", "ja")
+TRANSLATION_PIPELINE_VERSION = 3
 VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 SKIP_TEXT_TAGS = {"code", "pre", "script", "style"}
+PROTECTED_TERMS = (
+    ("Quirky Ball", "Quirky Ball"),
+    ("쿼키볼", "Quirky Ball"),
+    ("퀄키볼", "Quirky Ball"),
+    ("Project K", "Project K"),
+    ("프로젝트 K", "Project K"),
+)
+
+
+def translate_text_preserving_terms(text, target, translate):
+    protected = text
+    replacements = []
+    for source_term, canonical_term in PROTECTED_TERMS:
+        while source_term in protected:
+            token = f"HDUCKPROTECTED{len(replacements)}XQZ"
+            protected = protected.replace(source_term, token, 1)
+            replacements.append((token, canonical_term))
+    translated = translate(protected, target)
+    for token, canonical_term in replacements:
+        if token not in translated:
+            raise ValueError(f"translator changed protected term token: {token}")
+        translated = translated.replace(token, canonical_term)
+    return translated
+
+
+def installed_translation_pairs(languages):
+    return {
+        (translation.from_lang.code, translation.to_lang.code)
+        for language in languages
+        for translation in language.translations_to
+    }
 
 
 class TranslatingHTMLParser(HTMLParser):
@@ -68,16 +101,21 @@ class TranslatingHTMLParser(HTMLParser):
 
 
 def translate_html(source_html, target, translate):
-    parser = TranslatingHTMLParser(lambda text: translate(text, target))
-    parser.feed(source_html)
+    # Tistory wraps sentence fragments in decorative span/b tags. Removing those
+    # wrappers gives the offline translator a complete sentence instead of scraps.
+    normalized_html = re.sub(r"</?(?:span|b)(?:\s[^>]*)?>", "", source_html, flags=re.IGNORECASE)
+    parser = TranslatingHTMLParser(lambda text: translate_text_preserving_terms(text, target, translate))
+    parser.feed(normalized_html)
     parser.close()
     return parser.get_html()
 
 
 def needs_translation(source, existing):
     cache = existing.get("posts", {})
+    required_version = source.get("translation_version")
     return any(
         cache.get(post["slug"], {}).get("source_hash") != post["source_hash"]
+        or (required_version is not None and cache.get(post["slug"], {}).get("translation_version") != required_version)
         or not all(cache.get(post["slug"], {}).get(locale) for locale in TARGETS)
         for post in source.get("posts", [])
     )
@@ -85,16 +123,23 @@ def needs_translation(source, existing):
 
 def update_cache(source, existing, translate):
     cache = {"posts": dict(existing.get("posts", {}))}
+    required_version = source.get("translation_version")
     for post in source.get("posts", []):
         slug = post["slug"]
         current = cache["posts"].get(slug, {})
-        if current.get("source_hash") == post["source_hash"] and all(current.get(locale) for locale in TARGETS):
+        if (
+            current.get("source_hash") == post["source_hash"]
+            and (required_version is None or current.get("translation_version") == required_version)
+            and all(current.get(locale) for locale in TARGETS)
+        ):
             continue
         translated = {"source_hash": post["source_hash"]}
+        if required_version is not None:
+            translated["translation_version"] = required_version
         for locale in TARGETS:
             translated[locale] = {
-                "title": translate(post["title"], locale),
-                "summary": translate(post["summary"], locale),
+                "title": translate_text_preserving_terms(post["title"], locale, translate),
+                "summary": translate_text_preserving_terms(post["summary"], locale, translate),
                 "body_html": translate_html(post["body_html"], locale, translate),
             }
         cache["posts"][slug] = translated
@@ -122,11 +167,7 @@ def argos_translator():
     from argostranslate import package, translate
 
     required_pairs = (("ko", "en"), ("en", "de"), ("en", "ja"))
-    installed_pairs = {
-        (source.code, target.code)
-        for source in translate.get_installed_languages()
-        for target in source.translations_to
-    }
+    installed_pairs = installed_translation_pairs(translate.get_installed_languages())
     missing = [pair for pair in required_pairs if pair not in installed_pairs]
     if missing:
         package.update_package_index()

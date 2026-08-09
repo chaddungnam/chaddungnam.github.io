@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: sync-house-duck-blog
@@ -24,6 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Install Node dependencies
+        run: npm ci --ignore-scripts
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -53,3 +56,14 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "chore(blog): sync Tistory posts"
           git push
+      - name: Trigger GitHub Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for delay in 0 10 20; do
+            sleep "$delay"
+            if gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"; then
+              exit 0
+            fi
+          done
+          exit 1

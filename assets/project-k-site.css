@@ -41,20 +41,10 @@
   color: var(--k-paper);
 }
 
-.project-k-header .duck-mark {
-  border-color: var(--k-paper);
-  background: var(--k-gold);
-  box-shadow: 3px 4px 0 var(--k-paper);
-}
-
-.project-k-header .duck-mark::before {
-  border-color: var(--k-paper);
-  background: var(--k-crimson);
-}
-
-.project-k-header .duck-mark::after {
-  background: var(--k-void);
-}
+.project-k-header .brand-duck-image { width: 38px; height: 38px; object-fit: contain; }
+.project-k-header .brand-wordmark-image { width: 150px; height: auto; object-fit: contain; filter: brightness(0) invert(1); transform: translateY(1px); }
+.project-k-page .footer-duck-image { width: 44px; height: 44px; object-fit: contain; }
+.project-k-page .footer-wordmark-image { width: 138px; height: auto; object-fit: contain; filter: brightness(0) invert(1); }
 
 .project-k-header .site-nav a::after {
   background: var(--k-crimson);

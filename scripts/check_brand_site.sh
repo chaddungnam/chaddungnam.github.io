@@ -68,7 +68,7 @@ for page in "${content_pages[@]}"; do
   require_token "$page" "terms/"
   require_token "$page" "support"
   require_token "$page" "data-current-year"
-  require_token "$page" "https://houseduck.tistory.com/"
+  require_token "$page" "https://blog.houseduck.in/"
 
   reject_token "$page" "cdn."
   reject_token "$page" "fonts.googleapis.com"
@@ -79,9 +79,9 @@ done
 for page in "${redirect_pages[@]}"; do
   test -s "$repo_dir/$page" || fail "$page does not exist"
   require_token "$page" 'data-page="blog-redirect"'
-  require_token "$page" 'http-equiv="refresh" content="0; url=https://houseduck.tistory.com/"'
-  require_token "$page" 'rel="canonical" href="https://houseduck.tistory.com/"'
-  require_token "$page" 'href="https://houseduck.tistory.com/"'
+  require_token "$page" 'http-equiv="refresh" content="0; url=https://blog.houseduck.in/"'
+  require_token "$page" 'rel="canonical" href="https://blog.houseduck.in/"'
+  require_token "$page" 'href="https://blog.houseduck.in/"'
 done
 
 for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do

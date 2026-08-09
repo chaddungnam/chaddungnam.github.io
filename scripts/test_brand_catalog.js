@@ -92,9 +92,7 @@ for (const [file, locale] of marketingPages) {
 
 for (const [file] of marketingPages) {
   const html = read(file);
-  const blogUrl = /^index(?:_[a-z]{2})?\.html$/.test(file)
-    ? "https://blog.houseduck.in/"
-    : "https://houseduck.tistory.com/";
+  const blogUrl = "https://blog.houseduck.in/";
   assert.ok(html.includes(`href="${blogUrl}"`), `${file} Blog link`);
   assert.doesNotMatch(html, /href="[^"]*story\//, `${file} must not link to the founder story`);
   assert.doesNotMatch(html, new RegExp(`href="${blogUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*target="_blank"`), `${file} Blog link stays in the same tab`);
@@ -126,9 +124,9 @@ for (const [file, locale] of legacyStoryPages) {
   const html = read(file);
   assert.match(html, new RegExp(`lang="${locale}"`), `${file} locale`);
   assert.match(html, /data-page="blog-redirect"/, `${file} redirect marker`);
-  assert.match(html, /http-equiv="refresh" content="0; url=https:\/\/houseduck\.tistory\.com\/"/, `${file} redirect metadata`);
-  assert.match(html, /rel="canonical" href="https:\/\/houseduck\.tistory\.com\/"/, `${file} canonical Blog URL`);
-  assert.match(html, /href="https:\/\/houseduck\.tistory\.com\/"/, `${file} accessible continue link`);
+  assert.match(html, /http-equiv="refresh" content="0; url=https:\/\/blog\.houseduck\.in\/"/, `${file} redirect metadata`);
+  assert.match(html, /rel="canonical" href="https:\/\/blog\.houseduck\.in\/"/, `${file} canonical Blog URL`);
+  assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} accessible continue link`);
   assert.doesNotMatch(html, /story-timeline|story-quote|1998|industrial design|산업디자인|Industriedesign|インダストリアル/, `${file} founder profile removed`);
 }
 

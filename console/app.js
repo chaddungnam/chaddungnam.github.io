@@ -23,6 +23,7 @@ function confirmChange(title, body) {
   const dialog = byId("confirmDialog");
   byId("confirmTitle").textContent = title;
   byId("confirmBody").textContent = body;
+  dialog.returnValue = "cancel";
   dialog.showModal();
   return new Promise((resolve) => dialog.addEventListener("close", () => resolve(dialog.returnValue === "confirm"), { once: true }));
 }
@@ -33,6 +34,7 @@ function showOnly(elementId) {
   ["loginPanel", "challengePanel", "projectPicker", "consoleApp"].forEach((id) => {
     byId(id).hidden = id !== elementId;
   });
+  byId("skipLink").href = elementId === "consoleApp" ? "#mainContent" : `#${elementId}`;
 }
 
 function renderAuth(authState = window.ConsoleAuth.snapshot()) {
@@ -106,17 +108,26 @@ function challengeErrorMessage(error) {
 byId("challengeForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const answerInput = byId("challengeAnswer");
-  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
-  submitButton.disabled = true;
-  byId("challengeMessage").textContent = "확인 중...";
+  const finishRequest = window.ConsoleUiState.beginRequest(event.currentTarget);
+  if (!finishRequest) return;
+  let failed = false;
+  window.ConsoleUiState.setMessage(byId("challengeMessage"), "확인 중...");
   try {
     await window.ConsoleAuth.unlock(answerInput.value);
-    byId("challengeMessage").textContent = "";
+    window.ConsoleUiState.setMessage(byId("challengeMessage"), "");
   } catch (error) {
-    byId("challengeMessage").textContent = challengeErrorMessage(error);
+    if (error?.message === "invalid_google_identity") {
+      window.ConsoleUiState.setMessage(byId("challengeMessage"), "");
+      window.ConsoleUiState.setMessage(byId("loginMessage"), challengeErrorMessage(error), true);
+      window.ConsoleAuth.logout();
+    } else {
+      failed = true;
+      window.ConsoleUiState.setMessage(byId("challengeMessage"), challengeErrorMessage(error), true);
+    }
   } finally {
     answerInput.value = "";
-    submitButton.disabled = false;
+    finishRequest();
+    if (failed) answerInput.focus();
   }
 });
 
@@ -129,12 +140,17 @@ window.addEventListener("console-auth-change", (event) => renderAuth(event.detai
 
 (async () => {
   window.ConsoleAPI.initialize({ functionBaseUrl: CONSOLE_CONFIG.functionBaseUrl });
+  const finishLogin = window.ConsoleUiState.beginRequest(byId("loginPanel"));
+  window.ConsoleUiState.setMessage(byId("loginMessage"), "Google 로그인 버튼을 불러오는 중입니다.");
   try {
     const authState = await window.ConsoleAuth.initialize(CONSOLE_CONFIG);
     window.GmailAPI.initialize({ clientId: CONSOLE_CONFIG.clientId });
+    window.ConsoleUiState.setMessage(byId("loginMessage"), "");
     renderAuth(authState);
   } catch (_error) {
     renderAuth({ signedIn: false, unlocked: false, email: "" });
-    byId("loginMessage").textContent = "Google 로그인 버튼을 불러오지 못했습니다. 공개 주소에서 다시 열어 주세요.";
+    window.ConsoleUiState.setMessage(byId("loginMessage"), "Google 로그인 버튼을 불러오지 못했습니다. 공개 주소에서 다시 열어 주세요.", true);
+  } finally {
+    finishLogin?.();
   }
 })();

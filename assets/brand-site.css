@@ -1190,6 +1190,33 @@ button {
   transform: translateX(5px);
 }
 
+/* Studio-home readability overrides live here so shared public UI stays in one contract. */
+body[data-page="studio"] .journal-toolbar .text-link {
+  color: var(--studio-ink);
+}
+
+body[data-page="studio"] .theme-toggle {
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+}
+
+body[data-page="studio"] .post-tab {
+  min-height: 44px;
+}
+
+body[data-page="studio"] .project-copy p {
+  font-size: 0.9375rem;
+}
+
+body[data-page="studio"] .project-copy .text-link {
+  font-size: 0.875rem;
+}
+
+body[data-page="studio"] .post-preview-copy p {
+  font-size: 0.9rem;
+}
+
 /* Quirky Ball product page */
 .game-hero {
   padding-block: clamp(62px, 9vw, 120px);

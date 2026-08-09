@@ -103,11 +103,12 @@
       body: JSON.stringify({ answer }),
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok || typeof body.adminTicket !== "string") {
+    const expiresIn = Number(body.expiresIn);
+    if (!response.ok || typeof body.adminTicket !== "string" || !body.adminTicket.trim() || !Number.isSafeInteger(expiresIn) || expiresIn <= 0) {
       throw Object.assign(new Error(body.error || "admin_auth_failed"), { status: response.status });
     }
     adminTicket = body.adminTicket;
-    ticketExpiresAt = Date.now() + Number(body.expiresIn || 0) * 1_000;
+    ticketExpiresAt = Date.now() + expiresIn * 1_000;
     email = body.email || email;
     root.sessionStorage.setItem(ADMIN_TICKET_KEY, adminTicket);
     root.sessionStorage.setItem(TICKET_EXPIRY_KEY, String(ticketExpiresAt));

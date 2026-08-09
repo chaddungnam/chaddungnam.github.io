@@ -66,14 +66,14 @@ button { color: inherit; font: inherit; }
 .mirror-brand img:last-child { width: 150px; height: auto; object-fit: contain; transform: translateY(1px); }
 html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness(0) invert(1); }
 .mirror-header nav { display: flex; align-items: center; gap: 10px; }
-.mirror-header nav a { display: inline-flex; min-height: 42px; align-items: center; color: var(--ink); font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-[data-theme-toggle] { display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--surface); cursor: pointer; }
+.mirror-header nav a { display: inline-flex; min-height: 44px; align-items: center; color: var(--ink); font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+[data-theme-toggle] { display: grid; width: 44px; height: 44px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--surface); cursor: pointer; }
 .mirror-main { width: min(100% - (var(--gutter) * 2), 960px); margin: 0 auto; padding-block: clamp(48px, 8vw, 96px) clamp(88px, 11vw, 140px); }
-.mirror-back { display: inline-flex; min-height: 40px; align-items: center; margin-bottom: 30px; color: var(--muted); font-size: .76rem; font-weight: 850; }
+.mirror-back { display: inline-flex; min-height: 44px; align-items: center; margin-bottom: 30px; color: var(--muted); font-size: .76rem; font-weight: 850; }
 .mirror-back:hover { color: var(--cyan); }
 .mirror-post-header { max-width: 820px; margin-inline: auto; text-align: center; }
 .mirror-post-header p, .mirror-index > p { margin: 0 0 14px; color: var(--coral); font-size: .7rem; font-weight: 950; letter-spacing: .15em; }
-.mirror-post-header h1 { margin: 0; color: var(--ink); font-size: clamp(2.35rem, 5vw, 4.8rem); letter-spacing: -.055em; line-height: 1.03; text-wrap: balance; }
+.mirror-post-header h1 { margin: 0; color: var(--ink); font-size: clamp(2.1rem, 4vw, 3.6rem); letter-spacing: -.045em; line-height: 1.08; text-wrap: balance; }
 .mirror-post-header time { display: block; margin-top: 20px; color: var(--muted); font-size: .78rem; }
 .mirror-note { display: flex; width: min(100%, 760px); align-items: start; gap: 16px; margin: 44px auto 0; padding: 18px 20px; border-left: 4px solid var(--yellow); border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--yellow) 10%, var(--surface)); font-size: .84rem; }
 .mirror-note strong { flex: 0 0 auto; color: var(--ink); }
@@ -92,11 +92,21 @@ html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness
 .mirror-body code { padding: .15em .36em; border-radius: 5px; color: var(--ink); background: var(--raised); font-size: .9em; }
 .mirror-body pre code { padding: 0; background: transparent; }
 .mirror-body iframe { width: 100%; max-width: 100%; height: auto; border: 0; border-radius: 14px; }
-.mirror-body [data-ke-type="opengraph"], .mirror-body .og-link { overflow: hidden; border: 1px solid var(--line) !important; border-radius: 14px; background: var(--surface) !important; }
+.mirror-body iframe.video-landscape { aspect-ratio: 16 / 9; }
+.mirror-body iframe.video-portrait { width: min(100%, 405px); aspect-ratio: 9 / 16; margin-inline: auto; }
+.mirror-body [data-ke-type="opengraph"] { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { display: grid; min-height: 132px; grid-template-columns: 180px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: inherit; background: var(--surface); text-decoration: none; }
+.mirror-body [data-ke-type="opengraph"] > .og-link, .mirror-body [data-ke-type="opengraph"] > .link-og, .mirror-body [data-ke-type="opengraph"] > a { border: 0; border-radius: 0; }
+.mirror-body .og-image { width: 100% !important; height: 100% !important; min-height: 132px; margin: 0; object-fit: cover; border-radius: 0; background-position: center; background-size: cover; }
+.mirror-body .og-text { display: grid; min-width: 0; align-content: center; gap: 6px; padding: 18px 20px; }
+.mirror-body .og-title, .mirror-body .og-desc, .mirror-body .og-host { margin: 0; font-family: "Montserrat", sans-serif; }
+.mirror-body .og-title { overflow: hidden; color: var(--ink); font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.mirror-body .og-desc { display: -webkit-box; overflow: hidden; color: var(--copy); font-size: .82rem; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.mirror-body .og-host { color: var(--cyan); font-size: .72rem; font-weight: 750; }
 .mirror-index { width: min(100% - (var(--gutter) * 2), 1180px); margin: 0 auto; padding-block: clamp(56px, 8vw, 96px) clamp(88px, 12vw, 150px); }
 .mirror-index h1 { margin: 0; color: var(--ink); font-size: clamp(2.6rem, 6vw, 5.2rem); letter-spacing: -.06em; line-height: 1; }
 .mirror-locales { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 28px; }
-.mirror-locales a { display: grid; min-width: 48px; min-height: 42px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); font-size: .78rem; font-weight: 800; }
+.mirror-locales a { display: grid; min-width: 48px; min-height: 44px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); font-size: .78rem; font-weight: 800; }
 .mirror-locales a:hover, .mirror-locales a[aria-current="page"] { color: #10213e; background: var(--yellow); }
 .mirror-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 42px; }
 .mirror-grid article { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: transform 180ms ease, border-color 180ms ease; }
@@ -113,6 +123,9 @@ html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness
   .mirror-brand img:last-child { width: 122px; }
   .mirror-main { padding-top: 28px; }
   .mirror-note { align-items: stretch; flex-direction: column; gap: 4px; }
+  .mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { min-height: 112px; grid-template-columns: 112px minmax(0, 1fr); }
+  .mirror-body .og-image { min-height: 112px; }
+  .mirror-body .og-desc { display: none; }
   .mirror-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {

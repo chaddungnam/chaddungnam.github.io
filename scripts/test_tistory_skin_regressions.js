@@ -1,0 +1,128 @@
+#!/usr/bin/env node
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+const { test } = require("node:test");
+
+const root = path.resolve(__dirname, "..");
+const skinDir = path.join(root, "tistory-skin");
+const html = fs.readFileSync(path.join(skinDir, "skin.html"), "utf8");
+const css = fs.readFileSync(path.join(skinDir, "style.css"), "utf8");
+const script = fs.readFileSync(path.join(skinDir, "images/script.js"), "utf8");
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function declarations(selector) {
+  const match = css.match(new RegExp(`(?:^|})\\s*${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`, "m"));
+  assert.ok(match, `missing CSS rule: ${selector}`);
+  return Object.fromEntries(
+    match[1]
+      .split(";")
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const separator = entry.indexOf(":");
+        return [entry.slice(0, separator).trim(), entry.slice(separator + 1).trim()];
+      })
+  );
+}
+
+function minHeight(selector) {
+  const value = declarations(selector)["min-height"] || "";
+  const match = value.match(/^(\d+(?:\.\d+)?)px/);
+  assert.ok(match, `${selector} needs a pixel min-height`);
+  return Number(match[1]);
+}
+
+test("a hidden translation link stays out of layout", () => {
+  assert.equal(declarations(".translation-note a[hidden]").display, "none");
+});
+
+test("the script leaves Tistory's native empty state as the only fallback", () => {
+  const stream = {
+    innerHTML: "",
+    querySelector() {
+      return null;
+    },
+  };
+  const document = {
+    documentElement: { dataset: {} },
+    body: { id: "tt-body-index" },
+    querySelector(selector) {
+      if (selector === "#tt-body-index #post-stream") return stream;
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+    addEventListener() {},
+  };
+
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document,
+    localStorage: { getItem: () => "", setItem() {} },
+    location: { hostname: "localhost", pathname: "/", replace() {}, search: "" },
+    navigator: { language: "ko", languages: ["ko"], userAgent: "" },
+    window: {},
+  });
+
+  assert.equal(stream.innerHTML, "");
+  assert.equal((html.match(/class="empty-state shell"/g) || []).length, 1);
+});
+
+test("tag and RSS navigation stay on the active custom domain", () => {
+  assert.doesNotMatch(html, /\[##_taglog_link_##\]|\[##_rss_url_##\]/);
+  assert.equal((html.match(/href="\/tag"/g) || []).length, 3);
+  assert.equal((html.match(/href="\/rss"/g) || []).length, 2);
+});
+
+test("a singleton post card spans the grid and remains centered", () => {
+  const rule = declarations(".post-card:only-child");
+  assert.equal(rule["grid-column"], "1 / -1");
+  assert.equal(rule.width, "min(100%, 760px)");
+  assert.equal(rule["justify-self"], "center");
+});
+
+test("pagination disappears when neither direction has another page", () => {
+  assert.equal(
+    declarations(".pagination:has(.no-more-prev):has(.no-more-next)").display,
+    "none"
+  );
+});
+
+test("safe interactive skin controls keep a 44px minimum target", () => {
+  const selectors = [
+    ".category-menu-panel a",
+    ".search-box",
+    ".search-box button",
+    ".category-tree a",
+    ".article-index-link",
+    ".article-category",
+    ".owner-tools a, .owner-tools button",
+    ".translation-note a",
+    ".article-tags a",
+    ".tt_box_namecard .tt_btn_subscribe",
+    ".tt-comment-cont .tt-btn_register",
+  ];
+
+  for (const selector of selectors) {
+    assert.ok(minHeight(selector) >= 44, `${selector} is shorter than 44px`);
+  }
+});
+
+test("theme, reduced-motion, and responsive contracts remain present", () => {
+  assert.match(css, /html\[data-theme="light"\]/);
+  assert.match(css, /html\[data-theme="dark"\]/);
+  assert.match(css, /@media\s*\(max-width:\s*900px\)/);
+  assert.match(css, /@media\s*\(max-width:\s*620px\)/);
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+});
+
+test("article titles stay readable instead of dominating the page", () => {
+  assert.equal(declarations(".article-header h1")["font-size"], "clamp(2.1rem, 4vw, 3.6rem)");
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*8vw,\s*2\.6rem\)/);
+});

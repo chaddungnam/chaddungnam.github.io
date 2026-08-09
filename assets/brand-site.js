@@ -71,6 +71,33 @@
     new URLSearchParams(window.location.search).get("lang")
   );
   var locale = normalizeLanguage(root.dataset.locale) || "en";
+  var controlLabels = {
+    ko: {
+      themeLight: "라이트 모드로 전환",
+      themeDark: "다크 모드로 전환",
+      menuOpen: "메뉴 열기",
+      menuClose: "메뉴 닫기",
+    },
+    en: {
+      themeLight: "Switch to light mode",
+      themeDark: "Switch to dark mode",
+      menuOpen: "Open menu",
+      menuClose: "Close menu",
+    },
+    de: {
+      themeLight: "Zum hellen Modus wechseln",
+      themeDark: "Zum dunklen Modus wechseln",
+      menuOpen: "Menü öffnen",
+      menuClose: "Menü schließen",
+    },
+    ja: {
+      themeLight: "ライトモードに切り替え",
+      themeDark: "ダークモードに切り替え",
+      menuOpen: "メニューを開く",
+      menuClose: "メニューを閉じる",
+    },
+  };
+  var controlCopy = controlLabels[locale] || controlLabels.en;
 
   if (requestedLanguage) {
     try {
@@ -111,7 +138,7 @@
       var themeColor = document.querySelector('meta[name="theme-color"]');
       if (themeColor) themeColor.content = theme === "dark" ? "#0d1525" : "#f3f1ea";
       document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
-        button.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+        button.setAttribute("aria-label", theme === "dark" ? controlCopy.themeLight : controlCopy.themeDark);
         button.setAttribute("aria-pressed", String(theme === "dark"));
       });
     }
@@ -129,15 +156,49 @@
       });
     });
 
-    document.querySelectorAll("[data-post-tab]").forEach(function (button) {
+    var postTabs = Array.from(document.querySelectorAll("[data-post-tab]"));
+    var postPanels = Array.from(document.querySelectorAll("[data-post-panel]"));
+
+    function activatePostTab(button) {
+      var selected = button.dataset.postTab;
+      postTabs.forEach(function (tab) {
+        var isSelected = tab === button;
+        tab.setAttribute("aria-selected", String(isSelected));
+        tab.setAttribute("tabindex", isSelected ? "0" : "-1");
+      });
+      postPanels.forEach(function (panel) {
+        panel.hidden = panel.dataset.postPanel !== selected;
+      });
+    }
+
+    postTabs.forEach(function (button) {
       button.addEventListener("click", function () {
-        var selected = button.dataset.postTab;
-        document.querySelectorAll("[data-post-tab]").forEach(function (tab) {
-          tab.setAttribute("aria-selected", String(tab === button));
+        activatePostTab(button);
+      });
+
+      button.addEventListener("keydown", function (event) {
+        var availableTabs = postTabs.filter(function (tab) {
+          return !tab.hidden && tab.getAttribute("aria-hidden") !== "true";
         });
-        document.querySelectorAll("[data-post-panel]").forEach(function (panel) {
-          panel.hidden = panel.dataset.postPanel !== selected;
-        });
+        var currentIndex = availableTabs.indexOf(button);
+        if (currentIndex < 0 || availableTabs.length === 0) return;
+
+        var nextIndex = currentIndex;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          nextIndex = (currentIndex + 1) % availableTabs.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          nextIndex = (currentIndex - 1 + availableTabs.length) % availableTabs.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = availableTabs.length - 1;
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+        activatePostTab(availableTabs[nextIndex]);
+        availableTabs[nextIndex].focus();
       });
     });
 
@@ -169,16 +230,22 @@
     var nav = document.querySelector("[data-site-nav]");
     var menuButton = document.querySelector("[data-menu-button]");
 
-    function closeMenu() {
+    function setMenuState(isOpen) {
       if (!nav || !menuButton) return;
-      nav.classList.remove("is-open");
-      menuButton.setAttribute("aria-expanded", "false");
+      if (isOpen) nav.classList.add("is-open");
+      else nav.classList.remove("is-open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? controlCopy.menuClose : controlCopy.menuOpen);
+    }
+
+    function closeMenu() {
+      setMenuState(false);
     }
 
     if (nav && menuButton) {
+      setMenuState(false);
       menuButton.addEventListener("click", function () {
-        var isOpen = nav.classList.toggle("is-open");
-        menuButton.setAttribute("aria-expanded", String(isOpen));
+        setMenuState(menuButton.getAttribute("aria-expanded") !== "true");
       });
 
       nav.querySelectorAll("a").forEach(function (link) {
@@ -186,7 +253,7 @@
       });
 
       document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
           closeMenu();
           menuButton.focus();
         }

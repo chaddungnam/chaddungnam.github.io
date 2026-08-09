@@ -45,11 +45,6 @@
     });
   }
 
-  const stream = document.querySelector("#tt-body-index #post-stream");
-  if (stream && !stream.querySelector(".post-card")) {
-    stream.innerHTML = '<section class="empty-state"><span class="duck-mark" aria-hidden="true"></span><h2>첫 제작 기록을 준비하고 있습니다.</h2><p>House Duck이 만드는 과정이 곧 이곳에 쌓입니다.</p></section>';
-  }
-
   if (typeof location === "undefined" || typeof navigator === "undefined") return;
   const language = String((navigator.languages && navigator.languages[0]) || navigator.language || "ko").toLowerCase().split("-")[0];
   const locale = { en: "en", de: "de", ja: "ja" }[language];

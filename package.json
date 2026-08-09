@@ -1,0 +1,17 @@
+{
+  "name": "house-duck-site",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test:blog-security": "node scripts/test_blog_security_regressions.mjs",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "sanitize-html": "2.17.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0"
+  }
+}

@@ -85,7 +85,7 @@ assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color sc
 assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark theme");
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
-assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(2\.35rem,\s*5vw,\s*4\.8rem\)/, "desktop article titles must stay practical");
+assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(2\.1rem,\s*4vw,\s*3\.6rem\)/, "desktop article titles must stay practical");
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.match(script, /house_duck_theme/, "theme choice must persist between visits");

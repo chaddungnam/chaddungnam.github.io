@@ -23,6 +23,10 @@ secrets*
 *.log
 *.bak
 node_modules/
+__pycache__/
+test-results/
+playwright-report/
 .superdesign/
 .tmp/
 .worktrees/
+.gstack/

@@ -41,9 +41,10 @@ try {
       posts: {
         "first-post": {
           source_hash: posts[0].sourceHash,
-          en: { title: "The first build log", summary: "The first record of turning an idea into a real product.", body_html: "<p>The first record of turning an idea into a real product.</p>" },
-          de: { title: "Der erste Entwicklungsbericht", summary: "Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.", body_html: "<p>Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.</p>" },
-          ja: { title: "最初の開発記録", summary: "アイデアを実際の製品にした最初の記録です。", body_html: "<p>アイデアを実際の製品にした最初の記録です。</p>" },
+          translation_version: 3,
+          en: { title: "The first build log", summary: "The first record of turning an idea into a real product.", body_html: "<p>The first record of turning an idea into a real product.</p>", reviewed: true },
+          de: { title: "Der erste Entwicklungsbericht", summary: "Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.", body_html: "<p>Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.</p>", reviewed: true },
+          ja: { title: "最初の開発記録", summary: "アイデアを実際の製品にした最初の記録です。", body_html: "<p>アイデアを実際の製品にした最初の記録です。</p>", reviewed: true },
         },
       },
     },
@@ -100,6 +101,28 @@ try {
   assert.match(englishPage, /hreflang="ko" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
   assert.match(englishPage, /hreflang="de" href="https:\/\/houseduck\.in\/blog\/de\/first-post\/"/);
   assert.match(englishPage, /hreflang="x-default" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
+
+  const pendingRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-pending-"));
+  try {
+    await blogSync.syncFromXml(fixture, {
+      outRoot: pendingRoot,
+      translations: { posts: { "first-post": {
+        source_hash: posts[0].sourceHash,
+        translation_version: 3,
+        en: { title: "The first build log", summary: "COOKIE HALLUCINATION SUMMARY", body_html: "<p>COOKIE HALLUCINATION BODY</p>" },
+        de: { title: "Der erste Entwicklungsbericht", summary: "Eine geprüfte Zusammenfassung.", summary_reviewed: true, body_html: "<p>HALLUCINATED BODY</p>" },
+      } } },
+    });
+    const pendingPage = await readFile(path.join(pendingRoot, "blog", "en", "first-post", "index.html"), "utf8");
+    assert.match(pendingPage, /Full translation under review/);
+    assert.match(pendingPage, /This article is being reviewed/);
+    assert.doesNotMatch(pendingPage, /COOKIE HALLUCINATION/);
+    const reviewedSummaryPage = await readFile(path.join(pendingRoot, "blog", "de", "first-post", "index.html"), "utf8");
+    assert.match(reviewedSummaryPage, /Eine geprüfte Zusammenfassung/);
+    assert.doesNotMatch(reviewedSummaryPage, /HALLUCINATED BODY/);
+  } finally {
+    await rm(pendingRoot, { recursive: true, force: true });
+  }
 
   for (const locale of ["kr", "en", "de", "ja"]) {
     const indexPage = await readFile(path.join(outputRoot, "blog", locale, "index.html"), "utf8");

@@ -4,15 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#mainContent">본문으로 건너뛰기</a>
+  <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
 
   <main class="console-entry">
-    <section id="loginPanel" class="login-panel" aria-labelledby="loginTitle">
+    <section id="loginPanel" class="login-panel" aria-labelledby="loginTitle" tabindex="-1">
       <div class="brand-mark" aria-hidden="true"><span>HD</span></div>
       <p class="eyebrow">HOUSE DUCK / PRIVATE CONSOLE</p>
       <h1 id="loginTitle">게임 운영을<br><em>한 화면에서</em></h1>
@@ -25,11 +26,11 @@
       <p id="loginMessage" class="form-message" role="status"></p>
     </section>
 
-    <section id="challengePanel" class="login-panel" aria-labelledby="challengeTitle" hidden>
+    <section id="challengePanel" class="login-panel" aria-labelledby="challengeTitle" tabindex="-1" hidden>
       <p class="eyebrow">HOUSE DUCK / SECOND CHECK</p>
       <h1 id="challengeTitle">관리자 확인</h1>
       <p id="challengeEmail" class="auth-account"></p>
-      <form id="challengeForm">
+      <form id="challengeForm" aria-describedby="challengeMessage">
         <label for="challengeAnswer">내가 처음 한 게임 이름은?</label>
         <input id="challengeAnswer" name="answer" type="password" autocomplete="off" required maxlength="80">
         <button class="primary-button" type="submit">콘솔 열기</button>
@@ -38,7 +39,7 @@
       <button id="challengeLogout" class="text-button muted" type="button">다른 Google 계정 사용</button>
     </section>
 
-    <section id="projectPicker" class="project-picker" aria-labelledby="projectPickerTitle" hidden>
+    <section id="projectPicker" class="project-picker" aria-labelledby="projectPickerTitle" tabindex="-1" hidden>
       <p class="eyebrow">HOUSE DUCK / PROJECTS</p>
       <h1 id="projectPickerTitle">관리할 게임 선택</h1>
       <p class="picker-copy">Quirky Ball은 전체 기능을 제공하고 Project K는 현재 구조만 준비합니다.</p>
@@ -278,6 +279,7 @@
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js"></script>
   <script src="model.js"></script>
+  <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
   <script src="analytics.js?v=20260804-3"></script>
