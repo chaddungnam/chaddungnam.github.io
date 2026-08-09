@@ -23,14 +23,14 @@ assert.equal(intelligence.localSummary({ subject: "로그인", text: "계정에 
 assert.equal(intelligence.localSummary({ subject: "튕김", text: "게임 실행 후 계속 튕겨요." }).category, "bug");
 assert.ok(intelligence.localSummary({ subject: "문의", text: "안녕하세요.\n\n문의드립니다." }).summary.length > 0);
 
-const monday = Date.parse("2026-08-03T00:00:00+02:00");
+const monday = new Date(2026, 7, 3).getTime();
 const items = [
   { id: "1", latestAt: monday + 1_000, status: "new", category: "bug", urgent: false },
   { id: "2", latestAt: monday + 2_000, status: "needs_reply", category: "bug", urgent: true },
   { id: "3", latestAt: monday + 3_000, status: "waiting_customer", category: "billing", urgent: false },
-  { id: "4", latestAt: Date.parse("2026-07-30T12:00:00+02:00"), status: "done", category: "other", urgent: false },
+  { id: "4", latestAt: new Date(2026, 6, 30, 12).getTime(), status: "done", category: "other", urgent: false },
 ];
-const brief = intelligence.weeklyBrief(items, Date.parse("2026-08-05T12:00:00+02:00"));
+const brief = intelligence.weeklyBrief(items, new Date(2026, 7, 5, 12).getTime());
 assert.equal(brief.total, 3);
 assert.equal(brief.needsReply, 1);
 assert.equal(brief.urgent, 1);
@@ -40,9 +40,9 @@ assert.match(brief.headline, /버그/);
 const buckets = intelligence.bucketByLocalDate(items);
 assert.equal(buckets.get("2026-08-03").length, 3);
 assert.equal(buckets.get("2026-07-30").length, 1);
-assert.equal(intelligence.startOfWeek(new Date("2026-08-05T12:00:00+02:00")).getDay(), 1);
-assert.equal(intelligence.monthGrid(new Date("2026-08-05T12:00:00+02:00")).length, 42);
-assert.equal(intelligence.yearMonths(new Date("2026-08-05T12:00:00+02:00")).length, 12);
+assert.equal(intelligence.startOfWeek(new Date(2026, 7, 5, 12)).getDay(), 1);
+assert.equal(intelligence.monthGrid(new Date(2026, 7, 5, 12)).length, 42);
+assert.equal(intelligence.yearMonths(new Date(2026, 7, 5, 12)).length, 12);
 assert.equal(intelligence.addLocalDays(new Date(2026, 2, 28, 12), 1).getHours(), 12);
 
 assert.deepEqual(intelligence.rewardTemplate("maintenance"), {
