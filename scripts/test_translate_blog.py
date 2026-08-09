@@ -103,7 +103,7 @@ class BlogTranslationTest(unittest.TestCase):
             "test-key", request_json=request_json, sleep=delays.append
         )
         self.assertEqual(translate(self.post, "en")["title"], "First log")
-        self.assertEqual(delays, [1, 2])
+        self.assertEqual(delays, [10, 30])
 
     def test_does_not_retry_non_transient_client_errors(self):
         calls = 0
@@ -135,7 +135,7 @@ class BlogTranslationTest(unittest.TestCase):
             "test-key", request_json=request_json, sleep=delays.append
         )
         self.assertEqual(translate(self.post, "en")["title"], "First log")
-        self.assertEqual(delays, [1, 2, 4])
+        self.assertEqual(delays, [10, 30, 60])
 
     def test_api_errors_never_echo_the_key(self):
         def request_json(_url, _headers, _payload):

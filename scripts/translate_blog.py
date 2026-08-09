@@ -25,6 +25,7 @@ GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6
 MAX_POST_CHARS = 100_000
 MAX_CHANGED_POSTS = 12
 RETRYABLE_STATUSES = {429, 500, 502, 503, 504}
+RETRY_DELAYS = (10, 30, 60)
 VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 SKIP_TEXT_TAGS = {"script", "style"}
 TRANSLATABLE_ATTRIBUTES = {"alt", "aria-label", "data-alt", "title"}
@@ -348,21 +349,21 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
         }
         headers = dict([("x-goog-api-key", api_key.strip())])
         response = None
-        for attempt in range(4):
+        for attempt in range(len(RETRY_DELAYS) + 1):
             try:
                 status, response = request_json(GEMINI_URL, headers, payload)
             except (TimeoutError, URLError):
-                if attempt == 3:
+                if attempt == len(RETRY_DELAYS):
                     raise RuntimeError("Gemini API network request failed after retries") from None
-                sleep(2 ** attempt)
+                sleep(RETRY_DELAYS[attempt])
                 continue
             if status == 200:
                 break
-            if status not in RETRYABLE_STATUSES or attempt == 3:
+            if status not in RETRYABLE_STATUSES or attempt == len(RETRY_DELAYS):
                 message = response.get("error", {}).get("message", "unknown error") if isinstance(response, dict) else "unknown error"
                 message = str(message).replace(api_key.strip(), "[redacted]")
                 raise RuntimeError(f"Gemini API failed ({status}): {message}")
-            sleep(2 ** attempt)
+            sleep(RETRY_DELAYS[attempt])
         value = parse_gemini_response(response)
         response_fragments = value.get("fragments")
         if not isinstance(response_fragments, list) or len(response_fragments) != len(protected_fragments):
