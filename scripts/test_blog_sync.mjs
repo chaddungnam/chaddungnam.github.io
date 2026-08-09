@@ -114,6 +114,18 @@ try {
   for (const locale of ["kr", "en", "de", "ja"]) {
     assert.match(blogSitemap, new RegExp(`https://houseduck\\.in/blog/${locale}/first-post/`));
   }
+
+  const stableRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-stable-"));
+  try {
+    await blogSync.syncFromXml(fixture, { outRoot: stableRoot });
+    const firstFeed = await readFile(path.join(stableRoot, "assets", "blog-feed.json"), "utf8");
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await blogSync.syncFromXml(fixture, { outRoot: stableRoot });
+    const secondFeed = await readFile(path.join(stableRoot, "assets", "blog-feed.json"), "utf8");
+    assert.equal(secondFeed, firstFeed, "unchanged RSS must not create a new generated diff");
+  } finally {
+    await rm(stableRoot, { recursive: true, force: true });
+  }
 } finally {
   await rm(outputRoot, { recursive: true, force: true });
 }

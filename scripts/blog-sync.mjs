@@ -175,8 +175,8 @@ function contentByLocale(post, translations) {
 
 export async function syncFromXml(xml, options) {
   const outRoot = path.resolve(options.outRoot);
-  const now = options.now || new Date().toISOString();
   const posts = parseRss(xml).sort((a, b) => b.publishedAt - a.publishedAt);
+  const now = options.now || posts[0]?.publishedAt.toISOString() || new Date(0).toISOString();
   const translations = options.translations?.posts || {};
   const feed = {
     updated_at: now,
