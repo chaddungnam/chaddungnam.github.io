@@ -101,17 +101,27 @@ class BlogTranslationTest(unittest.TestCase):
         def request_json(_url, _headers, payload):
             model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
             fragments = model_input["fragments"]
+            first_batch = not batches
             self.assertLessEqual(len(fragments), 80)
+            if first_batch:
+                self.assertIn("title", model_input)
+                self.assertIn("summary", model_input)
+                self.assertEqual(payload["generationConfig"]["responseSchema"]["required"], ["title", "summary", "fragments"])
+            else:
+                self.assertNotIn("title", model_input)
+                self.assertNotIn("summary", model_input)
+                self.assertEqual(payload["generationConfig"]["responseSchema"]["required"], ["fragments"])
             batches.append([fragment["id"] for fragment in fragments])
             contexts.append((model_input.get("context_before", []), model_input.get("context_after", [])))
-            return 200, gemini_response({
-                "title": "First log",
-                "summary": "First summary",
+            response = {
                 "fragments": [
                     {"id": fragment["id"], "text": "Sentence"}
                     for fragment in fragments
                 ],
-            })
+            }
+            if first_batch:
+                response.update(title="First log", summary="First summary")
+            return 200, gemini_response(response)
 
         result = self.module.gemini_translator(
             "test-key", request_json=request_json, sleep=delays.append

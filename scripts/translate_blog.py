@@ -394,15 +394,23 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
             else "Translate or romanize every Korean name and proper noun; never preserve Hangul. Spell out inferred quantities instead of adding literal digits. "
         )
         for batch_index, batch in enumerate(batches):
+            first_batch = batch_index == 0
             start = batch_index * MAX_FRAGMENTS_PER_REQUEST
             model_input = {
                 "target_language": TARGET_NAMES[locale],
-                "title": protected_title,
-                "summary": protected_summary,
                 "fragments": batch,
                 "context_before": protected_fragments[max(0, start - 1) : start],
                 "context_after": protected_fragments[start + len(batch) : start + len(batch) + 1],
             }
+            response_schema = schema
+            if first_batch:
+                model_input.update(title=protected_title, summary=protected_summary)
+            else:
+                response_schema = {
+                    "type": "OBJECT",
+                    "properties": {"fragments": schema["properties"]["fragments"]},
+                    "required": ["fragments"],
+                }
             contract_error = None
             for contract_attempt in range(MAX_CONTRACT_ATTEMPTS):
                 correction = "" if contract_error is None else (
@@ -426,7 +434,7 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                     "generationConfig": {
                         "maxOutputTokens": 65536,
                         "responseMimeType": "application/json",
-                        "responseSchema": schema,
+                        "responseSchema": response_schema,
                     },
                 }
                 response = None
@@ -450,8 +458,11 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                     response_fragments = value.get("fragments")
                     if not isinstance(response_fragments, list) or len(response_fragments) != len(batch):
                         raise ValueError("Gemini changed fragment IDs or order")
-                    batch_title = restore_brands(restore_numbers(value.get("title"), title_numbers), title_brands)
-                    batch_summary = restore_brands(restore_numbers(value.get("summary"), summary_numbers), summary_brands)
+                    if first_batch:
+                        batch_title = restore_brands(restore_numbers(value.get("title"), title_numbers), title_brands)
+                        batch_summary = restore_brands(restore_numbers(value.get("summary"), summary_numbers), summary_brands)
+                    else:
+                        batch_title, batch_summary = translated_title, translated_summary
                     restored_batch = []
                     for source_fragment, translated_fragment in zip(batch, response_fragments):
                         if not isinstance(translated_fragment, dict) or translated_fragment.get("id") != source_fragment["id"]:
@@ -466,12 +477,12 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                             **translated_fragment,
                             "text": translated_text,
                         })
-                    if not batch_title.strip() or not batch_summary.strip():
+                    if first_batch and (not batch_title.strip() or not batch_summary.strip()):
                         raise ValueError("Gemini returned an empty title or summary")
                     hangul_fields = []
-                    if HANGUL.search(batch_title):
+                    if first_batch and HANGUL.search(batch_title):
                         hangul_fields.append("title")
-                    if HANGUL.search(batch_summary):
+                    if first_batch and HANGUL.search(batch_summary):
                         hangul_fields.append("summary")
                     hangul_fields.extend(
                         fragment["id"] for fragment in restored_batch if HANGUL.search(fragment["text"])
@@ -480,16 +491,13 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                         raise ValueError(
                             "translation still contains Korean visible text in " + ", ".join(hangul_fields)
                         )
-                    source_visible = "\0".join((
-                        post["title"],
-                        post["summary"],
-                        *(fragment["text"] for fragment in fragmenter.fragments[start : start + len(batch)]),
-                    ))
-                    translated_visible = "\0".join((
-                        batch_title,
-                        batch_summary,
-                        *(fragment["text"] for fragment in restored_batch),
-                    ))
+                    source_fields = [fragment["text"] for fragment in fragmenter.fragments[start : start + len(batch)]]
+                    translated_fields = [fragment["text"] for fragment in restored_batch]
+                    if first_batch:
+                        source_fields[:0] = [post["title"], post["summary"]]
+                        translated_fields[:0] = [batch_title, batch_summary]
+                    source_visible = "\0".join(source_fields)
+                    translated_visible = "\0".join(translated_fields)
                     validate_visible_text(source_visible, translated_visible)
                 except ValueError as error:
                     contract_error = error
