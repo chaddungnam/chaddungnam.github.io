@@ -413,6 +413,34 @@ class BlogTranslationTest(unittest.TestCase):
                 self.assertEqual(delays, [7])
                 self.assertEqual(result["body_html"], f"<p>{valid_text}</p>")
 
+    def test_japanese_retry_targets_names_left_in_hangul(self):
+        post = {**self.post, "body_html": "<p>경기대학교</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            prompt = payload["systemInstruction"]["parts"][0]["text"]
+            self.assertIn("Japanese kanji or katakana", prompt)
+            if attempts == 2:
+                self.assertIn("f00000", prompt)
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [{
+                    "id": model_input["fragments"][0]["id"],
+                    "text": "경기대학교" if attempts == 1 else "京畿大学",
+                }],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "ja")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(result["body_html"], "<p>京畿大学</p>")
+
     def test_hides_brand_terms_from_gemini_and_restores_canonical_names(self):
         post = {
             **self.post,
