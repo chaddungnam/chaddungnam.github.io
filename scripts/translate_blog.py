@@ -74,6 +74,15 @@ def translate_html(source_html, target, translate):
     return parser.get_html()
 
 
+def needs_translation(source, existing):
+    cache = existing.get("posts", {})
+    return any(
+        cache.get(post["slug"], {}).get("source_hash") != post["source_hash"]
+        or not all(cache.get(post["slug"], {}).get(locale) for locale in TARGETS)
+        for post in source.get("posts", [])
+    )
+
+
 def update_cache(source, existing, translate):
     cache = {"posts": dict(existing.get("posts", {}))}
     for post in source.get("posts", []):
@@ -147,6 +156,9 @@ def main():
     source = json.loads(Path(args.input).read_text(encoding="utf-8"))
     output = Path(args.output)
     existing = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {"posts": {}}
+    if not needs_translation(source, existing):
+        print(f"translation cache current: {len(existing.get('posts', {}))} post(s)")
+        return
     updated = update_cache(source, existing, argos_translator())
     write_json_atomic(output, updated)
     print(f"translated cache: {len(updated['posts'])} post(s)")

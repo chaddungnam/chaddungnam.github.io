@@ -60,6 +60,23 @@ class BlogTranslationTest(unittest.TestCase):
             module.write_json_atomic(output, {"posts": {"one": {"source_hash": "hash"}}})
             self.assertEqual(json.loads(output.read_text()), {"posts": {"one": {"source_hash": "hash"}}})
 
+    def test_skips_model_startup_when_every_translation_is_current(self):
+        self.assertTrue(SCRIPT_PATH.exists(), "translate_blog.py must exist")
+        spec = importlib.util.spec_from_file_location("translate_blog_skip", SCRIPT_PATH)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        source = {"posts": [{"slug": "one", "source_hash": "same"}]}
+        existing = {"posts": {"one": {
+            "source_hash": "same",
+            "en": {"title": "x"},
+            "de": {"title": "x"},
+            "ja": {"title": "x"},
+        }}}
+        self.assertFalse(module.needs_translation(source, existing))
+        existing["posts"]["one"].pop("de")
+        self.assertTrue(module.needs_translation(source, existing))
+
 
 if __name__ == "__main__":
     unittest.main()
