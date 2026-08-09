@@ -255,8 +255,10 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
 .owner-tools a, .owner-tools button { min-height: 44px; padding: 0 15px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: .76rem; font-weight: 800; cursor: pointer; }
 .translation-note { display: flex; width: min(100%, 760px); align-items: start; gap: 16px; margin: 46px auto 0; padding: 18px 20px; border-left: 4px solid var(--gold); border-radius: 0 12px 12px 0; color: var(--muted); background: rgba(244, 200, 74, .13); font-size: .86rem; }
 .translation-note strong { flex: 0 0 auto; color: var(--navy); }
-.translation-note a { display: inline-flex; min-height: 44px; align-items: center; margin-left: 8px; color: var(--teal); font-weight: 850; text-decoration: underline; text-underline-offset: 3px; }
-.translation-note a[hidden] { display: none; }
+.translation-locales { display: flex; width: min(100%, 760px); flex-wrap: wrap; justify-content: center; gap: 7px; margin: 16px auto 0; }
+.translation-locales[hidden], .translation-locales a[hidden] { display: none; }
+.translation-locales a, .translation-locales span { display: grid; min-width: 48px; min-height: 44px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--paper); font-size: .78rem; font-weight: 800; }
+.translation-locales a:hover, .translation-locales span[aria-current="page"] { color: #10213e; background: var(--gold); }
 .article-body { width: min(100%, 760px); margin: clamp(54px, 8vw, 90px) auto 0; color: #3d3429; font-family: ui-serif, Georgia, "Noto Serif KR", serif; font-size: clamp(1.04rem, 1.7vw, 1.16rem); line-height: 1.9; overflow-wrap: anywhere; }
 .article-body > :first-child { margin-top: 0; }
 .article-body h2, .article-body h3, .article-body h4 { color: var(--navy); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; letter-spacing: -.04em; line-height: 1.25; scroll-margin-top: 110px; }
@@ -273,7 +275,7 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
 .article-body hr { margin: 3em 0; border: 0; border-top: 1px solid var(--line); }
 .article-body table { display: block; width: 100%; margin: 2em 0; overflow-x: auto; border-collapse: collapse; }
 .article-body th, .article-body td { padding: 12px 14px; border: 1px solid var(--line); text-align: left; }
-.article-body figure, .article-body .imageblock, .article-body .imagegridblock { max-width: min(100vw - 32px, 960px); margin: 2.4em 50%; transform: translateX(-50%); }
+.article-body figure, .article-body .imageblock, .article-body .imagegridblock { max-width: min(100vw - 32px, 960px); margin: 2.4em auto; transform: none; }
 .article-body figure img, .article-body .imageblock img { width: auto; max-width: 100%; height: auto; margin-inline: auto; border-radius: 16px; }
 .article-body figcaption, .article-body .cap1 { margin-top: 10px; color: var(--muted); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: .78rem; text-align: center; }
 .article-body iframe, .article-body video { max-width: 100%; border: 0; border-radius: 16px; }

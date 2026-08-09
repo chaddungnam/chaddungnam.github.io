@@ -37,8 +37,65 @@ function minHeight(selector) {
   return Number(match[1]);
 }
 
-test("a hidden translation link stays out of layout", () => {
-  assert.equal(declarations(".translation-note a[hidden]").display, "none");
+test("hidden translation controls stay out of layout", () => {
+  assert.equal(declarations(".translation-locales[hidden], .translation-locales a[hidden]").display, "none");
+});
+
+test("article media stays readable under Tistory's display-table rule", () => {
+  const media = declarations(".article-body figure, .article-body .imageblock, .article-body .imagegridblock");
+  assert.equal(media.margin, "2.4em auto");
+  assert.equal(media.transform, "none");
+  assert.notEqual(media.margin, "2.4em 50%");
+});
+
+test("article language controls expose every available translation", () => {
+  const links = ["en", "de", "ja"].map((locale) => ({
+    dataset: { blogLocale: locale },
+    hidden: true,
+    href: "#",
+  }));
+  const localeSwitcher = { hidden: true };
+  const document = {
+    documentElement: { dataset: {} },
+    body: { id: "tt-body-page" },
+    querySelector(selector) {
+      if (selector === "[data-translation-links]") return localeSwitcher;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === "[data-blog-locale]") return links;
+      return [];
+    },
+    addEventListener() {},
+  };
+  const replacements = [];
+
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document,
+    localStorage: { getItem: () => "", setItem() {} },
+    location: {
+      hostname: "blog.houseduck.in",
+      pathname: "/entry/first.post",
+      replace(value) { replacements.push(value); },
+      search: "",
+    },
+    navigator: { language: "ko", languages: ["ko"], userAgent: "" },
+    window: { HOUSE_DUCK_BLOG_LOCALES: { posts: { "first-post": {
+      kr: "https://houseduck.in/blog/kr/first-post/",
+      en: "https://houseduck.in/blog/en/first-post/",
+      de: "https://houseduck.in/blog/de/first-post/",
+      ja: "https://houseduck.in/blog/ja/first-post/",
+    } } } },
+  });
+
+  assert.equal(localeSwitcher.hidden, false);
+  assert.deepEqual(links.map(({ href, hidden }) => ({ href, hidden })), [
+    { href: "https://houseduck.in/blog/en/first-post/", hidden: false },
+    { href: "https://houseduck.in/blog/de/first-post/", hidden: false },
+    { href: "https://houseduck.in/blog/ja/first-post/", hidden: false },
+  ]);
+  assert.deepEqual(replacements, []);
 });
 
 test("the script leaves Tistory's native empty state as the only fallback", () => {
@@ -103,7 +160,7 @@ test("safe interactive skin controls keep a 44px minimum target", () => {
     ".article-index-link",
     ".article-category",
     ".owner-tools a, .owner-tools button",
-    ".translation-note a",
+    ".translation-locales a, .translation-locales span",
     ".article-tags a",
     ".tt_box_namecard .tt_btn_subscribe",
     ".tt-comment-cont .tt-btn_register",

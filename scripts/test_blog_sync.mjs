@@ -130,6 +130,35 @@ try {
   assert.match(englishPage, /hreflang="ko" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
   assert.match(englishPage, /hreflang="de" href="https:\/\/houseduck\.in\/blog\/de\/first-post\/"/);
   assert.match(englishPage, /hreflang="x-default" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
+  for (const locale of ["kr", "en", "de", "ja"]) {
+    assert.match(englishPage, new RegExp(`<a href="/blog/${locale}/first-post/"`), `post switcher needs ${locale}`);
+  }
+  assert.match(englishPage, /<a href="\/blog\/en\/first-post\/" aria-current="page">English<\/a>/);
+  assert.match(englishPage, /<meta property="og:type" content="article">/);
+  assert.match(englishPage, /<meta property="og:title" content="The first build log">/);
+  assert.match(englishPage, /<meta property="og:url" content="https:\/\/houseduck\.in\/blog\/en\/first-post\/">/);
+  assert.match(englishPage, /<meta property="og:image" content="https:\/\/blog\.kakaocdn\.net\/example\.png">/);
+  assert.match(englishPage, /<meta name="twitter:card" content="summary_large_image">/);
+  const jsonLdMatch = englishPage.match(/<script type="application\/ld\+json">([^<]+)<\/script>/);
+  assert.ok(jsonLdMatch, "post needs BlogPosting structured data");
+  assert.deepEqual(JSON.parse(jsonLdMatch[1]), {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: "The first build log",
+    description: "The first record of turning an idea into a real product.",
+    datePublished: "2026-08-09T07:32:44.000Z",
+    inLanguage: "en",
+    mainEntityOfPage: "https://houseduck.in/blog/en/first-post/",
+    url: "https://houseduck.in/blog/en/first-post/",
+    image: "https://blog.kakaocdn.net/example.png",
+    author: { "@type": "Organization", name: "House Duck", url: "https://houseduck.in/" },
+    publisher: {
+      "@type": "Organization",
+      name: "House Duck",
+      url: "https://houseduck.in/",
+      logo: { "@type": "ImageObject", url: "https://houseduck.in/assets/house-duck-logo.png" },
+    },
+  });
 
   const pendingRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-pending-"));
   try {

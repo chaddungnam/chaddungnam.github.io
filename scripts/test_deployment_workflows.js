@@ -5,6 +5,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "sync-blog.yml"), "utf8");
+const workflows = ["sync-blog.yml", "public-site-security.yml", "site-browser-qa.yml"]
+  .map((name) => fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", name), "utf8"))
+  .join("\n");
+
+assert.doesNotMatch(workflows, /actions\/checkout@(?!v5)|actions\/setup-node@(?!v6)|actions\/setup-python@(?!v6)/);
 
 assert.match(workflow, /permissions:\s*\n\s+contents:\s*write\s*\n\s+pages:\s*write/);
 assert.match(workflow, /name:\s*Trigger GitHub Pages build/);

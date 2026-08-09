@@ -67,7 +67,10 @@ assert.match(html, /tistory_admin\/lib\/jquery\/jquery-1\.12\.4\.min\.js/, "Tist
 assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels");
 assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
-assert.match(html, /data-translation-link/, "article needs a visible translated-version link");
+assert.match(html, /data-translation-links/, "article needs a translated-version language switcher");
+for (const locale of ["en", "de", "ja"]) {
+  assert.match(html, new RegExp(`data-blog-locale="${locale}"`), `article needs a ${locale} translation link`);
+}
 assert.match(
   html,
   /https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js/,
@@ -86,6 +89,8 @@ assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark them
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(2\.1rem,\s*4vw,\s*3\.6rem\)/, "desktop article titles must stay practical");
+assert.match(css, /\.article-body figure[^{}]*\{[^}]*margin:\s*2\.4em auto[^}]*transform:\s*none/, "article media must keep its natural readable width");
+assert.doesNotMatch(css, /\.article-body figure[^{}]*\{[^}]*margin:\s*2\.4em 50%/, "article media must not collapse under Tistory's display-table rule");
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.match(script, /house_duck_theme/, "theme choice must persist between visits");

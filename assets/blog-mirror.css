@@ -108,6 +108,7 @@ html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness
 .mirror-locales { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 28px; }
 .mirror-locales a { display: grid; min-width: 48px; min-height: 44px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); font-size: .78rem; font-weight: 800; }
 .mirror-locales a:hover, .mirror-locales a[aria-current="page"] { color: #10213e; background: var(--yellow); }
+.mirror-post-locales { width: min(100%, 760px); justify-content: center; margin: 22px auto 0; }
 .mirror-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 42px; }
 .mirror-grid article { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: transform 180ms ease, border-color 180ms ease; }
 .mirror-grid article:hover { transform: translateY(-4px); border-color: var(--cyan); }

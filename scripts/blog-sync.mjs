@@ -214,6 +214,29 @@ function renderPostPage(post, locale, content, availableLocales) {
   const canonical = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`;
   const translatedLabel = copy.auto ? "AUTOMATIC TRANSLATION" : "KOREAN ORIGINAL";
   const bodyHtml = sanitizeHtml(content.body_html);
+  const image = safeHttpsUrl(post.image);
+  const ogLocales = { kr: "ko_KR", en: "en_US", de: "de_DE", ja: "ja_JP" };
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: content.title,
+    description: content.summary,
+    datePublished: post.publishedAt.toISOString(),
+    inLanguage: copy.lang,
+    mainEntityOfPage: canonical,
+    url: canonical,
+    ...(image ? { image } : {}),
+    ...(locale === "kr" && post.category ? { articleSection: post.category } : {}),
+    author: { "@type": "Organization", name: "House Duck", url: `${SITE_ORIGIN}/` },
+    publisher: {
+      "@type": "Organization",
+      name: "House Duck",
+      url: `${SITE_ORIGIN}/`,
+      logo: { "@type": "ImageObject", url: `${SITE_ORIGIN}/assets/house-duck-logo.png` },
+    },
+  };
+  const koreanLabels = { en: "Korean", de: "Koreanisch", ja: "韓国語" };
+  const localeLinks = availableLocales.map((key) => `<a href="/blog/${key}/${encodeURIComponent(post.slug)}/"${key === locale ? ' aria-current="page"' : ""}>${key === "kr" && locale !== "kr" ? koreanLabels[locale] : LOCALES[key].label}</a>`).join("");
   return `<!doctype html>
 <html lang="${copy.lang}" data-theme="dark">
 <head>
@@ -221,11 +244,25 @@ function renderPostPage(post, locale, content, availableLocales) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="${escapeHtml(content.summary)}">
   <meta name="theme-color" content="#0d1525">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="${escapeHtml(content.title)}">
+  <meta property="og:description" content="${escapeHtml(content.summary)}">
+  <meta property="og:url" content="${canonical}">
+  <meta property="og:locale" content="${ogLocales[locale]}">
+${availableLocales.filter((key) => key !== locale).map((key) => `  <meta property="og:locale:alternate" content="${ogLocales[key]}">`).join("\n")}
+  <meta property="article:published_time" content="${post.publishedAt.toISOString()}">
+${image ? `  <meta property="og:image" content="${escapeHtml(image)}">` : ""}
+  <meta name="twitter:card" content="${image ? "summary_large_image" : "summary"}">
+  <meta name="twitter:title" content="${escapeHtml(content.title)}">
+  <meta name="twitter:description" content="${escapeHtml(content.summary)}">
+${image ? `  <meta name="twitter:image" content="${escapeHtml(image)}">` : ""}
   <link rel="canonical" href="${canonical}">
 ${alternateLinks(post, availableLocales)}
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/blog-mirror.css">
   <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">${JSON.stringify(structuredData).replaceAll("<", "\\u003c")}</script>
   <title>${escapeHtml(content.title)} — House Duck Blog</title>
 </head>
 <body>
@@ -235,6 +272,7 @@ ${alternateLinks(post, availableLocales)}
     <a class="mirror-back" href="/blog/${locale}/">← ${copy.back}</a>
     <article>
       <header class="mirror-post-header"><p>HOUSE DUCK · ${translatedLabel}</p><h1>${escapeHtml(content.title)}</h1><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language">${localeLinks}</nav>
       <aside class="mirror-note"><strong>${copy.noteTitle}</strong><span>${copy.note} <a href="${escapeHtml(originalViewUrl(post.originalUrl))}">${copy.original}</a></span></aside>
       <div class="mirror-body">${bodyHtml}</div>
     </article>

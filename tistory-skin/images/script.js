@@ -48,13 +48,25 @@
   if (typeof location === "undefined" || typeof navigator === "undefined") return;
   const language = String((navigator.languages && navigator.languages[0]) || navigator.language || "ko").toLowerCase().split("-")[0];
   const locale = { en: "en", de: "de", ja: "ja" }[language];
-  const slug = decodeURIComponent(location.pathname.split("/").filter(Boolean).pop() || "");
+  const slug = decodeURIComponent(location.pathname.split("/").filter(Boolean).pop() || "")
+    .normalize("NFKC")
+    .replace(/[^\p{Letter}\p{Number}_-]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120) || "post";
   const localeEntry = window.HOUSE_DUCK_BLOG_LOCALES && window.HOUSE_DUCK_BLOG_LOCALES.posts && window.HOUSE_DUCK_BLOG_LOCALES.posts[slug];
   const translatedUrl = locale && localeEntry && localeEntry[locale];
-  const translationLink = document.querySelector("[data-translation-link]");
-  if (translatedUrl && translationLink) {
-    translationLink.href = translatedUrl;
-    translationLink.hidden = false;
+  const translationLinks = document.querySelectorAll("[data-blog-locale]");
+  let availableTranslations = 0;
+  translationLinks.forEach((link) => {
+    const translatedHref = localeEntry && localeEntry[link.dataset.blogLocale];
+    if (!translatedHref) return;
+    link.href = translatedHref;
+    link.hidden = false;
+    availableTranslations += 1;
+  });
+  const translationSwitcher = document.querySelector("[data-translation-links]");
+  if (translationSwitcher && availableTranslations > 0) {
+    translationSwitcher.hidden = false;
   }
 
   const originalRequested = new URLSearchParams(location.search).get("original") === "1";
