@@ -257,6 +257,18 @@ class BlogTranslationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "changed a number"):
             self.module.validate_translation(source, translated)
 
+    def test_rejects_unprotected_model_numbers(self):
+        def request_json(_url, _headers, payload):
+            response = self.translated_response(payload)
+            value = json.loads(response["candidates"][0]["content"]["parts"][0]["text"])
+            value["fragments"][0]["text"] = "COVID-19"
+            return 200, gemini_response(value)
+
+        with self.assertRaisesRegex(ValueError, "unprotected number"):
+            self.module.gemini_translator(
+                "test-key", request_json=request_json, sleep=lambda _seconds: None
+            )(self.post, "en")
+
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
         source = {"translation_version": 5, "posts": [self.post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
