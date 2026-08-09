@@ -326,6 +326,90 @@ class BlogTranslationTest(unittest.TestCase):
                 "test-key", request_json=request_json, sleep=lambda _seconds: None
             )(self.post, "en")
 
+    def test_retries_a_contract_violation_without_duplicating_fragments(self):
+        post = {
+            **self.post,
+            "body_html": "<p>코로나</p><p>계속</p>",
+        }
+        attempts = 0
+        delays = []
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            fragments = [
+                {"id": fragment["id"], "text": text}
+                for fragment, text in zip(model_input["fragments"], ("COVID", "Continues"))
+            ]
+            if attempts == 1:
+                fragments[1]["text"] = "COVID-19"
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": fragments,
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=delays.append
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(delays, [7])
+        self.assertEqual(result["body_html"], "<p>COVID</p><p>Continues</p>")
+
+    def test_reports_locale_and_batch_after_contract_retries_are_exhausted(self):
+        attempts = 0
+        delays = []
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            response = self.translated_response(payload)
+            value = json.loads(response["candidates"][0]["content"]["parts"][0]["text"])
+            value["fragments"][0]["text"] = "COVID-19"
+            return 200, gemini_response(value)
+
+        with self.assertRaisesRegex(ValueError, "en batch 1/1.*unprotected number"):
+            self.module.gemini_translator(
+                "test-key", request_json=request_json, sleep=delays.append
+            )(self.post, "en")
+        self.assertEqual(attempts, 3)
+        self.assertEqual(delays, [7, 7])
+
+    def test_retries_korean_empty_or_changed_brand_text(self):
+        cases = (
+            ("안녕", "안녕", "Hello"),
+            ("안녕", " ", "Hello"),
+            ("House Duck", "Duck House", "House Duck"),
+        )
+        for source_text, invalid_text, valid_text in cases:
+            with self.subTest(invalid_text=invalid_text):
+                post = {**self.post, "body_html": f"<p>{source_text}</p>"}
+                attempts = 0
+                delays = []
+
+                def request_json(_url, _headers, payload):
+                    nonlocal attempts
+                    attempts += 1
+                    model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+                    return 200, gemini_response({
+                        "title": "First log",
+                        "summary": "First summary",
+                        "fragments": [{
+                            "id": model_input["fragments"][0]["id"],
+                            "text": invalid_text if attempts == 1 else valid_text,
+                        }],
+                    })
+
+                result = self.module.gemini_translator(
+                    "test-key", request_json=request_json, sleep=delays.append
+                )(post, "en")
+
+                self.assertEqual(attempts, 2)
+                self.assertEqual(delays, [7])
+                self.assertEqual(result["body_html"], f"<p>{valid_text}</p>")
+
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
         source = {"translation_version": 5, "posts": [self.post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
