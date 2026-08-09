@@ -89,6 +89,63 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertNotIn("body_html", payload["contents"][0]["parts"][0]["text"])
         self.assertNotIn("cdn.example", payload["contents"][0]["parts"][0]["text"])
 
+    def test_splits_long_articles_into_stable_fragment_batches(self):
+        post = {
+            **self.post,
+            "body_html": "".join("<p>문장</p>" for _ in range(81)),
+        }
+        batches = []
+        contexts = []
+        delays = []
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            fragments = model_input["fragments"]
+            self.assertLessEqual(len(fragments), 80)
+            batches.append([fragment["id"] for fragment in fragments])
+            contexts.append((model_input.get("context_before", []), model_input.get("context_after", [])))
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [
+                    {"id": fragment["id"], "text": "Sentence"}
+                    for fragment in fragments
+                ],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=delays.append
+        )(post, "en")
+
+        self.assertEqual(len(batches), 2)
+        self.assertEqual([fragment_id for batch in batches for fragment_id in batch], [f"f{index:05d}" for index in range(81)])
+        self.assertEqual(contexts[0], ([], [{"id": "f00080", "text": "문장"}]))
+        self.assertEqual(contexts[1], ([{"id": "f00079", "text": "문장"}], []))
+        self.assertEqual(delays, [7, 7])
+        self.assertEqual(result["body_html"].count("<p>Sentence</p>"), 81)
+
+    def test_rejects_articles_that_would_create_too_many_batches(self):
+        post = {
+            **self.post,
+            "body_html": "".join("<p>문장</p>" for _ in range(961)),
+        }
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [
+                    {"id": fragment["id"], "text": "Sentence"}
+                    for fragment in model_input["fragments"]
+                ],
+            })
+
+        with self.assertRaisesRegex(ValueError, "too many translation batches"):
+            self.module.gemini_translator(
+                "test-key", request_json=request_json, sleep=lambda _seconds: None
+            )(post, "en")
+
     def test_retries_rate_limits_and_server_errors_with_backoff(self):
         statuses = [429, 503, 200]
         delays = []
