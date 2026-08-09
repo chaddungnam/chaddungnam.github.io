@@ -98,6 +98,49 @@ test("article language controls expose every available translation", () => {
   assert.deepEqual(replacements, []);
 });
 
+test("the live legacy skin receives the media fix and all locale links", () => {
+  const links = [{ dataset: {}, hidden: true, href: "#", textContent: "기기 언어 번역본 보기" }];
+  const media = { style: {} };
+  const note = { append(link) { links.push(link); } };
+  const document = {
+    documentElement: { dataset: {} },
+    body: { id: "tt-body-page" },
+    createElement() { return { dataset: {}, hidden: true, href: "#", textContent: "" }; },
+    querySelector(selector) {
+      if (selector === "[data-translation-link]") return links[0];
+      if (selector === ".translation-note span") return note;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === "[data-blog-locale]") return links;
+      if (selector.includes(".article-body figure")) return [media];
+      return [];
+    },
+    addEventListener() {},
+  };
+
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document,
+    localStorage: { getItem: () => "", setItem() {} },
+    location: { hostname: "blog.houseduck.in", pathname: "/entry/first-post", replace() {}, search: "" },
+    navigator: { language: "ko", languages: ["ko"], userAgent: "" },
+    window: { HOUSE_DUCK_BLOG_LOCALES: { posts: { "first-post": {
+      en: "https://houseduck.in/blog/en/first-post/",
+      de: "https://houseduck.in/blog/de/first-post/",
+      ja: "https://houseduck.in/blog/ja/first-post/",
+    } } } },
+  });
+
+  assert.deepEqual(links.map(({ dataset, href, hidden, textContent }) => ({ dataset, href, hidden, textContent })), [
+    { dataset: { blogLocale: "en" }, href: "https://houseduck.in/blog/en/first-post/", hidden: false, textContent: "English" },
+    { dataset: { blogLocale: "de" }, href: "https://houseduck.in/blog/de/first-post/", hidden: false, textContent: "Deutsch" },
+    { dataset: { blogLocale: "ja" }, href: "https://houseduck.in/blog/ja/first-post/", hidden: false, textContent: "日本語" },
+  ]);
+  assert.equal(media.style.margin, "2.4em auto");
+  assert.equal(media.style.transform, "none");
+});
+
 test("the script leaves Tistory's native empty state as the only fallback", () => {
   const stream = {
     innerHTML: "",

@@ -45,6 +45,11 @@
     });
   }
 
+  document.querySelectorAll(".article-body figure, .article-body .imageblock, .article-body .imagegridblock").forEach((media) => {
+    media.style.margin = "2.4em auto";
+    media.style.transform = "none";
+  });
+
   if (typeof location === "undefined" || typeof navigator === "undefined") return;
   const language = String((navigator.languages && navigator.languages[0]) || navigator.language || "ko").toLowerCase().split("-")[0];
   const locale = { en: "en", de: "de", ja: "ja" }[language];
@@ -55,6 +60,21 @@
     .slice(0, 120) || "post";
   const localeEntry = window.HOUSE_DUCK_BLOG_LOCALES && window.HOUSE_DUCK_BLOG_LOCALES.posts && window.HOUSE_DUCK_BLOG_LOCALES.posts[slug];
   const translatedUrl = locale && localeEntry && localeEntry[locale];
+  let translationSwitcher = document.querySelector("[data-translation-links]");
+  if (!translationSwitcher) {
+    const legacyLink = document.querySelector("[data-translation-link]");
+    const legacyContainer = document.querySelector(".translation-note span");
+    if (legacyLink && legacyContainer) {
+      [["en", "English"], ["de", "Deutsch"], ["ja", "日本語"]].forEach(([key, label], index) => {
+        const link = index === 0 ? legacyLink : document.createElement("a");
+        link.dataset.blogLocale = key;
+        link.textContent = label;
+        link.hidden = true;
+        if (index > 0) legacyContainer.append(link);
+      });
+      translationSwitcher = legacyContainer;
+    }
+  }
   const translationLinks = document.querySelectorAll("[data-blog-locale]");
   let availableTranslations = 0;
   translationLinks.forEach((link) => {
@@ -64,7 +84,6 @@
     link.hidden = false;
     availableTranslations += 1;
   });
-  const translationSwitcher = document.querySelector("[data-translation-links]");
   if (translationSwitcher && availableTranslations > 0) {
     translationSwitcher.hidden = false;
   }
