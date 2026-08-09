@@ -21,7 +21,7 @@ from urllib.request import Request, urlopen
 TARGETS = ("en", "de", "ja")
 TARGET_NAMES = {"en": "English", "de": "German", "ja": "Japanese"}
 TRANSLATION_PIPELINE_VERSION = 5
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
 MAX_POST_CHARS = 100_000
 MAX_CHANGED_POSTS = 12
 MAX_FRAGMENTS_PER_REQUEST = 80
@@ -389,9 +389,9 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
         if len(batches) > MAX_BATCHES_PER_POST:
             raise ValueError(f"post requires too many translation batches: {len(batches)}")
         name_instruction = (
-            "For Japanese, render every Korean name and proper noun in Japanese kanji or katakana; never preserve Hangul. "
+            "For Japanese, render every Korean name and proper noun in Japanese kanji or katakana; never preserve Hangul. Use Japanese kanji numerals for inferred quantities instead of Arabic digits. "
             if locale == "ja"
-            else "Translate or romanize every Korean name and proper noun; never preserve Hangul. "
+            else "Translate or romanize every Korean name and proper noun; never preserve Hangul. Spell out inferred quantities instead of adding literal digits. "
         )
         for batch_index, batch in enumerate(batches):
             start = batch_index * MAX_FRAGMENTS_PER_REQUEST

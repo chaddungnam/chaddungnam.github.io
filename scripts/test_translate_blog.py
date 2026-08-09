@@ -80,7 +80,7 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(result, {**self.english, "reviewed": True, "summary_reviewed": True})
         self.assertEqual(len(calls), 1)
         url, headers, payload = calls[0]
-        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent")
+        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent")
         self.assertEqual(headers["x-goog-api-key"], "test-key")
         self.assertNotIn("test-key", url)
         self.assertEqual(payload["generationConfig"]["responseMimeType"], "application/json")
@@ -440,6 +440,32 @@ class BlogTranslationTest(unittest.TestCase):
 
         self.assertEqual(attempts, 2)
         self.assertEqual(result["body_html"], "<p>京畿大学</p>")
+
+    def test_japanese_spells_inferred_numbers_without_digits(self):
+        post = {**self.post, "body_html": "<p>한 번</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            prompt = payload["systemInstruction"]["parts"][0]["text"]
+            self.assertIn("Japanese kanji numerals", prompt)
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [{
+                    "id": model_input["fragments"][0]["id"],
+                    "text": "1回" if attempts == 1 else "一回",
+                }],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "ja")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(result["body_html"], "<p>一回</p>")
 
     def test_hides_brand_terms_from_gemini_and_restores_canonical_names(self):
         post = {
