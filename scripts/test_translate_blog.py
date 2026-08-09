@@ -134,6 +134,40 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(delays, [7, 7])
         self.assertEqual(result["body_html"].count("<p>Sentence</p>"), 81)
 
+    def test_keeps_inline_groups_together_at_a_batch_boundary(self):
+        post = {
+            **self.post,
+            "body_html": "".join("<p>문장</p>" for _ in range(79))
+            + "<p><span>첫</span><b>둘</b></p>",
+        }
+        batches = []
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            fragments = model_input["fragments"]
+            batches.append([fragment["id"] for fragment in fragments])
+            response = {
+                "fragments": [
+                    {
+                        "id": fragment["id"],
+                        "text": {"문장": "Sentence", "첫": "First", "둘": "second"}.get(
+                            fragment["text"], fragment["text"]
+                        ),
+                    }
+                    for fragment in fragments
+                ],
+            }
+            if len(batches) == 1:
+                response.update(title="First log", summary="First summary")
+            return 200, gemini_response(response)
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual([len(batch) for batch in batches], [79, 2])
+        self.assertIn("<p><span>First</span><b> second</b></p>", result["body_html"])
+
     def test_rejects_articles_that_would_create_too_many_batches(self):
         post = {
             **self.post,
@@ -271,7 +305,7 @@ class BlogTranslationTest(unittest.TestCase):
             "summary": "2026년 8월 9일 시작",
             "body_html": "<p>1번과 19번</p>",
         }
-        token_pattern = re.compile(r"__HD_NUMBER_[A-Z0-9_]+__")
+        token_pattern = re.compile(r"__HD_(?:NUMBER|YEAR)_[A-Z0-9_]+__")
 
         def request_json(_url, _headers, payload):
             model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
@@ -315,8 +349,209 @@ class BlogTranslationTest(unittest.TestCase):
 
     def test_allows_localized_date_order(self):
         protected, numbers = self.module.protect_numbers("2026년 8월 9일")
-        tokens = re.findall(r"__HD_NUMBER_[A-Z]+__", protected)
+        tokens = re.findall(r"__HD_(?:YEAR|NUMBER)_[A-Z]+__", protected)
+        self.assertTrue(tokens[0].startswith("__HD_YEAR_"))
         self.assertEqual(self.module.restore_numbers(f"{tokens[1]}/{tokens[2]}/{tokens[0]}", numbers), "8/9/2026")
+        duration, _numbers = self.module.protect_numbers("2025년 동안 3년")
+        self.assertNotIn("__HD_YEAR_", duration)
+
+    def test_year_tokens_fail_closed(self):
+        protected, numbers = self.module.protect_numbers("2025년에 시작했다")
+        token = re.search(r"__HD_YEAR_[A-Z]+__", protected).group(0)
+        with self.assertRaisesRegex(ValueError, "changed a protected number token"):
+            self.module.restore_numbers("Started", numbers)
+        with self.assertRaisesRegex(ValueError, "unknown number token"):
+            self.module.restore_numbers("__HD_YEAR_Z__", [])
+        with self.assertRaisesRegex(ValueError, "reserved number token"):
+            self.module.protect_numbers(token)
+
+    def test_year_token_context_rejects_duration_variants_without_calendar_false_positives(self):
+        protected, numbers = self.module.protect_numbers("2025년 목표")
+        token = re.search(r"__HD_YEAR_[A-Z]+__", protected).group(0)
+        invalid = {
+            "en": f"{token} calendar years",
+            "de": f"{token} Kalenderjahre",
+            "ja": f"{token}年以上続いた",
+        }
+        for locale, text in invalid.items():
+            with self.subTest(locale=locale):
+                with self.assertRaisesRegex(ValueError, "calendar year token"):
+                    self.module.validate_year_token_context(text, numbers, locale)
+        self.module.validate_year_token_context(f"{token}年目標", numbers, "ja")
+        with self.assertRaisesRegex(ValueError, "calendar year token"):
+            self.module.validate_year_token_context(f"{token}年目に入った", numbers, "ja")
+        with self.assertRaisesRegex(ValueError, "calendar year token"):
+            self.module.validate_year_token_context(f"{token} 年後に始まった", numbers, "ja")
+
+    def test_retries_calendar_years_translated_as_durations(self):
+        post = {**self.post, "body_html": "<p>그렇게 2025년, 결혼해서 독일로 넘어왔다.</p>"}
+        cases = {
+            "en": ("A __YEAR__-year period ended.", "In __YEAR__, we got married."),
+            "de": ("Ein __YEAR__-jähriger Zeitraum endete.", "Im Jahr __YEAR__ heirateten wir."),
+            "ja": ("__YEAR__年後に始まった。", "__YEAR__年に始まった。"),
+        }
+        for locale, (invalid, valid) in cases.items():
+            with self.subTest(locale=locale):
+                attempts = 0
+
+                def request_json(_url, _headers, payload):
+                    nonlocal attempts
+                    attempts += 1
+                    prompt = payload["systemInstruction"]["parts"][0]["text"]
+                    self.assertIn("calendar year", prompt)
+                    model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+                    source_text = model_input["fragments"][0]["text"]
+                    year_token = re.search(r"__HD_YEAR_[A-Z]+__", source_text).group(0)
+                    translated = (invalid if attempts == 1 else valid).replace("__YEAR__", year_token)
+                    return 200, gemini_response({
+                        "title": "First log",
+                        "summary": "First summary",
+                        "fragments": [{"id": model_input["fragments"][0]["id"], "text": translated}],
+                    })
+
+                result = self.module.gemini_translator(
+                    "test-key", request_json=request_json, sleep=lambda _seconds: None
+                )(post, locale)
+
+                self.assertEqual(attempts, 2)
+                self.assertNotRegex(result["body_html"], r"2025(?:[- ]year|[- ]jähr|年後)")
+
+    def test_distinguishes_a_calendar_year_from_the_same_number_as_a_duration(self):
+        post = {**self.post, "body_html": "<p>2025년에 시작했고 2025년 동안 지속됐다.</p>"}
+
+        def request_json(_url, _headers, payload):
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            text = model_input["fragments"][0]["text"]
+            year = re.search(r"__HD_YEAR_[A-Z]+__", text).group(0)
+            duration = re.search(r"__HD_NUMBER_[A-Z]+__", text).group(0)
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [{
+                    "id": model_input["fragments"][0]["id"],
+                    "text": f"It started in {year} and lasted {duration} years.",
+                }],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(result["body_html"], "<p>It started in 2025 and lasted 2025 years.</p>")
+
+    def test_retries_year_meaning_split_across_inline_fragments(self):
+        post = {**self.post, "body_html": "<p><span>2025년</span><b>에 시작했다</b></p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            year = re.search(r"__HD_YEAR_[A-Z]+__", model_input["fragments"][0]["text"]).group(0)
+            second = "years later, it began" if attempts == 1 else "was when it began"
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [
+                    {"id": model_input["fragments"][0]["id"], "text": year},
+                    {"id": model_input["fragments"][1]["id"], "text": second},
+                ],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertIn("<span>2025</span><b> was when it began</b>", result["body_html"])
+
+    def test_classifies_calendar_year_split_by_inline_source_markup(self):
+        post = {**self.post, "body_html": "<p><b>2025</b>년에 시작했다</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            year = re.search(r"__HD_YEAR_[A-Z]+__", model_input["fragments"][0]["text"]).group(0)
+            second = "years later, it began" if attempts == 1 else "was when it began"
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [
+                    {"id": model_input["fragments"][0]["id"], "text": year},
+                    {"id": model_input["fragments"][1]["id"], "text": second},
+                ],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertIn("<b>2025</b> was when it began", result["body_html"])
+
+    def test_retries_misleading_german_sole_proprietor_terms(self):
+        post = {**self.post, "body_html": "<p>독일에서 개인사업자 등록도 마쳤다.</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            prompt = payload["systemInstruction"]["parts"][0]["text"]
+            self.assertIn("Einzelunternehmen", prompt)
+            self.assertIn("Kleinunternehmer", prompt)
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            text = (
+                "Ich habe die Registrierung als Kleinunternehmer abgeschlossen."
+                if attempts == 1 else
+                "Ich habe ein Einzelunternehmen angemeldet."
+            )
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [{"id": model_input["fragments"][0]["id"], "text": text}],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "de")
+
+        self.assertEqual(attempts, 2)
+        self.assertIn("Einzelunternehmen", result["body_html"])
+        self.assertNotIn("Kleinunternehmer", result["body_html"])
+        self.module.validate_locale_semantics(
+            "독일에서 개인사업자를 만드는 과정",
+            "die Gründung eines Einzelunternehmens",
+            "de",
+        )
+        self.module.validate_locale_semantics(
+            "독일에서 개인사업자 등록도 마쳤다",
+            "Ich habe in Deutschland ein Gewerbe angemeldet",
+            "de",
+        )
+
+    def test_adds_missing_spaces_across_inline_translation_fragments(self):
+        fragmenter = self.module.FragmentingHTMLParser()
+        fragmenter.feed(
+            "<p><span>첫 게임 </span><b><span>Quirky Ball</span></b><span>로 정했다.</span></p>"
+            "<p><b><span>House Duck,</span></b><span>라고 부른다.</span></p>"
+        )
+        fragmenter.close()
+        translated = [
+            {"id": "f00000", "text": "The first game "},
+            {"id": "f00001", "text": "Quirky Ball"},
+            {"id": "f00002", "text": "was chosen."},
+            {"id": "f00003", "text": "House Duck,"},
+            {"id": "f00004", "text": "as it is called."},
+        ]
+
+        self.assertEqual(
+            fragmenter.render(translated, "en"),
+            "<p><span>The first game </span><b><span>Quirky Ball</span></b><span> was chosen.</span></p>"
+            "<p><b><span>House Duck,</span></b><span> as it is called.</span></p>",
+        )
+        self.assertNotIn("<span> was", fragmenter.render(translated, "ja"))
 
     def test_rejects_changed_number_signs(self):
         source = {"title": "Range", "summary": "Temperature", "body_html": "<p>-5 to +10</p>"}
@@ -540,7 +775,7 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(result["body_html"], "<p>Godot</p>")
 
     def test_failed_locale_keeps_the_existing_cache_untouched(self):
-        source = {"translation_version": 5, "posts": [self.post]}
+        source = {"translation_version": 6, "posts": [self.post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
         before = copy.deepcopy(existing)
 
@@ -554,11 +789,11 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(existing, before)
 
     def test_source_hash_version_and_review_state_control_regeneration(self):
-        source = {"translation_version": 5, "posts": [self.post]}
+        source = {"translation_version": 6, "posts": [self.post]}
         valid_locale = {**self.english, "reviewed": True, "summary_reviewed": True}
         current = {"posts": {"first-post": {
             "source_hash": "new-hash",
-            "translation_version": 5,
+            "translation_version": 6,
             "en": valid_locale,
             "de": valid_locale,
             "ja": valid_locale,
@@ -567,7 +802,7 @@ class BlogTranslationTest(unittest.TestCase):
 
         for mutation in (
             lambda value: value["posts"]["first-post"].update(source_hash="changed"),
-            lambda value: value["posts"]["first-post"].update(translation_version=3),
+            lambda value: value["posts"]["first-post"].update(translation_version=5),
             lambda value: value["posts"]["first-post"]["de"].update(reviewed=False),
         ):
             stale = copy.deepcopy(current)
@@ -578,7 +813,7 @@ class BlogTranslationTest(unittest.TestCase):
         oversized = {**self.post, "body_html": f"<p>{'가' * (self.module.MAX_POST_CHARS + 1)}</p>"}
         with self.assertRaises(ValueError):
             self.module.update_cache(
-                {"translation_version": 5, "posts": [oversized]},
+                {"translation_version": 6, "posts": [oversized]},
                 {"posts": {}},
                 lambda _post, _locale: self.english,
             )
@@ -586,7 +821,7 @@ class BlogTranslationTest(unittest.TestCase):
         posts = [{**self.post, "slug": f"post-{index}", "source_hash": str(index)} for index in range(self.module.MAX_CHANGED_POSTS + 1)]
         with self.assertRaises(ValueError):
             self.module.update_cache(
-                {"translation_version": 5, "posts": posts},
+                {"translation_version": 6, "posts": posts},
                 {"posts": {}},
                 lambda _post, _locale: self.english,
             )

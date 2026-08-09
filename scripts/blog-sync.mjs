@@ -6,7 +6,7 @@ import sanitizeHtmlLibrary from "sanitize-html";
 
 const SITE_ORIGIN = "https://houseduck.in";
 const BLOG_ORIGIN = "https://blog.houseduck.in";
-const TRANSLATION_PIPELINE_VERSION = 5;
+const TRANSLATION_PIPELINE_VERSION = 6;
 const YOUTUBE_EMBED_HOSTS = new Set(["youtube.com", "www.youtube.com", "www.youtube-nocookie.com"]);
 const LOCALES = {
   kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
