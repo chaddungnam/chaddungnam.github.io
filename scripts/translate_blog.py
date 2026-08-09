@@ -21,7 +21,7 @@ from urllib.request import Request, urlopen
 TARGETS = ("en", "de", "ja")
 TARGET_NAMES = {"en": "English", "de": "German", "ja": "Japanese"}
 TRANSLATION_PIPELINE_VERSION = 4
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent"
 MAX_POST_CHARS = 100_000
 MAX_CHANGED_POSTS = 12
 RETRYABLE_STATUSES = {429, 500, 502, 503, 504}
@@ -282,7 +282,6 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
             )}]},
             "contents": [{"role": "user", "parts": [{"text": json.dumps(model_input, ensure_ascii=False)}]}],
             "generationConfig": {
-                "temperature": 0.1,
                 "maxOutputTokens": 65536,
                 "responseMimeType": "application/json",
                 "responseSchema": schema,

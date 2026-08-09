@@ -79,10 +79,11 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(result, {**self.english, "reviewed": True, "summary_reviewed": True})
         self.assertEqual(len(calls), 1)
         url, headers, payload = calls[0]
-        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+        self.assertEqual(url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent")
         self.assertEqual(headers["x-goog-api-key"], "test-key")
         self.assertNotIn("test-key", url)
         self.assertEqual(payload["generationConfig"]["responseMimeType"], "application/json")
+        self.assertNotIn("temperature", payload["generationConfig"])
         self.assertEqual(payload["generationConfig"]["responseSchema"]["required"], ["title", "summary", "fragments"])
         self.assertNotIn("body_html", payload["contents"][0]["parts"][0]["text"])
         self.assertNotIn("cdn.example", payload["contents"][0]["parts"][0]["text"])
