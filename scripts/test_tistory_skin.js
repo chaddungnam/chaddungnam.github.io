@@ -68,6 +68,11 @@ assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels")
 assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
 assert.match(html, /data-translation-link/, "article needs a visible translated-version link");
+assert.match(
+  html,
+  /https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js/,
+  "live Tistory skin should load the repository-managed behavior script"
+);
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /images\/house-duck-wordmark\.png/, "skin must use the House Duck PNG wordmark");
 assert.match(html, /<details class="category-menu"[\s\S]*?\[##_category_##\][\s\S]*?<\/details>/, "desktop navigation needs Tistory categories");
