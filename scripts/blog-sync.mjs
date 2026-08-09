@@ -10,9 +10,9 @@ const TRANSLATION_PIPELINE_VERSION = 3;
 const YOUTUBE_EMBED_HOSTS = new Set(["youtube.com", "www.youtube.com", "www.youtube-nocookie.com"]);
 const LOCALES = {
   kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
-  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", pendingTitle: "Full translation under review", pending: "To avoid publishing a misleading machine translation, the full text remains hidden until it is reviewed.", pendingSummary: "This article is being reviewed. Read the Korean original for the complete story.", original: "Read the Korean original", auto: true },
-  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", pendingTitle: "Vollständige Übersetzung wird geprüft", pending: "Um irreführende maschinelle Übersetzungen zu vermeiden, bleibt der vollständige Text bis zur Prüfung verborgen.", pendingSummary: "Dieser Beitrag wird geprüft. Die vollständige Geschichte finden Sie im koreanischen Original.", original: "Koreanisches Original lesen", auto: true },
-  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", pendingTitle: "本文の翻訳を確認中", pending: "誤解を招く機械翻訳の公開を避けるため、確認が終わるまで本文を非表示にしています。", pendingSummary: "この記事は確認中です。全文は韓国語の原文でお読みいただけます。", original: "韓国語の原文を読む", auto: true },
+  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", pendingTitle: "Full translation under review", pending: "The reviewed summary appears first. The complete Korean original is shown below and can be translated with your browser.", pendingSummary: "This article is being reviewed. Read the Korean original for the complete story.", sourceTitle: "Complete Korean original", original: "Read the Korean original", auto: true },
+  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", pendingTitle: "Vollständige Übersetzung wird geprüft", pending: "Zuerst erscheint die geprüfte Zusammenfassung. Darunter steht der vollständige koreanische Originaltext, den Ihr Browser übersetzen kann.", pendingSummary: "Dieser Beitrag wird geprüft. Die vollständige Geschichte finden Sie im koreanischen Original.", sourceTitle: "Vollständiger koreanischer Originaltext", original: "Koreanisches Original lesen", auto: true },
+  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", pendingTitle: "本文の翻訳を確認中", pending: "確認済みの要約を先に表示し、その下に韓国語の原文全文を掲載しています。ブラウザの翻訳機能も利用できます。", pendingSummary: "この記事は確認中です。全文は韓国語の原文でお読みいただけます。", sourceTitle: "韓国語の原文全文", original: "韓国語の原文を読む", auto: true },
 };
 
 function decodeEntities(value) {
@@ -216,7 +216,9 @@ function renderPostPage(post, locale, content, availableLocales) {
   const translatedLabel = !copy.auto ? "KOREAN ORIGINAL" : reviewed ? "AUTOMATIC TRANSLATION" : "TRANSLATION REVIEW";
   const noteTitle = reviewed ? copy.noteTitle : copy.pendingTitle;
   const note = reviewed ? copy.note : copy.pending;
-  const bodyHtml = reviewed ? sanitizeHtml(content.body_html) : `<p>${escapeHtml(content.summary)}</p>`;
+  const bodyHtml = reviewed
+    ? sanitizeHtml(content.body_html)
+    : `<p>${escapeHtml(content.summary)}</p><section class="mirror-source" lang="ko"><h2>${copy.sourceTitle}</h2>${sanitizeHtml(post.bodyHtml)}</section>`;
   return `<!doctype html>
 <html lang="${copy.lang}" data-theme="dark">
 <head>

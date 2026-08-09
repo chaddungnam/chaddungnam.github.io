@@ -116,6 +116,8 @@ try {
     const pendingPage = await readFile(path.join(pendingRoot, "blog", "en", "first-post", "index.html"), "utf8");
     assert.match(pendingPage, /Full translation under review/);
     assert.match(pendingPage, /This article is being reviewed/);
+    assert.match(pendingPage, /<section class="mirror-source" lang="ko">/);
+    assert.match(pendingPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
     assert.doesNotMatch(pendingPage, /COOKIE HALLUCINATION/);
     const reviewedSummaryPage = await readFile(path.join(pendingRoot, "blog", "de", "first-post", "index.html"), "utf8");
     assert.match(reviewedSummaryPage, /Eine geprüfte Zusammenfassung/);
