@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="결론부터 말하자면, Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#111315">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.">
+  <meta property="og:description" content="결론부터 말하자면, Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적">
+  <meta property="og:url" content="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <meta property="og:locale" content="ko_KR">
+
+  <meta property="article:published_time" content="2026-08-10T16:19:21.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.">
+  <meta name="twitter:description" content="결론부터 말하자면, Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.","description":"결론부터 말하자면, Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적","datePublished":"2026-08-10T16:19:21.000Z","inLanguage":"ko","mainEntityOfPage":"https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/","url":"https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/","image":"https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png","articleSection":"Mobile Game Dev./Projeckt K","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다. — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">본문으로 건너뛰기</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/kr/">Blog</a><button type="button" data-theme-toggle aria-label="색상 테마 전환">☾</button></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/kr/">← 모든 포스트</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · KOREAN ORIGINAL</p><h1>바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.</h1><time datetime="2026-08-10T16:19:21.000Z">2026년 8월 10일</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/" aria-current="page">한국어</a></nav>
+      <aside class="mirror-note"><strong>한국어 원문</strong><span>이 페이지는 House Duck이 작성한 원문입니다. <a href="https://blog.houseduck.in/entry/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4?original=1">티스토리에서 보기</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">결론부터 말하자면,</p>
+<p data-ke-size="size16">Project K는 아직 게임이라고 부르기 민망하다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">내 체감 개발률은</p>
+<p data-ke-size="size16">10%도 안 된다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">화면은 많다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">대화도 나오고,</p>
+<p data-ke-size="size16">농장도 있고,</p>
+<p data-ke-size="size16">광산도 있고,</p>
+<p data-ke-size="size16">전쟁 비슷한 것도 돌아간다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그런데 플레이어가 실제로 만지는 순간을 기준으로 보면,</p>
+<p data-ke-size="size16">완성된 콘텐츠가 거의 없다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">최근 리팩토링을 하면서</p>
+<p data-ke-size="size16">그 사실이 더 적나라하게 보이기 시작했다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" data-phocus="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" data-alt="스타일이 섞여 방향을 잃었던 Project K 인물 후보들."><img src="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" loading="lazy" width="1672" height="941" alt="" /></span><figcaption>스타일이 섞여 방향을 잃었던 Project K 인물 후보들.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>재미있는 소재를 찾았는데, 시작부터 위험하다.</b></h2>
+<p data-ke-size="size16">Project K는 가상의 폐쇄국 지도자가 되어</p>
+<p data-ke-size="size16">국가를 운영하는 풍자 게임이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">선전 방송에서는 모든 게 완벽한데,</p>
+<p data-ke-size="size16">현장에 나가보면 농장은 망가져 있고</p>
+<p data-ke-size="size16">광산은 멈춰 있고</p>
+<p data-ke-size="size16">부하들은 숫자를 예쁘게 고쳐서 보고한다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">나는 이 간극이 재미있었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">플레이어가 독재자를 구경하는 게 아니라,</p>
+<p data-ke-size="size16">직접 결재하고</p>
+<p data-ke-size="size16">직접 선전하고</p>
+<p data-ke-size="size16">결국 그 체제를 굴리는 사람이 되는 구조다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">세계관만 놓고 보면</p>
+<p data-ke-size="size16">지금까지 생각한 게임 중 가장 재미있을 가능성이 높다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">동시에 가장 쉽게 선을 넘을 수 있는 소재이기도 하다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>제목은 검열이라고 썼지만, 아직 걸린 건 아니다.</b></h2>
+<p data-ke-size="size16">정확히 말하면</p>
+<p data-ke-size="size16">Project K를 애플이나 구글에 제출해 본 적은 없다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그러니 실제로 거절당했다거나</p>
+<p data-ke-size="size16">검열을 당했다고 말할 수는 없다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">다만 심사 리스크는 분명히 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://developer.apple.com/app-store/review/guidelines/">애플 앱 심사 지침</a>은 모욕적이거나 불쾌감을 주는 콘텐츠를 제한하면서도</p>
+<p data-ke-size="size16">전문적인 정치 풍자와 유머에는 예외가 있을 수 있다고 적고 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://support.google.com/googleplay/android-developer/answer/17190352?hl=en">구글 플레이 정책</a>도 게임 속 가상 폭력 자체를 전부 금지하지는 않지만,</p>
+<p data-ke-size="size16">혐오 표현, 과도하게 사실적인 폭력, 민감한 사건의 소비,</p>
+<p data-ke-size="size16">실제 기관과의 관계를 오해하게 만드는 표현을 문제 삼는다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">결국 풍자라는 이유만으로</p>
+<p data-ke-size="size16">무조건 안전한 것도 아니고,</p>
+<p data-ke-size="size16">정치 소재라는 이유만으로</p>
+<p data-ke-size="size16">무조건 탈락하는 것도 아니다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">문제는 이 애매한 선을</p>
+<p data-ke-size="size16">혼자 판단해야 한다는 것이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 현재는 실존 국가명과 인물명을 쓰지 않고,</p>
+<p data-ke-size="size16">실제 국기와 문장을 복제하지 않고,</p>
+<p data-ke-size="size16">고문이나 처형을 직접 보여주지 않는 쪽으로 정리하고 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그런데 너무 안전하게만 만들면</p>
+<p data-ke-size="size16">이번에는 풍자가 밋밋해진다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">이 줄타기가 생각보다 어렵다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" data-phocus="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" data-alt="2D 원화와 로우폴리 3D 사이에서 계속 흔들린 지도자 에셋."><img src="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" loading="lazy" width="1672" height="941" alt="" /></span><figcaption>2D 원화와 로우폴리 3D 사이에서 계속 흔들린 지도자 에셋.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>하지만 지금 더 큰 문제는 마켓 심사가 아니다.</b></h2>
+<p data-ke-size="size16">솔직히 지금 상태로는</p>
+<p data-ke-size="size16">심사에 떨어질 걱정을 할 단계도 아니다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">게임의 완성도가 훨씬 더 큰 문제다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">자동 테스트는 돌아간다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">버튼을 누르면 다음 화면으로 넘어가고,</p>
+<p data-ke-size="size16">저장이 되고,</p>
+<p data-ke-size="size16">중간에 종료해도 이어서 시작할 수 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">개발자 시선으로 보면</p>
+<p data-ke-size="size16">기능이 꽤 많은 게임처럼 보인다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">하지만 플레이어 시선으로 보면</p>
+<p data-ke-size="size16">버튼을 눌러 숫자가 바뀌는 프로토타입이</p>
+<p data-ke-size="size16">여러 장 연결되어 있을 뿐이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">테스트가 통과했다는 것과</p>
+<p data-ke-size="size16">게임이 재미있다는 것은</p>
+<p data-ke-size="size16">정말 아무 상관이 없었다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" data-phocus="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" data-alt="화면은 돌아가지만 에셋은 불쾌한 골짜기를 연상케 한다."><img src="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>화면은 돌아가지만 에셋은 불쾌한 골짜기를 연상케 한다.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>리팩토링을 했더니, 숨겨둔 부실이 전부 나왔다.</b></h2>
+<p data-ke-size="size16">리팩토링을 시작한 이유는 단순했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">장면이 늘어날수록 코드가 꼬였고,</p>
+<p data-ke-size="size16">대사 하나를 고치면 다른 화면이 깨졌고,</p>
+<p data-ke-size="size16">비슷한 기능이 여러 파일에 복제되어 있었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 저장 구조와 화면 흐름을 정리하고,</p>
+<p data-ke-size="size16">농장과 광산과 전쟁을</p>
+<p data-ke-size="size16">각자의 콘텐츠로 분리하기 시작했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">코드는 이전보다 나아졌다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그런데 코드가 정리되자</p>
+<p data-ke-size="size16">그동안 뒤에 숨어 있던 문제가 전부 보였다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">에셋은 화면마다 화풍이 달랐고,</p>
+<p data-ke-size="size16">대사는 인물이 아니라 설명서처럼 말했고,</p>
+<p data-ke-size="size16">각 콘텐츠는 모양만 다를 뿐</p>
+<p data-ke-size="size16">결국 비슷한 버튼을 누르는 형태였다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">리팩토링으로 게임을 살리려다가,</p>
+<p data-ke-size="size16">게임을 다시 만들어야 한다는 결론에 도착했다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" data-phocus="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" data-alt="트렉터와 굴삭기와 차량은 있지만 아직 한 장면으로 정리되지 않은 현장 초안."><img src="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>트렉터와 굴삭기와 차량은 있지만 아직 한 장면으로 정리되지 않은 현장 초안.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>에셋은 많아졌는데 게임의 얼굴은 사라졌다.</b></h2>
+<p data-ke-size="size16">바이브코딩을 하면</p>
+<p data-ke-size="size16">에셋 후보를 만드는 속도가 정말 빠르다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">문제는 좋은 에셋이 빨리 만들어지는 게 아니라,</p>
+<p data-ke-size="size16">쓰지 않을 에셋까지 빨리 쌓인다는 것이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">어떤 날은 명암이 많은 일러스트가 좋아 보였고,</p>
+<p data-ke-size="size16">다른 날은 제한색 픽셀이 좋아 보였고,</p>
+<p data-ke-size="size16">또 다른 날은 로우폴리 3D가 답처럼 보였다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">각각 따로 보면 나쁘지 않다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">하지만 한 게임에 넣으면</p>
+<p data-ke-size="size16">서로 다른 세 게임을 억지로 붙여놓은 것처럼 보인다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지금 프로젝트 문서에는</p>
+<p data-ke-size="size16">임시 프로시저럴 에셋을 쓴 화면은</p>
+<p data-ke-size="size16">출시 완료로 표시하지 말라고 적어두었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">말이 규칙이지,</p>
+<p data-ke-size="size16">사실상 현재 화면 대부분을 다시 보겠다는 뜻이다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>대화는 많지만, 아직 사람 냄새가 나지 않는다.</b></h2>
+<p data-ke-size="size16">Project K에서 가장 중요한 건</p>
+<p data-ke-size="size16">어쩌면 전쟁이나 농장보다 대화다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">부하는 통계를 조작하고,</p>
+<p data-ke-size="size16">비서는 불편한 진실을 숨기고,</p>
+<p data-ke-size="size16">AI 국가는 민주주의를 말하면서</p>
+<p data-ke-size="size16">다른 방식으로 사람을 통제해야 한다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그런데 현재 대사는</p>
+<p data-ke-size="size16">상황을 설명하고</p>
+<p data-ke-size="size16">다음 버튼을 누르라고 알려주는 수준에 가깝다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">인물마다 직책은 다른데</p>
+<p data-ke-size="size16">목소리는 비슷하다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">욕망도 약하고,</p>
+<p data-ke-size="size16">서로 숨기는 것도 부족하고,</p>
+<p data-ke-size="size16">한 문장만 읽어서는 누가 말하는지 구분하기 어렵다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">대화창의 모양을 고치는 것보다</p>
+<p data-ke-size="size16">사람부터 다시 써야 한다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" data-alt="기능은 구현됐지만, 게임이 아니라 로블록스 시뮬레이션 수준"><img src="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" loading="lazy" width="540" height="1200" alt="" /></span><figcaption>기능은 구현됐지만, 게임이 아니라 로블록스 시뮬레이션 수준</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>재미가없다.</b></h2>
+<p data-ke-size="size16">차량도 움직이고,</p>
+<p data-ke-size="size16">병력을 뽑아 전쟁도 할 수 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">문제는 하나를 끝내고 나서</p>
+<p data-ke-size="size16">다음 것을 왜 해야 하는지가 약하다는 것이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">농장에서 수확한 식량이</p>
+<p data-ke-size="size16">어떤 사람을 살렸는지 잘 보이지 않고,</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">광산에서 얻은 자원이</p>
+<p data-ke-size="size16">어떤 정치적 문제를 만들었는지도 약하다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">전쟁은 화면만 보면 가장 게임처럼 보인다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" data-phocus="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" data-alt="전쟁처럼 보이는 데까지는 왔지만 아직 기술 데모에 가깝다."><img src="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>전쟁처럼 보이는 데까지는 왔지만 아직 기술 데모에 가깝다.</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">하지만 지금은 유닛을 소환하고</p>
+<p data-ke-size="size16">체력 막대가 줄어드는 기술 데모에 가깝다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">처음엔 유닛들이 문워크로 이동하기도 했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">전쟁이 끝났을 때</p>
+<p data-ke-size="size16">플레이어가 무슨 선택을 후회해야 하는지,</p>
+<p data-ke-size="size16">왜 이게임을 다시해야하는지 모른다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" data-alt="병력 소환과 전선 이동은 작동하지만 결과가 이야기로 이어지는 힘은 부족하다."><img src="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" loading="lazy" width="540" height="1200" alt="" /></span><figcaption>병력 소환과 전선 이동은 작동하지만 결과가 이야기로 이어지는 힘은 부족하다.</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">콘텐츠의 입구는 만들어졌지만,</p>
+<p data-ke-size="size16">그 안에서 기억에 남을 사건은 아직 없다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>그래서 지금은 더 만드는 게 아니라 뒤엎는 중이다.</b></h2>
+<p data-ke-size="size16">당분간 새로운 기능을 더 붙이는 건 의미가 없다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지구본을 하나 더 멋지게 만들고,</p>
+<p data-ke-size="size16">외교 카드를 몇 장 더 추가하고,</p>
+<p data-ke-size="size16">전쟁 유닛을 한 종류 더 넣어도</p>
+<p data-ke-size="size16">게임의 중심이 생기지는 않는다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지금 다시 잡고 있는 건 첫 30분이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">첫 대사부터 웃기는지,</p>
+<p data-ke-size="size16">첫 결재가 실제 선택처럼 느껴지는지,</p>
+<p data-ke-size="size16">첫 현장 조작이 손에 남는지,</p>
+<p data-ke-size="size16">첫 보상이 다음 사건을 궁금하게 만드는지를 다시 보고 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">에셋 방향도 하나로 고정하고,</p>
+<p data-ke-size="size16">대사는 인물별로 다시 쓰고,</p>
+<p data-ke-size="size16">각 콘텐츠는 고유한 손맛 하나를 증명하지 못하면</p>
+<p data-ke-size="size16">과감하게 빼려고 한다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지금 이 글에 들어간 화면 중</p>
+<p data-ke-size="size16">몇 개는 다음 버전에서 완전히 사라질 수도 있다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>그런데도 이 게임을 계속 만들 이유는 있다.</b></h2>
+<p data-ke-size="size16">Project K의 소재는 아직 재미있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">선전과 현실의 차이,</p>
+<p data-ke-size="size16">숫자로 포장되는 실패,</p>
+<p data-ke-size="size16">옳은 선택을 했다고 믿었는데</p>
+<p data-ke-size="size16">결과적으로 체제를 더 단단하게 만드는 모순은</p>
+<p data-ke-size="size16">게임으로 만들 가치가 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">다만 소재가 재미있다는 것과</p>
+<p data-ke-size="size16">게임이 재미있다는 것은 다른 문제다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지금 Project K는</p>
+<p data-ke-size="size16">재미있는 소재를 잡았지만,</p>
+<p data-ke-size="size16">에셋과 대사와 콘텐츠가</p>
+<p data-ke-size="size16">서로 다른 게임을 보고 있는 상태다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 다시 해체하고 있다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">양대 마켓 심사보다 먼저,</p>
+<p data-ke-size="size16">플레이어 심사부터 통과할 수 있는 게임으로 만들기 위해서다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">확실히 단순 보드/퍼즐 게임인 Quirky Ball에 비하면 갈길도 멀지만</p>
+<p data-ke-size="size16">복잡한 만큼 완성도 높은 게임으로, 돈을 벌어보고 싶다.</p>
+<p data-ke-size="size16"> </p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer>
+</body>
+</html>
