@@ -24,6 +24,15 @@ assert.match(germanCards, /Deutsche Zusammenfassung/);
 assert.match(germanCards, /href="https:\/\/houseduck\.in\/blog\/de\/post\/"/);
 assert.match(germanCards, /class="post-preview-image"/);
 
+const sixCards = buildPostCards(Array.from({ length: 7 }, (_value, index) => ({
+  title: `글 ${index + 1}`,
+  summary: `요약 ${index + 1}`,
+  image: "https://blog.kakaocdn.net/post.png",
+  published_at: "2026-08-09T07:32:44.000Z",
+  url: `https://houseduck.in/blog/kr/post-${index + 1}/`,
+})), "ko");
+assert.equal((sixCards.match(/<article /g) || []).length, 6, "home should show two rows of six latest posts");
+
 const safeCards = buildPostCards([{
   title: '<img src=x onerror="alert(1)">',
   summary: "<script>alert(1)</script>",
