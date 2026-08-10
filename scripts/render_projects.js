@@ -221,9 +221,14 @@ function renderManagedCatalog(html, content, file) {
 }
 
 function renderHome(html, projects, projectCountLabel, locale, file) {
-  const withCount = renderManagedProjectCount(html, renderProjectCount(projectCountLabel, locale, projects.length), file);
-  const withStatus = renderManagedStatus(withCount, renderStatus(projects, locale), file);
-  return renderManagedCatalog(withStatus, renderCatalog(projects, locale), file);
+  let rendered = html;
+  if (rendered.includes(COUNT_START) || rendered.includes('class="studio-facts"')) {
+    rendered = renderManagedProjectCount(rendered, renderProjectCount(projectCountLabel, locale, projects.length), file);
+  }
+  if (rendered.includes(STATUS_START) || rendered.includes(STATUS_OPEN)) {
+    rendered = renderManagedStatus(rendered, renderStatus(projects, locale), file);
+  }
+  return renderManagedCatalog(rendered, renderCatalog(projects, locale), file);
 }
 
 function main() {

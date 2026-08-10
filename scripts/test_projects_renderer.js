@@ -37,7 +37,7 @@ test("checked-in home pages match the single project catalog", () => {
   assert.match(output(result), /project catalog check: PASS/);
 });
 
-test("adding one project to the data renders both home regions in every locale", () => {
+test("adding one project to the data renders the project catalog in every locale", () => {
   assert.ok(fs.existsSync(renderer), "scripts/render_projects.js must exist");
   assert.ok(fs.existsSync(dataFile), "assets/projects.json must exist");
 
@@ -106,10 +106,32 @@ test("adding one project to the data renders both home regions in every locale",
 
     for (const [file, locale, projectCount] of pages) {
       const html = fs.readFileSync(path.join(fixtureRoot, file), "utf8");
-      assert.ok(html.includes(projectCount), `${file} derived project count`);
-      assert.match(html, /<strong>Future App<\/strong>/, `${file} NOW BUILDING entry`);
       assert.match(html, /<h3>Future App<\/h3>/, `${file} project card`);
       assert.match(html, new RegExp(fixtureData.projects.at(-1).description[locale].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${file} localized copy`);
+    }
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+});
+
+test("compact home rendering does not require duplicate project status regions", () => {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "house-duck-compact-projects-"));
+  try {
+    fs.mkdirSync(path.join(fixtureRoot, "assets"), { recursive: true });
+    fs.copyFileSync(dataFile, path.join(fixtureRoot, "assets", "projects.json"));
+    for (const [file] of pages) {
+      const source = fs.readFileSync(path.join(repoDir, file), "utf8")
+        .replace(/<div class="studio-facts"[\s\S]*?<\/div>/, "")
+        .replace(/<aside class="studio-status-panel[\s\S]*?<\/aside>/, "");
+      fs.writeFileSync(path.join(fixtureRoot, file), source);
+    }
+
+    const rendered = runRenderer(["--root", fixtureRoot]);
+    assert.equal(rendered.status, 0, output(rendered));
+    for (const [file] of pages) {
+      const html = fs.readFileSync(path.join(fixtureRoot, file), "utf8");
+      assert.match(html, /class="project-compact-grid/);
+      assert.doesNotMatch(html, /class="studio-status-panel|class="studio-facts/);
     }
   } finally {
     fs.rmSync(fixtureRoot, { recursive: true, force: true });

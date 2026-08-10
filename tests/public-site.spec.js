@@ -66,6 +66,31 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
+test("home shows compact Quirky Ball gameplay instead of duplicate project status", async ({ page }) => {
+  await page.goto("/?lang=ko");
+
+  const showcase = page.locator(".studio-showcase");
+  const video = showcase.locator("video");
+  await expect(showcase).toBeVisible();
+  await expect(video).toBeVisible();
+  await expect(page.locator(".studio-status-panel, .studio-facts")).toHaveCount(0);
+
+  const state = await video.evaluate((element) => ({
+    autoplay: element.autoplay,
+    muted: element.muted,
+    loop: element.loop,
+    playsInline: element.playsInline,
+    controls: element.controls,
+    width: element.getBoundingClientRect().width,
+    height: element.getBoundingClientRect().height,
+  }));
+  expect(state).toMatchObject({ autoplay: true, muted: true, loop: true, playsInline: true, controls: true });
+  expect(state.height / state.width).toBeCloseTo(1280 / 592, 2);
+
+  const headingSize = await page.locator(".studio-intro h1").evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+  expect(headingSize).toBeLessThanOrEqual(48);
+});
+
 test("YouTube Shorts keep their portrait ratio", async ({ page }) => {
   await page.goto("/blog/kr/내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유/");
   const frame = page.locator("iframe.video-portrait");

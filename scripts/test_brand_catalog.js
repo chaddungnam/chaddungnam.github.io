@@ -111,7 +111,9 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
   assert.match(html, /data-post-tab="popular"/, `${file} popular-post tab`);
   assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
   assert.match(html, /class="post-preview-image/, `${file} post preview image`);
-  assert.match(html, /class="studio-status-panel/, `${file} practical current-status panel`);
+  assert.match(html, /class="studio-showcase/, `${file} compact gameplay showcase`);
+  assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
+  assert.doesNotMatch(html, /class="studio-status-panel|class="studio-facts/, `${file} duplicate project status removed`);
   assert.match(html, /class="project-compact-grid/, `${file} compact project grid`);
   assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} custom-domain Blog link`);
   assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation calls the journal Blog`);
@@ -134,7 +136,7 @@ assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "si
 
 const studioCss = read("assets/studio-home.css");
 assert.doesNotMatch(studioCss, /@keyframes studio-grid-shift/, "studio background should stay calm and static");
-assert.match(studioCss, /@keyframes studio-status-pulse/, "live build status should visibly breathe");
+assert.match(studioCss, /\.studio-video/, "live build should show real gameplay");
 assert.match(studioCss, /\.post-preview-link/, "synchronized post cards should be fully clickable");
 assert.match(studioCss, /prefers-reduced-motion:\s*reduce[\s\S]*animation/, "studio motion must respect reduced-motion settings");
 
