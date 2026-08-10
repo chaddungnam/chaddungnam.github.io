@@ -15,7 +15,7 @@
   function setTheme(theme) {
     root.dataset.theme = theme;
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.content = theme === "dark" ? "#0d1525" : "#f3f1ea";
+    if (themeColor) themeColor.content = theme === "dark" ? "#111315" : "#f8f9fa";
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
       button.setAttribute("aria-pressed", String(theme === "dark"));
       button.setAttribute("aria-label", theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환");
@@ -46,8 +46,19 @@
   }
 
   document.querySelectorAll(".article-body figure, .article-body .imageblock, .article-body .imagegridblock").forEach((media) => {
-    media.style.margin = "2.4em auto";
+    media.style.display = "block";
+    media.style.width = "100%";
+    media.style.margin = "2.2em 0";
     media.style.transform = "none";
+  });
+
+  document.querySelectorAll(".article-body img").forEach((image) => {
+    if (image.getAttribute("alt")) return;
+    const figure = image.closest("figure");
+    const caption = figure && figure.querySelector("figcaption");
+    const alt = String(image.dataset.alt || (figure && figure.dataset.alt) || (caption && caption.textContent) || "").trim();
+    if (alt) image.setAttribute("alt", alt);
+    image.decoding = "async";
   });
 
   if (typeof location === "undefined" || typeof navigator === "undefined") return;

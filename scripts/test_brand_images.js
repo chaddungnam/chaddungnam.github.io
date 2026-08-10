@@ -32,6 +32,17 @@ function attribute(tag, name) {
   return match ? match[1] : "";
 }
 
+const wordmarkPath = path.join(repoDir, "assets", "house-duck-wordmark.png");
+const skinWordmarkPath = path.join(repoDir, "tistory-skin", "images", "house-duck-wordmark.png");
+assertWordmark();
+
+function assertWordmark() {
+  const size = pngSize(wordmarkPath);
+  if (size.width !== 1694 || size.height !== 394) fail(`House Duck wordmark must stay 1694x394, found ${size.width}x${size.height}`);
+  if (!fs.readFileSync(wordmarkPath).equals(fs.readFileSync(skinWordmarkPath))) fail("site and Tistory must use the same wordmark PNG");
+  if (!fs.existsSync(path.join(repoDir, "assets", "fonts", "Montserrat-Variable.ttf"))) fail("Montserrat source font is missing");
+}
+
 for (const page of pages) {
   const pagePath = path.join(repoDir, page.file);
   const html = fs.readFileSync(pagePath, "utf8");

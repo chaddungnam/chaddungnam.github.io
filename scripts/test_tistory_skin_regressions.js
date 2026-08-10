@@ -43,7 +43,9 @@ test("hidden translation controls stay out of layout", () => {
 
 test("article media stays readable under Tistory's display-table rule", () => {
   const media = declarations(".article-body figure, .article-body .imageblock, .article-body .imagegridblock");
-  assert.equal(media.margin, "2.4em auto");
+  assert.equal(media.display, "block !important");
+  assert.equal(media.width, "100% !important");
+  assert.equal(media.margin, "2.2em 0 !important");
   assert.equal(media.transform, "none");
   assert.notEqual(media.margin, "2.4em 50%");
 });
@@ -137,8 +139,46 @@ test("the live legacy skin receives the media fix and all locale links", () => {
     { dataset: { blogLocale: "de" }, href: "https://houseduck.in/blog/de/first-post/", hidden: false, textContent: "Deutsch" },
     { dataset: { blogLocale: "ja" }, href: "https://houseduck.in/blog/ja/first-post/", hidden: false, textContent: "日本語" },
   ]);
-  assert.equal(media.style.margin, "2.4em auto");
+  assert.equal(media.style.display, "block");
+  assert.equal(media.style.width, "100%");
+  assert.equal(media.style.margin, "2.2em 0");
   assert.equal(media.style.transform, "none");
+});
+
+test("empty image alt text is recovered from Tistory metadata", () => {
+  const image = {
+    alt: "",
+    dataset: {},
+    getAttribute(name) { return name === "alt" ? this.alt : null; },
+    setAttribute(name, value) { if (name === "alt") this.alt = value; },
+    closest() {
+      return {
+        dataset: { alt: "차기작 프로토타입" },
+        querySelector() { return null; },
+      };
+    },
+  };
+  const document = {
+    documentElement: { dataset: {} },
+    body: { id: "tt-body-index" },
+    querySelector() { return null; },
+    querySelectorAll(selector) {
+      if (selector.includes(".article-body img")) return [image];
+      return [];
+    },
+    addEventListener() {},
+  };
+
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document,
+    localStorage: { getItem: () => "", setItem() {} },
+    location: { hostname: "localhost", pathname: "/", replace() {}, search: "" },
+    navigator: { language: "ko", languages: ["ko"], userAgent: "" },
+    window: {},
+  });
+
+  assert.equal(image.alt, "차기작 프로토타입");
 });
 
 test("the script leaves Tistory's native empty state as the only fallback", () => {
@@ -200,7 +240,7 @@ test("safe interactive skin controls keep a 44px minimum target", () => {
     ".search-box",
     ".search-box button",
     ".category-tree a",
-    ".article-index-link",
+    ".article-breadcrumb",
     ".article-category",
     ".owner-tools a, .owner-tools button",
     ".translation-locales a, .translation-locales span",
@@ -223,6 +263,6 @@ test("theme, reduced-motion, and responsive contracts remain present", () => {
 });
 
 test("article titles stay readable instead of dominating the page", () => {
-  assert.equal(declarations(".article-header h1")["font-size"], "clamp(2.1rem, 4vw, 3.6rem)");
-  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*8vw,\s*2\.6rem\)/);
+  assert.equal(declarations(".article-header h1")["font-size"], "clamp(1.85rem, 3.2vw, 2.8rem)");
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.7rem,\s*7vw,\s*2\.25rem\)/);
 });

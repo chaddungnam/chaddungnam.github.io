@@ -9,7 +9,7 @@
     var selected = resolveTheme(theme);
     documentRef.documentElement.dataset.theme = selected;
     var color = documentRef.querySelector('meta[name="theme-color"]');
-    if (color) color.content = selected === "dark" ? "#0d1525" : "#f3f1ea";
+    if (color) color.content = selected === "dark" ? "#111315" : "#f8f9fa";
     documentRef.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
       button.textContent = selected === "dark" ? "☀" : "☾";
       button.setAttribute("aria-pressed", String(selected === "dark"));
@@ -36,6 +36,17 @@
     });
   }
 
+  function recoverImageAltText(documentRef) {
+    documentRef.querySelectorAll(".mirror-body img").forEach(function (image) {
+      if (image.getAttribute("alt")) return;
+      var figure = image.closest("figure");
+      var caption = figure && figure.querySelector("figcaption");
+      var alt = String(image.dataset.alt || (figure && figure.dataset.alt) || (caption && caption.textContent) || "").trim();
+      if (alt) image.setAttribute("alt", alt);
+      image.decoding = "async";
+    });
+  }
+
   function init(documentRef) {
     var saved = "";
     try {
@@ -45,6 +56,7 @@
     }
     applyTheme(documentRef, saved);
     hydrateOpenGraphImages(documentRef);
+    recoverImageAltText(documentRef);
     documentRef.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
       button.addEventListener("click", function () {
         var theme = documentRef.documentElement.dataset.theme === "dark" ? "light" : "dark";
@@ -61,7 +73,7 @@
     });
   }
 
-  var api = { resolveTheme: resolveTheme, hydrateOpenGraphImages: hydrateOpenGraphImages, init: init };
+  var api = { resolveTheme: resolveTheme, hydrateOpenGraphImages: hydrateOpenGraphImages, recoverImageAltText: recoverImageAltText, init: init };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (root && root.document) {
     if (root.document.readyState === "loading") root.document.addEventListener("DOMContentLoaded", function () { init(root.document); }, { once: true });

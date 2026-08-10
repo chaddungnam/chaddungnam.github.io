@@ -35,6 +35,7 @@ jobs:
           node scripts/render_projects.js --check
           node scripts/test_projects_renderer.js
           node scripts/test_brand_feed.js
+          node scripts/test_compact_visual_system.js
           node scripts/test_public_ui_regressions.js
           node scripts/test_site_links.js
           node scripts/test_deployment_workflows.js

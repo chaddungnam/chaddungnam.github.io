@@ -128,7 +128,7 @@ require_css_property ".featured-logo" "height: auto;"
 require_token "assets/brand-site.css" 'url("/assets/house-duck-logo.png")'
 require_token "assets/brand-site.css" 'url("/assets/house-duck-wordmark.png")'
 require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
-require_token "assets/brand-site.css" "height: calc(100dvh - 78px);"
+require_token "assets/brand-site.css" "height: calc(100dvh - 64px);"
 
 node "$repo_dir/scripts/test_brand_images.js"
 node "$repo_dir/scripts/test_brand_language.js"

@@ -136,7 +136,7 @@
     function setTheme(theme) {
       root.dataset.theme = theme;
       var themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = theme === "dark" ? "#0d1525" : "#f3f1ea";
+      if (themeColor) themeColor.content = theme === "dark" ? "#111315" : "#f8f9fa";
       document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
         button.setAttribute("aria-label", theme === "dark" ? controlCopy.themeLight : controlCopy.themeDark);
         button.setAttribute("aria-pressed", String(theme === "dark"));

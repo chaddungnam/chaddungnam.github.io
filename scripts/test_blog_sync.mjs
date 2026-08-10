@@ -139,6 +139,8 @@ try {
   assert.match(englishPage, /<meta property="og:url" content="https:\/\/houseduck\.in\/blog\/en\/first-post\/">/);
   assert.match(englishPage, /<meta property="og:image" content="https:\/\/blog\.kakaocdn\.net\/example\.png">/);
   assert.match(englishPage, /<meta name="twitter:card" content="summary_large_image">/);
+  assert.match(englishPage, /<meta name="robots" content="max-image-preview:large">/);
+  assert.doesNotMatch(englishPage, /site-fonts\.css/, "translated posts should not download the large display font");
   const jsonLdMatch = englishPage.match(/<script type="application\/ld\+json">([^<]+)<\/script>/);
   assert.ok(jsonLdMatch, "post needs BlogPosting structured data");
   assert.deepEqual(JSON.parse(jsonLdMatch[1]), {
@@ -195,6 +197,11 @@ try {
   for (const locale of ["kr", "en", "de", "ja"]) {
     const indexPage = await readFile(path.join(outputRoot, "blog", locale, "index.html"), "utf8");
     assert.match(indexPage, new RegExp(`/blog/${locale}/first-post/`));
+    assert.match(indexPage, /<meta name="description" content="[^"]+">/);
+    assert.match(indexPage, /<meta name="robots" content="max-image-preview:large">/);
+    assert.match(indexPage, /<meta property="og:type" content="website">/);
+    assert.match(indexPage, /loading="eager" fetchpriority="high"/, "the first blog card should be the eager LCP image");
+    assert.doesNotMatch(indexPage, /site-fonts\.css/);
   }
 
   const localeManifest = await readFile(path.join(outputRoot, "assets", "blog-locales.js"), "utf8");
@@ -216,6 +223,71 @@ try {
     assert.equal(secondFeed, firstFeed, "unchanged RSS must not create a new generated diff");
   } finally {
     await rm(stableRoot, { recursive: true, force: true });
+  }
+
+  const archiveRoot = await mkdtemp(path.join(tmpdir(), "house-duck-blog-archive-"));
+  try {
+    const archiveFixture = fixture.replace("  </channel>", `    <item>
+      <title>보존할 이전 제작 기록</title>
+      <link>https://houseduck.tistory.com/entry/archive-post</link>
+      <description>&lt;p&gt;RSS 범위 밖에서도 검색 가능한 이전 기록입니다.&lt;/p&gt;</description>
+      <category>Build Log</category>
+      <pubDate>Sat, 8 Aug 2026 16:32:44 +0900</pubDate>
+    </item>
+  </channel>`);
+    const archivePosts = blogSync.parseRss(archiveFixture);
+    const archivePost = archivePosts.find((post) => post.slug === "archive-post");
+    assert.ok(archivePost, "archive fixture needs the older post");
+    const archiveTranslations = {
+      posts: {
+        "first-post": {
+          source_hash: archivePosts.find((post) => post.slug === "first-post").sourceHash,
+          translation_version: 6,
+          en: { title: "The first build log", summary: "The first record of turning an idea into a real product.", body_html: "<p>The first record of turning an idea into a real product.</p>", reviewed: true },
+          de: { title: "Der erste Entwicklungsbericht", summary: "Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.", body_html: "<p>Der erste Bericht über die Umsetzung einer Idee in ein echtes Produkt.</p>", reviewed: true },
+          ja: { title: "最初の開発記録", summary: "アイデアを実際の製品にした最初の記録です。", body_html: "<p>アイデアを実際の製品にした最初の記録です。</p>", reviewed: true },
+        },
+        "archive-post": {
+          source_hash: archivePost.sourceHash,
+          translation_version: 6,
+          en: { title: "An archived build log", summary: "An older record that remains discoverable outside the RSS window.", body_html: "<p>An older record that remains discoverable outside the RSS window.</p>", reviewed: true },
+          de: { title: "Ein archivierter Entwicklungsbericht", summary: "Ein älterer Bericht, der außerhalb des RSS-Fensters auffindbar bleibt.", body_html: "<p>Ein älterer Bericht, der außerhalb des RSS-Fensters auffindbar bleibt.</p>", reviewed: true },
+          ja: { title: "保存された開発記録", summary: "RSSの範囲外でも見つけられる過去の記録です。", body_html: "<p>RSSの範囲外でも見つけられる過去の記録です。</p>", reviewed: true },
+        },
+      },
+    };
+
+    await blogSync.syncFromXml(archiveFixture, { outRoot: archiveRoot, translations: archiveTranslations });
+    await blogSync.syncFromXml(fixture, { outRoot: archiveRoot });
+
+    const archivedManifest = await readFile(path.join(archiveRoot, "assets", "blog-locales.js"), "utf8");
+    const archivedSitemap = await readFile(path.join(archiveRoot, "sitemap-blog.xml"), "utf8");
+    for (const locale of ["kr", "en", "de", "ja"]) {
+      const archivedIndex = await readFile(path.join(archiveRoot, "blog", locale, "index.html"), "utf8");
+      const archivedUrl = `https://houseduck.in/blog/${locale}/archive-post/`;
+      assert.match(archivedIndex, new RegExp(`/blog/${locale}/archive-post/`), `${locale} index must retain posts outside the current RSS window`);
+      assert.match(archivedManifest, new RegExp(`"${locale}":"${archivedUrl}"`), `${locale} locale manifest must retain posts outside the current RSS window`);
+      assert.match(archivedSitemap, new RegExp(archivedUrl), `${locale} sitemap must retain posts outside the current RSS window`);
+    }
+    for (const locale of ["en", "de", "ja"]) {
+      const archivedIndex = await readFile(path.join(archiveRoot, "blog", locale, "index.html"), "utf8");
+      assert.doesNotMatch(archivedIndex, new RegExp(`/blog/${locale}/first-post/`), `${locale} index must not resurrect a stale translation for a current RSS post`);
+      assert.doesNotMatch(archivedManifest, new RegExp(`"${locale}":"https://houseduck.in/blog/${locale}/first-post/"`), `${locale} locale manifest must drop a stale translation for a current RSS post`);
+      assert.doesNotMatch(archivedSitemap, new RegExp(`https://houseduck.in/blog/${locale}/first-post/`), `${locale} sitemap must drop a stale translation for a current RSS post`);
+    }
+
+    await rm(path.join(archiveRoot, "blog", "de", "index.html"));
+    const protectedManifest = await readFile(path.join(archiveRoot, "assets", "blog-locales.js"), "utf8");
+    const protectedSitemap = await readFile(path.join(archiveRoot, "sitemap-blog.xml"), "utf8");
+    await assert.rejects(
+      blogSync.syncFromXml(fixture, { outRoot: archiveRoot }),
+      /incomplete|malformed/i,
+      "partial generated discovery state must fail closed instead of dropping archived posts",
+    );
+    assert.equal(await readFile(path.join(archiveRoot, "assets", "blog-locales.js"), "utf8"), protectedManifest);
+    assert.equal(await readFile(path.join(archiveRoot, "sitemap-blog.xml"), "utf8"), protectedSitemap);
+  } finally {
+    await rm(archiveRoot, { recursive: true, force: true });
   }
 } finally {
   await rm(outputRoot, { recursive: true, force: true });

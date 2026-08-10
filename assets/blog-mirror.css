@@ -1,29 +1,29 @@
 :root {
   color-scheme: dark;
-  --bg: #0d1525;
-  --surface: #131f33;
-  --raised: #192740;
-  --ink: #f4f1e8;
-  --copy: #b1bdcf;
-  --muted: #8290a6;
-  --line: rgba(172, 190, 216, .18);
-  --yellow: #ffc341;
-  --cyan: #54d6cf;
-  --coral: #ff6b4a;
+  --bg: #111315;
+  --surface: #1b1d20;
+  --raised: #242629;
+  --ink: #f1f3f4;
+  --copy: #bdc1c6;
+  --muted: #9aa0a6;
+  --line: rgba(255, 255, 255, .12);
+  --yellow: #fbbc04;
+  --cyan: #8ab4f8;
+  --coral: #c4c7c5;
   --gutter: clamp(18px, 4vw, 40px);
 }
 html[data-theme="light"] {
   color-scheme: light;
-  --bg: #f3f1ea;
-  --surface: #fbfaf6;
-  --raised: #fff;
-  --ink: #132342;
-  --copy: #4f5d73;
-  --muted: #748095;
-  --line: rgba(19, 35, 66, .15);
-  --yellow: #e8ad22;
-  --cyan: #148f8a;
-  --coral: #df5539;
+  --bg: #f8f9fa;
+  --surface: #fff;
+  --raised: #f1f3f4;
+  --ink: #202124;
+  --copy: #3c4043;
+  --muted: #5f6368;
+  --line: #dadce0;
+  --yellow: #f9ab00;
+  --cyan: #1a73e8;
+  --coral: #5f6368;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--bg); }
@@ -31,13 +31,9 @@ body {
   min-width: 320px;
   margin: 0;
   color: var(--copy);
-  background:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px),
-    var(--bg);
-  background-size: 44px 44px;
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
-  line-height: 1.72;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  line-height: 1.68;
   -webkit-font-smoothing: antialiased;
 }
 img { display: block; max-width: 100%; }
@@ -52,7 +48,7 @@ button { color: inherit; font: inherit; }
   z-index: 100;
   display: flex;
   width: 100%;
-  min-height: 68px;
+  min-height: 64px;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -62,31 +58,31 @@ button { color: inherit; font: inherit; }
   backdrop-filter: blur(14px);
 }
 .mirror-brand { display: inline-flex; min-height: 48px; align-items: center; gap: 10px; }
-.mirror-brand img:first-child { width: 38px; height: 38px; object-fit: contain; }
-.mirror-brand img:last-child { width: 150px; height: auto; object-fit: contain; transform: translateY(1px); }
+.mirror-brand img:first-child { width: 34px; height: 34px; object-fit: contain; }
+.mirror-brand img:last-child { width: 132px; height: auto; object-fit: contain; transform: translateY(1px); }
 html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness(0) invert(1); }
 .mirror-header nav { display: flex; align-items: center; gap: 10px; }
 .mirror-header nav a { display: inline-flex; min-height: 44px; align-items: center; color: var(--ink); font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 [data-theme-toggle] { display: grid; width: 44px; height: 44px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--surface); cursor: pointer; }
-.mirror-main { width: min(100% - (var(--gutter) * 2), 960px); margin: 0 auto; padding-block: clamp(48px, 8vw, 96px) clamp(88px, 11vw, 140px); }
+.mirror-main { width: min(100% - (var(--gutter) * 2), 900px); margin: 0 auto; padding-block: clamp(38px, 6vw, 68px) clamp(68px, 9vw, 108px); }
 .mirror-back { display: inline-flex; min-height: 44px; align-items: center; margin-bottom: 30px; color: var(--muted); font-size: .76rem; font-weight: 850; }
 .mirror-back:hover { color: var(--cyan); }
-.mirror-post-header { max-width: 820px; margin-inline: auto; text-align: center; }
+.mirror-post-header { max-width: 760px; margin-inline: auto; text-align: center; }
 .mirror-post-header p, .mirror-index > p { margin: 0 0 14px; color: var(--coral); font-size: .7rem; font-weight: 950; letter-spacing: .15em; }
-.mirror-post-header h1 { margin: 0; color: var(--ink); font-size: clamp(2.1rem, 4vw, 3.6rem); letter-spacing: -.045em; line-height: 1.08; text-wrap: balance; }
+.mirror-post-header h1 { margin: 0; color: var(--ink); font-size: clamp(1.85rem, 3.2vw, 2.8rem); letter-spacing: -.04em; line-height: 1.12; text-wrap: balance; }
 .mirror-post-header time { display: block; margin-top: 20px; color: var(--muted); font-size: .78rem; }
-.mirror-note { display: flex; width: min(100%, 760px); align-items: start; gap: 16px; margin: 44px auto 0; padding: 18px 20px; border-left: 4px solid var(--yellow); border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--yellow) 10%, var(--surface)); font-size: .84rem; }
+.mirror-note { display: flex; width: min(100%, 760px); align-items: start; gap: 14px; margin: 34px auto 0; padding: 15px 18px; border-left: 3px solid var(--yellow); border-radius: 0 10px 10px 0; background: color-mix(in srgb, var(--yellow) 8%, var(--surface)); font-size: .8rem; }
 .mirror-note strong { flex: 0 0 auto; color: var(--ink); }
 .mirror-note a, .mirror-body a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
-.mirror-body { width: min(100%, 760px); margin: clamp(52px, 8vw, 84px) auto 0; color: var(--copy); font-family: ui-serif, Georgia, "Noto Serif KR", serif; font-size: clamp(1.02rem, 1.6vw, 1.14rem); line-height: 1.9; overflow-wrap: anywhere; }
+.mirror-body { width: min(100%, 760px); margin: clamp(46px, 6vw, 68px) auto 0; color: var(--copy); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; font-size: clamp(1rem, 1.1vw, 1.075rem); line-height: 1.8; overflow-wrap: anywhere; }
 .mirror-body > :first-child { margin-top: 0; }
-.mirror-body h2, .mirror-body h3, .mirror-body h4 { color: var(--ink); font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: -.035em; line-height: 1.3; }
-.mirror-body h2 { margin: 2.5em 0 .8em; font-size: clamp(1.7rem, 4vw, 2.5rem); }
-.mirror-body h3 { margin: 2.2em 0 .7em; font-size: clamp(1.35rem, 3vw, 1.9rem); }
+.mirror-body h2, .mirror-body h3, .mirror-body h4 { color: var(--ink); font-family: inherit; letter-spacing: -.035em; line-height: 1.3; }
+.mirror-body h2 { margin: 2.4em 0 .75em; font-size: clamp(1.55rem, 2.6vw, 2rem); }
+.mirror-body h3 { margin: 2em 0 .65em; font-size: clamp(1.3rem, 2vw, 1.6rem); }
 .mirror-body p, .mirror-body ul, .mirror-body ol { margin-block: 1.3em; }
-.mirror-body img { width: auto !important; max-width: 100% !important; height: auto !important; margin-inline: auto; border-radius: 14px; }
-.mirror-body figure, .mirror-body .imageblock, .mirror-body .imagegridblock { max-width: 100%; margin: 2.2em auto; }
-.mirror-body figcaption { color: var(--muted); font: .78rem/1.5 "Montserrat", sans-serif; text-align: center; }
+.mirror-body img { width: auto !important; max-width: 100% !important; height: auto !important; margin: 0; border-radius: 14px; }
+.mirror-body figure, .mirror-body .imageblock, .mirror-body .imagegridblock { display: block; width: 100%; max-width: 100%; margin: 2.2em 0; }
+.mirror-body figcaption { color: var(--muted); font: .76rem/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-align: left; }
 .mirror-body blockquote { margin: 2em 0; padding-left: 1.4em; border-left: 4px solid var(--coral); color: var(--muted); }
 .mirror-body pre { max-width: 100%; padding: 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--surface); font-size: .88rem; }
 .mirror-body code { padding: .15em .36em; border-radius: 5px; color: var(--ink); background: var(--raised); font-size: .9em; }
@@ -95,16 +91,18 @@ html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness
 .mirror-body iframe.video-landscape { aspect-ratio: 16 / 9; }
 .mirror-body iframe.video-portrait { width: min(100%, 405px); aspect-ratio: 9 / 16; margin-inline: auto; }
 .mirror-body [data-ke-type="opengraph"] { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
-.mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { display: grid; min-height: 132px; grid-template-columns: 180px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: inherit; background: var(--surface); text-decoration: none; }
+.mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { display: grid; min-height: 112px; grid-template-columns: 128px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; color: inherit; background: var(--surface); text-decoration: none; }
 .mirror-body [data-ke-type="opengraph"] > .og-link, .mirror-body [data-ke-type="opengraph"] > .link-og, .mirror-body [data-ke-type="opengraph"] > a { border: 0; border-radius: 0; }
-.mirror-body .og-image { width: 100% !important; height: 100% !important; min-height: 132px; margin: 0; object-fit: cover; border-radius: 0; background-position: center; background-size: cover; }
-.mirror-body .og-text { display: grid; min-width: 0; align-content: center; gap: 6px; padding: 18px 20px; }
-.mirror-body .og-title, .mirror-body .og-desc, .mirror-body .og-host { margin: 0; font-family: "Montserrat", sans-serif; }
+.mirror-body .og-image { width: 100% !important; height: 100% !important; min-height: 112px; margin: 0; object-fit: cover; border-radius: 0; background-position: center; background-size: cover; }
+.mirror-body .og-text { display: grid; min-width: 0; align-content: center; gap: 5px; padding: 15px 18px; }
+.mirror-body .og-title, .mirror-body .og-desc, .mirror-body .og-host { margin: 0; font-family: inherit; }
+.mirror-body [data-ke-type="opengraph"]:not([data-og-image]) > a, .mirror-body [data-og-image=""] > a { min-height: 0; grid-template-columns: 1fr; }
+.mirror-body [data-ke-type="opengraph"]:not([data-og-image]) .og-image, .mirror-body [data-og-image=""] .og-image { display: none !important; }
 .mirror-body .og-title { overflow: hidden; color: var(--ink); font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
 .mirror-body .og-desc { display: -webkit-box; overflow: hidden; color: var(--copy); font-size: .82rem; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .mirror-body .og-host { color: var(--cyan); font-size: .72rem; font-weight: 750; }
 .mirror-index { width: min(100% - (var(--gutter) * 2), 1180px); margin: 0 auto; padding-block: clamp(56px, 8vw, 96px) clamp(88px, 12vw, 150px); }
-.mirror-index h1 { margin: 0; color: var(--ink); font-size: clamp(2.6rem, 6vw, 5.2rem); letter-spacing: -.06em; line-height: 1; }
+.mirror-index h1 { margin: 0; color: var(--ink); font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: -.05em; line-height: 1.05; }
 .mirror-locales { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 28px; }
 .mirror-locales a { display: grid; min-width: 48px; min-height: 44px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); font-size: .78rem; font-weight: 800; }
 .mirror-locales a:hover, .mirror-locales a[aria-current="page"] { color: #10213e; background: var(--yellow); }
@@ -124,8 +122,8 @@ html:not([data-theme="light"]) .mirror-brand img:last-child { filter: brightness
   .mirror-brand img:last-child { width: 122px; }
   .mirror-main { padding-top: 28px; }
   .mirror-note { align-items: stretch; flex-direction: column; gap: 4px; }
-  .mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { min-height: 112px; grid-template-columns: 112px minmax(0, 1fr); }
-  .mirror-body .og-image { min-height: 112px; }
+  .mirror-body .og-link, .mirror-body .link-og, .mirror-body [data-ke-type="opengraph"] > a { min-height: 96px; grid-template-columns: 96px minmax(0, 1fr); }
+  .mirror-body .og-image { min-height: 96px; }
   .mirror-body .og-desc { display: none; }
   .mirror-grid { grid-template-columns: 1fr; }
 }

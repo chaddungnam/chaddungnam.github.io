@@ -9,10 +9,10 @@ const BLOG_ORIGIN = "https://blog.houseduck.in";
 const TRANSLATION_PIPELINE_VERSION = 6;
 const YOUTUBE_EMBED_HOSTS = new Set(["youtube.com", "www.youtube.com", "www.youtube-nocookie.com"]);
 const LOCALES = {
-  kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
-  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", original: "Read the Korean original", auto: true },
-  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", original: "Koreanisches Original lesen", auto: true },
-  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", original: "韓国語の原文を読む", auto: true },
+  kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", description: "게임과 앱을 만들며 겪은 시행착오와 출시 과정을 기록하는 House Duck 개발 블로그입니다.", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
+  en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", description: "House Duck build notes about making games and apps, including real decisions, mistakes, and release work.", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", original: "Read the Korean original", auto: true },
+  de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", description: "Entwicklungsnotizen von House Duck über Spiele, Apps, Entscheidungen, Fehler und Veröffentlichungen.", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", original: "Koreanisches Original lesen", auto: true },
+  ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", description: "ゲームやアプリを作る中での判断、失敗、改善、リリース過程を記録するHouse Duckの開発ブログです。", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", original: "韓国語の原文を読む", auto: true },
 };
 
 function decodeEntities(value) {
@@ -167,6 +167,147 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+async function readOptional(filePath) {
+  try {
+    return await readFile(filePath, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return "";
+    throw error;
+  }
+}
+
+function parseGeneratedLocaleManifest(source) {
+  if (!source) return { posts: {} };
+  const match = source.match(/^window\.HOUSE_DUCK_BLOG_LOCALES=(\{[\s\S]*\});\s*$/);
+  if (!match) throw new Error("Existing blog locale manifest is malformed; refusing to overwrite archived discovery data");
+  const manifest = JSON.parse(match[1]);
+  if (!manifest || typeof manifest !== "object" || !manifest.posts || typeof manifest.posts !== "object" || Array.isArray(manifest.posts)) {
+    throw new Error("Existing blog locale manifest has an invalid shape; refusing to overwrite archived discovery data");
+  }
+  return manifest;
+}
+
+function parseGeneratedIndexCards(source, locale) {
+  if (!source) return [];
+  const section = source.match(/<section class="mirror-grid">([\s\S]*?)<\/section>/);
+  if (!section) throw new Error(`Existing ${locale} blog index is malformed; refusing to overwrite archived discovery data`);
+  return Array.from(section[1].matchAll(/<article>[\s\S]*?<\/article>/g), (match) => {
+    const href = match[0].match(new RegExp(`href="/blog/${locale}/([^"/]+)/"`));
+    if (!href) return null;
+    try {
+      return { slug: decodeURIComponent(href[1]), html: match[0] };
+    } catch (_error) {
+      return null;
+    }
+  }).filter(Boolean);
+}
+
+function parseGeneratedSitemap(source) {
+  if (!source) return [];
+  const entries = Array.from(source.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>\s*<\/url>/g), (match) => ({
+    loc: decodeEntities(match[1]),
+    lastmod: match[2],
+  }));
+  if (!source.includes("<urlset") || entries.length === 0) {
+    throw new Error("Existing blog sitemap is malformed; refusing to overwrite archived discovery data");
+  }
+  return entries;
+}
+
+function assertGeneratedDiscoveryConsistent(manifest, cardsByLocale, sitemapEntries) {
+  const manifestKeys = new Set();
+  const manifestUrls = new Set();
+  for (const [slug, localeUrls] of Object.entries(manifest.posts)) {
+    if (!localeUrls || typeof localeUrls !== "object" || Array.isArray(localeUrls) || Object.keys(localeUrls).length === 0) {
+      throw new Error(`Existing discovery data for ${slug} is incomplete; refusing to overwrite archived posts`);
+    }
+    for (const [locale, url] of Object.entries(localeUrls)) {
+      if (!LOCALES[locale]) throw new Error(`Existing discovery data for ${slug} has an unknown locale; refusing to overwrite archived posts`);
+      const expectedUrl = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(slug)}/`;
+      if (url !== expectedUrl) throw new Error(`Existing discovery data for ${slug} is malformed; refusing to overwrite archived posts`);
+      manifestKeys.add(`${locale}\0${slug}`);
+      manifestUrls.add(expectedUrl);
+    }
+  }
+
+  const cardKeys = new Set();
+  for (const [locale, cards] of Object.entries(cardsByLocale)) {
+    for (const { slug } of cards) {
+      const key = `${locale}\0${slug}`;
+      if (cardKeys.has(key) || !manifestKeys.has(key)) {
+        throw new Error(`Existing ${locale} blog index is incomplete; refusing to overwrite archived posts`);
+      }
+      cardKeys.add(key);
+    }
+  }
+  for (const key of manifestKeys) {
+    if (!cardKeys.has(key)) throw new Error("Existing blog index is incomplete; refusing to overwrite archived posts");
+  }
+
+  const sitemapUrls = new Set();
+  const generatedPostPattern = new RegExp(`^${SITE_ORIGIN.replaceAll(".", "\\.")}/blog/(?:${Object.keys(LOCALES).join("|")})/[^/]+/$`);
+  for (const { loc } of sitemapEntries) {
+    if (sitemapUrls.has(loc)) throw new Error("Existing blog sitemap is malformed; refusing to overwrite archived posts");
+    sitemapUrls.add(loc);
+    if (generatedPostPattern.test(loc) && !manifestUrls.has(loc)) {
+      throw new Error("Existing blog sitemap is incomplete; refusing to overwrite archived posts");
+    }
+  }
+  for (const url of manifestUrls) {
+    if (!sitemapUrls.has(url)) throw new Error("Existing blog sitemap is incomplete; refusing to overwrite archived posts");
+  }
+}
+
+async function readGeneratedDiscoveryState(outRoot, currentSlugs) {
+  const manifestSource = await readOptional(path.join(outRoot, "assets", "blog-locales.js"));
+  const indexSources = Object.fromEntries(await Promise.all(Object.keys(LOCALES).map(async (locale) => [
+    locale,
+    await readOptional(path.join(outRoot, "blog", locale, "index.html")),
+  ])));
+  const sitemapSource = await readOptional(path.join(outRoot, "sitemap-blog.xml"));
+  const sources = [manifestSource, sitemapSource, ...Object.values(indexSources)];
+  if (sources.some(Boolean) && sources.some((source) => !source)) {
+    throw new Error("Existing generated discovery state is incomplete; refusing to overwrite archived posts");
+  }
+  const manifest = parseGeneratedLocaleManifest(manifestSource);
+  const cardsByLocale = Object.fromEntries(Object.entries(indexSources).map(([locale, source]) => [
+    locale,
+    parseGeneratedIndexCards(source, locale),
+  ]));
+  const sitemapEntries = parseGeneratedSitemap(sitemapSource);
+  if (sources.every(Boolean)) assertGeneratedDiscoveryConsistent(manifest, cardsByLocale, sitemapEntries);
+  const sitemapByUrl = new Map(sitemapEntries.map((entry) => [entry.loc, entry]));
+  const cardByLocaleAndSlug = Object.fromEntries(Object.entries(cardsByLocale).map(([locale, cards]) => [
+    locale,
+    new Map(cards.map((card) => [card.slug, card])),
+  ]));
+  const posts = {};
+  const retainedUrls = new Set();
+
+  for (const [slug, localeUrls] of Object.entries(manifest.posts)) {
+    if (currentSlugs.has(slug) || !localeUrls || typeof localeUrls !== "object") continue;
+    const retainedLocales = {};
+    for (const locale of Object.keys(LOCALES)) {
+      const expectedUrl = `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(slug)}/`;
+      if (localeUrls[locale] !== expectedUrl
+        || !cardByLocaleAndSlug[locale].has(slug)
+        || !sitemapByUrl.has(expectedUrl)) continue;
+      retainedLocales[locale] = expectedUrl;
+      retainedUrls.add(expectedUrl);
+    }
+    if (Object.keys(retainedLocales).length > 0) posts[slug] = retainedLocales;
+  }
+
+  return {
+    manifest: { posts },
+    cardsByLocale: Object.fromEntries(Object.entries(cardsByLocale).map(([locale, cards]) => [
+      locale,
+      cards.filter(({ slug }) => posts[slug]?.[locale]),
+    ])),
+    sitemapEntries: sitemapEntries.filter(({ loc }) => retainedUrls.has(loc)),
+  };
+}
+
 export function parseRss(xml) {
   return Array.from(String(xml || "").matchAll(/<item>([\s\S]*?)<\/item>/gi), (match) => {
     const block = match[1];
@@ -243,7 +384,8 @@ function renderPostPage(post, locale, content, availableLocales) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="${escapeHtml(content.summary)}">
-  <meta name="theme-color" content="#0d1525">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#111315">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="House Duck">
   <meta property="og:title" content="${escapeHtml(content.title)}">
@@ -259,7 +401,6 @@ ${image ? `  <meta property="og:image" content="${escapeHtml(image)}">` : ""}
 ${image ? `  <meta name="twitter:image" content="${escapeHtml(image)}">` : ""}
   <link rel="canonical" href="${canonical}">
 ${alternateLinks(post, availableLocales)}
-  <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/blog-mirror.css">
   <script defer src="/assets/blog-mirror.js"></script>
   <script type="application/ld+json">${JSON.stringify(structuredData).replaceAll("<", "\\u003c")}</script>
@@ -282,12 +423,19 @@ ${alternateLinks(post, availableLocales)}
 </html>\n`;
 }
 
-function renderIndexPage(posts, locale) {
+function renderIndexPage(posts, locale, archivedCards = []) {
   const copy = LOCALES[locale];
-  const cards = posts.map(({ post, content }) => `<article><a href="/blog/${locale}/${encodeURIComponent(post.slug)}/">${post.image ? `<img src="${escapeHtml(post.image)}" alt="${escapeHtml(content.title)}" loading="lazy">` : ""}<div><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time><h2>${escapeHtml(content.title)}</h2><p>${escapeHtml(content.summary)}</p></div></a></article>`).join("\n");
+  const currentCards = posts.map(({ post, content }, index) => `<article><a href="/blog/${locale}/${encodeURIComponent(post.slug)}/">${post.image ? `<img src="${escapeHtml(post.image)}" alt="${escapeHtml(content.title)}" loading="${index === 0 ? "eager" : "lazy"}"${index === 0 ? ' fetchpriority="high"' : ""}>` : ""}<div><time datetime="${post.publishedAt.toISOString()}">${escapeHtml(localizedDate(post.publishedAt, locale))}</time><h2>${escapeHtml(content.title)}</h2><p>${escapeHtml(content.summary)}</p></div></a></article>`);
+  const retainedCards = archivedCards.map(({ html }) => html
+    .replace(/\s+fetchpriority="high"/g, "")
+    .replace(/loading="eager"/g, 'loading="lazy"'));
+  if (currentCards.length === 0 && retainedCards.length > 0) {
+    retainedCards[0] = retainedCards[0].replace('loading="lazy"', 'loading="eager" fetchpriority="high"');
+  }
+  const cards = [...currentCards, ...retainedCards].join("\n");
   const alternates = Object.entries(LOCALES).map(([key, value]) => `<link rel="alternate" hreflang="${value.lang}" href="${SITE_ORIGIN}/blog/${key}/">`).join("");
   return `<!doctype html>
-<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d1525"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="stylesheet" href="/assets/site-fonts.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header><main class="mirror-index" id="blog-content"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>${copy.heading}.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
+<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${escapeHtml(copy.description)}"><meta name="robots" content="max-image-preview:large"><meta name="theme-color" content="#111315"><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:title" content="House Duck Blog — ${copy.label}"><meta property="og:description" content="${escapeHtml(copy.description)}"><meta property="og:url" content="${SITE_ORIGIN}/blog/${locale}/"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header><main class="mirror-index" id="blog-content"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>${copy.heading}.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
 }
 
 export function buildTranslationSource(posts) {
@@ -323,6 +471,8 @@ function contentByLocale(post, translations) {
 export async function syncFromXml(xml, options) {
   const outRoot = path.resolve(options.outRoot);
   const posts = parseRss(xml).sort((a, b) => b.publishedAt - a.publishedAt);
+  const currentSlugs = new Set(posts.map((post) => post.slug));
+  const archivedDiscovery = await readGeneratedDiscoveryState(outRoot, currentSlugs);
   const now = options.now || posts[0]?.publishedAt.toISOString() || new Date(0).toISOString();
   const translations = options.translations?.posts || {};
   const feed = {
@@ -367,14 +517,15 @@ export async function syncFromXml(xml, options) {
       sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/${encodeURIComponent(post.slug)}/`, lastmod: post.publishedAt.toISOString().slice(0, 10) });
     }
   }
+  Object.assign(localeManifest.posts, archivedDiscovery.manifest.posts);
+  sitemapUrls.push(...archivedDiscovery.sitemapEntries);
   for (const locale of Object.keys(LOCALES)) {
     const directory = path.join(outRoot, "blog", locale);
     await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, "index.html"), renderIndexPage(localeIndexes[locale], locale));
+    await writeFile(path.join(directory, "index.html"), renderIndexPage(localeIndexes[locale], locale, archivedDiscovery.cardsByLocale[locale]));
     sitemapUrls.push({ loc: `${SITE_ORIGIN}/blog/${locale}/`, lastmod: now.slice(0, 10) });
   }
   await writeFile(path.join(outRoot, "assets", "blog-locales.js"), `window.HOUSE_DUCK_BLOG_LOCALES=${JSON.stringify(localeManifest)};\n`);
-  // ponytail: RSS is the archive source for now; add a manifest only if Tistory starts dropping older posts.
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(({ loc, lastmod }) => `  <url><loc>${escapeHtml(loc)}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}\n</urlset>\n`;
   await writeFile(path.join(outRoot, "sitemap-blog.xml"), sitemap);
   return feed;

@@ -23,8 +23,21 @@ assert.deepEqual(previewImage, {
   src: "https://example.com/preview.png",
 });
 
+const bodyImage = {
+  alt: "",
+  dataset: {},
+  getAttribute(name) { return name === "alt" ? this.alt : null; },
+  setAttribute(name, value) { if (name === "alt") this.alt = value; },
+  closest() { return { dataset: { alt: "Prototype screen" }, querySelector() { return null; } }; },
+};
+mirror.recoverImageAltText({ querySelectorAll() { return [bodyImage]; } });
+assert.equal(bodyImage.alt, "Prototype screen");
+
 const css = fs.readFileSync(path.join(__dirname, "..", "assets", "blog-mirror.css"), "utf8");
-assert.match(css, /\.mirror-post-header h1\s*\{[^}]*font-size:\s*clamp\(2\.1rem,\s*4vw,\s*3\.6rem\)/s);
+assert.match(css, /\.mirror-post-header h1\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.2vw,\s*2\.8rem\)/s);
+assert.match(css, /\.mirror-body\s*\{[^}]*font-family:\s*-apple-system[^}]*font-size:\s*clamp\(1rem,\s*1\.1vw,\s*1\.075rem\)/s);
+assert.match(css, /\.mirror-body figure[^{}]*\{[^}]*display:\s*block[^}]*width:\s*100%[^}]*margin:\s*2\.2em 0/s);
+assert.match(css, /\[data-og-image=""\][^{}]*> a\s*\{[^}]*grid-template-columns:\s*1fr/s);
 
 for (const locale of ["en", "de", "ja"]) {
   const localeRoot = path.join(__dirname, "..", "blog", locale);

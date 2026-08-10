@@ -1,12 +1,12 @@
 :root {
-  --k-void: #0b110e;
-  --k-ink: #111915;
-  --k-panel: #18211a;
+  --k-void: #111315;
+  --k-ink: #151816;
+  --k-panel: #1b1d20;
   --k-olive: #4b543d;
   --k-crimson: #b72c38;
   --k-crimson-deep: #741d24;
-  --k-paper: #eee7cd;
-  --k-muted: #b8b39f;
+  --k-paper: #f1f3f4;
+  --k-muted: #9aa0a6;
   --k-gold: #e1c94d;
   --k-line: rgba(238, 231, 205, 0.18);
 }
@@ -16,7 +16,7 @@
   background:
     linear-gradient(rgba(225, 201, 77, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(225, 201, 77, 0.025) 1px, transparent 1px),
-    radial-gradient(circle at 78% 4%, rgba(183, 44, 56, 0.16), transparent 32rem),
+    radial-gradient(circle at 78% 4%, rgba(183, 44, 56, 0.1), transparent 32rem),
     var(--k-void);
   background-size: 28px 28px, 28px 28px, auto, auto;
 }
@@ -32,7 +32,7 @@
 
 .project-k-header {
   border-color: var(--k-line);
-  background: rgba(11, 17, 14, 0.94);
+  background: rgba(17, 19, 21, 0.94);
 }
 
 .project-k-header .brand-lockup,
@@ -41,10 +41,10 @@
   color: var(--k-paper);
 }
 
-.project-k-header .brand-duck-image { width: 38px; height: 38px; object-fit: contain; }
-.project-k-header .brand-wordmark-image { width: 150px; height: auto; object-fit: contain; filter: brightness(0) invert(1); transform: translateY(1px); }
-.project-k-page .footer-duck-image { width: 44px; height: 44px; object-fit: contain; }
-.project-k-page .footer-wordmark-image { width: 138px; height: auto; object-fit: contain; filter: brightness(0) invert(1); }
+.project-k-header .brand-duck-image { width: 34px; height: 34px; object-fit: contain; }
+.project-k-header .brand-wordmark-image { width: 132px; height: auto; object-fit: contain; filter: brightness(0) invert(1); }
+.project-k-page .footer-duck-image { width: 34px; height: 34px; object-fit: contain; }
+.project-k-page .footer-wordmark-image { width: 132px; height: auto; object-fit: contain; filter: brightness(0) invert(1); }
 
 .project-k-header .site-nav a::after {
   background: var(--k-crimson);
@@ -81,16 +81,16 @@
 
 .project-k-hero {
   display: grid;
-  min-height: calc(100svh - 78px);
+  min-height: auto;
   align-items: center;
-  padding-block: clamp(58px, 7vw, 104px);
+  padding-block: clamp(48px, 6vw, 72px);
 }
 
 .project-k-hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(480px, 1.08fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
   align-items: center;
-  gap: clamp(44px, 7vw, 92px);
+  gap: clamp(40px, 5vw, 56px);
 }
 
 .project-k-eyebrow,
@@ -104,9 +104,9 @@
 }
 
 .project-k-title {
-  margin: 18px 0 24px;
+  margin: 16px 0 20px;
   color: var(--k-paper);
-  font-size: clamp(3rem, 6.3vw, 6.4rem);
+  font-size: clamp(2.8rem, 5.3vw, 4.75rem);
   font-weight: 900;
   letter-spacing: -0.065em;
   line-height: 0.93;
@@ -121,20 +121,20 @@
   max-width: 630px;
   margin: 0;
   color: var(--k-muted);
-  font-size: clamp(1.02rem, 1.8vw, 1.2rem);
-  line-height: 1.8;
+  font-size: clamp(1rem, 1.4vw, 1.1rem);
+  line-height: 1.7;
 }
 
 .project-k-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin: 32px 0 0;
+  margin: 24px 0 0;
 }
 
 .project-k-meta div {
-  min-height: 96px;
-  padding: 15px;
+  min-height: 72px;
+  padding: 12px;
   border: 1px solid var(--k-line);
   background: rgba(24, 33, 26, 0.82);
 }
@@ -173,12 +173,12 @@
 
 .project-k-montage {
   position: relative;
-  min-height: 610px;
+  min-height: 520px;
 }
 
 .project-k-frame {
   position: absolute;
-  width: min(48%, 270px);
+  width: min(48%, 240px);
   aspect-ratio: 9 / 16;
   overflow: hidden;
   border: 2px solid var(--k-gold);
@@ -197,7 +197,7 @@
   top: 0;
   left: 23%;
   z-index: 2;
-  width: min(54%, 302px);
+  width: min(54%, 270px);
 }
 
 .project-k-frame-left {
@@ -232,7 +232,7 @@
 }
 
 .project-k-section {
-  padding-block: clamp(76px, 10vw, 132px);
+  padding-block: clamp(52px, 7vw, 88px);
   border-top: 1px solid var(--k-line);
 }
 
@@ -240,15 +240,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
   align-items: end;
-  gap: 44px;
-  margin-bottom: clamp(38px, 6vw, 66px);
+  gap: 32px;
+  margin-bottom: clamp(30px, 4vw, 44px);
 }
 
 .project-k-section-heading h2 {
   max-width: 790px;
   margin: 13px 0 0;
   color: var(--k-paper);
-  font-size: clamp(2.25rem, 5vw, 4.9rem);
+  font-size: clamp(2rem, 4vw, 3.4rem);
   letter-spacing: -0.055em;
   line-height: 0.98;
   text-wrap: balance;
@@ -262,12 +262,12 @@
 .project-k-loop-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .project-k-loop-card {
-  min-height: 286px;
-  padding: clamp(24px, 3vw, 34px);
+  min-height: 220px;
+  padding: clamp(22px, 3vw, 28px);
   border: 1px solid var(--k-line);
   background: var(--k-panel);
 }
@@ -279,12 +279,12 @@
 
 .project-k-loop-card span {
   color: var(--k-crimson);
-  font-size: 2.4rem;
+  font-size: 2rem;
   font-weight: 900;
 }
 
 .project-k-loop-card h3 {
-  margin: 54px 0 13px;
+  margin: 32px 0 10px;
   color: var(--k-paper);
   font-size: 1.25rem;
 }
@@ -331,12 +331,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
   overflow: hidden;
-  padding: clamp(34px, 6vw, 72px);
+  padding: clamp(30px, 5vw, 48px);
   border: 2px solid var(--k-crimson);
   background: var(--k-panel);
-  box-shadow: 12px 14px 0 var(--k-crimson-deep);
+  box-shadow: 7px 8px 0 var(--k-crimson-deep);
 }
 
 .project-k-release-card::after {
@@ -361,7 +361,7 @@
   max-width: 760px;
   margin: 10px 0 12px;
   color: var(--k-paper);
-  font-size: clamp(2rem, 5vw, 4.2rem);
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
   letter-spacing: -0.055em;
   line-height: 1;
 }
@@ -383,8 +383,8 @@
 
 @media (min-width: 901px) and (max-height: 860px) {
   .project-k-hero {
-    min-height: calc(100dvh - 78px);
-    padding-block: 28px;
+    min-height: auto;
+    padding-block: 40px;
   }
 
   .project-k-montage {
@@ -393,7 +393,7 @@
   }
 
   .project-k-title {
-    font-size: clamp(3.3rem, 8.5dvh, 5.2rem);
+    font-size: clamp(2.8rem, 7.5dvh, 4.2rem);
   }
 }
 
@@ -429,7 +429,7 @@
   }
 
   .project-k-title {
-    font-size: clamp(2.9rem, 14.5vw, 4.6rem);
+    font-size: clamp(2.6rem, 12vw, 4rem);
   }
 
   .project-k-meta,
