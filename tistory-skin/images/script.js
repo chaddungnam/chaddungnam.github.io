@@ -61,6 +61,23 @@
     image.decoding = "async";
   });
 
+  const articleToc = document.querySelector("[data-article-toc]");
+  const articleHeadings = [...document.querySelectorAll(".article-body h2, .article-body h3")];
+  if (articleToc && articleHeadings.length >= 2) {
+    const tocList = articleToc.querySelector("ol");
+    articleHeadings.forEach((heading, index) => {
+      heading.id ||= `article-section-${index + 1}`;
+      const item = document.createElement("li");
+      if (heading.tagName === "H3") item.className = "toc-subitem";
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent.trim();
+      item.append(link);
+      tocList.append(item);
+    });
+    articleToc.hidden = false;
+  }
+
   if (typeof location === "undefined" || typeof navigator === "undefined") return;
   const language = String((navigator.languages && navigator.languages[0]) || navigator.language || "ko").toLowerCase().split("-")[0];
   const locale = { en: "en", de: "de", ja: "ja" }[language];

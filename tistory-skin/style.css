@@ -10,7 +10,7 @@
   --coral: #c4c7c5;
   --teal: #8ab4f8;
   --gold: #fbbc04;
-  --line: rgba(255, 255, 255, .12);
+  --line: rgba(255, 255, 255, .08);
   --shadow: 0 14px 36px rgba(0, 0, 0, .22);
   --code-bg: #0b0c0e;
   --code-text: #f8f9fa;
@@ -55,7 +55,7 @@ body::before {
   z-index: -1;
   content: "";
   pointer-events: none;
-  opacity: .1;
+  opacity: .06;
   background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 48px 48px;
 }
@@ -262,6 +262,14 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
 .translation-locales[hidden], .translation-locales a[hidden] { display: none; }
 .translation-locales a, .translation-locales span { display: grid; min-width: 48px; min-height: 44px; padding: 8px 12px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--paper); font-size: .78rem; font-weight: 800; }
 .translation-locales a:hover, .translation-locales span[aria-current="page"] { color: #10213e; background: var(--gold); }
+.article-toc { width: min(100%, 760px); margin: 24px auto 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+.article-toc[hidden] { display: none; }
+.article-toc strong { display: block; margin-bottom: 9px; color: var(--navy); font-size: .78rem; letter-spacing: .1em; }
+.article-toc ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 22px; margin: 0; padding-left: 20px; color: var(--muted); font-size: .8rem; }
+.article-toc li { min-width: 0; }
+.article-toc .toc-subitem { margin-left: 14px; }
+.article-toc a { display: block; padding-block: 3px; overflow: hidden; color: inherit; text-overflow: ellipsis; white-space: nowrap; }
+.article-toc a:hover { color: var(--teal); }
 .article-body { width: min(100%, 760px); margin: clamp(46px, 6vw, 68px) auto 0; color: var(--navy-soft); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; font-size: clamp(1rem, 1.1vw, 1.075rem); line-height: 1.8; overflow-wrap: anywhere; }
 .article-body > :first-child { margin-top: 0; }
 .article-body h2, .article-body h3, .article-body h4 { color: var(--navy); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; letter-spacing: -.04em; line-height: 1.25; scroll-margin-top: 110px; }
@@ -322,6 +330,8 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
 .post-neighbors small { margin-bottom: 9px; color: var(--coral); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .post-neighbors strong { color: var(--navy); line-height: 1.35; }
 .comments { width: min(100%, 760px); margin: 60px auto 0; padding-top: 38px; border-top: 1px solid var(--line); }
+#tt-body-page .revenue_unit_wrap { width: min(calc(100% - (var(--gutter) * 2)), 760px); margin: 28px auto !important; padding-block: 12px; overflow: hidden; border-block: 1px solid var(--line); text-align: center; }
+#tt-body-page .revenue_unit_wrap .adsbygoogle { max-width: 100%; margin-inline: auto; }
 .tt-comment-cont { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; font-size: .9rem; }
 .tt_box_namecard { width: min(100%, 760px) !important; min-height: 0 !important; align-items: flex-start !important; margin: 48px auto 0 !important; padding: 18px 20px !important; border: 1px solid var(--line) !important; border-radius: 16px !important; color: var(--ink) !important; background: var(--paper) !important; }
 .tt_box_namecard .tt_cont { min-width: 0 !important; flex: 1 1 auto !important; padding: 0 !important; }
@@ -418,6 +428,7 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
   .article-meta { align-items: center; flex-direction: column; gap: 4px; }
   .article-meta span::before { display: none; }
   .translation-note { flex-direction: column; gap: 4px; }
+  .article-toc ol { grid-template-columns: 1fr; }
   .article-body .og-link, .article-body .link-og, .article-body [data-ke-type="opengraph"] > a { min-height: 96px; grid-template-columns: 96px minmax(0, 1fr) !important; }
   .article-body .og-image { min-height: 96px; }
   .article-body .og-desc { display: none; }

@@ -70,6 +70,7 @@ assert.match(html, /name="robots" content="max-image-preview:large"/, "skin shou
 assert.doesNotMatch(html, /<meta name="description" content="\[##_desc_##\]">/, "Tistory should own the per-page description meta tag");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
 assert.match(html, /data-translation-links/, "article needs a translated-version language switcher");
+assert.match(html, /data-article-toc/, "articles need a generated table of contents");
 for (const locale of ["en", "de", "ja"]) {
   assert.match(html, new RegExp(`data-blog-locale="${locale}"`), `article needs a ${locale} translation link`);
 }
@@ -87,6 +88,9 @@ assert.match(css, /@media\s*\(max-width:/, "skin needs a mobile breakpoint");
 assert.match(css, /prefers-reduced-motion/, "skin must respect reduced motion");
 assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color schemes");
 assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark theme");
+assert.match(css, /--line:\s*rgba\(255,\s*255,\s*255,\s*\.08\)/, "dark dividers should stay subtle");
+assert.match(css, /\.article-toc\s*\{/, "article table of contents needs compact styling");
+assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{/, "native top and bottom ads need bounded article spacing");
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.2vw,\s*2\.8rem\)/, "desktop article titles must stay practical");
@@ -118,6 +122,7 @@ assert.match(script, /house_duck_theme/, "theme choice must persist between visi
 assert.match(script, /HOUSE_DUCK_BLOG_LOCALES/, "skin must route readers through the generated locale manifest");
 assert.match(script, /original/, "Korean original view must bypass automatic redirection");
 assert.match(script, /data-alt|figcaption/, "skin script should recover useful image alt text");
+assert.match(script, /article-section-/, "skin script should anchor article headings for the table of contents");
 
 const assetReferences = [...html.matchAll(/(?:href|src)="\.\/([^"?#]+)"/g)].map((match) => match[1]);
 for (const asset of assetReferences) {

@@ -74,6 +74,7 @@ test("home shows compact Quirky Ball gameplay instead of duplicate project statu
   await expect(showcase).toBeVisible();
   await expect(video).toBeVisible();
   await expect(page.locator(".studio-status-panel, .studio-facts")).toHaveCount(0);
+  await expect(showcase.locator(".studio-showcase-copy")).toHaveCount(0);
 
   const state = await video.evaluate((element) => ({
     autoplay: element.autoplay,
@@ -81,11 +82,18 @@ test("home shows compact Quirky Ball gameplay instead of duplicate project statu
     loop: element.loop,
     playsInline: element.playsInline,
     controls: element.controls,
-    width: element.getBoundingClientRect().width,
-    height: element.getBoundingClientRect().height,
+    width: element.offsetWidth,
+    height: element.offsetHeight,
   }));
   expect(state).toMatchObject({ autoplay: true, muted: true, loop: true, playsInline: true, controls: true });
   expect(state.height / state.width).toBeCloseTo(1280 / 592, 2);
+
+  const phone = await showcase.locator(".studio-video-shell").evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { borderRadius: parseFloat(style.borderRadius), transform: style.transform };
+  });
+  expect(phone.borderRadius).toBeGreaterThanOrEqual(24);
+  expect(phone.transform).not.toBe("none");
 
   const headingSize = await page.locator(".studio-intro h1").evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
   expect(headingSize).toBeLessThanOrEqual(48);

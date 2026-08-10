@@ -41,6 +41,48 @@ test("hidden translation controls stay out of layout", () => {
   assert.equal(declarations(".translation-locales[hidden], .translation-locales a[hidden]").display, "none");
 });
 
+test("article headings build a compact table of contents", () => {
+  const headings = [
+    { id: "", tagName: "H2", textContent: "첫 번째 결정" },
+    { id: "", tagName: "H3", textContent: "검증 과정" },
+  ];
+  const items = [];
+  const list = { append(item) { items.push(item); } };
+  const toc = { hidden: true, querySelector() { return list; } };
+  const document = {
+    documentElement: { dataset: {} },
+    body: { id: "tt-body-page" },
+    createElement(tagName) {
+      return { tagName: tagName.toUpperCase(), children: [], append(child) { this.children.push(child); } };
+    },
+    querySelector(selector) {
+      if (selector === "[data-article-toc]") return toc;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === ".article-body h2, .article-body h3") return headings;
+      return [];
+    },
+    addEventListener() {},
+  };
+
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document,
+    localStorage: { getItem: () => "", setItem() {} },
+    location: { hostname: "localhost", pathname: "/entry/test", replace() {}, search: "" },
+    navigator: { language: "ko", languages: ["ko"], userAgent: "" },
+    window: {},
+  });
+
+  assert.equal(toc.hidden, false);
+  assert.deepEqual(headings.map(({ id }) => id), ["article-section-1", "article-section-2"]);
+  assert.deepEqual(items.map((item) => ({ className: item.className || "", text: item.children[0].textContent, href: item.children[0].href })), [
+    { className: "", text: "첫 번째 결정", href: "#article-section-1" },
+    { className: "toc-subitem", text: "검증 과정", href: "#article-section-2" },
+  ]);
+});
+
 test("article media stays readable under Tistory's display-table rule", () => {
   const media = declarations(".article-body figure, .article-body .imageblock, .article-body .imagegridblock");
   assert.equal(media.display, "block !important");
