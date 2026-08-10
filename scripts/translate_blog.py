@@ -94,9 +94,11 @@ def restore_numbers(value, numbers):
         raise ValueError("Gemini returned non-text number content")
     if re.search(r"\d", value):
         raise ValueError(f"Gemini added an unprotected number: {NUMBER_PATTERN.findall(value)!r}")
-    for token, _number in numbers:
+    for token, number in numbers:
         if value.count(token) != 1:
             raise ValueError(f"Gemini changed a protected number token: {token}")
+        if not number.startswith(("+", "-")) and re.search(rf"[+-]\s*{re.escape(token)}", value):
+            raise ValueError("Gemini changed a protected number sign")
     for token, number in numbers:
         value = value.replace(token, number)
     if NUMBER_TOKEN_PREFIX in value or YEAR_TOKEN_PREFIX in value:
@@ -529,13 +531,15 @@ def gemini_translator(api_key, request_json=http_post_json, sleep=time.sleep):
                     " Your previous response failed validation. Regenerate the whole batch. "
                     "Return no literal digits or Korean text, and leave no field empty."
                 )
-                if contract_error and ("number token" in str(contract_error) or "brand" in str(contract_error)):
+                if contract_error and ("number" in str(contract_error) or "brand" in str(contract_error)):
                     correction += (
                         " Your previous response violated token ownership. In every output fragment, use only the protected tokens "
                         "from the input fragment with the same ID, each with the same count. Never move, swap, copy, or replace "
                         "tokens between fields or fragment IDs, including identical fragments. Tokens in context are read-only "
                         "and must never appear in output."
                     )
+                if contract_error and "number sign" in str(contract_error):
+                    correction += " Do not attach a plus or minus sign to an unsigned protected number token."
                 if contract_error and str(contract_error).startswith("translation still contains Korean visible text in "):
                     correction += f" Remove Hangul from these fields: {str(contract_error).partition(' in ')[2]}."
                 if contract_error and "calendar year token translated as a duration" in str(contract_error):
@@ -692,25 +696,44 @@ def needs_translation(source, existing):
     return any(not cache_entry_current(post, cache.get(post["slug"]), required_version) for post in source.get("posts", []))
 
 
-def update_cache(source, existing, translate):
+def update_cache(source, existing, translate, failures=None):
     cache = {"posts": copy.deepcopy(existing.get("posts", {}))}
+    failures = failures if failures is not None else []
     required_version = source.get("translation_version", TRANSLATION_PIPELINE_VERSION)
     changed = [
         post for post in source.get("posts", [])
         if not cache_entry_current(post, cache["posts"].get(post["slug"]), required_version)
     ]
     if len(changed) > MAX_CHANGED_POSTS:
-        raise ValueError(f"refusing to translate more than {MAX_CHANGED_POSTS} changed posts")
+        for post in changed[MAX_CHANGED_POSTS:]:
+            failures.append(f"{post['slug']}: deferred because this run is limited to {MAX_CHANGED_POSTS} changed posts")
+        changed = changed[:MAX_CHANGED_POSTS]
     for post in changed:
         if input_character_count(post) > MAX_POST_CHARS:
-            raise ValueError(f"post exceeds translation input limit: {post['slug']}")
-        translated_post = {
+            failures.append(f"{post['slug']}: deferred because it exceeds the translation input limit")
+            continue
+        previous = cache["posts"].get(post["slug"])
+        translated_post = (
+            copy.deepcopy(previous)
+            if isinstance(previous, dict)
+            and previous.get("source_hash") == post["source_hash"]
+            and previous.get("translation_version") == required_version
+            else {}
+        )
+        translated_post.update({
             "source_hash": post["source_hash"],
             "translation_version": required_version,
-        }
+        })
         for locale in TARGETS:
-            content = translate(post, locale)
-            validate_translation(post, content, locale)
+            content = translated_post.get(locale)
+            try:
+                if not isinstance(content, dict) or not content.get("reviewed"):
+                    content = translate(post, locale)
+                validate_translation(post, content, locale)
+            except (RuntimeError, ValueError) as error:
+                translated_post.pop(locale, None)
+                failures.append(f"{post['slug']} [{locale}]: {error}")
+                continue
             translated_post[locale] = {
                 "title": content["title"],
                 "summary": content["summary"],
@@ -751,9 +774,12 @@ def main():
     if not needs_translation(source, existing):
         print(f"translation cache current: {len(existing.get('posts', {}))} post(s)")
         return
-    updated = update_cache(source, existing, gemini_translator(os.environ.get("GEMINI_API_KEY", "")))
+    failures = []
+    updated = update_cache(source, existing, gemini_translator(os.environ.get("GEMINI_API_KEY", "")), failures)
     write_json_atomic(output, updated)
     print(f"translated cache: {len(updated['posts'])} post(s)")
+    for failure in failures:
+        print(f"translation deferred: {failure}")
 
 
 if __name__ == "__main__":

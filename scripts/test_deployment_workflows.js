@@ -18,6 +18,8 @@ assert.match(workflow, /gh api --method POST "repos\/\$GITHUB_REPOSITORY\/pages\
 assert.doesNotMatch(workflow, /steps\.publish\.outputs\.changed/);
 assert.equal(workflow.match(/https:\/\/houseduck\.tistory\.com\/rss/g)?.length, 1, "RSS must be fetched once per run");
 assert.equal(workflow.match(/--rss \.tmp\/rss\.xml/g)?.length, 2, "source and render must use the same RSS snapshot");
+assert.ok(workflow.indexOf("name: Publish Korean posts") < workflow.indexOf("name: Translate changed posts"), "Korean posts must publish before translation can fail");
+assert.ok(workflow.indexOf("name: Trigger GitHub Pages build (Korean posts)") < workflow.indexOf("name: Translate changed posts"), "Korean updates need their own Pages build trigger");
 assert.equal(workflow.split("\n").filter((line) => line.includes("GEMINI_API_KEY")).length, 1, "Gemini key must be scoped to the translator step");
 assert.doesNotMatch(workflow, /argostranslate|argos-translate/);
 for (const check of [

@@ -636,6 +636,29 @@ class BlogTranslationTest(unittest.TestCase):
         self.assertEqual(delays, [7])
         self.assertEqual(result["body_html"], "<p>COVID</p><p>Continues</p>")
 
+    def test_retries_a_model_added_number_sign_before_rendering(self):
+        post = {**self.post, "body_html": "<p>3개의 레벨</p>"}
+        attempts = 0
+
+        def request_json(_url, _headers, payload):
+            nonlocal attempts
+            attempts += 1
+            model_input = json.loads(payload["contents"][0]["parts"][0]["text"])
+            token = re.search(r"__HD_NUMBER_[A-Z]+__", model_input["fragments"][0]["text"]).group(0)
+            text = f"There are {'-' if attempts == 1 else ''}{token} levels."
+            return 200, gemini_response({
+                "title": "First log",
+                "summary": "First summary",
+                "fragments": [{"id": model_input["fragments"][0]["id"], "text": text}],
+            })
+
+        result = self.module.gemini_translator(
+            "test-key", request_json=request_json, sleep=lambda _seconds: None
+        )(post, "en")
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(result["body_html"], "<p>There are 3 levels.</p>")
+
     def test_reports_locale_and_batch_after_contract_retries_are_exhausted(self):
         attempts = 0
         delays = []
@@ -807,19 +830,30 @@ class BlogTranslationTest(unittest.TestCase):
 
         self.assertEqual(result["body_html"], "<p>Godot</p>")
 
-    def test_failed_locale_keeps_the_existing_cache_untouched(self):
-        source = {"translation_version": 6, "posts": [self.post]}
+    def test_failed_locale_does_not_block_other_locales_or_the_post_cache(self):
+        post = {
+            "slug": "first-post",
+            "source_hash": "new-hash",
+            "title": "첫 기록",
+            "summary": "첫 요약",
+            "body_html": "<p>안녕</p>",
+        }
+        valid = {"title": "First log", "summary": "First summary", "body_html": "<p>Hello</p>"}
+        source = {"translation_version": 6, "posts": [post]}
         existing = {"posts": {"archive": {"source_hash": "old"}}}
-        before = copy.deepcopy(existing)
 
         def translate(_post, locale):
             if locale == "de":
-                return {**self.english, "body_html": "<p>번역 실패</p>"}
-            return dict(self.english)
+                return {**valid, "body_html": "<p>번역 실패</p>"}
+            return dict(valid)
 
-        with self.assertRaises(ValueError):
-            self.module.update_cache(source, existing, translate)
-        self.assertEqual(existing, before)
+        updated = self.module.update_cache(source, existing, translate)
+        self.assertEqual(updated["posts"]["archive"], {"source_hash": "old"})
+        entry = updated["posts"]["first-post"]
+        self.assertEqual(entry["source_hash"], "new-hash")
+        self.assertIn("en", entry)
+        self.assertNotIn("de", entry)
+        self.assertIn("ja", entry)
 
     def test_source_hash_version_and_review_state_control_regeneration(self):
         source = {"translation_version": 6, "posts": [self.post]}
@@ -842,22 +876,30 @@ class BlogTranslationTest(unittest.TestCase):
             mutation(stale)
             self.assertTrue(self.module.needs_translation(source, stale))
 
-    def test_rejects_oversized_posts_and_too_many_changed_posts(self):
+    def test_defers_oversized_and_excess_posts_without_blocking_the_queue(self):
         oversized = {**self.post, "body_html": f"<p>{'가' * (self.module.MAX_POST_CHARS + 1)}</p>"}
-        with self.assertRaises(ValueError):
-            self.module.update_cache(
-                {"translation_version": 6, "posts": [oversized]},
-                {"posts": {}},
-                lambda _post, _locale: self.english,
-            )
+        failures = []
+        updated = self.module.update_cache(
+            {"translation_version": 6, "posts": [oversized]},
+            {"posts": {}},
+            lambda _post, _locale: self.english,
+            failures,
+        )
+        self.assertNotIn("first-post", updated["posts"])
+        self.assertEqual(len(failures), 1)
+        self.assertIn("input limit", failures[0])
 
         posts = [{**self.post, "slug": f"post-{index}", "source_hash": str(index)} for index in range(self.module.MAX_CHANGED_POSTS + 1)]
-        with self.assertRaises(ValueError):
-            self.module.update_cache(
-                {"translation_version": 6, "posts": posts},
-                {"posts": {}},
-                lambda _post, _locale: self.english,
-            )
+        failures = []
+        updated = self.module.update_cache(
+            {"translation_version": 6, "posts": posts},
+            {"posts": {}},
+            lambda _post, _locale: self.english,
+            failures,
+        )
+        self.assertEqual(len(updated["posts"]), self.module.MAX_CHANGED_POSTS)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("deferred", failures[0])
 
     def test_writes_cache_atomically(self):
         with tempfile.TemporaryDirectory() as directory:

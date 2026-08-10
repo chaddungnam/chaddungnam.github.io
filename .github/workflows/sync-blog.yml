@@ -36,6 +36,31 @@ jobs:
           mkdir -p .tmp
           curl --fail --silent --show-error --location https://houseduck.tistory.com/rss --output .tmp/rss.xml
           node scripts/blog-sync.mjs --rss .tmp/rss.xml --out-root . --source-out .tmp/blog-source.json --translations assets/blog-translations.json
+      - name: Publish Korean posts
+        id: publish-korean
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/blog-feed.json assets/blog-locales.js assets/blog-translations.json blog sitemap-blog.xml
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore(blog): sync Korean Tistory posts"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Trigger GitHub Pages build (Korean posts)
+        if: steps.publish-korean.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for delay in 0 10 20; do
+            sleep "$delay"
+            if gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"; then
+              exit 0
+            fi
+          done
+          exit 1
       - name: Translate changed posts
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -50,15 +75,21 @@ jobs:
           python scripts/test_blog_translation_regressions.py
           node scripts/test_blog_mirror.js
           npm run test:blog-security
-      - name: Publish changed posts
+      - name: Publish translated posts
+        id: publish-translations
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/blog-feed.json assets/blog-locales.js assets/blog-translations.json blog sitemap-blog.xml
-          git diff --cached --quiet && exit 0
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "chore(blog): sync Tistory posts"
           git push
-      - name: Trigger GitHub Pages build
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Trigger GitHub Pages build (translations)
+        if: steps.publish-translations.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
