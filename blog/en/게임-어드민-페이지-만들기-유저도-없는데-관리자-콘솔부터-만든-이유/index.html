@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="To start with the conclusion, I didn&#39;t build the game manager console because I hated touching Supabase directly. Even when vibe coding, some people like terminals, while others like desktop programs and GUIs. I am definitely the latter. For server operations too, rather than opening logs and tables one by one, I wanted to see the necessary information on a processed screen.">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#111315">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Creating a Game Admin Page | Why I Built a Manager Console Before Even Having Users">
+  <meta property="og:description" content="To start with the conclusion, I didn&#39;t build the game manager console because I hated touching Supabase directly. Even when vibe coding, some people like terminals, while others like desktop programs and GUIs. I am definitely the latter. For server operations too, rather than opening logs and tables one by one, I wanted to see the necessary information on a processed screen.">
+  <meta property="og:url" content="https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta property="article:published_time" content="2026-08-10T20:32:24.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Creating a Game Admin Page | Why I Built a Manager Console Before Even Having Users">
+  <meta name="twitter:description" content="To start with the conclusion, I didn&#39;t build the game manager console because I hated touching Supabase directly. Even when vibe coding, some people like terminals, while others like desktop programs and GUIs. I am definitely the latter. For server operations too, rather than opening logs and tables one by one, I wanted to see the necessary information on a processed screen.">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Creating a Game Admin Page | Why I Built a Manager Console Before Even Having Users","description":"To start with the conclusion, I didn't build the game manager console because I hated touching Supabase directly. Even when vibe coding, some people like terminals, while others like desktop programs and GUIs. I am definitely the latter. For server operations too, rather than opening logs and tables one by one, I wanted to see the necessary information on a processed screen.","datePublished":"2026-08-10T20:32:24.000Z","inLanguage":"en","mainEntityOfPage":"https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/","url":"https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/","image":"https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Creating a Game Admin Page | Why I Built a Manager Console Before Even Having Users — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">Skip to content</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/en/">Blog</a><button type="button" data-theme-toggle aria-label="Switch color theme">☾</button></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/en/">← All posts</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Creating a Game Admin Page | Why I Built a Manager Console Before Even Having Users</h1><time datetime="2026-08-10T20:32:24.000Z">August 10, 2026</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">Korean</a><a href="/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/" aria-current="page">English</a><a href="/blog/de/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">Deutsch</a><a href="/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">日本語</a></nav>
+      <aside class="mirror-note"><strong>Automatic translation</strong><span>This page was automatically translated from Korean and may contain unnatural wording. <a href="https://blog.houseduck.in/entry/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0?original=1">Read the Korean original</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">To start with the conclusion,</p>
+<p data-ke-size="size16">I didn't build the game manager console</p>
+<p data-ke-size="size16">because I hated touching Supabase directly.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Even when doing vibe coding, some people like the terminal,</p>
+<p data-ke-size="size16">while others like desktop programs and GUIs.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">I am definitely the latter.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">For server operations too, rather than opening logs and tables one by one,</p>
+<p data-ke-size="size16">I wanted to view the necessary information on a processed screen.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">If possible, even without opening my laptop,</p>
+<p data-ke-size="size16">I wanted to check the status on my phone and finish necessary operations.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" data-phocus="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" data-alt="A House Duck private console accessible only by authorized Google accounts"><img src="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" loading="lazy" width="621" height="654" alt="" /></span><figcaption>A House Duck private console accessible only by authorized Google accounts</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>I built the admin page before there were even any users.</b></h2>
+<p data-ke-size="size16">Quirky Ball is still before its official launch.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Yet the House Duck Console already has</p>
+<p data-ke-size="size16">analytics, player, operations, purchase and refund, CS, and audit log menus.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The order might seem a bit unusual.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, after launching the game and running into problems,</p>
+<p data-ke-size="size16">I thought making operational tools only at that point would be too late.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">How long users played the game,</p>
+<p data-ke-size="size16">where they dropped off,</p>
+<p data-ke-size="size16">whether they came back the next day,</p>
+<p data-ke-size="size16">and whether ads appeared too frequently</p>
+<p data-ke-size="size16">were things I did not want to worry about for the first time only after launch.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Having already worked in the industry and</p>
+<p data-ke-size="size16">witnessed numerous trials and errors,</p>
+<p data-ke-size="size16">this was the conclusion I reached.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Since there is already an AI that can get everything done</p>
+<p data-ke-size="size16">as long as the requirements are clear, what is the problem?</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>Instead of the terminal, I wanted to make judgments from a single screen.</b></h2>
+<p data-ke-size="size16">Supabase stores game data and</p>
+<p data-ke-size="size16">serves as the foundation connecting authentication and server functions.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, database tables</p>
+<p data-ke-size="size16">are not screens where an operator gets immediate answers.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Looking up play time, completion rate, revisit rate, ad view rate,</p>
+<p data-ke-size="size16">and gem and stamina usage separately</p>
+<p data-ke-size="size16">is different from seeing "What is weird about this game right now?" at a glance.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So rather than ending up just laying out</p>
+<p data-ke-size="size16">raw data in a nice-looking way,</p>
+<p data-ke-size="size16">I tried to turn it into questions I would actually make decisions on.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">If more players need to accumulate before making a judgment,</p>
+<p data-ke-size="size16">I display it as is without making up a plausible conclusion.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" data-alt="An actual analysis screen organizing play time, completion rate, returns, and ads into question formats"><img src="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" loading="lazy" width="980" height="860" alt="" /></span><figcaption>An actual analysis screen organizing play time, completion rate, returns, and ads into question formats</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">What I needed was not a pretty graph,</p>
+<p data-ke-size="size16">but a screen telling me what to fix first in the next update.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>I wanted to spot unusual users in the analysis and handle them right away.</b></h2>
+<p data-ke-size="size16">After checking the insights,</p>
+<p data-ke-size="size16">I didn't want to open Supabase or other tools again.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">I searched for nicknames and display codes in the player list,</p>
+<p data-ke-size="size16">and checked the game count, highest score, currency, and recent play.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Abnormal scores are excluded or adjusted from the rankings,</p>
+<p data-ke-size="size16">and if necessary, I made it possible to grant or retrieve items</p>
+<p data-ke-size="size16">and send reward mails to specific users.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">On the operations screen,</p>
+<p data-ke-size="size16">you can change the minimum supported version and notices,</p>
+<p data-ke-size="size16">and also send mass reward mails.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">I included a workflow to view purchase and refund records,</p>
+<p data-ke-size="size16">and handle inquiries sent to support@houseduck.in</p>
+<p data-ke-size="size16">right from the same console.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The user sanctions I speak of</p>
+<p data-ke-size="size16">are not automated bans that block people with a single button.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is closer to a method of checking actual logs</p>
+<p data-ke-size="size16">and selecting only necessary measures</p>
+<p data-ke-size="size16">like score exclusions or item retrievals.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Important changes require entering a reason and confirming once more,</p>
+<p data-ke-size="size16">and who changed what is left in the audit logs.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>I did not want to operate only when in front of my laptop.</b></h2>
+<p data-ke-size="size16">A 1 developer is both a developer and a QA,</p>
+<p data-ke-size="size16">as well as a planner and customer service.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">You cannot always sit in front of a desk.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">When bug reports come in from outside,</p>
+<p data-ke-size="size16">or when metrics look abnormal right after an update,</p>
+<p data-ke-size="size16">I wanted to check the status on my phone and execute limited operational functions.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Of course, this does not mean opening all dangerous functions on mobile.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Queries should be fast,</p>
+<p data-ke-size="size16">changes should be limited to necessities,</p>
+<p data-ke-size="size16">and irreversible tasks should go through confirmation and logging.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">This is also why GUIs were good.</p>
+<p data-ke-size="size16">Even on a small screen, it was easy to distinguish</p>
+<p data-ke-size="size16">It was easy to distinguish which button changed the actual data.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>Security was handled reliably.</b></h2>
+<p data-ke-size="size16">The console is not a service exposed to the outside.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">First, you log in with an authorized Google account,</p>
+<p data-ke-size="size16">and then it opens only after answering a personal question that only I can immediately recall.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" data-phocus="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" data-alt="A personal question verified one more time after Google login"><img src="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" loading="lazy" width="546" height="475" alt="" /></span><figcaption>A personal question verified one more time after Google login</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">"What is the name of the first game I ever played?"</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is not a device created to look like massive security technology.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Actual permissions are rechecked on the server,</p>
+<p data-ke-size="size16">and this question is closer to a door that blocks accidental entry from another account or an open browser once more.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">As I quickly expanded features through vibe coding,</p>
+<p data-ke-size="size16">I felt that these small boundaries became even more important.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>Because it was vibe coding, a GUI was needed even more.</b></h2>
+<p data-ke-size="size16">AI makes code quickly.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, if I have to remember table names and commands every time,</p>
+<p data-ke-size="size16">and re-explain what values are needed for which task,</p>
+<p data-ke-size="size16">I would have to return to development mode every time I operate it.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The admin screen fixes that process into buttons and forms.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It checks in the sequence I intended,</p>
+<p data-ke-size="size16">accepts only designated inputs,</p>
+<p data-ke-size="size16">and asks one more time for dangerous tasks.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is not meant to eliminate the terminal,</p>
+<p data-ke-size="size16">but rather to productize repetitive operations into a GUI.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>It is not a completed admin yet.</b></h2>
+<p data-ke-size="size16">Just because a feature was created did not mean it could be operated right away.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Buttons sometimes failed because server functions were missing,</p>
+<p data-ke-size="size16">and there were times when permission settings did not match actual operational data, so I had to fix them again.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The Project K menu is still close to a shell,</p>
+<p data-ke-size="size16">and areas that could not be automatically connected, such as store refund notifications, remain.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Since it is before the official launch, there are many cards with insufficient data.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Still, if I build it from now on,</p>
+<p data-ke-size="size16">I can avoid scrambling to figure out what to check after the first user enters.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">House Duck Console is not a fancy-looking dashboard.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is closer to my own operational desktop program created to see the status of the game at a glance,</p>
+<p data-ke-size="size16">and carefully handle only necessary tasks anytime and anywhere.</p>
+<p data-ke-size="size16">none</p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer>
+</body>
+</html>
