@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-08-10T19:04:03.000Z",
+  "updated_at": "2026-08-10T20:32:24.000Z",
   "posts": [
+    {
+      "slug": "게임-어드민-페이지-만들기-유저도-없는데-관리자-콘솔부터-만든-이유",
+      "title": "게임 어드민 페이지 만들기 | 유저도 없는데 관리자 콘솔부터 만든 이유",
+      "summary": "결론부터 말하자면, 나는 Supabase를 직접 만지기 싫어서 게임 관리자 콘솔을 만든 게 아니다. 바이브코딩을 할 때도 터미널을 좋아하는 사람이 있고, 데스크톱 프로그램과 GUI를 좋아하는 사람이 있다. 나는 확실히 후자다. 서버 운영도 로그와 테이블을 하나씩 열어보는 것보다 필요한 정보가 가공된 화면으로 보고 싶었다.",
+      "image": "https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png",
+      "published_at": "2026-08-10T20:32:24.000Z",
+      "url": "https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/",
+      "original_url": "https://blog.houseduck.in/entry/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0",
+      "localized": {
+        "kr": {
+          "title": "게임 어드민 페이지 만들기 | 유저도 없는데 관리자 콘솔부터 만든 이유",
+          "summary": "결론부터 말하자면, 나는 Supabase를 직접 만지기 싫어서 게임 관리자 콘솔을 만든 게 아니다. 바이브코딩을 할 때도 터미널을 좋아하는 사람이 있고, 데스크톱 프로그램과 GUI를 좋아하는 사람이 있다. 나는 확실히 후자다. 서버 운영도 로그와 테이블을 하나씩 열어보는 것보다 필요한 정보가 가공된 화면으로 보고 싶었다.",
+          "url": "https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/"
+        }
+      }
+    },
     {
       "slug": "구글-플레이-콘솔-비공개-테스트-12명-14일-게임이-개과천선한-이유-Quirky-Ball",
       "title": "구글 플레이 콘솔 비공개 테스트 12명 14일 | 게임이 개과천선한 이유 | Quirky Ball",
