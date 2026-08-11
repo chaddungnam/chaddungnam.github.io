@@ -109,11 +109,40 @@ function renderDashboard() {
   renderFunnel();
   renderExitBreakdown();
   renderAds();
+  renderChoices();
   renderAttention(pulseModel);
   renderPeriodPlayers();
   renderGameMetrics();
   renderDailyTable();
   renderInsight();
+}
+
+function renderChoices() {
+  const labels = {
+    space: "공간 확보",
+    fast_growth: "빠른 성장",
+    unstable_growth: "불안정 성장",
+    size_restore: "크기 복구",
+    all_or_nothing: "모 아니면 도",
+    mad_scientist: "매드 사이언티스트",
+    blood_game: "피의 게임",
+    score_double: "점수 2배",
+    roulette_reroll: "룰렛 다시하기",
+    bonus: "보너스",
+    nothing: "미당첨",
+    hard_mode: "하드모드",
+    breakthrough: "돌파",
+    time_rewind: "처음부터 재시작",
+    unknown: "확인 필요",
+  };
+  const renderRows = (id, rows) => {
+    const body = byId(id);
+    body.innerHTML = rows.length === 0
+      ? '<tr><td class="empty-row" colspan="3">아직 수집된 선택이 없습니다.</td></tr>'
+      : rows.map((row) => `<tr><td><strong>${escapeHtml(labels[row.key] ?? row.key)}</strong></td><td>${formatNumber(row.count)}</td><td>${formatRate(row.rate)}</td></tr>`).join("");
+  };
+  renderRows("growthChoicesTable", state.payload?.choices?.growth ?? []);
+  renderRows("rouletteResultsTable", state.payload?.choices?.roulette ?? []);
 }
 
 function renderGameMetrics() {
