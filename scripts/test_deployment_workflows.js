@@ -21,6 +21,12 @@ assert.equal(workflow.match(/--rss \.tmp\/rss\.xml/g)?.length, 2, "source and re
 assert.ok(workflow.indexOf("name: Publish Korean posts") < workflow.indexOf("name: Translate changed posts"), "Korean posts must publish before translation can fail");
 assert.ok(workflow.indexOf("name: Trigger GitHub Pages build (Korean posts)") < workflow.indexOf("name: Translate changed posts"), "Korean updates need their own Pages build trigger");
 assert.equal(workflow.split("\n").filter((line) => line.includes("GEMINI_API_KEY")).length, 1, "Gemini key must be scoped to the translator step");
+assert.equal(workflow.match(/node scripts\/indexnow-payload\.mjs/g)?.length, 2, "each blog publish phase must build an IndexNow payload");
+assert.equal(workflow.match(/https:\/\/api\.indexnow\.org\/indexnow/g)?.length, 2, "each blog publish phase must notify IndexNow");
+assert.equal(workflow.match(/--retry 3 --retry-all-errors/g)?.length, 2, "IndexNow notifications must retry transient network failures");
+assert.equal(workflow.match(/pages\/builds\/latest/g)?.length, 2, "IndexNow must wait for each Pages deployment to finish");
+assert.equal(workflow.match(/continue-on-error:\s*true/g)?.length, 2, "IndexNow failures must not block blog publishing");
+assert.match(workflows, /node scripts\/test_indexnow_payload\.mjs/, "CI must exercise the IndexNow payload contract");
 assert.doesNotMatch(workflow, /argostranslate|argos-translate/);
 for (const check of [
   "node scripts/test_blog_sync.mjs",

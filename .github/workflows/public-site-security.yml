@@ -37,6 +37,7 @@ jobs:
           node scripts/test_public_ui_regressions.js
           node scripts/test_site_links.js
           node scripts/test_deployment_workflows.js
+          node scripts/test_indexnow_payload.mjs
       - name: Test blog pipeline
         run: |
           node scripts/test_blog_mirror.js
