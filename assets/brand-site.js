@@ -22,7 +22,7 @@
   function buildPostCards(posts, locale) {
     var localeKey = locale === "ko" ? "kr" : locale;
     var dateLocales = { ko: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
-    return (Array.isArray(posts) ? posts : []).slice(0, 4).map(function (post, index) {
+    return (Array.isArray(posts) ? posts : []).slice(0, 6).map(function (post, index) {
       var localized = post.localized && (post.localized[localeKey] || post.localized.kr) || post;
       var link = safeHttpsUrl(locale === "ko" ? post.original_url : (localized.url || post.url));
       if (!link) return "";

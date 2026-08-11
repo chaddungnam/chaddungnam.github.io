@@ -36,7 +36,7 @@ const homeCards = buildPostCards(Array.from({ length: 7 }, (_value, index) => ({
   url: `https://houseduck.in/blog/kr/post-${index + 1}/`,
   original_url: `https://blog.houseduck.in/entry/post-${index + 1}`,
 })), "ko");
-assert.equal((homeCards.match(/<article /g) || []).length, 4, "home should show four latest posts");
+assert.equal((homeCards.match(/<article /g) || []).length, 6, "home should show six latest posts");
 assert.equal((homeCards.match(/post-preview-card-wide/g) || []).length, 1, "the fourth post should span the full row");
 
 const safeCards = buildPostCards([{

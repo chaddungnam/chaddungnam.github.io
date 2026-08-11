@@ -77,7 +77,7 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
 
 test("home hierarchy keeps the statement compact and the journal scannable", async ({ page, isMobile }) => {
   await page.goto("/?lang=ko");
-  await expect(page.locator(".manifesto-bubble")).toContainText("사람냄새 나는 게임과 소프트웨어");
+  await expect(page.locator("[data-typewriter]")).toHaveAttribute("aria-label", "House Duck, 게임 및 기타 소프트웨어 개발과 일기를 보여줍니다.");
   await expect(page.locator(".manifesto-mark")).toHaveText("HD");
   await expect(page.locator(".brand-lockup")).toHaveCSS("background-image", /house-duck-logo\.png/);
   await expect(page.locator(".type-cursor")).toHaveCount(0);
@@ -86,21 +86,31 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".phone-side-button")).toHaveCount(4);
   await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
   await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
-  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(4);
+  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
   await expect(page.locator(".post-preview-card-wide")).toHaveCount(1);
 
   if (!isMobile) {
+    await page.waitForTimeout(900);
     const bubble = await page.locator(".manifesto-bubble").boundingBox();
     const phone = await page.locator(".iphone-shell").first().boundingBox();
     const cards = await page.locator(".post-preview-card:not(.post-preview-empty)").evaluateAll((nodes) => nodes.map((node) => {
       const box = node.getBoundingClientRect();
-      return { y: box.y, width: box.width };
+      return { x: box.x, y: box.y, width: box.width, height: box.height };
+    }));
+    const phones = await page.locator(".game-device").evaluateAll((nodes) => nodes.map((node) => {
+      const box = node.getBoundingClientRect();
+      return { left: box.left, right: box.right };
     }));
     expect(bubble.width).toBeLessThan(680);
     expect(phone.width).toBeGreaterThan(200);
     expect(Math.max(...cards.slice(0, 3).map((card) => card.y)) - Math.min(...cards.slice(0, 3).map((card) => card.y))).toBeLessThan(2);
     expect(cards[3].y).toBeGreaterThan(cards[0].y);
     expect(cards[3].width).toBeGreaterThan(cards[0].width * 2.5);
+    expect(cards[3].height).toBeLessThan(210);
+    expect(Math.abs(cards[4].y - cards[5].y)).toBeLessThan(2);
+    expect(cards[4].y).toBeGreaterThan(cards[3].y);
+    expect(cards[4].width).toBeGreaterThan(cards[0].width * 1.4);
+    expect(phones[1].left - phones[0].right).toBeLessThan(16);
     expect(await page.locator(".game-device").first().evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-phone-float");
   }
 

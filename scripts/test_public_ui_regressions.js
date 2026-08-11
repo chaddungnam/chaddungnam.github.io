@@ -150,10 +150,10 @@ test("product navigation stays on the House Duck Blog domain and returns to #gam
 
 test("home leads with the approved statement and two real game previews", () => {
   const expected = {
-    "index.html": ["AI를 사용하지만,", "사람냄새 나는 게임과 소프트웨어,", "그리고 개발 일기를 보여주는 웹사이트"],
-    "index_en.html": ["We use AI,", "but make games and software that still feel human,", "and show the development blog behind them."],
-    "index_de.html": ["Wir nutzen KI,", "entwickeln aber Spiele und Software mit menschlicher Handschrift,", "und zeigen das Entwicklungstagebuch dahinter."],
-    "index_ja.html": ["AIを使いながらも、", "人の温度があるゲームとソフトウェア、", "そして開発日記を見せるウェブサイトです。"],
+    "index.html": ["House Duck,", "게임 및 기타 소프트웨어 개발과 일기를 보여줍니다."],
+    "index_en.html": ["House Duck,", "games, other software, and the development journal."],
+    "index_de.html": ["House Duck,", "Spiele, andere Software und das Entwicklungstagebuch."],
+    "index_ja.html": ["House Duck,", "ゲームやその他のソフトウェア、そして開発日誌。"],
   };
 
   for (const [file, lines] of Object.entries(expected)) {
