@@ -126,6 +126,32 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   ]);
 });
 
+test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => {
+  test.skip(isMobile, "mouse hover is covered by the desktop project");
+
+  for (const target of [
+    { path: "/?lang=ko", card: ".post-preview-card:not(.post-preview-empty)", image: ".post-preview-image", settle: 900 },
+    { path: "/blog/kr/", card: ".mirror-grid article", image: "img", settle: 0 },
+  ]) {
+    await page.goto(target.path);
+    await page.waitForTimeout(target.settle);
+    const card = page.locator(target.card).first();
+    await card.hover();
+    await page.waitForTimeout(320);
+    const state = await card.evaluate((node, imageSelector) => {
+      const image = node.querySelector(imageSelector);
+      return {
+        shadow: getComputedStyle(node).boxShadow,
+        transform: getComputedStyle(node).transform,
+        imageTransform: image ? getComputedStyle(image).transform : "none",
+      };
+    }, target.image);
+    expect(state.shadow).not.toBe("none");
+    expect(state.transform).not.toBe("none");
+    expect(state.imageTransform).not.toBe("none");
+  }
+});
+
 test("YouTube Shorts keep their portrait ratio", async ({ page }) => {
   await page.goto("/blog/kr/내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유/");
   const frame = page.locator("iframe.video-portrait");

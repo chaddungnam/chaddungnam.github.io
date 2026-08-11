@@ -279,16 +279,19 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
 
 .journal-section { background: var(--studio-surface); }
 .post-preview-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
-.post-preview-card { grid-column: span 2; overflow: hidden; border: 1px solid var(--studio-line); border-radius: 15px; background: var(--studio-bg); transition: transform 180ms ease, border-color 180ms ease; animation: studio-card-in 520ms cubic-bezier(.2,.75,.2,1) both; }
+.post-preview-card { position: relative; grid-column: span 2; overflow: hidden; border: 1px solid var(--studio-line); border-radius: 15px; background: var(--studio-bg); box-shadow: 0 2px 0 transparent; transition: transform 240ms cubic-bezier(.2,.8,.2,1), border-color 240ms ease, box-shadow 240ms ease; animation: studio-card-in 520ms cubic-bezier(.2,.75,.2,1) backwards; }
 .post-preview-card:nth-child(2) { animation-delay: 70ms; }
 .post-preview-card:nth-child(3) { animation-delay: 140ms; }
 .post-preview-card:nth-child(4) { animation-delay: 210ms; }
 .post-preview-card:nth-child(5) { grid-column: span 3; animation-delay: 280ms; }
 .post-preview-card:nth-child(6) { grid-column: span 3; animation-delay: 350ms; }
 .post-preview-card-wide { grid-column: 1 / -1; }
-.post-preview-card:hover { border-color: color-mix(in srgb, var(--studio-yellow) 48%, var(--studio-line)); transform: translateY(-3px); }
+.post-preview-card:hover,
+.post-preview-card:focus-within { z-index: 2; border-color: color-mix(in srgb, var(--studio-yellow) 68%, var(--studio-line)); box-shadow: 0 22px 48px rgba(0, 0, 0, .34), 0 3px 0 color-mix(in srgb, var(--studio-yellow) 76%, transparent); transform: translateY(-7px) scale(1.01); }
 .post-preview-link { display: flex; height: 100%; flex-direction: column; }
-.post-preview-image { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.post-preview-image { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; transition: transform 360ms cubic-bezier(.2,.8,.2,1), filter 360ms ease; }
+.post-preview-card:hover .post-preview-image,
+.post-preview-card:focus-within .post-preview-image { filter: saturate(1.06) contrast(1.03); transform: scale(1.045); }
 .post-preview-copy { padding: 18px; flex: 1; }
 .post-preview-copy small { color: var(--studio-cyan); font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .post-preview-copy h3 { display: -webkit-box; margin: 8px 0 6px; overflow: hidden; color: var(--studio-ink); font-size: 1.06rem; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
