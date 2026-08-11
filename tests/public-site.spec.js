@@ -5,6 +5,8 @@ const routes = [
   "/index_en.html?lang=en",
   "/index_de.html?lang=de",
   "/index_ja.html?lang=ja",
+  "/about/?lang=ko",
+  "/about/index_en.html?lang=en",
   "/quirky-ball/?lang=ko",
   "/project-k/index_en.html?lang=en",
   "/privacy/de.html?stay=1",
@@ -66,37 +68,24 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
-test("home shows compact Quirky Ball gameplay instead of duplicate project status", async ({ page }) => {
+test("home statement points to two playable phone previews", async ({ page }) => {
   await page.goto("/?lang=ko");
+  await expect(page.locator(".manifesto-bubble")).toContainText("사람냄새 나는 게임과 소프트웨어");
+  await expect(page.locator("[data-game-preview]")).toHaveCount(2);
+  await expect(page.locator(".phone-side-button")).toHaveCount(4);
+  await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
+  await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
 
-  const showcase = page.locator(".studio-showcase");
-  const video = showcase.locator("video");
-  await expect(showcase).toBeVisible();
-  await expect(video).toBeVisible();
-  await expect(page.locator(".studio-status-panel, .studio-facts")).toHaveCount(0);
-  await expect(showcase.locator(".studio-showcase-copy")).toHaveCount(0);
-
-  const state = await video.evaluate((element) => ({
-    autoplay: element.autoplay,
-    muted: element.muted,
-    loop: element.loop,
-    playsInline: element.playsInline,
-    controls: element.controls,
-    width: element.offsetWidth,
-    height: element.offsetHeight,
-  }));
-  expect(state).toMatchObject({ autoplay: true, muted: true, loop: true, playsInline: true, controls: true });
-  expect(state.height / state.width).toBeCloseTo(1280 / 592, 2);
-
-  const phone = await showcase.locator(".studio-video-shell").evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { borderRadius: parseFloat(style.borderRadius), transform: style.transform };
-  });
-  expect(phone.borderRadius).toBeGreaterThanOrEqual(24);
-  expect(phone.transform).not.toBe("none");
-
-  const headingSize = await page.locator(".studio-intro h1").evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-  expect(headingSize).toBeLessThanOrEqual(48);
+  const state = await page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({
+    autoplay: video.autoplay,
+    muted: video.muted,
+    loop: video.loop,
+    playsInline: video.playsInline,
+  })));
+  expect(state).toEqual([
+    { autoplay: true, muted: true, loop: true, playsInline: true },
+    { autoplay: true, muted: true, loop: true, playsInline: true },
+  ]);
 });
 
 test("YouTube Shorts keep their portrait ratio", async ({ page }) => {

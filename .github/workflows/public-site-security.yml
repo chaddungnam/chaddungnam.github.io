@@ -32,8 +32,6 @@ jobs:
       - name: Test public site
         run: |
           bash scripts/check_brand_site.sh
-          node scripts/render_projects.js --check
-          node scripts/test_projects_renderer.js
           node scripts/test_brand_feed.js
           node scripts/test_compact_visual_system.js
           node scripts/test_public_ui_regressions.js

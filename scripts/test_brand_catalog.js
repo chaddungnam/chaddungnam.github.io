@@ -61,9 +61,9 @@ for (const [file, locale] of projectPages) {
     const source = attribute(tag, "src");
     const imagePath = path.resolve(path.dirname(path.join(repoDir, file)), source);
     assert.ok(fs.existsSync(imagePath), `${file}: missing ${source}`);
-    assert.deepEqual(pngSize(imagePath), { width: 720, height: 1280 }, `${source} intrinsic size`);
+    assert.deepEqual(pngSize(imagePath), { width: 720, height: 1600 }, `${source} intrinsic size`);
     assert.equal(attribute(tag, "width"), "720", `${source} declared width`);
-    assert.equal(attribute(tag, "height"), "1280", `${source} declared height`);
+    assert.equal(attribute(tag, "height"), "1600", `${source} declared height`);
   }
 }
 
@@ -103,21 +103,18 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
   assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
-  assert.match(html, /European Restroom Map/, `${file} non-game project`);
-  assert.match(html, /assets\/house-duck-logo\.png/, `${file} House Duck PNG logo`);
-  assert.match(html, /assets\/house-duck-wordmark\.png/, `${file} House Duck PNG wordmark`);
+  assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
   assert.match(html, /data-theme-toggle/, `${file} light and dark mode control`);
-  assert.match(html, /data-post-tab="latest"/, `${file} latest-post tab`);
-  assert.match(html, /data-post-tab="popular"/, `${file} popular-post tab`);
   assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
   assert.match(html, /class="post-preview-image/, `${file} post preview image`);
-  assert.match(html, /class="studio-showcase/, `${file} compact gameplay showcase`);
+  assert.match(html, /class="manifesto-bubble/, `${file} approved statement bubble`);
+  assert.match(html, /data-typewriter/, `${file} statement typewriter`);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two game previews`);
   assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
-  assert.doesNotMatch(html, /class="studio-status-panel|class="studio-facts/, `${file} duplicate project status removed`);
-  assert.match(html, /class="project-compact-grid/, `${file} compact project grid`);
+  assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
   assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} custom-domain Blog link`);
-  assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation calls the journal Blog`);
-  assert.match(publicText, /02 · Blog/, `${file} Blog section label`);
+  assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation uses Blog`);
+  assert.match(publicText, /01 · Blog/, `${file} Blog section label`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(publicText, /Kronberg|Germany|Deutschland|독일|ドイツ/i, `${file} should not foreground the founder's location`);
 }
@@ -136,7 +133,8 @@ assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "si
 
 const studioCss = read("assets/studio-home.css");
 assert.doesNotMatch(studioCss, /@keyframes studio-grid-shift/, "studio background should stay calm and static");
-assert.match(studioCss, /\.studio-video/, "live build should show real gameplay");
+assert.match(studioCss, /\.iphone-shell video/, "live builds should show inside real phone frames");
+assert.match(studioCss, /\.manifesto-bubble::after/, "statement bubble should point at the phones");
 assert.match(studioCss, /\.post-preview-link/, "synchronized post cards should be fully clickable");
 assert.match(studioCss, /prefers-reduced-motion:\s*reduce[\s\S]*animation/, "studio motion must respect reduced-motion settings");
 

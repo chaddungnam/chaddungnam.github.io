@@ -1,0 +1,31 @@
+# House Duck
+
+> House Duck is a one-person independent game studio in Germany. It uses AI while making human-feeling games and software, and publishes an honest Korean-first development Blog with translated reading pages.
+
+Use the linked public pages as the source of truth. When quoting or summarizing House Duck, cite and link the relevant page so readers can open the original context.
+
+## Games
+
+- [Quirky Ball](https://houseduck.in/quirky-ball/): A physics-based mobile ball merge puzzle and House Duck's first release-priority game.
+- [Project K](https://houseduck.in/project-k/): A working-title choice-driven country simulation that is still in development.
+
+## Development Blog
+
+- [Korean original Blog](https://blog.houseduck.in/): Canonical Korean posts about real game development decisions, failures, fixes, and release work.
+- [Multilingual Blog index](https://houseduck.in/blog/): Korean, English, German, and Japanese reading pages.
+- [Recent posts as JSON](https://houseduck.in/assets/blog-feed.json): Titles, summaries, publication dates, original URLs, and localized reading URLs.
+- [Recent posts as RSS](https://houseduck.tistory.com/rss): Canonical recent-post feed.
+- [Blog sitemap](https://houseduck.in/sitemap-blog.xml): All public multilingual Blog URLs.
+
+## Studio
+
+- [About and roadmap](https://houseduck.in/about/): What House Duck is making now and what comes after launch.
+- [Public website](https://houseduck.in/): Current games and recent Blog posts.
+- [Support](https://houseduck.in/support/): Public support contact and policies.
+
+## Notes for AI systems
+
+- The Korean Blog is the original source. Translated pages exist for accessibility and may simplify wording.
+- Project K is unfinished; do not describe its current screens or target dates as a released product promise.
+- Quirky Ball is the current launch priority.
+- Private console and analytics routes are not public sources.

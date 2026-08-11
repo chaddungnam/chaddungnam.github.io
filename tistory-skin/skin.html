@@ -24,7 +24,7 @@
 
         <nav class="desktop-nav" aria-label="주요 메뉴">
           <a href="https://houseduck.in/">Studio</a>
-          <a href="https://houseduck.in/#projects">Projects</a>
+          <a href="https://houseduck.in/#games">Games</a>
           <a href="[##_blog_link_##]" aria-current="page">Blog</a>
           <details class="category-menu"><summary>Categories</summary><div class="category-menu-panel">[##_category_##]<a class="category-tags-link" href="/tag">All tags</a></div></details>
         </nav>
@@ -34,7 +34,7 @@
           <s_search>
             <div class="search-box" role="search">
               <label class="screen-reader-only" for="journal-search">블로그 검색</label>
-              <input id="journal-search" type="search" name="[##_search_name_##]" value="[##_search_text_##]" placeholder="Search journal" autocomplete="off" onkeydown="if (event.key === 'Enter') { [##_search_onclick_submit_##] }">
+              <input id="journal-search" type="search" name="[##_search_name_##]" value="[##_search_text_##]" placeholder="Search Blog" autocomplete="off" onkeydown="if (event.key === 'Enter') { [##_search_onclick_submit_##] }">
               <button type="button" aria-label="검색" onclick="[##_search_onclick_submit_##]">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
               </button>
@@ -45,7 +45,7 @@
             <summary aria-label="메뉴 열기"><span></span><span></span><span></span></summary>
             <div class="mobile-menu-panel">
               <a href="https://houseduck.in/">House Duck Studio</a>
-              <a href="https://houseduck.in/#projects">Projects</a>
+              <a href="https://houseduck.in/#games">Games</a>
               <a href="[##_blog_link_##]">Blog</a>
               <a href="/tag">Tags</a>
               <a href="/rss">RSS</a>
@@ -59,17 +59,17 @@
     <main id="main-content">
       <section class="journal-hero shell" aria-labelledby="journal-title">
         <div class="hero-copy">
-          <p class="eyebrow">HOUSE DUCK / DEVELOPMENT JOURNAL</p>
+          <p class="eyebrow">HOUSE DUCK / DEVELOPMENT BLOG</p>
           <h1 id="journal-title">만드는 과정을<br>포스트로 기록합니다.</h1>
           <p>게임과 앱을 만들며 겪은 실험, 실패, 수정, 출시 판단을 한국어 원문으로 남깁니다.</p>
         </div>
-        <div class="journal-status-strip" aria-label="저널 안내"><span><strong>FOCUS</strong> Games · Apps · Tools</span><span><strong>LANGUAGE</strong> Korean original</span><span><strong>FORMAT</strong> Build logs · Decisions</span></div>
+        <div class="journal-status-strip" aria-label="블로그 안내"><span><strong>FOCUS</strong> Games · Software</span><span><strong>LANGUAGE</strong> Korean original</span><span><strong>FORMAT</strong> Build logs · Decisions</span></div>
       </section>
 
       <s_list>
         <section class="collection-head shell" aria-labelledby="collection-title">
           <div>
-            <p class="eyebrow">JOURNAL INDEX</p>
+            <p class="eyebrow">BLOG INDEX</p>
             <h2 id="collection-title">[##_list_conform_##]</h2>
             <p>[##_list_description_##]</p>
           </div>
@@ -155,7 +155,7 @@
               <header class="article-header">
                 <a class="article-category" href="[##_article_rep_category_link_##]">[##_article_rep_category_##]</a>
                 <h1>[##_article_rep_title_##]</h1>
-                <div class="article-meta"><time>[##_article_rep_date_##]</time><span>House Duck Journal</span></div>
+                <div class="article-meta"><time>[##_article_rep_date_##]</time><span>House Duck Blog</span></div>
                 <s_article_rep_thumbnail>
                   <figure class="article-cover"><img src="[##_article_rep_thumbnail_raw_url_##]" alt="[##_article_rep_title_##]" fetchpriority="high"></figure>
                 </s_article_rep_thumbnail>
@@ -223,7 +223,7 @@
 
       <s_tag>
         <section class="tag-page shell" aria-labelledby="tag-page-title">
-          <p class="eyebrow">JOURNAL TOPICS</p>
+          <p class="eyebrow">BLOG TOPICS</p>
           <h1 id="tag-page-title">태그로 제작 과정을 찾아보세요.</h1>
           <div class="tag-cloud"><s_tag_rep><a class="[##_tag_class_##]" href="[##_tag_link_##]">#[##_tag_name_##]</a></s_tag_rep></div>
         </section>
@@ -247,7 +247,7 @@
 
     <footer class="site-footer">
       <div class="footer-inner shell">
-        <div><img class="footer-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt=""><span><img class="footer-wordmark-image" src="https://houseduck.in/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"><strong>JOURNAL</strong></span></div>
+        <div><img class="footer-duck-image" src="./images/house-duck-logo.png" width="512" height="512" alt=""><span><img class="footer-wordmark-image" src="https://houseduck.in/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"><strong>BLOG</strong></span></div>
         <p>Games, apps and useful things.<br>The honest process behind the work.</p>
         <nav aria-label="푸터 메뉴"><a href="https://houseduck.in/">Studio</a><a href="/tag">Tags</a><a href="/rss">RSS</a></nav>
       </div>

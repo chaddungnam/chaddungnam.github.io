@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <skin>
   <information>
-    <name>House Duck Journal</name>
+    <name>House Duck Blog</name>
     <version>1.2.0</version>
-    <description><![CDATA[House Duck의 공식 제작 저널을 위한 다크 우선 반응형 개발 저널 스킨입니다.]]></description>
+    <description><![CDATA[House Duck의 공식 개발 블로그를 위한 다크 우선 반응형 스킨입니다.]]></description>
     <license><![CDATA[House Duck private brand skin. Redistribution is not permitted.]]></license>
   </information>
   <author>

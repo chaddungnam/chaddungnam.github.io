@@ -119,7 +119,8 @@ try {
   assert.match(koreanPage, /<html lang="ko"/);
   assert.match(koreanPage, /rel="canonical" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
   assert.match(koreanPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
-  assert.match(koreanPage, /한국어 원문/);
+  assert.match(koreanPage, /공식 블로그/);
+  assert.match(koreanPage, /House Duck Blog에서 읽기/);
   assert.match(koreanPage, /https:\/\/blog\.houseduck\.in\/entry\/first-post\?original=1/);
   assert.doesNotMatch(koreanPage, /<script>alert|onerror=/i);
 
@@ -140,6 +141,7 @@ try {
   assert.match(englishPage, /<meta property="og:image" content="https:\/\/blog\.kakaocdn\.net\/example\.png">/);
   assert.match(englishPage, /<meta name="twitter:card" content="summary_large_image">/);
   assert.match(englishPage, /<meta name="robots" content="max-image-preview:large">/);
+  assert.match(englishPage, /type="application\/rss\+xml" title="House Duck Blog"/);
   assert.doesNotMatch(englishPage, /site-fonts\.css/, "translated posts should not download the large display font");
   const jsonLdMatch = englishPage.match(/<script type="application\/ld\+json">([^<]+)<\/script>/);
   assert.ok(jsonLdMatch, "post needs BlogPosting structured data");
@@ -200,6 +202,8 @@ try {
     assert.match(indexPage, /<meta name="description" content="[^"]+">/);
     assert.match(indexPage, /<meta name="robots" content="max-image-preview:large">/);
     assert.match(indexPage, /<meta property="og:type" content="website">/);
+    assert.match(indexPage, /"@type":"Blog"/);
+    assert.match(indexPage, /type="application\/rss\+xml" title="House Duck Blog"/);
     assert.match(indexPage, /loading="eager" fetchpriority="high"/, "the first blog card should be the eager LCP image");
     assert.doesNotMatch(indexPage, /site-fonts\.css/);
   }

@@ -24,7 +24,7 @@
     var dateLocales = { ko: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
     return (Array.isArray(posts) ? posts : []).slice(0, 6).map(function (post) {
       var localized = post.localized && (post.localized[localeKey] || post.localized.kr) || post;
-      var link = safeHttpsUrl(localized.url || post.url);
+      var link = safeHttpsUrl(locale === "ko" ? post.original_url : (localized.url || post.url));
       if (!link) return "";
       var image = safeHttpsUrl(post.image);
       var published = new Date(post.published_at);
@@ -131,8 +131,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    root.classList.add("js-ready");
-
     function setTheme(theme) {
       root.dataset.theme = theme;
       var themeColor = document.querySelector('meta[name="theme-color"]');
@@ -153,52 +151,6 @@
         } catch (_error) {
           // Theme switching still works when storage is blocked.
         }
-      });
-    });
-
-    var postTabs = Array.from(document.querySelectorAll("[data-post-tab]"));
-    var postPanels = Array.from(document.querySelectorAll("[data-post-panel]"));
-
-    function activatePostTab(button) {
-      var selected = button.dataset.postTab;
-      postTabs.forEach(function (tab) {
-        var isSelected = tab === button;
-        tab.setAttribute("aria-selected", String(isSelected));
-        tab.setAttribute("tabindex", isSelected ? "0" : "-1");
-      });
-      postPanels.forEach(function (panel) {
-        panel.hidden = panel.dataset.postPanel !== selected;
-      });
-    }
-
-    postTabs.forEach(function (button) {
-      button.addEventListener("click", function () {
-        activatePostTab(button);
-      });
-
-      button.addEventListener("keydown", function (event) {
-        var availableTabs = postTabs.filter(function (tab) {
-          return !tab.hidden && tab.getAttribute("aria-hidden") !== "true";
-        });
-        var currentIndex = availableTabs.indexOf(button);
-        if (currentIndex < 0 || availableTabs.length === 0) return;
-
-        var nextIndex = currentIndex;
-        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-          nextIndex = (currentIndex + 1) % availableTabs.length;
-        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-          nextIndex = (currentIndex - 1 + availableTabs.length) % availableTabs.length;
-        } else if (event.key === "Home") {
-          nextIndex = 0;
-        } else if (event.key === "End") {
-          nextIndex = availableTabs.length - 1;
-        } else {
-          return;
-        }
-
-        event.preventDefault();
-        activatePostTab(availableTabs[nextIndex]);
-        availableTabs[nextIndex].focus();
       });
     });
 
@@ -274,20 +226,81 @@
       });
     });
 
-    var revealNodes = Array.from(document.querySelectorAll(".reveal"));
-    if (!("IntersectionObserver" in window)) {
-      revealNodes.forEach(function (node) { node.classList.add("is-visible"); });
-      return;
+    var reducedMotion = typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    document.querySelectorAll("[data-typewriter]").forEach(function (heading) {
+      var lines = Array.from(heading.querySelectorAll("[data-type-line]"));
+      if (!lines.length || reducedMotion) {
+        heading.dataset.typed = "true";
+        return;
+      }
+      var source = lines.map(function (line) { return line.textContent; });
+      lines.forEach(function (line) { line.textContent = ""; });
+      var lineIndex = 0;
+      var characterIndex = 0;
+
+      function typeNextCharacter() {
+        if (lineIndex >= lines.length) {
+          heading.dataset.typed = "true";
+          return;
+        }
+        if (characterIndex >= source[lineIndex].length) {
+          lineIndex += 1;
+          characterIndex = 0;
+          window.setTimeout(typeNextCharacter, 150);
+          return;
+        }
+        var character = source[lineIndex].charAt(characterIndex);
+        lines[lineIndex].textContent += character;
+        characterIndex += 1;
+        window.setTimeout(typeNextCharacter, /[,.!?。]/.test(character) ? 150 : 38);
+      }
+      typeNextCharacter();
+    });
+
+    function animateIn(node) {
+      if (reducedMotion || typeof node.animate !== "function") return;
+      node.animate([
+        { opacity: .35, filter: "blur(5px)", transform: "translateY(14px)" },
+        { opacity: 1, filter: "blur(0)", transform: "translateY(0)" },
+      ], { duration: 460, easing: "cubic-bezier(.2,.75,.2,1)", fill: "both" });
     }
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px 0px -8%", threshold: 0.08 });
+    var revealNodes = Array.from(document.querySelectorAll(".reveal"));
+    if ("IntersectionObserver" in window) {
+      var revealObserver = new window.IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          animateIn(entry.target);
+          revealObserver.unobserve(entry.target);
+        });
+      }, { rootMargin: "0px 0px -8%", threshold: .08 });
+      revealNodes.forEach(function (node) { revealObserver.observe(node); });
+    } else {
+      revealNodes.forEach(animateIn);
+    }
 
-    revealNodes.forEach(function (node) { observer.observe(node); });
+    var previews = Array.from(document.querySelectorAll("[data-game-preview]"));
+    var saveData = navigator.connection && navigator.connection.saveData;
+    if (reducedMotion || saveData) {
+      previews.forEach(function (video) {
+        video.autoplay = false;
+        if (typeof video.pause === "function") video.pause();
+      });
+    } else if ("IntersectionObserver" in window) {
+      var previewObserver = new window.IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (!entry.isIntersecting) {
+            video.pause();
+            return;
+          }
+          var playback = video.play();
+          if (playback && typeof playback.catch === "function") playback.catch(function () {});
+        });
+      }, { threshold: .2 });
+      previews.forEach(function (video) { previewObserver.observe(video); });
+    }
   });
 }());

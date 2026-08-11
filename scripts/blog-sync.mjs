@@ -9,7 +9,7 @@ const BLOG_ORIGIN = "https://blog.houseduck.in";
 const TRANSLATION_PIPELINE_VERSION = 6;
 const YOUTUBE_EMBED_HOSTS = new Set(["youtube.com", "www.youtube.com", "www.youtube-nocookie.com"]);
 const LOCALES = {
-  kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", description: "게임과 앱을 만들며 겪은 시행착오와 출시 과정을 기록하는 House Duck 개발 블로그입니다.", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "한국어 원문", note: "이 페이지는 House Duck이 작성한 원문입니다.", original: "티스토리에서 보기", auto: false },
+  kr: { lang: "ko", label: "한국어", back: "모든 포스트", heading: "제작 기록", description: "게임과 앱을 만들며 겪은 시행착오와 출시 과정을 기록하는 House Duck 개발 블로그입니다.", skip: "본문으로 건너뛰기", theme: "색상 테마 전환", noteTitle: "공식 블로그", note: "같은 글을", original: "House Duck Blog에서 읽기", auto: false },
   en: { lang: "en", label: "English", back: "All posts", heading: "Build notes", description: "House Duck build notes about making games and apps, including real decisions, mistakes, and release work.", skip: "Skip to content", theme: "Switch color theme", noteTitle: "Automatic translation", note: "This page was automatically translated from Korean and may contain unnatural wording.", original: "Read the Korean original", auto: true },
   de: { lang: "de", label: "Deutsch", back: "Alle Beiträge", heading: "Entwicklungsnotizen", description: "Entwicklungsnotizen von House Duck über Spiele, Apps, Entscheidungen, Fehler und Veröffentlichungen.", skip: "Zum Inhalt springen", theme: "Farbschema wechseln", noteTitle: "Automatische Übersetzung", note: "Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten.", original: "Koreanisches Original lesen", auto: true },
   ja: { lang: "ja", label: "日本語", back: "すべての記事", heading: "開発記録", description: "ゲームやアプリを作る中での判断、失敗、改善、リリース過程を記録するHouse Duckの開発ブログです。", skip: "本文へ移動", theme: "カラーテーマを切り替える", noteTitle: "自動翻訳", note: "このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。", original: "韓国語の原文を読む", auto: true },
@@ -401,6 +401,7 @@ ${image ? `  <meta property="og:image" content="${escapeHtml(image)}">` : ""}
 ${image ? `  <meta name="twitter:image" content="${escapeHtml(image)}">` : ""}
   <link rel="canonical" href="${canonical}">
 ${alternateLinks(post, availableLocales)}
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
   <link rel="stylesheet" href="/assets/blog-mirror.css">
   <script defer src="/assets/blog-mirror.js"></script>
   <script type="application/ld+json">${JSON.stringify(structuredData).replaceAll("<", "\\u003c")}</script>
@@ -434,8 +435,16 @@ function renderIndexPage(posts, locale, archivedCards = []) {
   }
   const cards = [...currentCards, ...retainedCards].join("\n");
   const alternates = Object.entries(LOCALES).map(([key, value]) => `<link rel="alternate" hreflang="${value.lang}" href="${SITE_ORIGIN}/blog/${key}/">`).join("");
+  const structuredData = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "House Duck Blog",
+    url: `${SITE_ORIGIN}/blog/${locale}/`,
+    inLanguage: copy.lang,
+    publisher: { "@type": "Organization", name: "House Duck", url: `${SITE_ORIGIN}/` },
+  }).replaceAll("<", "\\u003c");
   return `<!doctype html>
-<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${escapeHtml(copy.description)}"><meta name="robots" content="max-image-preview:large"><meta name="theme-color" content="#111315"><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:title" content="House Duck Blog — ${copy.label}"><meta property="og:description" content="${escapeHtml(copy.description)}"><meta property="og:url" content="${SITE_ORIGIN}/blog/${locale}/"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header><main class="mirror-index" id="blog-content"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>${copy.heading}.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
+<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${escapeHtml(copy.description)}"><meta name="robots" content="max-image-preview:large"><meta name="theme-color" content="#111315"><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:title" content="House Duck Blog — ${copy.label}"><meta property="og:description" content="${escapeHtml(copy.description)}"><meta property="og:url" content="${SITE_ORIGIN}/blog/${locale}/"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><script type="application/ld+json">${structuredData}</script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header><main class="mirror-index" id="blog-content"><p>HOUSE DUCK · ${copy.label.toUpperCase()}</p><h1>${copy.heading}.</h1><nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main><footer class="mirror-footer">© <span data-current-year>2026</span> House Duck.</footer></body></html>\n`;
 }
 
 export function buildTranslationSource(posts) {

@@ -38,6 +38,10 @@ content_pages=(
   "index_en.html"
   "index_de.html"
   "index_ja.html"
+  "about/index.html"
+  "about/index_en.html"
+  "about/index_de.html"
+  "about/index_ja.html"
   "quirky-ball/index.html"
   "quirky-ball/index_en.html"
   "quirky-ball/index_de.html"
@@ -84,6 +88,12 @@ for page in "${redirect_pages[@]}"; do
   require_token "$page" 'href="https://blog.houseduck.in/"'
 done
 
+for page in about/index.html about/index_en.html about/index_de.html about/index_ja.html; do
+  require_token "$page" 'data-page="about"'
+  require_token "$page" 'class="about-timeline"'
+  require_token "$page" 'assets/about-site.css'
+done
+
 for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do
   require_token "$page" 'data-page="project-k"'
   require_token "$page" 'class="language-picker"'
@@ -93,21 +103,18 @@ done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
-  require_token "$page" 'data-section="games-catalog"'
-  require_token "$page" 'data-section="journal-posts"'
+  require_token "$page" 'class="manifesto-bubble'
+  require_token "$page" 'data-typewriter'
+  require_token "$page" 'id="games"'
+  require_token "$page" 'data-section="blog-posts"'
   require_token "$page" 'assets/studio-home.css'
-  require_token "$page" 'assets/house-duck-logo.png'
-  require_token "$page" 'assets/house-duck-wordmark.png'
   require_token "$page" 'data-theme-toggle'
-  require_token "$page" 'data-post-tab="latest"'
-  require_token "$page" 'data-post-tab="popular"'
   require_token "$page" 'data-post-feed'
   require_token "$page" "quirky-ball/store/feature-graphic.png"
-  require_token "$page" "quirky-ball/store/01-core.png"
-  require_token "$page" "project-k/media/decision.png"
-  require_token "$page" "European Restroom Map"
+  require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
+  require_token "$page" "assets/media/project-k-highlight.mp4"
   require_token "$page" "https://blog.houseduck.in/"
-  require_token "$page" "https://houseduck.tistory.com/"
+  reject_token "$page" "European Restroom Map"
 done
 
 for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_de.html quirky-ball/index_ja.html; do
@@ -124,11 +131,16 @@ if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
   fail "sitemap.xml still publishes founder-story URLs"
 fi
 
-require_css_property ".featured-logo" "height: auto;"
-require_token "assets/brand-site.css" 'url("/assets/house-duck-logo.png")'
-require_token "assets/brand-site.css" 'url("/assets/house-duck-wordmark.png")'
-require_token "assets/brand-site.css" "@media (min-width: 901px) and (max-height: 980px)"
-require_token "assets/brand-site.css" "height: calc(100dvh - 64px);"
+require_token "assets/brand-site.css" 'content: "HD"'
+require_token "assets/studio-home.css" ".manifesto-bubble::after"
+require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
+require_token "llms.txt" "https://blog.houseduck.in/"
+
+for page in index.html index_en.html index_de.html index_ja.html; do
+  require_token "$page" 'application/ld+json'
+  require_token "$page" 'https://houseduck.in/#organization'
+  require_token "$page" '"@type":"WebSite"'
+done
 
 node "$repo_dir/scripts/test_brand_images.js"
 node "$repo_dir/scripts/test_brand_language.js"

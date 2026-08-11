@@ -9,7 +9,6 @@ const vm = require("node:vm");
 const repoDir = path.join(__dirname, "..");
 const brandScript = fs.readFileSync(path.join(repoDir, "assets", "brand-site.js"), "utf8");
 
-const homePages = ["index.html", "index_en.html", "index_de.html", "index_ja.html"];
 const productPages = [
   "quirky-ball/index.html",
   "quirky-ball/index_en.html",
@@ -34,22 +33,6 @@ const nonKoreanMarketingPages = [
 
 function read(file) {
   return fs.readFileSync(path.join(repoDir, file), "utf8");
-}
-
-function htmlTag(html, tagName, attributeName, value) {
-  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = html.match(new RegExp(`<${tagName}\\b[^>]*\\b${attributeName}="${escaped}"[^>]*>`, "i"));
-  assert.ok(match, `${tagName}[${attributeName}="${value}"] must exist`);
-  return match[0];
-}
-
-function attribute(tag, name) {
-  const match = tag.match(new RegExp(`\\b${name}="([^"]*)"`, "i"));
-  return match ? match[1] : "";
-}
-
-function hasBooleanAttribute(tag, name) {
-  return new RegExp(`(?:^|\\s)${name}(?:\\s|>|=)`, "i").test(tag);
 }
 
 function cssDeclarations(css, selector) {
@@ -102,7 +85,7 @@ function makeElement({ dataset = {}, attributes = {}, hidden = false } = {}) {
   return element;
 }
 
-function runBrandSite({ locale = "en", themeButton, menuButton, nav, tabs = [], panels = [] } = {}) {
+function runBrandSite({ locale = "en", themeButton, menuButton, nav } = {}) {
   const root = makeElement({ dataset: { locale } });
   const metaTheme = { content: "" };
   const documentListeners = new Map();
@@ -117,8 +100,6 @@ function runBrandSite({ locale = "en", themeButton, menuButton, nav, tabs = [], 
     },
     querySelectorAll(selector) {
       if (selector === "[data-theme-toggle]") return themeButton ? [themeButton] : [];
-      if (selector === "[data-post-tab]") return tabs;
-      if (selector === "[data-post-panel]") return panels;
       return [];
     },
     addEventListener(type, listener) {
@@ -154,7 +135,7 @@ function runBrandSite({ locale = "en", themeButton, menuButton, nav, tabs = [], 
   return { document, root, metaTheme };
 }
 
-test("product navigation stays on the House Duck Blog domain and returns to #projects", () => {
+test("product navigation stays on the House Duck Blog domain and returns to #games", () => {
   for (const file of productPages) {
     const html = read(file);
     assert.doesNotMatch(html, /https:\/\/houseduck\.tistory\.com\//, `${file} must not use the retired Blog host`);
@@ -162,34 +143,31 @@ test("product navigation stays on the House Duck Blog domain and returns to #pro
   }
   for (const file of productPages.filter((file) => file.startsWith("project-k/"))) {
     const html = read(file);
-    assert.doesNotMatch(html, /#games/, `${file} must not target the missing #games anchor`);
-    assert.match(html, /#projects/, `${file} must return directly to the project catalog`);
+    assert.match(html, /#games/, `${file} must return directly to the game previews`);
+    assert.doesNotMatch(html, /#projects/, `${file} must not target the retired catalog`);
   }
 });
 
-test("home Blog tabs expose complete ARIA relationships while Popular stays unavailable", () => {
-  for (const file of homePages) {
-    const html = read(file);
-    const latestTab = htmlTag(html, "button", "data-post-tab", "latest");
-    const popularTab = htmlTag(html, "button", "data-post-tab", "popular");
-    const latestPanel = htmlTag(html, "div", "data-post-panel", "latest");
-    const popularPanel = htmlTag(html, "div", "data-post-panel", "popular");
+test("home leads with the approved statement and two real game previews", () => {
+  const expected = {
+    "index.html": ["AI를 사용하지만,", "사람냄새 나는 게임과 소프트웨어,", "그리고 개발 일기를 보여주는 웹사이트"],
+    "index_en.html": ["We use AI,", "but make games and software that still feel human,", "and show the development blog behind them."],
+    "index_de.html": ["Wir nutzen KI,", "entwickeln aber Spiele und Software mit menschlicher Handschrift,", "und zeigen das Entwicklungstagebuch dahinter."],
+    "index_ja.html": ["AIを使いながらも、", "人の温度があるゲームとソフトウェア、", "そして開発日記を見せるウェブサイトです。"],
+  };
 
-    assert.equal(attribute(latestTab, "id"), "post-tab-latest", `${file} latest tab id`);
-    assert.equal(attribute(latestTab, "aria-controls"), "post-panel-latest", `${file} latest tab controls`);
-    assert.equal(attribute(latestTab, "tabindex"), "0", `${file} latest tab keyboard entry`);
-    assert.equal(attribute(popularTab, "id"), "post-tab-popular", `${file} popular tab id`);
-    assert.equal(attribute(popularTab, "aria-controls"), "post-panel-popular", `${file} popular tab controls`);
-    assert.equal(attribute(popularTab, "tabindex"), "-1", `${file} unavailable tab stays out of keyboard order`);
-    assert.ok(hasBooleanAttribute(popularTab, "hidden"), `${file} Popular must remain hidden until useful`);
-    assert.equal(attribute(latestPanel, "id"), "post-panel-latest", `${file} latest panel id`);
-    assert.equal(attribute(latestPanel, "aria-labelledby"), "post-tab-latest", `${file} latest panel label`);
-    assert.equal(attribute(latestPanel, "tabindex"), "0", `${file} latest panel keyboard entry`);
-    assert.equal(attribute(popularPanel, "id"), "post-panel-popular", `${file} popular panel id`);
-    assert.equal(attribute(popularPanel, "aria-labelledby"), "post-tab-popular", `${file} popular panel label`);
-    assert.equal(attribute(popularPanel, "tabindex"), "0", `${file} popular panel keyboard entry when enabled`);
-    assert.ok(hasBooleanAttribute(popularPanel, "hidden"), `${file} Popular panel remains unavailable`);
+  for (const [file, lines] of Object.entries(expected)) {
+    const html = read(file);
+    assert.match(html, /class="manifesto-bubble/);
+    assert.match(html, /data-typewriter/);
+    for (const line of lines) assert.ok(html.includes(line), `${file}: ${line}`);
+    assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);
+    assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG/);
+    assert.ok(html.indexOf("manifesto-bubble") < html.indexOf("data-post-feed"), `${file} Blog follows statement`);
   }
+
+  const brandCss = read("assets/brand-site.css");
+  assert.doesNotMatch(brandCss, /\.js-ready\s+\.reveal\s*\{[^}]*opacity:\s*0/s, "JavaScript must not hide authored content");
 });
 
 test("brand controls keep localized theme and mobile-menu labels", () => {
@@ -216,32 +194,6 @@ test("brand controls keep localized theme and mobile-menu labels", () => {
     assert.equal(menuButton.getAttribute("aria-label"), copy.open, `${locale} closed-menu label`);
     assert.equal(menuButton.focused, true, `${locale} Escape returns focus to the menu button`);
   }
-});
-
-test("home tabs support arrows plus Home and End with automatic activation", () => {
-  const tabs = ["latest", "popular", "archive"].map((name, index) => makeElement({
-    dataset: { postTab: name },
-    attributes: { "aria-selected": String(index === 0), tabindex: String(index === 0 ? 0 : -1) },
-  }));
-  const panels = ["latest", "popular", "archive"].map((name, index) => makeElement({
-    dataset: { postPanel: name },
-    hidden: index !== 0,
-  }));
-  runBrandSite({ locale: "en", tabs, panels });
-
-  let prevented = false;
-  tabs[0].dispatch("keydown", { key: "ArrowRight", preventDefault() { prevented = true; } });
-  assert.equal(prevented, true, "ArrowRight prevents page scrolling");
-  assert.equal(tabs[1].focused, true, "ArrowRight focuses the next tab");
-  assert.equal(tabs[1].getAttribute("aria-selected"), "true", "ArrowRight activates the next tab");
-  assert.equal(panels[1].hidden, false, "ArrowRight reveals the linked panel");
-
-  tabs[1].dispatch("keydown", { key: "End", preventDefault() {} });
-  assert.equal(tabs[2].getAttribute("aria-selected"), "true", "End activates the final tab");
-  tabs[2].dispatch("keydown", { key: "Home", preventDefault() {} });
-  assert.equal(tabs[0].getAttribute("aria-selected"), "true", "Home activates the first tab");
-  tabs[0].dispatch("keydown", { key: "ArrowLeft", preventDefault() {} });
-  assert.equal(tabs[2].getAttribute("aria-selected"), "true", "ArrowLeft wraps to the final tab");
 });
 
 test("Support offers a direct English section to EN, DE, and JA readers", () => {
@@ -271,28 +223,16 @@ test("the common Terms route delegates to the branded Quirky Ball terms shell", 
 test("public UI CSS preserves contrast, brand visibility, and mobile readability", () => {
   const brandCss = read("assets/brand-site.css");
   const projectKCss = read("assets/project-k-site.css");
-  const journalLink = cssDeclarations(brandCss, 'body[data-page="studio"] .journal-toolbar .text-link');
-  const projectWordmark = cssDeclarations(projectKCss, ".project-k-header .brand-wordmark-image");
+  const brandMark = cssDeclarations(brandCss, ".brand-lockup::before");
+  const projectMark = cssDeclarations(projectKCss, ".project-k-header .brand-lockup::before");
   const themeToggle = cssDeclarations(brandCss, 'body[data-page="studio"] .theme-toggle');
-  const postTab = cssDeclarations(brandCss, 'body[data-page="studio"] .post-tab');
-  const projectCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .project-copy p');
-  const projectLink = cssDeclarations(brandCss, 'body[data-page="studio"] .project-copy .text-link');
   const postCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .post-preview-copy p');
 
-  assert.equal(journalLink.color, "var(--studio-ink)", "Blog CTA must follow the active theme ink color");
-  assert.equal(projectWordmark.filter, "brightness(0) invert(1)", "Project K needs a light wordmark on its dark header");
+  assert.equal(brandMark.content, '"HD"', "the compact mark must read HD");
+  assert.ok(parseFloat(brandMark.width) >= 42, "the HD mark must remain legible");
+  assert.equal(projectMark.background, "var(--k-gold)", "Project K needs its gold HD mark");
   assert.ok(parseFloat(themeToggle.height) >= 44, "theme control needs a 44px touch target");
-  assert.ok(parseFloat(postTab["min-height"]) >= 44, "post tabs need a 44px touch target");
-  assert.ok(parseFloat(projectCopy["font-size"]) >= 0.9375, "project descriptions need readable mobile type");
-  assert.ok(parseFloat(projectLink["font-size"]) >= 0.875, "project links need readable mobile type");
   assert.ok(parseFloat(postCopy["font-size"]) >= 0.9, "Blog summaries need readable mobile type");
-
-  for (const file of ["project-k/index.html", "project-k/index_en.html", "project-k/index_de.html", "project-k/index_ja.html"]) {
-    const html = read(file);
-    assert.match(html, /assets\/house-duck-logo\.png/, `${file} needs the real duck PNG`);
-    assert.match(html, /assets\/house-duck-wordmark\.png/, `${file} needs the PNG wordmark`);
-    assert.doesNotMatch(html, /class="duck-mark"/, `${file} must not use the placeholder logo`);
-  }
 });
 
 test("pre-launch terms describe the effective date and business status as pending", () => {

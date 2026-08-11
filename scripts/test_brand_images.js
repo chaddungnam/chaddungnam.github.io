@@ -9,8 +9,6 @@ const css = ["assets/brand-site.css", "assets/studio-home.css"]
   .map((file) => fs.readFileSync(path.join(repoDir, file), "utf8"))
   .join("\n");
 const pages = [
-  { file: "index.html", expected: 4, prefix: "quirky-ball/store/" },
-  { file: "index_en.html", expected: 4, prefix: "quirky-ball/store/" },
   { file: "quirky-ball/index.html", expected: 9, prefix: "store/" },
   { file: "quirky-ball/index_en.html", expected: 9, prefix: "store/" },
 ];
@@ -78,7 +76,7 @@ for (const page of pages) {
   }
 }
 
-for (const selector of [".hero-showcase img", ".featured-game-visual img", ".game-logo", ".game-visual img", ".shot img", ".project-phone", ".project-visual-k img"]) {
+for (const selector of [".game-logo", ".game-visual img", ".shot img"]) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const rule = css.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`));
   if (!rule || !/height:\s*auto\s*;/.test(rule[1]) || !/object-fit:\s*contain\s*;/.test(rule[1])) {
