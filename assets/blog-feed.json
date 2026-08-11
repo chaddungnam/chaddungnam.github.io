@@ -14,6 +14,21 @@
           "title": "프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩",
           "summary": "AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는",
           "url": "https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "en": {
+          "title": "Designing Game Characters with Prompts | House Duck Vibecoding",
+          "summary": "If you ask AI to create a game character, a plausible single image comes out pretty quickly. The problem was what came next. When asked to redraw the same person, the face changed, when the expression changed, even the clothes changed, and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Just looking at one image it looks good, but when you put many images side by side, they often didn't look like the same game",
+          "url": "https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "de": {
+          "title": "Spielcharakter-Design mit Prompts | House Duck Vibe Coding",
+          "summary": "Wenn man die KI bittet, einen Spielcharakter zu erstellen, erhält man recht schnell ein überzeugendes Bild. Das Problem war das Danach. Man bat darum, dieselbe Person erneut zu zeichnen, aber das Gesicht änderte sich, beim Ändern des Gesichtsausdrucks veränderte sich sogar die Kleidung, und als es für den Spielbildschirm verkleinert wurde, verschmolzen Augen und Mund zu einer Einheit. Betrachtet man nur ein einzelnes Bild, gefällt es einem, aber wenn man mehrere nebeneinander legt, sah es oft nicht mehr nach demselben Spiel aus.",
+          "url": "https://houseduck.in/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "ja": {
+          "title": "プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング",
+          "summary": "AIにゲームキャラクターを作ってもらうと、それらしい絵は一瞬で完成する。しかし問題はその先だった。同じ人物をもう一度描いてもらうと顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく配置すると目と口が一つのかたまりになってしまった。一枚だけ見れば気に入るのに、複数枚を並べると同じゲームのキャラクターに見えないことが多かった。",
+          "url": "https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
         }
       }
     },
@@ -175,6 +190,11 @@
           "title": "바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.",
           "summary": "Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적나라하게 보이기 시작",
           "url": "https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/"
+        },
+        "en": {
+          "title": "Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores",
+          "summary": "Project K is still embarrassing to call a game. My perceived development progress is less than 10 percent. There are many screens. There are dialogues, farms, mines, and things resembling war. However, based on the moment players actually touch it, there is almost no completed content. While refactoring recently, that fact started to become even more apparent",
+          "url": "https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/"
         },
         "ja": {
           "title": "バイブコーディングでゲームを作る | プロジェクトK | 面白いテーマだが両ストアの審査に引っかかりそうだ。",

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Project K is still embarrassing to call a game. My perceived development progress is less than 10 percent. There are many screens. There are dialogues, farms, mines, and things resembling war. However, based on the moment players actually touch it, there is almost no completed content. While refactoring recently, that fact started to become even more apparent">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores">
+  <meta property="og:description" content="Project K is still embarrassing to call a game. My perceived development progress is less than 10 percent. There are many screens. There are dialogues, farms, mines, and things resembling war. However, based on the moment players actually touch it, there is almost no completed content. While refactoring recently, that fact started to become even more apparent">
+  <meta property="og:url" content="https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta property="article:published_time" content="2026-08-10T16:19:21.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores">
+  <meta name="twitter:description" content="Project K is still embarrassing to call a game. My perceived development progress is less than 10 percent. There are many screens. There are dialogues, farms, mines, and things resembling war. However, based on the moment players actually touch it, there is almost no completed content. While refactoring recently, that fact started to become even more apparent">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores","description":"Project K is still embarrassing to call a game. My perceived development progress is less than 10 percent. There are many screens. There are dialogues, farms, mines, and things resembling war. However, based on the moment players actually touch it, there is almost no completed content. While refactoring recently, that fact started to become even more apparent","datePublished":"2026-08-10T16:19:21.000Z","inLanguage":"en","mainEntityOfPage":"https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/","url":"https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/","image":"https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">Skip to content</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/en/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/en/">← All posts</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Making a game with vibe coding, project K, an interesting concept but likely to fail review on both major app stores</h1><time datetime="2026-08-10T16:19:21.000Z">August 10, 2026</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">Korean</a><a href="/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/" aria-current="page">English</a><a href="/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/">日本語</a></nav>
+      <aside class="mirror-note"><strong>Automatic translation</strong><span>This page was automatically translated from Korean and may contain unnatural wording. <a href="https://blog.houseduck.in/entry/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4?original=1">Read the Korean original</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">Project K is still too embarrassing to be called a game.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">My personal feeling is that development progress</p>
+<p data-ke-size="size16">is not even 10 percent.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">There are many screens.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">There are dialogues,</p>
+<p data-ke-size="size16">there are farms,</p>
+<p data-ke-size="size16">there are mines,</p>
+<p data-ke-size="size16">and something similar to war runs as well.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, based on the moment players actually interact with it,</p>
+<p data-ke-size="size16">almost no finished content exists.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">While doing recent refactoring,</p>
+<p data-ke-size="size16">that fact began to show more nakedly.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" data-phocus="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" data-alt="Project K character candidates whose styles got mixed and lost direction."><img src="https://blog.kakaocdn.net/dn/TzsY1/dJMcaiRT2rN/UwU1iuMKJdLrDnnayAI7S0/img.png" loading="lazy" width="1672" height="941" alt="" /></span><figcaption>Project K character candidates whose styles got mixed and lost direction.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>I found an interesting subject, but it is dangerous from the start.</b></h2>
+<p data-ke-size="size16">Project K is a satirical game where you become the leader of a fictional closed nation</p>
+<p data-ke-size="size16">and manage the country.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">In the propaganda broadcasts everything is perfect,</p>
+<p data-ke-size="size16">but when you go to the field the farms are ruined,</p>
+<p data-ke-size="size16">the mines have stopped,</p>
+<p data-ke-size="size16">and subordinates report by prettifying the numbers.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">I found this gap interesting.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Rather than players just watching a dictator,</p>
+<p data-ke-size="size16">it is a structure where they directly approve things,</p>
+<p data-ke-size="size16">directly conduct propaganda,</p>
+<p data-ke-size="size16">and ultimately become the person running that regime.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Looking at the worldview alone,</p>
+<p data-ke-size="size16">it has the highest possibility of being the most fun game I have thought of so far.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">At the same time, it is also a subject that can easily cross the line.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>I used censorship in the title, but it has not been flagged yet.</b></h2>
+<p data-ke-size="size16">To be precise,</p>
+<p data-ke-size="size16">I have never submitted Project K to Apple or Google.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So I cannot say that it was actually rejected</p>
+<p data-ke-size="size16">or faced censorship.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, review risk definitely exists.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://developer.apple.com/app-store/review/guidelines/">Apple App Review Guidelines</a> state that while they restrict content that is insulting or offensive,</p>
+<p data-ke-size="size16">there can be exceptions for professional political satire and humor.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://support.google.com/googleplay/android-developer/answer/17190352?hl=en">Google Play Policy</a> also does not completely ban all virtual violence within games,</p>
+<p data-ke-size="size16">but takes issue with hate speech, excessively realistic violence, exploitation of sensitive events,</p>
+<p data-ke-size="size16">and expressions that cause misunderstandings regarding relationships with actual institutions.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ultimately, just because something is satire</p>
+<p data-ke-size="size16">does not make it unconditionally safe,</p>
+<p data-ke-size="size16">and just because it has a political theme</p>
+<p data-ke-size="size16">does not mean it is unconditionally rejected.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The problem is that this ambiguous line</p>
+<p data-ke-size="size16">must be judged by myself.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Therefore, currently, I am sorting things out so as not to use real country and person names,</p>
+<p data-ke-size="size16">not to replicate actual flags and coats of arms,</p>
+<p data-ke-size="size16">and not to directly show torture or execution.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, if I make it too safe,</p>
+<p data-ke-size="size16">this time the satire becomes bland.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">This tightrope walking is harder than expected.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" data-phocus="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" data-alt="Leader assets that kept shaking between 2D original artwork and low-poly 3D."><img src="https://blog.kakaocdn.net/dn/6szbx/dJMcaiRT2rL/pecy1hwxFxNayD4M3u3S9k/img.png" loading="lazy" width="1672" height="941" alt="" /></span><figcaption>Leader assets that kept shaking between 2D original artwork and low-poly 3D.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>However, the bigger problem right now is not market review.</b></h2>
+<p data-ke-size="size16">Honestly, in the current state,</p>
+<p data-ke-size="size16">this is not even the stage to worry about failing reviews.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The completeness of the game is a much bigger problem.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Automated tests run.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Pressing the button moves to the next screen,</p>
+<p data-ke-size="size16">it saves,</p>
+<p data-ke-size="size16">and even if you quit in the middle, you can continue playing.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">From a developer's perspective,</p>
+<p data-ke-size="size16">it looks like a game with quite a few features.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, from a player's perspective,</p>
+<p data-ke-size="size16">it is just prototypes where pressing buttons changes numbers,</p>
+<p data-ke-size="size16">connected across multiple sheets.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The fact that tests passed</p>
+<p data-ke-size="size16">and the fact that the game is fun</p>
+<p data-ke-size="size16">had truly nothing to do with each other.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" data-phocus="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" data-alt="The screens run, but the assets are reminiscent of the uncanny valley."><img src="https://blog.kakaocdn.net/dn/HvtyA/dJMcadiNGXW/ETfF8fWer5knM71WqwMnQK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>The screens run, but the assets are reminiscent of the uncanny valley.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>When I did refactoring, all the hidden shoddy parts came out.</b></h2>
+<p data-ke-size="size16">The reason for starting refactoring was simple.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">As scenes increased, the code got tangled,</p>
+<p data-ke-size="size16">fixing one line of dialogue broke other screens,</p>
+<p data-ke-size="size16">and similar functions were duplicated across multiple files.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So I am organizing the save structure and screen flow,</p>
+<p data-ke-size="size16">began separating farms, mines, and wars</p>
+<p data-ke-size="size16">into their respective contents.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The code improved compared to before.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, once the code was organized,</p>
+<p data-ke-size="size16">all the problems that had been hiding behind it became visible.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The assets had different art styles for each screen,</p>
+<p data-ke-size="size16">the lines sounded like manuals rather than characters,</p>
+<p data-ke-size="size16">and each piece of content only differed in shape,</p>
+<p data-ke-size="size16">ultimately taking the form of pressing similar buttons.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Trying to save the game through refactoring,</p>
+<p data-ke-size="size16">I reached the conclusion that the game needed to be remade.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" data-phocus="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" data-alt="A field draft with tractors, excavators, and vehicles, but not yet organized into a single scene."><img src="https://blog.kakaocdn.net/dn/cD8E1w/dJMcaiRT2rG/hOhLIHE59A7ZPrpn0SeHXk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>A field draft with tractors, excavators, and vehicles, but not yet organized into a single scene.</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Assets increased, but the face of the game disappeared.</b></h2>
+<p data-ke-size="size16">When doing vibe coding,</p>
+<p data-ke-size="size16">the speed of creating asset candidates is really fast.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The problem is not that good assets are created quickly,</p>
+<p data-ke-size="size16">but that even assets that won't be used pile up quickly.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Some days, illustrations with heavy shading looked good,</p>
+<p data-ke-size="size16">other days, limited-color pixels looked good,</p>
+<p data-ke-size="size16">and yet other days, low-poly 3D seemed like the answer.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Viewed separately, each is not bad.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, when put into one game,</p>
+<p data-ke-size="size16">it looks like three different games forced together.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Currently, the project document states</p>
+<p data-ke-size="size16">that screens using temporary procedural assets</p>
+<p data-ke-size="size16">should not be marked as launch complete.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">That's just a rule in name,</p>
+<p data-ke-size="size16">which essentially means revisiting most of the current screens.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>There is plenty of dialogue, but it still lacks a human touch.</b></h2>
+<p data-ke-size="size16">What matters most in Project K</p>
+<p data-ke-size="size16">is perhaps dialogue rather than war or farms.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Subordinates manipulate statistics,</p>
+<p data-ke-size="size16">secretaries hide uncomfortable truths,</p>
+<p data-ke-size="size16">and AI nations talk about democracy</p>
+<p data-ke-size="size16">while having to control people in different ways.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, current lines</p>
+<p data-ke-size="size16">are closer to a level of explaining the situation</p>
+<p data-ke-size="size16">and telling you to press the next button.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Each character has a different title,</p>
+<p data-ke-size="size16">yet their voices sound similar.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Their desires are weak,</p>
+<p data-ke-size="size16">what they hide from each other is lacking,</p>
+<p data-ke-size="size16">and reading just one sentence makes it hard to tell who is speaking.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Rather than fixing the shape of the dialogue box,</p>
+<p data-ke-size="size16">the people need to be rewritten from scratch.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" data-alt="Features are implemented, but it feels like a Roblox simulation rather than a game"><img src="https://blog.kakaocdn.net/dn/ccudn4/dJMcabZA6zq/qK8zqsYss8NmgSQc0nBZTk/img.gif" loading="lazy" width="540" height="1200" alt="" /></span><figcaption>Features are implemented, but it feels like a Roblox simulation rather than a game</figcaption>
+</figure>
+<p></p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>It is not fun.</b></h2>
+<p data-ke-size="size16">Vehicles move,</p>
+<p data-ke-size="size16">and you can recruit troops to wage war.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The problem is that after finishing one thing,</p>
+<p data-ke-size="size16">the motivation for why you should do the next is weak.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is not very clear which people were saved</p>
+<p data-ke-size="size16">by the food harvested on the farm,</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">and it is also unclear what political problems</p>
+<p data-ke-size="size16">were created by the resources obtained from the mine.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">War looks the most like a game visually.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" data-phocus="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" data-alt="It has reached the point of looking like war, but it is still closer to a tech demo."><img src="https://blog.kakaocdn.net/dn/cDnTAb/dJMcaiRT2rJ/A1gJ678aHWkpsuqIyiMMWK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>It has reached the point of looking like war, but it is still closer to a tech demo.</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, right now it is closer to a tech demo where units are summoned</p>
+<p data-ke-size="size16">and health bars decrease.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">At first, units even moved with the moonwalk.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">When the war ends,</p>
+<p data-ke-size="size16">players do not know what choices they should regret,</p>
+<p data-ke-size="size16">nor why they should play this game again.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" data-alt="Troop summoning and front line movement work, but the power for results to connect into a story is lacking."><img src="https://blog.kakaocdn.net/dn/dxAKvP/dJMcabZA6zp/SmAZBUtxOL9ZmsKKelJVOk/img.gif" loading="lazy" width="540" height="1200" alt="" /></span><figcaption>Troop summoning and front line movement work, but the power for results to connect into a story is lacking.</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The entrance to the content has been built,</p>
+<p data-ke-size="size16">but there are no memorable events inside it yet.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>So right now, instead of making more, everything is being overturned.</b></h2>
+<p data-ke-size="size16">Attaching new features for the time being is meaningless.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Making another fancy globe,</p>
+<p data-ke-size="size16">adding a few more diplomatic cards,</p>
+<p data-ke-size="size16">or putting in one more type of war unit</p>
+<p data-ke-size="size16">will not create a center for the game.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">What is being re-evaluated right now is the first 30 minutes.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Whether the first lines are funny,</p>
+<p data-ke-size="size16">whether the first approval feels like a real choice,</p>
+<p data-ke-size="size16">whether the first field controls linger in the hands,</p>
+<p data-ke-size="size16">I am reviewing once more whether the initial reward makes people curious about the next event.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">I am fixing the asset direction to one,</p>
+<p data-ke-size="size16">rewriting the dialogue for each character,</p>
+<p data-ke-size="size16">and if each piece of content fails to prove a unique manual feel,</p>
+<p data-ke-size="size16">I intend to boldly cut it out.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Among the screens included in this post right now,</p>
+<p data-ke-size="size16">several might completely disappear in the next version.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Even so, there is a reason to keep making this game.</b></h2>
+<p data-ke-size="size16">The subject matter of Project K is still interesting.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The gap between propaganda and reality,</p>
+<p data-ke-size="size16">failure packaged in numbers,</p>
+<p data-ke-size="size16">and the contradiction where you believed you made the right choice</p>
+<p data-ke-size="size16">but it consequently makes the system more rigid</p>
+<p data-ke-size="size16">are worth making into a game.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, the subject matter being interesting</p>
+<p data-ke-size="size16">and the game being fun are different issues.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Right now, Project K</p>
+<p data-ke-size="size16">has caught an interesting subject matter,</p>
+<p data-ke-size="size16">but the assets, dialogue, and content</p>
+<p data-ke-size="size16">are in a state where they are looking at different games.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">That is why I am dismantling it again.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Before the review of the two major markets,</p>
+<p data-ke-size="size16">this is to make it into a game that can pass the player review first.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It is certainly a long way to go compared to Quirky Ball, which is a simple board and puzzle game, but</p>
+<p data-ke-size="size16">as complex as it is, I want to make a highly polished game and try earning money.</p>
+<p data-ke-size="size16"> </p>
+<div>
+<div> </div>
+</div></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/en.html">Terms</a><a href="/privacy/en.html">Privacy</a><a href="/impressum/en.html">Impressum</a><a href="/support/#english">Support</a><a href="mailto:business@houseduck.in">Business inquiries · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>

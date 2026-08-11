@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="AIにゲームキャラクターを作ってもらうと、それらしい絵は一瞬で完成する。しかし問題はその先だった。同じ人物をもう一度描いてもらうと顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく配置すると目と口が一つのかたまりになってしまった。一枚だけ見れば気に入るのに、複数枚を並べると同じゲームのキャラクターに見えないことが多かった。">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング">
+  <meta property="og:description" content="AIにゲームキャラクターを作ってもらうと、それらしい絵は一瞬で完成する。しかし問題はその先だった。同じ人物をもう一度描いてもらうと顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく配置すると目と口が一つのかたまりになってしまった。一枚だけ見れば気に入るのに、複数枚を並べると同じゲームのキャラクターに見えないことが多かった。">
+  <meta property="og:url" content="https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="article:published_time" content="2026-08-11T19:28:26.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング">
+  <meta name="twitter:description" content="AIにゲームキャラクターを作ってもらうと、それらしい絵は一瞬で完成する。しかし問題はその先だった。同じ人物をもう一度描いてもらうと顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく配置すると目と口が一つのかたまりになってしまった。一枚だけ見れば気に入るのに、複数枚を並べると同じゲームのキャラクターに見えないことが多かった。">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング","description":"AIにゲームキャラクターを作ってもらうと、それらしい絵は一瞬で完成する。しかし問題はその先だった。同じ人物をもう一度描いてもらうと顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく配置すると目と口が一つのかたまりになってしまった。一枚だけ見れば気に入るのに、複数枚を並べると同じゲームのキャラクターに見えないことが多かった。","datePublished":"2026-08-11T19:28:26.000Z","inLanguage":"ja","mainEntityOfPage":"https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","url":"https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","image":"https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">本文へ移動</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/ja/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/ja/">← すべての記事</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>プロンプトでゲームキャラクターをデザインする | House Duck バイブコーディング</h1><time datetime="2026-08-11T19:28:26.000Z">2026年8月11日</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">韓国語</a><a href="/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">English</a><a href="/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">Deutsch</a><a href="/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/" aria-current="page">日本語</a></nav>
+      <aside class="mirror-note"><strong>自動翻訳</strong><span>このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。 <a href="https://blog.houseduck.in/entry/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9?original=1">韓国語の原文を読む</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">人工知能にゲームのキャラクターを作ってほしいと頼むと</p>
+<p data-ke-size="size16">それらしい絵が一枚はかなり早く出来上がる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">問題はその次だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">同じ人物をもう一度描いてほしいと頼んだのに顔が変わり、</p>
+<p data-ke-size="size16">表情を変えると服まで変わり、</p>
+<p data-ke-size="size16">ゲーム画面に縮小して入れると目と口が一つのかたまりになった。</p>
+<p data-ke-size="size16">一枚だけ見ると気に入るのに</p>
+<p data-ke-size="size16">何枚か並べて置くと同じゲームのように見えないことも多かった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>可愛い画像を出力することと</b></p>
+<p data-ke-size="size16"><b>ゲームのキャラクターを作ることは違うことだった。</b></p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16">プロンプト一回でお気に入りの絵が出ても</p>
+<p data-ke-size="size16"><b>その絵がゲームの中で生き残るのかは別の問題だった。</b></p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Project K、Quirky Ball、</p>
+<p data-ke-size="size16">そしてまだゲーム名も決まっていない</p>
+<p data-ke-size="size16">次作を作りながら学んだ。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>一枚うまく描けた絵が一番危険だった。</b></h2>
+<p data-ke-size="size16">Project Kの初期の人物画は</p>
+<p data-ke-size="size16">今見ると生成型画像の痕跡が非常に鮮明だ。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-phocus="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-alt="Project Kの初期に使用していた生成型人物試案"><img src="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" loading="lazy" width="1024" height="1024" alt="" /></span><figcaption>Project Kの初期に使用していた生成型人物試案</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">絵一枚だけを見ればキャラクターが存在感のあるように見えた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし世界観の特徴を早く見せたくて</p>
+<p data-ke-size="size16">似た外見の条件を繰り返し入力した結果</p>
+<p data-ke-size="size16">指導者候補が全員似たような年齢と体型で集まった。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-phocus="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-alt="特徴を過剰に固定しお互い似てしまった指導者と表情候補"><img src="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" loading="lazy" width="1402" height="1122" alt="" /></span><figcaption>特徴を過剰に固定しお互い似てしまった指導者と表情候補</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">表情は増えたものの</p>
+<p data-ke-size="size16">名前を隠すと誰が誰なのかすぐに区別しにくかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そのため人物の数を増やす代わりに</p>
+<p data-ke-size="size16">顔の型、体型、髪型と服装のシルエットを</p>
+<p data-ke-size="size16">まず広げる方向に変えた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-phocus="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-alt="外見とシルエットを広げて作り直した三名の指導者候補"><img src="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" loading="lazy" width="1717" height="916" alt="" /></span><figcaption>外見とシルエットを広げて作り直した三名の指導者候補</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">自動検査もたくさんパスし</p>
+<p data-ke-size="size16">画像サイズとファイル規格も合っていた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ところが実際のモバイル画面に入れてみると</p>
+<p data-ke-size="size16">髪の毛や服のしわ、光沢のような細かい描写が残り</p>
+<p data-ke-size="size16">ゲームのドット絵と浮いているような感じがした。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-phocus="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-alt="キャラクターを実際のモバイル指導者選択画面に入れてみた結果"><img src="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>キャラクターを実際のモバイル指導者選択画面に入れてみた結果</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>ファイルが正常だからといって絵まで良いわけではなかった。</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">結局Project Kはドットフィルターをさらに強くかける方向も捨てて</p>
+<p data-ke-size="size16">一人の3Dの元データをまずきっちり作った後に</p>
+<p data-ke-size="size16">その元データから似顔絵、プロフィールとカード画像を抽出する方向へ改めた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-phocus="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-alt="現在承認されたProject Kの人物方向板であり、最終的なゲームアセットではない"><img src="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" loading="lazy" width="1641" height="958" alt="" /></span><figcaption>現在承認されたProject Kの人物方向板であり、最終的なゲームアセットではない</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">上記の絵も最終的なゲームアセットではない。</p>
+<p data-ke-size="size16">現在承認された人物方向板に近く</p>
+<p data-ke-size="size16">実際のゲームに入れる3Dの元データはまだ製作中である。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">気に入る方向を見つけたからといって</p>
+<p data-ke-size="size16">完成したかのように言わないこともかなり重要だった。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>プロンプトを鑑賞文ではなく製作指示書のように変えた。</b></h2>
+<p data-ke-size="size16">最初は素敵な、高級な、映画のような感じの</p>
+<p data-ke-size="size16">形容詞をたくさん入れれば良くなると思っていた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">今は逆に書いている。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">このキャラクターがどんな役割なのか、</p>
+<p data-ke-size="size16">画面でどのサイズで見えるのか、</p>
+<p data-ke-size="size16">何が変わってはいけないのかを先に記述する。</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>役割：</b> モバイル画面ですぐ認識できる指導者</p>
+<p data-ke-size="size16"><b>区分：</b> 顔型・体型・髪・長いコートのシルエット</p>
+<p data-ke-size="size16"><b>固定：</b> 同一人物の正面・側面・背面、同じ服装と代表色</p>
+<p data-ke-size="size16"><b>明暗：</b> 基本色と影中心の2から3階調のセル明暗</p>
+<p data-ke-size="size16"><b>禁止：</b> 実在の人物の似顔絵、肌のノイズ、微細なシワ、文字とウォーターマーク</p>
+<p data-ke-size="size16"><b>検収：</b> 実際のゲームサイズに縮小しても目・鼻・口と役割が判読できること</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">これは当時使用していたプロンプトの原文ではない。</p>
+<p data-ke-size="size16">何度も失敗した後に残った製作条件を</p>
+<p data-ke-size="size16">プロンプトの形式で再び整理したものである。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そして一度に数十人を作らない。</p>
+<p data-ke-size="size16">代表キャラクター数名だけをまず出力し</p>
+<p data-ke-size="size16">実際のUIやゲーム画面に入れてみた後に次の束へ移行する。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>生成回数を増やすことよりも差し戻しの基準を先に作ることが早かった。</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Quirky Ballはむしろあまり描かないことでキャラクターになった。</b></h2>
+<p data-ke-size="size16">Quirky Ballも最初から現在の顔だったわけではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">一時は一般の玉にも顔を付けようとしたり</p>
+<p data-ke-size="size16">赤い六角形のクッキーは大きな歯を見せて笑っていた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-phocus="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-alt="大きな歯の笑顔を使用していた以前のバージョンのクッキー"><img src="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" loading="lazy" width="1080" height="1920" alt="" /></span><figcaption>大きな歯の笑顔を使用していた以前のバージョンのクッキー</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">画面の中のすべてがキャラクターのように見えると</p>
+<p data-ke-size="size16">肝心の主人公が誰なのかがぼやけてしまった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そのため一般の玉の顔は取り払い</p>
+<p data-ke-size="size16">クッキーだけ三白眼と太い眉毛、</p>
+<p data-ke-size="size16">片方が上がった口角を持つキャラクターとして残した。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-phocus="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-alt="三白眼と非対称の口角で性格を整理した現在のクッキー"><img src="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>三白眼と非対称の口角で性格を整理した現在のクッキー</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">表情を直すだけでは終わらなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">名前を知らせ、なぜ研究所に閉じ込められたのかを話し、</p>
+<p data-ke-size="size16">プレイ状況に応じてまばたきし、笑い、心配し、挑発してこそ</p>
+<p data-ke-size="size16">ようやく赤い図形がキャラクターとして読み取られ始めた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">カットシーンも似たような過程を経た。</p>
+<p data-ke-size="size16">初期には科学者と機械を単純な図形で描いた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-phocus="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-alt="単純な図形で構成した Quirky Ball 初期カットシーン"><img src="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" loading="lazy" width="720" height="1280" alt="" /></span><figcaption>単純な図形で構成した Quirky Ball 初期カットシーン</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">その後、生成型画像で科学者と装備の草案を得たが</p>
+<p data-ke-size="size16">その結果物をそのままゲームに入れたりはしなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">色を五つに減らし、白い背景を消し、</p>
+<p data-ke-size="size16">サイズとピクセル倍率を固定して一枚のアトラスに再びまとめた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-phocus="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-alt="生成草案を五つの色と固定規格で再び整理したピクセルアトラス"><img src="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" loading="lazy" width="768" height="512" alt="" /></span><figcaption>生成草案を五つの色と固定規格で再び整理したピクセルアトラス</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">同じ規格で切り抜いておいてこそ</p>
+<p data-ke-size="size16">場面が変わっても科学者の顔と機械の大きさがブレなかった。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-phocus="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-alt="整理したピクセルアセットを実際のカットシーンに適用した姿"><img src="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>整理したピクセルアセットを実際のカットシーンに適用した姿</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"><b>優れたプロンプトよりも後処理のルールの方が長く生き残った。</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>ゲーム名未定の次期作では最終キャラクターをあえて作らなかった。</b></h2>
+<p data-ke-size="size16">次期作の初期プロトタイプは</p>
+<p data-ke-size="size16">キャラクターすらいないタイミングゲームに近かった。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-phocus="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-alt="キャラクターなしでタイミング操作のみを検証していたゲーム名未定の初期プロトタイプ"><img src="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>キャラクターなしでタイミング操作のみを検証していたゲーム名未定の初期プロトタイプ</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">リブートしながらアヒル、ガチョウ、ハトを入れたが</p>
+<p data-ke-size="size16">今見えている鳥たちはコードで作ったローポリのグレーボックスだ。</p>
+<p data-ke-size="size16">最終的なキャラクターデザインではない。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-phocus="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-alt="アヒルとガチョウ、ハトの役割をローポリのグレーボックスで確認する段階"><img src="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>アヒルとガチョウ、ハトの役割をローポリのグレーボックスで確認する段階</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">代わりに先に決めたのは役割だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">アヒルは指揮とバランス、</p>
+<p data-ke-size="size16">ガチョウは防御と重さ、</p>
+<p data-ke-size="size16">ハトは経路を作るキャラクターに分けた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">モデルが美しくなくても</p>
+<p data-ke-size="size16">ドラッグ、衝突、掩蔽と報酬が正しく読み取れるかから見る。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-phocus="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-alt="完成したキャラクターよりも衝突と報酬のフィードバックを先に検証した場面"><img src="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>完成したキャラクターよりも衝突と報酬のフィードバックを先に検証した場面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">まだ外部プレイヤーの面白さの検証も通過していない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そのため最終的なセル 3D キャラクターをまず大量に作らず</p>
+<p data-ke-size="size16">アヒル一種類の原画だけを検証した後に拡張する計画で止めておいた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>面白くないゲームに綺麗なキャラクターを十人さらに増やしたところで</b></p>
+<p data-ke-size="size16"><b>面白いゲームになるわけではないからだ。</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>アセットが気に入っているからといってゲームが完成したわけではない。</b></h2>
+<p data-ke-size="size16">キャラクターの画像がうまく出ると</p>
+<p data-ke-size="size16">プロジェクトが急にたくさん完成したかのように感じられる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私も新しい絵を画面に入れるたびに</p>
+<p data-ke-size="size16">ゲームがかなりそれっぽくなったと勘違いした。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかしプレイヤーがもう一度実行したくなるほど <b>面白いのか、</b></p>
+<p data-ke-size="size16">セーブとログイン、決済が壊れないほど <b>ソフトウェアが完成しているのか、</b></p>
+<p data-ke-size="size16">初めて見る人でも理解できるほど <b>UIが明確なのか、</b></p>
+<p data-ke-size="size16">ボタンを押したときに即座に反応するほど <b>インタラクションが機敏なのか、</b></p>
+<p data-ke-size="size16">そしてゲームの存在を知らせる <b>マーケティング</b>へとつながるのかは</p>
+<p data-ke-size="size16">キャラクターの原画一枚で解決されるものではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">むしろアセットが良くなるほど</p>
+<p data-ke-size="size16">プレイヤーがゲームに期待する基準も一緒に上がる。</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>アセットはスタートラインを見栄えよく作ってくれる。</b></p>
+<p data-ke-size="size16">しかし結局ゲームを動かすのは<br /><br />面白さと完成度だ。</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プロンプトがうまく機能して気に入ったキャラクターが出たら</p>
+<p data-ke-size="size16">喜んでもいい。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ただその日一日プロジェクトがうまくいったということであり</p>
+<p data-ke-size="size16">ゲームが成功したわけではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">翌日には再びプレイし、修正し、</p>
+<p data-ke-size="size16">ボタン一つの反応と最初の 10 分の面白さを確認しなければならない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>一喜一憂するには、ゲームを完成させる仕事がまだあまりにも多く残っている。</b></p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ja.html">利用規約</a><a href="/privacy/ja.html">プライバシー</a><a href="/impressum/ja.html">Impressum</a><a href="/support/#english">サポート</a><a href="mailto:business@houseduck.in">ビジネスのお問い合わせ · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>

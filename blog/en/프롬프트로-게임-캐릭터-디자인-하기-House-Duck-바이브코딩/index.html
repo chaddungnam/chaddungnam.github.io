@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="If you ask AI to create a game character, a plausible single image comes out pretty quickly. The problem was what came next. When asked to redraw the same person, the face changed, when the expression changed, even the clothes changed, and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Just looking at one image it looks good, but when you put many images side by side, they often didn&#39;t look like the same game">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Designing Game Characters with Prompts | House Duck Vibecoding">
+  <meta property="og:description" content="If you ask AI to create a game character, a plausible single image comes out pretty quickly. The problem was what came next. When asked to redraw the same person, the face changed, when the expression changed, even the clothes changed, and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Just looking at one image it looks good, but when you put many images side by side, they often didn&#39;t look like the same game">
+  <meta property="og:url" content="https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta property="article:published_time" content="2026-08-11T19:28:26.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Designing Game Characters with Prompts | House Duck Vibecoding">
+  <meta name="twitter:description" content="If you ask AI to create a game character, a plausible single image comes out pretty quickly. The problem was what came next. When asked to redraw the same person, the face changed, when the expression changed, even the clothes changed, and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Just looking at one image it looks good, but when you put many images side by side, they often didn&#39;t look like the same game">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Designing Game Characters with Prompts | House Duck Vibecoding","description":"If you ask AI to create a game character, a plausible single image comes out pretty quickly. The problem was what came next. When asked to redraw the same person, the face changed, when the expression changed, even the clothes changed, and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Just looking at one image it looks good, but when you put many images side by side, they often didn't look like the same game","datePublished":"2026-08-11T19:28:26.000Z","inLanguage":"en","mainEntityOfPage":"https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","url":"https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","image":"https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Designing Game Characters with Prompts | House Duck Vibecoding — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">Skip to content</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/en/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/en/">← All posts</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Designing Game Characters with Prompts | House Duck Vibecoding</h1><time datetime="2026-08-11T19:28:26.000Z">August 11, 2026</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">Korean</a><a href="/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/" aria-current="page">English</a><a href="/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">Deutsch</a><a href="/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">日本語</a></nav>
+      <aside class="mirror-note"><strong>Automatic translation</strong><span>This page was automatically translated from Korean and may contain unnatural wording. <a href="https://blog.houseduck.in/entry/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9?original=1">Read the Korean original</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">When you ask AI to create a game character,</p>
+<p data-ke-size="size16">a plausible single image comes out pretty quickly.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The problem was what came next.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">When asked to redraw the same person, the face changed,</p>
+<p data-ke-size="size16">when the expression changed, even the clothes changed,</p>
+<p data-ke-size="size16">and when scaled down onto the game screen, the eyes and mouth merged into a single lump.</p>
+<p data-ke-size="size16">Looking at just one image, you might like it,</p>
+<p data-ke-size="size16">but when placing multiple images side by side, they often didn't look like the same game.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>Producing pretty images and</b></p>
+<p data-ke-size="size16"><b>creating game characters were two different things.</b></p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16">Even if a single prompt gave you an image you liked,</p>
+<p data-ke-size="size16"><b>whether that image would continue to survive inside the game was a separate issue.</b></p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Project K, Quirky Ball,</p>
+<p data-ke-size="size16">and while making a next project</p>
+<p data-ke-size="size16">whose game title wasn't even decided yet, I learned.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>A single well-drawn image was the most dangerous.</b></h2>
+<p data-ke-size="size16">The initial character art of Project K</p>
+<p data-ke-size="size16">shows very clear traces of generative imagery when viewed now.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-phocus="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-alt="Generative character drafts used in the early days of Project K"><img src="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" loading="lazy" width="1024" height="1024" alt="" /></span><figcaption>Generative character drafts used in the early days of Project K</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Just looking at a single picture, the character seemed to have presence.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, wanting to quickly showcase the characteristics of the worldview,</p>
+<p data-ke-size="size16">we repeatedly inserted similar appearance conditions,</p>
+<p data-ke-size="size16">so the leader candidates all gathered with similar ages and body types.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-phocus="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-alt="Leaders and expression candidates that became similar to each other by excessively fixing traits"><img src="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" loading="lazy" width="1402" height="1122" alt="" /></span><figcaption>Leaders and expression candidates that became similar to each other by excessively fixing traits</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Expressions became more varied,</p>
+<p data-ke-size="size16">but if you covered the names, it was hard to tell who was who immediately.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So, instead of increasing the number of characters,</p>
+<p data-ke-size="size16">we changed to first diversifying</p>
+<p data-ke-size="size16">face shapes, body types, hairstyles, and clothing silhouettes.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-phocus="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-alt="Three leader candidates recreated by diversifying appearances and silhouettes"><img src="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" loading="lazy" width="1717" height="916" alt="" /></span><figcaption>Three leader candidates recreated by diversifying appearances and silhouettes</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">They passed automated checks a lot</p>
+<p data-ke-size="size16">and matched image sizes and file specifications.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Yet, when actually placed on the mobile screen,</p>
+<p data-ke-size="size16">fine details like hair, clothing wrinkles, and gloss remained,</p>
+<p data-ke-size="size16">giving a feeling that they were disconnected from the game's pixel screen.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-phocus="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-alt="Result of placing characters into the actual mobile leader selection screen"><img src="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>Result of placing characters into the actual mobile leader selection screen</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>A normal file did not mean the artwork itself was good.</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ultimately, Project K abandoned the direction of applying stronger pixel filters and</p>
+<p data-ke-size="size16">re-adopted making a single 3D original properly first,</p>
+<p data-ke-size="size16">then pulling portraits, profiles, and card images from that original.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-phocus="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-alt="Currently approved Project K character direction board and not final game assets"><img src="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" loading="lazy" width="1641" height="958" alt="" /></span><figcaption>Currently approved Project K character direction board and not final game assets</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The image above is also not a final game asset.</p>
+<p data-ke-size="size16">It is closer to an approved character direction board,</p>
+<p data-ke-size="size16">and the actual 3D original to put into the game is still being made.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Finding a direction you like</p>
+<p data-ke-size="size16">and not speaking as if it were finished was quite important.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>We changed prompts from being reviews to production instructions.</b></h2>
+<p data-ke-size="size16">At first, we thought that adding many adjectives like</p>
+<p data-ke-size="size16">cool, luxurious, or cinematic would make things better.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Now we write them the opposite way.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">We first write down what role this character plays,</p>
+<p data-ke-size="size16">what size they appear on the screen,</p>
+<p data-ke-size="size16">and what must not change.</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>Role:</b> A leader immediately readable on the mobile screen</p>
+<p data-ke-size="size16"><b>Distinction:</b> Face shape, body type, hair, long coat silhouette</p>
+<p data-ke-size="size16"><b>Fixed:</b> Front, side, and back of the same person, same outfit and signature color</p>
+<p data-ke-size="size16"><b>Shading:</b> 2 to 3 step cell shading centered on base color and shadows</p>
+<p data-ke-size="size16"><b>Prohibited:</b> Resemblance to real people, skin noise, micro-wrinkles, text, and watermarks</p>
+<p data-ke-size="size16"><b>Inspection:</b> Eyes, nose, mouth, and role must be readable even when scaled down to actual game size</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">This is not the exact original prompt used at the time.</p>
+<p data-ke-size="size16">It is a reorganization of the production conditions left behind after multiple failures,</p>
+<p data-ke-size="size16">formatted into a prompt style.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">And we do not make dozens at once.</p>
+<p data-ke-size="size16">We pull just a few representative characters first,</p>
+<p data-ke-size="size16">put them into the actual UI and game screen, and then move on to the next batch.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>Establishing rejection criteria first was faster than increasing generation attempts.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Quirky Ball became a character by drawing less, paradoxically.</b></h2>
+<p data-ke-size="size16">Quirky Ball's face wasn't what it is now from the beginning.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">At one point, we even tried attaching faces to ordinary beads,</p>
+<p data-ke-size="size16">The red hexagonal Quirky was wearing a big-toothed smile.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-phocus="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-alt="An earlier version of Quirky that used a big-toothed smile"><img src="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" loading="lazy" width="1080" height="1920" alt="" /></span><figcaption>An earlier version of Quirky that used a big-toothed smile</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">When everything inside the screen looked like a character,</p>
+<p data-ke-size="size16">it became blurry who the main protagonist actually was.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So, we removed the faces from regular orbs</p>
+<p data-ke-size="size16">and left only Quirky as a character with sanpaku eyes and thick eyebrows,</p>
+<p data-ke-size="size16">and one corner of the mouth raised.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-phocus="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-alt="The current Quirky with personality defined by sanpaku eyes and an asymmetric mouth corner"><img src="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>The current Quirky with personality defined by sanpaku eyes and an asymmetric mouth corner</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Fixing just the expressions was not the end.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Revealing its name, explaining why it was trapped in the laboratory,</p>
+<p data-ke-size="size16">and having it blink, smile, worry, and provoke according to the gameplay situation</p>
+<p data-ke-size="size16">was when the red shape finally began to read as a character.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Cutscenes went through a similar process.</p>
+<p data-ke-size="size16">Initially, scientists and machines were drawn as simple shapes.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-phocus="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-alt="An early cutscene of Quirky Ball composed of simple shapes"><img src="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" loading="lazy" width="720" height="1280" alt="" /></span><figcaption>An early cutscene of Quirky Ball composed of simple shapes</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">Afterwards, we obtained drafts of the scientist and equipment using generative imagery,</p>
+<p data-ke-size="size16">but we did not put those results directly into the game.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">We reduced the colors to five, erased the white background,</p>
+<p data-ke-size="size16">fixed the size and pixel scale, and rebundled them into a single atlas.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-phocus="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-alt="A pixel atlas that re-organized the generative drafts into five colors and fixed specifications"><img src="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" loading="lazy" width="768" height="512" alt="" /></span><figcaption>A pixel atlas that re-organized the generative drafts into five colors and fixed specifications</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">Only after cutting them to the same specifications</p>
+<p data-ke-size="size16">did the scientist's face and machine's size not waver even when the scene changed.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-phocus="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-alt="The organized pixel assets applied to actual cutscenes"><img src="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>The organized pixel assets applied to actual cutscenes</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"><b>Post-processing rules survived longer than good prompts.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>In the upcoming work with an untitled title, we intentionally did not make the final characters.</b></h2>
+<p data-ke-size="size16">The early prototype of the upcoming work</p>
+<p data-ke-size="size16">was close to a timing game without even characters.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-phocus="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-alt="An untitled early prototype verifying only timing controls without characters"><img src="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>An untitled early prototype verifying only timing controls without characters</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">While rebooting, we added a duck, a goose, and a pigeon,</p>
+<p data-ke-size="size16">but the birds visible now are low-poly greyboxes made with code.</p>
+<p data-ke-size="size16">They are not the final character designs.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-phocus="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-alt="The stage of checking the roles of duck, goose, and pigeon with low-poly greyboxes"><img src="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>The stage of checking the roles of duck, goose, and pigeon with low-poly greyboxes</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">Instead, what we decided first was their roles.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The duck was divided into leadership and balance,</p>
+<p data-ke-size="size16">the goose into defense and weight,</p>
+<p data-ke-size="size16">and the pigeon into a character that creates paths.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Even if the models are not pretty,</p>
+<p data-ke-size="size16">we first check whether dragging, collisions, cover, and rewards are read properly.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-phocus="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-alt="A scene where collision and reward feedback were verified before the finished characters"><img src="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>A scene where collision and reward feedback were verified before the finished characters</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Fun verification by external players has not passed yet either.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">So, instead of making a bunch of final cell 3D characters first,</p>
+<p data-ke-size="size16">we stopped with a plan to review only the original of one duck species and then expand.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>Because adding a dozen more pretty characters to an unfun game</b></p>
+<p data-ke-size="size16"><b>does not make it a fun game.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Just because you like the assets does not mean the game is completed.</b></h2>
+<p data-ke-size="size16">When character images turn out well,</p>
+<p data-ke-size="size16">it suddenly feels like a lot of the project is finished.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Every time I put a new bird drawing on the screen,</p>
+<p data-ke-size="size16">I too was deluded into thinking the game had become quite plausible.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">However, whether players will run it again because it is fun, <b>none of that is solved by a single character concept art,</b></p>
+<p data-ke-size="size16">whether the software is completed enough that saves, logins, and payments are not broken, <b>whether the software is completed,</b></p>
+<p data-ke-size="size16">whether the UI is clear enough for a first-time viewer to understand, <b>whether the UI is clear,</b></p>
+<p data-ke-size="size16">whether interactions are agile enough to respond instantly when a button is pressed, <b>whether interactions are agile,</b></p>
+<p data-ke-size="size16">and whether it extends to marketing <b>marketing</b> to announce the existence of the game</p>
+<p data-ke-size="size16">is not resolved by a single character concept art.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Rather, the better the assets get,</p>
+<p data-ke-size="size16">the higher the standards players expect from the game rise together.</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>Assets make the starting line look nice.</b></p>
+<p data-ke-size="size16">However, what ultimately makes the game move<br /><br />is fun and completion.</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">If a prompt works well and you get a character you like,</p>
+<p data-ke-size="size16">you can be glad.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">It just means the project went well that day,</p>
+<p data-ke-size="size16">not that the game has succeeded.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">The next day, you must play again, fix things,</p>
+<p data-ke-size="size16">and check the response of a single button and the fun of the first 10 minutes.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>There is still too much left to complete the game to be easily swayed by ups and downs.</b></p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/en.html">Terms</a><a href="/privacy/en.html">Privacy</a><a href="/impressum/en.html">Impressum</a><a href="/support/#english">Support</a><a href="mailto:business@houseduck.in">Business inquiries · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>
