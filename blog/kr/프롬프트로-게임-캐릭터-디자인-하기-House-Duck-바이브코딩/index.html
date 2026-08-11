@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩">
+  <meta property="og:description" content="AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는">
+  <meta property="og:url" content="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <meta property="og:locale" content="ko_KR">
+
+  <meta property="article:published_time" content="2026-08-11T19:28:26.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩">
+  <meta name="twitter:description" content="AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩","description":"AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는","datePublished":"2026-08-11T19:28:26.000Z","inLanguage":"ko","mainEntityOfPage":"https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","url":"https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/","image":"https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png","articleSection":"Mobile Game Dev./Projeckt K","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩 — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">본문으로 건너뛰기</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/kr/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/kr/">← 모든 포스트</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · KOREAN ORIGINAL</p><h1>프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩</h1><time datetime="2026-08-11T19:28:26.000Z">2026년 8월 11일</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/" aria-current="page">한국어</a></nav>
+      <aside class="mirror-note"><strong>공식 블로그</strong><span>같은 글을 <a href="https://blog.houseduck.in/entry/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9?original=1">House Duck Blog에서 읽기</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">AI에게 게임 캐릭터를 만들어달라고 하면</p>
+<p data-ke-size="size16">그럴듯한 그림 한 장은 꽤 빨리 나온다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">문제는 그다음이었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고,</p>
+<p data-ke-size="size16">표정을 바꾸니 옷까지 달라지고,</p>
+<p data-ke-size="size16">게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다.</p>
+<p data-ke-size="size16">한 장만 보면 마음에 드는데</p>
+<p data-ke-size="size16">여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는 일도 많았다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>예쁜 이미지를 뽑는 것과</b></p>
+<p data-ke-size="size16"><b>게임 캐릭터를 만드는 것은 다른 일이었다.</b></p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16">프롬프트 한 번으로 마음에 드는 그림이 나와도</p>
+<p data-ke-size="size16"><b>그 그림이 게임 안에서 계속 살아남는지는 별개의 문제였다.</b></p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Project K, Quirky Ball,</p>
+<p data-ke-size="size16">그리고 아직 게임명도 정하지 않은</p>
+<p data-ke-size="size16">차기작을 만들면서 배웠다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>한 장 잘 나온 그림이 가장 위험했다.</b></h2>
+<p data-ke-size="size16">Project K의 초기 인물 그림은</p>
+<p data-ke-size="size16">지금 보면 생성형 이미지의 흔적이 아주 선명하다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-phocus="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" data-alt="Project K 초기에 사용했던 생성형 인물 시안"><img src="https://blog.kakaocdn.net/dn/H2YhX/dJMcajb7Btb/20q94Mk1BKvzXxuXtUhbRK/img.png" loading="lazy" width="1024" height="1024" alt="" /></span><figcaption>Project K 초기에 사용했던 생성형 인물 시안</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그림 한 장만 보면 캐릭터가 있어 보였다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">하지만 세계관의 특징을 빨리 보여주고 싶어서</p>
+<p data-ke-size="size16">비슷한 외형 조건을 반복해서 넣다 보니</p>
+<p data-ke-size="size16">지도자 후보들이 전부 비슷한 나이와 체형으로 모였다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-phocus="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" data-alt="특징을 과하게 고정하면서 서로 비슷해진 지도자와 표정 후보"><img src="https://blog.kakaocdn.net/dn/cq9HMa/dJMb998sxSo/DNkiN8pbkco4V2eYYojic0/img.png" loading="lazy" width="1402" height="1122" alt="" /></span><figcaption>특징을 과하게 고정하면서 서로 비슷해진 지도자와 표정 후보</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">표정은 많아졌는데</p>
+<p data-ke-size="size16">이름을 가리면 누가 누구인지 바로 구분하기 어려웠다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 인물 수를 늘리는 대신</p>
+<p data-ke-size="size16">얼굴형, 체형, 머리 모양과 복장 실루엣을</p>
+<p data-ke-size="size16">먼저 벌리는 쪽으로 바꿨다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-phocus="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" data-alt="외형과 실루엣을 벌려 다시 만든 세 명의 지도자 후보"><img src="https://blog.kakaocdn.net/dn/drq21o/dJMcaiYyHaC/jMUyyezhvakM4dMk7lkhB1/img.png" loading="lazy" width="1717" height="916" alt="" /></span><figcaption>외형과 실루엣을 벌려 다시 만든 세 명의 지도자 후보</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">자동 검사도 많이 통과했고</p>
+<p data-ke-size="size16">이미지 크기와 파일 규격도 맞았다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그런데 실제 모바일 화면에 넣어보니</p>
+<p data-ke-size="size16">머리카락과 옷 주름, 광택 같은 잔묘사가 남았고</p>
+<p data-ke-size="size16">게임의 픽셀 화면과 따로 노는 느낌이 났다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-phocus="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" data-alt="캐릭터를 실제 모바일 지도자 선택 화면에 넣어본 결과"><img src="https://blog.kakaocdn.net/dn/sVhM4/dJMcajb7Bta/sgCd9XgMpfqHgYBtofR1WK/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>캐릭터를 실제 모바일 지도자 선택 화면에 넣어본 결과</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>파일이 정상이라고 그림까지 좋은 것은 아니었다.</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">결국 Project K는 픽셀 필터를 더 세게 거는 방향도 버리고</p>
+<p data-ke-size="size16">한 명의 3D 원본을 먼저 제대로 만든 뒤</p>
+<p data-ke-size="size16">그 원본에서 초상, 프로필과 카드 이미지를 뽑는 쪽으로 다시 잡았다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-phocus="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" data-alt="현재 승인된 Project K 인물 방향판이며 최종 게임 에셋은 아니다"><img src="https://blog.kakaocdn.net/dn/WfXl1/dJMb998sxSp/I8WYlJpsyaKq8EUeags6kk/img.png" loading="lazy" width="1641" height="958" alt="" /></span><figcaption>현재 승인된 Project K 인물 방향판이며 최종 게임 에셋은 아니다</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">위 그림도 최종 게임 에셋은 아니다.</p>
+<p data-ke-size="size16">현재 승인된 인물 방향판에 가깝고</p>
+<p data-ke-size="size16">실제 게임에 넣을 3D 원본은 아직 만드는 중이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">마음에 드는 방향을 찾았다고</p>
+<p data-ke-size="size16">완성된 것처럼 말하지 않는 것도 꽤 중요했다.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>프롬프트를 감상평이 아니라 제작 지시서처럼 바꿨다.</b></h2>
+<p data-ke-size="size16">처음에는 멋진, 고급스러운, 영화 같은 식의</p>
+<p data-ke-size="size16">형용사를 많이 넣으면 좋아질 거라고 생각했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">지금은 반대로 쓴다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">이 캐릭터가 무슨 역할인지,</p>
+<p data-ke-size="size16">화면에서 어느 크기로 보이는지,</p>
+<p data-ke-size="size16">무엇이 바뀌면 안 되는지를 먼저 적는다.</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>역할:</b> 모바일 화면에서 바로 읽히는 지도자</p>
+<p data-ke-size="size16"><b>구분:</b> 얼굴형·체형·머리·긴 코트 실루엣</p>
+<p data-ke-size="size16"><b>고정:</b> 같은 인물의 정면·측면·후면, 같은 복장과 대표색</p>
+<p data-ke-size="size16"><b>명암:</b> 기본색과 그림자 중심의 2~3단 셀 명암</p>
+<p data-ke-size="size16"><b>금지:</b> 실존 인물 닮은꼴, 피부 노이즈, 미세 주름, 글자와 워터마크</p>
+<p data-ke-size="size16"><b>검수:</b> 실제 게임 크기로 줄여도 눈·코·입과 역할이 읽힐 것</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">이건 당시 사용했던 프롬프트 원문은 아니다.</p>
+<p data-ke-size="size16">여러 번 실패한 뒤 지금 남긴 제작 조건을</p>
+<p data-ke-size="size16">프롬프트 형식으로 다시 정리한 것이다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그리고 한 번에 수십 명을 만들지 않는다.</p>
+<p data-ke-size="size16">대표 캐릭터 몇 명만 먼저 뽑고</p>
+<p data-ke-size="size16">실제 UI와 게임 화면에 넣어본 뒤 다음 묶음으로 넘어간다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>생성 횟수를 늘리는 것보다 반려 기준을 먼저 만드는 편이 빨랐다.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>Quirky Ball은 오히려 덜 그려서 캐릭터가 됐다.</b></h2>
+<p data-ke-size="size16">Quirky Ball도 처음부터 지금 얼굴이었던 것은 아니다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">한때는 일반 구슬에도 얼굴을 붙이려고 했고</p>
+<p data-ke-size="size16">빨간 육각형 쿼키는 큰 이빨 웃음을 짓고 있었다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-phocus="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" data-alt="큰 이빨 웃음을 사용하던 이전 버전의 쿼키"><img src="https://blog.kakaocdn.net/dn/9Orhx/dJMcaiYyHaz/Z5zzeu2E7YgfhJR3FgSJH1/img.png" loading="lazy" width="1080" height="1920" alt="" /></span><figcaption>큰 이빨 웃음을 사용하던 이전 버전의 쿼키</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">화면 안의 모든 것이 캐릭터처럼 보이면</p>
+<p data-ke-size="size16">정작 주인공이 누구인지 흐려졌다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 일반 구슬의 얼굴은 걷어내고</p>
+<p data-ke-size="size16">쿼키만 사백안과 굵은 눈썹,</p>
+<p data-ke-size="size16">한쪽이 올라간 입꼬리를 가진 캐릭터로 남겼다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-phocus="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" data-alt="사백안과 비대칭 입꼬리로 성격을 정리한 현재 쿼키"><img src="https://blog.kakaocdn.net/dn/nWTvs/dJMcajb7Bs8/CNqi9b88pJkbl96k9gLE0k/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>사백안과 비대칭 입꼬리로 성격을 정리한 현재 쿼키</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">표정만 고친다고 끝나지도 않았다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">이름을 알려주고, 왜 연구소에 갇혔는지 말하고,</p>
+<p data-ke-size="size16">플레이 상황에 따라 깜빡이고 웃고 걱정하고 도발해야</p>
+<p data-ke-size="size16">그제야 빨간 도형이 캐릭터로 읽히기 시작했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">컷신도 비슷한 과정을 거쳤다.</p>
+<p data-ke-size="size16">초기에는 과학자와 기계를 단순 도형으로 그렸다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-phocus="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" data-alt="단순 도형으로 구성했던 Quirky Ball 초기 컷신"><img src="https://blog.kakaocdn.net/dn/pwPWU/dJMcaiYyHaw/nflt8ZYerHZ6E9kzQ0W1h1/img.png" loading="lazy" width="720" height="1280" alt="" /></span><figcaption>단순 도형으로 구성했던 Quirky Ball 초기 컷신</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">이후 생성형 이미지로 과학자와 장비의 초안을 얻었지만</p>
+<p data-ke-size="size16">그 결과물을 그대로 게임에 넣지는 않았다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">색상을 다섯 개로 줄이고, 흰 배경을 지우고,</p>
+<p data-ke-size="size16">크기와 픽셀 배율을 고정해 한 장의 아틀라스로 다시 묶었다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-phocus="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" data-alt="생성 초안을 다섯 가지 색과 고정 규격으로 다시 정리한 픽셀 아틀라스"><img src="https://blog.kakaocdn.net/dn/OvJ25/dJMcajb7Bs7/DkhDwYrKCXGzlX39hhaxUk/img.png" loading="lazy" width="768" height="512" alt="" /></span><figcaption>생성 초안을 다섯 가지 색과 고정 규격으로 다시 정리한 픽셀 아틀라스</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">같은 규격으로 잘라둔 뒤에야</p>
+<p data-ke-size="size16">장면이 바뀌어도 과학자의 얼굴과 기계의 크기가 흔들리지 않았다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-phocus="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" data-alt="정리한 픽셀 에셋을 실제 컷신에 적용한 모습"><img src="https://blog.kakaocdn.net/dn/6ojVS/dJMcaiYyHax/LPeoGdayDII0qykfCsF7n1/img.png" loading="lazy" width="718" height="1598" alt="" /></span><figcaption>정리한 픽셀 에셋을 실제 컷신에 적용한 모습</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"><b>좋은 프롬프트보다 후처리 규칙이 더 오래 살아남았다.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>게임명 미정 차기작에서는 최종 캐릭터를 일부러 안 만들었다.</b></h2>
+<p data-ke-size="size16">차기작의 초기 프로토타입은</p>
+<p data-ke-size="size16">캐릭터조차 없는 타이밍 게임에 가까웠다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-phocus="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" data-alt="캐릭터 없이 타이밍 조작만 검증하던 게임명 미정 초기 프로토타입"><img src="https://blog.kakaocdn.net/dn/ceMIt9/dJMb998sxSl/BSIokGKctZQ9dYXmOKK9Yk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>캐릭터 없이 타이밍 조작만 검증하던 게임명 미정 초기 프로토타입</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">리부트하면서 오리, 거위와 비둘기를 넣었지만</p>
+<p data-ke-size="size16">지금 보이는 새들은 코드로 만든 저폴리 그레이박스다.</p>
+<p data-ke-size="size16">최종 캐릭터 디자인이 아니다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-phocus="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" data-alt="오리와 거위, 비둘기 역할을 저폴리 그레이박스로 확인하는 단계"><img src="https://blog.kakaocdn.net/dn/bfpIyl/dJMcajb7Bs9/6XeOqhKf0FXbRcKrLlkFL1/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>오리와 거위, 비둘기 역할을 저폴리 그레이박스로 확인하는 단계</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16">대신 먼저 정한 것은 역할이었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">오리는 지휘와 균형,</p>
+<p data-ke-size="size16">거위는 방어와 무게,</p>
+<p data-ke-size="size16">비둘기는 경로를 만드는 캐릭터로 나눴다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">모델이 예쁘지는 않아도</p>
+<p data-ke-size="size16">끌기, 충돌, 엄폐와 보상이 제대로 읽히는지부터 본다.</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-phocus="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" data-alt="완성된 캐릭터보다 충돌과 보상 피드백을 먼저 검증한 장면"><img src="https://blog.kakaocdn.net/dn/bpxqnm/dJMb998sxSm/iLWpin1cxxSOpXwOrsUEBk/img.png" loading="lazy" width="1080" height="2400" alt="" /></span><figcaption>완성된 캐릭터보다 충돌과 보상 피드백을 먼저 검증한 장면</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">아직 외부 플레이어의 재미 검증도 통과하지 않았다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">그래서 최종 셀 3D 캐릭터를 먼저 잔뜩 만들지 않고</p>
+<p data-ke-size="size16">오리 한 종의 원본만 검수한 뒤 확장하는 계획으로 멈춰두었다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>재미가 없는 게임에 예쁜 캐릭터를 열 명 더 넣어도</b></p>
+<p data-ke-size="size16"><b>재미있는 게임이 되는 것은 아니기 때문이다.</b></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<h2 data-ke-size="size26"><b>에셋이 마음에 든다고 게임이 완성된 것은 아니다.</b></h2>
+<p data-ke-size="size16">캐릭터 이미지가 잘 나오면</p>
+<p data-ke-size="size16">프로젝트가 갑자기 많이 완성된 것처럼 느껴진다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">나도 새 그림을 화면에 넣을 때마다</p>
+<p data-ke-size="size16">게임이 꽤 그럴듯해졌다고 착각했다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">하지만 플레이어가 다시 실행할 만큼 <b>재미있는지,</b></p>
+<p data-ke-size="size16">저장과 로그인, 결제가 망가지지 않을 만큼 <b>소프트웨어가 완성됐는지,</b></p>
+<p data-ke-size="size16">처음 보는 사람도 이해할 만큼 <b>UI가 분명한지,</b></p>
+<p data-ke-size="size16">버튼을 눌렀을 때 즉시 반응할 만큼 <b>상호작용이 기민한지,</b></p>
+<p data-ke-size="size16">그리고 게임의 존재를 알릴 <b>마케팅</b>까지 이어지는지는</p>
+<p data-ke-size="size16">캐릭터 원화 한 장으로 해결되지 않는다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">오히려 에셋이 좋아질수록</p>
+<p data-ke-size="size16">플레이어가 게임에 기대하는 기준도 같이 올라간다.</p>
+<p data-ke-size="size16"> </p>
+<blockquote data-ke-style="style3">
+<p data-ke-size="size16"><b>에셋은 출발선을 보기 좋게 만들어준다.</b></p>
+<p data-ke-size="size16">하지만 결국 게임을 움직이는 것은<br /><br />재미와 완성도다.</p>
+</blockquote>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">프롬프트가 잘 먹혀서 마음에 드는 캐릭터가 나오면</p>
+<p data-ke-size="size16">기뻐해도 된다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">다만 그날 하루 프로젝트가 잘 풀린 것이지</p>
+<p data-ke-size="size16">게임이 성공한 것은 아니다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">다음 날에는 다시 플레이하고, 고치고,</p>
+<p data-ke-size="size16">버튼 하나의 반응과 첫 10분의 재미를 확인해야 한다.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>일희일비하기에는 게임을 완성하는 일이 아직 너무 많이 남아 있다.</b></p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ko.html">이용약관</a><a href="/privacy/ko.html">개인정보처리방침</a><a href="/impressum/ko.html">Impressum</a><a href="/support/">고객지원</a><a href="mailto:business@houseduck.in">비즈니스 문의 · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>
