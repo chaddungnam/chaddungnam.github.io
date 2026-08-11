@@ -1,14 +1,15 @@
 :root {
-  --k-void: #111315;
-  --k-ink: #151816;
-  --k-panel: #1b1d20;
+  color-scheme: light;
+  --k-void: #f8f5ec;
+  --k-ink: #fffdf7;
+  --k-panel: #fff;
   --k-olive: #4b543d;
   --k-crimson: #b72c38;
   --k-crimson-deep: #741d24;
-  --k-paper: #f1f3f4;
-  --k-muted: #9aa0a6;
+  --k-paper: #17191d;
+  --k-muted: #62676e;
   --k-gold: #e1c94d;
-  --k-line: rgba(238, 231, 205, 0.18);
+  --k-line: rgba(23, 25, 29, .18);
 }
 
 .project-k-page {
@@ -32,7 +33,7 @@
 
 .project-k-header {
   border-color: var(--k-line);
-  background: rgba(17, 19, 21, 0.94);
+  background: color-mix(in srgb, var(--k-void) 92%, transparent);
 }
 
 .project-k-header .brand-lockup,
@@ -135,7 +136,7 @@
   min-height: 72px;
   padding: 12px;
   border: 1px solid var(--k-line);
-  background: rgba(24, 33, 26, 0.82);
+  background: rgba(255, 255, 255, .88);
 }
 
 .project-k-meta dt {
@@ -273,7 +274,7 @@
 
 .project-k-loop-card:nth-child(2),
 .project-k-loop-card:nth-child(4) {
-  background: #20281e;
+  background: #eef1e8;
 }
 
 .project-k-loop-card span {
@@ -377,7 +378,7 @@
 }
 
 .project-k-page .footer-links a {
-  color: var(--k-paper);
+  color: #f7f5ef;
 }
 
 @media (min-width: 901px) and (max-height: 860px) {

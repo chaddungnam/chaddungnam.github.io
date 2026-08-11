@@ -1,38 +1,20 @@
 body[data-page="quirky-ball"] {
-  --qb-bg: #101114;
-  --qb-surface: #191b20;
-  --qb-panel: #22252b;
-  --qb-text: #f7f5ef;
-  --qb-muted: #aeb2ba;
-  --qb-line: rgba(255, 255, 255, .14);
-  --qb-cyan: #59f1dc;
-  --qb-pink: #ff5c7d;
-  --qb-yellow: #ffd84d;
-  --qb-lime: #a9ed55;
-  --qb-cyan-text: var(--qb-cyan);
-  --qb-pink-text: var(--qb-pink);
-  --qb-yellow-text: var(--qb-yellow);
-  --qb-lime-text: var(--qb-lime);
-  --qb-ink: #111318;
-  color: var(--qb-text);
-  background:
-    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px),
-    var(--qb-bg);
-  background-size: 32px 32px;
-}
-
-html[data-theme="light"] body[data-page="quirky-ball"] {
   --qb-bg: #f8f9fa;
   --qb-surface: #eef0f3;
   --qb-panel: #fff;
   --qb-text: #202124;
   --qb-muted: #60646c;
   --qb-line: rgba(32, 33, 36, .16);
+  --qb-cyan: #59f1dc;
+  --qb-pink: #ff5c7d;
+  --qb-yellow: #ffd84d;
+  --qb-lime: #a9ed55;
   --qb-cyan-text: #00796f;
   --qb-pink-text: #b1264e;
   --qb-yellow-text: #8a5d00;
   --qb-lime-text: #4e7012;
+  --qb-ink: #111318;
+  color: var(--qb-text);
   background:
     linear-gradient(rgba(32, 33, 36, .035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(32, 33, 36, .035) 1px, transparent 1px),
@@ -49,8 +31,7 @@ body[data-page="quirky-ball"] .site-header {
 
 body[data-page="quirky-ball"] .brand-lockup,
 body[data-page="quirky-ball"] .site-nav a,
-body[data-page="quirky-ball"] .language-picker summary,
-body[data-page="quirky-ball"] .theme-toggle { color: var(--qb-text); }
+body[data-page="quirky-ball"] .language-picker summary { color: var(--qb-text); }
 
 body[data-page="quirky-ball"] .site-nav a::after { background: var(--qb-cyan); }
 body[data-page="quirky-ball"] .site-nav .nav-featured { color: var(--qb-yellow-text); }
@@ -61,7 +42,6 @@ body[data-page="quirky-ball"] .site-nav a:focus-visible {
 }
 
 body[data-page="quirky-ball"] .language-picker summary,
-body[data-page="quirky-ball"] .theme-toggle,
 body[data-page="quirky-ball"] .language-menu {
   border-color: var(--qb-line);
   background: var(--qb-panel);
@@ -614,7 +594,6 @@ body[data-page="quirky-ball"] .footer-links a:hover { color: var(--qb-cyan-text)
 body[data-page="quirky-ball"] .footer-brand-images { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
 body[data-page="quirky-ball"] .footer-brand-images .brand-duck-image { width: 34px; height: 34px; object-fit: contain; }
 body[data-page="quirky-ball"] .footer-wordmark-image { width: 116px; height: auto; object-fit: contain; }
-html[data-theme="dark"] body[data-page="quirky-ball"] .footer-wordmark-image { filter: brightness(0) invert(1); }
 
 @media (max-width: 900px) {
   .game-hero { min-height: auto; padding-block: 62px 86px; }

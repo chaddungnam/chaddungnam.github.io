@@ -46,14 +46,15 @@ function themeRun(file, storedTheme, sharedCookie = "") {
   });
 
   vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file });
-  return { theme: documentElement.dataset.theme, cookieWrites };
+  return { theme: documentElement.dataset.theme, cookieWrites, storedTheme: values.get("house_duck_theme") };
 }
 
-for (const file of ["assets/brand-site.js", "assets/blog-mirror.js", "tistory-skin/images/script.js"]) {
-  assert.equal(themeRun(file, "").theme, "dark", `${file} must default to dark mode`);
-  assert.equal(themeRun(file, "light").theme, "light", `${file} must preserve an explicit light preference`);
-  assert.equal(themeRun(file, "dark", "house_duck_theme=light").theme, "light", `${file} must prefer the shared parent-domain cookie`);
-  assert.match(themeRun(file, "light").cookieWrites.join("\n"), /house_duck_theme=light;[^\n]*Domain=houseduck\.in/, `${file} must migrate the theme to a shared cookie`);
+for (const file of ["assets/brand-site.js", "assets/blog-mirror.js", "assets/legal-site.js", "tistory-skin/images/script.js"]) {
+  assert.equal(themeRun(file, "").theme, "light", `${file} must default to light`);
+  const staleDark = themeRun(file, "dark", "house_duck_theme=dark");
+  assert.equal(staleDark.theme, "light", `${file} must ignore stale dark preferences`);
+  assert.equal(staleDark.storedTheme, "dark", `${file} must not rewrite unrelated stored preferences`);
+  assert.deepEqual(staleDark.cookieWrites, [], `${file} must not persist a removed theme control`);
 }
 
 console.log("default theme behavior: PASS");

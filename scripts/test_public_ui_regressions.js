@@ -85,7 +85,7 @@ function makeElement({ dataset = {}, attributes = {}, hidden = false } = {}) {
   return element;
 }
 
-function runBrandSite({ locale = "en", themeButton, menuButton, nav } = {}) {
+function runBrandSite({ locale = "en", menuButton, nav } = {}) {
   const root = makeElement({ dataset: { locale } });
   const metaTheme = { content: "" };
   const documentListeners = new Map();
@@ -98,10 +98,7 @@ function runBrandSite({ locale = "en", themeButton, menuButton, nav } = {}) {
       if (selector === "[data-menu-button]") return menuButton || null;
       return null;
     },
-    querySelectorAll(selector) {
-      if (selector === "[data-theme-toggle]") return themeButton ? [themeButton] : [];
-      return [];
-    },
+    querySelectorAll() { return []; },
     addEventListener(type, listener) {
       if (!documentListeners.has(type)) documentListeners.set(type, []);
       documentListeners.get(type).push(listener);
@@ -182,23 +179,18 @@ test("home footer exposes the business inquiry address", () => {
   }
 });
 
-test("brand controls keep localized theme and mobile-menu labels", () => {
+test("brand controls keep localized mobile-menu labels", () => {
   const labels = {
-    ko: { open: "메뉴 열기", close: "메뉴 닫기", light: "라이트 모드로 전환", dark: "다크 모드로 전환" },
-    en: { open: "Open menu", close: "Close menu", light: "Switch to light mode", dark: "Switch to dark mode" },
-    de: { open: "Menü öffnen", close: "Menü schließen", light: "Zum hellen Modus wechseln", dark: "Zum dunklen Modus wechseln" },
-    ja: { open: "メニューを開く", close: "メニューを閉じる", light: "ライトモードに切り替え", dark: "ダークモードに切り替え" },
+    ko: { open: "메뉴 열기", close: "메뉴 닫기" },
+    en: { open: "Open menu", close: "Close menu" },
+    de: { open: "Menü öffnen", close: "Menü schließen" },
+    ja: { open: "メニューを開く", close: "メニューを閉じる" },
   };
 
   for (const [locale, copy] of Object.entries(labels)) {
-    const themeButton = makeElement();
     const menuButton = makeElement({ attributes: { "aria-expanded": "false", "aria-label": copy.open } });
     const nav = makeElement();
-    const runtime = runBrandSite({ locale, themeButton, menuButton, nav });
-
-    assert.equal(themeButton.getAttribute("aria-label"), copy.light, `${locale} initial theme label`);
-    themeButton.dispatch("click");
-    assert.equal(themeButton.getAttribute("aria-label"), copy.dark, `${locale} toggled theme label`);
+    const runtime = runBrandSite({ locale, menuButton, nav });
 
     menuButton.dispatch("click");
     assert.equal(menuButton.getAttribute("aria-label"), copy.close, `${locale} open-menu label`);
@@ -247,14 +239,12 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
   const brandMark = cssDeclarations(brandCss, ".brand-lockup");
   const duckMark = cssDeclarations(brandCss, ".brand-lockup .brand-duck-image");
   const wordmark = cssDeclarations(brandCss, ".brand-lockup .brand-wordmark-image");
-  const themeToggle = cssDeclarations(brandCss, 'body[data-page="studio"] .theme-toggle');
   const postCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .post-preview-copy p');
 
   assert.equal(brandMark.display, "inline-flex", "public headers must show the complete brand lockup");
   assert.ok(parseFloat(duckMark.width) >= 34, "the duck mark must remain legible");
   assert.equal(wordmark.width, "132px", "the House Duck wordmark must remain visible beside the duck");
   assert.equal(cssDeclarations(studioCss, ".journal-section::before").color, cssDeclarations(studioCss, ".history-number").color, "01 and 02 need the same visual tone");
-  assert.ok(parseFloat(themeToggle.height) >= 44, "theme control needs a 44px touch target");
   assert.ok(parseFloat(postCopy["font-size"]) >= 0.9, "Blog summaries need readable mobile type");
 });
 

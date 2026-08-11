@@ -144,7 +144,6 @@ button {
   height: auto;
   object-fit: contain;
 }
-html[data-theme="dark"] .brand-lockup .brand-wordmark-image { filter: brightness(0) invert(1); }
 
 .site-nav {
   display: flex;
@@ -163,36 +162,6 @@ html[data-theme="dark"] .brand-lockup .brand-wordmark-image { filter: brightness
   font-weight: 850;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.theme-toggle {
-  position: relative;
-  display: grid;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  overflow: hidden;
-  flex: 0 0 44px;
-  place-items: center;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.theme-toggle .theme-sun,
-.theme-toggle .theme-moon {
-  grid-area: 1 / 1;
-  font-size: 1.05rem;
-  line-height: 1;
-  animation: theme-icon-in 180ms ease both;
-}
-
-.theme-toggle .theme-moon,
-html[data-theme="light"] .theme-toggle .theme-sun { display: none; }
-html[data-theme="light"] .theme-toggle .theme-moon { display: block; }
-
-@keyframes theme-icon-in {
-  from { opacity: 0; transform: scale(.7) rotate(-18deg); }
-  to { opacity: 1; transform: scale(1) rotate(0); }
 }
 
 .site-nav a::after {
@@ -904,12 +873,6 @@ html[data-theme="light"] .theme-toggle .theme-moon { display: block; }
 
 .text-link:hover::after {
   transform: translateX(5px);
-}
-
-body[data-page="studio"] .theme-toggle {
-  min-width: 44px;
-  width: 44px;
-  height: 44px;
 }
 
 body[data-page="studio"] .post-preview-copy p {

@@ -45,35 +45,7 @@
 
   var root = document.documentElement;
   var supportedLanguages = ["ko", "en", "de", "ja"];
-  var savedTheme = "";
-
-  function sharedThemeCookie() {
-    var match = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/);
-    return match ? match[1] : "";
-  }
-
-  function saveSharedTheme(theme) {
-    try {
-      document.cookie = "house_duck_theme=" + theme + "; Domain=houseduck.in; Path=/; Max-Age=31536000; SameSite=Lax; Secure";
-    } catch (_error) {
-      // Local storage still preserves the preference when cookies are blocked.
-    }
-  }
-
-  try {
-    savedTheme = window.localStorage.getItem("house_duck_theme") || "";
-  } catch (_error) {
-    savedTheme = "";
-  }
-
-  var cookieTheme = sharedThemeCookie();
-  var initialTheme = cookieTheme || (savedTheme === "light" || savedTheme === "dark"
-    ? savedTheme
-    : "dark");
-  if (!cookieTheme && (savedTheme === "light" || savedTheme === "dark")) {
-    saveSharedTheme(savedTheme);
-  }
-  root.dataset.theme = initialTheme;
+  root.dataset.theme = "light";
 
   function normalizeLanguage(value) {
     var language = String(value || "").toLowerCase().split("-")[0];
@@ -90,26 +62,18 @@
   var locale = normalizeLanguage(root.dataset.locale) || "en";
   var controlLabels = {
     ko: {
-      themeLight: "라이트 모드로 전환",
-      themeDark: "다크 모드로 전환",
       menuOpen: "메뉴 열기",
       menuClose: "메뉴 닫기",
     },
     en: {
-      themeLight: "Switch to light mode",
-      themeDark: "Switch to dark mode",
       menuOpen: "Open menu",
       menuClose: "Close menu",
     },
     de: {
-      themeLight: "Zum hellen Modus wechseln",
-      themeDark: "Zum dunklen Modus wechseln",
       menuOpen: "Menü öffnen",
       menuClose: "Menü schließen",
     },
     ja: {
-      themeLight: "ライトモードに切り替え",
-      themeDark: "ダークモードに切り替え",
       menuOpen: "メニューを開く",
       menuClose: "メニューを閉じる",
     },
@@ -148,29 +112,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    function setTheme(theme) {
-      root.dataset.theme = theme;
-      var themeColor = document.querySelector('meta[name="theme-color"]');
-      if (themeColor) themeColor.content = theme === "dark" ? "#111315" : "#f8f9fa";
-      document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
-        button.setAttribute("aria-label", theme === "dark" ? controlCopy.themeLight : controlCopy.themeDark);
-        button.setAttribute("aria-pressed", String(theme === "dark"));
-      });
-    }
-
-    setTheme(initialTheme);
-    document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
-        setTheme(nextTheme);
-        try {
-          window.localStorage.setItem("house_duck_theme", nextTheme);
-        } catch (_error) {
-          // Theme switching still works when storage is blocked.
-        }
-        saveSharedTheme(nextTheme);
-      });
-    });
+    var themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = "#f8f9fa";
 
     document.querySelectorAll("[data-current-year]").forEach(function (node) {
       node.textContent = String(new Date().getFullYear());

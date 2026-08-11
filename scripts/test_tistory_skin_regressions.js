@@ -359,8 +359,8 @@ test("safe interactive skin controls keep a 44px minimum target", () => {
 });
 
 test("theme, reduced-motion, and responsive contracts remain present", () => {
-  assert.match(css, /html\[data-theme="light"\]/);
-  assert.match(css, /html\[data-theme="dark"\]/);
+  assert.match(css, /color-scheme:\s*light/);
+  assert.doesNotMatch(css, /html\[data-theme="dark"\]/);
   assert.match(css, /@media\s*\(max-width:\s*900px\)/);
   assert.match(css, /@media\s*\(max-width:\s*620px\)/);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);

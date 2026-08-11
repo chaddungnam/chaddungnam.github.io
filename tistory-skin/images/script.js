@@ -2,53 +2,17 @@
   "use strict";
 
   const root = document.documentElement;
-  let savedTheme = "";
-  let cookieTheme = "";
-  try {
-    cookieTheme = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/)?.[1] || "";
-  } catch (_error) {
-    // Opaque preview documents can deny cookie reads.
+  root.dataset.theme = "light";
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.content = "#f8f9fa";
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => button.remove());
+  if (document.head && typeof document.createElement === "function" && !document.querySelector("[data-house-duck-skin]")) {
+    const managedStyle = document.createElement("link");
+    managedStyle.rel = "stylesheet";
+    managedStyle.href = "https://houseduck.in/tistory-skin/style.css";
+    managedStyle.dataset.houseDuckSkin = "";
+    document.head.append(managedStyle);
   }
-
-  function saveSharedTheme(theme) {
-    try {
-      document.cookie = `house_duck_theme=${theme}; Domain=houseduck.in; Path=/; Max-Age=31536000; SameSite=Lax; Secure`;
-    } catch (_error) {
-      // Local storage remains available when cookies are blocked.
-    }
-  }
-
-  try {
-    savedTheme = localStorage.getItem("house_duck_theme") || "";
-  } catch (_error) {
-    savedTheme = "";
-  }
-  const initialTheme = cookieTheme || (savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark");
-  if (!cookieTheme && (savedTheme === "light" || savedTheme === "dark")) saveSharedTheme(savedTheme);
-
-  function setTheme(theme) {
-    root.dataset.theme = theme;
-    const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.content = theme === "dark" ? "#111315" : "#f8f9fa";
-    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      button.setAttribute("aria-pressed", String(theme === "dark"));
-      button.setAttribute("aria-label", theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환");
-    });
-  }
-
-  setTheme(initialTheme);
-  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const theme = root.dataset.theme === "dark" ? "light" : "dark";
-      setTheme(theme);
-      try {
-        localStorage.setItem("house_duck_theme", theme);
-      } catch (_error) {
-        // The control still works when storage is blocked.
-      }
-      saveSharedTheme(theme);
-    });
-  });
 
   document.querySelectorAll("[data-current-year]").forEach((node) => {
     node.textContent = String(new Date().getFullYear());

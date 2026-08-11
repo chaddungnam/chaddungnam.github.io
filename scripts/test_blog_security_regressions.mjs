@@ -57,7 +57,8 @@ try {
   const koreanIndex = await readFile(path.join(outputRoot, "blog", "kr", "index.html"), "utf8");
   assert.match(koreanIndex, /class="skip-link" href="#blog-content"/);
   assert.match(koreanIndex, /<main[^>]+id="blog-content"/);
-  assert.match(koreanIndex, /aria-label="색상 테마 전환"/);
+  assert.match(koreanIndex, /data-theme="light"/);
+  assert.doesNotMatch(koreanIndex, /data-theme-toggle/);
   const koreanPost = await readFile(path.join(outputRoot, "blog", "kr", "security-probe", "index.html"), "utf8");
   assert.match(koreanPost, /<iframe[^>]+62oI3qFF7-U[^>]+class="video-portrait"/);
   assert.match(koreanPost, /<iframe[^>]+abcdefghijk[^>]+class="video-landscape"/);

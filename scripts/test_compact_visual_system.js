@@ -14,9 +14,9 @@ const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8
 const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css"), "utf8");
 const quirky = fs.readFileSync(path.join(root, "assets", "quirky-ball-site.css"), "utf8");
 
-assert.match(studio, /--studio-bg:\s*#111315/);
-assert.match(studio, /--studio-surface:\s*#1b1d20/);
-assert.match(studio, /html\[data-theme="light"\][\s\S]*--studio-bg:\s*#f8f9fa/);
+assert.match(studio, /--studio-bg:\s*#f8f9fa/);
+assert.match(studio, /--studio-surface:\s*#fff/);
+assert.doesNotMatch(studio, /html\[data-theme="dark"\]/);
 assert.doesNotMatch(studio, /#0d1525|#131f33|#132342/i);
 assert.match(studio, /\.manifesto-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(studio, /\.manifesto-bubble::after\s*\{[^}]*content:\s*""/s);
@@ -36,8 +36,8 @@ assert.match(mirror, /\.mirror-grid article:hover img,[\s\S]*?scale\(1\.04\)/);
 assert.doesNotMatch(mirror, /animation-timeline:\s*view\(\)/);
 
 for (const css of [skin, mirror]) {
-  assert.match(css, /#111315/);
-  assert.match(css, /#f8f9fa/);
+  assert.match(css, /color-scheme:\s*light/);
+  assert.doesNotMatch(css, /html\[data-theme="dark"\]/);
   assert.doesNotMatch(css, /ui-serif|Georgia|Noto Serif KR/);
 }
 
@@ -58,22 +58,22 @@ assert.match(brand, /\.game-title\s*\{[^}]*font-size:\s*clamp\(2\.75rem,\s*5\.2v
 assert.match(brand, /\.feature-card\s*\{[^}]*min-height:\s*280px/s);
 assert.match(brand, /\.closing-card h2\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.6vw,\s*3rem\)/s);
 
-assert.match(legal, /--legal-cream:\s*#111315/);
-assert.match(legal, /--legal-paper:\s*#1b1d20/);
-assert.match(legal, /html\[data-theme="light"\][\s\S]*--legal-cream:\s*#f8f9fa/);
+assert.match(legal, /--legal-cream:\s*#f8f5ec/);
+assert.match(legal, /--legal-paper:\s*#fff/);
+assert.doesNotMatch(legal, /html\[data-theme="dark"\]/);
 assert.match(legal, /\.legal-header-inner\s*\{[^}]*min-height:\s*64px/s);
 assert.match(legal, /\.legal-brand > span:last-child\s*\{[^}]*width:\s*132px/s);
 assert.match(legal, /\.legal-duck-mark\s*\{[^}]*width:\s*34px[^}]*height:\s*34px/s);
 assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*3rem\)/s);
 assert.match(legal, /\.legal-paper\s*\{[^}]*padding:\s*clamp\(24px,\s*4vw,\s*40px\)/s);
 
-assert.match(projectK, /--k-void:\s*#111315/);
+assert.match(projectK, /--k-void:\s*#f8f5ec/);
 assert.match(projectK, /\.project-k-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
 assert.match(projectK, /\.project-k-title\s*\{[^}]*font-size:\s*clamp\(2\.65rem,\s*4vw,\s*3\.45rem\)[^}]*word-break:\s*keep-all/s);
 assert.match(projectK, /\.project-k-section\s*\{[^}]*padding-block:\s*clamp\(52px,\s*7vw,\s*88px\)/s);
 assert.match(projectK, /\.project-k-loop-card\s*\{[^}]*min-height:\s*220px/s);
-assert.match(quirky, /--qb-bg:\s*#101114/);
-assert.match(quirky, /html\[data-theme="light"\][\s\S]*--qb-bg:\s*#f8f9fa/);
+assert.match(quirky, /--qb-bg:\s*#f8f9fa/);
+assert.doesNotMatch(quirky, /html\[data-theme="dark"\]/);
 assert.match(quirky, /\.hero-device\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
 assert.match(quirky, /\.marble-rain\s*\{[^}]*pointer-events:\s*none/s);
 assert.match(quirky, /\.shot:nth-child\(2\)[\s\S]*rotateY/s);

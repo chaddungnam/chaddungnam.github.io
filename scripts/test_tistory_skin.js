@@ -65,7 +65,8 @@ assert.match(html, /onkey(?:down|press)="[^"]*\[#\#_search_onclick_submit_##\]/,
 assert.match(html, /onclick="\[#\#_search_onclick_submit_##\]"/, "search button must submit search");
 assert.match(html, /tistory_admin\/lib\/jquery\/jquery-1\.12\.4\.min\.js/, "Tistory controls need the bundled jQuery runtime");
 assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels");
-assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
+assert.match(html, /<html lang="ko" data-theme="light">/, "skin must paint light before JavaScript");
+assert.doesNotMatch(html, /data-theme-toggle/, "skin must not expose a removed dark-mode control");
 assert.match(html, /class="journal-hero manifesto-hero shell"/, "Blog home needs the shared speech-bubble composition");
 assert.match(html, /class="manifesto-bubble journal-bubble"/, "Blog statement needs a speech bubble");
 assert.equal((html.match(/data-game-preview/g) || []).length, 2, "Blog home needs two live game previews");
@@ -103,9 +104,8 @@ assert.match(css, /#tt-body-page \.article-body figure\[data-ke-type="opengraph"
 assert.match(css, /#tt-body-page \.article-body figure\[data-ke-type="opengraph"\] p\.og-desc\s*\{\s*display:\s*none\s*!important;\s*\}/, "mobile link previews must hide clipped descriptions");
 assert.match(css, /@media\s*\(max-width:/, "skin needs a mobile breakpoint");
 assert.match(css, /prefers-reduced-motion/, "skin must respect reduced motion");
-assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color schemes");
-assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark theme");
-assert.match(css, /--line:\s*rgba\(255,\s*255,\s*255,\s*\.08\)/, "dark dividers should stay subtle");
+assert.match(css, /color-scheme:\s*light/, "skin must declare the single supported color scheme");
+assert.doesNotMatch(css, /html\[data-theme="dark"\]/, "skin must not retain a dark theme branch");
 assert.match(css, /\.article-toc\s*\{/, "article table of contents needs compact styling");
 assert.match(css, /\.article-toc \.toc-children\s*\{/, "article subheadings need a nested list style");
 assert.match(css, /\.category-dock\s*\{[^}]*position:\s*fixed/s, "desktop categories need to float beside the page");
@@ -146,7 +146,9 @@ assert.match(css, /\.tt-comment-cont \.tt-area-write\s*\{[^}]*align-items:\s*fle
 assert.match(css, /#tt-body-page \.tt-comment-cont \.tt-area-write\s*\{[^}]*display:\s*grid\s*!important[^}]*grid-template-columns:\s*44px minmax\(0,\s*1fr\)/, "comment editor reset must prevent the avatar strip");
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
-assert.match(script, /house_duck_theme/, "theme choice must persist between visits");
+assert.doesNotMatch(script, /house_duck_theme/, "skin must not read or persist a removed theme choice");
+assert.match(script, /https:\/\/houseduck\.in\/tistory-skin\/style\.css/, "the live skin must receive the managed stylesheet without a manual admin upload");
+assert.match(script, /\[data-theme-toggle\][\s\S]*\.remove\(\)/, "the live skin must remove the retired control from older uploaded HTML");
 assert.match(script, /data-typewriter/, "Blog statement needs game-style text output");
 assert.match(script, /data-game-preview/, "Blog previews need reduced-motion playback control");
 assert.match(script, /HOUSE_DUCK_BLOG_LOCALES/, "skin must route readers through the generated locale manifest");

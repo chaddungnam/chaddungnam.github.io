@@ -117,6 +117,9 @@ try {
 
   const koreanPage = await readFile(path.join(outputRoot, "blog", "kr", "first-post", "index.html"), "utf8");
   assert.match(koreanPage, /<html lang="ko"/);
+  assert.match(koreanPage, /<html lang="ko" data-theme="light"/);
+  assert.match(koreanPage, /<meta name="theme-color" content="#f8f9fa">/);
+  assert.doesNotMatch(koreanPage, /data-theme-toggle/);
   assert.match(koreanPage, /rel="canonical" href="https:\/\/houseduck\.in\/blog\/kr\/first-post\/"/);
   assert.match(koreanPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
   assert.match(koreanPage, /공식 블로그/);
@@ -211,6 +214,8 @@ try {
     assert.match(indexPage, /class="mirror-footer site-footer"/);
     assert.match(indexPage, /Impressum/);
     assert.match(indexPage, /business@houseduck\.in/);
+    assert.match(indexPage, /data-theme="light"/);
+    assert.doesNotMatch(indexPage, /data-theme-toggle/);
     assert.doesNotMatch(indexPage, /site-fonts\.css/);
   }
 

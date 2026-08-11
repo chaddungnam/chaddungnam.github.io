@@ -5,10 +5,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const mirror = require("../assets/blog-mirror.js");
 
-assert.equal(mirror.resolveTheme("light"), "light");
-assert.equal(mirror.resolveTheme("dark"), "dark");
-assert.equal(mirror.resolveTheme("invalid"), "dark");
-
 let previewImage;
 const imageSlot = { tagName: "DIV", replaceWith(node) { previewImage = node; } };
 const card = { dataset: { ogImage: "https://example.com/preview.png" }, querySelector() { return imageSlot; } };
@@ -36,6 +32,8 @@ assert.equal(bodyImage.alt, "Prototype screen");
 const css = fs.readFileSync(path.join(__dirname, "..", "assets", "blog-mirror.css"), "utf8");
 const koreanIndex = fs.readFileSync(path.join(__dirname, "..", "blog", "kr", "index.html"), "utf8");
 assert.match(koreanIndex, /class="manifesto-hero mirror-manifesto"/);
+assert.match(koreanIndex, /<html lang="ko" data-theme="light"/);
+assert.doesNotMatch(koreanIndex, /data-theme-toggle/);
 assert.match(koreanIndex, /House Duck(?:'|&#39;)s Blog,/);
 assert.match(koreanIndex, /메인 페이지 보러가기/);
 assert.match(koreanIndex, /data-preview-type/);

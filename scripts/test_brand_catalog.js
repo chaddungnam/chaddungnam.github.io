@@ -11,6 +11,12 @@ const projectPages = [
   ["project-k/index_de.html", "de"],
   ["project-k/index_ja.html", "ja"]
 ];
+const aboutPages = [
+  ["about/index.html", "ko"],
+  ["about/index_en.html", "en"],
+  ["about/index_de.html", "de"],
+  ["about/index_ja.html", "ja"]
+];
 const marketingPages = [
   ["index.html", "ko"],
   ["index_en.html", "en"],
@@ -20,6 +26,7 @@ const marketingPages = [
   ["quirky-ball/index_en.html", "en"],
   ["quirky-ball/index_de.html", "de"],
   ["quirky-ball/index_ja.html", "ja"],
+  ...aboutPages,
   ...projectPages
 ];
 const quirkyPages = marketingPages.filter(([file]) => file.startsWith("quirky-ball/"));
@@ -71,6 +78,8 @@ for (const [file, locale] of projectPages) {
 for (const [file, locale] of marketingPages) {
   const html = read(file);
   assert.match(html, new RegExp(`data-locale="${locale}"`), `${file} locale`);
+  assert.match(html, /<html[^>]*data-theme="light"/, `${file} must paint in light mode before JavaScript`);
+  assert.doesNotMatch(html, /data-theme-toggle/, `${file} must not expose a dark-mode control`);
   assert.equal((html.match(/data-lang-link=/g) || []).length, 4, `${file} language options`);
   for (const language of ["ko", "en", "de", "ja"]) {
     assert.match(html, new RegExp(`hreflang="${language}"`), `${file} ${language} alternate`);
@@ -101,7 +110,6 @@ for (const [file] of quirkyPages) {
   assert.equal((html.match(/data-quirky-capture/g) || []).length, 4, `${file} current-build capture count`);
   assert.match(html, /class="hero-device"/, `${file} tilted hero device`);
   assert.match(html, /data-video-toggle/, `${file} hero loop pause control`);
-  assert.match(html, /data-theme-toggle/, `${file} shared theme control`);
   assert.doesNotMatch(publicText, /조커|Joker/i, `${file} retired mascot terminology`);
   assert.doesNotMatch(publicText, /첨부된|supplied|bereitgestellten|提供された/i, `${file} must read like public copy, not a work request`);
 }
@@ -120,7 +128,6 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
   assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
-  assert.match(html, /data-theme-toggle/, `${file} light and dark mode control`);
   assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
   assert.match(html, /class="post-preview-image/, `${file} post preview image`);
   assert.match(html, /class="manifesto-bubble/, `${file} approved statement bubble`);

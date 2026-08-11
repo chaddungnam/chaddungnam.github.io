@@ -24,8 +24,8 @@ reject_token() {
 
 test -s "$repo_dir/assets/legal-site.css" || fail "assets/legal-site.css does not exist"
 test -s "$repo_dir/assets/legal-site.js" || fail "assets/legal-site.js does not exist"
-require_token "assets/legal-site.css" 'html[data-theme="light"]'
-require_token "assets/legal-site.css" '.legal-theme-toggle'
+require_token "assets/legal-site.css" 'color-scheme: light'
+reject_token "assets/legal-site.css" 'html[data-theme="dark"]'
 require_token "assets/legal-site.css" '/assets/house-duck-logo.png'
 
 localized_pages=()

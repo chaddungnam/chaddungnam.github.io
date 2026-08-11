@@ -2,8 +2,8 @@
 <skin>
   <information>
     <name>House Duck Blog</name>
-    <version>1.2.0</version>
-    <description><![CDATA[House Duck의 공식 개발 블로그를 위한 다크 우선 반응형 스킨입니다.]]></description>
+    <version>1.3.0</version>
+    <description><![CDATA[House Duck의 공식 개발 블로그를 위한 라이트 전용 반응형 스킨입니다.]]></description>
     <license><![CDATA[House Duck private brand skin. Redistribution is not permitted.]]></license>
   </information>
   <author>
@@ -30,9 +30,9 @@
     <showListOnArchive>1</showListOnArchive>
     <showListLock>0</showListLock>
     <tree>
-      <color>aab6c8</color>
-      <bgColor>131f33</bgColor>
-      <activeColor>10264d</activeColor>
+      <color>62676e</color>
+      <bgColor>f8f5ec</bgColor>
+      <activeColor>17191d</activeColor>
       <activeBgColor>ffc341</activeBgColor>
       <labelLength>32</labelLength>
       <showValue>1</showValue>

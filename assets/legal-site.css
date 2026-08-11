@@ -1,37 +1,20 @@
 :root {
-  color-scheme: dark;
-  --legal-cream: #111315;
-  --legal-cream-deep: #17191c;
-  --legal-paper: #1b1d20;
-  --legal-navy: #f1f3f4;
-  --legal-navy-soft: #bdc1c6;
-  --legal-ink: #e8eaed;
-  --legal-muted: #9aa0a6;
-  --legal-coral: #8ab4f8;
-  --legal-coral-deep: #8ab4f8;
-  --legal-teal: #81c995;
-  --legal-gold: #fdd663;
-  --legal-line: rgba(255, 255, 255, 0.14);
-  --legal-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
-  --legal-gutter: clamp(18px, 4vw, 40px);
-  --legal-page: 1180px;
-}
-
-html[data-theme="light"] {
   color-scheme: light;
-  --legal-cream: #f8f9fa;
-  --legal-cream-deep: #f1f3f4;
+  --legal-cream: #f8f5ec;
+  --legal-cream-deep: #eef1f3;
   --legal-paper: #fff;
-  --legal-navy: #202124;
+  --legal-navy: #17191d;
   --legal-navy-soft: #3c4043;
   --legal-ink: #202124;
-  --legal-muted: #5f6368;
-  --legal-coral: #1a73e8;
-  --legal-coral-deep: #185abc;
-  --legal-teal: #188038;
-  --legal-gold: #fbbc04;
-  --legal-line: #dadce0;
-  --legal-shadow: 0 10px 28px rgba(60, 64, 67, 0.12);
+  --legal-muted: #62676e;
+  --legal-coral: #d93662;
+  --legal-coral-deep: #aa2348;
+  --legal-teal: #007e74;
+  --legal-gold: #d99300;
+  --legal-line: rgba(23, 25, 29, .16);
+  --legal-shadow: 7px 8px 0 rgba(0, 168, 150, .16), 0 14px 30px rgba(23, 25, 29, .08);
+  --legal-gutter: clamp(18px, 4vw, 40px);
+  --legal-page: 1180px;
 }
 
 * {
@@ -146,7 +129,6 @@ a:hover {
   background: url("/assets/house-duck-wordmark.png") center / contain no-repeat;
   font-size: 0;
 }
-html:not([data-theme="light"]) .legal-brand > span:last-child { filter: brightness(0) invert(1); }
 
 .legal-duck-mark {
   display: inline-block;
@@ -162,20 +144,6 @@ html:not([data-theme="light"]) .legal-brand > span:last-child { filter: brightne
 
 .legal-duck-mark::after {
   display: none;
-}
-
-.legal-theme-toggle {
-  display: grid;
-  width: 42px;
-  min-width: 42px;
-  height: 42px;
-  padding: 0;
-  place-items: center;
-  border: 1px solid var(--legal-line);
-  border-radius: 12px;
-  color: var(--legal-navy);
-  background: var(--legal-paper);
-  cursor: pointer;
 }
 
 .legal-header-links,

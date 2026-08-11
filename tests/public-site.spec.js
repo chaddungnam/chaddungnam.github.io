@@ -42,7 +42,8 @@ for (const route of routes) {
   });
 }
 
-test("theme, mobile menu, and keyboard state stay understandable", async ({ page, isMobile }) => {
+test("public pages stay light-only while mobile navigation remains accessible", async ({ page, isMobile }) => {
+  await page.addInitScript(() => window.localStorage.setItem("house_duck_theme", "dark"));
   await page.goto("/index_en.html?lang=en");
   let menu;
   if (isMobile) {
@@ -53,18 +54,9 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
     await expect(menu).toHaveAccessibleName("Close menu");
   }
 
-  const theme = page.locator("[data-theme-toggle]").first();
-  await expect(theme).toHaveAccessibleName(/light mode/i);
-  await expect(theme.locator(".theme-sun")).toBeVisible();
-  await expect(theme.locator(".theme-moon")).toBeHidden();
-  const themeBox = await theme.boundingBox();
-  expect(themeBox.height).toBe(44);
-  if (!isMobile) expect(themeBox.width).toBe(44);
-  await theme.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(theme).toHaveAccessibleName(/dark mode/i);
-  await expect(theme.locator(".theme-sun")).toBeHidden();
-  await expect(theme.locator(".theme-moon")).toBeVisible();
+  await expect(page.locator("[data-theme-toggle], [data-legal-theme-toggle]")).toHaveCount(0);
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#f8f9fa");
 
   if (isMobile) {
     await page.keyboard.press("Escape");
@@ -74,6 +66,24 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});
+
+test("every public surface ignores a stale dark preference", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("house_duck_theme", "dark"));
+  for (const route of [
+    "/?lang=ko",
+    "/about/?lang=ko",
+    "/quirky-ball/?lang=ko",
+    "/project-k/?lang=ko",
+    "/privacy/ko.html?stay=1",
+    "/terms/ko.html",
+    "/support/?lang=ko",
+    "/blog/kr/",
+  ]) {
+    await page.goto(route);
+    await expect(page.locator("html"), route).toHaveAttribute("data-theme", "light");
+    await expect(page.locator("[data-theme-toggle], [data-legal-theme-toggle]"), route).toHaveCount(0);
+  }
 });
 
 test("home hierarchy keeps the statement compact and the journal scannable", async ({ page, isMobile }) => {
@@ -201,11 +211,14 @@ test("foreign House Duck pages keep readers in their selected Blog language", as
 });
 
 test("Quirky Ball presents the current build as a responsive candy-neon showcase", async ({ page, isMobile }) => {
+  await page.addInitScript(() => window.localStorage.setItem("house_duck_theme", "dark"));
   await page.goto("/quirky-ball/?lang=ko");
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
   if (isMobile) await page.locator("[data-menu-button]").click();
-  await expect(page.locator("[data-theme-toggle]")).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("[data-theme-toggle]")).toHaveCount(0);
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#f8f9fa");
   await expect(page.locator(".marble-rain .falling-marble")).toHaveCount(12);
   await expect(page.locator(".hero-device video")).toHaveCount(1);
   await expect(page.locator("[data-quirky-capture]")).toHaveCount(4);
@@ -237,7 +250,6 @@ test("Quirky Ball presents the current build as a responsive candy-neon showcase
   expect(chrome.overflow).toBe("visible");
   expect(chrome.quirkyWidth).toBeLessThanOrEqual(116);
 
-  await page.locator("[data-theme-toggle]").click();
   const lightContrast = await page.evaluate(() => {
     const style = getComputedStyle(document.body);
     const parse = (value) => {
@@ -259,6 +271,10 @@ test("Quirky Ball presents the current build as a responsive candy-neon showcase
     expect(device.width).toBeGreaterThan(260);
     await expect.poll(() => page.locator(".shot").evaluateAll((nodes) => new Set(nodes.map((node) => getComputedStyle(node).transform)).size)).toBeGreaterThan(2);
   }
+
+  await page.goto("/?lang=ko");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("[data-theme-toggle]")).toHaveCount(0);
 });
 
 test("all Quirky Ball locales fit a narrow mobile viewport", async ({ page, isMobile }) => {

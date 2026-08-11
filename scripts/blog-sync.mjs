@@ -390,13 +390,13 @@ function renderPostPage(post, locale, content, availableLocales) {
   const koreanLabels = { en: "Korean", de: "Koreanisch", ja: "韓国語" };
   const localeLinks = availableLocales.map((key) => `<a href="/blog/${key}/${encodeURIComponent(post.slug)}/"${key === locale ? ' aria-current="page"' : ""}>${key === "kr" && locale !== "kr" ? koreanLabels[locale] : LOCALES[key].label}</a>`).join("");
   return `<!doctype html>
-<html lang="${copy.lang}" data-theme="dark">
+<html lang="${copy.lang}" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="${escapeHtml(content.summary)}">
   <meta name="robots" content="max-image-preview:large">
-  <meta name="theme-color" content="#111315">
+  <meta name="theme-color" content="#f8f9fa">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="House Duck">
   <meta property="og:title" content="${escapeHtml(content.title)}">
@@ -420,7 +420,7 @@ ${alternateLinks(post, availableLocales)}
 </head>
 <body>
   <a class="skip-link" href="#post-content">${copy.skip}</a>
-  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/${locale}/">Blog</a><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/${locale}/">Blog</a></nav></header>
   <main class="mirror-main" id="post-content">
     <a class="mirror-back" href="/blog/${locale}/">← ${copy.back}</a>
     <article>
@@ -462,7 +462,7 @@ function renderIndexPage(posts, locale, archivedCards = []) {
     publisher: { "@type": "Organization", name: "House Duck", url: `${SITE_ORIGIN}/` },
   }).replaceAll("<", "\\u003c");
   return `<!doctype html>
-<html lang="${copy.lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${escapeHtml(copy.description)}"><meta name="robots" content="max-image-preview:large"><meta name="theme-color" content="#111315"><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:title" content="House Duck Blog — ${copy.label}"><meta property="og:description" content="${escapeHtml(copy.description)}"><meta property="og:url" content="${SITE_ORIGIN}/blog/${locale}/"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss"><link rel="stylesheet" href="/assets/studio-home.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><script type="application/ld+json">${structuredData}</script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><button type="button" data-theme-toggle aria-label="${copy.theme}">☾</button></nav></header><main class="mirror-index" id="blog-content">${renderBlogHero(locale)}<nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main>${renderBlogFooter(locale)}</body></html>\n`;
+<html lang="${copy.lang}" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${escapeHtml(copy.description)}"><meta name="robots" content="max-image-preview:large"><meta name="theme-color" content="#f8f9fa"><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:title" content="House Duck Blog — ${copy.label}"><meta property="og:description" content="${escapeHtml(copy.description)}"><meta property="og:url" content="${SITE_ORIGIN}/blog/${locale}/"><link rel="canonical" href="${SITE_ORIGIN}/blog/${locale}/">${alternates}<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/blog/kr/"><link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss"><link rel="stylesheet" href="/assets/studio-home.css"><link rel="stylesheet" href="/assets/blog-mirror.css"><script defer src="/assets/blog-mirror.js"></script><script type="application/ld+json">${structuredData}</script><title>House Duck Blog — ${copy.label}</title></head><body><a class="skip-link" href="#blog-content">${copy.skip}</a><header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a></header><main class="mirror-index" id="blog-content">${renderBlogHero(locale)}<nav class="mirror-locales">${Object.entries(LOCALES).map(([key, value]) => `<a href="/blog/${key}/"${key === locale ? ' aria-current="page"' : ""}>${value.label}</a>`).join("")}</nav><section class="mirror-grid">${cards}</section></main>${renderBlogFooter(locale)}</body></html>\n`;
 }
 
 export function buildTranslationSource(posts) {
