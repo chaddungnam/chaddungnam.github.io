@@ -330,7 +330,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 .article-body table { display: block; width: 100%; margin: 2em 0; overflow-x: auto; border-collapse: collapse; }
 .article-body th, .article-body td { padding: 12px 14px; border: 1px solid var(--line); text-align: left; }
 .article-body figure, .article-body .imageblock, .article-body .imagegridblock { display: block !important; width: 100% !important; max-width: 100%; margin: 2.2em 0 !important; transform: none; }
-.article-body img:not(.og-image) { width: auto !important; max-width: min(100%, 400px) !important; height: auto !important; margin: 0 auto !important; border-radius: 14px; }
+#tt-body-page #main-content .article-body img:not(.og-image) { display: block !important; width: auto !important; max-width: min(100%, 400px) !important; height: auto !important; margin: 0 auto !important; border-radius: 14px; }
 .article-body figcaption, .article-body .cap1 { margin-top: 9px; color: var(--muted); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: .76rem; text-align: left; }
 .article-body iframe, .article-body video { max-width: 100%; border: 0; border-radius: 16px; }
 .article-body .video-wrap, .article-body [data-ke-type="video"] { max-width: 100%; overflow: hidden; border-radius: 16px; }
