@@ -1,3 +1,16 @@
+@font-face {
+  font-family: "House Duck Display";
+  src: url("/assets/fonts/DoHyeon-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "House Duck Sans";
+  src: url("/assets/fonts/Montserrat-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 html { color-scheme: light; }
 
 body[data-page="studio"] {
@@ -102,8 +115,10 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   z-index: -2;
   content: "";
   background:
-    radial-gradient(circle at 17% 64%, color-mix(in srgb, var(--studio-neon) 12%, transparent), transparent 25rem),
-    radial-gradient(circle at 82% 32%, color-mix(in srgb, var(--studio-cyan) 12%, transparent), transparent 28rem);
+    radial-gradient(circle at 15% 72%, color-mix(in srgb, var(--studio-neon) 22%, transparent), transparent 24rem),
+    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--studio-cyan) 24%, transparent), transparent 28rem),
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--studio-ink) 18%, transparent) 1.4px, transparent 1.5px);
+  background-size: auto, auto, 18px 18px;
   pointer-events: none;
 }
 
@@ -113,10 +128,10 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   display: block;
   min-height: 0;
   padding: clamp(86px, 6vw, 94px) clamp(30px, 3.6vw, 48px) clamp(28px, 2vw, 32px);
-  border: 2px solid var(--studio-ink);
+  border: 3px solid var(--studio-ink);
   border-radius: clamp(28px, 3vw, 40px) 8px clamp(28px, 3vw, 40px) 8px;
-  background: color-mix(in srgb, var(--studio-surface) 94%, transparent);
-  box-shadow: 7px 7px 0 color-mix(in srgb, var(--studio-neon) 20%, transparent), 0 28px 76px rgba(0, 0, 0, .22);
+  background: color-mix(in srgb, var(--studio-surface) 96%, transparent);
+  box-shadow: 9px 9px 0 var(--studio-cyan), 15px 15px 0 color-mix(in srgb, var(--studio-neon) 80%, transparent), 0 28px 70px rgba(23, 25, 29, .16);
   animation: studio-bubble-in 640ms cubic-bezier(.2,.8,.2,1) both, studio-bubble-breathe 5.8s 900ms ease-in-out infinite;
 }
 
@@ -125,17 +140,19 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   top: clamp(24px, 2.4vw, 34px);
   left: clamp(24px, 2.6vw, 36px);
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border-radius: 14px 14px 14px 5px;
-  color: var(--studio-bg);
-  background: var(--studio-ink);
-  font-size: .75rem;
+  border: 2px solid var(--studio-ink);
+  color: var(--studio-ink);
+  background: var(--studio-yellow);
+  font-family: "House Duck Sans", sans-serif;
+  font-size: .8rem;
   font-weight: 950;
   letter-spacing: -.08em;
   transform: rotate(-6deg);
-  box-shadow: 4px 4px 0 var(--studio-neon);
+  box-shadow: 5px 5px 0 var(--studio-ink);
   animation: studio-mark-pop 520ms cubic-bezier(.2,.8,.2,1) both;
 }
 
@@ -158,9 +175,11 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   flex: 1;
   margin: 0;
   color: var(--studio-ink);
-  font-size: clamp(1.45rem, 1.65vw, 1.82rem);
-  letter-spacing: -.055em;
-  line-height: 1.16;
+  font-family: "House Duck Display", "Noto Sans KR", sans-serif;
+  font-size: clamp(1.72rem, 2vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: 1.12;
 }
 
 .manifesto-dialogue { width: 100%; transform: translateY(-8px); }
@@ -170,6 +189,7 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   margin: 14px 0 0;
   color: var(--studio-copy);
   font-size: clamp(.8rem, .9vw, .92rem);
+  font-weight: 650;
   line-height: 1.65;
 }
 
@@ -182,26 +202,27 @@ body[data-page="studio"] .language-menu a[aria-current="page"] {
   border: 2px solid var(--studio-ink);
   border-radius: 9px;
   color: var(--studio-ink);
-  background: var(--studio-surface);
-  box-shadow: 4px 4px 0 var(--studio-neon);
-  font-size: .78rem;
+  background: var(--studio-yellow);
+  box-shadow: 5px 5px 0 var(--studio-ink);
+  font-family: "House Duck Sans", sans-serif;
+  font-size: .75rem;
   font-weight: 900;
   text-decoration: none;
   transition: box-shadow 160ms ease, transform 160ms ease;
 }
 .manifesto-action:hover,
-.manifesto-action:focus-visible { box-shadow: 2px 2px 0 var(--studio-neon); transform: translate(2px, 2px); }
+.manifesto-action:focus-visible { box-shadow: 2px 2px 0 var(--studio-ink); transform: translate(3px, 3px); }
 
 .quirky-sticker {
   position: absolute;
   top: clamp(24px, 2.4vw, 34px);
   left: clamp(84px, 7.5vw, 96px);
   z-index: 3;
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 58px;
   transform: rotate(-8deg);
 }
-.quirky-sticker img { width: 100%; height: 100%; filter: drop-shadow(5px 5px 0 color-mix(in srgb, var(--studio-neon) 75%, transparent)); }
+.quirky-sticker img { width: 100%; height: 100%; filter: drop-shadow(3px 3px 0 var(--studio-ink)) drop-shadow(7px 7px 0 color-mix(in srgb, var(--studio-neon) 75%, transparent)); }
 
 .manifesto-bubble [data-type-line] { display: block; min-height: 1.16em; white-space: normal; word-break: keep-all; }
 html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.72rem); }
@@ -211,6 +232,19 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
   min-height: 610px;
   perspective: 1100px;
 }
+.device-stage::before,
+.device-stage::after {
+  position: absolute;
+  z-index: 0;
+  width: clamp(140px, 16vw, 230px);
+  aspect-ratio: 1;
+  border: 3px solid var(--studio-ink);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+.device-stage::before { top: 12%; right: 2%; background: var(--studio-yellow); box-shadow: 11px 11px 0 var(--studio-neon); }
+.device-stage::after { bottom: 4%; left: 1%; background: var(--studio-cyan); box-shadow: -9px 9px 0 var(--studio-ink); transform: scale(.52); }
 .game-device {
   position: absolute;
   display: grid;
@@ -234,7 +268,7 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
   animation: studio-phone-in-k 760ms 280ms cubic-bezier(.2,.8,.2,1) both, studio-phone-float-k 5.8s 1.2s ease-in-out infinite;
 }
 .game-device-label { display: grid; gap: 2px; text-align: center; }
-.game-device-label strong { font-size: .8rem; letter-spacing: -.01em; }
+.game-device-label strong { justify-self: center; padding: 5px 10px; border: 2px solid var(--studio-ink); border-radius: 8px 3px 8px 3px; color: var(--studio-surface); background: var(--studio-ink); box-shadow: 3px 3px 0 var(--studio-yellow); font-family: "House Duck Sans", sans-serif; font-size: .72rem; letter-spacing: .03em; }
 .game-device-label small { color: var(--studio-muted); font-size: .62rem; }
 
 .iphone-shell {
@@ -246,7 +280,7 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
   border: 2px solid #484d52;
   border-radius: 36px;
   background: #050607;
-  box-shadow: 15px 24px 45px rgba(0, 0, 0, .36), inset 0 0 0 2px #181a1d;
+  box-shadow: 12px 16px 0 color-mix(in srgb, var(--studio-cyan) 70%, transparent), 18px 25px 45px rgba(0, 0, 0, .3), inset 0 0 0 2px #181a1d;
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -261,8 +295,8 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
 }
 
 @keyframes studio-bubble-breathe {
-  0%, 100% { box-shadow: 7px 7px 0 color-mix(in srgb, var(--studio-neon) 20%, transparent), 0 28px 76px rgba(0, 0, 0, .22); }
-  50% { box-shadow: 7px 7px 0 color-mix(in srgb, var(--studio-neon) 26%, transparent), 0 32px 84px rgba(0, 0, 0, .27); }
+  0%, 100% { box-shadow: 9px 9px 0 var(--studio-cyan), 15px 15px 0 color-mix(in srgb, var(--studio-neon) 80%, transparent), 0 28px 70px rgba(23, 25, 29, .16); }
+  50% { box-shadow: 12px 12px 0 var(--studio-cyan), 18px 18px 0 color-mix(in srgb, var(--studio-neon) 88%, transparent), 0 34px 84px rgba(23, 25, 29, .2); }
 }
 
 @keyframes studio-phone-in-quirky {
