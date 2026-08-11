@@ -113,7 +113,7 @@ button { color: inherit; font: inherit; }
   padding-block: 0 30px;
 }
 .mirror-manifesto .manifesto-bubble h1 { font-size: clamp(1.75rem, 2.05vw, 2.3rem); }
-.mirror-manifesto .quirky-sticker { width: 60px; height: 60px; }
+.mirror-manifesto .quirky-sticker { width: 50px; height: 50px; }
 .mirror-manifesto .device-stage { min-height: 500px; }
 .mirror-manifesto .iphone-shell { width: clamp(174px, 12.8vw, 196px); border: 4px solid var(--ink); box-shadow: 8px 9px 0 var(--cyan-pop), 15px 21px 38px rgba(23, 25, 29, .2); }
 .mirror-manifesto .game-device-k { right: 19%; }
@@ -166,7 +166,7 @@ button { color: inherit; font: inherit; }
   .mirror-grid { grid-template-columns: 1fr; }
   .mirror-manifesto { min-height: auto; }
   .mirror-manifesto .manifesto-bubble h1 { font-size: clamp(1.66rem, 7.3vw, 2.16rem); }
-  .mirror-manifesto .quirky-sticker { width: 52px; height: 52px; }
+  .mirror-manifesto .quirky-sticker { width: 46px; height: 46px; }
   .mirror-manifesto .device-stage { min-height: 430px; }
   .mirror-manifesto .iphone-shell { width: min(38vw, 156px); box-shadow: 6px 7px 0 var(--cyan-pop), 12px 18px 34px rgba(23, 25, 29, .2); }
   .mirror-manifesto .game-device-k .iphone-shell { box-shadow: 6px 7px 0 var(--pink-pop), 12px 18px 34px rgba(23, 25, 29, .2); }

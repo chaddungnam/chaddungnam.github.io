@@ -81,7 +81,7 @@ assert.match(html, /data-article-toc/, "articles need a generated table of conte
 for (const locale of ["en", "de", "ja"]) {
   assert.match(html, new RegExp(`data-blog-locale="${locale}"`), `article needs a ${locale} translation link`);
 }
-assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js\?v=1\.3\.1"/, "the managed skin should load a cache-busted House Duck behavior script");
+assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js\?v=1\.3\.2"/, "the managed skin should load a cache-busted House Duck behavior script");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/house-duck-wordmark\.png/, "skin must use the hosted Montserrat House Duck wordmark");
 assert.doesNotMatch(html, /<nav class="desktop-nav"[\s\S]*?class="category-menu"/, "desktop categories should not expand inside the top navigation");
@@ -122,7 +122,7 @@ assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*3\.2vw,\s*3rem\)/, "desktop article titles must stay bounded while using the editorial display scale");
 assert.match(css, /\.journal-hero\s*\{[^}]*--studio-bg:\s*var\(--cream\)/, "Blog hero must map the shared studio colors");
-assert.match(html, /href="https:\/\/houseduck\.in\/assets\/studio-home\.css\?v=1\.3\.1"/, "Blog speech bubble must reuse the cache-busted shared studio motion");
+assert.match(html, /href="https:\/\/houseduck\.in\/assets\/studio-home\.css\?v=1\.3\.2"/, "Blog speech bubble must reuse the cache-busted shared studio motion");
 assert.doesNotMatch(css, /\.journal-bubble\s*\{[^}]*animation:/, "Blog speech bubble must not override the shared motion");
 assert.doesNotMatch(css, /studio-bubble-float/, "Blog speech bubble text must not move with the shell");
 assert.match(css, /\.collection-head h2\s*\{[^}]*font-size:\s*clamp\(1\.7rem,\s*2\.6vw,\s*2\.4rem\)/, "Blog collection heading must keep a compact editorial scale");
@@ -149,7 +149,7 @@ assert.match(css, /#tt-body-page \.tt-comment-cont \.tt-area-write\s*\{[^}]*disp
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.doesNotMatch(script, /house_duck_theme/, "skin must not read or persist a removed theme choice");
-assert.match(script, /https:\/\/houseduck\.in\/tistory-skin\/style\.css\?v=1\.3\.1/, "the live skin must receive a cache-busted managed stylesheet without a manual admin upload");
+assert.match(script, /https:\/\/houseduck\.in\/tistory-skin\/style\.css\?v=1\.3\.2/, "the live skin must receive a cache-busted managed stylesheet without a manual admin upload");
 assert.match(script, /\[data-theme-toggle\][\s\S]*\.remove\(\)/, "the live skin must remove the retired control from older uploaded HTML");
 assert.match(script, /data-typewriter/, "Blog statement needs game-style text output");
 assert.match(script, /data-game-preview/, "Blog previews need reduced-motion playback control");
