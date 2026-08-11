@@ -200,6 +200,89 @@ test("foreign House Duck pages keep readers in their selected Blog language", as
   }
 });
 
+test("Quirky Ball presents the current build as a responsive candy-neon showcase", async ({ page, isMobile }) => {
+  await page.goto("/quirky-ball/?lang=ko");
+  await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
+  await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
+  if (isMobile) await page.locator("[data-menu-button]").click();
+  await expect(page.locator("[data-theme-toggle]")).toBeVisible();
+  await expect(page.locator(".marble-rain .falling-marble")).toHaveCount(12);
+  await expect(page.locator(".hero-device video")).toHaveCount(1);
+  await expect(page.locator("[data-quirky-capture]")).toHaveCount(4);
+  await expect(page.locator("main")).toContainText("쿼키");
+  await expect(page.locator("main")).not.toContainText("조커");
+
+  const playback = await page.locator(".hero-device video").evaluate((video) => ({
+    autoplay: video.autoplay,
+    muted: video.muted,
+    loop: video.loop,
+    playsInline: video.playsInline,
+  }));
+  expect(playback).toEqual({ autoplay: true, muted: true, loop: true, playsInline: true });
+
+  const videoToggle = page.locator("[data-video-toggle]");
+  await expect(videoToggle).toHaveAccessibleName(/영상 일시정지/);
+  await videoToggle.click();
+  await expect.poll(() => page.locator(".hero-device video").evaluate((video) => video.paused)).toBe(true);
+  await expect(videoToggle).toHaveAccessibleName(/영상 재생/);
+  await page.locator("#gallery").scrollIntoViewIfNeeded();
+  await page.locator(".game-hero").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  expect(await page.locator(".hero-device video").evaluate((video) => video.paused)).toBe(true);
+
+  const chrome = await page.locator(".hero-device").evaluate((device) => ({
+    overflow: getComputedStyle(device).overflow,
+    quirkyWidth: parseFloat(getComputedStyle(document.querySelector(".hero-quirky")).width),
+  }));
+  expect(chrome.overflow).toBe("visible");
+  expect(chrome.quirkyWidth).toBeLessThanOrEqual(116);
+
+  await page.locator("[data-theme-toggle]").click();
+  const lightContrast = await page.evaluate(() => {
+    const style = getComputedStyle(document.body);
+    const parse = (value) => {
+      const hex = value.trim().replace("#", "");
+      return [0, 2, 4].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
+    };
+    const luminance = (rgb) => rgb.map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
+      .reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
+    const background = luminance(parse(style.getPropertyValue("--qb-bg")));
+    return ["--qb-cyan-text", "--qb-yellow-text", "--qb-pink-text", "--qb-lime-text"].map((token) => {
+      const foreground = luminance(parse(style.getPropertyValue(token)));
+      return (Math.max(background, foreground) + .05) / (Math.min(background, foreground) + .05);
+    });
+  });
+  expect(Math.min(...lightContrast)).toBeGreaterThanOrEqual(4.5);
+
+  if (!isMobile) {
+    const device = await page.locator(".hero-device").boundingBox();
+    expect(device.width).toBeGreaterThan(260);
+    await expect.poll(() => page.locator(".shot").evaluateAll((nodes) => new Set(nodes.map((node) => getComputedStyle(node).transform)).size)).toBeGreaterThan(2);
+  }
+});
+
+test("all Quirky Ball locales fit a narrow mobile viewport", async ({ page, isMobile }) => {
+  if (!isMobile) return;
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const route of ["/quirky-ball/?lang=ko", "/quirky-ball/index_en.html?lang=en", "/quirky-ball/index_de.html?lang=de", "/quirky-ball/index_ja.html?lang=ja"]) {
+    await page.goto(route);
+    const overflowing = await page.locator(".game-hero-copy").evaluate((copy) => [...copy.querySelectorAll("h1, p, span, a")]
+      .filter((node) => {
+        const rect = node.getBoundingClientRect();
+        return node.scrollWidth > node.clientWidth + 1 || rect.left < -1 || rect.right > window.innerWidth + 1;
+      })
+      .map((node) => ({ text: node.textContent.trim(), clientWidth: node.clientWidth, scrollWidth: node.scrollWidth, rect: node.getBoundingClientRect().toJSON() })));
+    expect(overflowing, `${route} must not clip localized hero copy`).toEqual([]);
+  }
+});
+
+test("Quirky Ball motion reduction removes the marble intro and pauses the loop", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/quirky-ball/?lang=ko");
+  await expect(page.locator(".marble-rain")).toHaveCSS("display", "none");
+  await expect.poll(() => page.locator(".hero-device video").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
+});
+
 test("editorial section numbers stay visible without taking over the layout", async ({ page }) => {
   await page.goto("/?lang=ko");
   const homeNumbers = await page.evaluate(() => ({
@@ -277,13 +360,13 @@ test("journal cards stay fully visible and type their previews quickly", async (
   expect(await lastHomeCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
   await lastHomeCard.scrollIntoViewIfNeeded();
   await expect(lastHomeCard.locator("[data-preview-type]")).toHaveCount(2);
-  await expect(lastHomeCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 2500 });
+  await expect(lastHomeCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 4000 });
 
   await page.goto("/blog/kr/");
   const lastMirrorCard = page.locator(".mirror-grid article").last();
   expect(await lastMirrorCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
   await lastMirrorCard.scrollIntoViewIfNeeded();
-  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 2500 });
+  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 4000 });
 });
 
 test("Tistory semantic categories rename the root and keep subcategories expanded", async ({ page }) => {

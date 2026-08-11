@@ -326,7 +326,7 @@
       node.animate([
         { opacity: .35, filter: "blur(5px)", transform: "translateY(14px)" },
         { opacity: 1, filter: "blur(0)", transform: "translateY(0)" },
-      ], { duration: 460, delay: Number(node.dataset.revealDelay || 0), easing: "cubic-bezier(.2,.75,.2,1)", fill: "both" });
+      ], { duration: 460, delay: Number(node.dataset.revealDelay || 0), easing: "cubic-bezier(.2,.75,.2,1)", fill: "backwards" });
     }
 
     var historyRevealNodes = Array.from(document.querySelectorAll(".history-heading, .history-event"));
@@ -360,11 +360,38 @@
             video.pause();
             return;
           }
+          if (video.dataset.userPaused === "true") return;
           var playback = video.play();
           if (playback && typeof playback.catch === "function") playback.catch(function () {});
         });
       }, { threshold: .2 });
       previews.forEach(function (video) { previewObserver.observe(video); });
     }
+
+    document.querySelectorAll("[data-video-toggle]").forEach(function (button) {
+      var device = button.closest(".hero-device");
+      var video = device && device.querySelector("video");
+      if (!video) return;
+
+      function syncVideoButton() {
+        button.dataset.paused = String(video.paused);
+        button.setAttribute("aria-label", video.paused ? button.dataset.playLabel : button.dataset.pauseLabel);
+      }
+
+      button.addEventListener("click", function () {
+        if (video.paused) {
+          video.dataset.userPaused = "false";
+          var playback = video.play();
+          if (playback && typeof playback.catch === "function") playback.catch(syncVideoButton);
+        } else {
+          video.dataset.userPaused = "true";
+          video.pause();
+        }
+        syncVideoButton();
+      });
+      video.addEventListener("play", syncVideoButton);
+      video.addEventListener("pause", syncVideoButton);
+      syncVideoButton();
+    });
   });
 }());

@@ -22,6 +22,7 @@ const marketingPages = [
   ["quirky-ball/index_ja.html", "ja"],
   ...projectPages
 ];
+const quirkyPages = marketingPages.filter(([file]) => file.startsWith("quirky-ball/"));
 const legacyStoryPages = [
   ["story/index.html", "ko"],
   ["story/index_en.html", "en"],
@@ -88,6 +89,21 @@ for (const [file, locale] of marketingPages) {
     assert.ok(width > 0 && height > 0, `${file}: ${source} needs declared dimensions`);
     assert.ok(Math.abs(width / height - natural.width / natural.height) < 0.001, `${file}: ${source} declared ratio`);
   }
+}
+
+for (const [file] of quirkyPages) {
+  const html = read(file);
+  const publicText = html.replace(/<[^>]*>/g, " ");
+  assert.match(html, /assets\/quirky-ball-site\.css/, `${file} product stylesheet`);
+  assert.match(html, /assets\/media\/quirky-ball-showcase\.mp4/, `${file} current-build hero loop`);
+  assert.match(html, /class="marble-rain"/, `${file} marble-drop intro`);
+  assert.equal((html.match(/class="falling-marble"/g) || []).length, 12, `${file} restrained marble intro count`);
+  assert.equal((html.match(/data-quirky-capture/g) || []).length, 4, `${file} current-build capture count`);
+  assert.match(html, /class="hero-device"/, `${file} tilted hero device`);
+  assert.match(html, /data-video-toggle/, `${file} hero loop pause control`);
+  assert.match(html, /data-theme-toggle/, `${file} shared theme control`);
+  assert.doesNotMatch(publicText, /조커|Joker/i, `${file} retired mascot terminology`);
+  assert.doesNotMatch(publicText, /첨부된|supplied|bereitgestellten|提供された/i, `${file} must read like public copy, not a work request`);
 }
 
 for (const [file, locale] of marketingPages) {

@@ -12,6 +12,7 @@ const fonts = fs.readFileSync(path.join(root, "assets", "site-fonts.css"), "utf8
 const brand = fs.readFileSync(path.join(root, "assets", "brand-site.css"), "utf8");
 const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8");
 const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css"), "utf8");
+const quirky = fs.readFileSync(path.join(root, "assets", "quirky-ball-site.css"), "utf8");
 
 assert.match(studio, /--studio-bg:\s*#111315/);
 assert.match(studio, /--studio-surface:\s*#1b1d20/);
@@ -71,6 +72,12 @@ assert.match(projectK, /\.project-k-hero\s*\{[^}]*min-height:\s*auto[^}]*padding
 assert.match(projectK, /\.project-k-title\s*\{[^}]*font-size:\s*clamp\(2\.65rem,\s*4vw,\s*3\.45rem\)[^}]*word-break:\s*keep-all/s);
 assert.match(projectK, /\.project-k-section\s*\{[^}]*padding-block:\s*clamp\(52px,\s*7vw,\s*88px\)/s);
 assert.match(projectK, /\.project-k-loop-card\s*\{[^}]*min-height:\s*220px/s);
+assert.match(quirky, /--qb-bg:\s*#101114/);
+assert.match(quirky, /html\[data-theme="light"\][\s\S]*--qb-bg:\s*#f8f9fa/);
+assert.match(quirky, /\.hero-device\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
+assert.match(quirky, /\.marble-rain\s*\{[^}]*pointer-events:\s*none/s);
+assert.match(quirky, /\.shot:nth-child\(2\)[\s\S]*rotateY/s);
+assert.match(quirky, /@media \(prefers-reduced-motion:\s*reduce\)[\s\S]*\.marble-rain[\s\S]*display:\s*none/s);
 for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /class="manifesto-bubble/);

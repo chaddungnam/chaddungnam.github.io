@@ -139,9 +139,11 @@ for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_d
   require_token "$page" 'data-section="game-loop"'
   require_token "$page" 'data-section="game-features"'
   require_token "$page" 'data-section="gallery"'
-  require_token "$page" "store/feature-graphic.png"
-  require_token "$page" "store/01-core.png"
-  require_token "$page" "store/08-ranking.png"
+  require_token "$page" "assets/quirky-ball-site.css"
+  require_token "$page" "assets/media/quirky-ball-showcase.mp4"
+  require_token "$page" 'class="marble-rain"'
+  require_token "$page" "latest/01-core.png"
+  require_token "$page" "latest/04-roulette.png"
 done
 
 if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
