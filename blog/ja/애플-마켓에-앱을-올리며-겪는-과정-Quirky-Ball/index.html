@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Apple に アプリ を 公開 する の は ゲーム の ビルド を 準備 する だけ で 終わり で は なかった 。 Quirky Ball の iOS リリース 準備 を 進める 中 で 、 App Store Connect に 登録 さ れ て いる 住所 が 引っ越し 前 の ドイツ の 住所 の まま に なっ て いる こと に 気付い た 。 住所 を ひと 行 変える だけ で 済む と 思っ て い た 。 しかし Apple で は この 住所 が 契約 と 紐づい て いる ため 、 プロフィール から ">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#111315">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Quirky Ball の アプリ を ストア に 公開 する まで の 過程">
+  <meta property="og:description" content="Apple に アプリ を 公開 する の は ゲーム の ビルド を 準備 する だけ で 終わり で は なかった 。 Quirky Ball の iOS リリース 準備 を 進める 中 で 、 App Store Connect に 登録 さ れ て いる 住所 が 引っ越し 前 の ドイツ の 住所 の まま に なっ て いる こと に 気付い た 。 住所 を ひと 行 変える だけ で 済む と 思っ て い た 。 しかし Apple で は この 住所 が 契約 と 紐づい て いる ため 、 プロフィール から ">
+  <meta property="og:url" content="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="article:published_time" content="2026-08-11T12:22:37.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quirky Ball の アプリ を ストア に 公開 する まで の 過程">
+  <meta name="twitter:description" content="Apple に アプリ を 公開 する の は ゲーム の ビルド を 準備 する だけ で 終わり で は なかった 。 Quirky Ball の iOS リリース 準備 を 進める 中 で 、 App Store Connect に 登録 さ れ て いる 住所 が 引っ越し 前 の ドイツ の 住所 の まま に なっ て いる こと に 気付い た 。 住所 を ひと 行 変える だけ で 済む と 思っ て い た 。 しかし Apple で は この 住所 が 契約 と 紐づい て いる ため 、 プロフィール から ">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg">
+  <link rel="canonical" href="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Quirky Ball の アプリ を ストア に 公開 する まで の 過程","description":"Apple に アプリ を 公開 する の は ゲーム の ビルド を 準備 する だけ で 終わり で は なかった 。 Quirky Ball の iOS リリース 準備 を 進める 中 で 、 App Store Connect に 登録 さ れ て いる 住所 が 引っ越し 前 の ドイツ の 住所 の まま に なっ て いる こと に 気付い た 。 住所 を ひと 行 変える だけ で 済む と 思っ て い た 。 しかし Apple で は この 住所 が 契約 と 紐づい て いる ため 、 プロフィール から ","datePublished":"2026-08-11T12:22:37.000Z","inLanguage":"ja","mainEntityOfPage":"https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/","url":"https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/","image":"https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Quirky Ball の アプリ を ストア に 公開 する まで の 過程 — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">本文へ移動</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/ja/">Blog</a><button type="button" data-theme-toggle aria-label="カラーテーマを切り替える">☾</button></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/ja/">← すべての記事</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Quirky Ball の アプリ を ストア に 公開 する まで の 過程</h1><time datetime="2026-08-11T12:22:37.000Z">2026年8月11日</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">韓国語</a><a href="/blog/en/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">English</a><a href="/blog/de/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">Deutsch</a><a href="/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/" aria-current="page">日本語</a></nav>
+      <aside class="mirror-note"><strong>自動翻訳</strong><span>このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。 <a href="https://blog.houseduck.in/entry/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball?original=1">韓国語の原文を読む</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">Apple に アプリ を 登録 する 過程 は</p>
+<p data-ke-size="size16">ゲーム の ビルド さえ 準備 すれ ば 終わる と いう もの で は なかった 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky Ball の iOS リリース 準備 を 始め た とき に</p>
+<p data-ke-size="size16">App Store Connect に 登録 さ れ て いる 住所 が</p>
+<p data-ke-size="size16">引っ越し 前 の ドイツ の 住所 の まま に なっ て いる こと を 発見 し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">住所 を ひと 行 書き換える だけ で よい と 思って いた 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし Apple で は この 住所 が 契約 に 関連づけ られ て いる ため 、</p>
+<p data-ke-size="size16">プロフィール から 直接 修正 する 方法 で は なかった 。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" data-alt="Apple Developer アカウント で 住所 変更 を 開始 し た 画面"><img src="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" loading="lazy" width="1027" height="797" alt="" /></span><figcaption>Apple Developer アカウント で 住所 変更 を 開始 し た 画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>App Store Connect の 住所 が 古い 住所 に なっ て いた 。</b></h2>
+<p data-ke-size="size16">まず Apple Developer アカウント に ログイン し</p>
+<p data-ke-size="size16">メンバーシップ の 詳細 を 確認 し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プログラム は 正常に 登録 さ れ て いた ものの</p>
+<p data-ke-size="size16">住所 だけ 引っ越し 前 の 情報 が 残って いた 。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" data-alt="メンバーシップ 詳細 に 残って いた 引っ越し 前 の 住所"><img src="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" loading="lazy" width="1025" height="778" alt="" /></span><figcaption>メンバーシップ 詳細 に 残って いた 引っ越し 前 の 住所</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">画面 下部 の 「 情報 を 更新 し て ください 」 を 押し</p>
+<p data-ke-size="size16">Apple Developer Support に 住所 変更 を 申請 し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Apple の 公式 案内 に も</p>
+<p data-ke-size="size16">Developer Program に 関連づけ られ た 氏名 や 住所 を 変更 する に は</p>
+<p data-ke-size="size16">変更 依頼 を 提出 し 、 証明 書類 で 確認 を 受ける 必要 が ある と 記載 さ れ て いる 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://developer.apple.com/help/account/membership/updating-your-account-information">Apple Developer アカウント 情報 変更 の 公式 案内</a></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">つまり 、 住所 入力 欄 を 修正 し て 保存 する の で は なく</p>
+<p data-ke-size="size16">Apple が 新しい 住所 を 確認 し た 後 に 反映 する 手続き で あった 。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>3 から 4 営業日 後 に 証明 書類 の 依頼 が 来 た 。</b></h2>
+<p data-ke-size="size16">住所 変更 依頼 を 送信 し た 後</p>
+<p data-ke-size="size16">私 の 場合 は 営業日 基準 で およそ 3 から 4 日 後 に 返信 が 来 た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">この 期間 は あくまで 私 の 実体験 で あり 、</p>
+<p data-ke-size="size16">すべて の 申請 が 同じ 時間 内 に 処理 さ れる と いう 意味 で は ない 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">メール で は 新しい 住所 が 記載 さ れ た 書類 の 中 から</p>
+<p data-ke-size="size16">いずれ か を アップロード する よう 求め られ た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">例えば 、 有効な 政府 発行 の 身分 証明 書 、</p>
+<p data-ke-size="size16">郵便 物 の 住所 変更 申請 書 、</p>
+<p data-ke-size="size16">居住地 官公庁 の 住所 確認 文書 、</p>
+<p data-ke-size="size16">直近 の 公共 料金 請求 書 、 銀行 明細 書 、 官公庁 の 書類 など の 資料 だ 。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" data-alt="住所 確認 書類 と アップロード リンク が 含ま れ た Apple Developer Support の メール"><img src="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" loading="lazy" width="649" height="481" alt="" /></span><figcaption>住所 確認 書類 と アップロード リンク が 含ま れ た Apple Developer Support の メール</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私 は 現在 の 住所 が 記載 さ れ た ドイツ の 滞在 許可 証 の 表裏面 を</p>
+<p data-ke-size="size16">ひと つ の ファイル に まとめて 提出 する こと に し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ここ まで は 面倒くさい と 思え ば 理解 でき なく も なかった 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">問題 は ファイル を アップロード する よう 送ら れ て き た リンク だっ た 。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>メール の 自動 リンク が 正常に 開か なかっ た の だ 。</b></h2>
+<p data-ke-size="size16">メール に 記載 さ れ て いる リンク を 押す と</p>
+<p data-ke-size="size16">ファイル アップロード 画面 の 代わり に</p>
+<p data-ke-size="size16">「 該当 アカウント に は ファイル アップロード 権限 が あり ませ ん 」 と いう 画面 が 表示 さ れ た 。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" data-alt="誤って 開い た リンク で 表示 さ れ た ファイル アップロード 権限 なし の 画面"><img src="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" loading="lazy" width="1041" height="455" alt="" /></span><figcaption>誤って 開い た リンク で 表示 さ れ た ファイル アップロード 権限 なし の 画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">結局 、 メール に 記載 さ れ て いる インターネット アドレス を 再度 確認 し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">メール の 文章 の 末尾 に 付い た 句点 が アドレス に 混ざって いたり 、</p>
+<p data-ke-size="size16">アカウント を 識別 する ?teamId= の 後ろ の 値 が</p>
+<p data-ke-size="size16">自動 リンク に 最後 まで 含ま れ て いない 状態 だっ た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">開発 知識 の ない 方 の ため に 分かり やすく 説明 する と 、</p>
+<p data-ke-size="size16">Apple が 送って くれ た 長い インターネット アドレス が 途中 で 誤って 途切れて いた の だ 。</p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>私 の 場合 は この よう に し て 解決 し た 。</b></h2>
+<p data-ke-size="size16">メール の アドレス を 最初 から 最後 まで 直接 コピー し た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そして アドレス の 最も 末尾 に 句読点 の よう に 付い た <b>「 句点 」 を 除外 し</b>て 、</p>
+<p data-ke-size="size16">?teamId= の 後ろ の 識別 値 は 最後 の 文字 まで 含め て</p>
+<p data-ke-size="size16">ブラウザ の アドレス バー に 貼り付け た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そうして 初めて 同じ Apple アカウント で</p>
+<p data-ke-size="size16">正常な ファイル アップロード 画面 に 入る こと が でき た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">この 記事 の スクリーンショット でも 氏名 、 住所 、 アカウント 識別 値 は すべて 隠し て ある 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" data-alt="住所 証明 書類 が 正常に 受理 さ れ て 処理 中 の 画面"><img src="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" loading="lazy" width="1031" height="390" alt="" /></span><figcaption>住所 証明 書類 が 正常に 受理 さ れ て 処理 中 の 画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>アップロード 成功 と 住所 変更 完了 は 同じ 意味 で は ない 。</b></h2>
+<p data-ke-size="size16">書類 を アップロード し た 後</p>
+<p data-ke-size="size16">「 書類 を 処理 中 です 」 と いう 画面 が 表示 さ れ た 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ここ で 確認 でき た の は あくまで 書類 が 正常に 受理 さ れ た と いう 点 まで だ 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">住所 変更 が 最終 承認 さ れ</p>
+<p data-ke-size="size16">App Store Connect に 新しい 住所 が 反映 さ れ た か どうか は</p>
+<p data-ke-size="size16">再度 確認 する 必要 が ある 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky Ball を Apple の ストア に 登録 する 過程 で</p>
+<p data-ke-size="size16">この よう な 管理 業務 が 次々 と 発生 し て いる 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">コード を 知ら なく て も</p>
+<p data-ke-size="size16">アプリ の 準備 は できる が 、</p>
+<p data-ke-size="size16">リンク が どこ まで か を 見分ける ささやかな 知識 が</p>
+<p data-ke-size="size16">時間 を 節約 し て くれる こと も ある 。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私 の よう に Apple Developer の 住所 変更 リンク で</p>
+<p data-ke-size="size16">突然アップロード権限がないと表示される方は、</p>
+<p data-ke-size="size16">アカウントを何度も切り替える前に、URLの末尾のピリオドと</p>
+<p data-ke-size="size16">?teamId= の後ろの値がすべて含まれているかまず確認してほしい。</p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ja.html">利用規約</a><a href="/privacy/ja.html">プライバシー</a><a href="/impressum/ja.html">Impressum</a><a href="/support/#english">サポート</a><a href="mailto:business@houseduck.in">ビジネスのお問い合わせ · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>
