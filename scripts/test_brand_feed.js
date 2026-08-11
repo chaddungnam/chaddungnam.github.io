@@ -38,6 +38,7 @@ const homeCards = buildPostCards(Array.from({ length: 7 }, (_value, index) => ({
 })), "ko");
 assert.equal((homeCards.match(/<article /g) || []).length, 6, "home should show six latest posts");
 assert.equal((homeCards.match(/post-preview-card-wide/g) || []).length, 3, "the last three posts should use horizontal rows");
+assert.equal((homeCards.match(/post-preview-media/g) || []).length, 6, "every journal card should own a bounded media frame");
 
 const safeCards = buildPostCards([{
   title: '<img src=x onerror="alert(1)">',

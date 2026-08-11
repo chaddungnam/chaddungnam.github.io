@@ -165,6 +165,44 @@ test("blog index repeats the speech bubble and game previews", async ({ page }) 
   await expect(page.locator(".mirror-manifesto [data-game-preview]")).toHaveCount(2);
 });
 
+test("editorial section numbers stay visible without taking over the layout", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const homeNumbers = await page.evaluate(() => ({
+    games: getComputedStyle(document.querySelector(".device-stage"), "::before").content,
+    blog: getComputedStyle(document.querySelector(".journal-section"), "::before").content,
+  }));
+  expect(homeNumbers).toEqual({ games: '"02 GAMES"', blog: '"01"' });
+
+  await page.goto("/blog/kr/");
+  const blogNumber = await page.locator(".mirror-grid").evaluate((node) => getComputedStyle(node, "::before").content);
+  expect(blogNumber).toBe('"01 BLOG"');
+});
+
+test("the last three home journal rows show complete artwork in square frames", async ({ page, isMobile }) => {
+  await page.goto("/?lang=ko");
+  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
+  const media = page.locator(".post-preview-card-wide .post-preview-media");
+  await expect(media).toHaveCount(3);
+  const frames = await media.evaluateAll((nodes) => nodes.map((node) => {
+    const box = node.getBoundingClientRect();
+    const image = node.querySelector(".post-preview-image");
+    return { width: box.width, height: box.height, objectFit: getComputedStyle(image).objectFit };
+  }));
+  for (const frame of frames) {
+    expect(frame.objectFit).toBe("contain");
+    if (!isMobile) expect(Math.abs(frame.width - frame.height)).toBeLessThan(2);
+  }
+});
+
+test("the static Blog footer matches House Duck and exposes legal contact routes", async ({ page }) => {
+  await page.goto("/blog/kr/");
+  const footer = page.locator(".mirror-footer");
+  await expect(footer.locator(".footer-brand-images")).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Impressum" })).toHaveAttribute("href", "/impressum/ko.html");
+  await expect(footer.getByRole("link", { name: /business@houseduck\.in/ })).toHaveAttribute("href", "mailto:business@houseduck.in");
+  await expect(footer).not.toHaveCSS("background-color", "rgb(9, 17, 31)");
+});
+
 test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => {
   test.skip(isMobile, "mouse hover is covered by the desktop project");
 

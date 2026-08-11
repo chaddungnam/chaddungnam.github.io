@@ -81,7 +81,13 @@ for (const locale of ["en", "de", "ja"]) {
 assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js"/, "the managed skin should load the deployed House Duck behavior script");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/house-duck-wordmark\.png/, "skin must use the hosted Montserrat House Duck wordmark");
-assert.match(html, /<details class="category-menu"[\s\S]*?\[##_category_##\][\s\S]*?<\/details>/, "desktop navigation needs Tistory categories");
+assert.doesNotMatch(html, /<nav class="desktop-nav"[\s\S]*?class="category-menu"/, "desktop categories should not expand inside the top navigation");
+assert.match(html, /<aside class="category-dock"[\s\S]*?\[##_category_##\][\s\S]*?<\/aside>/, "desktop categories need a floating side dock");
+assert.equal((html.match(/\[##_category_##\]/g) || []).length, 2, "desktop dock and mobile menu each need the Tistory category tree");
+assert.match(html, /<p class="eyebrow">01 · BLOG<\/p>/, "Blog index needs the shared editorial section number");
+assert.match(html, /class="footer-brand-images"/, "Blog footer should reuse the House Duck footer lockup");
+assert.match(html, /href="https:\/\/houseduck\.in\/impressum\/ko\.html"[^>]*>Impressum<\/a>/, "Blog footer needs an Impressum link");
+assert.match(html, /href="mailto:business@houseduck\.in"/, "Blog footer needs the business inquiry address");
 assert.equal((html.match(/class="article-breadcrumb"/g) || []).length, 2, "post and notice pages need one compact breadcrumb each");
 assert.doesNotMatch(html, /class="post-discovery|<s_list_rep>|<small>JOURNAL<\/small>/, "list pages must not duplicate discovery, article cards, or offset the header wordmark");
 assert.match(css, /\.article-breadcrumb\s*\{[^}]*display:\s*flex[^}]*font-size:\s*\.72rem/, "post breadcrumbs must stay compact and visible");
@@ -94,6 +100,9 @@ assert.match(css, /color-scheme:\s*light dark/, "skin must declare both color sc
 assert.match(css, /html\[data-theme="dark"\]/, "skin needs an explicit dark theme");
 assert.match(css, /--line:\s*rgba\(255,\s*255,\s*255,\s*\.08\)/, "dark dividers should stay subtle");
 assert.match(css, /\.article-toc\s*\{/, "article table of contents needs compact styling");
+assert.match(css, /\.article-toc \.toc-children\s*\{/, "article subheadings need a nested list style");
+assert.match(css, /\.category-dock\s*\{[^}]*position:\s*fixed/s, "desktop categories need to float beside the page");
+assert.doesNotMatch(css, /#09111f/i, "Blog footer must not keep the old navy background");
 assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{/, "native top and bottom ads need bounded article spacing");
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");

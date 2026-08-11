@@ -41,20 +41,31 @@ test("hidden translation controls stay out of layout", () => {
   assert.equal(declarations(".translation-locales[hidden], .translation-locales a[hidden]").display, "none");
 });
 
-test("article headings build a compact table of contents", () => {
+test("article headings build a nested table of contents", () => {
   const headings = [
     { id: "", tagName: "H2", textContent: "첫 번째 결정" },
-    { id: "", tagName: "H3", textContent: "검증 과정" },
+    { id: "", tagName: "H3", textContent: "- 검증 과정" },
+    { id: "", tagName: "H3", textContent: "– 배포 확인" },
+    { id: "", tagName: "H2", textContent: "두 번째 결정" },
+    { id: "", tagName: "H3", textContent: "회귀 테스트" },
   ];
-  const items = [];
-  const list = { append(item) { items.push(item); } };
+  function makeNode(tagName) {
+    return {
+      tagName: tagName.toUpperCase(),
+      className: "",
+      attributes: {},
+      children: [],
+      append(...children) { this.children.push(...children); },
+      setAttribute(name, value) { this.attributes[name] = value; },
+      removeAttribute(name) { delete this.attributes[name]; },
+    };
+  }
+  const list = makeNode("ol");
   const toc = { hidden: true, querySelector() { return list; } };
   const document = {
     documentElement: { dataset: {} },
     body: { id: "tt-body-page" },
-    createElement(tagName) {
-      return { tagName: tagName.toUpperCase(), children: [], append(child) { this.children.push(child); } };
-    },
+    createElement: makeNode,
     querySelector(selector) {
       if (selector === "[data-article-toc]") return toc;
       return null;
@@ -66,21 +77,60 @@ test("article headings build a compact table of contents", () => {
     addEventListener() {},
   };
 
+  let observerCallback;
+  const observedHeadings = [];
+  class IntersectionObserver {
+    constructor(callback) { observerCallback = callback; }
+    observe(heading) { observedHeadings.push(heading); }
+  }
+
   vm.runInNewContext(script, {
     URLSearchParams,
     document,
     localStorage: { getItem: () => "", setItem() {} },
     location: { hostname: "localhost", pathname: "/entry/test", replace() {}, search: "" },
     navigator: { language: "ko", languages: ["ko"], userAgent: "" },
-    window: {},
+    window: { IntersectionObserver },
   });
 
   assert.equal(toc.hidden, false);
-  assert.deepEqual(headings.map(({ id }) => id), ["article-section-1", "article-section-2"]);
-  assert.deepEqual(items.map((item) => ({ className: item.className || "", text: item.children[0].textContent, href: item.children[0].href })), [
-    { className: "", text: "첫 번째 결정", href: "#article-section-1" },
-    { className: "toc-subitem", text: "검증 과정", href: "#article-section-2" },
+  assert.deepEqual(headings.map(({ id }) => id), [
+    "article-section-1",
+    "article-section-2",
+    "article-section-3",
+    "article-section-4",
+    "article-section-5",
   ]);
+  assert.deepEqual(list.children.map((item) => ({
+    text: item.children[0].textContent,
+    href: item.children[0].href,
+    children: (item.children[1]?.children || []).map((child) => ({
+      text: child.children[0].textContent,
+      href: child.children[0].href,
+    })),
+  })), [
+    {
+      text: "첫 번째 결정",
+      href: "#article-section-1",
+      children: [
+        { text: "검증 과정", href: "#article-section-2" },
+        { text: "배포 확인", href: "#article-section-3" },
+      ],
+    },
+    {
+      text: "두 번째 결정",
+      href: "#article-section-4",
+      children: [
+        { text: "회귀 테스트", href: "#article-section-5" },
+      ],
+    },
+  ]);
+  assert.deepEqual(observedHeadings, headings);
+  observerCallback([{ target: headings[1], isIntersecting: true }]);
+  const allLinks = list.children.flatMap((item) => [item.children[0], ...(item.children[1]?.children || []).map((child) => child.children[0])]);
+  assert.deepEqual(allLinks.map((link) => link.attributes["aria-current"] || ""), ["", "location", "", "", ""]);
+  observerCallback([{ target: headings[3], isIntersecting: true }]);
+  assert.deepEqual(allLinks.map((link) => link.attributes["aria-current"] || ""), ["", "", "", "location", ""]);
 });
 
 test("article media stays readable under Tistory's display-table rule", () => {
@@ -191,7 +241,10 @@ test("empty image alt text is recovered from Tistory metadata", () => {
   const image = {
     alt: "",
     dataset: {},
-    getAttribute(name) { return name === "alt" ? this.alt : null; },
+    style: {},
+    getAttribute(name) {
+      return { alt: this.alt, width: "420", height: "934" }[name] ?? null;
+    },
     setAttribute(name, value) { if (name === "alt") this.alt = value; },
     closest() {
       return {
@@ -221,6 +274,8 @@ test("empty image alt text is recovered from Tistory metadata", () => {
   });
 
   assert.equal(image.alt, "차기작 프로토타입");
+  assert.equal(image.style.width, "min(100%, 420px)");
+  assert.equal(image.style.aspectRatio, "420 / 934");
 });
 
 test("the script leaves Tistory's native empty state as the only fallback", () => {
@@ -258,8 +313,8 @@ test("the script leaves Tistory's native empty state as the only fallback", () =
 
 test("tag and RSS navigation stay on the active custom domain", () => {
   assert.doesNotMatch(html, /\[##_taglog_link_##\]|\[##_rss_url_##\]/);
-  assert.equal((html.match(/href="\/tag"/g) || []).length, 3);
-  assert.equal((html.match(/href="\/rss"/g) || []).length, 2);
+  assert.equal((html.match(/href="\/tag"/g) || []).length, 2);
+  assert.equal((html.match(/href="\/rss"/g) || []).length, 1);
 });
 
 test("a singleton post card spans the grid and remains centered", () => {
@@ -278,7 +333,7 @@ test("pagination disappears when neither direction has another page", () => {
 
 test("safe interactive skin controls keep a 44px minimum target", () => {
   const selectors = [
-    ".category-menu-panel a",
+    ".category-dock-panel a",
     ".search-box",
     ".search-box button",
     ".category-tree a",

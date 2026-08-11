@@ -121,6 +121,9 @@ try {
   assert.match(koreanPage, /아이디어를 실제 제품으로 만든 첫 기록입니다/);
   assert.match(koreanPage, /공식 블로그/);
   assert.match(koreanPage, /House Duck Blog에서 읽기/);
+  assert.match(koreanPage, /class="mirror-footer site-footer"/);
+  assert.match(koreanPage, /href="\/impressum\/ko\.html">Impressum<\/a>/);
+  assert.match(koreanPage, /href="mailto:business@houseduck\.in"/);
   assert.match(koreanPage, /https:\/\/blog\.houseduck\.in\/entry\/first-post\?original=1/);
   assert.doesNotMatch(koreanPage, /<script>alert|onerror=/i);
 
@@ -205,6 +208,9 @@ try {
     assert.match(indexPage, /"@type":"Blog"/);
     assert.match(indexPage, /type="application\/rss\+xml" title="House Duck Blog"/);
     assert.match(indexPage, /loading="eager" fetchpriority="high"/, "the first blog card should be the eager LCP image");
+    assert.match(indexPage, /class="mirror-footer site-footer"/);
+    assert.match(indexPage, /Impressum/);
+    assert.match(indexPage, /business@houseduck\.in/);
     assert.doesNotMatch(indexPage, /site-fonts\.css/);
   }
 

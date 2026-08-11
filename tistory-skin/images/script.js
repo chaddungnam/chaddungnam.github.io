@@ -45,6 +45,10 @@
     });
   });
 
+  document.querySelectorAll("[data-current-year]").forEach((node) => {
+    node.textContent = String(new Date().getFullYear());
+  });
+
   const mobileMenu = document.querySelector(".mobile-menu");
   if (mobileMenu) {
     mobileMenu.addEventListener("click", (event) => {
@@ -63,6 +67,12 @@
   });
 
   document.querySelectorAll(".article-body img").forEach((image) => {
+    const width = Number(image.getAttribute("width") || image.dataset.originWidth);
+    const height = Number(image.getAttribute("height") || image.dataset.originHeight);
+    if (width > 0 && height > 0) {
+      image.style.width = `min(100%, ${width}px)`;
+      image.style.aspectRatio = `${width} / ${height}`;
+    }
     if (image.getAttribute("alt")) return;
     const figure = image.closest("figure");
     const caption = figure && figure.querySelector("figcaption");
@@ -112,17 +122,41 @@
   const articleHeadings = [...document.querySelectorAll(".article-body h2, .article-body h3")];
   if (articleToc && articleHeadings.length >= 2) {
     const tocList = articleToc.querySelector("ol");
+    const tocLinks = new Map();
+    let currentRootItem = null;
+    let currentChildList = null;
     articleHeadings.forEach((heading, index) => {
       heading.id ||= `article-section-${index + 1}`;
       const item = document.createElement("li");
-      if (heading.tagName === "H3") item.className = "toc-subitem";
       const link = document.createElement("a");
       link.href = `#${heading.id}`;
-      link.textContent = heading.textContent.trim();
+      link.textContent = heading.textContent.trim().replace(/^\s*(?:[-–—•]\s+|\d+[.)]\s+)/, "");
       item.append(link);
-      tocList.append(item);
+      tocLinks.set(heading.id, link);
+      if (heading.tagName === "H3" && currentRootItem) {
+        if (!currentChildList) {
+          currentChildList = document.createElement("ol");
+          currentChildList.className = "toc-children";
+          currentRootItem.append(currentChildList);
+        }
+        currentChildList.append(item);
+      } else {
+        tocList.append(item);
+        currentRootItem = item;
+        currentChildList = null;
+      }
     });
     articleToc.hidden = false;
+    if ("IntersectionObserver" in window) {
+      const observer = new window.IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          tocLinks.forEach((link) => link.removeAttribute("aria-current"));
+          tocLinks.get(entry.target.id)?.setAttribute("aria-current", "location");
+        });
+      }, { rootMargin: "-111px 0px -70% 0px" });
+      articleHeadings.forEach((heading) => observer.observe(heading));
+    }
   }
 
   if (typeof location === "undefined" || typeof navigator === "undefined") return;

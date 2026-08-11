@@ -32,7 +32,7 @@
         ? "HOUSE DUCK BLOG"
         : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
       return '<article class="post-preview-card' + (index >= 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
-        (image ? '<img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy">' : "") +
+        (image ? '<span class="post-preview-media"><img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy"></span>' : "") +
         '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3>' + escapeMarkup(localized.title) +
         '</h3><p>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
     }).join("");
