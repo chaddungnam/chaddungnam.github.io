@@ -365,7 +365,7 @@ function renderExitBreakdown() {
   const total = Math.max(1, summary.gamesStarted ?? 0);
   const items = [
     ["정상 게임 완료", summary.gameOvers, "normal"],
-    ["게임 중 이탈", summary.midGameExits, "exit"],
+    ["게임 중 이탈 (10초 이상)", summary.midGameExits, "exit"],
     ["강제 종료로 미확인", summary.unobservedGames, "unobserved"],
   ];
   byId("exitBreakdown").innerHTML = items.map(([label, value, color]) => `
