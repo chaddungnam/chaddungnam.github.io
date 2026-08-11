@@ -72,8 +72,6 @@ for page in "${content_pages[@]}"; do
   require_token "$page" "terms/"
   require_token "$page" "support"
   require_token "$page" "data-current-year"
-  require_token "$page" "https://blog.houseduck.in/"
-
   reject_token "$page" "cdn."
   reject_token "$page" "fonts.googleapis.com"
   reject_token "$page" "iconify"
@@ -83,10 +81,28 @@ done
 for page in "${redirect_pages[@]}"; do
   test -s "$repo_dir/$page" || fail "$page does not exist"
   require_token "$page" 'data-page="blog-redirect"'
-  require_token "$page" 'http-equiv="refresh" content="0; url=https://blog.houseduck.in/"'
-  require_token "$page" 'rel="canonical" href="https://blog.houseduck.in/"'
-  require_token "$page" 'href="https://blog.houseduck.in/"'
 done
+
+for page in index.html about/index.html quirky-ball/index.html project-k/index.html; do
+  require_token "$page" "https://blog.houseduck.in/"
+done
+require_token "index_en.html" 'blog/en/'
+require_token "about/index_en.html" 'blog/en/'
+require_token "quirky-ball/index_en.html" 'blog/en/'
+require_token "project-k/index_en.html" 'blog/en/'
+require_token "index_de.html" 'blog/de/'
+require_token "about/index_de.html" 'blog/de/'
+require_token "quirky-ball/index_de.html" 'blog/de/'
+require_token "project-k/index_de.html" 'blog/de/'
+require_token "index_ja.html" 'blog/ja/'
+require_token "about/index_ja.html" 'blog/ja/'
+require_token "quirky-ball/index_ja.html" 'blog/ja/'
+require_token "project-k/index_ja.html" 'blog/ja/'
+
+require_token "story/index.html" 'url=https://blog.houseduck.in/'
+require_token "story/index_en.html" 'url=https://houseduck.in/blog/en/'
+require_token "story/index_de.html" 'url=https://houseduck.in/blog/de/'
+require_token "story/index_ja.html" 'url=https://houseduck.in/blog/ja/'
 
 for page in about/index.html about/index_en.html about/index_de.html about/index_ja.html; do
   require_token "$page" 'data-page="about"'

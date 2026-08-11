@@ -33,8 +33,8 @@
         : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
       return '<article class="post-preview-card' + (index >= 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
         (image ? '<span class="post-preview-media"><img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy"></span>' : "") +
-        '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3>' + escapeMarkup(localized.title) +
-        '</h3><p>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
+        '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3 data-preview-type>' + escapeMarkup(localized.title) +
+        '</h3><p data-preview-type>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
     }).join("");
   }
 
@@ -187,7 +187,10 @@
         })
         .then(function (feed) {
           var cards = buildPostCards(feed.posts, locale);
-          if (cards) latestGrid.innerHTML = cards;
+          if (cards) {
+            latestGrid.innerHTML = cards;
+            typePreviewText(latestGrid);
+          }
         })
         .catch(function () {
           // The authored fallback remains visible while the next sync runs.
@@ -246,6 +249,47 @@
 
     var reducedMotion = typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function typePreviewText(scope) {
+      var nodes = Array.from((scope || document).querySelectorAll("[data-preview-type]:not([data-preview-ready])"));
+      function start(node) {
+        node.dataset.previewReady = "true";
+        var source = node.textContent;
+        if (!source || reducedMotion) {
+          node.dataset.typed = "true";
+          return;
+        }
+        node.setAttribute("aria-label", source);
+        node.textContent = "";
+        var index = 0;
+        function next() {
+          if (index >= source.length) {
+            node.dataset.typed = "true";
+            node.removeAttribute("aria-label");
+            return;
+          }
+          var character = source.charAt(index);
+          node.textContent += character;
+          index += 1;
+          window.setTimeout(next, /[,.!?。]/.test(character) ? 24 : 8);
+        }
+        next();
+      }
+      if (!("IntersectionObserver" in window)) {
+        nodes.forEach(start);
+        return;
+      }
+      var observer = new window.IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          start(entry.target);
+        });
+      }, { rootMargin: "0px 0px 8%", threshold: .05 });
+      nodes.forEach(function (node) { observer.observe(node); });
+    }
+
+    typePreviewText(document);
 
     document.querySelectorAll("[data-typewriter]").forEach(function (heading) {
       var lines = Array.from(heading.querySelectorAll("[data-type-line]"));

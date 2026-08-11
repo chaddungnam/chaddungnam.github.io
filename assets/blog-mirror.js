@@ -118,6 +118,42 @@
       typeNextCharacter();
     });
 
+    var previewNodes = Array.from(documentRef.querySelectorAll("[data-preview-type]"));
+    function typePreview(node) {
+      var source = node.textContent;
+      if (!source || reducedMotion) {
+        node.dataset.typed = "true";
+        return;
+      }
+      node.setAttribute("aria-label", source);
+      node.textContent = "";
+      var index = 0;
+      function next() {
+        if (index >= source.length) {
+          node.dataset.typed = "true";
+          node.removeAttribute("aria-label");
+          return;
+        }
+        var character = source.charAt(index);
+        node.textContent += character;
+        index += 1;
+        root.setTimeout(next, /[,.!?。]/.test(character) ? 24 : 8);
+      }
+      next();
+    }
+    if (typeof root.IntersectionObserver === "function") {
+      var observer = new root.IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          typePreview(entry.target);
+        });
+      }, { rootMargin: "0px 0px 8%", threshold: .05 });
+      previewNodes.forEach(function (node) { observer.observe(node); });
+    } else {
+      previewNodes.forEach(typePreview);
+    }
+
     var previews = Array.from(documentRef.querySelectorAll("[data-game-preview]"));
     var saveData = root.navigator && root.navigator.connection && root.navigator.connection.saveData;
     if (reducedMotion || saveData) {

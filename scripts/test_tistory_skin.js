@@ -32,7 +32,7 @@ const requiredTokens = [
   "[##_search_name_##]",
   "[##_search_text_##]",
   "[##_search_onclick_submit_##]",
-  "[##_category_##]",
+  "[##_category_list_##]",
   "<s_list>",
   "<s_article_rep>",
   "<s_index_article_rep>",
@@ -69,7 +69,8 @@ assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode contro
 assert.match(html, /class="journal-hero manifesto-hero shell"/, "Blog home needs the shared speech-bubble composition");
 assert.match(html, /class="manifesto-bubble journal-bubble"/, "Blog statement needs a speech bubble");
 assert.equal((html.match(/data-game-preview/g) || []).length, 2, "Blog home needs two live game previews");
-assert.match(html, /만드는 과정을/, "Blog statement needs the approved making-of copy");
+assert.match(html, /House Duck's Blog,/, "Blog statement needs the approved Blog opening");
+assert.match(html, /메인 페이지 보러가기/, "Blog speech bubble needs a direct route back to House Duck");
 assert.match(html, /name="robots" content="max-image-preview:large"/, "skin should allow large image previews in search");
 assert.doesNotMatch(html, /<meta name="description" content="\[##_desc_##\]">/, "Tistory should own the per-page description meta tag");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
@@ -82,13 +83,17 @@ assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/house-duck-wordmark\.png/, "skin must use the hosted Montserrat House Duck wordmark");
 assert.doesNotMatch(html, /<nav class="desktop-nav"[\s\S]*?class="category-menu"/, "desktop categories should not expand inside the top navigation");
-assert.match(html, /<aside class="category-dock"[\s\S]*?\[##_category_##\][\s\S]*?<\/aside>/, "desktop categories need a floating side dock");
+assert.match(html, /<aside class="category-dock"[\s\S]*?\[##_category_list_##\][\s\S]*?<\/aside>/, "desktop categories need a floating semantic list");
 assert.match(html, /<aside class="category-dock"[\s\S]*?<details open>/, "desktop categories should be expanded by default");
-assert.equal((html.match(/\[##_category_##\]/g) || []).length, 2, "desktop dock and mobile menu each need the Tistory category tree");
+assert.equal((html.match(/\[##_category_##\]/g) || []).length, 0, "Tistory's legacy GIF category tree must not be rendered");
+assert.equal((html.match(/\[##_category_list_##\]/g) || []).length, 2, "desktop and mobile each need Tistory's semantic expanded list");
+assert.equal((html.match(/data-category-list/g) || []).length, 2, "both category surfaces need the shared list styling hook");
 assert.match(html, /<p class="eyebrow">01 · BLOG<\/p>/, "Blog index needs the shared editorial section number");
 assert.match(html, /class="footer-brand-images"/, "Blog footer should reuse the House Duck footer lockup");
 assert.match(html, /href="https:\/\/houseduck\.in\/impressum\/ko\.html"[^>]*>Impressum<\/a>/, "Blog footer needs an Impressum link");
 assert.match(html, /href="mailto:business@houseduck\.in"/, "Blog footer needs the business inquiry address");
+assert.match(html, /href="https:\/\/houseduck\.in\/terms\/ko\.html"[^>]*>이용약관<\/a>/, "Blog footer must open the common project selector");
+assert.ok((html.match(/data-preview-type/g) || []).length >= 4, "Blog titles and summaries need the fast preview typer");
 assert.equal((html.match(/class="article-breadcrumb"/g) || []).length, 2, "post and notice pages need one compact breadcrumb each");
 assert.doesNotMatch(html, /class="post-discovery|<s_list_rep>|<small>JOURNAL<\/small>/, "list pages must not duplicate discovery, article cards, or offset the header wordmark");
 assert.match(css, /\.article-breadcrumb\s*\{[^}]*display:\s*flex[^}]*font-size:\s*\.72rem/, "post breadcrumbs must stay compact and visible");
@@ -103,8 +108,12 @@ assert.match(css, /--line:\s*rgba\(255,\s*255,\s*255,\s*\.08\)/, "dark dividers 
 assert.match(css, /\.article-toc\s*\{/, "article table of contents needs compact styling");
 assert.match(css, /\.article-toc \.toc-children\s*\{/, "article subheadings need a nested list style");
 assert.match(css, /\.category-dock\s*\{[^}]*position:\s*fixed/s, "desktop categories need to float beside the page");
+assert.doesNotMatch(css, /animation-timeline:\s*view\(\)/, "Blog cards must not dim while entering the viewport");
 assert.doesNotMatch(css, /#09111f/i, "Blog footer must not keep the old navy background");
 assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{/, "native top and bottom ads need bounded article spacing");
+assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{[^}]*border-top:\s*1px[^}]*\}/, "empty native ads must render one divider instead of a doubled border");
+assert.doesNotMatch(css, /#tt-body-page \.revenue_unit_wrap\s*\{[^}]*border-block:/, "native ad edges must not collapse into two adjacent lines");
+assert.match(css, /\.site-footer nav a\s*\{[^}]*text-transform:\s*none/, "footer contact text must preserve the lowercase email address");
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.2vw,\s*2\.8rem\)/, "desktop article titles must stay practical");

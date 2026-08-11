@@ -612,7 +612,8 @@ body > .legal-hero { display: block; padding: 0; }
   list-style: none;
 }
 
-.language-card-list a {
+.language-card-list a,
+.language-card-list .project-pending {
   display: grid;
   min-height: 64px;
   align-content: center;
@@ -626,6 +627,8 @@ body > .legal-hero { display: block; padding: 0; }
   text-decoration: none;
   transition: transform 150ms ease, border-color 150ms ease;
 }
+
+.language-card-list .project-pending { opacity: .58; cursor: default; }
 
 .language-card-list a:hover {
   border-color: var(--legal-coral);

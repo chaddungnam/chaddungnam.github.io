@@ -90,15 +90,15 @@ for (const [file, locale] of marketingPages) {
   }
 }
 
-for (const [file] of marketingPages) {
+for (const [file, locale] of marketingPages) {
   const html = read(file);
-  const blogUrl = "https://blog.houseduck.in/";
-  assert.ok(html.includes(`href="${blogUrl}"`), `${file} Blog link`);
+  const blogUrl = locale === "ko" ? "https://blog.houseduck.in/" : `blog/${locale}/`;
+  assert.ok(html.includes(blogUrl), `${file} Blog link`);
   assert.doesNotMatch(html, /href="[^"]*story\//, `${file} must not link to the founder story`);
-  assert.doesNotMatch(html, new RegExp(`href="${blogUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*target="_blank"`), `${file} Blog link stays in the same tab`);
+  assert.doesNotMatch(html, new RegExp(`href="[^"]*${blogUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*target="_blank"`), `${file} Blog link stays in the same tab`);
 }
 
-for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
+for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
@@ -112,7 +112,7 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
   assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two game previews`);
   assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
   assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
-  assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} custom-domain Blog link`);
+  assert.match(html, locale === "ko" ? /href="https:\/\/blog\.houseduck\.in\/"/ : new RegExp(`href="blog/${locale}/"`), `${file} localized Blog link`);
   assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation uses Blog`);
   assert.match(publicText, /01 · Blog/, `${file} Blog section label`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
@@ -121,11 +121,12 @@ for (const [file] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.ht
 
 for (const [file, locale] of legacyStoryPages) {
   const html = read(file);
+  const blogUrl = locale === "ko" ? "https://blog.houseduck.in/" : `https://houseduck.in/blog/${locale}/`;
   assert.match(html, new RegExp(`lang="${locale}"`), `${file} locale`);
   assert.match(html, /data-page="blog-redirect"/, `${file} redirect marker`);
-  assert.match(html, /http-equiv="refresh" content="0; url=https:\/\/blog\.houseduck\.in\/"/, `${file} redirect metadata`);
-  assert.match(html, /rel="canonical" href="https:\/\/blog\.houseduck\.in\/"/, `${file} canonical Blog URL`);
-  assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} accessible continue link`);
+  assert.ok(html.includes(`url=${blogUrl}`), `${file} redirect metadata`);
+  assert.ok(html.includes(`rel="canonical" href="${blogUrl}"`), `${file} canonical Blog URL`);
+  assert.ok(html.includes(`href="${blogUrl}"`), `${file} accessible continue link`);
   assert.doesNotMatch(html, /story-timeline|story-quote|1998|industrial design|산업디자인|Industriedesign|インダストリアル/, `${file} founder profile removed`);
 }
 

@@ -10,6 +10,7 @@ const routes = [
   "/quirky-ball/?lang=ko",
   "/project-k/index_en.html?lang=en",
   "/privacy/de.html?stay=1",
+  "/terms/ko.html",
   "/support/?lang=en",
   "/blog/kr/",
   "/blog/en/내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유/",
@@ -80,6 +81,8 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".manifesto-bubble h1")).toHaveAttribute("aria-label", "House Duck, 게임 및 기타 소프트웨어 개발과 일기를 보여줍니다.");
   await expect(page.locator(".manifesto-note")).toContainText("환경 변화가 잦았던 제 경험을 녹여");
   await expect(page.locator(".manifesto-mark")).toHaveText("HD");
+  await expect(page.locator(".manifesto-action")).toHaveText(/블로그 보러가기/);
+  await expect(page.locator(".quirky-sticker img")).toHaveAttribute("src", /assets\/media\/quirky-character\.svg/);
   await expect(page.locator(".brand-lockup")).toHaveCSS("background-image", /house-duck-logo\.png/);
   await expect(page.locator(".type-cursor")).toHaveCount(0);
   await expect(page.locator(".nav-featured")).toHaveCount(2);
@@ -87,6 +90,9 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".phone-side-button")).toHaveCount(4);
   await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
   await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
+  await expect(page.locator("#journal-title")).toHaveText("하우스덕 개발 블로그");
+  await expect(page.locator(".history-section")).toBeVisible();
+  await expect(page.locator(".history-section a")).toHaveAttribute("href", "about/?lang=ko#history");
   await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
   await expect(page.locator(".post-preview-card-wide")).toHaveCount(3);
 
@@ -161,8 +167,22 @@ test("primary navigation responds without colored hover chrome", async ({ page, 
 test("blog index repeats the speech bubble and game previews", async ({ page }) => {
   await page.goto("/blog/kr/");
   await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toBeVisible();
-  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toContainText("만드는 과정을");
+  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toContainText("House Duck's Blog,");
+  await expect(page.locator(".mirror-manifesto .manifesto-action")).toHaveText(/메인 페이지 보러가기/);
   await expect(page.locator(".mirror-manifesto [data-game-preview]")).toHaveCount(2);
+});
+
+test("foreign House Duck pages keep readers in their selected Blog language", async ({ page }) => {
+  for (const locale of ["en", "de", "ja"]) {
+    await page.goto(`/index_${locale}.html?lang=${locale}`);
+    await expect(page.locator(".nav-blog")).toHaveAttribute("href", `blog/${locale}/`);
+    await expect(page.locator(".manifesto-action")).toHaveAttribute("href", `blog/${locale}/`);
+    await expect(page.locator(".journal-section .text-link")).toHaveAttribute("href", `blog/${locale}/`);
+    for (const route of [`/about/index_${locale}.html`, `/quirky-ball/index_${locale}.html`, `/project-k/index_${locale}.html`]) {
+      await page.goto(route);
+      await expect(page.locator("[data-site-nav] a", { hasText: "Blog" })).toHaveAttribute("href", `../blog/${locale}/`);
+    }
+  }
 });
 
 test("editorial section numbers stay visible without taking over the layout", async ({ page }) => {
@@ -170,8 +190,9 @@ test("editorial section numbers stay visible without taking over the layout", as
   const homeNumbers = await page.evaluate(() => ({
     games: getComputedStyle(document.querySelector(".device-stage"), "::before").content,
     blog: getComputedStyle(document.querySelector(".journal-section"), "::before").content,
+    history: getComputedStyle(document.querySelector(".history-section"), "::before").content,
   }));
-  expect(homeNumbers).toEqual({ games: '"02 GAMES"', blog: '"01"' });
+  expect(homeNumbers).toEqual({ games: "none", blog: '"01"', history: '"02"' });
 
   await page.goto("/blog/kr/");
   const blogNumber = await page.locator(".mirror-grid").evaluate((node) => getComputedStyle(node, "::before").content);
@@ -199,7 +220,10 @@ test("the static Blog footer matches House Duck and exposes legal contact routes
   const footer = page.locator(".mirror-footer");
   await expect(footer.locator(".footer-brand-images")).toBeVisible();
   await expect(footer.getByRole("link", { name: "Impressum" })).toHaveAttribute("href", "/impressum/ko.html");
-  await expect(footer.getByRole("link", { name: /business@houseduck\.in/ })).toHaveAttribute("href", "mailto:business@houseduck.in");
+  const businessLink = footer.getByRole("link", { name: /business@houseduck\.in/ });
+  await expect(businessLink).toHaveAttribute("href", "mailto:business@houseduck.in");
+  await expect(businessLink).toHaveCSS("text-transform", "none");
+  await expect(footer.getByRole("link", { name: /business@houseduck\.in/ })).toHaveText(/business@houseduck\.in/);
   await expect(footer).not.toHaveCSS("background-color", "rgb(9, 17, 31)");
 });
 
@@ -230,6 +254,35 @@ test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => 
     const channels = state.border.match(/\d+(?:\.\d+)?/g).slice(0, 3).map(Number);
     expect(Math.max(...channels) - Math.min(...channels)).toBeLessThan(26);
   }
+});
+
+test("journal cards stay fully visible and type their previews quickly", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const lastHomeCard = page.locator(".post-preview-card:not(.post-preview-empty)").last();
+  expect(await lastHomeCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+  await lastHomeCard.scrollIntoViewIfNeeded();
+  await expect(lastHomeCard.locator("[data-preview-type]")).toHaveCount(2);
+  await expect(lastHomeCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 2500 });
+
+  await page.goto("/blog/kr/");
+  const lastMirrorCard = page.locator(".mirror-grid article").last();
+  expect(await lastMirrorCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+  await lastMirrorCard.scrollIntoViewIfNeeded();
+  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 2500 });
+});
+
+test("Tistory semantic categories rename the root and keep subcategories expanded", async ({ page }) => {
+  await page.setContent(`<!doctype html><html><body id="tt-body-index">
+    <nav data-category-list><ul class="tt_category"><li><a class="link_tit" href="/category">분류 전체보기 <span class="c_cnt">(8)</span></a><ul class="category_list"><li><a class="link_item" href="/category/Mobile%20Game%20Dev.">Mobile Game Dev. <span class="c_cnt">(5)</span></a><ul class="sub_category_list"><li><a class="link_sub_item" href="/category/Mobile%20Game%20Dev./Quirky%20Ball">Quirky Ball <span class="c_cnt">(4)</span></a></li></ul></li></ul></li></ul></nav>
+    <nav data-category-list><ul class="tt_category"><li><a class="link_tit" href="/category">분류 전체보기 <span class="c_cnt">(8)</span></a><ul class="category_list"><li><a class="link_item" href="/category/Mobile%20Game%20Dev.">Mobile Game Dev. <span class="c_cnt">(5)</span></a><ul class="sub_category_list"><li><a class="link_sub_item" href="/category/Mobile%20Game%20Dev./Quirky%20Ball">Quirky Ball <span class="c_cnt">(4)</span></a></li></ul></li></ul></li></ul></nav>
+  </body></html>`);
+  await page.addScriptTag({ url: "http://127.0.0.1:4173/tistory-skin/images/script.js" });
+
+  await expect(page.locator("[data-category-list] .link_tit")).toHaveCount(2);
+  await expect(page.locator("[data-category-list] .link_tit").first()).toContainText("전체 글");
+  await expect(page.locator("[data-category-list] .link_tit").first()).not.toContainText("분류 전체보기");
+  await expect(page.locator("[data-category-list] .sub_category_list").first()).toBeVisible();
+  await expect(page.locator("[data-category-list]").first().getByRole("link", { name: /Quirky Ball/ })).toBeVisible();
 });
 
 test("YouTube Shorts keep their portrait ratio", async ({ page }) => {

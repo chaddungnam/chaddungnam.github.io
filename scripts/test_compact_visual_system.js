@@ -13,20 +13,24 @@ const brand = fs.readFileSync(path.join(root, "assets", "brand-site.css"), "utf8
 const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8");
 const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css"), "utf8");
 
-assert.match(studio, /--studio-bg:\s*#101315/);
-assert.match(studio, /--studio-surface:\s*#181c1f/);
-assert.match(studio, /html\[data-theme="light"\][\s\S]*--studio-bg:\s*#f4f1e8/);
+assert.match(studio, /--studio-bg:\s*#111315/);
+assert.match(studio, /--studio-surface:\s*#1b1d20/);
+assert.match(studio, /html\[data-theme="light"\][\s\S]*--studio-bg:\s*#f8f9fa/);
 assert.doesNotMatch(studio, /#0d1525|#131f33|#132342/i);
 assert.match(studio, /\.manifesto-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(studio, /\.manifesto-bubble::after\s*\{[^}]*content:\s*""/s);
+assert.doesNotMatch(studio, /\.device-stage::before\s*\{/);
+assert.match(studio, /\.history-section::before\s*\{[^}]*content:\s*"02"/s);
+assert.match(studio, /\.manifesto-action\s*\{/);
 assert.match(studio, /\.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
 assert.match(studio, /\.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.post-preview-copy h3\s*\{[^}]*-webkit-line-clamp:\s*2/s);
 assert.match(studio, /\.post-preview-copy p\s*\{[^}]*-webkit-line-clamp:\s*3/s);
-assert.match(studio, /\.post-preview-card\s*\{[^}]*animation:[^;}]*backwards/s);
+assert.doesNotMatch(studio, /\.post-preview-card\s*\{[^}]*animation:/s);
 assert.match(studio, /\.post-preview-card:hover \.post-preview-image,[\s\S]*?scale\(1\.04\)/);
 assert.match(skin, /\.post-card:hover \.card-image,[\s\S]*?scale\(1\.04\)/);
 assert.match(mirror, /\.mirror-grid article:hover img,[\s\S]*?scale\(1\.04\)/);
+assert.doesNotMatch(mirror, /animation-timeline:\s*view\(\)/);
 
 for (const css of [skin, mirror]) {
   assert.match(css, /#111315/);
@@ -68,7 +72,17 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /class="manifesto-bubble/);
   assert.match(html, /class="manifesto-mark"[^>]*>HD</);
+  assert.match(html, /class="manifesto-action"/);
+  assert.match(html, /class="quirky-sticker"/);
+  assert.match(html, /class="studio-section history-section"/);
+  assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
   assert.equal((html.match(/data-game-preview/g) || []).length, 2);
+}
+
+for (const file of ["about/index.html", "about/index_en.html", "about/index_de.html", "about/index_ja.html"]) {
+  const html = fs.readFileSync(path.join(root, file), "utf8");
+  assert.match(html, /id="history"/);
+  assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
 }
 
 console.log("compact visual system: PASS");

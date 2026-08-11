@@ -3,7 +3,12 @@
 
   const root = document.documentElement;
   let savedTheme = "";
-  const cookieTheme = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/)?.[1] || "";
+  let cookieTheme = "";
+  try {
+    cookieTheme = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/)?.[1] || "";
+  } catch (_error) {
+    // Opaque preview documents can deny cookie reads.
+  }
 
   function saveSharedTheme(theme) {
     try {
@@ -47,6 +52,11 @@
 
   document.querySelectorAll("[data-current-year]").forEach((node) => {
     node.textContent = String(new Date().getFullYear());
+  });
+
+  document.querySelectorAll("[data-category-list] .link_tit").forEach((link) => {
+    const label = [...link.childNodes].find((node) => node.nodeType === 3 && node.textContent.trim());
+    if (label) label.textContent = "전체 글 ";
   });
 
   const mobileMenu = document.querySelector(".mobile-menu");
@@ -110,6 +120,42 @@
     }
     typeNextCharacter();
   });
+
+  const previewNodes = [...document.querySelectorAll("[data-preview-type]")];
+  function typePreview(node) {
+    const source = node.textContent;
+    if (!source || reducedMotion) {
+      node.dataset.typed = "true";
+      return;
+    }
+    node.setAttribute("aria-label", source);
+    node.textContent = "";
+    let index = 0;
+    function next() {
+      if (index >= source.length) {
+        node.dataset.typed = "true";
+        node.removeAttribute("aria-label");
+        return;
+      }
+      const character = source.charAt(index);
+      node.textContent += character;
+      index += 1;
+      window.setTimeout(next, /[,.!?。]/.test(character) ? 24 : 8);
+    }
+    next();
+  }
+  if ("IntersectionObserver" in window) {
+    const previewObserver = new window.IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        previewObserver.unobserve(entry.target);
+        typePreview(entry.target);
+      });
+    }, { rootMargin: "0px 0px 8%", threshold: .05 });
+    previewNodes.forEach((node) => previewObserver.observe(node));
+  } else {
+    previewNodes.forEach(typePreview);
+  }
 
   const previews = [...document.querySelectorAll("[data-game-preview]")];
   if (reducedMotion || navigator.connection?.saveData) {

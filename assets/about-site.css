@@ -48,7 +48,7 @@ body[data-page="about"] .language-menu a { color: var(--about-copy); }
 .about-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 body[data-page="about"] .button-secondary { border-color: var(--about-line); color: var(--about-ink); background: var(--about-surface); }
 
-.about-roadmap { padding-block: clamp(62px, 9vw, 118px); }
+.about-roadmap { padding-block: clamp(62px, 9vw, 118px); scroll-margin-top: 80px; }
 .about-heading { max-width: 760px; margin-bottom: clamp(42px, 6vw, 68px); }
 .about-heading p { margin: 0 0 10px; color: var(--about-yellow); font-size: .72rem; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
 .about-heading h2 { margin: 0; color: var(--about-ink); font-size: clamp(2rem, 4vw, 4rem); letter-spacing: -.055em; line-height: 1.05; }
