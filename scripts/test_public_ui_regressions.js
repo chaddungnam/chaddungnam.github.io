@@ -135,11 +135,13 @@ function runBrandSite({ locale = "en", themeButton, menuButton, nav } = {}) {
   return { document, root, metaTheme };
 }
 
-test("product navigation stays on the House Duck Blog domain and returns to #games", () => {
+test("product navigation stays on the localized House Duck Blog route and returns to #games", () => {
   for (const file of productPages) {
     const html = read(file);
+    const locale = file.match(/index_(en|de|ja)\.html$/)?.[1];
+    const blogHref = locale ? `../blog/${locale}/` : "https://blog.houseduck.in/";
     assert.doesNotMatch(html, /https:\/\/houseduck\.tistory\.com\//, `${file} must not use the retired Blog host`);
-    assert.match(html, /href="https:\/\/blog\.houseduck\.in\/"/, `${file} must link to the custom Blog domain`);
+    assert.ok(html.includes(`href="${blogHref}"`), `${file} must link to its localized Blog route`);
   }
   for (const file of productPages.filter((file) => file.startsWith("project-k/"))) {
     const html = read(file);

@@ -92,7 +92,10 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
   await expect(page.locator("#journal-title")).toHaveText("하우스덕 개발 블로그");
   await expect(page.locator(".history-section")).toBeVisible();
-  await expect(page.locator(".history-section a")).toHaveAttribute("href", "about/?lang=ko#history");
+  await expect(page.locator(".site-nav a", { hasText: "About" })).toHaveAttribute("href", "#history");
+  await expect(page.locator(".history-section")).toHaveAttribute("id", "history");
+  await expect(page.locator(".history-number")).toHaveText("02");
+  await expect(page.locator(".history-event")).toHaveCount(4);
   await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
   await expect(page.locator(".post-preview-card-wide")).toHaveCount(3);
 
@@ -101,11 +104,10 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
     const bubble = await page.locator(".manifesto-bubble").boundingBox();
     const bubbleSpacing = await page.locator(".manifesto-bubble").evaluate((node) => {
       const bubbleBox = node.getBoundingClientRect();
-      const markBox = node.querySelector(".manifesto-mark").getBoundingClientRect();
-      const dialogueBox = node.querySelector(".manifesto-dialogue").getBoundingClientRect();
+      const boxes = Array.from(node.querySelectorAll(".manifesto-mark, .quirky-sticker, .manifesto-dialogue, .manifesto-action"), (child) => child.getBoundingClientRect());
       return {
-        top: Math.min(markBox.top, dialogueBox.top) - bubbleBox.top,
-        bottom: bubbleBox.bottom - Math.max(markBox.bottom, dialogueBox.bottom),
+        top: Math.min(...boxes.map((box) => box.top)) - bubbleBox.top,
+        bottom: bubbleBox.bottom - Math.max(...boxes.map((box) => box.bottom), bubbleBox.top),
       };
     });
     const phone = await page.locator(".iphone-shell").first().boundingBox();
@@ -121,6 +123,13 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
     expect(bubble.height).toBeLessThan(320);
     expect(Math.max(bubbleSpacing.top, bubbleSpacing.bottom)).toBeLessThan(58);
     expect(Math.abs(bubbleSpacing.top - bubbleSpacing.bottom)).toBeLessThan(20);
+    const mark = await page.locator(".manifesto-mark").boundingBox();
+    const quirky = await page.locator(".quirky-sticker").boundingBox();
+    const note = await page.locator(".manifesto-note").boundingBox();
+    const action = await page.locator(".manifesto-action").boundingBox();
+    expect(quirky.x).toBeGreaterThan(mark.x + mark.width);
+    expect(Math.abs(quirky.y - mark.y)).toBeLessThan(12);
+    expect(action.y).toBeGreaterThanOrEqual(note.y + note.height);
     expect(phone.width).toBeGreaterThan(200);
     expect(Math.max(...cards.slice(0, 3).map((card) => card.y)) - Math.min(...cards.slice(0, 3).map((card) => card.y))).toBeLessThan(2);
     expect(cards[3].y).toBeGreaterThan(cards[0].y);
@@ -134,7 +143,9 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
     }
     expect(phones[1].left - phones[0].right).toBeLessThan(16);
     expect(await page.locator(".game-device").first().evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-phone-float");
-    expect(await page.locator(".manifesto-bubble").evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-bubble-float");
+    const bubbleAnimation = await page.locator(".manifesto-bubble").evaluate((node) => getComputedStyle(node).animationName);
+    expect(bubbleAnimation).toContain("studio-bubble-breathe");
+    expect(bubbleAnimation).not.toContain("studio-bubble-float");
   }
 
   const state = await page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({
@@ -190,9 +201,9 @@ test("editorial section numbers stay visible without taking over the layout", as
   const homeNumbers = await page.evaluate(() => ({
     games: getComputedStyle(document.querySelector(".device-stage"), "::before").content,
     blog: getComputedStyle(document.querySelector(".journal-section"), "::before").content,
-    history: getComputedStyle(document.querySelector(".history-section"), "::before").content,
+    history: document.querySelector(".history-number").textContent,
   }));
-  expect(homeNumbers).toEqual({ games: "none", blog: '"01"', history: '"02"' });
+  expect(homeNumbers).toEqual({ games: "none", blog: '"01"', history: "02" });
 
   await page.goto("/blog/kr/");
   const blogNumber = await page.locator(".mirror-grid").evaluate((node) => getComputedStyle(node, "::before").content);

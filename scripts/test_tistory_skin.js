@@ -118,7 +118,9 @@ assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.2vw,\s*2\.8rem\)/, "desktop article titles must stay practical");
 assert.match(css, /\.journal-hero\s*\{[^}]*--studio-bg:\s*var\(--cream\)/, "Blog hero must map the shared studio colors");
-assert.match(css, /\.journal-bubble\s*\{[^}]*animation:[^}]*studio-bubble-float/, "Blog speech bubble needs the same gentle motion");
+assert.match(html, /href="https:\/\/houseduck\.in\/assets\/studio-home\.css"/, "Blog speech bubble must reuse the shared studio motion");
+assert.doesNotMatch(css, /\.journal-bubble\s*\{[^}]*animation:/, "Blog speech bubble must not override the shared motion");
+assert.doesNotMatch(css, /studio-bubble-float/, "Blog speech bubble text must not move with the shell");
 assert.match(css, /\.collection-head h2\s*\{[^}]*font-size:\s*clamp\(1\.65rem,\s*2\.6vw,\s*2\.25rem\)/, "Blog collection heading must stay compact");
 assert.match(css, /\.card-media\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/, "Blog card media must use a compact preview ratio");
 assert.match(css, /\.header-inner\s*\{[^}]*min-height:\s*64px/, "skin header must match the compact House Duck chrome");

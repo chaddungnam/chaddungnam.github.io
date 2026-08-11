@@ -20,7 +20,9 @@ assert.doesNotMatch(studio, /#0d1525|#131f33|#132342/i);
 assert.match(studio, /\.manifesto-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(studio, /\.manifesto-bubble::after\s*\{[^}]*content:\s*""/s);
 assert.doesNotMatch(studio, /\.device-stage::before\s*\{/);
-assert.match(studio, /\.history-section::before\s*\{[^}]*content:\s*"02"/s);
+assert.match(studio, /\.history-number\s*\{/);
+assert.match(studio, /@keyframes studio-bubble-breathe/);
+assert.doesNotMatch(studio, /studio-bubble-float/);
 assert.match(studio, /\.manifesto-action\s*\{/);
 assert.match(studio, /\.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
 assert.match(studio, /\.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
@@ -74,7 +76,9 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   assert.match(html, /class="manifesto-mark"[^>]*>HD</);
   assert.match(html, /class="manifesto-action"/);
   assert.match(html, /class="quirky-sticker"/);
-  assert.match(html, /class="studio-section history-section"/);
+  assert.match(html, /class="studio-section history-section"[^>]*id="history"/);
+  assert.match(html, /class="history-number"[^>]*>02</);
+  assert.equal((html.match(/class="history-event"/g) || []).length, 4, `${file} should embed the complete history timeline`);
   assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
   assert.equal((html.match(/data-game-preview/g) || []).length, 2);
 }

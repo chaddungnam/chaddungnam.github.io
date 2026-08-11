@@ -219,7 +219,6 @@ html[data-theme="dark"] .theme-toggle .theme-moon { display: inline; }
   padding-block: 34px 42px;
 }
 .eyebrow { margin: 0 0 18px; color: var(--coral); font-size: .72rem; font-weight: 950; letter-spacing: .17em; text-transform: uppercase; }
-.journal-bubble { animation: studio-bubble-in 640ms cubic-bezier(.2,.8,.2,1) both, studio-bubble-float 5.8s 900ms ease-in-out infinite; }
 .journal-bubble h1 { font-size: clamp(1.55rem, 1.85vw, 2.05rem); }
 .journal-device-stage { min-height: 540px; }
 .collection-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 24px clamp(20px, 3vw, 30px); border: 1px solid var(--line); border-radius: 14px; color: var(--navy); background: var(--paper); }
