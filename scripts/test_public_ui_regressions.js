@@ -170,6 +170,8 @@ test("home leads with the approved statement and two real game previews", () => 
 
   const brandCss = read("assets/brand-site.css");
   assert.doesNotMatch(brandCss, /\.js-ready\s+\.reveal\s*\{[^}]*opacity:\s*0/s, "JavaScript must not hide authored content");
+  assert.match(brandScript, /\.history-heading, \.history-event/, "History needs the shared scroll reveal behavior");
+  assert.match(brandScript, /dataset\.revealDelay/, "History reveals need a top-to-bottom stagger");
 });
 
 test("home footer exposes the business inquiry address", () => {

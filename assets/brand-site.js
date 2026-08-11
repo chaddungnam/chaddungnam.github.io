@@ -326,10 +326,12 @@
       node.animate([
         { opacity: .35, filter: "blur(5px)", transform: "translateY(14px)" },
         { opacity: 1, filter: "blur(0)", transform: "translateY(0)" },
-      ], { duration: 460, easing: "cubic-bezier(.2,.75,.2,1)", fill: "both" });
+      ], { duration: 460, delay: Number(node.dataset.revealDelay || 0), easing: "cubic-bezier(.2,.75,.2,1)", fill: "both" });
     }
 
-    var revealNodes = Array.from(document.querySelectorAll(".reveal"));
+    var historyRevealNodes = Array.from(document.querySelectorAll(".history-heading, .history-event"));
+    historyRevealNodes.forEach(function (node, index) { node.dataset.revealDelay = String(index * 90); });
+    var revealNodes = Array.from(document.querySelectorAll(".reveal, .history-heading, .history-event"));
     if ("IntersectionObserver" in window) {
       var revealObserver = new window.IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {

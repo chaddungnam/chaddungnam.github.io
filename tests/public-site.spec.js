@@ -96,6 +96,8 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".history-section")).toHaveAttribute("id", "history");
   await expect(page.locator(".history-number")).toHaveText("02");
   await expect(page.locator(".history-event")).toHaveCount(4);
+  await expect(page.locator(".history-heading")).toHaveAttribute("data-reveal-delay", "0");
+  expect(await page.locator(".history-event").evaluateAll((nodes) => nodes.map((node) => node.dataset.revealDelay))).toEqual(["90", "180", "270", "360"]);
   await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
   await expect(page.locator(".post-preview-card-wide")).toHaveCount(3);
 

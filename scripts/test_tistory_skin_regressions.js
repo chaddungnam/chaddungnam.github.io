@@ -313,7 +313,7 @@ test("the script leaves Tistory's native empty state as the only fallback", () =
 
 test("tag and RSS navigation stay on the active custom domain", () => {
   assert.doesNotMatch(html, /\[##_taglog_link_##\]|\[##_rss_url_##\]/);
-  assert.equal((html.match(/href="\/tag"/g) || []).length, 2);
+  assert.equal((html.match(/href="\/tag"/g) || []).length, 1);
   assert.equal((html.match(/href="\/rss"/g) || []).length, 1);
 });
 
@@ -329,6 +329,13 @@ test("pagination disappears when neither direction has another page", () => {
     declarations(".pagination:has(.no-more-prev):has(.no-more-next)").display,
     "none"
   );
+});
+
+test("pagination keeps Tistory's nested number spans visually transparent", () => {
+  assert.equal(declarations(".page-number > span").display, "contents");
+  const selected = declarations(".page-number:has(.selected), .page-number.selected");
+  assert.equal(selected.color, "var(--paper)");
+  assert.equal(selected.background, "var(--navy)");
 });
 
 test("safe interactive skin controls keep a 44px minimum target", () => {

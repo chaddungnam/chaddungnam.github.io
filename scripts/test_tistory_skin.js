@@ -88,6 +88,7 @@ assert.match(html, /<aside class="category-dock"[\s\S]*?<details open>/, "deskto
 assert.equal((html.match(/\[##_category_##\]/g) || []).length, 0, "Tistory's legacy GIF category tree must not be rendered");
 assert.equal((html.match(/\[##_category_list_##\]/g) || []).length, 2, "desktop and mobile each need Tistory's semantic expanded list");
 assert.equal((html.match(/data-category-list/g) || []).length, 2, "both category surfaces need the shared list styling hook");
+assert.doesNotMatch(html, /category-tags-link|전체 태그/, "the category dock must not repeat the tag index");
 assert.match(html, /<p class="eyebrow">01 · BLOG<\/p>/, "Blog index needs the shared editorial section number");
 assert.match(html, /class="footer-brand-images"/, "Blog footer should reuse the House Duck footer lockup");
 assert.match(html, /href="https:\/\/houseduck\.in\/impressum\/ko\.html"[^>]*>Impressum<\/a>/, "Blog footer needs an Impressum link");
@@ -108,6 +109,8 @@ assert.match(css, /--line:\s*rgba\(255,\s*255,\s*255,\s*\.08\)/, "dark dividers 
 assert.match(css, /\.article-toc\s*\{/, "article table of contents needs compact styling");
 assert.match(css, /\.article-toc \.toc-children\s*\{/, "article subheadings need a nested list style");
 assert.match(css, /\.category-dock\s*\{[^}]*position:\s*fixed/s, "desktop categories need to float beside the page");
+assert.match(css, /\.page-number > span\s*\{[^}]*display:\s*contents/, "Tistory paging spans must not render a box inside the circular control");
+assert.match(css, /\.page-number:has\(\.selected\),\s*\.page-number\.selected\s*\{/, "the selected paging state must style the whole circular control");
 assert.doesNotMatch(css, /animation-timeline:\s*view\(\)/, "Blog cards must not dim while entering the viewport");
 assert.doesNotMatch(css, /#09111f/i, "Blog footer must not keep the old navy background");
 assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{/, "native top and bottom ads need bounded article spacing");
