@@ -9,7 +9,7 @@
   if (document.head && typeof document.createElement === "function" && !document.querySelector("[data-house-duck-skin]")) {
     const managedStyle = document.createElement("link");
     managedStyle.rel = "stylesheet";
-    managedStyle.href = "https://houseduck.in/tistory-skin/style.css?v=1.3.0";
+    managedStyle.href = "https://houseduck.in/tistory-skin/style.css?v=1.3.1";
     managedStyle.dataset.houseDuckSkin = "";
     document.head.append(managedStyle);
   }

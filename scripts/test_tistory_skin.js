@@ -22,6 +22,7 @@ const html = fs.readFileSync(path.join(skinDir, "skin.html"), "utf8");
 const css = fs.readFileSync(path.join(skinDir, "style.css"), "utf8");
 const xml = fs.readFileSync(path.join(skinDir, "index.xml"), "utf8");
 const script = fs.readFileSync(path.join(skinDir, "images/script.js"), "utf8");
+assert.match(css, /\.article-body figure img,\s*\.article-body \.imageblock img\s*\{[^}]*width:\s*auto[^}]*max-width:\s*min\(100%,\s*400px\)[^}]*margin:\s*0 auto/s, "article images larger than 400px must be centered and bounded without upscaling smaller images");
 
 const requiredTokens = [
   "<s_t3>",
@@ -80,7 +81,7 @@ assert.match(html, /data-article-toc/, "articles need a generated table of conte
 for (const locale of ["en", "de", "ja"]) {
   assert.match(html, new RegExp(`data-blog-locale="${locale}"`), `article needs a ${locale} translation link`);
 }
-assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js\?v=1\.3\.0"/, "the managed skin should load a cache-busted House Duck behavior script");
+assert.match(html, /src="https:\/\/houseduck\.in\/tistory-skin\/images\/script\.js\?v=1\.3\.1"/, "the managed skin should load a cache-busted House Duck behavior script");
 assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck PNG logo");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/house-duck-wordmark\.png/, "skin must use the hosted Montserrat House Duck wordmark");
 assert.doesNotMatch(html, /<nav class="desktop-nav"[\s\S]*?class="category-menu"/, "desktop categories should not expand inside the top navigation");
@@ -119,17 +120,17 @@ assert.doesNotMatch(css, /#tt-body-page \.revenue_unit_wrap\s*\{[^}]*border-bloc
 assert.match(css, /\.site-footer nav a\s*\{[^}]*text-transform:\s*none/, "footer contact text must preserve the lowercase email address");
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
-assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(2rem,\s*3\.6vw,\s*3\.25rem\)/, "desktop article titles must stay bounded while using the editorial display scale");
+assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*3\.2vw,\s*3rem\)/, "desktop article titles must stay bounded while using the editorial display scale");
 assert.match(css, /\.journal-hero\s*\{[^}]*--studio-bg:\s*var\(--cream\)/, "Blog hero must map the shared studio colors");
-assert.match(html, /href="https:\/\/houseduck\.in\/assets\/studio-home\.css\?v=1\.3\.0"/, "Blog speech bubble must reuse the cache-busted shared studio motion");
+assert.match(html, /href="https:\/\/houseduck\.in\/assets\/studio-home\.css\?v=1\.3\.1"/, "Blog speech bubble must reuse the cache-busted shared studio motion");
 assert.doesNotMatch(css, /\.journal-bubble\s*\{[^}]*animation:/, "Blog speech bubble must not override the shared motion");
 assert.doesNotMatch(css, /studio-bubble-float/, "Blog speech bubble text must not move with the shell");
-assert.match(css, /\.collection-head h2\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*3vw,\s*2\.7rem\)/, "Blog collection heading must use the stronger editorial scale");
+assert.match(css, /\.collection-head h2\s*\{[^}]*font-size:\s*clamp\(1\.7rem,\s*2\.6vw,\s*2\.4rem\)/, "Blog collection heading must keep a compact editorial scale");
 assert.match(css, /\.card-media\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/, "Blog card media must use a compact preview ratio");
-assert.match(css, /\.header-inner\s*\{[^}]*min-height:\s*64px/, "skin header must match the compact House Duck chrome");
-assert.match(css, /\.brand-duck-image\s*\{[^}]*width:\s*34px[^}]*height:\s*34px/, "skin must keep the compact duck logo");
-assert.match(css, /\.brand-wordmark-image\s*\{[^}]*width:\s*132px/, "skin must keep the Montserrat wordmark compact");
-assert.match(css, /\.article-cover\s*\{[^}]*width:\s*min\(100%,\s*520px\)[^}]*aspect-ratio:\s*16\s*\/\s*9/, "article cover must remain a bounded editorial preview");
+assert.match(css, /\.header-inner\s*\{[^}]*min-height:\s*60px/, "skin header must match the compact House Duck chrome");
+assert.match(css, /\.brand-duck-image\s*\{[^}]*width:\s*32px[^}]*height:\s*32px/, "skin must keep the compact duck logo");
+assert.match(css, /\.brand-wordmark-image\s*\{[^}]*width:\s*124px/, "skin must keep the Montserrat wordmark compact");
+assert.match(css, /\.article-cover\s*\{[^}]*width:\s*min\(100%,\s*500px\)[^}]*aspect-ratio:\s*16\s*\/\s*9/, "article cover must remain a bounded editorial preview");
 assert.match(css, /\.category-dock-panel\s*\{[^}]*backdrop-filter:\s*blur\(22px\)/, "desktop categories need a readable glass surface over game previews");
 assert.match(css, /\.article-cover\s*\{[^}]*background:\s*#000/, "portrait article covers need black letterboxing");
 assert.match(css, /\.article-cover img\s*\{[^}]*height:\s*100%[^}]*object-fit:\s*contain/, "article covers must show the full image without stretching");
@@ -148,7 +149,7 @@ assert.match(css, /#tt-body-page \.tt-comment-cont \.tt-area-write\s*\{[^}]*disp
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.doesNotMatch(script, /house_duck_theme/, "skin must not read or persist a removed theme choice");
-assert.match(script, /https:\/\/houseduck\.in\/tistory-skin\/style\.css\?v=1\.3\.0/, "the live skin must receive a cache-busted managed stylesheet without a manual admin upload");
+assert.match(script, /https:\/\/houseduck\.in\/tistory-skin\/style\.css\?v=1\.3\.1/, "the live skin must receive a cache-busted managed stylesheet without a manual admin upload");
 assert.match(script, /\[data-theme-toggle\][\s\S]*\.remove\(\)/, "the live skin must remove the retired control from older uploaded HTML");
 assert.match(script, /data-typewriter/, "Blog statement needs game-style text output");
 assert.match(script, /data-game-preview/, "Blog previews need reduced-motion playback control");

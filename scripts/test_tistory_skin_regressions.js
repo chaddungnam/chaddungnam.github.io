@@ -367,6 +367,6 @@ test("theme, reduced-motion, and responsive contracts remain present", () => {
 });
 
 test("article titles use the editorial display scale without overflowing", () => {
-  assert.equal(declarations(".article-header h1")["font-size"], "clamp(2rem, 3.6vw, 3.25rem)");
-  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*8vw,\s*2\.55rem\)/);
+  assert.equal(declarations(".article-header h1")["font-size"], "clamp(1.9rem, 3.2vw, 3rem)");
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.78rem,\s*7\.4vw,\s*2\.35rem\)/);
 });

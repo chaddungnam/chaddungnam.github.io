@@ -42,9 +42,9 @@ for (const css of [skin, mirror]) {
   assert.doesNotMatch(css, /ui-serif|Georgia|Noto Serif KR/);
 }
 
-assert.match(mirror, /\.mirror-header\s*\{[^}]*min-height:\s*64px/s);
-assert.match(mirror, /\.mirror-brand img:first-child\s*\{[^}]*width:\s*34px[^}]*height:\s*34px/s);
-assert.match(mirror, /\.mirror-brand img:last-child\s*\{[^}]*width:\s*132px/s);
+assert.match(mirror, /\.mirror-header\s*\{[^}]*min-height:\s*60px/s);
+assert.match(mirror, /\.mirror-brand img:first-child\s*\{[^}]*width:\s*32px[^}]*height:\s*32px/s);
+assert.match(mirror, /\.mirror-brand img:last-child\s*\{[^}]*width:\s*124px/s);
 
 assert.match(fonts, /font-family:\s*"Montserrat"/);
 

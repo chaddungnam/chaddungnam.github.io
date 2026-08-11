@@ -30,6 +30,7 @@ mirror.recoverImageAltText({ querySelectorAll() { return [bodyImage]; } });
 assert.equal(bodyImage.alt, "Prototype screen");
 
 const css = fs.readFileSync(path.join(__dirname, "..", "assets", "blog-mirror.css"), "utf8");
+assert.match(css, /\.mirror-body img\s*\{[^}]*width:\s*auto\s*!important[^}]*max-width:\s*min\(100%,\s*400px\)\s*!important[^}]*margin:\s*0 auto/s, "mirrored article images must use the same 400px no-upscale bound");
 const koreanIndex = fs.readFileSync(path.join(__dirname, "..", "blog", "kr", "index.html"), "utf8");
 assert.match(koreanIndex, /class="manifesto-hero mirror-manifesto"/);
 assert.match(koreanIndex, /<html lang="ko" data-theme="light"/);
@@ -40,8 +41,8 @@ assert.match(koreanIndex, /data-preview-type/);
 assert.match(koreanIndex, /href="\/terms\/ko\.html">이용약관<\/a>/);
 assert.equal((koreanIndex.match(/data-game-preview/g) || []).length, 2);
 assert.match(koreanIndex, /만드는 과정을/);
-assert.match(css, /\.mirror-post-header h1\s*\{[^}]*font-size:\s*clamp\(2rem,\s*3\.6vw,\s*3\.25rem\)/s);
-assert.match(css, /\.mirror-grid article\s*\{[^}]*border:\s*2px solid var\(--ink\)[^}]*box-shadow:\s*7px 8px 0 var\(--cyan-pop\)/s);
+assert.match(css, /\.mirror-post-header h1\s*\{[^}]*font-size:\s*clamp\(1\.9rem,\s*3\.2vw,\s*3rem\)/s);
+assert.match(css, /\.mirror-grid article\s*\{[^}]*border:\s*2px solid var\(--ink\)[^}]*box-shadow:\s*6px 7px 0 var\(--cyan-pop\)/s);
 assert.match(css, /\.mirror-body\s*\{[^}]*font-family:\s*-apple-system[^}]*font-size:\s*clamp\(1rem,\s*1\.1vw,\s*1\.075rem\)/s);
 assert.match(css, /\.mirror-body figure[^{}]*\{[^}]*display:\s*block[^}]*width:\s*100%[^}]*margin:\s*2\.2em 0/s);
 assert.match(css, /\[data-og-image=""\][^{}]*> a\s*\{[^}]*grid-template-columns:\s*1fr/s);
