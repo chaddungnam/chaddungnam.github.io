@@ -35,8 +35,8 @@
       </a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="메뉴 열기" data-menu-button><span class="menu-button-lines" aria-hidden="true"></span></button>
       <nav class="site-nav" id="site-navigation" aria-label="주요 메뉴" data-site-nav>
-        <a href="#blog">Blog</a>
-        <a href="#games">Games</a>
+        <a class="nav-featured nav-blog" href="#blog">Blog</a>
+        <a class="nav-featured nav-games" href="#games">Games</a>
         <a href="about/?lang=ko">About</a>
         <a href="support/">Support</a>
         <button class="theme-toggle" type="button" aria-label="다크 모드로 전환" aria-pressed="false" data-theme-toggle><span class="theme-sun" aria-hidden="true">☀</span><span class="theme-moon" aria-hidden="true">☾</span></button>
@@ -48,8 +48,8 @@
   <main id="main-content">
     <section class="manifesto-hero container" aria-labelledby="studio-title">
       <div class="manifesto-bubble reveal">
+        <span class="manifesto-mark" aria-hidden="true">HD</span>
         <h1 id="studio-title" data-typewriter aria-label="AI를 사용하지만, 사람냄새 나는 게임과 소프트웨어, 그리고 개발 일기를 보여주는 웹사이트"><span data-type-line>AI를 사용하지만,</span><span data-type-line>사람냄새 나는 게임과 소프트웨어,</span><span data-type-line>그리고 개발 일기를 보여주는 웹사이트</span></h1>
-        <span class="type-cursor" aria-hidden="true"></span>
       </div>
       <div class="device-stage reveal" id="games" aria-label="현재 제작 중인 게임">
         <a class="game-device game-device-quirky" href="quirky-ball/?lang=ko"><span class="game-device-label"><strong>Quirky Ball</strong><small>출시 준비 중</small></span><span class="iphone-shell"><span class="phone-side-button phone-side-button-top"></span><span class="phone-side-button phone-side-button-bottom"></span><span class="phone-camera" aria-hidden="true"></span><video data-game-preview autoplay muted loop playsinline preload="metadata" poster="assets/media/quirky-ball-gameplay-poster.jpg" aria-label="Quirky Ball 실제 플레이"><source src="assets/media/quirky-ball-gameplay.mp4" type="video/mp4"></video><span class="phone-home-indicator" aria-hidden="true"></span></span></a>

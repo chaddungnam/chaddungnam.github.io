@@ -121,26 +121,19 @@ button {
 }
 
 .brand-lockup {
-  display: inline-grid;
-  min-height: 44px;
-  place-items: center;
+  display: block;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
   color: var(--navy);
+  background-image: url("house-duck-logo.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: transform 180ms ease;
 }
 
-.brand-lockup::before {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border-radius: 14px 14px 14px 5px;
-  content: "HD";
-  color: var(--cream);
-  background: var(--navy);
-  font-size: .82rem;
-  font-weight: 950;
-  letter-spacing: -.08em;
-  transform: rotate(-7deg);
-}
+.brand-lockup:hover { transform: translateY(-2px) rotate(-3deg); }
 
 .brand-lockup > img,
 .brand-lockup > span {
@@ -164,6 +157,36 @@ button {
   font-weight: 850;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.theme-toggle {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  flex: 0 0 44px;
+  place-items: center;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.theme-toggle .theme-sun,
+.theme-toggle .theme-moon {
+  grid-area: 1 / 1;
+  font-size: 1.05rem;
+  line-height: 1;
+  animation: theme-icon-in 180ms ease both;
+}
+
+.theme-toggle .theme-moon,
+html[data-theme="light"] .theme-toggle .theme-sun { display: none; }
+html[data-theme="light"] .theme-toggle .theme-moon { display: block; }
+
+@keyframes theme-icon-in {
+  from { opacity: 0; transform: scale(.7) rotate(-18deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
 }
 
 .site-nav a::after {

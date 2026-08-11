@@ -54,9 +54,16 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
 
   const theme = page.locator("[data-theme-toggle]").first();
   await expect(theme).toHaveAccessibleName(/light mode/i);
+  await expect(theme.locator(".theme-sun")).toBeVisible();
+  await expect(theme.locator(".theme-moon")).toBeHidden();
+  const themeBox = await theme.boundingBox();
+  expect(themeBox.height).toBe(44);
+  if (!isMobile) expect(themeBox.width).toBe(44);
   await theme.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(theme).toHaveAccessibleName(/dark mode/i);
+  await expect(theme.locator(".theme-sun")).toBeHidden();
+  await expect(theme.locator(".theme-moon")).toBeVisible();
 
   if (isMobile) {
     await page.keyboard.press("Escape");
@@ -68,13 +75,34 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
-test("home statement points to two playable phone previews", async ({ page }) => {
+test("home hierarchy keeps the statement compact and the journal scannable", async ({ page, isMobile }) => {
   await page.goto("/?lang=ko");
   await expect(page.locator(".manifesto-bubble")).toContainText("사람냄새 나는 게임과 소프트웨어");
+  await expect(page.locator(".manifesto-mark")).toHaveText("HD");
+  await expect(page.locator(".brand-lockup")).toHaveCSS("background-image", /house-duck-logo\.png/);
+  await expect(page.locator(".type-cursor")).toHaveCount(0);
+  await expect(page.locator(".nav-featured")).toHaveCount(2);
   await expect(page.locator("[data-game-preview]")).toHaveCount(2);
   await expect(page.locator(".phone-side-button")).toHaveCount(4);
   await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
   await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
+  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(4);
+  await expect(page.locator(".post-preview-card-wide")).toHaveCount(1);
+
+  if (!isMobile) {
+    const bubble = await page.locator(".manifesto-bubble").boundingBox();
+    const phone = await page.locator(".iphone-shell").first().boundingBox();
+    const cards = await page.locator(".post-preview-card:not(.post-preview-empty)").evaluateAll((nodes) => nodes.map((node) => {
+      const box = node.getBoundingClientRect();
+      return { y: box.y, width: box.width };
+    }));
+    expect(bubble.width).toBeLessThan(680);
+    expect(phone.width).toBeGreaterThan(200);
+    expect(Math.max(...cards.slice(0, 3).map((card) => card.y)) - Math.min(...cards.slice(0, 3).map((card) => card.y))).toBeLessThan(2);
+    expect(cards[3].y).toBeGreaterThan(cards[0].y);
+    expect(cards[3].width).toBeGreaterThan(cards[0].width * 2.5);
+    expect(await page.locator(".game-device").first().evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-phone-float");
+  }
 
   const state = await page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({
     autoplay: video.autoplay,

@@ -22,7 +22,7 @@
   function buildPostCards(posts, locale) {
     var localeKey = locale === "ko" ? "kr" : locale;
     var dateLocales = { ko: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
-    return (Array.isArray(posts) ? posts : []).slice(0, 6).map(function (post) {
+    return (Array.isArray(posts) ? posts : []).slice(0, 4).map(function (post, index) {
       var localized = post.localized && (post.localized[localeKey] || post.localized.kr) || post;
       var link = safeHttpsUrl(locale === "ko" ? post.original_url : (localized.url || post.url));
       if (!link) return "";
@@ -31,7 +31,7 @@
       var date = Number.isNaN(published.valueOf())
         ? "HOUSE DUCK BLOG"
         : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
-      return '<article class="post-preview-card"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
+      return '<article class="post-preview-card' + (index === 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
         (image ? '<img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy">' : "") +
         '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3>' + escapeMarkup(localized.title) +
         '</h3><p>' + escapeMarkup(localized.summary) + '</p></div></a></article>';

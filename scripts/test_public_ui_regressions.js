@@ -222,15 +222,12 @@ test("the common Terms route delegates to the branded Quirky Ball terms shell", 
 
 test("public UI CSS preserves contrast, brand visibility, and mobile readability", () => {
   const brandCss = read("assets/brand-site.css");
-  const projectKCss = read("assets/project-k-site.css");
-  const brandMark = cssDeclarations(brandCss, ".brand-lockup::before");
-  const projectMark = cssDeclarations(projectKCss, ".project-k-header .brand-lockup::before");
+  const brandMark = cssDeclarations(brandCss, ".brand-lockup");
   const themeToggle = cssDeclarations(brandCss, 'body[data-page="studio"] .theme-toggle');
   const postCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .post-preview-copy p');
 
-  assert.equal(brandMark.content, '"HD"', "the compact mark must read HD");
-  assert.ok(parseFloat(brandMark.width) >= 42, "the HD mark must remain legible");
-  assert.equal(projectMark.background, "var(--k-gold)", "Project K needs its gold HD mark");
+  assert.match(brandMark["background-image"], /house-duck-logo\.png/, "public headers must use the duck mark");
+  assert.ok(parseFloat(brandMark.width) >= 44, "the duck mark must remain legible");
   assert.ok(parseFloat(themeToggle.height) >= 44, "theme control needs a 44px touch target");
   assert.ok(parseFloat(postCopy["font-size"]) >= 0.9, "Blog summaries need readable mobile type");
 });

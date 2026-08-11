@@ -104,6 +104,7 @@ done
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
   require_token "$page" 'class="manifesto-bubble'
+  require_token "$page" 'class="manifesto-mark"'
   require_token "$page" 'data-typewriter'
   require_token "$page" 'id="games"'
   require_token "$page" 'data-section="blog-posts"'
@@ -131,7 +132,7 @@ if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
   fail "sitemap.xml still publishes founder-story URLs"
 fi
 
-require_token "assets/brand-site.css" 'content: "HD"'
+require_token "assets/brand-site.css" 'background-image: url("house-duck-logo.png")'
 require_token "assets/studio-home.css" ".manifesto-bubble::after"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"

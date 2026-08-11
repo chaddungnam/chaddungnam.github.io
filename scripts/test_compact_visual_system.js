@@ -40,7 +40,7 @@ assert.match(brand, /--cream:\s*#f8f9fa/);
 assert.match(brand, /--navy:\s*#202124/);
 assert.match(brand, /--section-space:\s*clamp\(52px,\s*6vw,\s*80px\)/);
 assert.match(brand, /\.header-inner\s*\{[^}]*min-height:\s*64px/s);
-assert.match(brand, /\.brand-lockup::before\s*\{[^}]*width:\s*42px[^}]*height:\s*42px[^}]*content:\s*"HD"/s);
+assert.match(brand, /\.brand-lockup\s*\{[^}]*width:\s*48px[^}]*background-image:\s*url\("house-duck-logo\.png"\)/s);
 assert.match(brand, /\.game-hero\s*\{[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
 assert.match(brand, /\.game-title\s*\{[^}]*font-size:\s*clamp\(2\.75rem,\s*5\.2vw,\s*4\.4rem\)/s);
 assert.match(brand, /\.feature-card\s*\{[^}]*min-height:\s*280px/s);
@@ -56,7 +56,6 @@ assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*
 assert.match(legal, /\.legal-paper\s*\{[^}]*padding:\s*clamp\(24px,\s*4vw,\s*40px\)/s);
 
 assert.match(projectK, /--k-void:\s*#111315/);
-assert.match(projectK, /\.project-k-header \.brand-lockup::before\s*\{[^}]*background:\s*var\(--k-gold\)/s);
 assert.match(projectK, /\.project-k-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
 assert.match(projectK, /\.project-k-title\s*\{[^}]*font-size:\s*clamp\(2\.65rem,\s*4vw,\s*3\.45rem\)[^}]*word-break:\s*keep-all/s);
 assert.match(projectK, /\.project-k-section\s*\{[^}]*padding-block:\s*clamp\(52px,\s*7vw,\s*88px\)/s);
@@ -64,6 +63,7 @@ assert.match(projectK, /\.project-k-loop-card\s*\{[^}]*min-height:\s*220px/s);
 for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /class="manifesto-bubble/);
+  assert.match(html, /class="manifesto-mark"[^>]*>HD</);
   assert.equal((html.match(/data-game-preview/g) || []).length, 2);
 }
 

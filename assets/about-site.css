@@ -33,7 +33,6 @@ body[data-page="about"]::before {
 }
 
 body[data-page="about"] .site-header { border-color: var(--about-line); background: color-mix(in srgb, var(--about-bg) 90%, transparent); }
-body[data-page="about"] .brand-lockup::before { color: #182033; background: var(--about-yellow); }
 body[data-page="about"] .site-nav a,
 body[data-page="about"] .language-picker summary { color: var(--about-ink); }
 body[data-page="about"] .language-picker summary,
