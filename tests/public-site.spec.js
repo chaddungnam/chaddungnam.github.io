@@ -93,6 +93,15 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   if (!isMobile) {
     await page.waitForTimeout(900);
     const bubble = await page.locator(".manifesto-bubble").boundingBox();
+    const bubbleSpacing = await page.locator(".manifesto-bubble").evaluate((node) => {
+      const bubbleBox = node.getBoundingClientRect();
+      const markBox = node.querySelector(".manifesto-mark").getBoundingClientRect();
+      const dialogueBox = node.querySelector(".manifesto-dialogue").getBoundingClientRect();
+      return {
+        top: Math.min(markBox.top, dialogueBox.top) - bubbleBox.top,
+        bottom: bubbleBox.bottom - Math.max(markBox.bottom, dialogueBox.bottom),
+      };
+    });
     const phone = await page.locator(".iphone-shell").first().boundingBox();
     const cards = await page.locator(".post-preview-card:not(.post-preview-empty)").evaluateAll((nodes) => nodes.map((node) => {
       const box = node.getBoundingClientRect();
@@ -103,6 +112,9 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
       return { left: box.left, right: box.right };
     }));
     expect(bubble.width).toBeLessThan(680);
+    expect(bubble.height).toBeLessThan(320);
+    expect(Math.max(bubbleSpacing.top, bubbleSpacing.bottom)).toBeLessThan(58);
+    expect(Math.abs(bubbleSpacing.top - bubbleSpacing.bottom)).toBeLessThan(20);
     expect(phone.width).toBeGreaterThan(200);
     expect(Math.max(...cards.slice(0, 3).map((card) => card.y)) - Math.min(...cards.slice(0, 3).map((card) => card.y))).toBeLessThan(2);
     expect(cards[3].y).toBeGreaterThan(cards[0].y);
