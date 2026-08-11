@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.chaddungnam/house-duck-public",
+  "name": "in.houseduck/house-duck-public",
   "title": "House Duck",
   "description": "Read-only public information about House Duck games and its Korean-first development Blog.",
   "repository": {
