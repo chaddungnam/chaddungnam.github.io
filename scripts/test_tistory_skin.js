@@ -66,6 +66,10 @@ assert.match(html, /onclick="\[#\#_search_onclick_submit_##\]"/, "search button 
 assert.match(html, /tistory_admin\/lib\/jquery\/jquery-1\.12\.4\.min\.js/, "Tistory controls need the bundled jQuery runtime");
 assert.match(html, /aria-label="[^"]+"/, "skin needs accessible control labels");
 assert.match(html, /data-theme-toggle/, "skin needs a light and dark mode control");
+assert.match(html, /class="journal-hero manifesto-hero shell"/, "Blog home needs the shared speech-bubble composition");
+assert.match(html, /class="manifesto-bubble journal-bubble"/, "Blog statement needs a speech bubble");
+assert.equal((html.match(/data-game-preview/g) || []).length, 2, "Blog home needs two live game previews");
+assert.match(html, /만드는 과정을/, "Blog statement needs the approved making-of copy");
 assert.match(html, /name="robots" content="max-image-preview:large"/, "skin should allow large image previews in search");
 assert.doesNotMatch(html, /<meta name="description" content="\[##_desc_##\]">/, "Tistory should own the per-page description meta tag");
 assert.match(html, /https:\/\/houseduck\.in\/assets\/blog-locales\.js/, "skin needs the generated locale manifest");
@@ -94,8 +98,8 @@ assert.match(css, /#tt-body-page \.revenue_unit_wrap\s*\{/, "native top and bott
 assert.match(css, /\.tt_box_namecard/, "Tistory subscription card needs explicit theme styles");
 assert.match(css, /\.tt-comment-cont[\s\S]*\.tt-box-account/, "Tistory comment account fields need explicit theme styles");
 assert.match(css, /\.article-header h1\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.2vw,\s*2\.8rem\)/, "desktop article titles must stay practical");
-assert.match(css, /\.journal-hero\s*\{[^}]*padding-block:\s*clamp\(40px,\s*5vw,\s*64px\) 32px/, "Blog index hero must stay compact");
-assert.match(css, /\.hero-copy h1\s*\{[^}]*font-size:\s*clamp\(2\.25rem,\s*4vw,\s*3\.5rem\)/, "Blog index title must not dominate the screen");
+assert.match(css, /\.journal-hero\s*\{[^}]*--studio-bg:\s*var\(--cream\)/, "Blog hero must map the shared studio colors");
+assert.match(css, /\.journal-bubble\s*\{[^}]*animation:[^}]*studio-bubble-float/, "Blog speech bubble needs the same gentle motion");
 assert.match(css, /\.collection-head h2\s*\{[^}]*font-size:\s*clamp\(1\.65rem,\s*2\.6vw,\s*2\.25rem\)/, "Blog collection heading must stay compact");
 assert.match(css, /\.card-media\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/, "Blog card media must use a compact preview ratio");
 assert.match(css, /\.header-inner\s*\{[^}]*min-height:\s*64px/, "skin header must match the compact House Duck chrome");
@@ -119,6 +123,8 @@ assert.match(css, /#tt-body-page \.tt-comment-cont \.tt-area-write\s*\{[^}]*disp
 assert.match(xml, /<contentWidth>760<\/contentWidth>/, "editor width must match article measure");
 assert.doesNotMatch(script, /\b(?:fetch|XMLHttpRequest|WebSocket)\b/, "skin script must not make remote requests");
 assert.match(script, /house_duck_theme/, "theme choice must persist between visits");
+assert.match(script, /data-typewriter/, "Blog statement needs game-style text output");
+assert.match(script, /data-game-preview/, "Blog previews need reduced-motion playback control");
 assert.match(script, /HOUSE_DUCK_BLOG_LOCALES/, "skin must route readers through the generated locale manifest");
 assert.match(script, /original/, "Korean original view must bypass automatic redirection");
 assert.match(script, /data-alt|figcaption/, "skin script should recover useful image alt text");

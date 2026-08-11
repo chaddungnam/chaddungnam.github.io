@@ -5,6 +5,19 @@
     return value === "light" ? "light" : "dark";
   }
 
+  function sharedThemeCookie(documentRef) {
+    var match = String(documentRef.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/);
+    return match ? match[1] : "";
+  }
+
+  function saveSharedTheme(documentRef, theme) {
+    try {
+      documentRef.cookie = "house_duck_theme=" + theme + "; Domain=houseduck.in; Path=/; Max-Age=31536000; SameSite=Lax; Secure";
+    } catch (_error) {
+      // Local storage remains available when cookies are blocked.
+    }
+  }
+
   function applyTheme(documentRef, theme) {
     var selected = resolveTheme(theme);
     documentRef.documentElement.dataset.theme = selected;
@@ -54,7 +67,9 @@
     } catch (_error) {
       saved = "";
     }
-    applyTheme(documentRef, saved);
+    var cookieTheme = sharedThemeCookie(documentRef);
+    applyTheme(documentRef, cookieTheme || saved);
+    if (!cookieTheme && (saved === "light" || saved === "dark")) saveSharedTheme(documentRef, saved);
     hydrateOpenGraphImages(documentRef);
     recoverImageAltText(documentRef);
     documentRef.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
@@ -66,11 +81,53 @@
         } catch (_error) {
           // Theme switching still works when storage is unavailable.
         }
+        saveSharedTheme(documentRef, theme);
       });
     });
     documentRef.querySelectorAll("[data-current-year]").forEach(function (node) {
       node.textContent = String(new Date().getFullYear());
     });
+
+    var reducedMotion = typeof root.matchMedia === "function" && root.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    documentRef.querySelectorAll("[data-typewriter]").forEach(function (dialogue) {
+      var lines = Array.from(dialogue.querySelectorAll("[data-type-line]"));
+      if (!lines.length || reducedMotion) {
+        dialogue.dataset.typed = "true";
+        return;
+      }
+      var source = lines.map(function (line) { return line.textContent; });
+      lines.forEach(function (line) { line.textContent = ""; });
+      var lineIndex = 0;
+      var characterIndex = 0;
+      function typeNextCharacter() {
+        if (lineIndex >= lines.length) {
+          dialogue.dataset.typed = "true";
+          return;
+        }
+        if (characterIndex >= source[lineIndex].length) {
+          lineIndex += 1;
+          characterIndex = 0;
+          root.setTimeout(typeNextCharacter, 150);
+          return;
+        }
+        var character = source[lineIndex].charAt(characterIndex);
+        lines[lineIndex].textContent += character;
+        characterIndex += 1;
+        root.setTimeout(typeNextCharacter, /[,.!?。]/.test(character) ? 150 : 38);
+      }
+      typeNextCharacter();
+    });
+
+    var previews = Array.from(documentRef.querySelectorAll("[data-game-preview]"));
+    var saveData = root.navigator && root.navigator.connection && root.navigator.connection.saveData;
+    if (reducedMotion || saveData) {
+      previews.forEach(function (video) { video.autoplay = false; if (typeof video.pause === "function") video.pause(); });
+    } else {
+      previews.forEach(function (video) {
+        var playback = typeof video.play === "function" && video.play();
+        if (playback && typeof playback.catch === "function") playback.catch(function () {});
+      });
+    }
   }
 
   var api = { resolveTheme: resolveTheme, hydrateOpenGraphImages: hydrateOpenGraphImages, recoverImageAltText: recoverImageAltText, init: init };

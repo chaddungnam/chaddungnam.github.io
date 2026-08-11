@@ -31,7 +31,7 @@
       var date = Number.isNaN(published.valueOf())
         ? "HOUSE DUCK BLOG"
         : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
-      return '<article class="post-preview-card' + (index === 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
+      return '<article class="post-preview-card' + (index >= 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
         (image ? '<img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy">' : "") +
         '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3>' + escapeMarkup(localized.title) +
         '</h3><p>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
@@ -47,15 +47,32 @@
   var supportedLanguages = ["ko", "en", "de", "ja"];
   var savedTheme = "";
 
+  function sharedThemeCookie() {
+    var match = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/);
+    return match ? match[1] : "";
+  }
+
+  function saveSharedTheme(theme) {
+    try {
+      document.cookie = "house_duck_theme=" + theme + "; Domain=houseduck.in; Path=/; Max-Age=31536000; SameSite=Lax; Secure";
+    } catch (_error) {
+      // Local storage still preserves the preference when cookies are blocked.
+    }
+  }
+
   try {
     savedTheme = window.localStorage.getItem("house_duck_theme") || "";
   } catch (_error) {
     savedTheme = "";
   }
 
-  var initialTheme = savedTheme === "light" || savedTheme === "dark"
+  var cookieTheme = sharedThemeCookie();
+  var initialTheme = cookieTheme || (savedTheme === "light" || savedTheme === "dark"
     ? savedTheme
-    : "dark";
+    : "dark");
+  if (!cookieTheme && (savedTheme === "light" || savedTheme === "dark")) {
+    saveSharedTheme(savedTheme);
+  }
   root.dataset.theme = initialTheme;
 
   function normalizeLanguage(value) {
@@ -151,6 +168,7 @@
         } catch (_error) {
           // Theme switching still works when storage is blocked.
         }
+        saveSharedTheme(nextTheme);
       });
     });
 

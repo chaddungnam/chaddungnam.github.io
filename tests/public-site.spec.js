@@ -77,7 +77,8 @@ test("theme, mobile menu, and keyboard state stay understandable", async ({ page
 
 test("home hierarchy keeps the statement compact and the journal scannable", async ({ page, isMobile }) => {
   await page.goto("/?lang=ko");
-  await expect(page.locator("[data-typewriter]")).toHaveAttribute("aria-label", "House Duck, 게임 및 기타 소프트웨어 개발과 일기를 보여줍니다.");
+  await expect(page.locator(".manifesto-bubble h1")).toHaveAttribute("aria-label", "House Duck, 게임 및 기타 소프트웨어 개발과 일기를 보여줍니다.");
+  await expect(page.locator(".manifesto-note")).toContainText("환경 변화가 잦았던 제 경험을 녹여");
   await expect(page.locator(".manifesto-mark")).toHaveText("HD");
   await expect(page.locator(".brand-lockup")).toHaveCSS("background-image", /house-duck-logo\.png/);
   await expect(page.locator(".type-cursor")).toHaveCount(0);
@@ -87,7 +88,7 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
   await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
   await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
-  await expect(page.locator(".post-preview-card-wide")).toHaveCount(1);
+  await expect(page.locator(".post-preview-card-wide")).toHaveCount(3);
 
   if (!isMobile) {
     await page.waitForTimeout(900);
@@ -107,11 +108,15 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
     expect(cards[3].y).toBeGreaterThan(cards[0].y);
     expect(cards[3].width).toBeGreaterThan(cards[0].width * 2.5);
     expect(cards[3].height).toBeLessThan(210);
-    expect(Math.abs(cards[4].y - cards[5].y)).toBeLessThan(2);
     expect(cards[4].y).toBeGreaterThan(cards[3].y);
-    expect(cards[4].width).toBeGreaterThan(cards[0].width * 1.4);
+    expect(cards[5].y).toBeGreaterThan(cards[4].y);
+    for (const card of cards.slice(3)) {
+      expect(card.width).toBeGreaterThan(cards[0].width * 2.5);
+      expect(card.height).toBeLessThan(210);
+    }
     expect(phones[1].left - phones[0].right).toBeLessThan(16);
     expect(await page.locator(".game-device").first().evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-phone-float");
+    expect(await page.locator(".manifesto-bubble").evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-bubble-float");
   }
 
   const state = await page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({
@@ -124,6 +129,28 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
     { autoplay: true, muted: true, loop: true, playsInline: true },
     { autoplay: true, muted: true, loop: true, playsInline: true },
   ]);
+});
+
+test("primary navigation responds without colored hover chrome", async ({ page, isMobile }) => {
+  test.skip(isMobile, "mouse hover is covered by the desktop project");
+  await page.goto("/?lang=ko");
+  for (const link of await page.locator(".site-nav > a").all()) {
+    await link.hover();
+    await page.waitForTimeout(220);
+    const state = await link.evaluate((node) => ({
+      background: getComputedStyle(node).backgroundColor,
+      transform: getComputedStyle(node).transform,
+    }));
+    expect(state.background).not.toBe("rgba(0, 0, 0, 0)");
+    expect(state.transform).not.toBe("none");
+  }
+});
+
+test("blog index repeats the speech bubble and game previews", async ({ page }) => {
+  await page.goto("/blog/kr/");
+  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toBeVisible();
+  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toContainText("만드는 과정을");
+  await expect(page.locator(".mirror-manifesto [data-game-preview]")).toHaveCount(2);
 });
 
 test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => {
@@ -141,6 +168,7 @@ test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => 
     const state = await card.evaluate((node, imageSelector) => {
       const image = node.querySelector(imageSelector);
       return {
+        border: getComputedStyle(node).borderColor,
         shadow: getComputedStyle(node).boxShadow,
         transform: getComputedStyle(node).transform,
         imageTransform: image ? getComputedStyle(image).transform : "none",
@@ -149,6 +177,8 @@ test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => 
     expect(state.shadow).not.toBe("none");
     expect(state.transform).not.toBe("none");
     expect(state.imageTransform).not.toBe("none");
+    const channels = state.border.match(/\d+(?:\.\d+)?/g).slice(0, 3).map(Number);
+    expect(Math.max(...channels) - Math.min(...channels)).toBeLessThan(26);
   }
 });
 

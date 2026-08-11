@@ -3,14 +3,23 @@
 
   const root = document.documentElement;
   let savedTheme = "";
+  const cookieTheme = String(document.cookie || "").match(/(?:^|;\s*)house_duck_theme=(light|dark)(?:;|$)/)?.[1] || "";
+
+  function saveSharedTheme(theme) {
+    try {
+      document.cookie = `house_duck_theme=${theme}; Domain=houseduck.in; Path=/; Max-Age=31536000; SameSite=Lax; Secure`;
+    } catch (_error) {
+      // Local storage remains available when cookies are blocked.
+    }
+  }
+
   try {
     savedTheme = localStorage.getItem("house_duck_theme") || "";
   } catch (_error) {
     savedTheme = "";
   }
-  const initialTheme = savedTheme === "light" || savedTheme === "dark"
-    ? savedTheme
-    : "dark";
+  const initialTheme = cookieTheme || (savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark");
+  if (!cookieTheme && (savedTheme === "light" || savedTheme === "dark")) saveSharedTheme(savedTheme);
 
   function setTheme(theme) {
     root.dataset.theme = theme;
@@ -32,6 +41,7 @@
       } catch (_error) {
         // The control still works when storage is blocked.
       }
+      saveSharedTheme(theme);
     });
   });
 
@@ -60,6 +70,43 @@
     if (alt) image.setAttribute("alt", alt);
     image.decoding = "async";
   });
+
+  const reducedMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("[data-typewriter]").forEach((dialogue) => {
+    const lines = [...dialogue.querySelectorAll("[data-type-line]")];
+    if (!lines.length || reducedMotion) {
+      dialogue.dataset.typed = "true";
+      return;
+    }
+    const source = lines.map((line) => line.textContent);
+    lines.forEach((line) => { line.textContent = ""; });
+    let lineIndex = 0;
+    let characterIndex = 0;
+    function typeNextCharacter() {
+      if (lineIndex >= lines.length) {
+        dialogue.dataset.typed = "true";
+        return;
+      }
+      if (characterIndex >= source[lineIndex].length) {
+        lineIndex += 1;
+        characterIndex = 0;
+        window.setTimeout(typeNextCharacter, 150);
+        return;
+      }
+      const character = source[lineIndex].charAt(characterIndex);
+      lines[lineIndex].textContent += character;
+      characterIndex += 1;
+      window.setTimeout(typeNextCharacter, /[,.!?。]/.test(character) ? 150 : 38);
+    }
+    typeNextCharacter();
+  });
+
+  const previews = [...document.querySelectorAll("[data-game-preview]")];
+  if (reducedMotion || navigator.connection?.saveData) {
+    previews.forEach((video) => { video.autoplay = false; video.pause?.(); });
+  } else {
+    previews.forEach((video) => video.play?.().catch?.(() => {}));
+  }
 
   const articleToc = document.querySelector("[data-article-toc]");
   const articleHeadings = [...document.querySelectorAll(".article-body h2, .article-body h3")];

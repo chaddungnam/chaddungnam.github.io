@@ -24,9 +24,9 @@ assert.match(studio, /\.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.post-preview-copy h3\s*\{[^}]*-webkit-line-clamp:\s*2/s);
 assert.match(studio, /\.post-preview-copy p\s*\{[^}]*-webkit-line-clamp:\s*3/s);
 assert.match(studio, /\.post-preview-card\s*\{[^}]*animation:[^;}]*backwards/s);
-assert.match(studio, /\.post-preview-card:hover \.post-preview-image,[\s\S]*?scale\(1\.045\)/);
-assert.match(skin, /\.post-card:hover \.card-image,[\s\S]*?scale\(1\.045\)/);
-assert.match(mirror, /\.mirror-grid article:hover img,[\s\S]*?scale\(1\.045\)/);
+assert.match(studio, /\.post-preview-card:hover \.post-preview-image,[\s\S]*?scale\(1\.04\)/);
+assert.match(skin, /\.post-card:hover \.card-image,[\s\S]*?scale\(1\.04\)/);
+assert.match(mirror, /\.mirror-grid article:hover img,[\s\S]*?scale\(1\.04\)/);
 
 for (const css of [skin, mirror]) {
   assert.match(css, /#111315/);
