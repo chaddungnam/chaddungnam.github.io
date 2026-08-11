@@ -148,7 +148,8 @@ if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
   fail "sitemap.xml still publishes founder-story URLs"
 fi
 
-require_token "assets/brand-site.css" 'background-image: url("house-duck-logo.png")'
+require_css_property ".brand-lockup .brand-duck-image" "width: 38px"
+require_css_property ".brand-lockup .brand-wordmark-image" "width: 132px"
 require_token "assets/studio-home.css" ".manifesto-bubble::after"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"

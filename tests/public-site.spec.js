@@ -83,7 +83,9 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   await expect(page.locator(".manifesto-mark")).toHaveText("HD");
   await expect(page.locator(".manifesto-action")).toHaveText(/블로그 보러가기/);
   await expect(page.locator(".quirky-sticker img")).toHaveAttribute("src", /assets\/media\/quirky-character\.svg/);
-  await expect(page.locator(".brand-lockup")).toHaveCSS("background-image", /house-duck-logo\.png/);
+  await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
+  await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
+  await expect(page.locator(".brand-lockup .brand-wordmark-image")).toHaveCSS("width", "132px");
   await expect(page.locator(".type-cursor")).toHaveCount(0);
   await expect(page.locator(".nav-featured")).toHaveCount(2);
   await expect(page.locator("[data-game-preview]")).toHaveCount(2);

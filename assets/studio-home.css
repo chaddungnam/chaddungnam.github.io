@@ -346,7 +346,7 @@ html[data-locale="de"] .manifesto-bubble h1 { font-size: clamp(1.3rem, 1.6vw, 1.
   top: 8px;
   right: max(20px, calc((100vw - 1180px) / 2));
   content: "01";
-  color: color-mix(in srgb, var(--studio-ink) 6%, transparent);
+  color: color-mix(in srgb, var(--studio-ink) 48%, var(--studio-bg));
   font-size: clamp(6rem, 12vw, 11rem);
   font-weight: 950;
   letter-spacing: -.1em;

@@ -243,12 +243,17 @@ test("the common Terms route asks readers to choose a project", () => {
 
 test("public UI CSS preserves contrast, brand visibility, and mobile readability", () => {
   const brandCss = read("assets/brand-site.css");
+  const studioCss = read("assets/studio-home.css");
   const brandMark = cssDeclarations(brandCss, ".brand-lockup");
+  const duckMark = cssDeclarations(brandCss, ".brand-lockup .brand-duck-image");
+  const wordmark = cssDeclarations(brandCss, ".brand-lockup .brand-wordmark-image");
   const themeToggle = cssDeclarations(brandCss, 'body[data-page="studio"] .theme-toggle');
   const postCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .post-preview-copy p');
 
-  assert.match(brandMark["background-image"], /house-duck-logo\.png/, "public headers must use the duck mark");
-  assert.ok(parseFloat(brandMark.width) >= 44, "the duck mark must remain legible");
+  assert.equal(brandMark.display, "inline-flex", "public headers must show the complete brand lockup");
+  assert.ok(parseFloat(duckMark.width) >= 34, "the duck mark must remain legible");
+  assert.equal(wordmark.width, "132px", "the House Duck wordmark must remain visible beside the duck");
+  assert.equal(cssDeclarations(studioCss, ".journal-section::before").color, cssDeclarations(studioCss, ".history-number").color, "01 and 02 need the same visual tone");
   assert.ok(parseFloat(themeToggle.height) >= 44, "theme control needs a 44px touch target");
   assert.ok(parseFloat(postCopy["font-size"]) >= 0.9, "Blog summaries need readable mobile type");
 });
