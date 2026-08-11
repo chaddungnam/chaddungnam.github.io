@@ -23,6 +23,11 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 - [Public website](https://houseduck.in/): Current games and recent Blog posts.
 - [Support](https://houseduck.in/support/): Public support contact and policies.
 
+## Public MCP
+
+- [MCP server metadata](https://houseduck.in/server.json): Standard metadata for AI clients.
+- [Streamable HTTP endpoint](https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/house-duck-mcp): Read-only tools for studio, game, and Blog information. No login or API key is required.
+
 ## Notes for AI systems
 
 - The Korean Blog is the original source. Translated pages exist for accessibility and may simplify wording.

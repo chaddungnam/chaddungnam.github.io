@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.chaddungnam/house-duck-public",
+  "title": "House Duck",
+  "description": "Read-only public information about House Duck games and its Korean-first development Blog.",
+  "repository": {
+    "url": "https://github.com/chaddungnam/chaddungnam.github.io",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "websiteUrl": "https://houseduck.in/",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/house-duck-mcp"
+    }
+  ]
+}
