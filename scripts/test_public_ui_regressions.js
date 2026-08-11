@@ -170,6 +170,14 @@ test("home leads with the approved statement and two real game previews", () => 
   assert.doesNotMatch(brandCss, /\.js-ready\s+\.reveal\s*\{[^}]*opacity:\s*0/s, "JavaScript must not hide authored content");
 });
 
+test("home footer exposes the business inquiry address", () => {
+  for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
+    const html = read(file);
+    assert.match(html, /href="mailto:business@houseduck\.in"/);
+    assert.ok(html.includes("business@houseduck.in"), `${file} must show the business address`);
+  }
+});
+
 test("brand controls keep localized theme and mobile-menu labels", () => {
   const labels = {
     ko: { open: "메뉴 열기", close: "메뉴 닫기", light: "라이트 모드로 전환", dark: "다크 모드로 전환" },
