@@ -361,7 +361,8 @@ const operationContext = {
 };
 vm.runInNewContext(read("console/operations.js"), operationContext, { filename: "console/operations.js" });
 operationWindow.ConsoleOperations.mount();
-await Promise.resolve();
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.match(operationElements.operationsSummary.innerHTML, /공통 호환 코드/, "minimum-version summary must identify the shared compatibility code");
 minVersion.form.emit("submit");
 minVersion.form.emit("submit");
 await new Promise((resolve) => setTimeout(resolve, 0));
