@@ -83,6 +83,7 @@ assert.match(html, /images\/house-duck-logo\.png/, "skin must use the House Duck
 assert.match(html, /https:\/\/houseduck\.in\/assets\/house-duck-wordmark\.png/, "skin must use the hosted Montserrat House Duck wordmark");
 assert.doesNotMatch(html, /<nav class="desktop-nav"[\s\S]*?class="category-menu"/, "desktop categories should not expand inside the top navigation");
 assert.match(html, /<aside class="category-dock"[\s\S]*?\[##_category_##\][\s\S]*?<\/aside>/, "desktop categories need a floating side dock");
+assert.match(html, /<aside class="category-dock"[\s\S]*?<details open>/, "desktop categories should be expanded by default");
 assert.equal((html.match(/\[##_category_##\]/g) || []).length, 2, "desktop dock and mobile menu each need the Tistory category tree");
 assert.match(html, /<p class="eyebrow">01 · BLOG<\/p>/, "Blog index needs the shared editorial section number");
 assert.match(html, /class="footer-brand-images"/, "Blog footer should reuse the House Duck footer lockup");
