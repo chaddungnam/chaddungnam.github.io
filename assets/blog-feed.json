@@ -248,10 +248,20 @@
           "summary": "Godot이 유니티보다 무조건 좋은 엔진이라서 선택한 건 아니다. 내가 가진 맥북에서, 혼자 AI와 게임을 만들고 계속 고쳐나가기에는 Godot이 가장 현실적이었기 때문이다. 나는 개발자가 아니다. 산업디자인을 전공했고, 게임 QA로 3년 정도 일했다. 그러다가 지금은 독일에서 Quirky Ball이라는 모바일 퍼즐게임을",
           "url": "https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         },
+        "en": {
+          "title": "Making Games with Vibe Coding, Why I Chose Godot Instead of Unity | Quirky Ball",
+          "summary": "Godot is not chosen because it is unconditionally better than Unity. On the MacBook I have, it was because Godot was the most realistic for making games with AI alone and continuously modifying them. I am not a developer. I majored in industrial design and worked as a game QA for about 3 years. And now I am making a mobile puzzle game called Quirky Ball in Germany",
+          "url": "https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
         "de": {
           "title": "Spieleentwicklung mit Vibe Coding, warum ich mich anstelle von Unity für Godot entschieden habe | Quirky Ball",
           "summary": "Es ist nicht so, dass Godot unbedingt eine bessere Engine als Unity ist. Auf meinem MacBook war Godot schlichtweg die realistischste Wahl, um allein mit KI Spiele zu entwickeln und stetig anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Mittlerweile entwickle ich in Deutschland ein mobiles Puzzlespiel namens Quirky Ball.",
           "url": "https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "ja": {
+          "title": "Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball",
+          "summary": "Godot ga Unity yori zettai ni yoi enjin dakara sentaku shita wake dewa nai. Watashi ga motsu Mac de, hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa Godot ga mottomo genjitsuteki datta kara da. Watashi wa kaihatsusha dewa nai. Sangyō dezain o senkō shi, gem QA to shite 3-nen hodo hataraita. Soshite ima wa Doitsu de Quirky Ball to iu mobairu pazuru gem o tsukutte iru.",
+          "url": "https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         }
       }
     },

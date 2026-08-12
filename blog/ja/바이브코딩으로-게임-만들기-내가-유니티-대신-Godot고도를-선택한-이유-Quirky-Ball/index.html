@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Godot ga Unity yori zettai ni yoi enjin dakara sentaku shita wake dewa nai. Watashi ga motsu Mac de, hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa Godot ga mottomo genjitsuteki datta kara da. Watashi wa kaihatsusha dewa nai. Sangyō dezain o senkō shi, gem QA to shite 3-nen hodo hataraita. Soshite ima wa Doitsu de Quirky Ball to iu mobairu pazuru gem o tsukutte iru.">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball">
+  <meta property="og:description" content="Godot ga Unity yori zettai ni yoi enjin dakara sentaku shita wake dewa nai. Watashi ga motsu Mac de, hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa Godot ga mottomo genjitsuteki datta kara da. Watashi wa kaihatsusha dewa nai. Sangyō dezain o senkō shi, gem QA to shite 3-nen hodo hataraita. Soshite ima wa Doitsu de Quirky Ball to iu mobairu pazuru gem o tsukutte iru.">
+  <meta property="og:url" content="https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="article:published_time" content="2026-08-10T14:08:52.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball">
+  <meta name="twitter:description" content="Godot ga Unity yori zettai ni yoi enjin dakara sentaku shita wake dewa nai. Watashi ga motsu Mac de, hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa Godot ga mottomo genjitsuteki datta kara da. Watashi wa kaihatsusha dewa nai. Sangyō dezain o senkō shi, gem QA to shite 3-nen hodo hataraita. Soshite ima wa Doitsu de Quirky Ball to iu mobairu pazuru gem o tsukutte iru.">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif">
+  <link rel="canonical" href="https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball","description":"Godot ga Unity yori zettai ni yoi enjin dakara sentaku shita wake dewa nai. Watashi ga motsu Mac de, hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa Godot ga mottomo genjitsuteki datta kara da. Watashi wa kaihatsusha dewa nai. Sangyō dezain o senkō shi, gem QA to shite 3-nen hodo hataraita. Soshite ima wa Doitsu de Quirky Ball to iu mobairu pazuru gem o tsukutte iru.","datePublished":"2026-08-10T14:08:52.000Z","inLanguage":"ja","mainEntityOfPage":"https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/","url":"https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/","image":"https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">本文へ移動</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/ja/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/ja/">← すべての記事</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Vibe Coding de Gem o Tsukuru, Unity no Kawari ni Godot o Sentaku Shita Riyū | Quirky Ball</h1><time datetime="2026-08-10T14:08:52.000Z">2026年8月10日</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">韓国語</a><a href="/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">English</a><a href="/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">Deutsch</a><a href="/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/" aria-current="page">日本語</a></nav>
+      <aside class="mirror-note"><strong>自動翻訳</strong><span>このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。 <a href="https://blog.houseduck.in/entry/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball?original=1">韓国語の原文を読む</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">Godot ga Unity yori muzoken ni yoi enjin dakara sentaku shita wake dewa nai.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Watashi ga motsu Makubuku de,</p>
+<p data-ke-size="size16">hitori de AI to gem o tsukuri tsudzukete naoshite iku ni wa</p>
+<p data-ke-size="size16">Godot ga mottomo genjitsuteki datta kara da.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Watashi wa kaihatsusha dewa nai.</p>
+<p data-ke-size="size16">Sangyō dezain o senkō shi,</p>
+<p data-ke-size="size16">gem QA to shite 3-nen hodo hataraita.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Soshite ima wa Doitsu de</p>
+<p data-ke-size="size16">Quirky Ball to iu mobairu pazuru gem o tsukutte iru.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif" data-phocus="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif"><img src="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif" alt="Quirky Ball homu gamen to kyarakuta ga ugoku in-gem no bamen" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>Yuniti to Aniraru mo tsukatta. Dakedo omokatta.</b></h2>
+<p data-ke-size="size16">Gem o tsukuru to kimeta toki</p>
+<p data-ke-size="size16">Yuniti ya Aniraru o shiranakatta wake dewa nai.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Dochira mo mukashi ni sawatta koto ga aru.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Jōhō mo oku,</p>
+<p data-ke-size="size16">kansei shita gem mo kazoekirenai hodo ari,</p>
+<p data-ke-size="size16">yoi enjin to iu jijitsu wa waza waza watashi ga shōmei suru hitsuyō mo nai.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Mondai wa watashi no jōkyō datta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Watashi ga motsu sōbi wa M2 Makubuku Ewa da.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Kōsōdo desukutoppu dewa naku,</p>
+<p data-ke-size="size16">chimu tani de ōkina 3D gem o tsukuru wake dewa nakatta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">AI ni shūsei o yōmon shi,</p>
+<p data-ke-size="size16">enjin de sugu jikkō shi,</p>
+<p data-ke-size="size16">okashikattara mata naosu koto o ichinichi ni mo nando mo kurikaesanakereba naranakatta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Dakedo Yuniti to Aniraru wa</p>
+<p data-ke-size="size16">watashi ga nozomu kono mijikai kurikaeshi de kanari omoku kanjirareta.</p>
+<p data-ke-size="size16">Enjin o tsukeru koto kara futan ni nattara</p>
+<p data-ke-size="size16">gem o tsukuru no dewa naku</p>
+<p data-ke-size="size16">enjin o ogamu kibun ni nari hajimeru.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif"><img src="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif" alt="Quirky Ball homu gamen kara gem o hajimeru tenkan bamen" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Godot wa watashi no Makubuku to sagyō hōshiki ni yoku atteta.</b></h2>
+<p data-ke-size="size16">Godot o hajimete aketa toki ichiban saisho ni omotta koto wa</p>
+<p data-ke-size="size16">igai to nanimonai to iu koto datta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Kore wa tanten no yō ni kikoeru ga,</p>
+<p data-ke-size="size16">watashi ni totte wa mushiro chōten datta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Purojekuto o ake,</p>
+<p data-ke-size="size16">naoshi,</p>
+<p data-ke-size="size16">jikkō shi,</p>
+<p data-ke-size="size16">kekka o kakunin suru nagare ga hayakatta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky Ball wa kyodaina 3D ōpunwōrudo gem dewa nai.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Tate gamen de gyutama o otoshi,</p>
+<p data-ke-size="size16">butsukaru ugoki to UI o tsudzukete totonoo</p>
+<p data-ke-size="size16">2D mobairu pazuru gem da.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Dakara watashi ga tsukawanai kyodaina kinō yori</p>
+<p data-ke-size="size16">ima naoshita gamen o hayaku kakunin suru hō ga jūyō datta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Godot kōshiki bunsho demo macOS no Apple Silicon o shien taishō to shite meiji shite iru.</p>
+<p data-ke-size="size16">Jissai ni M2 Makubuku Ewa de henshūsha to gem o oikaki sagyō suru ni wa ōkina fuhuben ga nakatta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Sankō: <a href="https://docs.godotengine.org/en/4.7/about/system_requirements.html">https://docs.godotengine.org/en/4.7/about/system_requirements.html</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter"><a href="https://docs.godotengine.org/en/4.7/about/system_requirements.html" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">System requirements</p>
+<p class="og-desc" data-ke-size="size16">This page contains system requirements for the editor and exported projects. These specifications are given for informative purposes only, but they can be referred to if you're looking to buil...</p>
+<p class="og-host" data-ke-size="size16">docs.godotengine.org</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Baibukodingu to Godot ga yoku atteta riyū</b></h2>
+<p data-ke-size="size16">Watashi ga iu baibukodingu wa</p>
+<p data-ke-size="size16">AI ni “gem hitotsu tsukutte” to ii owaru hōshiki dewa nai.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Codex ga kōdo o sakusei sureba,</p>
+<p data-ke-size="size16">watashi wa jikasei de gem o jikkō shite miru.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Botan ga okashii ka,</p>
+<p data-ke-size="size16">gyutama no ugoki ga omoshiroku nai ka,</p>
+<p data-ke-size="size16">moji ga kirarete iru ka,</p>
+<p data-ke-size="size16">hajimete suru hito ga kisoku o rikai dekiru ka o miru.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Soshite mata gutaiteki ni shūsei saseru.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Kaihatsusha yaku o AI ga ōku totte tara,</p>
+<p data-ke-size="size16">watashi wa kikakusha to dezainā,</p>
+<p data-ke-size="size16">soshite QA yaku o shita yō na mono da.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Kono katei de jūyō na no wa</p>
+<p data-ke-size="size16">ichido ni kanpeki na kōdo o morau koto dewa nakatta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Chiisaku shūsei shi,</p>
+<p data-ke-size="size16">hayaku jikkō shi,</p>
+<p data-ke-size="size16">me de kakunin suru sokudo datta.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Godot wa sono kurikaeshi o tsukarenai yō ni shite kureta.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif" data-phocus="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif"><img src="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif" alt="Quirky Ball de gyutama o kiki otosu purei bamen" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Muryō to iu ten mo 1-nin no kaihatsusha ni totte wa mushi dekinai.</b></h2>
+<p data-ke-size="size16">Godot wa MIT raisensu no muryō opun-sōsu enjin da.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Shōgyōteki ni shiyō deki,</p>
+<p data-ke-size="size16">watashi ga tsukutta gem no kontentsu to kenri wa watashi gawa ni nokoru.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Sankō: <a href="https://godotengine.org/license/">https://godotengine.org/license/</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter" data-og-image="https://scrap.kakaocdn.net/dn/lfY9V/dJMb9jOCtg7/aAcPzL32Wc7AWAXSKKXzVK/img.jpg?width=1200&amp;height=630&amp;face=0_0_1200_630"><a href="https://godotengine.org/license/" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">License – Godot Engine</p>
+<p class="og-desc" data-ke-size="size16">Godot Engine is free and open source software released under the permissive MIT license.</p>
+<p class="og-host" data-ke-size="size16">godotengine.org</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">もちろん無料だからといって無条件に良いわけではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし、まだ収益のない1の個人開発者が</p>
+<p data-ke-size="size16">エンジンの費用やポリシー変更を先に心配しなくてもよいというのは</p>
+<p data-ke-size="size16">確実に気が楽になる部分だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そのお金と労力を</p>
+<p data-ke-size="size16">ゲームを一度でも多く修正することに使えるからだ。</p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>だからといってGodotがすべての面で楽だったわけではない。</b></h2>
+<p data-ke-size="size16">ここまでの内容だけを書くと</p>
+<p data-ke-size="size16">まるでGodotの伝道師のように見えるかもしれない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし、モバイルゲームを実際にリリースしようとすると</p>
+<p data-ke-size="size16">不便な部分も確かにあった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">広告、</p>
+<p data-ke-size="size16">アプリ内課金、</p>
+<p data-ke-size="size16">ログイン、</p>
+<p data-ke-size="size16">AndroidとiOSのネイティブ機能は</p>
+<p data-ke-size="size16">ゲーム画面を一つ作るのとはまったく違う問題だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プラグインのバージョンを合わせ、</p>
+<p data-ke-size="size16">各プラットフォームで個別に確認し、</p>
+<p data-ke-size="size16">エンジン内では問題ないのに実際の端末では異なる問題を見つける作業が繰り返された。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Unityのようにユーザーがはるかに多いエンジンと比較すると</p>
+<p data-ke-size="size16">行き詰まった時にそのまま当てはまる資料を見つけるのが難しい瞬間もあった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">AIがコードを代わりに書いてくれるからといって</p>
+<p data-ke-size="size16">こうした問題まで魔法のように消えるわけではなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">むしろ自分の知らないコードが急速に増える分だけ</p>
+<p data-ke-size="size16">実際に実行して確認するQAの重要性が増した。</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif"><img src="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif" alt="Quirky Ballのビー玉が地面で衝突するインゲームのシーン" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>それでも再びQuirky Ballを作るならGodotを選ぶだろうか。</b></h2>
+<p data-ke-size="size16">このゲームであれば再び選ぶと思う。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">正確には、</p>
+<p data-ke-size="size16">M2のMacBook Air一台で</p>
+<p data-ke-size="size16">AIと一緒に2Dのモバイルゲームを素早く作り直す条件であればそうだ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">逆に大規模な3Dゲームや、</p>
+<p data-ke-size="size16">特定の商用SDKを大量に組み込まなければならないプロジェクトであれば</p>
+<p data-ke-size="size16">私も別のエンジンを最初に比較するだろう。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">エンジンの選択は宗教ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">有名なエンジンを選ぶ問題ではなく、</p>
+<p data-ke-size="size16">自分が最後まで作りきることができるエンジンを選ぶ問題に近い。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">自分にとってその答えがGodotだった。</p>
+<p data-ke-size="size16">そして今は</p>
+<p data-ke-size="size16">エンジンを選んだという事実よりも</p>
+<p data-ke-size="size16">Quirky Ballを実際にリリースすることがはるかに重要だ。</p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>よくある質問</b></h2>
+<h3 data-ke-size="size23">- コーディングを知らなくてもGodotでゲームを作ることができますか。</h3>
+<p data-ke-size="size16">AIの助けにより、開始のハードルは大幅に下がった。</p>
+<p data-ke-size="size16">ただし、コードを全く見なくてもよいという意味ではない。</p>
+<p data-ke-size="size16">何が間違っているのかを説明し、</p>
+<p data-ke-size="size16">実際に実行して結果を判断する能力は依然として必要だ。</p>
+<p data-ke-size="size16"> </p>
+<h3 data-ke-size="size23">- バイブコーディングにはGodotが最も最適ですか。</h3>
+<p data-ke-size="size16">プロジェクトごとに異なる。</p>
+<p data-ke-size="size16">私は軽い2Dのモバイルゲームと早い反復作業のためにGodotを選んだ。</p>
+<p data-ke-size="size16">アセット生態系や特定のSDKがより重要であれば、Unityの方が楽な場合もある。</p>
+<p data-ke-size="size16"> </p>
+<h3 data-ke-size="size23">- M2のMacBook AirでGodotのゲーム開発は可能ですか。</h3>
+<p data-ke-size="size16">Quirky Ballのような2Dモバイルゲームは十分に作業できた。</p>
+<p data-ke-size="size16">ただしこれは私のプロジェクト基準の経験だ。</p>
+<p data-ke-size="size16">重い3Dグラフィックスやビルドの規模が大きくなると、結果は変わる可能性がある。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">次の記事では</p>
+<p data-ke-size="size16">インダストリアルデザイン専攻の私がなぜゲームアセットを一つも自作しなかったのか、</p>
+<p data-ke-size="size16">それにもかかわらずどのような方法でQuirky Ballのデザインを完成させたのかについて書きたいと思う。</p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ja.html">利用規約</a><a href="/privacy/ja.html">プライバシー</a><a href="/impressum/ja.html">Impressum</a><a href="/support/#english">サポート</a><a href="mailto:business@houseduck.in">ビジネスのお問い合わせ · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>
