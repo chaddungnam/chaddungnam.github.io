@@ -10,6 +10,7 @@ const state = {
   loading: false,
   aiBusy: false,
   mounted: false,
+  purchaseSnapshot: undefined,
 };
 const byId = (id) => document.getElementById(id);
 
@@ -59,6 +60,20 @@ function readFunctionError(error) {
   return `지표를 불러오지 못했습니다: ${error?.message ?? "알 수 없는 오류"}`;
 }
 
+async function loadPurchaseSnapshot() {
+  if (state.purchaseSnapshot) return;
+  const filters = { action: "purchases.list", rangeDays: 30, platform: "", productId: "", query: "", page: 1, limit: 50 };
+  try {
+    const [all, cancelled] = await Promise.all([
+      root.ConsoleAPI.post("admin-console", { ...filters, status: "" }),
+      root.ConsoleAPI.post("admin-console", { ...filters, status: "cancelled" }),
+    ]);
+    state.purchaseSnapshot = { summary: all?.summary ?? {}, total: all?.total, cancelled: cancelled?.total };
+  } catch (_error) {
+    state.purchaseSnapshot = null;
+  }
+}
+
 async function loadDashboard() {
   if (state.loading) return;
   if (!root.ConsoleAuth.isUnlocked()) {
@@ -69,15 +84,18 @@ async function loadDashboard() {
   setFiltersDisabled(true);
   setMessage(`Quirky Ball · 최근 ${state.rangeDays}일 이벤트와 플레이 계정을 집계하는 중...`);
   try {
-    const data = await root.ConsoleAPI.post("analytics-dashboard", {
-      projectKey: "quirky_ball",
-      distributionKey: state.distributionKey,
-      rangeDays: state.rangeDays,
-      playerQuery: state.playerQuery,
-      playerSort: state.playerSort,
-      playerDirection: state.playerDirection,
-      playerPage: state.playerPage,
-    });
+    const [data] = await Promise.all([
+      root.ConsoleAPI.post("analytics-dashboard", {
+        projectKey: "quirky_ball",
+        distributionKey: state.distributionKey,
+        rangeDays: state.rangeDays,
+        playerQuery: state.playerQuery,
+        playerSort: state.playerSort,
+        playerDirection: state.playerDirection,
+        playerPage: state.playerPage,
+      }),
+      loadPurchaseSnapshot(),
+    ]);
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
@@ -109,6 +127,8 @@ function renderDashboard() {
   renderFunnel();
   renderExitBreakdown();
   renderAds();
+  renderAppStatus();
+  renderPurchaseTrend();
   renderChoices();
   renderAttention(pulseModel);
   renderPeriodPlayers();
@@ -411,6 +431,62 @@ function renderAds() {
   byId("adsTable").innerHTML = rows.length === 0
     ? '<tr><td class="empty-row" colspan="8">아직 광고 이벤트가 없습니다.</td></tr>'
     : rows.map((row) => `<tr><td><strong>${escapeHtml(row.format)}</strong></td><td>${escapeHtml(row.placement)}</td><td>${formatNumber(row.started)}</td><td>${formatNumber(row.impressions)}</td><td>${formatNumber(row.testImpressions)}</td><td>${formatNumber(row.rewards)}</td><td>${formatNumber(row.dismissed)}</td><td>${formatNumber(row.failed)}</td></tr>`).join("");
+}
+
+function renderCoverageCards(id, cards) {
+  const statusLabels = { available: "수집됨", empty: "데이터 없음", waiting: "계측 대기", error: "조회 실패" };
+  byId(id).innerHTML = cards.map((card) => `
+    <article class="coverage-card" data-status="${card.status}">
+      <div class="coverage-card-top"><span class="coverage-status">${statusLabels[card.status]}</span><strong>${escapeHtml(card.value)}</strong></div>
+      <h3>${escapeHtml(card.label)}</h3>
+      <small>${escapeHtml(card.detail)}</small>
+    </article>`).join("");
+}
+
+function measuredCard(label, value, detail, hasData, formatter = (count) => `${formatNumber(count)}회`) {
+  const measured = hasData && typeof value === "number" && Number.isFinite(value);
+  return { status: measured ? "available" : "empty", label, value: measured ? formatter(value) : "데이터 없음", detail };
+}
+
+function renderAppStatus() {
+  const summary = state.payload?.summary ?? {};
+  const ads = state.payload?.ads;
+  const hasEvents = Number(summary.installs ?? 0) > 0 || Number(summary.sessions ?? 0) > 0;
+  const hasAds = Array.isArray(ads) && ads.length > 0;
+  const cards = [
+    measuredCard("세션 시작", summary.sessions, "session_start · 고유 세션", hasEvents),
+    measuredCard("평균 세션", summary.avgSessionSeconds, "session_end 기반 · 종료 건수는 현재 응답 미제공", hasEvents, formatDuration),
+    measuredCard("게임 시작", summary.gamesStarted, "game_start · 10초 미만 즉시 이탈 제외", hasEvents),
+    measuredCard("게임 완료", summary.gameOvers, "game_over · 정상 종료", hasEvents),
+    measuredCard("광고 노출", summary.adImpressions, "ad_impression · 테스트 광고 포함", hasAds),
+    measuredCard("광고 표시 실패", hasAds ? ads.reduce((sum, row) => sum + Number(row.failed ?? 0), 0) : null, "ad_show_failed · 로드 실패는 현재 집계 제외", hasAds),
+  ];
+  renderCoverageCards("appStatusGrid", cards);
+  setText("appStatusTotal", hasEvents ? `${cards.filter((card) => card.status === "available").length} / ${cards.length} 확인` : "데이터 없음");
+}
+
+function renderPurchaseTrend() {
+  const snapshot = state.purchaseSnapshot;
+  if (!snapshot) {
+    const status = snapshot === null ? "error" : "waiting";
+    renderCoverageCards("purchaseTrend", ["구매 완료", "구매 실패", "사용자 취소", "구매 복원", "환불", "결제 취소(차지백)"].map((label) => ({ status, label, value: status === "error" ? "조회 실패" : "계측 대기", detail: status === "error" ? "구매 서버 기록을 불러오지 못했습니다." : "구매 데이터를 불러오는 중입니다." })));
+    setText("purchaseTrendStatus", status === "error" ? "조회 실패" : "불러오는 중");
+    return;
+  }
+  const total = Number(snapshot.total);
+  const hasRecords = Number.isFinite(total) && total > 0;
+  const summary = snapshot.summary ?? {};
+  const recordCard = (label, value, detail) => measuredCard(label, Number(value), detail, hasRecords, (count) => `${formatNumber(count)}건`);
+  const cards = [
+    recordCard("구매 완료", summary.purchased, "purchase_records · purchased"),
+    { status: "waiting", label: "구매 실패", value: "계측 대기", detail: "현재 analytics 응답에 구매 실패 집계가 없습니다." },
+    recordCard("사용자 취소", snapshot.cancelled, "purchase_records · cancelled"),
+    { status: "waiting", label: "구매 복원", value: "계측 대기", detail: "현재 analytics 응답에 구매 복원 집계가 없습니다." },
+    recordCard("환불", summary.refunded, "purchase_records · refunded"),
+    recordCard("결제 취소(차지백)", summary.chargebacks, "purchase_records · chargeback"),
+  ];
+  renderCoverageCards("purchaseTrend", cards);
+  setText("purchaseTrendStatus", hasRecords ? `${formatNumber(total)}건 기록` : "데이터 없음");
 }
 
 function renderDailyTable() {

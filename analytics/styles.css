@@ -268,6 +268,16 @@ tbody tr:hover { background: #fffaf0; }
 .platform-row span, .platform-name small { color: #8990a5; font-size: 10px; }
 .platform-row strong { color: var(--ink); font-size: 13px; }
 .platform-name { display: grid; gap: 4px; }
+.coverage-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.coverage-card { --coverage-state: var(--gold); min-width: 0; padding: 13px 14px; background: #fffaf0; border: 1px solid #f0eade; border-left: 4px solid var(--coverage-state); border-radius: 12px; }
+.coverage-card[data-status="available"] { --coverage-state: var(--teal); background: var(--teal-soft); border-color: rgba(66,189,176,.3); }
+.coverage-card[data-status="empty"] { --coverage-state: #8990a5; background: #f2f1eb; }
+.coverage-card[data-status="error"] { --coverage-state: var(--coral); background: var(--coral-soft); border-color: rgba(238,111,94,.3); }
+.coverage-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.coverage-status { color: var(--coverage-state); font-size: 9px; font-weight: 900; }
+.coverage-card-top strong { color: var(--ink); font-size: 13px; white-space: nowrap; }
+.coverage-card h3 { margin: 0 0 6px; font-size: 12px; line-height: 1.35; }
+.coverage-card small { display: block; color: #8990a5; font-size: 9px; line-height: 1.5; }
 .dashboard-message { min-height: 20px; margin: 20px 0 0; color: #8b91a1; font-size: 11px; }
 
 @media (max-width: 1050px) {
@@ -313,6 +323,7 @@ tbody tr:hover { background: #fffaf0; }
   .project-picker { margin-top: 3vh; padding: 30px 24px; }
   .platform-row { grid-template-columns: repeat(2, 1fr); }
   .platform-name { grid-column: 1 / -1; }
+  .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operator-details > summary { align-items: flex-start; }
   .collapsible-content summary { padding: 18px; }
   .collapsible-content > .table-scroll { padding: 0 18px 16px; }
@@ -329,4 +340,5 @@ tbody tr:hover { background: #fffaf0; }
   .status-chip { grid-column: 2; justify-self: start; }
   .question-value, .question-gauge, .question-card > small { margin-left: 42px; }
   .operator-details > summary > b { display: none; }
+  .coverage-grid { grid-template-columns: 1fr; }
 }

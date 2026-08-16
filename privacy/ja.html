@@ -21,8 +21,8 @@
         <h2 id="section-2">2. 処理する情報</h2>
         <div class="table-scroll" role="region" aria-label="処理情報の表" tabindex="0"><table>
           <tr><th>情報</th><th>処理時点と目的</th></tr>
-          <tr><td>ゲスト識別子（UID）・認証提供者の識別子</td><td>初回利用時および任意でGoogleまたはAppleアカウントを連携した際に作成され、認証と同期に使用されます。</td></tr>
-          <tr><td>メールアドレス・プロフィール名</td><td>GoogleログインまたはAppleでサインインを選択し、共有を許可した範囲で処理します。Appleから非公開メール中継アドレスが提供される場合があります。</td></tr>
+          <tr><td>ゲスト識別子（UID）・認証提供者の識別子</td><td>初回利用時および任意でGoogleアカウント、またはiOS対応後にAppleアカウントを連携した際に作成され、認証と同期に使用されます。</td></tr>
+          <tr><td>メールアドレス・プロフィール名</td><td>Googleログイン、またはiOS対応後にAppleでサインインを選択し、共有を許可した範囲で処理します。Appleから非公開メール中継アドレスが提供される場合があります。</td></tr>
           <tr><td>ゲーム・アカウント情報</td><td>スコア、レベル、プレイ履歴、ニックネーム、表示コード、選択した国、スタミナ、ジェム、チケット、出席、ミッション、ショップ進行、フレンド、ギフト、メールボックス、所有・装備中のカスタマイズ情報が端末とSupabaseに保存される場合があります。</td></tr>
           <tr><td>購入情報</td><td>商品ID、ストア取引IDまたは購入トークン、購入状態、プラットフォーム、復元・返金状態、権利情報を処理します。House Duckがカード番号や銀行口座などの完全な決済情報を直接受け取ることはありません。</td></tr>
           <tr><td>広告・端末情報</td><td>Google Mobile Ads SDKは、広告配信・測定・エラー対応・不正防止のため、IPから推定されるおおよその位置、アプリ・広告操作、診断情報、広告ID、App Set ID等を処理する場合があります。</td></tr>
@@ -38,7 +38,7 @@
 
         <h2 id="section-4">4. 外部サービスと受領者</h2>
         <p>House Duckは個人情報を販売しません。以下の事業者が、サービスに応じて独立した管理者または処理者として情報を扱う場合があります。</p>
-        <div class="table-scroll" role="region" aria-label="外部サービスの表" tabindex="0"><table><tr><th>サービス</th><th>目的</th></tr><tr><td>Supabase (Supabase Inc.)</td><td>認証、同期、ゲーム状態、ランキング・ソーシャル機能、自社分析イベントの保存</td></tr><tr><td>Google Sign-In、Google AdMob/UMP、Google Play Billing（Google関連会社）</td><td>任意ログイン、広告・同意管理、Androidのアプリ内購入・復元・返金処理</td></tr><tr><td>Appleでサインイン、App Store/StoreKit（Apple関連会社）</td><td>任意ログイン、iOSのアプリ内購入・復元・返金処理</td></tr><tr><td>GitHub Pages (GitHub, Inc.)</td><td>houseduck.inの静的ホスティングとセキュリティログ</td></tr></table></div>
+        <div class="table-scroll" role="region" aria-label="外部サービスの表" tabindex="0"><table><tr><th>サービス</th><th>目的</th></tr><tr><td>Supabase (Supabase Inc.)</td><td>認証、同期、ゲーム状態、ランキング・ソーシャル機能、自社分析イベントの保存</td></tr><tr><td>Google Sign-In、Google AdMob/UMP、Google Play Billing（Google関連会社）</td><td>任意ログイン、広告・同意管理、Androidのアプリ内購入・復元・返金処理</td></tr><tr><td>Appleでサインイン、App Store/StoreKit（Apple関連会社）</td><td>iOS対応後の任意ログイン、iOSのアプリ内購入・復元・返金処理</td></tr><tr><td>GitHub Pages (GitHub, Inc.)</td><td>houseduck.inの静的ホスティングとセキュリティログ</td></tr></table></div>
         <ul><li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Googleプライバシーポリシー</a></li><li><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Appleプライバシーポリシー</a></li><li><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabaseプライバシーポリシー</a></li><li><a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHubプライバシーステートメント</a></li></ul>
 
         <h2 id="section-5">5. 国際移転</h2>
@@ -51,7 +51,7 @@
         <p>Quirky Ballの<strong>設定 → アカウント削除</strong>、または<a href="/quirky-ball/privacy/delete_ja.html">外部削除案内</a>から手続きできます。関連するゲーム・ソーシャルデータは削除され、復元できません。ただし、法的義務、決済・返金、不正防止、権利主張に厳密に必要な最小記録は目的終了まで残る場合があります。AppleやGoogleが独立して管理するストア取引記録はゲームアカウント削除では消去されません。</p>
 
         <h2 id="section-8">8. 広告同意と選択</h2>
-        <ul><li>EEA、英国、スイス等、同意が必要な地域ではGoogle UMPメッセージが表示される場合があります。</li><li>iOSでは、アプリ横断トラッキング権限を求める場合、AppleのApp Tracking Transparency（ATT）が別途表示されます。</li><li>必要な利用者は設定の<strong>広告プライバシー設定</strong>を再度開き、端末設定でも広告識別子やトラッキングを管理できます。</li><li>撤回前の適法な処理は撤回の影響を受けません。選択により制限付きまたは非パーソナライズ広告が表示される場合があります。</li></ul>
+        <ul><li>EEA、英国、スイス等、同意が必要な地域ではGoogle UMPメッセージが表示される場合があります。</li><li>iOS対応後、アプリ横断トラッキング権限を求める場合はAppleのApp Tracking Transparency（ATT）が別途表示されます。</li><li>必要な利用者は設定の<strong>広告プライバシー設定</strong>を再度開き、端末設定でも広告識別子やトラッキングを管理できます。</li><li>撤回前の適法な処理は撤回の影響を受けません。選択により制限付きまたは非パーソナライズ広告が表示される場合があります。</li></ul>
 
         <h2 id="section-9">9. 利用者の権利</h2>
         <p>適用法令に従い、アクセス、訂正、削除、制限、データポータビリティ、異議、同意撤回を請求できます。<a href="mailto:support@houseduck.in">support@houseduck.in</a>へご連絡ください。EU/EEA利用者は監督機関へ申し立てる権利があり、ヘッセン州の機関は<a href="https://datenschutz.hessen.de/" target="_blank" rel="noopener noreferrer">Der Hessische Beauftragte für Datenschutz und Informationsfreiheit</a>です。</p>
@@ -66,7 +66,7 @@
         <p>ゲストUIDと基本ゲーム状態はサービス提供に必要です。任意ログインや広告同意がなくてもゲスト利用できますが、同期やパーソナライズ広告が利用できない場合があります。House Duckは法的または同様に重大な影響を与える完全自動の意思決定を行いません。</p>
 
         <h2 id="section-13">13. 改定</h2>
-        <ul><li>2026年8月24日に発効予定 — House Duck共通ポリシーへ移行し、Android/iOS、Appleログイン、広告同意、一回限りの購入処理を反映予定（v3.0）。</li></ul><p>重要な変更は発効前にウェブサイトまたはアプリ内でお知らせします。</p>
+        <ul><li>2026年8月24日に発効予定 — House Duck共通ポリシーへ移行し、Android・Google Play、予定するiOS対応でのAppleログイン、広告同意、一回限りの購入処理を反映予定（v3.0）。</li></ul><p>重要な変更は発効前にウェブサイトまたはアプリ内でお知らせします。</p>
       </div>
       <!-- 문서 본문 끝 -->
       <footer class="legal-document-footer"><p>House Duck公式文書 · プライバシーポリシー</p></footer>
