@@ -39,12 +39,12 @@ for locale in "${locales[@]}"; do
   fi
 
   case "$locale" in
-    ko) product_term='엘리트 패키지'; rights_term='정당한 환불 요청' ;;
-    en) product_term='Elite Package'; rights_term='legitimate refund request' ;;
-    de) product_term='Elite-Paket'; rights_term='berechtigter Erstattungsantrag' ;;
-    ja) product_term='エリートパッケージ'; rights_term='正当な返金申請' ;;
+    ko) product_term='스타터 패키지'; rights_term='정당한 환불 요청' ;;
+    en) product_term='Starter Package'; rights_term='legitimate refund request' ;;
+    de) product_term='Starter-Paket'; rights_term='berechtigter Erstattungsantrag' ;;
+    ja) product_term='スターターパッケージ'; rights_term='正当な返金申請' ;;
   esac
-  if ! rg -q "$product_term" "$terms" || ! rg -q "$rights_term" "$terms"; then
+  if ! rg -q "$product_term" "$terms" || ! rg -qi 'yakwon' "$terms" || ! rg -q "$rights_term" "$terms"; then
     printf 'Terms page misses current product or lawful-refund protection: %s\n' "$terms" >&2
     failed=1
   fi

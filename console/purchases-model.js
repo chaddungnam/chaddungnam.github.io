@@ -8,7 +8,7 @@
     chargeback: "결제 취소", cancelled: "취소", revoked: "권한 회수",
   };
   const ENTITLEMENT_LABELS = { none: "없음", active: "활성", partial: "일부 회수", revoked: "회수" };
-  const PRODUCT_LABELS = { remove_ads: "광고 제거", elite_package: "엘리트 패키지", yakwon_bundle: "약원 패키지" };
+  const PRODUCT_LABELS = { remove_ads: "광고 제거", elite_package: "엘리트 패키지 (레거시)", yakwon_bundle: "약원 패키지" };
   const REASON_LABELS = {
     customer_request: "고객 요청", unauthorized: "승인하지 않은 결제", minor_purchase: "미성년 결제",
     technical_issue: "기술 문제", duplicate: "중복 결제", suspected_abuse: "반복 이용 검토",
