@@ -262,6 +262,11 @@
           "title": "Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball",
           "summary": "Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.",
           "url": "https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "ja": {
+          "title": "バイブコーディングでゲーム制作、私がユニティの代わりに Godot を選んだ理由 | Quirky Ball",
+          "summary": "Godot がユニティより無条件に良いエンジンだから選んだわけではない。私が持っているマックブックで、一人でAIとゲームを作り、直し続けるためには Godot が最も現実的だったからだ。私は開発者ではない。インダストリアルデザインを専攻し、ゲームQAとして 3 年ほど働いた。そして今はドイツで Quirky Ball というモバイルパズルゲームを",
+          "url": "https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         }
       }
     },
