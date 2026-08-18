@@ -426,11 +426,31 @@ function renderExitBreakdown() {
     </div>`).join("");
 }
 
+// QB-119 — "광고 표시 실패" 총합만으로는 특정 유저에게 몰린 문제(reason=not_ready가
+// 프리로드 타이밍)인지 전반적인 재고 부족(여러 날짜에 고르게 분산)인지 구분할 수
+// 없었다. analytics-dashboard가 placement별로 돌려주는 failuresByReason/
+// failuresByDay(둘 다 QB-116 RPC 경로가 살아나야 실제 데이터가 쌓인다)를 표로
+// 그대로 펼친다.
+function formatAdFailureReasons(failuresByReason) {
+  const entries = Object.entries(failuresByReason ?? {}).sort(([, a], [, b]) => b - a);
+  if (entries.length === 0) return "—";
+  return entries.map(([reason, count]) => `${escapeHtml(reason)}×${formatNumber(count)}`).join(", ");
+}
+
+function formatAdFailureDays(failuresByDay) {
+  const entries = Array.isArray(failuresByDay) ? failuresByDay : [];
+  if (entries.length === 0) return "—";
+  // 최근 날짜가 먼저 보이도록 뒤집는다 — 서버는 오름차순으로 보낸다.
+  return entries.slice().reverse().slice(0, 7)
+    .map((entry) => `${escapeHtml(String(entry.day).slice(5))}:${formatNumber(entry.count)}`)
+    .join(" ");
+}
+
 function renderAds() {
   const rows = state.payload?.ads ?? [];
   byId("adsTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="8">아직 광고 이벤트가 없습니다.</td></tr>'
-    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.format)}</strong></td><td>${escapeHtml(row.placement)}</td><td>${formatNumber(row.started)}</td><td>${formatNumber(row.impressions)}</td><td>${formatNumber(row.testImpressions)}</td><td>${formatNumber(row.rewards)}</td><td>${formatNumber(row.dismissed)}</td><td>${formatNumber(row.failed)}</td></tr>`).join("");
+    ? '<tr><td class="empty-row" colspan="10">아직 광고 이벤트가 없습니다.</td></tr>'
+    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.format)}</strong></td><td>${escapeHtml(row.placement)}</td><td>${formatNumber(row.started)}</td><td>${formatNumber(row.impressions)}</td><td>${formatNumber(row.testImpressions)}</td><td>${formatNumber(row.rewards)}</td><td>${formatNumber(row.dismissed)}</td><td>${formatNumber(row.failed)}</td><td>${formatAdFailureReasons(row.failuresByReason)}</td><td>${formatAdFailureDays(row.failuresByDay)}</td></tr>`).join("");
 }
 
 function renderCoverageCards(id, cards) {

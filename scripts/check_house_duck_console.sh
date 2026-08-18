@@ -96,4 +96,12 @@ if rg -n '기록 삭제|계정 삭제' "$console_dir"; then
   exit 1
 fi
 
+# QB-119 — 광고 실패 reason·날짜 분해가 콘솔 표에 실제로 붙어 있는지 고정한다.
+# 서버가 breakdown을 돌려줘도 콘솔이 렌더링하지 않으면 콘솔에서는 여전히 안 보인다.
+rg -F -q '<th>실패 사유</th><th>일별 실패(최근순)</th>' "$console_dir/index.html"
+rg -F -q 'function formatAdFailureReasons(' "$console_dir/analytics.js"
+rg -F -q 'function formatAdFailureDays(' "$console_dir/analytics.js"
+rg -F -q 'formatAdFailureReasons(row.failuresByReason)' "$console_dir/analytics.js"
+rg -F -q 'formatAdFailureDays(row.failuresByDay)' "$console_dir/analytics.js"
+
 echo "House Duck console contract: PASS"
