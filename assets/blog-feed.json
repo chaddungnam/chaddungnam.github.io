@@ -14,6 +14,21 @@
           "title": "프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩",
           "summary": "AI에게 게임 캐릭터를 만들어달라고 하면 그럴듯한 그림 한 장은 꽤 빨리 나온다. 문제는 그다음이었다. 같은 인물을 다시 그려달라고 했는데 얼굴이 바뀌고, 표정을 바꾸니 옷까지 달라지고, 게임 화면에 줄여 넣으니 눈과 입이 한 덩어리가 됐다. 한 장만 보면 마음에 드는데 여러 장을 나란히 놓으면 같은 게임처럼 보이지 않는",
           "url": "https://houseduck.in/blog/kr/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "en": {
+          "title": "Designing Game Characters with Prompts | House Duck Vibe Coding",
+          "summary": "When you ask an AI to create a game character, it generates a decent-looking image quite quickly. The problem came next. When asked to redraw the same person, the face changed; changing the expression also changed the clothing; and when scaled down onto the game screen, the eyes and mouth merged into a single lump. Looking at a single image, it was appealing, but placed side by side, many did not look like the same game",
+          "url": "https://houseduck.in/blog/en/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "de": {
+          "title": "Spielcharakterdesign mit Prompts | House Duck Vibe Coding",
+          "summary": "Wenn man die KI bittet, einen Spielcharakter zu erstellen, erhält man ziemlich schnell ein plausibles Bild. Das Problem war das Danach. Man bat darum, dieselbe Person noch einmal zu zeichnen, aber das Gesicht änderte sich; man änderte den Ausdruck, und sogar die Kleidung veränderte sich; als man es für den Spielbildschirm verkleinerte, verschmolzen Augen und Mund zu einer Masse. Wenn man nur ein einzelnes Bild betrachtete, gefiel es einem, aber wenn man mehrere Bilder nebeneinanderstellte, sahen sie oft nicht aus wie aus demselben Spiel.",
+          "url": "https://houseduck.in/blog/de/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
+        },
+        "ja": {
+          "title": "プロンプトでゲームキャラクターデザインをする | House Duck バイブコーディング",
+          "summary": "AIにゲームキャラクターを作ってほしいと頼むと、それらしい絵が枚はすぐに出来上がる。問題はその次だった。同じ人物をもう一度描いてほしいと頼んだのに顔が変わり、表情を変えると服まで変わり、ゲーム画面に小さく縮小して入れると目と口がひと固まりになった。枚だけ見ると気に入るのに、複数枚を並べると同じゲームに見えないことが多かった。",
+          "url": "https://houseduck.in/blog/ja/%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EC%BA%90%EB%A6%AD%ED%84%B0-%EB%94%94%EC%9E%90%EC%9D%B8-%ED%95%98%EA%B8%B0-House-Duck-%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9/"
         }
       }
     },
@@ -30,6 +45,21 @@
           "title": "인디게임 마케팅 비용이 너무 비싸서 블로그부터 만들었다 | House Duck",
           "summary": "게임을 다 만들면 이제 사람들에게 보여주기만 하면 되는 줄 알았다. 그런데 인디게임 마케팅 비용을 찾아보다가 조용히 창을 닫았다. 게임이 재미있는지, 사람들이 계속 플레이할지도 아직 숫자로 확인하지 못했는데 광고부터 크게 돌릴 형편은 아니었다. 그래서 돈 대신 시간을 쓰기로 했다. 누가 만들었는지 알 수 없는 게임보다 실",
           "url": "https://houseduck.in/blog/kr/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EB%A7%88%EC%BC%80%ED%8C%85-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EB%84%88%EB%AC%B4-%EB%B9%84%EC%8B%B8%EC%84%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A4%EC%97%88%EB%8B%A4-House-Duck/"
+        },
+        "en": {
+          "title": "Indie Game Marketing Costs Were Too High So I Started With a Blog | House Duck",
+          "summary": "I thought once the game was finished, I just had to show it to people. But after looking into indie game marketing costs, I quietly closed the window. I hadn't yet confirmed with numbers whether the game was fun or if people would keep playing, and I wasn't in a position to run large-scale ads right away. So I decided to spend time instead of money. Rather than a game made by an unknown creator, I",
+          "url": "https://houseduck.in/blog/en/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EB%A7%88%EC%BC%80%ED%8C%85-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EB%84%88%EB%AC%B4-%EB%B9%84%EC%8B%B8%EC%84%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A4%EC%97%88%EB%8B%A4-House-Duck/"
+        },
+        "de": {
+          "title": "Die Marketingkosten für Indie-Spiele waren zu hoch, also habe ich zuerst einen Blog erstellt | House Duck",
+          "summary": "Als das Spiel fertig war, dachte ich, ich müsse es den Leuten nur noch zeigen. Doch als ich nach den Marketingkosten für Indie-Spiele suchte, schloss ich das Fenster leise. Ich hatte noch nicht einmal mit Zahlen belegen können, ob das Spiel Spaß macht oder ob die Leute es weiter spielen würden, und ich konnte mir keine groß angelegte Werbung leisten. Also beschloss ich, Zeit statt Geld zu investieren. Statt eines Spiels, von dem man nicht weiß, wer es gemacht hat,",
+          "url": "https://houseduck.in/blog/de/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EB%A7%88%EC%BC%80%ED%8C%85-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EB%84%88%EB%AC%B4-%EB%B9%84%EC%8B%B8%EC%84%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A4%EC%97%88%EB%8B%A4-House-Duck/"
+        },
+        "ja": {
+          "title": "インディゲームのマーケティング費用が高すぎてブログから作り始めた | House Duck",
+          "summary": "ゲームを完成させたら、あとは人々に披露するだけだと思っていた。しかし、インディゲームのマーケティング費用を調べてみて、そっとブラウザを閉じた。ゲームが面白いか、人々が遊び続けるかまだ数字で確認できていないのに、広告を大々的に回せる状況ではなかった。だから、お金の代わりに時間を使うことにした。誰が作ったのか分からないゲームより、失敗し、直し、再挑戦する人間が見えるゲームの方が、少しは長く記憶に残るだろうと思った。",
+          "url": "https://houseduck.in/blog/ja/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EB%A7%88%EC%BC%80%ED%8C%85-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EB%84%88%EB%AC%B4-%EB%B9%84%EC%8B%B8%EC%84%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A4%EC%97%88%EB%8B%A4-House-Duck/"
         }
       }
     },
@@ -46,6 +76,21 @@
           "title": "애플 마켓에 앱을 올리며 겪는 과정 | Quirky Ball",
           "summary": "애플에 앱을 올리는 과정은 게임 빌드만 준비한다고 끝나는 일이 아니었다. Quirky Ball의 iOS 출시 준비를 시작하면서 App Store Connect에 등록된 주소가 이사 전 독일 주소로 남아 있는 걸 발견했다. 주소 한 줄만 바꾸면 될 줄 알았다. 그런데 애플에서는 이 주소가 계약과 연결되어 있어서 프로필에서 ",
           "url": "https://houseduck.in/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/"
+        },
+        "en": {
+          "title": "The process of uploading an app to Apple Market | Quirky Ball",
+          "summary": "Uploading an app to Apple was not just about preparing the game build. When starting the iOS launch preparation for Quirky Ball, I discovered that the address registered in App Store Connect was still my old German address from before the move. I thought I just needed to change a single line of address. However, at Apple, this address was connected to the contract, so it was not something that could be fixed directly in the profile",
+          "url": "https://houseduck.in/blog/en/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/"
+        },
+        "de": {
+          "title": "Der Prozess beim Hochladen einer App in den Apple Store | Quirky Ball",
+          "summary": "Der Prozess des Hochladens einer App zu Apple war nicht nur mit der Vorbereitung des Spiel-Builds getan. Als ich mit den Vorbereitungen fuer die iOS-Veroeffentlichung von Quirky Ball begann, stellte ich fest, dass die bei App Store Connect hinterlegte Adresse noch die deutsche Adresse vor dem Umzug war. Ich dachte, es wuerde genuegen, einfach eine Zeile der Adresse zu aendern. Doch bei Apple war diese Adresse mit dem Vertrag verknuepft, sodass man sie nicht einfach im Profil aendern konnte.",
+          "url": "https://houseduck.in/blog/de/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/"
+        },
+        "ja": {
+          "title": "アップルマーケットにアプリを公開する過程 | Quirky Ball",
+          "summary": "アップルにアプリを公開する過程はゲームビルドを準備するだけで終わるものではなかった。Quirky BallのiOSリリース準備を始めながらApp Store Connectに登録された住所が引っ越し前のドイツの住所のまま残っていることを発見した。住所を一文字変えるだけでいいと思った。しかしアップルではこの住所が契約と繋がっているためプロフィールで ",
+          "url": "https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/"
         }
       }
     },
@@ -62,6 +107,21 @@
           "title": "게임 어드민 페이지 만들기 | 유저도 없는데 관리자 콘솔부터 만든 이유",
           "summary": "나는 Supabase를 직접 만지기 싫어서 게임 관리자 콘솔을 만든 게 아니다. 바이브코딩을 할 때도 터미널을 좋아하는 사람이 있고, 데스크톱 프로그램과 GUI를 좋아하는 사람이 있다. 나는 확실히 후자다. 서버 운영도 로그와 테이블을 하나씩 열어보는 것보다 필요한 정보가 가공된 화면으로 보고 싶었다. 가능하다면 노트북을",
           "url": "https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/"
+        },
+        "en": {
+          "title": "Making a Game Admin Page | Why I Built the Manager Console First Even Without Users",
+          "summary": "I didn't build the game manager console because I hated touching Supabase directly. When vibe coding, some people love the terminal, while others love desktop programs and GUIs. I am definitely the latter. For server operations too, rather than opening logs and tables one by one, I wanted to see the necessary information on a processed screen.",
+          "url": "https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/"
+        },
+        "de": {
+          "title": "Spiel-Admin-Seite erstellen | Warum ich zuerst eine Admin-Console gebaut habe, obwohl es noch keine User gibt",
+          "summary": "Ich habe die Spiel-Admin-Console nicht deshalb gebaut, weil ich Supabase nicht direkt anfassen wollte. Auch beim Vibe Coding gibt es Leute, die das Terminal bevorzugen, und solche, die Desktop-Programme und GUIs mögen. Ich gehöre definitiv zur letzteren Kategorie. Auch bei der Serververwaltung wollte ich die benötigten Informationen lieber auf einem aufbereiteten Bildschirm sehen, anstatt Protokolle und Tabellen einzeln zu öffnen. Wenn möglich",
+          "url": "https://houseduck.in/blog/de/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/"
+        },
+        "ja": {
+          "title": "ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由",
+          "summary": "私はSupabaseを直接触りたくなくてゲーム管理者コンソールを作ったわけではない。バイブコーディングをする時もターミナルを好む人がいれば、デスクトッププログラムとGUIを好む人もいる。私は確実に後者だ。サーバー運営もログとテーブルを一つずつ開いてみるより、必要な情報が加工された画面で見",
+          "url": "https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/"
         }
       }
     },
@@ -78,6 +138,21 @@
           "title": "구글 플레이 콘솔 비공개 테스트 12명 14일 | 게임이 개과천선한 이유 | Quirky Ball",
           "summary": "구글 플레이 비공개 테스트에서 가장 어려웠던 건 게임을 만드는 일이 아니라 안드로이드 사용자 12명을 모으는 일이었다. 가족과 친구에게 부탁하면 금방 끝날 줄 알았다. 그런데 생각보다 아이폰 사용자가 많았고, 안드로이드폰이 있어도 14일 동안 테스트 참여 상태를 유지해 달라는 부탁은 가볍게 꺼낼 수 있는 부탁이 아니었다.",
           "url": "https://houseduck.in/blog/kr/%EA%B5%AC%EA%B8%80-%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%BD%98%EC%86%94-%EB%B9%84%EA%B3%B5%EA%B0%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8-12%EB%AA%85-14%EC%9D%BC-%EA%B2%8C%EC%9E%84%EC%9D%B4-%EA%B0%9C%EA%B3%BC%EC%B2%9C%EC%84%A0%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "en": {
+          "title": "Google Play Console Closed Test 12 Users 14 Days | Why the Game Turned Over a New Leaf | Quirky Ball",
+          "summary": "The hardest part of the Google Play closed test was not making the game, but gathering 12 Android users. I thought it would end quickly if I asked family and friends. However, there were more iPhone users than expected, and even for those with Android phones, asking them to maintain test participation status for 14 days was not a casual favor to ask.",
+          "url": "https://houseduck.in/blog/en/%EA%B5%AC%EA%B8%80-%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%BD%98%EC%86%94-%EB%B9%84%EA%B3%B5%EA%B0%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8-12%EB%AA%85-14%EC%9D%BC-%EA%B2%8C%EC%9E%84%EC%9D%B4-%EA%B0%9C%EA%B3%BC%EC%B2%9C%EC%84%A0%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "de": {
+          "title": "Google Play Console geschlossener Test 12 Personen 14 Tage | Warum das Spiel eine komplette Wandlung durchlief | Quirky Ball",
+          "summary": "Das Schlimmste beim geschlossenen Google-Play-Test war nicht die Erstellung des Spiels, sondern das Sammeln von 12 Android-Nutzern. Ich dachte, wenn ich Familie und Freunde frage, wäre es schnell vorbei. Aber es gab mehr iPhone-Benutzer als erwartet, und selbst wenn sie ein Android-Telefon hatten, war die Bitte, den Teststatus für 14 Tage aufrechtzuerhalten, keine Bitte, die man einfach so leichtfertig stellen konnte.",
+          "url": "https://houseduck.in/blog/de/%EA%B5%AC%EA%B8%80-%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%BD%98%EC%86%94-%EB%B9%84%EA%B3%B5%EA%B0%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8-12%EB%AA%85-14%EC%9D%BC-%EA%B2%8C%EC%9E%84%EC%9D%B4-%EA%B0%9C%EA%B3%BC%EC%B2%9C%EC%84%A0%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "ja": {
+          "title": "グーグルプレイコンソール非公開テスト12人14日 | ゲームが改心した理由 | Quirky Ball",
+          "summary": "グーグルプレイ非公開テストで最も難しかったのはゲームを作ることではなくアンドロイドユーザー12人を集めることだった。家族や友人に頼めばすぐ終わると思った。ところが思ったよりアイフォンユーザーが多く、アンドロイドフォンがあっても14日間テスト参加状態を維持してほしいという頼みは軽く切り出せる頼みではなかった。",
+          "url": "https://houseduck.in/blog/ja/%EA%B5%AC%EA%B8%80-%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%BD%98%EC%86%94-%EB%B9%84%EA%B3%B5%EA%B0%9C-%ED%85%8C%EC%8A%A4%ED%8A%B8-12%EB%AA%85-14%EC%9D%BC-%EA%B2%8C%EC%9E%84%EC%9D%B4-%EA%B0%9C%EA%B3%BC%EC%B2%9C%EC%84%A0%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         }
       }
     },
@@ -94,6 +169,21 @@
           "title": "독일에서 1인 게임개발 사업자 등록하기 | 방구석에서 Gewerbe를 끝냈다",
           "summary": "독일에서 1인 게임개발 사업자를 등록하는 일 자체는 내 예상보다 훨씬 빨리 끝났다. 일요일에 방구석에서 신청을 마쳤고, 금요일에는 등록 완료 서류가 등기우편으로 도착했다. 딱 5일이었다. Kronberg에서 등록을 마친 House Duck의 Gewerbe-Anmeldung 사업자 등록은 전부 집에서 했다. 내가 등록한 사",
           "url": "https://houseduck.in/blog/kr/%EB%8F%85%EC%9D%BC%EC%97%90%EC%84%9C-1%EC%9D%B8-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EC%82%AC%EC%97%85%EC%9E%90-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0-%EB%B0%A9%EA%B5%AC%EC%84%9D%EC%97%90%EC%84%9C-Gewerbe%EB%A5%BC-%EB%81%9D%EB%83%88%EB%8B%A4/"
+        },
+        "en": {
+          "title": "Registering as a game development sole proprietor in Germany | Finished Gewerbe from my room 1",
+          "summary": "Registering as a game development sole proprietor in Germany 1 finished much faster than I expected. I completed the application from my room on Sunday, and the registration completion documents arrived by registered mail on Friday. It took exactly 5 days. Gewerbe-Anmeldung for House Duck registered in Kronberg. All business registrations were done from home.",
+          "url": "https://houseduck.in/blog/en/%EB%8F%85%EC%9D%BC%EC%97%90%EC%84%9C-1%EC%9D%B8-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EC%82%AC%EC%97%85%EC%9E%90-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0-%EB%B0%A9%EA%B5%AC%EC%84%9D%EC%97%90%EC%84%9C-Gewerbe%EB%A5%BC-%EB%81%9D%EB%83%88%EB%8B%A4/"
+        },
+        "de": {
+          "title": "Registrierung eines 1 Spielentwicklungsunternehmens in Deutschland | Erledigung des Gewerbes vom Zimmer aus",
+          "summary": "Die eigentliche Anmeldung eines 1 Spielentwicklungsunternehmens in Deutschland ging viel schneller als erwartet. Ich habe den Antrag sonntags von meinem Zimmer aus abgeschlossen, und freitags kamen die Registrierungsunterlagen per Einschreiben an. Es dauerte exakt 5 Tage. Gewerbe-Anmeldung von House Duck nach der Registrierung in Kronberg, und die Gewerbeanmeldung wurde komplett von zu Hause aus erledigt. Das Unternehmen, das ich angemeldet habe, ist",
+          "url": "https://houseduck.in/blog/de/%EB%8F%85%EC%9D%BC%EC%97%90%EC%84%9C-1%EC%9D%B8-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EC%82%AC%EC%97%85%EC%9E%90-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0-%EB%B0%A9%EA%B5%AC%EC%84%9D%EC%97%90%EC%84%9C-Gewerbe%EB%A5%BC-%EB%81%9D%EB%83%88%EB%8B%A4/"
+        },
+        "ja": {
+          "title": "ドイツで 1 なゲーム開発事業者の登録 | 部屋の隅で Gewerbe を完了した",
+          "summary": "ドイツで 1 なゲーム開発事業者の登録作業そのものは、私の予想よりはるかに早く終わった。日曜日に部屋の隅で申請を済ませ、金曜日には登録完了書類が書留郵便で届いた。ちょうど 5 日だった。クロンベルク で登録を終えた House Duck の Gewerbe-Anmeldung 事業者登録はすべて自宅で行った。私が登録した事",
+          "url": "https://houseduck.in/blog/ja/%EB%8F%85%EC%9D%BC%EC%97%90%EC%84%9C-1%EC%9D%B8-%EA%B2%8C%EC%9E%84%EA%B0%9C%EB%B0%9C-%EC%82%AC%EC%97%85%EC%9E%90-%EB%93%B1%EB%A1%9D%ED%95%98%EA%B8%B0-%EB%B0%A9%EA%B5%AC%EC%84%9D%EC%97%90%EC%84%9C-Gewerbe%EB%A5%BC-%EB%81%9D%EB%83%88%EB%8B%A4/"
         }
       }
     },
@@ -110,6 +200,11 @@
           "title": "바이브코딩으로 게임만들기 | 프로젝트K | 재밌는 소재지만 양대마켓 검열에 걸릴 것 같다.",
           "summary": "Project K는 아직 게임이라고 부르기 민망하다. 내 체감 개발률은 10%도 안 된다. 화면은 많다. 대화도 나오고, 농장도 있고, 광산도 있고, 전쟁 비슷한 것도 돌아간다. 그런데 플레이어가 실제로 만지는 순간을 기준으로 보면, 완성된 콘텐츠가 거의 없다. 최근 리팩토링을 하면서 그 사실이 더 적나라하게 보이기 시작",
           "url": "https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/"
+        },
+        "ja": {
+          "title": "バイブコーディングでゲームを作る | プロジェクトK | 面白いテーマだが両ストアの審査にひっかかりそうだ。",
+          "summary": "Project Kはまだゲームと呼ぶには恥ずかしい。私の体感での開発率は 10%にも満たない。画面は多い。会話もあり、農場もあり、鉱山もあり、戦争らしきものも動いている。しかしプレイヤーが実際に触れる瞬間を基準に見ると、完成したコンテンツがほとんどない。最近リファクタリングをする中で、その事実がより露骨に見え始めた",
+          "url": "https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84%EB%A7%8C%EB%93%A4%EA%B8%B0-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8K-%EC%9E%AC%EB%B0%8C%EB%8A%94-%EC%86%8C%EC%9E%AC%EC%A7%80%EB%A7%8C-%EC%96%91%EB%8C%80%EB%A7%88%EC%BC%93-%EA%B2%80%EC%97%B4%EC%97%90-%EA%B1%B8%EB%A6%B4-%EA%B2%83-%EA%B0%99%EB%8B%A4/"
         }
       }
     },
@@ -126,6 +221,21 @@
           "title": "바이브코딩으로 게임 디자인하기, 디자인과 출신인데 에셋을 하나도 직접 만들지 않은 이유 | Quirky Ball",
           "summary": "나는 산업디자인을 전공했지만 Quirky Ball의 게임 에셋을 직접 만들지 않았다. 일러스트를 한 장씩 그리고, 버튼을 포토샵에서 뽑고, 아이콘을 직접 다듬는 방식으로 만들지 않았다는 뜻이다. 그런데도 게임의 분위기는 점점 하나로 모이고 있다. 처음에는 나도 이게 좀 이상했다. 디자인과를 나왔는데 정작 내 게임 그림을 ",
           "url": "https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%94%94%EC%9E%90%EC%9D%B8%ED%95%98%EA%B8%B0-%EB%94%94%EC%9E%90%EC%9D%B8%EA%B3%BC-%EC%B6%9C%EC%8B%A0%EC%9D%B8%EB%8D%B0-%EC%97%90%EC%85%8B%EC%9D%84-%ED%95%98%EB%82%98%EB%8F%84-%EC%A7%81%EC%A0%91-%EB%A7%8C%EB%93%A4%EC%A7%80-%EC%95%8A%EC%9D%80-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "en": {
+          "title": "Designing a Game with Vibe Coding, Why I Majored in Industrial Design Yet Didn't Make a Single Asset Myself | Quirky Ball",
+          "summary": "I majored in industrial design, but I did not create the game assets for Quirky Ball myself. That means I did not make them by drawing illustrations one by one, exporting buttons in Photoshop, and refining icons manually. Yet the atmosphere of the game is gradually coming together into a single cohesive feel. At first, I found this a bit strange myself. I graduated from design school, and yet I am not drawing the art for my own game.",
+          "url": "https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%94%94%EC%9E%90%EC%9D%B8%ED%95%98%EA%B8%B0-%EB%94%94%EC%9E%90%EC%9D%B8%EA%B3%BC-%EC%B6%9C%EC%8B%A0%EC%9D%B8%EB%8D%B0-%EC%97%90%EC%85%8B%EC%9D%84-%ED%95%98%EB%82%98%EB%8F%84-%EC%A7%81%EC%A0%91-%EB%A7%8C%EB%93%A4%EC%A7%80-%EC%95%8A%EC%9D%80-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "de": {
+          "title": "Spiele-Design mit Vibe Coding: Warum ich Industriedesign studiert, aber nicht ein einziges Asset selbst erstellt habe | Quirky Ball",
+          "summary": "Ich habe Industriedesign studiert, aber die Game-Assets von Quirky Ball nicht selbst erstellt. Das bedeutet, dass ich weder Illustrationen Stück für Stück gezeichnet, noch Buttons in Photoshop exportiert oder Icons eigenhändig überarbeitet habe. Dennoch fügt sich die Atmosphäre des Spiels immer mehr zu einem stimmigen Ganzen zusammen. Anfangs kam mir das selbst etwas seltsam vor. Ich hatte einen Abschluss in Design, und doch zeichnete ich die Grafiken für mein eigenes Spiel nicht selbst.",
+          "url": "https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%94%94%EC%9E%90%EC%9D%B8%ED%95%98%EA%B8%B0-%EB%94%94%EC%9E%90%EC%9D%B8%EA%B3%BC-%EC%B6%9C%EC%8B%A0%EC%9D%B8%EB%8D%B0-%EC%97%90%EC%85%8B%EC%9D%84-%ED%95%98%EB%82%98%EB%8F%84-%EC%A7%81%EC%A0%91-%EB%A7%8C%EB%93%A4%EC%A7%80-%EC%95%8A%EC%9D%80-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "ja": {
+          "title": "バイブコーディングでゲームデザインする、デザイン科出身なのにアセットを一つも自分で作らなかった理由 | Quirky Ball",
+          "summary": "私はインダストリアルデザインを専攻したが、Quirky Ballのゲームアセットを自分で作らなかった。イラストを一枚ずつ描き、ボタンをフォトショップで書き出し、アイコンを直接整える方法で作らなかったという意味だ。それでもゲームの雰囲気は次第に一つにまとまっている。最初は私もこれが少し奇妙だった。デザイン科を出たのに、いざ自分のゲームの絵を",
+          "url": "https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%94%94%EC%9E%90%EC%9D%B8%ED%95%98%EA%B8%B0-%EB%94%94%EC%9E%90%EC%9D%B8%EA%B3%BC-%EC%B6%9C%EC%8B%A0%EC%9D%B8%EB%8D%B0-%EC%97%90%EC%85%8B%EC%9D%84-%ED%95%98%EB%82%98%EB%8F%84-%EC%A7%81%EC%A0%91-%EB%A7%8C%EB%93%A4%EC%A7%80-%EC%95%8A%EC%9D%80-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         }
       }
     },
@@ -142,6 +252,16 @@
           "title": "바이브코딩으로 게임 만들기, 내가 유니티 대신 Godot(고도)를 선택한 이유 | Quirky Ball",
           "summary": "Godot이 유니티보다 무조건 좋은 엔진이라서 선택한 건 아니다. 내가 가진 맥북에서, 혼자 AI와 게임을 만들고 계속 고쳐나가기에는 Godot이 가장 현실적이었기 때문이다. 나는 개발자가 아니다. 산업디자인을 전공했고, 게임 QA로 3년 정도 일했다. 그러다가 지금은 독일에서 Quirky Ball이라는 모바일 퍼즐게임을",
           "url": "https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "en": {
+          "title": "Making Games with Vibe Coding, Why I Chose Godot Instead of Unity | Quirky Ball",
+          "summary": "Godot is not chosen because it is unconditionally better than Unity. On the MacBook I have, Godot was the most realistic choice to make a game alone with AI and keep fixing it. I am not a developer. I majored in industrial design and worked as a game QA for about 3 years. Then now in Germany, I am making a mobile puzzle game called Quirky Ball",
+          "url": "https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
+        },
+        "de": {
+          "title": "Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball",
+          "summary": "Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.",
+          "url": "https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
         }
       }
     },
@@ -158,6 +278,21 @@
           "title": "내가 독일까지 와서 뜬금없이 개발을 시작하게 된 이유",
           "summary": "나는 경기대학교 산업디자인학과 17학번이다. 지금은 독일에서 개인사업자를 내고, 게임을 포함한 여러 소프트웨어를 직접 만들어 출시하려고 하고 있다. 당장 첫 게임인 Quirky Ball 도 사실상 개발을 끝내고, 사업자 등록과 양대 마켓 결제 테스트를 진행하는 단계까지 왔다. 그런데 웃긴 건, 나는 원래 개발자가 될 생각",
           "url": "https://houseduck.in/blog/kr/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
+        },
+        "en": {
+          "title": "Why I Suddenly Started Developing After Moving All The Way To Germany",
+          "summary": "I am a student of the Industrial Design Department at Kyonggi University from the admission year 17. Now, I have established a sole proprietorship in Germany and am trying to create and release various software including games myself. Right away, my first game Quirky Ball has virtually finished development and has reached the stage of business registration and conducting payment tests for both major markets. But the funny thing is, I never originally planned to become a developer.",
+          "url": "https://houseduck.in/blog/en/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
+        },
+        "de": {
+          "title": "Warum ich bis nach Deutschland kam und plötzlich anfing zu entwickeln",
+          "summary": "Ich gehöre zum Immatrikulationsjahrgang 17 der Kyonggi Universität für Industriedesign. Jetzt habe ich in Deutschland ein Einzelunternehmen gegründet und versuche, verschiedene Softwareprodukte einschließlich Spielen selbst zu entwickeln und zu veröffentlichen. Sogar mein erstes Spiel Quirky Ball ist faktisch fertig entwickelt und hat das Stadium der Gewerbeanmeldung und von Zahlungstests auf beiden großen Märkten erreicht. Das Komische ist nur, dass ich eigentlich nie Entwickler werden wollte",
+          "url": "https://houseduck.in/blog/de/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
+        },
+        "ja": {
+          "title": "私がドイツまで来て唐突に開発を始めることになった理由",
+          "summary": "私は京畿大学校産業デザイン学科の17期生である。現在はドイツで個人事業主として登録し、ゲームをはじめとする様々なソフトウェアを自分で作ってリリースしようとしている。さっそく最初のゲームであるQuirky Ballも事実上開発を終え、事業者登録と両大マーケットの決済テストを行う段階まで来た。だがおかしなことに、私はもともと開発者になるつもりは",
+          "url": "https://houseduck.in/blog/ja/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
         }
       }
     }

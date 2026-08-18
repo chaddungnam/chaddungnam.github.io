@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="私はSupabaseを直接触りたくなくてゲーム管理者コンソールを作ったわけではない。バイブコーディングをする時もターミナルを好む人がいれば、デスクトッププログラムとGUIを好む人もいる。私は確実に後者だ。サーバー運営もログとテーブルを一つずつ開いてみるより、必要な情報が加工された画面で見">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由">
+  <meta property="og:description" content="私はSupabaseを直接触りたくなくてゲーム管理者コンソールを作ったわけではない。バイブコーディングをする時もターミナルを好む人がいれば、デスクトッププログラムとGUIを好む人もいる。私は確実に後者だ。サーバー運営もログとテーブルを一つずつ開いてみるより、必要な情報が加工された画面で見">
+  <meta property="og:url" content="https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="article:published_time" content="2026-08-10T20:32:24.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由">
+  <meta name="twitter:description" content="私はSupabaseを直接触りたくなくてゲーム管理者コンソールを作ったわけではない。バイブコーディングをする時もターミナルを好む人がいれば、デスクトッププログラムとGUIを好む人もいる。私は確実に後者だ。サーバー運営もログとテーブルを一つずつ開いてみるより、必要な情報が加工された画面で見">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png">
+  <link rel="canonical" href="https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由","description":"私はSupabaseを直接触りたくなくてゲーム管理者コンソールを作ったわけではない。バイブコーディングをする時もターミナルを好む人がいれば、デスクトッププログラムとGUIを好む人もいる。私は確実に後者だ。サーバー運営もログとテーブルを一つずつ開いてみるより、必要な情報が加工された画面で見","datePublished":"2026-08-10T20:32:24.000Z","inLanguage":"ja","mainEntityOfPage":"https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/","url":"https://houseduck.in/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/","image":"https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由 — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">本文へ移動</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/ja/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/ja/">← すべての記事</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>ゲーム管理者ページの作成 | ユーザーもいないのに管理者コンソールから作った理由</h1><time datetime="2026-08-10T20:32:24.000Z">2026年8月10日</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">韓国語</a><a href="/blog/en/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">English</a><a href="/blog/de/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/">Deutsch</a><a href="/blog/ja/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0/" aria-current="page">日本語</a></nav>
+      <aside class="mirror-note"><strong>自動翻訳</strong><span>このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。 <a href="https://blog.houseduck.in/entry/%EA%B2%8C%EC%9E%84-%EC%96%B4%EB%93%9C%EB%AF%BC-%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%A0%EC%A0%80%EB%8F%84-%EC%97%86%EB%8A%94%EB%8D%B0-%EA%B4%80%EB%A6%AC%EC%9E%90-%EC%BD%98%EC%86%94%EB%B6%80%ED%84%B0-%EB%A7%8C%EB%93%A0-%EC%9D%B4%EC%9C%A0?original=1">韓国語の原文を読む</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">私はSupabaseを直接触りたくなくて</p>
+<p data-ke-size="size16">ゲーム管理者コンソールを作ったわけではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">バイブコーディングをする時もターミナルを好む人がいれば、</p>
+<p data-ke-size="size16">デスクトッププログラムとGUIを好む人がいる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私は確実に後者だ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">サーバー運営もログとテーブルを一つずつ開いてみるより</p>
+<p data-ke-size="size16">必要な情報が加工された画面で見たかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">可能であればノートパソコンを開かなくても、</p>
+<p data-ke-size="size16">携帯電話で状態を確認し、必要な運営まで終えたかった。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" data-phocus="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" data-alt="許可されたGoogleアカウントのみが入ってくることができる House Duck 非公開コンソール"><img src="https://blog.kakaocdn.net/dn/eyANG3/dJMcaij3nib/m0PdmwplCzFOu5tR5YVnSk/img.png" loading="lazy" width="621" height="654" alt="" /></span><figcaption>許可されたGoogleアカウントのみが入ってくることができる House Duck 非公開コンソール</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>ユーザーもいないのに管理画面から作った。</b></h2>
+<p data-ke-size="size16">まだ Quirky Ball は正式リリース前だ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし House Duck Consoleにはすでに</p>
+<p data-ke-size="size16">分析、プレイヤー、運営、購入・払い戻し、カスタマーサポート、監査記録のメニューがある。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">少し順序がおかしく見えるかもしれない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかしゲームをリリースして問題が発生した後</p>
+<p data-ke-size="size16">その時に行って運営ツールから作ることはさらに遅いと思った。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ユーザーがゲームをどれくらい長くしたのか、</p>
+<p data-ke-size="size16">どこで離脱したのか、</p>
+<p data-ke-size="size16">翌日再び戻ってきたのか、</p>
+<p data-ke-size="size16">広告が頻繁に出すぎていなかったかを</p>
+<p data-ke-size="size16">リリース後に初めて悩みたくなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">すでに業界に身を置きながら</p>
+<p data-ke-size="size16">数々の試行錯誤を見ながら</p>
+<p data-ke-size="size16">下した結論だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">どうせ要件さえ確かであれば</p>
+<p data-ke-size="size16">すべてやり遂げてくれるAIがいるのにどんな問題があるのか？</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>ターミナルの代わりに一つの画面で判断したかった。</b></h2>
+<p data-ke-size="size16">Supabaseはゲームのデータを保存し、</p>
+<p data-ke-size="size16">認証とサーバー機能を接続する基盤だ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかしデータベースのテーブルは</p>
+<p data-ke-size="size16">運営者がすぐに答えを得る画面ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プレイ時間と完了率、再訪問率、広告視聴率、</p>
+<p data-ke-size="size16">ジェムとスタミナの使用量をそれぞれ探してみることと</p>
+<p data-ke-size="size16">「今このゲームでおかしな部分は何か？」を一目で見ることは違う。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">だからローデータを</p>
+<p data-ke-size="size16">見栄えよく並べ立てることで終わらせず、</p>
+<p data-ke-size="size16">自分が実際に判断する質問に変えようとした。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プレイヤーがさらに蓄積されてこそ判断できるのであれば</p>
+<p data-ke-size="size16">無駄にもっともらしい結論を作らずそのまま表示する。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" data-alt="プレイ時間&amp;middot;完了率&amp;middot;再訪問&amp;middot;広告を質問の形に整理した実際の分析画面"><img src="https://blog.kakaocdn.net/dn/EWJkS/dJMcagNnMdE/eKkMorcbrZSCOJxOz5Nr4k/img.jpg" loading="lazy" width="980" height="860" alt="" /></span><figcaption>プレイ時間・完了率・再訪問・広告を質問の形に整理した実際の分析画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">自分に必要なのはきれいなグラフではなく</p>
+<p data-ke-size="size16">次のアップデートで何を先に直すべきか教えてくれる画面だった。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>分析でおかしなユーザーを見てすぐに処理したかった。</b></h2>
+<p data-ke-size="size16">インサイトを確認した後</p>
+<p data-ke-size="size16">再びSupabaseや他のツールを開きたくなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プレイヤーリストからニックネームと表示コードを検索し、</p>
+<p data-ke-size="size16">ゲーム数と最高スコア、財貨、最近のプレイを確認する。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">異常なスコアはランキングから除外するか補正し、</p>
+<p data-ke-size="size16">必要ならアイテムを支給・回収し</p>
+<p data-ke-size="size16">特定のユーザーに報酬メールを送ることができるように作った。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">運営画面では</p>
+<p data-ke-size="size16">最低サポートバージョンとお知らせを変更し、</p>
+<p data-ke-size="size16">全体報酬メールも送ることができる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">購入と払い戻しの記録を見て、</p>
+<p data-ke-size="size16">support@houseduck.inに入ってきた</p>
+<p data-ke-size="size16">問い合わせを同じコンソールで処理する流れも入れた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">自分が言うユーザー制裁は</p>
+<p data-ke-size="size16">ボタン一つで人を遮断してしまう自動制裁ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">実際の記録を確認し、</p>
+<p data-ke-size="size16">スコア除外やアイテム回収のように</p>
+<p data-ke-size="size16">必要な措置のみを選択する方式に近い。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">重要な変更には事由を入力してもう一度確認させ、</p>
+<p data-ke-size="size16">誰が何を変えたのかも監査記録に残す。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>ノートパソコンの前にいる時だけ運営したくなかった。</b></h2>
+<p data-ke-size="size16">1人である開発者は開発者でありながらQAで、</p>
+<p data-ke-size="size16">企画者でありながらカスタマーセンターでもある。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">常に机の前に座っているわけにはいかない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">外でエラーのジェボが入ってきたり、</p>
+<p data-ke-size="size16">アップデート直後に指標がおかしくなった時</p>
+<p data-ke-size="size16">携帯電話で状態を見て制限された運営機能を実行したかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">もちろんすべての危険な機能をモバイルに開いておくという意味ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">照会は素早く、</p>
+<p data-ke-size="size16">変更は必要なものだけ、</p>
+<p data-ke-size="size16">取り返しのつかない作業は確認と記録を経るようにすることが目標だ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">GUIが良かった理由もここにある。</p>
+<p data-ke-size="size16">小さな画面でも今どこを見ていて、</p>
+<p data-ke-size="size16">どのボタンが実際のデータを変えるのか区別しやすかった。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>セキュリティは確実に処理した。</b></h2>
+<p data-ke-size="size16">コンソールは外部に公開するサービスではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">まず許可されたグーグルアカウントでログインし、</p>
+<p data-ke-size="size16">その次に自分しかすぐに思い浮かべられない質問にもう一度答えなければ開かない。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" data-phocus="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" data-alt="グーグルログイン後にもう一度確認する個人質問"><img src="https://blog.kakaocdn.net/dn/bBY1Jg/dJMcaij3nia/mbGtEARPgn6XCfEH72aX81/img.png" loading="lazy" width="546" height="475" alt="" /></span><figcaption>グーグルログイン後にもう一度確認する個人質問</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">「自分が最初にやったゲームの名前は？」</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">凄まじいセキュリティ技術のように見せようと作った装置ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">実際の権限はサーバーで再び確認し、</p>
+<p data-ke-size="size16">この質問はうっかり別のアカウントや開いたブラウザから入ってくることをもう一度防ぐ扉に近い。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">バイブコーディングで機能を素早く増やすほど</p>
+<p data-ke-size="size16">こうした小さな境界がより重要になると感じた。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>バイブコーディングだからこそGUIがさらに必要だった。</b></h2>
+<p data-ke-size="size16">AIはコードを素早く作ってくれる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">しかし、自分が毎回テーブル名やコマンドを覚えておき、</p>
+<p data-ke-size="size16">どの作業にどの値が必要なのかを再び説明しなければならないなら</p>
+<p data-ke-size="size16">運用するたびに開発モードに戻らなければならない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">管理画面はそのプロセスをボタンとフォームで固定してくれる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">自分が意図した順序通りに確認し、</p>
+<p data-ke-size="size16">決まった入力だけを受け付け、</p>
+<p data-ke-size="size16">危険な作業はもう一度尋ねる。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ターミナルをなくすためではなく</p>
+<p data-ke-size="size16">繰り返される運用こそGUIで製品化したようなものだ。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>まだ完成した管理画面ではない。</b></h2>
+<p data-ke-size="size16">機能を作ったからといってすぐに運用できたわけでもない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">サーバー関数が抜けてボタンが失敗することもあったし、</p>
+<p data-ke-size="size16">権限設定と実際の運用データが合わずに直したこともあった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Project K メニューはまだ殻に近く、</p>
+<p data-ke-size="size16">ストア返金通知のように自動で接続できなかった領域も残っている。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">正式リリースの前なのでデータが不足しているカードも多い。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">それでも今から作っておけば</p>
+<p data-ke-size="size16">最初のユーザーが入ってきた後に何を確認すべきか慌てずに済む。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">House Duck Consoleは見栄えの良いダッシュボードではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ゲームの状態を一目で見て、</p>
+<p data-ke-size="size16">いつでもどこでも必要なことだけを慎重に処理するために作った</p>
+<p data-ke-size="size16">自分だけの運用向けデスクトッププログラムに近い。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"><b>参考：</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span>Quirky Ballはのちにグーグルプレイプロダクションに正式リリースされました。</span></p>
+<p data-ke-size="size16"><span></span><a href="https://play.google.com/store/apps/details?id=com.quirkyball.app">https://play.google.com/store/apps/details?id=com.quirkyball.app</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter" data-og-image="https://scrap.kakaocdn.net/dn/rBsGG/dJMb9b38AOS/r7S0d04q7peeNEXu62lfe0/img.png?width=512&amp;height=512&amp;face=0_0_512_512,https://scrap.kakaocdn.net/dn/brIrdL/dJMb82e3IRl/8PT3RDhkWuwIhxgCqDzQkK/img.png?width=600&amp;height=300&amp;face=0_0_600_300"><a href="https://play.google.com/store/apps/details?id=com.quirkyball.app" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">Quirky Ball - Google Play アプリ</p>
+<p class="og-desc" data-ke-size="size16">物理ベースボール合体パズル：ボールを落とし、合体させ、最高スコアを更新してみてください。</p>
+<p class="og-host" data-ke-size="size16">play.google.com</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ja.html">利用規約</a><a href="/privacy/ja.html">プライバシー</a><a href="/impressum/ja.html">Impressum</a><a href="/support/#english">サポート</a><a href="mailto:business@houseduck.in">ビジネスのお問い合わせ · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>

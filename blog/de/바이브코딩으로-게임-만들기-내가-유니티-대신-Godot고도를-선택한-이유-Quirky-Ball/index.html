@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball">
+  <meta property="og:description" content="Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.">
+  <meta property="og:url" content="https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="article:published_time" content="2026-08-10T14:08:52.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball">
+  <meta name="twitter:description" content="Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif">
+  <link rel="canonical" href="https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball","description":"Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre. Auf meinem MacBook war Godot jedoch die realistischste Option, um alleine mit KI ein Spiel zu erschaffen und kontinuierlich anzupassen. Ich bin kein Entwickler. Ich habe Industriedesign studiert und ungefähr 3 Jahre lang als Spiele-QA gearbeitet. Inzwischen entwickle ich in Deutschland ein Mobiles Puzzlespiel namens Quirky Ball.","datePublished":"2026-08-10T14:08:52.000Z","inLanguage":"de","mainEntityOfPage":"https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/","url":"https://houseduck.in/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/","image":"https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">Zum Inhalt springen</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/de/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/de/">← Alle Beiträge</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>Spieleentwicklung mit Vibe Coding, warum ich mich statt Unity für Godot entschieden habe | Quirky Ball</h1><time datetime="2026-08-10T14:08:52.000Z">10. August 2026</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">Koreanisch</a><a href="/blog/en/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/">English</a><a href="/blog/de/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/" aria-current="page">Deutsch</a></nav>
+      <aside class="mirror-note"><strong>Automatische Übersetzung</strong><span>Diese Seite wurde automatisch aus dem Koreanischen übersetzt und kann unnatürliche Formulierungen enthalten. <a href="https://blog.houseduck.in/entry/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball?original=1">Koreanisches Original lesen</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">Godot ist nicht deshalb meine Wahl, weil es grundsätzlich eine bessere Engine als Unity wäre.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Auf meinem MacBook,</p>
+<p data-ke-size="size16">um alleine mit KI ein Spiel zu entwickeln und kontinuierlich anzupassen,</p>
+<p data-ke-size="size16">war Godot die realistischste Option.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ich bin kein Entwickler.</p>
+<p data-ke-size="size16">Ich habe Industriedesign studiert</p>
+<p data-ke-size="size16">und ungefähr 3 Jahre lang als Spiele-QA gearbeitet.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Mittlerweile lebe ich in Deutschland</p>
+<p data-ke-size="size16">und entwickle dort ein Mobiles Puzzlespiel namens Quirky Ball.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif" data-phocus="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif"><img src="https://blog.kakaocdn.net/dn/kCO0R/dJMcabFaJgh/B4m8kaprDkLtFeI0tzwHH0/img.gif" alt="Der Startbildschirm von Quirky Ball und eine Ingame-Szene mit sich bewegenden Charakteren" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>Ich habe auch Unity und Unreal ausprobiert, aber sie waren zu schwer.</b></h2>
+<p data-ke-size="size16">Als ich beschlossen hatte, ein Spiel zu machen,</p>
+<p data-ke-size="size16">waren mir Unity und Unreal keineswegs unbekannt.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ich hatte früher bereits mit beiden gearbeitet.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Es gibt viele Informationen dazu,</p>
+<p data-ke-size="size16">unzählige fertiggestellte Spiele</p>
+<p data-ke-size="size16">und ich muss nicht erst beweisen, dass sie gute Engines sind.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Das Problem war meine eigene Situation.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Die Ausrüstung, die mir zur Verfügung steht, ist ein M2 MacBook Air.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Das ist weder ein Hochleistungsdesktop</p>
+<p data-ke-size="size16">noch habe ich in einem Team ein großes 3D-Spiel entwickelt.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ich musste die KI um Änderungen bitten,</p>
+<p data-ke-size="size16">das Spiel direkt in der Engine ausführen</p>
+<p data-ke-size="size16">und bei Unstimmigkeiten die Schritte immer und immer wieder am selben Tag wiederholen.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Dabei fühlten sich Unity und Unreal</p>
+<p data-ke-size="size16">bei diesen von mir benötigten kurzen Abläufen recht schwerfällig an.</p>
+<p data-ke-size="size16">Wenn schon das Starten der Engine zur Belastung wird,</p>
+<p data-ke-size="size16">erschafft man kein Spiel mehr,</p>
+<p data-ke-size="size16">sondern hat das Gefühl, die Engine zu bedienen.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif"><img src="https://blog.kakaocdn.net/dn/C4Bsq/dJMcacRArgR/NGayB7qtZ7ikBQScfvbGWk/img.gif" alt="Die Übergangsszene beim Starten des Spiels auf dem Startbildschirm von Quirky Ball" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Godot passte gut zu meinem MacBook und meiner Arbeitsweise.</b></h2>
+<p data-ke-size="size16">Als ich Godot zum ersten Mal öffnete, dachte ich mir als Erstes,</p>
+<p data-ke-size="size16">dass es unerwartet unspektakulär ist.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Das klingt zwar nach einem Nachteil,</p>
+<p data-ke-size="size16">war für mich jedoch ein echter Vorteil.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Das Öffnen des Projekts,</p>
+<p data-ke-size="size16">das Anpassen,</p>
+<p data-ke-size="size16">das Ausführen</p>
+<p data-ke-size="size16">und das Überprüfen der Ergebnisse liefen schnell ab.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky Ball ist kein riesiges 3D-Open-World-Spiel.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Es ist ein vertikales mobiles Puzzlespiel,</p>
+<p data-ke-size="size16">bei dem Murmeln fallen gelassen werden</p>
+<p data-ke-size="size16">und Kollisionsbewegungen sowie die Benutzeroberfläche stetig verfeinert werden (2D).</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Daher war es für mich wichtiger, die eben geänderten Bildschirme rasch zu überprüfen,</p>
+<p data-ke-size="size16">anstatt riesige Funktionen zu besitzen, die ich ohnehin nicht nutze.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">In der offiziellen Dokumentation von Godot wird die Apple Silicon-Architektur von macOS ausdrücklich als unterstützte Plattform genannt.</p>
+<p data-ke-size="size16">Tatsächlich gab es auf dem M2 MacBook Air keine nennenswerten Probleme beim Arbeiten zwischen Editor und Spiel.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Referenz: <a href="https://docs.godotengine.org/en/4.7/about/system_requirements.html">https://docs.godotengine.org/en/4.7/about/system_requirements.html</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter"><a href="https://docs.godotengine.org/en/4.7/about/system_requirements.html" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">System requirements</p>
+<p class="og-desc" data-ke-size="size16">This page contains system requirements for the editor and exported projects. These specifications are given for informative purposes only, but they can be referred to if you're looking to buil...</p>
+<p class="og-host" data-ke-size="size16">docs.godotengine.org</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Warum Vibe Coding und Godot so gut harmonierten</b></h2>
+<p data-ke-size="size16">Das von mir erwähnte Vibe Coding</p>
+<p data-ke-size="size16">ist keineswegs ein Ansatz, bei dem man der KI einfach sagt „Mach mir ein Spiel“ und dann aufhört.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Sobald Codex den Code schreibt,</p>
+<p data-ke-size="size16">teste ich das Spiel selbst.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Ich achte darauf, ob Buttons unnatürlich wirken,</p>
+<p data-ke-size="size16">ob die Bewegungen der Murmeln langweilig sind,</p>
+<p data-ke-size="size16">ob Texte abgeschnitten werden</p>
+<p data-ke-size="size16">und ob neue Spieler die Regeln verstehen können.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Danach lasse ich gezielte Anpassungen vornehmen.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Wenn die KI den Großteil der Entwicklerrolle übernommen hat,</p>
+<p data-ke-size="size16">entspricht das meiner Rolle als Planer, Designer</p>
+<p data-ke-size="size16">und QA-Verantwortlicher.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Das Wichtigste in diesem Prozess</p>
+<p data-ke-size="size16">war nicht, fehlerfreien Code auf Anhieb zu erhalten.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Es ging um das Tempo beim kleinen Modifizieren,</p>
+<p data-ke-size="size16">schnellen Ausführen</p>
+<p data-ke-size="size16">und visuellen Überprüfen.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Godot hat diese ständigen Wiederholungen deutlich weniger ermüdend gemacht.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif" data-phocus="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif"><img src="https://blog.kakaocdn.net/dn/oG65z/dJMcajb6KjU/LmJYilBekll3jIsELqpxK1/img.gif" alt="Eine Gameplay-Szene aus Quirky Ball, in der eine Murmel gezogen und fallengelassen wird" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Dass es kostenlos ist, lässt sich für einen Einzelunternehmer wie 1 kaum ignorieren.</b></h2>
+<p data-ke-size="size16">Godot ist eine kostenlose Open-Source-Engine unter der MIT-Lizenz.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Sie lässt sich kommerziell nutzen,</p>
+<p data-ke-size="size16">und die Inhalte sowie Rechte an meinem erstellten Spiel verbleiben bei mir.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Referenz: <a href="https://godotengine.org/license/">https://godotengine.org/license/</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter" data-og-image="https://scrap.kakaocdn.net/dn/lfY9V/dJMb9jOCtg7/aAcPzL32Wc7AWAXSKKXzVK/img.jpg?width=1200&amp;height=630&amp;face=0_0_1200_630"><a href="https://godotengine.org/license/" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">License – Godot Engine</p>
+<p class="og-desc" data-ke-size="size16">Godot Engine is free and open source software released under the permissive MIT license.</p>
+<p class="og-host" data-ke-size="size16">godotengine.org</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Natuerlich ist kostenlos nicht zwangslaeufig immer gut.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Aber dass ein Entwickler ohne 1 Einnahmen noch nicht</p>
+<p data-ke-size="size16">zu Goeden ueber Engine-Kosten oder Richtlinien-Aenderungen machen muss,</p>
+<p data-ke-size="size16">war definitiv eine Erleichterung.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Weil man dieses Geld und diese Aufmerksamkeit</p>
+<p data-ke-size="size16">dafuer nutzen kann, das Spiel auch nur ein einziges Mal mehr zu verbessern.</p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Das heisst aber nicht, dass Godot in jeder Hinsicht bequem war.</b></h2>
+<p data-ke-size="size16">Wenn man nur bis hierhin schreibt,</p>
+<p data-ke-size="size16">koennte man wie ein Godot-Evangelist wirken.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Aber als ich versuchte, ein Handyspiel tatsächlich zu veroeffentlichen,</p>
+<p data-ke-size="size16">gab es definitiv auch unbequeme Teile.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Werbung,</p>
+<p data-ke-size="size16">In-App-Kaeufe,</p>
+<p data-ke-size="size16">Anmeldung,</p>
+<p data-ke-size="size16">sowie native Funktionen von Android und iOS</p>
+<p data-ke-size="size16">waren ein voellig anderes Problem als das Erstellen eines einzigen Spielbildschirms.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Plugin-Versionen anzupassen,</p>
+<p data-ke-size="size16">auf jeder Plattform separat zu ueberpruefen,</p>
+<p data-ke-size="size16">und wiederholt nach Problemen zu suchen, die innerhalb der Engine normal aussahen, aber auf dem tatsächlichen Geraet anders waren, passierte immer wieder.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Verglichen mit Engines mit viel mehr Benutzern wie Unity</p>
+<p data-ke-size="size16">gab es Momente, in denen es schwer war, sofort passende Informationen zu finden, wenn man stecken blieb.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Nur weil KI anstelle von uns Code geschrieben hat,</p>
+<p data-ke-size="size16">bedeutete das nicht, dass solche Probleme auf magische Weise verschwanden.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Im Gegenteil: Da der Code, den ich nicht kannte, rasant zunahm,</p>
+<p data-ke-size="size16">wurde QA zum direkten Ausführen und Pruefen umso wichtiger.</p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif" data-phocus="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif"><img src="https://blog.kakaocdn.net/dn/benlTy/dJMcacRArgQ/99aljUvDYswgkdeJWE4dFk/img.gif" alt="In-Game-Szene, in der Quirky Ball-Kugeln am Boden kollidieren" loading="lazy" width="420" height="934" /></span></figure>
+<p></p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Wuerde ich mich bei einem erneuten Quirky Ball wieder fuer Godot entscheiden?</b></h2>
+<p data-ke-size="size16">Fuer dieses Spiel wuerde ich mich wahrscheinlich wieder dafuer entscheiden.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Genauer gesagt:</p>
+<p data-ke-size="size16">Unter der Bedingung, mit nur einem M2 MacBook Air</p>
+<p data-ke-size="size16">zusammen mit KI ein 2D-Handyspiel schnell zu erstellen und zu korrigieren, ja.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Im Gegensatz dazu wuerde ich bei einem grosstechnischen 3D-Spiel oder</p>
+<p data-ke-size="size16">einem Projekt, bei dem zahlreiche spezifische kommerzielle SDKs angebunden werden muessen,</p>
+<p data-ke-size="size16">zuerst andere Engines vergleichen.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Die Wahl einer Engine ist keine Religion.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Es geht eher weniger darum, eine beruehmte Engine zu wählen,</p>
+<p data-ke-size="size16">sondern vielmehr darum, eine Engine zu waehlen, die man bis zum Ende fertigstellen kann.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Fuer mich war diese Antwort Godot.</p>
+<p data-ke-size="size16">Und im Moment</p>
+<p data-ke-size="size16">ist es viel wichtiger,</p>
+<p data-ke-size="size16">Quirky Ball tatsächlich zu veroeffentlichen, als die Tatsache, welche Engine gewählt wurde.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<h2 data-ke-size="size26"><b>Haeufig gestellte Fragen</b></h2>
+<h3 data-ke-size="size23">- Kann man ohne Programmierkenntnisse mit Godot Spiele erstellen?</h3>
+<p data-ke-size="size16">Dank der Hilfe von KI hat sich die Einstiegshuerde stark verringert.</p>
+<p data-ke-size="size16">Das bedeutet jedoch nicht, dass man sich Code ueberhaupt nicht ansehen muss.</p>
+<p data-ke-size="size16">Die Faehigkeit zu erklaeren, was schiefgelaufen ist,</p>
+<p data-ke-size="size16">und das Programm selbst auszufuehren, um das Ergebnis zu beurteilen, wird nach wie vor benoetigt.</p>
+<p data-ke-size="size16"> </p>
+<h3 data-ke-size="size23">- Ist Godot am besten für Vibe-Coding geeignet?</h3>
+<p data-ke-size="size16">Das ist von Projekt zu Projekt unterschiedlich.</p>
+<p data-ke-size="size16">Ich habe mich wegen eines leichten 2D-Handispiels und schneller iterativer Arbeit für Godot entschieden.</p>
+<p data-ke-size="size16">Wenn Asset-Oekosysteme oder bestimmte SDKs wichtiger sind, ist Unity möglicherweise bequemer.</p>
+<p data-ke-size="size16"> </p>
+<h3 data-ke-size="size23">- Ist die Spieleentwicklung mit Godot auf einem M2 MacBook Air moeglich?</h3>
+<p data-ke-size="size16">Ein 2D-Handyspiel wie Quirky Ball konnte problemlos bearbeitet werden.</p>
+<p data-ke-size="size16">Das ist jedoch meine eigene erfahrungsbasierte Projektperspektive.</p>
+<p data-ke-size="size16">Bei schwerer 3D-Grafik und einem groesseren Build-Umfang koennen die Ergebnisse abweichen.</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Im naechsten Beitrag</p>
+<p data-ke-size="size16">moechte ich darüber schreiben, warum ich als Industriedesign-Student kein einziges Spiel-Asset selbst erstellt habe</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">und wie ich dennoch das Design von Quirky Ball vollendet habe.</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><b>Hinweis:</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span>Quirky Ball wurde danach offiziell bei Google Play Production veroeffentlicht.</span></p>
+<p data-ke-size="size16"><span></span><a href="https://play.google.com/store/apps/details?id=com.quirkyball.app">https://play.google.com/store/apps/details?id=com.quirkyball.app</a></p>
+<figure data-ke-type="opengraph" data-ke-align="alignCenter" data-og-image="https://scrap.kakaocdn.net/dn/rBsGG/dJMb9b38AOS/r7S0d04q7peeNEXu62lfe0/img.png?width=512&amp;height=512&amp;face=0_0_512_512,https://scrap.kakaocdn.net/dn/brIrdL/dJMb82e3IRl/8PT3RDhkWuwIhxgCqDzQkK/img.png?width=600&amp;height=300&amp;face=0_0_600_300"><a href="https://play.google.com/store/apps/details?id=com.quirkyball.app" target="_blank" rel="noopener noreferrer">
+<div class="og-image"> </div>
+<div class="og-text">
+<p class="og-title" data-ke-size="size16">Quirky Ball - Google Play App</p>
+<p class="og-desc" data-ke-size="size16">Physikalisches Kugel-Zusammenfuehrungs-Puzzle: Lass Kugeln fallen, fuehre sie zusammen und schlage den Highscore.</p>
+<p class="og-host" data-ke-size="size16">play.google.com</p>
+</div>
+</a></figure>
+<p data-ke-size="size16"> </p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/de.html">Nutzungsbedingungen</a><a href="/privacy/de.html">Datenschutz</a><a href="/impressum/de.html">Impressum</a><a href="/support/#english">Support</a><a href="mailto:business@houseduck.in">Geschäftsanfragen · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>

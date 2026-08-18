@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="アップルにアプリを公開する過程はゲームビルドを準備するだけで終わるものではなかった。Quirky BallのiOSリリース準備を始めながらApp Store Connectに登録された住所が引っ越し前のドイツの住所のまま残っていることを発見した。住所を一文字変えるだけでいいと思った。しかしアップルではこの住所が契約と繋がっているためプロフィールで ">
+  <meta name="robots" content="max-image-preview:large">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="House Duck">
+  <meta property="og:title" content="アップルマーケットにアプリを公開する過程 | Quirky Ball">
+  <meta property="og:description" content="アップルにアプリを公開する過程はゲームビルドを準備するだけで終わるものではなかった。Quirky BallのiOSリリース準備を始めながらApp Store Connectに登録された住所が引っ越し前のドイツの住所のまま残っていることを発見した。住所を一文字変えるだけでいいと思った。しかしアップルではこの住所が契約と繋がっているためプロフィールで ">
+  <meta property="og:url" content="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="article:published_time" content="2026-08-11T12:22:37.000Z">
+  <meta property="og:image" content="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="アップルマーケットにアプリを公開する過程 | Quirky Ball">
+  <meta name="twitter:description" content="アップルにアプリを公開する過程はゲームビルドを準備するだけで終わるものではなかった。Quirky BallのiOSリリース準備を始めながらApp Store Connectに登録された住所が引っ越し前のドイツの住所のまま残っていることを発見した。住所を一文字変えるだけでいいと思った。しかしアップルではこの住所が契約と繋がっているためプロフィールで ">
+  <meta name="twitter:image" content="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg">
+  <link rel="canonical" href="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="ko" href="https://houseduck.in/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="en" href="https://houseduck.in/blog/en/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="de" href="https://houseduck.in/blog/de/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="ja" href="https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" hreflang="x-default" href="https://houseduck.in/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">
+  <link rel="alternate" type="application/rss+xml" title="House Duck Blog" href="https://houseduck.tistory.com/rss">
+  <link rel="stylesheet" href="/assets/blog-mirror.css">
+  <script defer src="/assets/blog-mirror.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"アップルマーケットにアプリを公開する過程 | Quirky Ball","description":"アップルにアプリを公開する過程はゲームビルドを準備するだけで終わるものではなかった。Quirky BallのiOSリリース準備を始めながらApp Store Connectに登録された住所が引っ越し前のドイツの住所のまま残っていることを発見した。住所を一文字変えるだけでいいと思った。しかしアップルではこの住所が契約と繋がっているためプロフィールで ","datePublished":"2026-08-11T12:22:37.000Z","inLanguage":"ja","mainEntityOfPage":"https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/","url":"https://houseduck.in/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/","image":"https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg","author":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"},"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/","logo":{"@type":"ImageObject","url":"https://houseduck.in/assets/house-duck-logo.png"}}}</script>
+  <title>アップルマーケットにアプリを公開する過程 | Quirky Ball — House Duck Blog</title>
+</head>
+<body>
+  <a class="skip-link" href="#post-content">本文へ移動</a>
+  <header class="mirror-header"><a class="mirror-brand" href="/"><img src="/assets/house-duck-logo.png" alt="" width="512" height="512"><img src="/assets/house-duck-wordmark.png" alt="House Duck" width="1694" height="394"></a><nav><a href="/blog/ja/">Blog</a></nav></header>
+  <main class="mirror-main" id="post-content">
+    <a class="mirror-back" href="/blog/ja/">← すべての記事</a>
+    <article>
+      <header class="mirror-post-header"><p>HOUSE DUCK · AUTOMATIC TRANSLATION</p><h1>アップルマーケットにアプリを公開する過程 | Quirky Ball</h1><time datetime="2026-08-11T12:22:37.000Z">2026年8月11日</time></header>
+      <nav class="mirror-locales mirror-post-locales" aria-label="Language"><a href="/blog/kr/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">韓国語</a><a href="/blog/en/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">English</a><a href="/blog/de/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/">Deutsch</a><a href="/blog/ja/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball/" aria-current="page">日本語</a></nav>
+      <aside class="mirror-note"><strong>自動翻訳</strong><span>このページは韓国語から自動翻訳されているため、不自然な表現が含まれる場合があります。 <a href="https://blog.houseduck.in/entry/%EC%95%A0%ED%94%8C-%EB%A7%88%EC%BC%93%EC%97%90-%EC%95%B1%EC%9D%84-%EC%98%AC%EB%A6%AC%EB%A9%B0-%EA%B2%AA%EB%8A%94-%EA%B3%BC%EC%A0%95-Quirky-Ball?original=1">韓国語の原文を読む</a></span></aside>
+      <div class="mirror-body"><p data-ke-size="size16">アップルにアプリを登録する過程は</p>
+<p data-ke-size="size16">ゲームビルドの準備だけですむことではなかった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky BallのiOSリリース準備を始めながら</p>
+<p data-ke-size="size16">App Store Connectに登録された住所が</p>
+<p data-ke-size="size16">引っ越し前のドイツの住所のまま残っていることに気づいた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">住所を一文字変えればいいと思っていた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">だがアップルではこの住所が契約と結びついているため</p>
+<p data-ke-size="size16">プロフィールから直接直す方式ではなかった。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" data-alt="Apple Developerアカウントで住所変更を開始した画面"><img src="https://blog.kakaocdn.net/dn/djgy18/dJMcaalWDWO/Vm02G4vsVo5J4E2v5lobOK/img.jpg" loading="lazy" width="1027" height="797" alt="" /></span><figcaption>Apple Developerアカウントで住所変更を開始した画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>App Store Connectの住所が古い住所だった。</b></h2>
+<p data-ke-size="size16">まずApple Developerアカウントに入り</p>
+<p data-ke-size="size16">メンバーシップの詳細を確認した。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">プログラムは正常に登録されていたが</p>
+<p data-ke-size="size16">住所だけ引っ越し前の情報が残っていた。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" data-alt="メンバーシップの詳細に残っていた引っ越し前の住所"><img src="https://blog.kakaocdn.net/dn/bGvS3W/dJMcajpBZDq/eYQY7qzToaJaiau8WOo1X1/img.jpg" loading="lazy" width="1025" height="778" alt="" /></span><figcaption>メンバーシップの詳細に残っていた引っ越し前の住所</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">画面下の「情報をアップデートしてください」を押して</p>
+<p data-ke-size="size16">Apple Developer Supportに住所変更を申請した。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">アップルの公式案内にも</p>
+<p data-ke-size="size16">Developer Programに結びついた名前や住所を変えるには</p>
+<p data-ke-size="size16">変更要請を提出し証明書類で確認してもらわなければならないと書かれている。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><a href="https://developer.apple.com/help/account/membership/updating-your-account-information">Apple Developerアカウント情報変更公式案内</a></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">つまり、住所の入力欄を修正して保存する作業ではなく</p>
+<p data-ke-size="size16">アップルが新しい住所を確認した後に反映する手続きだった。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>3〜4営業日後に証明書類の要請が来た。</b></h2>
+<p data-ke-size="size16">住所変更の要請を送った後</p>
+<p data-ke-size="size16">私の場合は営業日基準で約3〜4日後に返事が来た。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">この期間は私の実際の経験にすぎず、</p>
+<p data-ke-size="size16">すべての申請が同じ時間内に処理されるという意味ではない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">メールでは新しい住所が記載された書類の中で</p>
+<p data-ke-size="size16">一つをアップロードしてほしいとのことだった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">例えば有効な政府発行の身分証明書、</p>
+<p data-ke-size="size16">郵便物の住所変更申請書、</p>
+<p data-ke-size="size16">居住地官庁の住所確認文書、</p>
+<p data-ke-size="size16">最近の公共料金・銀行明細書・官公署の書簡といった資料だ。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" data-alt="住所確認書類とアップロードリンクが含まれたApple Developer Supportメール"><img src="https://blog.kakaocdn.net/dn/b2XIUT/dJMcajpBZDr/yUZ7ZtkHtqKv4K7NkR71m1/img.jpg" loading="lazy" width="649" height="481" alt="" /></span><figcaption>住所確認書類とアップロードリンクが含まれたApple Developer Supportメール</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私は現在の住所が表示されたドイツの居住許可証の表裏面を</p>
+<p data-ke-size="size16">一つのファイルにまとめて提出することにした。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ここまでは面倒でも理解できた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">問題はファイルを上げるために送ってくれたリンクだった。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>メールの自動リンクが正常に開かなかった。</b></h2>
+<p data-ke-size="size16">メールに書かれたリンクを押したところ</p>
+<p data-ke-size="size16">ファイルアップロード画面の代わりに</p>
+<p data-ke-size="size16">「該当アカウントにはファイルアップロード権限がありません」という画面が出た。</p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" data-alt="誤って開いたリンクで表示されたファイルアップロード権限なし画面"><img src="https://blog.kakaocdn.net/dn/xVitG/dJMb99N6kWQ/syorVYcPKlUlGvhn8TlQ3K/img.jpg" loading="lazy" width="1041" height="455" alt="" /></span><figcaption>誤って開いたリンクで表示されたファイルアップロード権限なし画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">結局Eメールに書かれたインターネットアドレスをもう一度確認した。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">メールの文章の端についたピリオドがアドレスに混ざったり、</p>
+<p data-ke-size="size16">アカウントを区別する?teamId=の後の値が</p>
+<p data-ke-size="size16">自動リンクに最後まで含まれていない状態だった。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">開発の知識がない方のために簡単に言うと、</p>
+<p data-ke-size="size16">アップルが送ってくれた長いインターネットアドレスが途中で不自然に切れていたのだ。</p>
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>私の場合こうやって解決した。</b></h2>
+<p data-ke-size="size16">Eメールのアドレスを最初から最後まで自分で直接コピーした。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">そしてアドレスの一番最後に句読点のように付いた <b>「ピリオド」は除外</b>し、</p>
+<p data-ke-size="size16">?teamId=の後の識別値は最後の文字まで含めて</p>
+<p data-ke-size="size16">ブラウザのアドレスバーに貼り付けた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">その時になってようやく同じAppleアカウントで</p>
+<p data-ke-size="size16">正常なファイルアップロード画面に入ることができた。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">この記事のスクリーンショットでも名前、住所、アカウント識別値はすべて隠した。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"> </p>
+<p></p><figure class="imageblock alignLeft"><span data-url="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" data-phocus="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" data-alt="住所証明文書が正常に受け付けられて処理中の画面"><img src="https://blog.kakaocdn.net/dn/dphW6D/dJMcahrYX5h/ezb3wDabWfzikAozokUIL1/img.jpg" loading="lazy" width="1031" height="390" alt="" /></span><figcaption>住所証明文書が正常に受け付けられて処理中の画面</figcaption>
+</figure>
+<p></p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-style="style4" data-ke-type="horizontalRule" />
+<p data-ke-size="size16"> </p>
+<h2 data-ke-size="size26"><b>アップロード成功と住所変更完了は同じ意味ではない。</b></h2>
+<p data-ke-size="size16">書類をアップロードすると</p>
+<p data-ke-size="size16">「書類を処理中です」という画面が表示された。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">ここで確認できたのは書類が正常に受け付けられたということまでだ。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">住所変更が最終承認され</p>
+<p data-ke-size="size16">App Store Connectに新しい住所が反映されたかどうかは</p>
+<p data-ke-size="size16">再度確認しなければならない。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">Quirky Ballをアップルマーケットに登録する過程で</p>
+<p data-ke-size="size16">こうした行政作業が次々と飛び出してきている。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">コードを知らなくても</p>
+<p data-ke-size="size16">アプリを準備することはできるが、</p>
+<p data-ke-size="size16">リンクがどこまでかを区別するごく小さな知識が</p>
+<p data-ke-size="size16">時間を節約してくれることもある。</p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16">私のようにApple Developer住所変更リンクで</p>
+<p data-ke-size="size16">突然アップロード権限がないと表示される方は、</p>
+<p data-ke-size="size16">アカウントを何度も切り替える前に、URLの最後のピリオドと</p>
+<p data-ke-size="size16">?teamId= の後ろの値がすべて含まれているかをまず確認してほしい。</p>
+<p data-ke-size="size16"> </p>
+<hr data-ke-type="horizontalRule" data-ke-style="style4" />
+<p data-ke-size="size16"><b>参考:</b></p>
+<p data-ke-size="size16"> </p>
+<p data-ke-size="size16"><span>Quirky Ballはその後グーグル・プレイのプロダクションに正式リリースされました。</span></p>
+<p data-ke-size="size16"><span></span><a href="https://play.google.com/store/apps/details?id=com.quirkyball.app">https://play.google.com/store/apps/details?id=com.quirkyball.app</a></p></div>
+    </article>
+  </main>
+  <footer class="mirror-footer site-footer"><div class="footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="/assets/house-duck-logo.png" width="512" height="512" alt=""><img class="footer-wordmark-image" src="/assets/house-duck-wordmark.png" width="1694" height="394" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="Legal and support"><a href="/terms/ja.html">利用規約</a><a href="/privacy/ja.html">プライバシー</a><a href="/impressum/ja.html">Impressum</a><a href="/support/#english">サポート</a><a href="mailto:business@houseduck.in">ビジネスのお問い合わせ · business@houseduck.in</a></nav></div></footer>
+</body>
+</html>
