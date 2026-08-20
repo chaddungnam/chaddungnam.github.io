@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-08-11T19:28:26.000Z",
+  "updated_at": "2026-08-20T07:40:55.000Z",
   "posts": [
+    {
+      "slug": "인디게임-구글플레이-출시-후-구글애즈-광고를-돌려봤다-Quirky-Ball",
+      "title": "인디게임 구글플레이 출시 후 구글애즈 광고를 돌려봤다 | Quirky Ball",
+      "summary": "Quirky Ball이 드디어 Google Play에 정식으로 올라갔습니다. 비공개 테스트 12명을 모으고 14일을 채운 뒤, 심사를 또 거쳐서 8월 18일 프로덕션 출시까지 진행했습니다. 그런데 출시 버튼을 눌렀다고 사람들이 알아서 게임을 찾아오는 건 아니더라고요. 오늘 티스토리 방문자는 다시 0명입니다. 공개된 Qui",
+      "image": "https://blog.kakaocdn.net/dn/uUrwW/dJMcagGJnuo/X85KIQYr7EpJaWGf9H92F0/img.png",
+      "published_at": "2026-08-20T07:40:55.000Z",
+      "url": "https://houseduck.in/blog/kr/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EA%B5%AC%EA%B8%80%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%B6%9C%EC%8B%9C-%ED%9B%84-%EA%B5%AC%EA%B8%80%EC%95%A0%EC%A6%88-%EA%B4%91%EA%B3%A0%EB%A5%BC-%EB%8F%8C%EB%A0%A4%EB%B4%A4%EB%8B%A4-Quirky-Ball/",
+      "original_url": "https://blog.houseduck.in/entry/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EA%B5%AC%EA%B8%80%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%B6%9C%EC%8B%9C-%ED%9B%84-%EA%B5%AC%EA%B8%80%EC%95%A0%EC%A6%88-%EA%B4%91%EA%B3%A0%EB%A5%BC-%EB%8F%8C%EB%A0%A4%EB%B4%A4%EB%8B%A4-Quirky-Ball",
+      "localized": {
+        "kr": {
+          "title": "인디게임 구글플레이 출시 후 구글애즈 광고를 돌려봤다 | Quirky Ball",
+          "summary": "Quirky Ball이 드디어 Google Play에 정식으로 올라갔습니다. 비공개 테스트 12명을 모으고 14일을 채운 뒤, 심사를 또 거쳐서 8월 18일 프로덕션 출시까지 진행했습니다. 그런데 출시 버튼을 눌렀다고 사람들이 알아서 게임을 찾아오는 건 아니더라고요. 오늘 티스토리 방문자는 다시 0명입니다. 공개된 Qui",
+          "url": "https://houseduck.in/blog/kr/%EC%9D%B8%EB%94%94%EA%B2%8C%EC%9E%84-%EA%B5%AC%EA%B8%80%ED%94%8C%EB%A0%88%EC%9D%B4-%EC%B6%9C%EC%8B%9C-%ED%9B%84-%EA%B5%AC%EA%B8%80%EC%95%A0%EC%A6%88-%EA%B4%91%EA%B3%A0%EB%A5%BC-%EB%8F%8C%EB%A0%A4%EB%B4%A4%EB%8B%A4-Quirky-Ball/"
+        }
+      }
+    },
     {
       "slug": "프롬프트로-게임-캐릭터-디자인-하기-House-Duck-바이브코딩",
       "title": "프롬프트로 게임 캐릭터 디자인 하기 | House Duck 바이브코딩",
@@ -272,37 +288,6 @@
           "title": "バイブコーディングでゲーム制作、私がユニティの代わりに Godot を選んだ理由 | Quirky Ball",
           "summary": "Godot がユニティより無条件に良いエンジンだから選んだわけではない。私が持っているマックブックで、一人でAIとゲームを作り、直し続けるためには Godot が最も現実的だったからだ。私は開発者ではない。インダストリアルデザインを専攻し、ゲームQAとして 3 年ほど働いた。そして今はドイツで Quirky Ball というモバイルパズルゲームを",
           "url": "https://houseduck.in/blog/ja/%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%EC%9C%BC%EB%A1%9C-%EA%B2%8C%EC%9E%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%82%B4%EA%B0%80-%EC%9C%A0%EB%8B%88%ED%8B%B0-%EB%8C%80%EC%8B%A0-Godot%EA%B3%A0%EB%8F%84%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%9C-%EC%9D%B4%EC%9C%A0-Quirky-Ball/"
-        }
-      }
-    },
-    {
-      "slug": "내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유",
-      "title": "내가 독일까지 와서 뜬금없이 개발을 시작하게 된 이유",
-      "summary": "나는 경기대학교 산업디자인학과 17학번이다. 지금은 독일에서 개인사업자를 내고, 게임을 포함한 여러 소프트웨어를 직접 만들어 출시하려고 하고 있다. 당장 첫 게임인 Quirky Ball 도 사실상 개발을 끝내고, 사업자 등록과 양대 마켓 결제 테스트를 진행하는 단계까지 왔다. 그런데 웃긴 건, 나는 원래 개발자가 될 생각",
-      "image": "https://blog.kakaocdn.net/dn/o97pN/dJMb998qy6h/79Gk8UeEA5EShMu1MpEWek/img.png",
-      "published_at": "2026-08-08T19:13:59.000Z",
-      "url": "https://houseduck.in/blog/kr/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/",
-      "original_url": "https://blog.houseduck.in/entry/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0",
-      "localized": {
-        "kr": {
-          "title": "내가 독일까지 와서 뜬금없이 개발을 시작하게 된 이유",
-          "summary": "나는 경기대학교 산업디자인학과 17학번이다. 지금은 독일에서 개인사업자를 내고, 게임을 포함한 여러 소프트웨어를 직접 만들어 출시하려고 하고 있다. 당장 첫 게임인 Quirky Ball 도 사실상 개발을 끝내고, 사업자 등록과 양대 마켓 결제 테스트를 진행하는 단계까지 왔다. 그런데 웃긴 건, 나는 원래 개발자가 될 생각",
-          "url": "https://houseduck.in/blog/kr/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
-        },
-        "en": {
-          "title": "Why I Suddenly Started Developing After Moving All The Way To Germany",
-          "summary": "I am a student of the Industrial Design Department at Kyonggi University from the admission year 17. Now, I have established a sole proprietorship in Germany and am trying to create and release various software including games myself. Right away, my first game Quirky Ball has virtually finished development and has reached the stage of business registration and conducting payment tests for both major markets. But the funny thing is, I never originally planned to become a developer.",
-          "url": "https://houseduck.in/blog/en/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
-        },
-        "de": {
-          "title": "Warum ich bis nach Deutschland kam und plötzlich anfing zu entwickeln",
-          "summary": "Ich gehöre zum Immatrikulationsjahrgang 17 der Kyonggi Universität für Industriedesign. Jetzt habe ich in Deutschland ein Einzelunternehmen gegründet und versuche, verschiedene Softwareprodukte einschließlich Spielen selbst zu entwickeln und zu veröffentlichen. Sogar mein erstes Spiel Quirky Ball ist faktisch fertig entwickelt und hat das Stadium der Gewerbeanmeldung und von Zahlungstests auf beiden großen Märkten erreicht. Das Komische ist nur, dass ich eigentlich nie Entwickler werden wollte",
-          "url": "https://houseduck.in/blog/de/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
-        },
-        "ja": {
-          "title": "私がドイツまで来て唐突に開発を始めることになった理由",
-          "summary": "私は京畿大学校産業デザイン学科の17期生である。現在はドイツで個人事業主として登録し、ゲームをはじめとする様々なソフトウェアを自分で作ってリリースしようとしている。さっそく最初のゲームであるQuirky Ballも事実上開発を終え、事業者登録と両大マーケットの決済テストを行う段階まで来た。だがおかしなことに、私はもともと開発者になるつもりは",
-          "url": "https://houseduck.in/blog/ja/%EB%82%B4%EA%B0%80-%EB%8F%85%EC%9D%BC%EA%B9%8C%EC%A7%80-%EC%99%80%EC%84%9C-%EB%9C%AC%EA%B8%88%EC%97%86%EC%9D%B4-%EA%B0%9C%EB%B0%9C%EC%9D%84-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B2%8C-%EB%90%9C-%EC%9D%B4%EC%9C%A0/"
         }
       }
     }
