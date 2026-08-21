@@ -506,20 +506,23 @@ function renderDecisionPanels() {
   setText("adFormatStatus", formats.length ? `실광고 ${formatNumber(economics.monetizedImpressions)}회` : "집계 대기");
 
   const purchaseFunnels = state.payload?.purchaseFunnel;
+  const purchaseExclusions = state.payload?.purchaseExclusions;
   const removeAds = Array.isArray(purchaseFunnels) ? purchaseFunnels.find((item) => item?.productId === "remove_ads") : null;
-  if (!Array.isArray(purchaseFunnels)) {
-    renderCoverageCards("removeAdsFunnel", ["구매 시작", "구매 성공", "시작 → 성공", "구매 실패"].map((label) => ({ status: "waiting", label, value: "집계 대기", detail: "기존 구매 이벤트를 서버에서 묶는 중입니다." })));
+  if (!Array.isArray(purchaseFunnels) || !purchaseExclusions) {
+    renderCoverageCards("removeAdsFunnel", ["구매 시작", "구매 성공", "시작 → 성공", "구매 실패"].map((label) => ({ status: "waiting", label, value: "집계 대기", detail: "운영 결제와 테스트 결제를 서버에서 분리하는 중입니다." })));
     setText("removeAdsFunnelStatus", "집계 대기");
   } else {
     const hasIntent = Number(removeAds?.startedUsers ?? 0) > 0;
     const status = hasIntent ? "available" : "empty";
+    const excludedInstalls = Number(purchaseExclusions.excludedInstalls ?? 0);
     renderCoverageCards("removeAdsFunnel", [
-      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "remove_ads 구매 버튼을 누른 설치" },
-      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "purchase_succeeded가 기록된 설치" },
-      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "선택 기간의 고유 설치 기준 전환율" },
-      { status, label: "구매 실패", value: `${formatNumber(Number(removeAds?.failedUsers ?? 0))}명 · ${formatNumber(Number(removeAds?.failedEvents ?? 0))}회`, detail: "실패 사용자와 반복 시도 횟수를 함께 표시" },
+      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "테스트를 제외하고 remove_ads 구매 버튼을 누른 설치" },
+      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "운영 purchase_succeeded가 기록된 설치" },
+      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "테스트 설치를 제외한 운영 전환율" },
+      { status, label: "구매 실패", value: `${formatNumber(Number(removeAds?.failedUsers ?? 0))}명 · ${formatNumber(Number(removeAds?.failedEvents ?? 0))}회`, detail: "운영 실패 사용자와 반복 시도 횟수" },
     ]);
-    setText("removeAdsFunnelStatus", hasIntent ? `${formatNumber(removeAds.startedUsers)}명 시작` : "구매 시작 없음");
+    const liveStatus = hasIntent ? `운영 ${formatNumber(removeAds.startedUsers)}명 시작` : "운영 구매 시작 없음";
+    setText("removeAdsFunnelStatus", excludedInstalls > 0 ? `${liveStatus} · 테스트 ${formatNumber(excludedInstalls)}설치 제외` : liveStatus);
   }
 }
 
