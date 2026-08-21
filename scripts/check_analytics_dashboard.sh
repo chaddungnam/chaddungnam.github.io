@@ -38,6 +38,10 @@ if [[ -f "$function_file" && -d "$migration_dir" ]]; then
   rg -q 'verifyAdminTicket' "$function_file"
   rg -q 'admin_list_period_players_v1' "$function_file"
   rg -q 'periodPlayerTotal' "$function_file"
+  rg -q 'acquisitionQuality' "$function_file"
+  rg -q 'purchaseFunnel' "$function_file"
+  rg -q 'buildPurchaseFunnels' "$(dirname "$function_file")/analytics_logic.ts"
+  rg -q 'formatBreakdown' "$(dirname "$function_file")/analytics_logic.ts"
   rg -q 'refresh_admin_daily_game_metrics' "$function_file"
   rg -q 'admin_daily_game_metrics' "$migration_dir"/*_admin_daily_game_metrics.sql
   rg -q 'Europe/Berlin' "$(dirname "$function_file")/analytics_time.ts"

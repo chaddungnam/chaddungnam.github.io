@@ -140,6 +140,8 @@ textarea:focus-visible {
 .attention-item[data-severity="watch"] { border-left: 4px solid var(--gold); }
 .analytics-toolbar { margin-top: 0; }
 .period-players-panel { margin-bottom: 12px; }
+.decision-grid { margin-bottom: 14px; }
+.decision-grid > .panel:not(.panel-wide) .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .period-heading { align-items: flex-start; margin-bottom: 14px; }
 .period-heading small { display: block; max-width: 650px; margin-top: 5px; color: #8990a5; font-size: 10px; line-height: 1.5; }
 .table-toolbar { display: grid; gap: 7px; margin-bottom: 12px; }
@@ -324,6 +326,7 @@ textarea:focus-visible {
   .analytics-toolbar { align-items: flex-start; flex-direction: column; }
   .toolbar-switches { justify-content: flex-start; }
   .period-players-panel { padding: 14px; }
+  .decision-grid > .panel:not(.panel-wide) .coverage-grid { grid-template-columns: 1fr; }
   .table-toolbar > div { flex-wrap: wrap; }
   .table-toolbar input { flex-basis: 100%; }
   .admin-toolbar { grid-template-columns: 1fr; }

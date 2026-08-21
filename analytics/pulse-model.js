@@ -38,10 +38,9 @@
 
   function buildJourney(funnel) {
     const definitions = [
-      ["session_start", "들어옴", "앱을 연 사람"],
+      ["first_open", "첫 실행", "처음 앱을 연 사람"],
       ["game_start", "게임 시작", "게임을 시작한 사람"],
       ["game_over", "게임 완료", "끝까지 한 사람"],
-      ["ad_impression", "광고 봄", "광고를 본 사람"],
     ];
     let previous = null;
     return definitions.map(([event, label, description]) => {
@@ -59,7 +58,7 @@
     if (metrics.completion.status === "risk") return "끝까지 플레이하는 사람이 적어요. 첫 1분 난이도를 확인해요.";
     if (metrics.duration.status === "risk") return "한 판이 너무 빨리 끝나요. 시작 1분의 재미를 확인해요.";
     if (metrics.retention.status === "risk") return "다음 날 돌아오는 사람이 적어요. 재방문 보상을 확인해요.";
-    if (metrics.ads.status === "risk") return "한 사람에게 광고가 너무 많아요. 노출 간격을 늘려요.";
+    if (metrics.ads.status === "risk") return "강제 전면광고가 많아요. 게임 종료 후 노출 간격을 확인해요.";
     if (verdictStatus === "risk") return verdictSummary ?? "종합 상태가 위험해요. 평균 세션과 이탈 기록을 확인해요.";
     if (Object.values(metrics).some((item) => item.status === "watch")) return "노란 지표 하나를 골라 7일 변화를 지켜봐요.";
     if (verdictStatus === "watch") return verdictSummary ?? "종합 상태가 노란색이에요. 7일 변화를 지켜봐요.";
@@ -73,13 +72,13 @@
         completion: "끝까지 플레이하는 비율이 낮아 빨간 신호예요.",
         duration: "한 판이 너무 빨리 끝나서 빨간 신호예요.",
         retention: "다음 날 돌아오는 비율이 낮아 빨간 신호예요.",
-        ads: "한 사람에게 광고가 너무 많아 빨간 신호예요.",
+        ads: "강제 전면광고가 많아 빨간 신호예요.",
       },
       watch: {
         completion: "끝까지 플레이하는 비율을 조금 더 지켜봐야 해요.",
         duration: "한 판 시간이 조금 짧아 더 지켜봐야 해요.",
         retention: "다음 날 돌아오는 비율을 조금 더 지켜봐야 해요.",
-        ads: "광고 횟수를 조금 더 지켜봐야 해요.",
+        ads: "강제 전면광고 횟수를 조금 더 지켜봐야 해요.",
       },
     };
     const matchingMetric = Object.entries(metrics).find(([, item]) => item.status === status)?.[0];
@@ -108,15 +107,19 @@
     const gameOvers = Math.max(0, finiteNumber(summary.gameOvers) ?? 0);
     const completionRate = gamesStarted > 0 ? gameOvers / gamesStarted : null;
     const d1Rate = finiteNumber(retention.find((row) => row?.day === 1)?.rate);
-    const adsPerPlayer = finiteNumber(economics.impressionsPerPlayer);
-    let adsStatus = classify(adsPerPlayer, 3, 5, false);
-    if (adsPerPlayer === 0) adsStatus = "watch";
+    const hasFormatBreakdown = Array.isArray(economics.formatBreakdown);
+    const interstitial = hasFormatBreakdown
+      ? economics.formatBreakdown.find((row) => row?.format === "interstitial")
+      : null;
+    const measuredInterstitialRate = finiteNumber(interstitial?.impressionsPerPlayer);
+    const adsPerPlayer = measuredInterstitialRate ?? (hasFormatBreakdown && finiteNumber(economics.activePlayers) > 0 ? 0 : null);
+    const adsStatus = classify(adsPerPlayer, 1, 2, false);
 
     const rawMetrics = {
       duration: metric(classify(avgGameSeconds, 180, 60), avgGameSeconds, "평균 한 판 시간"),
       completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "시작한 사람 중 완료 비율"),
       retention: metric(classify(d1Rate, 0.2, 0.1), d1Rate, "다음 날 다시 온 비율"),
-      ads: metric(adsStatus, adsPerPlayer, "플레이어 한 명당 광고 노출"),
+      ads: metric(adsStatus, adsPerPlayer, "활성 플레이어 한 명당 강제 전면광고"),
     };
     const metrics = enoughSamples
       ? rawMetrics

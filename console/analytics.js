@@ -118,7 +118,7 @@ function renderDashboard() {
   setText("metricD7", formatRate(d7));
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
-  setText("adTotal", `${formatNumber(summary.adImpressions)} 노출 · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
+  setText("adTotal", `실광고 ${formatNumber(adEconomics.monetizedImpressions)} · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
   renderPulseOverview(pulseModel);
   renderInsightReasons(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
@@ -127,6 +127,7 @@ function renderDashboard() {
   renderFunnel();
   renderExitBreakdown();
   renderAds();
+  renderDecisionPanels();
   renderAppStatus();
   renderPurchaseTrend();
   renderChoices();
@@ -266,7 +267,7 @@ function renderInsightReasons(model) {
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
     completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 완료 이벤트와 게임 시작 이벤트를 비교해 계산했습니다.` },
     retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다. 첫 실행 이후 다음 날 다시 기록된 계정을 기준으로 계산했습니다.` },
-    ads: { title: "광고는 적당한가? · 판단 근거", body: `플레이어 1명당 광고 노출은 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 테스트 광고는 노출에는 포함하지만 예상 수익에서는 제외합니다.` },
+    ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활성 플레이어 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
     const reason = reasons[key];
@@ -285,7 +286,7 @@ function renderInsightReasons(model) {
 }
 
 function renderJourney(journey = []) {
-  const icons = { session_start: "↗", game_start: "▶", game_over: "✓", ad_impression: "AD" };
+  const icons = { first_open: "↗", game_start: "▶", game_over: "✓" };
   byId("journeyGraph").innerHTML = journey.map((step, index) => {
     const connector = index === 0 ? "" : `
       <div class="journey-link" style="--journey-progress:${Math.min(100, Math.max(0, (step.rate ?? 0) * 100))}%">
@@ -316,7 +317,7 @@ function renderPulseOverview(model) {
   renderQuestionMetric("Duration", model.metrics.duration, formatDuration(model.metrics.duration.value), metricProgress(model.metrics.duration.value, 180));
   renderQuestionMetric("Completion", model.metrics.completion, formatRate(model.metrics.completion.value), metricProgress(model.metrics.completion.value, 0.65));
   renderQuestionMetric("Retention", model.metrics.retention, formatRate(model.metrics.retention.value), metricProgress(model.metrics.retention.value, 0.2));
-  renderQuestionMetric("Ads", model.metrics.ads, model.metrics.ads.value == null ? "—" : `${formatDecimal(model.metrics.ads.value)}회`, metricProgress(model.metrics.ads.value, 5));
+  renderQuestionMetric("Ads", model.metrics.ads, model.metrics.ads.value == null ? "—" : `${formatDecimal(model.metrics.ads.value)}회`, metricProgress(model.metrics.ads.value, 2));
   renderJourney(model.journey);
 }
 
@@ -332,7 +333,7 @@ function renderPlatformSummary(platforms) {
     <div class="platform-row">
       <div class="platform-name"><strong>${escapeHtml(distributionLabel(row.distributionKey))}</strong><small>${escapeHtml(row.platform || "플랫폼 미지정")}</small></div>
       <div><span>플레이어</span><strong>${formatNumber(row.activePlayers)}</strong></div>
-      <div><span>광고/플레이어</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
+      <div><span>전체 광고/플레이어</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
       <div><span>예상 수익</span><strong>${formatCurrency(row.estimatedRevenueEur)}</strong></div>
     </div>`).join("");
 }
@@ -463,6 +464,65 @@ function renderCoverageCards(id, cards) {
     </article>`).join("");
 }
 
+function renderDecisionPanels() {
+  const acquisition = state.payload?.acquisitionQuality;
+  if (!acquisition || typeof acquisition !== "object") {
+    renderCoverageCards("acquisitionQuality", ["첫 실행", "게임 시작", "시작률", "완료"].map((label) => ({ status: "waiting", label, value: "집계 대기", detail: "서버 집계를 불러오는 중입니다." })));
+    setText("acquisitionQualityStatus", "집계 대기");
+  } else {
+    const firstOpens = Number(acquisition.firstOpens ?? 0);
+    const started = Number(acquisition.started ?? 0);
+    const completed = Number(acquisition.completed ?? 0);
+    const hasNewUsers = firstOpens > 0;
+    const status = hasNewUsers ? "available" : "empty";
+    renderCoverageCards("acquisitionQuality", [
+      { status, label: "첫 실행", value: `${formatNumber(firstOpens)}명`, detail: "선택 기간에 first_open이 기록된 신규 설치" },
+      { status, label: "게임 시작", value: `${formatNumber(started)}명`, detail: "같은 신규 설치에서 game_start까지 기록" },
+      { status, label: "첫 실행 → 시작", value: formatRate(acquisition.firstOpenToStartRate), detail: "광고 설치 수가 아닌 실제 앱 실행 코호트 기준" },
+      { status, label: "첫 실행 → 완료", value: `${formatNumber(completed)}명 · ${formatRate(acquisition.firstOpenToCompleteRate)}`, detail: "같은 신규 설치에서 game_over까지 기록" },
+    ]);
+    setText("acquisitionQualityStatus", hasNewUsers ? `${formatNumber(firstOpens)}명 코호트` : "신규 없음");
+  }
+
+  const economics = state.payload?.adEconomics ?? {};
+  const formats = Array.isArray(economics.formatBreakdown) ? economics.formatBreakdown : [];
+  const formatLabels = {
+    interstitial: ["강제 전면", "게임 종료 후 자동으로 노출되는 광고"],
+    rewarded: ["자발적 보상형", "보상을 선택한 플레이어가 보는 광고"],
+    banner: ["배너", "화면에 상시·부분 노출되는 광고"],
+    native: ["네이티브", "팝업 안에 자연스럽게 표시되는 광고"],
+  };
+  const formatCards = Object.entries(formatLabels).map(([format, [label, detail]]) => {
+    const row = formats.find((item) => item?.format === format);
+    const measured = Boolean(row) || Number(economics.impressions ?? 0) === 0;
+    return {
+      status: measured ? (Number(row?.monetizedImpressions ?? 0) > 0 ? "available" : "empty") : "waiting",
+      label,
+      value: measured ? `${formatNumber(Number(row?.monetizedImpressions ?? 0))}회` : "집계 대기",
+      detail: `${detail} · 활성 플레이어당 ${formatDecimal(row?.impressionsPerPlayer)}회 · 테스트 ${formatNumber(Number(row?.testImpressions ?? 0))}`,
+    };
+  });
+  renderCoverageCards("adFormatSummary", formatCards);
+  setText("adFormatStatus", formats.length ? `실광고 ${formatNumber(economics.monetizedImpressions)}회` : "집계 대기");
+
+  const purchaseFunnels = state.payload?.purchaseFunnel;
+  const removeAds = Array.isArray(purchaseFunnels) ? purchaseFunnels.find((item) => item?.productId === "remove_ads") : null;
+  if (!Array.isArray(purchaseFunnels)) {
+    renderCoverageCards("removeAdsFunnel", ["구매 시작", "구매 성공", "시작 → 성공", "구매 실패"].map((label) => ({ status: "waiting", label, value: "집계 대기", detail: "기존 구매 이벤트를 서버에서 묶는 중입니다." })));
+    setText("removeAdsFunnelStatus", "집계 대기");
+  } else {
+    const hasIntent = Number(removeAds?.startedUsers ?? 0) > 0;
+    const status = hasIntent ? "available" : "empty";
+    renderCoverageCards("removeAdsFunnel", [
+      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "remove_ads 구매 버튼을 누른 설치" },
+      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "purchase_succeeded가 기록된 설치" },
+      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "선택 기간의 고유 설치 기준 전환율" },
+      { status, label: "구매 실패", value: `${formatNumber(Number(removeAds?.failedUsers ?? 0))}명 · ${formatNumber(Number(removeAds?.failedEvents ?? 0))}회`, detail: "실패 사용자와 반복 시도 횟수를 함께 표시" },
+    ]);
+    setText("removeAdsFunnelStatus", hasIntent ? `${formatNumber(removeAds.startedUsers)}명 시작` : "구매 시작 없음");
+  }
+}
+
 function measuredCard(label, value, detail, hasData, formatter = (count) => `${formatNumber(count)}회`) {
   const measured = hasData && typeof value === "number" && Number.isFinite(value);
   return { status: measured ? "available" : "empty", label, value: measured ? formatter(value) : "데이터 없음", detail };
@@ -527,7 +587,11 @@ function renderInsight() {
     return;
   }
   const timeText = topHour ? `${String(topHour.hour).padStart(2, "0")}시–${String((topHour.hour + 1) % 24).padStart(2, "0")}시` : "—";
-  setText("insightText", `가장 많이 시작하는 시간은 ${timeText}입니다. 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
+  const acquisition = state.payload?.acquisitionQuality;
+  const cohortText = Number(acquisition?.firstOpens ?? 0) > 0
+    ? `신규 첫 실행 ${formatNumber(acquisition.firstOpens)}명 중 ${formatNumber(acquisition.started)}명이 게임을 시작했고 ${formatNumber(acquisition.completed)}명이 완료했습니다.`
+    : "이 기간에는 신규 첫 실행 코호트가 없습니다.";
+  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 전체 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
 }
 
 function setAiMessage(value, error = false) {
@@ -546,19 +610,20 @@ function advisorySnapshot() {
   const exitRate = summary.gamesStarted ? ((summary.midGameExits ?? 0) + (summary.unobservedGames ?? 0)) / summary.gamesStarted : null;
   const revenue = Number(ad.estimatedRevenueEur);
   const monthlyRevenue = Number.isFinite(revenue) && state.rangeDays > 0 ? revenue / state.rangeDays * 30 : null;
-  return { sessions: Number(summary.sessions ?? 0), gamesStarted: Number(summary.gamesStarted ?? 0), activePlayers: Number(summary.activeInstallsToday ?? 0), duration: Number(summary.avgSessionSeconds), completion, exitRate, d1, d7, adsPerPlayer: Number(summary.adImpressions) / Math.max(1, Number(summary.activeInstallsToday)), monthlyRevenue };
+  const forcedAdsPerPlayer = Number(ad.formatBreakdown?.find((row) => row?.format === "interstitial")?.impressionsPerPlayer);
+  return { sessions: Number(summary.sessions ?? 0), gamesStarted: Number(summary.gamesStarted ?? 0), activePlayers: Number(summary.activeInstallsToday ?? 0), duration: Number(summary.avgSessionSeconds), completion, exitRate, d1, d7, adsPerPlayer: Number.isFinite(forcedAdsPerPlayer) ? forcedAdsPerPlayer : null, monthlyRevenue };
 }
 
 function fallbackAdvice(snapshot) {
   const money = snapshot.monthlyRevenue == null ? "수익 추정에 필요한 eCPM 또는 광고 수익 데이터가 아직 부족합니다." : `현재 ${state.rangeDays}일 기준을 30일로 환산하면 보수 ${formatCurrency(snapshot.monthlyRevenue * 0.6)} · 기준 ${formatCurrency(snapshot.monthlyRevenue)} · 상향 ${formatCurrency(snapshot.monthlyRevenue * 1.4)}입니다. 실제 수익 보장은 아니며 eCPM과 필레이트에 따라 달라집니다.`;
   const iosReady = snapshot.sessions >= 50 && snapshot.completion >= 0.55 && snapshot.d1 >= 0.2 && snapshot.duration >= 90;
   const ios = iosReady ? "iOS는 소규모 소프트런치를 시작할 수 있습니다. 단, iOS 크래시·결제·개인정보 고지는 별도 실기기 확인 후 열어야 합니다." : `iOS 확장은 아직 보류가 좋습니다. 현재 완료율 ${formatRate(snapshot.completion)}, D1 ${formatRate(snapshot.d1)}, 평균 플레이 ${formatDuration(snapshot.duration)}를 먼저 안정화하세요.`;
-  const next = snapshot.completion != null && snapshot.completion < 0.55 ? "차기작보다 Quirky Ball 첫 1분 난이도와 중간 이탈을 먼저 고치는 편이 수익 가능성이 높습니다." : snapshot.adsPerPlayer > 4 ? "차기작은 강제 광고보다 선택형 보상 광고와 꾸미기 상품을 중심으로 설계하세요. 광고 피로도를 낮춘 뒤 유료 꾸미기·시즌패스를 붙이는 순서가 안전합니다." : "차기작은 짧은 세션의 물리 퍼즐을 유지하되, 수집·꾸미기·주간 목표를 가볍게 더한 반복 구조가 현재 데이터와 가장 잘 맞습니다.";
+  const next = snapshot.completion != null && snapshot.completion < 0.55 ? "차기작보다 Quirky Ball 첫 1분 난이도와 중간 이탈을 먼저 고치는 편이 수익 가능성이 높습니다." : snapshot.adsPerPlayer > 2 ? "강제 전면광고가 많습니다. 노출 간격을 확인한 뒤 선택형 보상 광고와 꾸미기 상품을 중심으로 설계하세요." : "차기작은 짧은 세션의 물리 퍼즐을 유지하되, 수집·꾸미기·주간 목표를 가볍게 더한 반복 구조가 현재 데이터와 가장 잘 맞습니다.";
   return `월 예상 수익\n${money}\n\niOS 확장 판단\n${ios}\n\n차기작 방향\n${next}`;
 }
 
 function englishPrompt(snapshot) {
-  return `You are a cautious mobile game operations advisor. Use only this aggregated Quirky Ball data: sessions=${snapshot.sessions}, games_started=${snapshot.gamesStarted}, average_session_seconds=${snapshot.duration}, completion_rate=${snapshot.completion}, exit_rate=${snapshot.exitRate}, D1=${snapshot.d1}, D7=${snapshot.d7}, ads_per_active_player=${snapshot.adsPerPlayer}, monthly_ad_revenue_baseline_EUR=${snapshot.monthlyRevenue}. Write concise English advice with exactly three headings: Monthly revenue forecast, iOS expansion decision, Next game direction. Give conservative, actionable recommendations, explicitly say when data is insufficient, never invent metrics, and do not give financial guarantees.`;
+  return `You are a cautious mobile game operations advisor. Use only this aggregated Quirky Ball data: sessions=${snapshot.sessions}, games_started=${snapshot.gamesStarted}, average_session_seconds=${snapshot.duration}, completion_rate=${snapshot.completion}, exit_rate=${snapshot.exitRate}, D1=${snapshot.d1}, D7=${snapshot.d7}, forced_ads_per_active_player=${snapshot.adsPerPlayer}, monthly_ad_revenue_baseline_EUR=${snapshot.monthlyRevenue}. Write concise English advice with exactly three headings: Monthly revenue forecast, iOS expansion decision, Next game direction. Give conservative, actionable recommendations, explicitly say when data is insufficient, never invent metrics, and do not give financial guarantees.`;
 }
 
 async function createChromeAdvice(prompt) {

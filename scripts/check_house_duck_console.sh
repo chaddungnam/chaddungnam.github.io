@@ -104,4 +104,13 @@ rg -F -q 'function formatAdFailureDays(' "$console_dir/analytics.js"
 rg -F -q 'formatAdFailureReasons(row.failuresByReason)' "$console_dir/analytics.js"
 rg -F -q 'formatAdFailureDays(row.failuresByDay)' "$console_dir/analytics.js"
 
+# 광고 피로도는 전체 광고가 아니라 강제 전면광고로 판단하고, 기존 이벤트만으로
+# 신규 유입 품질과 광고 제거 구매 퍼널을 운영 화면에 표시한다.
+rg -q 'id="acquisitionQuality"' "$console_dir/index.html"
+rg -q 'id="adFormatSummary"' "$console_dir/index.html"
+rg -q 'id="removeAdsFunnel"' "$console_dir/index.html"
+rg -F -q 'function renderDecisionPanels()' "$console_dir/analytics.js"
+rg -F -q 'format === "interstitial"' "$repo_dir/analytics/pulse-model.js"
+rg -F -q 'first_open", "첫 실행"' "$repo_dir/analytics/pulse-model.js"
+
 echo "House Duck console contract: PASS"

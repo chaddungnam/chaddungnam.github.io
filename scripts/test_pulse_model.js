@@ -12,12 +12,16 @@ function payload(overrides = {}) {
       ...overrides.summary,
     },
     retention: overrides.retention ?? [{ day: 1, rate: 0.25 }],
-    adEconomics: { impressionsPerPlayer: 2, estimatedRevenueEur: 1.25, ...overrides.adEconomics },
+    adEconomics: {
+      impressionsPerPlayer: 2,
+      estimatedRevenueEur: 1.25,
+      formatBreakdown: [{ format: "interstitial", impressionsPerPlayer: 0.5 }],
+      ...overrides.adEconomics,
+    },
     funnel: overrides.funnel ?? [
-      { event: "session_start", users: 10 },
+      { event: "first_open", users: 10 },
       { event: "game_start", users: 8 },
       { event: "game_over", users: 6 },
-      { event: "ad_impression", users: 4 },
     ],
     health: { status: "good", score: 82, summary: "흐름이 안정적입니다.", ...overrides.health },
   };
@@ -30,8 +34,8 @@ assert.equal(healthy.metrics.completion.status, "good");
 assert.equal(healthy.metrics.retention.status, "good");
 assert.equal(healthy.metrics.ads.status, "good");
 assert.equal(healthy.metrics.completion.value, 0.75);
-assert.deepEqual(healthy.journey.map((step) => step.users), [10, 8, 6, 4]);
-assert.deepEqual(healthy.journey.map((step) => step.rate), [1, 0.8, 0.75, 2 / 3]);
+assert.deepEqual(healthy.journey.map((step) => step.users), [10, 8, 6]);
+assert.deepEqual(healthy.journey.map((step) => step.rate), [1, 0.8, 0.75]);
 
 const insufficient = buildPulseModel(payload({ summary: { sessions: 8 } }));
 assert.equal(insufficient.verdict.status, "insufficient");
@@ -41,7 +45,7 @@ assert.match(insufficient.action, /22회/);
 const risky = buildPulseModel(payload({
   summary: { avgGameSeconds: 45, gamesStarted: 20, gameOvers: 6 },
   retention: [{ day: 1, rate: 0.05 }],
-  adEconomics: { impressionsPerPlayer: 6.2 },
+  adEconomics: { formatBreakdown: [{ format: "interstitial", impressionsPerPlayer: 2.2 }] },
   health: { status: "risk", score: 31, summary: "확인이 필요합니다." },
 }));
 assert.equal(risky.metrics.duration.status, "risk");
@@ -64,12 +68,26 @@ assert.doesNotMatch(contradictorySummary.verdict.summary, /안정적/);
 assert.match(contradictorySummary.verdict.summary, /위험 신호/);
 
 const adOverridesGreenHealth = buildPulseModel(payload({
-  adEconomics: { impressionsPerPlayer: 6.4 },
+  adEconomics: { formatBreakdown: [{ format: "interstitial", impressionsPerPlayer: 2.4 }] },
   health: { status: "good", score: 88, summary: "플레이 지표는 좋아요." },
 }));
 assert.equal(adOverridesGreenHealth.metrics.ads.status, "risk");
 assert.equal(adOverridesGreenHealth.verdict.status, "risk");
 assert.equal(adOverridesGreenHealth.verdict.score, null);
 assert.match(adOverridesGreenHealth.verdict.summary, /광고/);
+
+const passiveAdsDoNotTriggerForcedAdRisk = buildPulseModel(payload({
+  adEconomics: {
+    impressionsPerPlayer: 8.6,
+    formatBreakdown: [
+      { format: "interstitial", impressionsPerPlayer: 0.2 },
+      { format: "rewarded", impressionsPerPlayer: 0.4 },
+      { format: "banner", impressionsPerPlayer: 3 },
+      { format: "native", impressionsPerPlayer: 5 },
+    ],
+  },
+}));
+assert.equal(passiveAdsDoNotTriggerForcedAdRisk.metrics.ads.status, "good");
+assert.equal(passiveAdsDoNotTriggerForcedAdRisk.metrics.ads.value, 0.2);
 
 console.log("pulse model: PASS");

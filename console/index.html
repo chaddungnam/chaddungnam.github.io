@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260821-1">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -122,7 +122,13 @@
           <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>평균 한 판 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="duration" type="button">왜?</button></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
           <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>게임 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10명 중 7명쯤이면 좋아요</small></article>
           <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>다음 날 다시 온 비율</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>7일 뒤 다시 옴 <b id="metricD7">—</b></small></article>
-          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>광고는 적당한가?</h2><p>사람 한 명당 노출</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>테스트 광고 포함 · 수익에서는 제외</small></article>
+          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활성 플레이어당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
+        </section>
+
+        <section class="content-grid decision-grid" aria-label="신규 유입, 광고 형식, 광고 제거 구매 분석">
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 설치만 묶어 게임 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">AD FORMAT MIX</p><h2>어떤 광고를 보고 있나</h2><small>전체 합계 대신 강제 전면·자발적 보상·배너·네이티브를 나눕니다.</small></div><span id="adFormatStatus" class="panel-total">—</span></div><div id="adFormatSummary" class="coverage-grid" aria-live="polite"></div></article>
+          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">REMOVE ADS FUNNEL</p><h2>광고 제거 구매로 이어지나</h2><small>상품을 누른 설치부터 성공·실패까지 기존 구매 이벤트로 확인합니다.</small></div><span id="removeAdsFunnelStatus" class="panel-total">—</span></div><div id="removeAdsFunnel" class="coverage-grid" aria-live="polite"></div></article>
         </section>
 
         <section class="operations-pulse" aria-labelledby="operationsPulseTitle">
@@ -284,12 +290,12 @@
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="../analytics/pulse-model.js"></script>
+  <script src="../analytics/pulse-model.js?v=20260821-1"></script>
   <script src="model.js"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260816-3"></script>
+  <script src="analytics.js?v=20260821-1"></script>
   <script src="players.js"></script>
   <script src="operations.js"></script>
   <script src="purchases-model.js"></script>
