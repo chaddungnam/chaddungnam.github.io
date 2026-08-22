@@ -27,6 +27,9 @@ assert.deepEqual(model.countryDisplay("aln"), { code: "ALN", name: "외계인", 
 assert.deepEqual(model.countryDisplay("SGV"), { code: "SGV", name: "그림자정부", flag: "🕶️", custom: true });
 assert.deepEqual(model.countryDisplay("RPT"), { code: "RPT", name: "렙틸리언", flag: "🦎", custom: true });
 assert.deepEqual(model.countryDisplay(""), { code: "", name: "국가 미설정", flag: "", custom: false });
+assert.equal(model.actionDisplayName("player_mutation"), "플레이어 재화 변경");
+assert.equal(model.actionDisplayName("reward_mail_broadcast"), "전체 보상 우편");
+assert.equal(model.actionDisplayName("future_action"), "future_action");
 
 assert.equal(model.serializeAnalyticsFilters({
   rangeDays: 28,

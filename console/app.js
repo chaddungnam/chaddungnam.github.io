@@ -15,8 +15,19 @@ const pageTitles = {
   audit: "감사 기록",
   "project-k": "Project K",
 };
+const pageDescriptions = {
+  analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
+  players: "계정을 찾고 플레이 기록과 재화 상태를 빠르게 확인합니다.",
+  player: "한 플레이어의 계정 상태, 기록, 보상과 변경 이력을 처리합니다.",
+  operations: "전체 보상, 최소 지원 버전, QA 권한처럼 영향이 큰 작업을 관리합니다.",
+  purchases: "실제 스토어 구매·환불 기록과 검토가 필요한 결제를 확인합니다.",
+  cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
+  audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
+  "project-k": "아직 준비 중인 프로젝트입니다.",
+};
 
 let currentProjectKey = "";
+let renderedRouteKey = "";
 const byId = (id) => document.getElementById(id);
 
 function confirmChange(title, body) {
@@ -42,9 +53,11 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
   byId("challengeEmail").textContent = authState.email || "";
   if (!authState.signedIn) {
     currentProjectKey = "";
+    renderedRouteKey = "";
     showOnly("loginPanel");
   } else if (!authState.unlocked) {
     currentProjectKey = "";
+    renderedRouteKey = "";
     showOnly("challengePanel");
     byId("challengeAnswer").focus();
   } else if (currentProjectKey) {
@@ -82,9 +95,14 @@ function renderRoute() {
     if (link.dataset.page === route.page) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
+  const routeKey = `${route.page}:${route.userId || ""}`;
+  const routeChanged = routeKey !== renderedRouteKey;
+  renderedRouteKey = routeKey;
   byId("pageTitle").textContent = pageTitles[route.page] || "분석";
+  byId("pageDescription").textContent = pageDescriptions[route.page] || pageDescriptions.analytics;
   byId("consoleStatus").textContent = `${byId("pageTitle").textContent} 화면`;
   byId("mainContent").focus({ preventScroll: true });
+  if (routeChanged && typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "auto" });
   if (route.page === "analytics") window.ConsoleAnalytics.mount();
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
@@ -135,6 +153,18 @@ byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_
 byId("projectK").addEventListener("click", () => selectProject("project_k"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
+byId("refreshRouteButton").addEventListener("click", () => {
+  const button = byId("refreshRouteButton");
+  button.classList.add("is-refreshing");
+  renderRoute();
+  window.setTimeout(() => button.classList.remove("is-refreshing"), 650);
+});
+byId("scrollToTop").addEventListener("click", () => {
+  if (typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "smooth" });
+});
+window.addEventListener("scroll", () => {
+  byId("scrollToTop").hidden = !(Number(window.scrollY) > 640);
+});
 window.addEventListener("hashchange", renderRoute);
 window.addEventListener("console-auth-change", (event) => renderAuth(event.detail));
 

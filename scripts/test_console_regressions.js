@@ -23,7 +23,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 const consoleHtml = read("console/index.html");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
-assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.indexOf('<script src="app.js" defer></script>'), "the UI state helper must load before the console app");
+assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
 
 const playersSource = read("console/players.js");
 assert.match(playersSource, /icon_jakwon_tongue[\s\S]*yakwon 프로필/, "the admin inventory list must expose the retired yakwon profile item");

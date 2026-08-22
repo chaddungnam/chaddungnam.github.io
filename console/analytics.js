@@ -88,6 +88,7 @@ async function loadDashboard() {
     return;
   }
   state.loading = true;
+  byId("analyticsView").setAttribute("aria-busy", "true");
   setFiltersDisabled(true);
   setMessage(`Quirky Ball · 최근 ${state.rangeDays}일 이벤트와 플레이 계정을 집계하는 중...`);
   try {
@@ -112,6 +113,7 @@ async function loadDashboard() {
     setMessage(readFunctionError(error), true);
   } finally {
     state.loading = false;
+    byId("analyticsView").setAttribute("aria-busy", "false");
     setFiltersDisabled(false);
   }
 }
@@ -232,8 +234,10 @@ function renderPeriodPlayers() {
   const rows = root.ConsoleModel.dedupePlayers(state.payload?.periodPlayers ?? []);
   const total = Number(state.payload?.periodPlayerTotal ?? 0);
   const totalPages = Math.max(1, Math.ceil(total / 50));
+  const rangeStart = total ? (state.playerPage - 1) * 50 + 1 : 0;
+  const rangeEnd = Math.min(state.playerPage * 50, total);
   setText("periodPlayerTotal", `${formatNumber(total)}명`);
-  setText("periodPage", `${state.playerPage} / ${totalPages}`);
+  setText("periodPage", `${state.playerPage} / ${totalPages} · ${formatNumber(rangeStart)}–${formatNumber(rangeEnd)} / ${formatNumber(total)}`);
   byId("periodPrevious").disabled = state.playerPage <= 1;
   byId("periodNext").disabled = state.playerPage >= totalPages;
   byId("periodPlayersTable").innerHTML = rows.length === 0

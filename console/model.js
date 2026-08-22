@@ -69,6 +69,23 @@
     return { code, name: `알 수 없는 국가 (${code})`, flag: "", custom: false };
   }
 
+  const actionNames = Object.freeze({
+    player_mutation: "플레이어 재화 변경",
+    player_mutation_revert: "플레이어 재화 되돌리기",
+    player_wipe: "플레이어 데이터 초기화",
+    inventory_mutation: "아이템 지급·회수",
+    score_correction: "점수 기록 보정",
+    reward_mail_send: "개별 보상 우편",
+    reward_mail_broadcast: "전체 보상 우편",
+    min_version_update: "최소 지원 버전 변경",
+    qa_access_update: "QA 상점 권한 변경",
+  });
+
+  function actionDisplayName(value) {
+    const action = String(value || "").trim();
+    return actionNames[action] || action || "알 수 없는 작업";
+  }
+
   function serializeAnalyticsFilters(filters) {
     const params = new URLSearchParams();
     params.set("rangeDays", String(filters.rangeDays));
@@ -138,6 +155,7 @@
     dedupePlayers,
     playerDisplayName,
     countryDisplay,
+    actionDisplayName,
     serializeAnalyticsFilters,
     playerDeepLink,
     safeConsoleReturnHash,

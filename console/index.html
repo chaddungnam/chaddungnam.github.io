@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260822-1">
+  <link rel="stylesheet" href="styles.css?v=20260822-2">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -64,20 +64,20 @@
       <div class="console-brand"><span aria-hidden="true">HD</span><strong>House Duck</strong><small>Console</small></div>
       <button id="changeProjectButton" class="project-switch" type="button"><span id="currentProject">Quirky Ball</span><small>프로젝트 변경</small></button>
       <nav id="consoleNav">
-        <a href="#/analytics" data-page="analytics">분석</a>
-        <a href="#/players" data-page="players">플레이어</a>
-        <a href="#/operations" data-page="operations">운영</a>
-        <a href="#/purchases" data-page="purchases">구매</a>
-        <a href="#/cs" data-page="cs">CS</a>
-        <a href="#/audit" data-page="audit">감사 기록</a>
+        <a href="#/analytics" data-page="analytics"><span class="nav-index">01</span><span class="nav-copy">분석<small>성과·유입</small></span></a>
+        <a href="#/players" data-page="players"><span class="nav-index">02</span><span class="nav-copy">플레이어<small>검색·처리</small></span></a>
+        <a href="#/operations" data-page="operations"><span class="nav-index">03</span><span class="nav-copy">운영<small>보상·버전</small></span></a>
+        <a href="#/purchases" data-page="purchases"><span class="nav-index">04</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
+        <a href="#/cs" data-page="cs"><span class="nav-index">05</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
+        <a href="#/audit" data-page="audit"><span class="nav-index">06</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
     </aside>
 
     <main id="mainContent" class="console-main" tabindex="-1">
       <header class="console-topbar">
-        <div><p class="eyebrow">HOUSE DUCK / OPERATIONS</p><h1 id="pageTitle">분석</h1></div>
-        <span id="userEmail" class="user-pill"></span>
+        <div class="route-heading"><p class="eyebrow">HOUSE DUCK / OPERATIONS</p><h1 id="pageTitle">분석</h1><p id="pageDescription" class="page-description">현재 플레이 상태와 다음 판단 근거를 확인합니다.</p></div>
+        <div class="console-topbar-actions"><button id="refreshRouteButton" class="refresh-button" type="button" aria-label="현재 화면 새로고침">새로고침</button><span id="userEmail" class="user-pill"></span></div>
       </header>
 
       <section id="analyticsView" class="route-view" data-route="analytics">
@@ -202,9 +202,9 @@
         <div id="operationsSummary" class="operations-summary"></div>
         <div class="admin-card-grid">
           <article class="panel admin-form"><p class="eyebrow">NOTICE</p><h2>게임 공지</h2><span class="status-label">다음 게임 빌드 연동 후 활성</span><p class="empty-panel">현재 앱에는 공지 진입 경로가 없어, 보이지 않는 공지를 발행하지 않도록 잠갔습니다.</p></article>
-          <form id="rewardMailForm" class="panel admin-form"><p class="eyebrow">REWARD MAIL</p><h2>전체 보상 우편</h2><label>고정 다국어 문구<select name="templateKey" required><option value="general">안내 보상</option><option value="compensation">불편 보상</option><option value="maintenance">점검 보상</option><option value="welcome">환영 보상</option><option value="support">문의 지원 보상</option><option value="update">업데이트 보상</option><option value="launch">출시 기념 보상</option></select></label><div id="rewardTemplatePreview" class="reward-template-preview" aria-live="polite"></div><div class="form-pair"><label>보상<select name="kind"><option value="gems">젬</option><option value="breakthrough_ticket">배속 티켓</option><option value="entitlement">상점 아이템</option></select></label><label id="rewardValueLabel">수량<input name="rewardValue" required></label></div><label>수령 기한<input name="expiresAt" type="datetime-local" required></label><label>발송 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">전체 발송</button></form>
-          <form id="minVersionForm" class="panel admin-form"><p class="eyebrow">FORCED UPDATE</p><h2>최소 지원 릴리스</h2><p class="status-label">강제 업데이트는 두 플랫폼 앱에 함께 포함된 공통 호환 코드로 판정합니다. Android versionCode와 iOS 빌드 번호는 스토어 전용 값이므로 입력하지 마세요.</p><div class="form-pair"><label>표시 버전<input name="minVersion" pattern="[0-9]+(\.[0-9]+){1,3}" required></label><label>공통 호환 코드<input name="minVersionCode" type="number" min="0" step="1" required></label></div><label>변경 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">최소 버전 변경</button></form>
-          <form id="qaAccessForm" class="panel admin-form"><p class="eyebrow">QA ACCESS</p><h2>QA 상점 권한</h2><label>사용자 ID<input name="userId" required></label><label class="check-label"><input name="shopControlsEnabled" type="checkbox"> QA 상점 컨트롤 허용</label><label>변경 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">QA 권한 저장</button></form>
+          <form id="rewardMailForm" class="panel admin-form impact-form impact-form-critical"><p class="eyebrow">REWARD MAIL</p><h2>전체 보상 우편</h2><p class="impact-note">모든 플레이어에게 즉시 발송됩니다. 대상, 보상, 기한을 확인한 뒤 진행하세요.</p><label>고정 다국어 문구<select name="templateKey" required><option value="general">안내 보상</option><option value="compensation">불편 보상</option><option value="maintenance">점검 보상</option><option value="welcome">환영 보상</option><option value="support">문의 지원 보상</option><option value="update">업데이트 보상</option><option value="launch">출시 기념 보상</option></select></label><div id="rewardTemplatePreview" class="reward-template-preview" aria-live="polite"></div><div class="form-pair"><label>보상<select name="kind"><option value="gems">젬</option><option value="breakthrough_ticket">배속 티켓</option><option value="entitlement">상점 아이템</option></select></label><label id="rewardValueLabel">수량<input name="rewardValue" required></label></div><label>수령 기한<input name="expiresAt" type="datetime-local" required></label><label>발송 사유<input name="reason" maxlength="300" required></label><button class="danger-button" type="submit">전체 발송</button></form>
+          <form id="minVersionForm" class="panel admin-form impact-form impact-form-critical"><p class="eyebrow">FORCED UPDATE</p><h2>최소 지원 릴리스</h2><p class="impact-note">낮은 호환 코드의 빌드는 접속이 제한될 수 있습니다. 양쪽 스토어 배포 상태를 먼저 확인하세요.</p><p class="status-label">강제 업데이트는 두 플랫폼 앱에 함께 포함된 공통 호환 코드로 판정합니다. Android versionCode와 iOS 빌드 번호는 스토어 전용 값이므로 입력하지 마세요.</p><div class="form-pair"><label>표시 버전<input name="minVersion" pattern="[0-9]+(\.[0-9]+){1,3}" required></label><label>공통 호환 코드<input name="minVersionCode" type="number" min="0" step="1" required></label></div><label>변경 사유<input name="reason" maxlength="300" required></label><button class="danger-button" type="submit">최소 버전 변경</button></form>
+          <form id="qaAccessForm" class="panel admin-form impact-form"><p class="eyebrow">QA ACCESS</p><h2>QA 상점 권한</h2><p class="impact-note">입력한 사용자 1명에게만 QA 상점 컨트롤 권한을 적용합니다.</p><label>사용자 ID<input name="userId" required></label><label class="check-label"><input name="shopControlsEnabled" type="checkbox"> QA 상점 컨트롤 허용</label><label>변경 사유<input name="reason" maxlength="300" required></label><button class="warning-button" type="submit">QA 권한 저장</button></form>
         </div>
         <section class="panel"><div class="panel-heading"><div><p class="eyebrow">RECENT OPERATIONS</p><h2>최근 공지와 보상 발송</h2></div></div><div id="operationsHistory" class="audit-list"></div></section>
         <p id="operationsMessage" class="dashboard-message" role="status"></p>
@@ -224,14 +224,15 @@
           <button class="primary-button" type="submit">조회</button>
         </form>
         <section id="purchaseSummary" class="purchase-summary" aria-label="구매·환불 요약">
-          <article><span>전체</span><strong data-purchase-summary="total">—</strong></article>
-          <article><span>결제 완료</span><strong data-purchase-summary="purchased">—</strong></article>
-          <article><span>환불</span><strong data-purchase-summary="refunded">—</strong></article>
-          <article><span>결제 취소</span><strong data-purchase-summary="chargebacks">—</strong></article>
-          <article><span>환불 비율</span><strong data-purchase-summary="refundRate">—</strong></article>
+          <article data-tone="neutral"><span>전체</span><strong data-purchase-summary="total">—</strong></article>
+          <article data-tone="good"><span>결제 완료</span><strong data-purchase-summary="purchased">—</strong></article>
+          <article data-tone="risk"><span>환불</span><strong data-purchase-summary="refunded">—</strong></article>
+          <article data-tone="risk"><span>결제 취소</span><strong data-purchase-summary="chargebacks">—</strong></article>
+          <article data-tone="watch"><span>환불 비율</span><strong data-purchase-summary="refundRate">—</strong></article>
         </section>
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">REAL STORE RECORDS</p><h2>구매·환불 기록</h2><small>반복 환불 표시는 검토 신호일 뿐 제재 근거가 아닙니다.</small></div><span id="purchaseTotal" class="panel-total">—</span></div>
+          <div class="status-legend" aria-label="구매 상태 범례"><span data-status="purchased">결제 완료</span><span data-status="refunded">환불</span><span data-status="chargeback">결제 취소</span><span data-review="true">검토 필요</span></div>
           <div class="table-scroll"><table><thead><tr><th>처리 시각</th><th>사용자</th><th>상품</th><th>스토어</th><th>금액</th><th>상태</th><th>권한</th><th>사유</th><th>검토</th></tr></thead><tbody id="purchasesTable"></tbody></table></div>
           <div class="pagination"><button id="purchasesPrevious" type="button">이전</button><span id="purchasesPage">1 / 1</span><button id="purchasesNext" type="button">다음</button></div>
         </section>
@@ -276,13 +277,14 @@
       </section>
       <p id="consoleStatus" class="sr-only" role="status" aria-live="polite"></p>
     </main>
+    <button id="scrollToTop" class="scroll-to-top" type="button" aria-label="화면 맨 위로 이동" hidden>맨 위로</button>
   </div>
 
   <dialog id="confirmDialog" class="confirm-dialog">
     <form method="dialog">
       <h2 id="confirmTitle">변경 확인</h2>
       <p id="confirmBody"></p>
-      <div class="dialog-actions"><button value="cancel" type="submit">취소</button><button class="primary-button" value="confirm" type="submit">확인</button></div>
+      <div class="dialog-actions"><button value="cancel" type="submit">취소</button><button class="danger-button" value="confirm" type="submit">확인</button></div>
     </form>
   </dialog>
   <dialog id="insightReasonDialog" class="confirm-dialog insight-dialog">
@@ -291,21 +293,21 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260821-1"></script>
-  <script src="model.js?v=20260822-1"></script>
+  <script src="model.js?v=20260822-2"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260822-1"></script>
-  <script src="players.js?v=20260822-1"></script>
-  <script src="operations.js"></script>
+  <script src="analytics.js?v=20260822-2"></script>
+  <script src="players.js?v=20260822-2"></script>
+  <script src="operations.js?v=20260822-2"></script>
   <script src="purchases-model.js"></script>
-  <script src="purchases.js"></script>
-  <script src="audit.js"></script>
+  <script src="purchases.js?v=20260822-2"></script>
+  <script src="audit.js?v=20260822-2"></script>
   <script src="gmail-model.js"></script>
   <script src="gmail-api.js"></script>
   <script src="cs-intelligence.js"></script>
   <script src="cs-templates.js"></script>
   <script src="cs.js"></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=20260822-2" defer></script>
 </body>
 </html>

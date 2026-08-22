@@ -23,7 +23,8 @@
   function render(data) {
     rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
     const config = data.config || {};
-    byId("operationsSummary").innerHTML = `<article><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article><span>플레이어 수정</span><strong>${config.admin_player_mutations_enabled === "true" ? "활성" : "잠김"}</strong></article>`;
+    const mutationsEnabled = config.admin_player_mutations_enabled === "true";
+    byId("operationsSummary").innerHTML = `<article data-tone="neutral"><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article data-tone="neutral"><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article data-tone="${mutationsEnabled ? "good" : "watch"}"><span>플레이어 수정</span><strong>${mutationsEnabled ? "활성" : "잠김"}</strong></article>`;
     const notices = (data.notices || []).map((notice) => `<article class="audit-item"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code></article>`);
     const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.summary))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';

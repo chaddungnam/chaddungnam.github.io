@@ -15,6 +15,7 @@
   };
   const number = (value) => Number(value ?? 0).toLocaleString("ko-KR");
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
+  const prettyJson = (value) => value == null ? "없음" : JSON.stringify(value, null, 2);
   const message = (id, value, error = false) => {
     byId(id).textContent = value;
     byId(id).style.color = error ? "var(--coral)" : "";
@@ -50,7 +51,9 @@
       : "읽기 전용 · 다음 호환 게임 빌드가 배포될 때까지 재화와 점수 수정은 잠겨 있습니다.";
     byId("playerMutationBanner").dataset.enabled = String(Boolean(data.mutations_enabled));
     byId("playerTotal").textContent = `${number(total)}명`;
-    byId("playersPage").textContent = `${state.page} / ${pages}`;
+    const rangeStart = total ? (state.page - 1) * 50 + 1 : 0;
+    const rangeEnd = Math.min(state.page * 50, total);
+    byId("playersPage").textContent = `${state.page} / ${pages} · ${number(rangeStart)}–${number(rangeEnd)} / ${number(total)}`;
     byId("playersPrevious").disabled = state.page <= 1;
     byId("playersNext").disabled = state.page >= pages;
     byId("playersTable").innerHTML = rows.length ? rows.map((row) => `<tr>
@@ -67,7 +70,9 @@
   async function loadList() {
     if (state.loading) return;
     state.loading = true;
-    message("playersMessage", "플레이어를 불러오는 중...");
+    const panel = byId("playersTable").closest(".panel");
+    panel?.setAttribute("aria-busy", "true");
+    message("playersMessage", "플레이어 목록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.");
     try {
       const data = await root.ConsoleAPI.post("admin-console", {
         action: "players.list", rangeDays: state.rangeDays, query: state.query,
@@ -79,6 +84,7 @@
       message("playersMessage", errorText(error), true);
     } finally {
       state.loading = false;
+      panel?.setAttribute("aria-busy", "false");
     }
   }
 
@@ -109,8 +115,8 @@
 
   function auditHtml(rows) {
     return rows.length ? rows.map((row) => `<article class="audit-item" data-success="${row.success}">
-      <div><strong>${escapeHtml(row.action_type)}</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div>
-      <p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.before))} → ${escapeHtml(JSON.stringify(row.after))}</code>
+      <div><strong>${escapeHtml(root.ConsoleModel.actionDisplayName(row.action_type))}</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div>
+      <p>${escapeHtml(row.reason)}</p><details class="audit-diff"><summary>변경값 보기</summary><code>변경 전\n${escapeHtml(prettyJson(row.before))}\n\n변경 후\n${escapeHtml(prettyJson(row.after))}</code></details>
     </article>`).join("") : '<p class="empty-panel">아직 변경 기록이 없습니다.</p>';
   }
 

@@ -24,6 +24,8 @@
     if (!rows.length) { const tr = body.insertRow(); const td = tr.insertCell(); td.colSpan = 9; td.className = "empty-table-cell"; td.textContent = "조건에 맞는 실제 구매·환불 기록이 없습니다."; return; }
     rows.forEach((item) => {
       const tr = body.insertRow();
+      tr.dataset.status = item.status || "unknown";
+      tr.dataset.review = String(Boolean(item.repeat_refund_review));
       cell(tr, dateTime(item)); cell(tr, shortUser(item.user_id)); cell(tr, model.PRODUCT_LABELS[item.product_id] || item.product_id);
       cell(tr, item.platform === "ios" ? "App Store" : "Google Play"); cell(tr, model.formatMoney(item.amount_micros, item.currency));
       cell(tr, model.STATUS_LABELS[item.status] || item.status, `purchase-status purchase-status-${item.status}`);
@@ -35,7 +37,10 @@
   function render(data) {
     const values = { total: data.summary.total || 0, purchased: data.summary.purchased || 0, refunded: data.summary.refunded || 0, chargebacks: data.summary.chargebacks || 0, refundRate: model.formatRate(data.summary.refundRate) };
     Object.entries(values).forEach(([key, value]) => { const node = document.querySelector(`[data-purchase-summary="${key}"]`); if (node) node.textContent = text(value); });
-    byId("purchaseTotal").textContent = `${data.total}건`; byId("purchasesPage").textContent = `${data.page} / ${data.pageCount}`;
+    const rangeStart = data.total ? (data.page - 1) * 50 + 1 : 0;
+    const rangeEnd = Math.min(data.page * 50, data.total);
+    byId("purchaseTotal").textContent = `${Number(data.total).toLocaleString("ko-KR")}건`;
+    byId("purchasesPage").textContent = `${data.page} / ${data.pageCount} · ${rangeStart.toLocaleString("ko-KR")}–${rangeEnd.toLocaleString("ko-KR")} / ${Number(data.total).toLocaleString("ko-KR")}`;
     state.page = data.page; state.pageCount = data.pageCount;
     byId("purchasesPrevious").disabled = data.page <= 1; byId("purchasesNext").disabled = data.page >= data.pageCount;
     renderRows(data.purchases);
@@ -43,10 +48,27 @@
     note.querySelector(".status-label").textContent = data.connected ? "자동 동기화 연결됨" : "자동 동기화 미연동";
   }
   async function load() {
-    if (state.loading) return; state.loading = true; byId("purchasesMessage").textContent = "구매 기록을 불러오는 중입니다.";
-    try { render(model.normalize(await root.ConsoleAPI.post("admin-console", filters()))); byId("purchasesMessage").textContent = ""; }
-    catch (_error) { byId("purchasesMessage").textContent = "구매 기록을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요."; render(model.normalize({})); }
-    finally { state.loading = false; }
+    if (state.loading) return;
+    state.loading = true;
+    const panel = byId("purchasesTable").closest(".panel");
+    panel?.setAttribute("aria-busy", "true");
+    byId("purchasesMessage").textContent = "구매 기록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.";
+    try {
+      render(model.normalize(await root.ConsoleAPI.post("admin-console", filters())));
+      byId("purchasesMessage").textContent = "";
+    } catch (_error) {
+      byId("purchasesMessage").textContent = "구매 기록을 불러오지 못했습니다. 기존 결과를 유지했습니다. 새로고침으로 다시 시도해 주세요.";
+      if (!byId("purchasesTable").children.length) {
+        const tr = byId("purchasesTable").insertRow();
+        const td = tr.insertCell();
+        td.colSpan = 9;
+        td.className = "empty-table-cell error-state";
+        td.textContent = "구매 기록을 불러오지 못했습니다.";
+      }
+    } finally {
+      state.loading = false;
+      panel?.setAttribute("aria-busy", "false");
+    }
   }
   function mount() { load(); }
   byId("purchaseFilterForm").addEventListener("submit", (event) => { event.preventDefault(); state.page = 1; load(); });
