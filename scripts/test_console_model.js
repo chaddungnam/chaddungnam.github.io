@@ -22,6 +22,11 @@ assert.equal(players[0].nickname, "Duck");
 assert.equal(model.playerDisplayName({ nickname: "Duck", displayCode: "AB12" }), "Duck · AB12");
 assert.equal(model.playerDisplayName({ nickname: "Duck", displayCode: "" }), "Duck");
 assert.equal(model.playerDisplayName({ nickname: "", displayCode: "AB12" }), "이름 없음 · AB12");
+assert.deepEqual(model.countryDisplay("KR"), { code: "KR", name: "대한민국", flag: "🇰🇷", custom: false });
+assert.deepEqual(model.countryDisplay("aln"), { code: "ALN", name: "외계인", flag: "👽", custom: true });
+assert.deepEqual(model.countryDisplay("SGV"), { code: "SGV", name: "그림자정부", flag: "🕶️", custom: true });
+assert.deepEqual(model.countryDisplay("RPT"), { code: "RPT", name: "렙틸리언", flag: "🦎", custom: true });
+assert.deepEqual(model.countryDisplay(""), { code: "", name: "국가 미설정", flag: "", custom: false });
 
 assert.equal(model.serializeAnalyticsFilters({
   rangeDays: 28,

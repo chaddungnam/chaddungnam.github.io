@@ -6,6 +6,13 @@
   const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", page: 1, loading: false, bound: false };
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
+  const countryMarkup = (value) => {
+    const country = root.ConsoleModel.countryDisplay(value);
+    return `<span class="country-label" title="국가 코드: ${escapeHtml(country.code || "없음")}">
+      <span class="country-flag" aria-hidden="true">${escapeHtml(country.flag)}</span>
+      <span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.code)}</small></span>
+    </span>`;
+  };
   const number = (value) => Number(value ?? 0).toLocaleString("ko-KR");
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
   const message = (id, value, error = false) => {
@@ -48,7 +55,7 @@
     byId("playersNext").disabled = state.page >= pages;
     byId("playersTable").innerHTML = rows.length ? rows.map((row) => `<tr>
       <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: row.nickname, displayCode: row.display_code }))}</strong><small>${escapeHtml(row.account_type)}</small></td>
-      <td>${escapeHtml(row.country)}</td><td>${number(row.games_played)}</td>
+      <td>${countryMarkup(row.country)}</td><td>${number(row.games_played)}</td>
       <td>${number(row.best_score)}<small>Lv.${number(row.best_level)}</small></td>
       <td>${number(row.gems)}</td><td>${number(row.stamina)} / ${number(row.stamina_max)}</td>
       <td>${number(row.breakthrough_tickets)} · ${number(row.speed_boost_tickets)}</td>

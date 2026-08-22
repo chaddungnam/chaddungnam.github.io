@@ -43,6 +43,32 @@
     return displayCode ? `${nickname} · ${displayCode}` : nickname;
   }
 
+  const specialCountries = Object.freeze({
+    ALN: { name: "외계인", flag: "👽" },
+    SGV: { name: "그림자정부", flag: "🕶️" },
+    RPT: { name: "렙틸리언", flag: "🦎" },
+  });
+  let koreanRegionNames;
+
+  function countryDisplay(value) {
+    const code = String(value || "").trim().toUpperCase();
+    if (!code) return { code: "", name: "국가 미설정", flag: "", custom: false };
+    if (specialCountries[code]) return { code, ...specialCountries[code], custom: true };
+    if (/^[A-Z]{2}$/.test(code)) {
+      try {
+        koreanRegionNames ||= new Intl.DisplayNames(["ko-KR"], { type: "region" });
+        const name = koreanRegionNames.of(code);
+        if (name && name !== code) {
+          const flag = String.fromCodePoint(...Array.from(code, (letter) => letter.charCodeAt(0) + 127397));
+          return { code, name, flag, custom: false };
+        }
+      } catch (_error) {
+        // Intl.DisplayNames가 없는 오래된 브라우저에서는 아래 안전한 대체 문구를 사용한다.
+      }
+    }
+    return { code, name: `알 수 없는 국가 (${code})`, flag: "", custom: false };
+  }
+
   function serializeAnalyticsFilters(filters) {
     const params = new URLSearchParams();
     params.set("rangeDays", String(filters.rangeDays));
@@ -111,6 +137,7 @@
     decodeJwtPayload,
     dedupePlayers,
     playerDisplayName,
+    countryDisplay,
     serializeAnalyticsFilters,
     playerDeepLink,
     safeConsoleReturnHash,

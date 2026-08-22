@@ -151,6 +151,8 @@ textarea:focus-visible {
 .table-toolbar button { min-height: 42px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 10px; font-size: 11px; font-weight: 800; }
 .table-toolbar .primary-button { border: 0; }
 .period-players-panel th button { padding: 0; color: inherit; background: transparent; border: 0; font: inherit; font-weight: 800; white-space: nowrap; }
+.period-players-panel th[aria-sort="ascending"] button::after { content: " ↑"; color: var(--teal); }
+.period-players-panel th[aria-sort="descending"] button::after { content: " ↓"; color: var(--teal); }
 .period-players-panel td strong,
 .period-players-panel td small { display: block; }
 .period-players-panel td small { margin-top: 3px; color: #8990a5; font-size: 9px; }
@@ -177,6 +179,23 @@ textarea:focus-visible {
 .purchase-status-purchased { color: #17665e; }
 .purchase-status-refunded, .purchase-status-chargeback, .purchase-status-revoked, .purchase-review-flag { color: #a93f34; }
 .empty-table-cell { padding: 30px 14px !important; color: var(--ink-soft); text-align: center; }
+
+/* 모든 운영 화면에서 표를 빠르게 훑고 가로로 이동하기 쉽게 만든다. */
+.console-main .table-scroll { border: 1px solid var(--line); border-radius: 12px; scrollbar-color: #c8c1b3 transparent; }
+.console-main .table-scroll table { min-width: 720px; }
+.console-main .table-scroll thead th { position: sticky; top: 0; z-index: 2; padding-top: 10px; background: var(--paper); box-shadow: 0 1px 0 var(--line); }
+.console-main .table-scroll tbody tr { transition: background-color .15s ease; }
+.console-main .table-scroll tbody tr:nth-child(even) td { background: rgba(247,244,236,.5); }
+.console-main .table-scroll tbody tr:hover td { background: var(--teal-soft); }
+.country-label { display: inline-flex; align-items: center; gap: 7px; min-width: 105px; text-align: left; }
+.country-label > span:last-child { display: grid; gap: 1px; }
+.country-label strong { color: var(--ink); font-size: 11px; }
+.country-label small { margin: 0 !important; color: #8990a5; font-size: 8px; letter-spacing: .05em; }
+.country-flag { width: 20px; font-size: 16px; line-height: 1; text-align: center; }
+.console-main button, .player-open-link { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.console-main button:not(:disabled):hover, .player-open-link:hover { transform: translateY(-1px); }
+.console-main button:disabled { cursor: not-allowed; }
+
 .admin-toolbar { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(140px, .35fr)) auto; align-items: end; gap: 10px; margin-bottom: 14px; padding: 16px; }
 .admin-toolbar label,
 .admin-form label,

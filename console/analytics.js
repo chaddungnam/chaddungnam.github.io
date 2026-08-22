@@ -34,6 +34,13 @@ function formatDuration(value) {
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[character]));
 }
+function countryMarkup(value) {
+  const country = root.ConsoleModel.countryDisplay(value);
+  return `<span class="country-label" title="국가 코드: ${escapeHtml(country.code || "없음")}">
+    <span class="country-flag" aria-hidden="true">${escapeHtml(country.flag)}</span>
+    <span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.code)}</small></span>
+  </span>`;
+}
 function selectedDays() {
   return (state.payload?.daily ?? []).slice(-state.rangeDays);
 }
@@ -233,7 +240,7 @@ function renderPeriodPlayers() {
     ? '<tr><td class="empty-row" colspan="9">이 기간에 조건과 일치하는 플레이 기록 계정이 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
         <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName(row))}</strong><small>${escapeHtml(row.accountType)}</small></td>
-        <td>${escapeHtml(row.country)}</td>
+        <td>${countryMarkup(row.country)}</td>
         <td>${formatNumber(row.gamesPlayed)}</td>
         <td>${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small></td>
         <td>${formatNumber(row.gems)}</td>
