@@ -3,7 +3,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.ConsoleModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
-  const pages = new Set(["analytics", "players", "operations", "purchases", "cs", "audit", "project-k"]);
+  const pages = new Set(["analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "project-k"]);
 
   function routeFromHash(hash) {
     const path = String(hash || "").replace(/^#\/?/, "").split("?")[0];
@@ -103,7 +103,7 @@
 
   function safeConsoleReturnHash(value) {
     const hash = String(value || "");
-    return /^#\/(?:analytics|players(?:\/[^?#\u0000-\u0020\u007f]+)?|operations|purchases|cs|audit)(?:\?[^#\u0000-\u0020\u007f]*)?$/.test(hash)
+    return /^#\/(?:analytics|analytics-exclusions|players(?:\/[^?#\u0000-\u0020\u007f]+)?|operations|purchases|cs|audit)(?:\?[^#\u0000-\u0020\u007f]*)?$/.test(hash)
       ? hash
       : "#/players";
   }

@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js players.js analytics-exclusions.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -24,6 +24,7 @@ rg -q '내가 처음 한 게임 이름은?' "$console_dir/index.html"
 rg -q 'id="challengeForm"' "$console_dir/index.html"
 rg -q 'id="consoleApp"' "$console_dir/index.html"
 rg -q 'data-route="analytics"' "$console_dir/index.html"
+rg -q 'data-route="analytics-exclusions"' "$console_dir/index.html"
 rg -q 'data-route="players"' "$console_dir/index.html"
 rg -q 'data-route="operations"' "$console_dir/index.html"
 rg -q 'data-route="purchases"' "$console_dir/index.html"
@@ -32,6 +33,7 @@ rg -q 'id="purchaseSummary"' "$console_dir/index.html"
 rg -q 'id="purchasesTable"' "$console_dir/index.html"
 rg -q 'id="purchaseSyncStatus"' "$console_dir/index.html"
 rg -F -q 'window.ConsolePurchases.mount()' "$console_dir/app.js"
+rg -F -q 'window.ConsoleAnalyticsExclusions.mount()' "$console_dir/app.js"
 rg -F -q 'action: "purchases.list"' "$console_dir/purchases.js"
 rg -F -q 'rangeDays: Number(byId("purchaseRange").value)' "$console_dir/purchases.js"
 rg -q 'data-route="cs"' "$console_dir/index.html"
@@ -48,6 +50,7 @@ rg -q 'mutations_enabled' "$console_dir/players.js"
 rg -q 'safeConsoleReturnHash' "$console_dir/model.js" "$console_dir/players.js"
 rg -q 'pendingRequests' "$console_dir/operations.js"
 rg -q 'id="playerDirection"' "$console_dir/index.html"
+rg -q 'analytics_exclusions.list' "$console_dir/analytics-exclusions.js" "$console_dir/players.js"
 rg -q 'id="csWeeklyBrief"' "$console_dir/index.html"
 rg -q 'data-cs-view="kanban"' "$console_dir/index.html"
 rg -q 'data-cs-view="calendar"' "$console_dir/index.html"

@@ -7,6 +7,7 @@ const CONSOLE_CONFIG = {
 
 const pageTitles = {
   analytics: "분석",
+  "analytics-exclusions": "통계 제외 계정",
   players: "플레이어",
   player: "플레이어 상세",
   operations: "운영",
@@ -17,6 +18,7 @@ const pageTitles = {
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
+  "analytics-exclusions": "닉네임이 아니라 서버 계정 식별자로 운영 통계에서 제외된 계정을 확인합니다.",
   players: "계정을 찾고 플레이 기록과 재화 상태를 빠르게 확인합니다.",
   player: "한 플레이어의 계정 상태, 기록, 보상과 변경 이력을 처리합니다.",
   operations: "전체 보상, 최소 지원 버전, QA 권한처럼 영향이 큰 작업을 관리합니다.",
@@ -104,6 +106,7 @@ function renderRoute() {
   byId("mainContent").focus({ preventScroll: true });
   if (routeChanged && typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "auto" });
   if (route.page === "analytics") window.ConsoleAnalytics.mount();
+  if (route.page === "analytics-exclusions") window.ConsoleAnalyticsExclusions.mount();
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
   if (route.page === "operations") window.ConsoleOperations.mount();

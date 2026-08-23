@@ -23,6 +23,8 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 const consoleHtml = read("console/index.html");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
+assert.match(consoleHtml, /data-route="analytics-exclusions"/, "the console must expose an analytics exclusion route");
+assert.match(read("console/analytics-exclusions.js"), /analytics_exclusions\.list/, "the exclusion route must use the secured admin action");
 assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
 
 const playersSource = read("console/players.js");

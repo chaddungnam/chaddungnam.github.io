@@ -3,7 +3,7 @@
     { item_id: "icon_jakwon_tongue", item_type: "profile_icon", admin_label: "yakwon 프로필" },
     { item_id: "skin_jakwon", item_type: "marble_skin", admin_label: "yakwon 구슬" },
   ];
-  const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", page: 1, loading: false, bound: false };
+  const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", page: 1, loading: false, bound: false, exclusions: new Map() };
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const countryMarkup = (value) => {
@@ -57,7 +57,7 @@
     byId("playersPrevious").disabled = state.page <= 1;
     byId("playersNext").disabled = state.page >= pages;
     byId("playersTable").innerHTML = rows.length ? rows.map((row) => `<tr>
-      <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: row.nickname, displayCode: row.display_code }))}</strong><small>${escapeHtml(row.account_type)}</small></td>
+      <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: row.nickname, displayCode: row.display_code }))}</strong><small>${escapeHtml(row.account_type)}</small>${state.exclusions.has(row.user_id) ? '<span class="analytics-exclusion-badge">로컬/QA 제외</span>' : ""}</td>
       <td>${countryMarkup(row.country)}</td><td>${number(row.games_played)}</td>
       <td>${number(row.best_score)}<small>Lv.${number(row.best_level)}</small></td>
       <td>${number(row.gems)}</td><td>${number(row.stamina)} / ${number(row.stamina_max)}</td>
@@ -74,10 +74,15 @@
     panel?.setAttribute("aria-busy", "true");
     message("playersMessage", "플레이어 목록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.");
     try {
-      const data = await root.ConsoleAPI.post("admin-console", {
-        action: "players.list", rangeDays: state.rangeDays, query: state.query,
-        sort: state.sort, direction: state.direction, page: state.page,
-      });
+      const [data, exclusions] = await Promise.all([
+        root.ConsoleAPI.post("admin-console", {
+          action: "players.list", rangeDays: state.rangeDays, query: state.query,
+          sort: state.sort, direction: state.direction, page: state.page,
+        }),
+        root.ConsoleAPI.post("admin-console", { action: "analytics_exclusions.list" }).catch(() => []),
+      ]);
+      const exclusionRows = Array.isArray(exclusions) ? exclusions : Array.isArray(exclusions?.rows) ? exclusions.rows : [];
+      state.exclusions = new Map(exclusionRows.map((row) => [row.user_id, row]));
       renderList(data);
       message("playersMessage", "닉네임이 같아도 표시코드와 사용자 ID가 다른 계정은 각각 표시됩니다.");
     } catch (error) {
@@ -134,6 +139,7 @@
 
   function renderDetail(data, userId) {
     const player = data.player;
+    const exclusion = data.analytics_exclusion;
     const enabled = Boolean(data.operations?.mutations_enabled);
     const disabled = !enabled || player.state_version == null;
     const catalog = Array.isArray(data.catalog) ? data.catalog : [];
@@ -141,7 +147,7 @@
     const grantCatalog = catalog.concat(ADMIN_GRANT_ITEMS.filter((item) => !catalog.some((entry) => entry.item_id === item.item_id)));
     const catalogOptions = grantCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}" ${owned.has(item.item_id) ? "disabled" : ""}>${escapeHtml(item.admin_label || item.item_id)} · ${escapeHtml(item.item_type)}${owned.has(item.item_id) ? " · 보유 중" : ""}</option>`).join("");
     const entitlementRows = (data.entitlements || []).map((item) => `<li><span><strong>${escapeHtml(item.item_id)}</strong><small>${escapeHtml(item.item_type)} · ${escapeHtml(item.acquired_source || "-")}</small></span><button type="button" class="secondary-button inventory-revoke" data-item-id="${escapeHtml(item.item_id)}" ${disabled ? "disabled" : ""}>회수</button></li>`).join("");
-    byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))}</h2><code>${escapeHtml(userId)}</code></div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/cs?userId=${encodeURIComponent(userId)}">CS에서 보기</a></div></div>
+    byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))} ${exclusion ? '<span class="analytics-exclusion-badge">로컬/QA 제외</span>' : ""}</h2><code>${escapeHtml(userId)}</code>${exclusion ? `<p class="status-label">통계 제외 · ${escapeHtml(exclusion.reason)} · ${escapeHtml(exclusion.note || "메모 없음")}</p>` : ""}</div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/cs?userId=${encodeURIComponent(userId)}">CS에서 보기</a></div></div>
       <div class="read-only-banner" data-enabled="${enabled}">${enabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
       <div class="admin-card-grid"><form id="economyForm" class="panel admin-form"><p class="eyebrow">ECONOMY</p><h2>재화 직접 조정</h2><div class="economy-grid">${economyFields(player, disabled)}</div><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled ? "disabled" : ""}>변경 내용 확인</button></form>
       <form id="playerMailForm" class="panel admin-form"><p class="eyebrow">TARGETED MAIL</p><h2>이 플레이어에게 우편</h2><label>고정 다국어 문구<select name="templateKey"><option value="general">안내 보상</option><option value="compensation">불편 보상</option><option value="maintenance">점검 보상</option><option value="welcome">환영 보상</option><option value="support">문의 지원 보상</option><option value="update">업데이트 보상</option><option value="launch">출시 기념 보상</option></select></label><div class="form-pair"><label>보상<select name="kind"><option value="gems">젬</option><option value="breakthrough_ticket">배속 티켓</option><option value="entitlement">상점 아이템</option></select></label><label id="playerMailValueLabel">수량<input name="rewardValue" type="number" min="1" required></label></div><label>수령 기한<input name="expiresAt" type="datetime-local" required></label><label>발송 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">이 플레이어에게 발송</button></form>
@@ -265,7 +271,12 @@
     byId("playerBackLink").href = root.ConsoleModel.safeConsoleReturnHash(params.get("return"));
     message("playerMessage", "플레이어 상세를 불러오는 중...");
     try {
-      const data = await root.ConsoleAPI.post("admin-console", { action: "players.get", userId });
+      const [data, exclusions] = await Promise.all([
+        root.ConsoleAPI.post("admin-console", { action: "players.get", userId }),
+        root.ConsoleAPI.post("admin-console", { action: "analytics_exclusions.list" }).catch(() => []),
+      ]);
+      const exclusionRows = Array.isArray(exclusions) ? exclusions : Array.isArray(exclusions?.rows) ? exclusions.rows : [];
+      data.analytics_exclusion = exclusionRows.find((row) => row.user_id === userId) || null;
       renderDetail(data, userId);
       message("playerMessage", "복구 코드와 인증 정보는 콘솔에 표시하지 않습니다.");
     } catch (error) {

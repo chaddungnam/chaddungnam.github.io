@@ -65,11 +65,12 @@
       <button id="changeProjectButton" class="project-switch" type="button"><span id="currentProject">Quirky Ball</span><small>프로젝트 변경</small></button>
       <nav id="consoleNav">
         <a href="#/analytics" data-page="analytics"><span class="nav-index">01</span><span class="nav-copy">분석<small>성과·유입</small></span></a>
-        <a href="#/players" data-page="players"><span class="nav-index">02</span><span class="nav-copy">플레이어<small>검색·처리</small></span></a>
-        <a href="#/operations" data-page="operations"><span class="nav-index">03</span><span class="nav-copy">운영<small>보상·버전</small></span></a>
-        <a href="#/purchases" data-page="purchases"><span class="nav-index">04</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
-        <a href="#/cs" data-page="cs"><span class="nav-index">05</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
-        <a href="#/audit" data-page="audit"><span class="nav-index">06</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/analytics-exclusions" data-page="analytics-exclusions"><span class="nav-index">02</span><span class="nav-copy">통계 제외<small>로컬·QA</small></span></a>
+        <a href="#/players" data-page="players"><span class="nav-index">03</span><span class="nav-copy">플레이어<small>검색·처리</small></span></a>
+        <a href="#/operations" data-page="operations"><span class="nav-index">04</span><span class="nav-copy">운영<small>보상·버전</small></span></a>
+        <a href="#/purchases" data-page="purchases"><span class="nav-index">05</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
+        <a href="#/cs" data-page="cs"><span class="nav-index">06</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
+        <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
     </aside>
@@ -167,6 +168,8 @@
         <section class="content-grid" aria-label="게임 내 선택 분포">
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>플레이어가 실제로 고른 선택지 비율입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>선택지</th><th>횟수</th><th>비율</th></tr></thead><tbody id="growthChoicesTable"></tbody></table></div></article>
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>돌파·하드모드·시간 되감기 결과 분포입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>결과</th><th>횟수</th><th>비율</th></tr></thead><tbody id="rouletteResultsTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>화면 진입과 이전 행동 뒤 버튼을 누르기까지 걸린 시간입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>버튼</th><th>누름·사람</th><th>진입 후·행동 후</th></tr></thead><tbody id="buttonInsightsTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">SCREEN DROPOFF</p><h2>어디서 나가나</h2><small>화면 체류 시간과 마지막 행동입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>화면</th><th>방문·종료</th><th>평균 체류·마지막 버튼</th></tr></thead><tbody id="screenInsightsTable"></tbody></table></div></article>
         </section>
 
         <details id="operatorDetails" class="operator-details">
@@ -183,6 +186,18 @@
           </div>
         </details>
         <p id="dashboardMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="analyticsExclusionsView" class="route-view" data-route="analytics-exclusions" hidden>
+        <form id="analyticsExclusionsSearchForm" class="panel admin-toolbar" role="search">
+          <label>계정 검색<input id="analyticsExclusionsSearch" type="search" maxlength="100" placeholder="닉네임 · 표시코드 · 사용자 ID · 메모"></label>
+          <button class="primary-button" type="submit">검색</button>
+        </form>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">ANALYTICS EXCLUSIONS</p><h2>통계 제외 계정</h2><small>분석 제외는 QA 상점 권한·젬·구매·보상과 별개입니다. 원본 계정과 원본 기록은 삭제하지 않습니다.</small></div><span id="analyticsExclusionsTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>표시코드·ID</th><th>상태·사유</th><th>메모</th><th>제외 시각</th><th>처리</th></tr></thead><tbody id="analyticsExclusionsTable"></tbody></table></div>
+        </section>
+        <p id="analyticsExclusionsMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="playersView" class="route-view" data-route="players" hidden>
@@ -298,6 +313,7 @@
   <script src="auth.js"></script>
   <script src="api.js"></script>
   <script src="analytics.js?v=20260822-2"></script>
+  <script src="analytics-exclusions.js?v=20260823-1"></script>
   <script src="players.js?v=20260822-2"></script>
   <script src="operations.js?v=20260822-2"></script>
   <script src="purchases-model.js"></script>

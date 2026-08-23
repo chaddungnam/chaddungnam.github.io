@@ -140,6 +140,7 @@ function renderDashboard() {
   renderAppStatus();
   renderPurchaseTrend();
   renderChoices();
+  renderInteractionInsights();
   renderAttention(pulseModel);
   renderPeriodPlayers();
   renderGameMetrics();
@@ -173,6 +174,29 @@ function renderChoices() {
   };
   renderRows("growthChoicesTable", state.payload?.choices?.growth ?? []);
   renderRows("rouletteResultsTable", state.payload?.choices?.roulette ?? []);
+}
+
+function renderInteractionInsights() {
+  const interactions = state.payload?.interactions ?? {};
+  const buttons = interactions.buttons ?? [];
+  const buttonBody = byId("buttonInsightsTable");
+  buttonBody.innerHTML = buttons.length === 0
+    ? '<tr><td class="empty-row" colspan="3">v36 버튼 데이터가 쌓이면 표시됩니다.</td></tr>'
+    : buttons.slice(0, 20).map((row) => `<tr><td><strong>${escapeHtml(row.buttonId)}</strong><small>${escapeHtml(row.screen)}</small></td><td>${formatNumber(row.presses)}회 · ${formatNumber(row.users)}명</td><td>${formatDuration(row.avgScreenElapsedSec)} · ${formatDuration(row.avgIdleBeforeSec)}</td></tr>`).join("");
+
+  const dropoffByScreen = new Map();
+  for (const row of interactions.dropoffs ?? []) {
+    if (!dropoffByScreen.has(row.screen)) dropoffByScreen.set(row.screen, row);
+  }
+  const screens = interactions.screens ?? [];
+  const screenBody = byId("screenInsightsTable");
+  screenBody.innerHTML = screens.length === 0
+    ? '<tr><td class="empty-row" colspan="3">v36 화면 이동 데이터가 쌓이면 표시됩니다.</td></tr>'
+    : screens.map((row) => {
+      const dropoff = dropoffByScreen.get(row.screen);
+      const lastButton = dropoff?.lastButtonId && dropoff.lastButtonId !== "unknown" ? dropoff.lastButtonId : "행동 없음";
+      return `<tr><td><strong>${escapeHtml(row.screen)}</strong></td><td>${formatNumber(row.visits)}회 · 종료 ${formatNumber(row.exits)}</td><td>${formatDuration(row.avgDwellSec)}<small>${escapeHtml(lastButton)}</small></td></tr>`;
+    }).join("");
 }
 
 function renderGameMetrics() {
