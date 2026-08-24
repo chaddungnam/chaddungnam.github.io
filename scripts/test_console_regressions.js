@@ -21,7 +21,13 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 }
 
 const consoleHtml = read("console/index.html");
+const analyticsSource = read("console/analytics.js");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
+assert.match(consoleHtml, /id="kpiActiveLabel"/, "the active-player KPI must expose a range-aware label");
+assert.match(consoleHtml, /id="dailyTrendEyebrow"/, "the daily trend heading must follow the selected range");
+assert.match(analyticsSource, /setText\("kpiActive", formatNumber\(summary\.installs\)\)/, "the active-player KPI must count unique installs across the selected range");
+assert.match(analyticsSource, /activePlayers: Number\(summary\.installs \?\? 0\)/, "AI advice must use the selected-range active player count");
+assert.doesNotMatch(analyticsSource, /summary\.activeInstallsToday/, "selected-range analytics must not silently fall back to today's count");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
 assert.match(consoleHtml, /data-route="analytics-exclusions"/, "the console must expose an analytics exclusion route");
 assert.match(read("console/analytics-exclusions.js"), /analytics_exclusions\.list/, "the exclusion route must use the secured admin action");

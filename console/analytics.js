@@ -121,7 +121,10 @@ async function loadDashboard() {
 function renderDashboard() {
   const { summary, retention } = state.payload;
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
-  setText("kpiActive", formatNumber(summary.activeInstallsToday));
+  const rangeLabel = state.rangeDays === 1 ? "오늘" : `최근 ${state.rangeDays}일`;
+  setText("kpiActiveLabel", `${rangeLabel} 온 사람`);
+  setText("kpiActive", formatNumber(summary.installs));
+  setText("dailyTrendEyebrow", `${state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const d7 = retention?.find((item) => item.day === 7)?.rate;
   setText("metricD7", formatRate(d7));
@@ -657,7 +660,7 @@ function advisorySnapshot() {
   const revenue = Number(ad.estimatedRevenueEur);
   const monthlyRevenue = Number.isFinite(revenue) && state.rangeDays > 0 ? revenue / state.rangeDays * 30 : null;
   const forcedAdsPerPlayer = Number(ad.formatBreakdown?.find((row) => row?.format === "interstitial")?.impressionsPerPlayer);
-  return { sessions: Number(summary.sessions ?? 0), gamesStarted: Number(summary.gamesStarted ?? 0), activePlayers: Number(summary.activeInstallsToday ?? 0), duration: Number(summary.avgSessionSeconds), completion, exitRate, d1, d7, adsPerPlayer: Number.isFinite(forcedAdsPerPlayer) ? forcedAdsPerPlayer : null, monthlyRevenue };
+  return { sessions: Number(summary.sessions ?? 0), gamesStarted: Number(summary.gamesStarted ?? 0), activePlayers: Number(summary.installs ?? 0), duration: Number(summary.avgSessionSeconds), completion, exitRate, d1, d7, adsPerPlayer: Number.isFinite(forcedAdsPerPlayer) ? forcedAdsPerPlayer : null, monthlyRevenue };
 }
 
 function fallbackAdvice(snapshot) {

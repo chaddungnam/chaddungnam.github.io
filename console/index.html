@@ -116,7 +116,7 @@
             <span data-signal="good"><i></i><b>좋아요</b></span><span data-signal="watch"><i></i><b>지켜봐요</b></span><span data-signal="risk"><i></i><b>고쳐야 해요</b></span><span data-signal="insufficient"><i></i><b>판단 대기</b></span>
           </div>
           <aside class="today-action"><span>오늘 할 일 1개</span><strong id="todayAction">플레이 데이터를 조금 더 모아요.</strong></aside>
-          <div class="pulse-facts"><span>오늘 앱 실행 <strong id="kpiActive">—</strong>개 설치</span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
+          <div class="pulse-facts"><span><span id="kpiActiveLabel">최근 7일 온 사람</span> <strong id="kpiActive">—</strong>명</span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
         </section>
 
         <section class="question-grid" aria-label="게임 상태를 설명하는 네 가지 질문">
@@ -162,7 +162,7 @@
 
         <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
           <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">INSTALL JOURNEY</p><h2>설치가 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 고유 설치 수예요.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
-          <article class="trend-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">7 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>온 사람</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활성 설치와 게임 완료 차트"></canvas></div></article>
+          <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">7 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>온 사람</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활성 설치와 게임 완료 차트"></canvas></div></article>
         </section>
 
         <section class="content-grid" aria-label="게임 내 선택 분포">
@@ -312,7 +312,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260824-1"></script>
+  <script src="analytics.js?v=20260824-2"></script>
   <script src="analytics-exclusions.js?v=20260823-1"></script>
   <script src="players.js?v=20260822-2"></script>
   <script src="operations.js?v=20260822-2"></script>
