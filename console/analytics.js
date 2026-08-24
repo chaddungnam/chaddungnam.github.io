@@ -297,12 +297,16 @@ function renderQuestionMetric(key, metric, formattedValue, progress) {
 
 function renderInsightReasons(model) {
   const metrics = model.metrics || {};
+  const d1 = state.payload?.retention?.find((row) => row?.day === 1);
+  const d1Sample = d1 && Number(d1.eligible) > 0
+    ? ` 관찰 가능한 ${formatNumber(Number(d1.eligible))}개 설치 중 ${formatNumber(Number(d1.retained))}개가 돌아왔습니다.`
+    : " 아직 다음 날까지 관찰 가능한 신규 설치가 없습니다.";
   const reasons = {
     insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 ${formatNumber(state.payload?.summary?.sessions)}회 세션, ${formatNumber(state.payload?.summary?.gamesStarted)}회 게임 시작, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다. 원본 이벤트를 그대로 노출하지 않고 지표 기준으로 설명합니다.` },
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
     completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 완료 이벤트와 게임 시작 이벤트를 비교해 계산했습니다.` },
-    retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다. 첫 실행 이후 다음 날 다시 기록된 계정을 기준으로 계산했습니다.` },
-    ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활성 플레이어 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다.${d1Sample} 실제 first_open 다음 날 session_start가 다시 기록된 운영 설치만 계산합니다.` },
+    ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활성 설치 1개당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
     const reason = reasons[key];
@@ -367,8 +371,8 @@ function renderPlatformSummary(platforms) {
   element.innerHTML = platforms.map((row) => `
     <div class="platform-row">
       <div class="platform-name"><strong>${escapeHtml(distributionLabel(row.distributionKey))}</strong><small>${escapeHtml(row.platform || "플랫폼 미지정")}</small></div>
-      <div><span>플레이어</span><strong>${formatNumber(row.activePlayers)}</strong></div>
-      <div><span>전체 광고/플레이어</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
+      <div><span>활성 설치</span><strong>${formatNumber(row.activePlayers)}</strong></div>
+      <div><span>전체 광고/설치</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
       <div><span>예상 수익</span><strong>${formatCurrency(row.estimatedRevenueEur)}</strong></div>
     </div>`).join("");
 }
@@ -511,12 +515,12 @@ function renderDecisionPanels() {
     const hasNewUsers = firstOpens > 0;
     const status = hasNewUsers ? "available" : "empty";
     renderCoverageCards("acquisitionQuality", [
-      { status, label: "첫 실행", value: `${formatNumber(firstOpens)}명`, detail: "선택 기간에 first_open이 기록된 신규 설치" },
-      { status, label: "게임 시작", value: `${formatNumber(started)}명`, detail: "같은 신규 설치에서 game_start까지 기록" },
+      { status, label: "첫 실행", value: `${formatNumber(firstOpens)}개`, detail: "선택 기간에 first_open이 기록된 신규 설치" },
+      { status, label: "게임 시작", value: `${formatNumber(started)}개`, detail: "같은 신규 설치에서 game_start까지 기록" },
       { status, label: "첫 실행 → 시작", value: formatRate(acquisition.firstOpenToStartRate), detail: "광고 설치 수가 아닌 실제 앱 실행 코호트 기준" },
-      { status, label: "첫 실행 → 완료", value: `${formatNumber(completed)}명 · ${formatRate(acquisition.firstOpenToCompleteRate)}`, detail: "같은 신규 설치에서 game_over까지 기록" },
+      { status, label: "첫 실행 → 완료", value: `${formatNumber(completed)}개 · ${formatRate(acquisition.firstOpenToCompleteRate)}`, detail: "같은 신규 설치에서 game_over까지 기록" },
     ]);
-    setText("acquisitionQualityStatus", hasNewUsers ? `${formatNumber(firstOpens)}명 코호트` : "신규 없음");
+    setText("acquisitionQualityStatus", hasNewUsers ? `${formatNumber(firstOpens)}개 설치 코호트` : "신규 없음");
   }
 
   const economics = state.payload?.adEconomics ?? {};
@@ -534,7 +538,7 @@ function renderDecisionPanels() {
       status: measured ? (Number(row?.monetizedImpressions ?? 0) > 0 ? "available" : "empty") : "waiting",
       label,
       value: measured ? `${formatNumber(Number(row?.monetizedImpressions ?? 0))}회` : "집계 대기",
-      detail: `${detail} · 활성 플레이어당 ${formatDecimal(row?.impressionsPerPlayer)}회 · 테스트 ${formatNumber(Number(row?.testImpressions ?? 0))}`,
+      detail: `${detail} · 활성 설치당 ${formatDecimal(row?.impressionsPerPlayer)}회 · 테스트 ${formatNumber(Number(row?.testImpressions ?? 0))}`,
     };
   });
   renderCoverageCards("adFormatSummary", formatCards);
@@ -619,7 +623,8 @@ function renderInsight() {
   const hourly = state.payload?.hourly ?? [];
   const topHour = [...hourly].sort((left, right) => right.sessions - left.sessions)[0];
   const exitRate = summary.gamesStarted ? (summary.midGameExits + summary.unobservedGames) / summary.gamesStarted : null;
-  const d1 = state.payload?.retention?.find((item) => item.day === 1)?.rate;
+  const d1Row = state.payload?.retention?.find((item) => item.day === 1);
+  const d1 = d1Row?.rate;
   if (!(summary.sessions || summary.installs)) {
     setText("insightText", "아직 수집된 이벤트가 없습니다. 테스트 빌드에서 약관 동의 후 게임을 실행하면 여기에 흐름이 나타납니다.");
     return;
@@ -627,9 +632,12 @@ function renderInsight() {
   const timeText = topHour ? `${String(topHour.hour).padStart(2, "0")}시–${String((topHour.hour + 1) % 24).padStart(2, "0")}시` : "—";
   const acquisition = state.payload?.acquisitionQuality;
   const cohortText = Number(acquisition?.firstOpens ?? 0) > 0
-    ? `신규 첫 실행 ${formatNumber(acquisition.firstOpens)}명 중 ${formatNumber(acquisition.started)}명이 게임을 시작했고 ${formatNumber(acquisition.completed)}명이 완료했습니다.`
+    ? `신규 설치 ${formatNumber(acquisition.firstOpens)}개 중 ${formatNumber(acquisition.started)}개가 게임을 시작했고 ${formatNumber(acquisition.completed)}개가 완료했습니다.`
     : "이 기간에는 신규 첫 실행 코호트가 없습니다.";
-  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 전체 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${formatRate(d1)}입니다.`);
+  const d1Text = Number(d1Row?.eligible ?? 0) > 0
+    ? `${formatRate(d1)} (${formatNumber(Number(d1Row.retained))}/${formatNumber(Number(d1Row.eligible))}개 설치)`
+    : "아직 산출 대기";
+  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 전체 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${d1Text}입니다.`);
 }
 
 function setAiMessage(value, error = false) {

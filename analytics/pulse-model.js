@@ -38,9 +38,9 @@
 
   function buildJourney(funnel) {
     const definitions = [
-      ["first_open", "첫 실행", "처음 앱을 연 사람"],
-      ["game_start", "게임 시작", "게임을 시작한 사람"],
-      ["game_over", "게임 완료", "끝까지 한 사람"],
+      ["first_open", "첫 실행", "처음 앱을 연 설치"],
+      ["game_start", "게임 시작", "게임을 시작한 설치"],
+      ["game_over", "게임 완료", "끝까지 간 설치"],
     ];
     let previous = null;
     return definitions.map(([event, label, description]) => {
@@ -118,8 +118,8 @@
     const rawMetrics = {
       duration: metric(classify(avgGameSeconds, 180, 60), avgGameSeconds, "평균 한 판 시간"),
       completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "시작한 사람 중 완료 비율"),
-      retention: metric(classify(d1Rate, 0.2, 0.1), d1Rate, "다음 날 다시 온 비율"),
-      ads: metric(adsStatus, adsPerPlayer, "활성 플레이어 한 명당 강제 전면광고"),
+      retention: metric(classify(d1Rate, 0.2, 0.1), d1Rate, "다음 날 다시 온 설치 비율"),
+      ads: metric(adsStatus, adsPerPlayer, "활성 설치당 강제 전면광고"),
     };
     const metrics = enoughSamples
       ? rawMetrics
