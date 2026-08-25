@@ -1,0 +1,53 @@
+name: Sync House Duck YouTube
+
+on:
+  schedule:
+    - cron: "23 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: sync-house-duck-youtube
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Fetch YouTube feed once
+        run: |
+          mkdir -p .tmp
+          curl --fail --silent --show-error --location "https://www.youtube.com/feeds/videos.xml?channel_id=UCVeNEKtmPXkSUuTslQKUKbw" --output .tmp/youtube.xml
+          node scripts/youtube-sync.mjs --rss .tmp/youtube.xml --out .tmp/youtube-feed.json
+          mv .tmp/youtube-feed.json assets/youtube-feed.json
+      - name: Verify feed
+        run: node scripts/test_youtube_sync.mjs
+      - name: Publish feed
+        id: publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/youtube-feed.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore(youtube): sync latest videos"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Trigger GitHub Pages build
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"

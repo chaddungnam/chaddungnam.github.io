@@ -13,3 +13,11 @@
   font-weight: 400;
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Chilgok KwonAnJa";
+  src: url("/assets/fonts/Chilgok_Kaj.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}

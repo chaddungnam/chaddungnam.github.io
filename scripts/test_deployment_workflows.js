@@ -5,7 +5,10 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "sync-blog.yml"), "utf8");
-const workflows = ["sync-blog.yml", "public-site-security.yml", "site-browser-qa.yml"]
+const youtubeWorkflowPath = path.join(__dirname, "..", ".github", "workflows", "sync-youtube.yml");
+assert.ok(fs.existsSync(youtubeWorkflowPath), "sync-youtube.yml must exist");
+const youtubeWorkflow = fs.readFileSync(youtubeWorkflowPath, "utf8");
+const workflows = ["sync-blog.yml", "sync-youtube.yml", "public-site-security.yml", "site-browser-qa.yml"]
   .map((name) => fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", name), "utf8"))
   .join("\n");
 
@@ -28,6 +31,10 @@ assert.equal(workflow.match(/pages\/builds\/latest/g)?.length, 2, "IndexNow must
 assert.equal(workflow.match(/continue-on-error:\s*true/g)?.length, 2, "IndexNow failures must not block blog publishing");
 assert.match(workflows, /node scripts\/test_indexnow_payload\.mjs/, "CI must exercise the IndexNow payload contract");
 assert.doesNotMatch(workflow, /argostranslate|argos-translate/);
+assert.equal(youtubeWorkflow.match(/https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=UCVeNEKtmPXkSUuTslQKUKbw/g)?.length, 1, "YouTube feed must be fetched once per run");
+assert.match(youtubeWorkflow, /node scripts\/youtube-sync\.mjs/);
+assert.match(youtubeWorkflow, /assets\/youtube-feed\.json/);
+assert.match(youtubeWorkflow, /cron:\s*"[^\"]*\/4/);
 for (const check of [
   "node scripts/test_blog_sync.mjs",
   "python scripts/test_translate_blog.py",

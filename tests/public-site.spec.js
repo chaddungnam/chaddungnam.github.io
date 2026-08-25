@@ -86,81 +86,58 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
   }
 });
 
-test("home hierarchy keeps the statement compact and the journal scannable", async ({ page, isMobile }) => {
+test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
-  await expect(page.locator(".manifesto-bubble h1")).toHaveAttribute("aria-label", "House Duck, 게임 및 기타 소프트웨어 개발과 일기를 보여줍니다.");
-  await expect(page.locator(".manifesto-note")).toContainText("환경 변화가 잦았던 제 경험을 녹여");
-  await expect(page.locator(".manifesto-mark")).toHaveText("HD");
-  await expect(page.locator(".manifesto-action")).toHaveText(/블로그 보러가기/);
-  await expect(page.locator(".quirky-sticker img")).toHaveAttribute("src", /assets\/media\/quirky-character\.svg/);
+  await expect(page.locator("[data-studio-hero] h1")).toContainText("Made in Germany");
+  await expect(page.locator("[data-studio-hero] h1")).toContainText("from South Korea");
+  await expect(page.locator(".hero-description")).toContainText("기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.");
+  await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
+  await expect(page.locator("[data-project]")).toHaveCount(2);
+  await expect(page.locator("[data-project='project-k']")).toContainText("출시 예정 미정");
+  await expect(page.locator(".history-section, .journal-section")).toHaveCount(0);
+  await expect(page.locator("[data-scroll-quirky]")).toHaveAttribute("src", /assets\/red-quirky\.svg/);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  await expect(page.locator(".brand-lockup .brand-wordmark-image")).toHaveCSS("width", "132px");
-  await expect(page.locator(".type-cursor")).toHaveCount(0);
-  await expect(page.locator(".nav-featured")).toHaveCount(2);
   await expect(page.locator("[data-game-preview]")).toHaveCount(2);
   await expect(page.locator(".phone-side-button")).toHaveCount(4);
   await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
-  await expect(page.locator("[data-section='blog-posts']")).toBeVisible();
-  await expect(page.locator("#journal-title")).toHaveText("하우스덕 개발 블로그");
-  await expect(page.locator(".history-section")).toBeVisible();
-  await expect(page.locator(".site-nav a", { hasText: "About" })).toHaveAttribute("href", "#history");
-  await expect(page.locator(".history-section")).toHaveAttribute("id", "history");
-  await expect(page.locator(".history-number")).toHaveText("02");
-  await expect(page.locator(".history-event")).toHaveCount(4);
-  await expect(page.locator(".history-heading")).toHaveAttribute("data-reveal-delay", "0");
-  expect(await page.locator(".history-event").evaluateAll((nodes) => nodes.map((node) => node.dataset.revealDelay))).toEqual(["90", "180", "270", "360"]);
-  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
-  await expect(page.locator(".post-preview-card-wide")).toHaveCount(3);
 
-  if (!isMobile) {
-    await page.waitForTimeout(900);
-    const bubble = await page.locator(".manifesto-bubble").boundingBox();
-    const bubbleSpacing = await page.locator(".manifesto-bubble").evaluate((node) => {
-      const bubbleBox = node.getBoundingClientRect();
-      const boxes = Array.from(node.querySelectorAll(".manifesto-mark, .quirky-sticker, .manifesto-dialogue, .manifesto-action"), (child) => child.getBoundingClientRect());
-      return {
-        top: Math.min(...boxes.map((box) => box.top)) - bubbleBox.top,
-        bottom: bubbleBox.bottom - Math.max(...boxes.map((box) => box.bottom), bubbleBox.top),
-      };
-    });
-    const phone = await page.locator(".iphone-shell").first().boundingBox();
-    const cards = await page.locator(".post-preview-card:not(.post-preview-empty)").evaluateAll((nodes) => nodes.map((node) => {
-      const box = node.getBoundingClientRect();
-      return { x: box.x, y: box.y, width: box.width, height: box.height };
-    }));
-    const phones = await page.locator(".game-device").evaluateAll((nodes) => nodes.map((node) => {
-      const box = node.getBoundingClientRect();
-      return { left: box.left, right: box.right };
-    }));
-    expect(bubble.width).toBeLessThan(680);
-    expect(bubble.height).toBeLessThan(350);
-    expect(Math.max(bubbleSpacing.top, bubbleSpacing.bottom)).toBeLessThan(58);
-    expect(Math.abs(bubbleSpacing.top - bubbleSpacing.bottom)).toBeLessThan(20);
-    const mark = await page.locator(".manifesto-mark").boundingBox();
-    const quirky = await page.locator(".quirky-sticker").boundingBox();
-    const note = await page.locator(".manifesto-note").boundingBox();
-    const action = await page.locator(".manifesto-action").boundingBox();
-    expect(quirky.x).toBeGreaterThan(mark.x + mark.width);
-    expect(Math.abs(quirky.y - mark.y)).toBeLessThan(12);
-    expect(action.y).toBeGreaterThanOrEqual(note.y + note.height);
-    expect(phone.width).toBeGreaterThan(200);
-    expect(Math.max(...cards.slice(0, 3).map((card) => card.y)) - Math.min(...cards.slice(0, 3).map((card) => card.y))).toBeLessThan(2);
-    expect(cards[3].y).toBeGreaterThan(cards[0].y);
-    expect(cards[3].width).toBeGreaterThan(cards[0].width * 2.5);
-    expect(cards[3].height).toBeLessThan(210);
-    expect(cards[4].y).toBeGreaterThan(cards[3].y);
-    expect(cards[5].y).toBeGreaterThan(cards[4].y);
-    for (const card of cards.slice(3)) {
-      expect(card.width).toBeGreaterThan(cards[0].width * 2.5);
-      expect(card.height).toBeLessThan(210);
-    }
-    expect(phones[1].left - phones[0].right).toBeLessThan(16);
-    expect(await page.locator(".game-device").first().evaluate((node) => getComputedStyle(node).animationName)).toContain("studio-phone-float");
-    const bubbleAnimation = await page.locator(".manifesto-bubble").evaluate((node) => getComputedStyle(node).animationName);
-    expect(bubbleAnimation).toContain("studio-bubble-breathe");
-    expect(bubbleAnimation).not.toContain("studio-bubble-float");
+  const cardHeights = await page.locator("[data-youtube-card]").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
+  expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThan(2);
+
+  const firstFrame = Number(await page.locator("[data-quirky-canvas]").getAttribute("data-frame"));
+  await page.waitForTimeout(180);
+  expect(Number(await page.locator("[data-quirky-canvas]").getAttribute("data-frame"))).toBeGreaterThan(firstFrame);
+
+  await page.locator(".youtube-section").scrollIntoViewIfNeeded();
+  await expect(page.locator("html")).toHaveAttribute("data-scroll-tone", "#ffffff");
+  await expect.poll(() => page.locator("[data-scroll-quirky]").evaluate((node) => Number(getComputedStyle(node).opacity))).toBeGreaterThan(0);
+  await page.locator('[data-project="quirky-ball"]').scrollIntoViewIfNeeded();
+  await expect(page.locator("html")).toHaveAttribute("data-scroll-tone", "#dce6ff");
+
+  const mascot = await page.locator("[data-scroll-quirky]").evaluate((node) => ({
+    naturalWidth: node.naturalWidth,
+    naturalHeight: node.naturalHeight,
+    objectFit: getComputedStyle(node).objectFit,
+  }));
+  expect(mascot.naturalWidth).toBe(240);
+  expect(mascot.naturalHeight).toBe(260);
+  expect(mascot.objectFit).toBe("contain");
+
+  const phoneGeometry = await page.locator("[data-project]").evaluateAll((cards) => cards.map((card) => {
+    const phone = card.querySelector(".project-phone").getBoundingClientRect();
+    const media = card.querySelector(".project-media").getBoundingClientRect();
+    const overflow = [];
+    for (let node = card; node; node = node.parentElement) overflow.push(getComputedStyle(node).overflowY);
+    return { phoneTop: phone.top, mediaTop: media.top, overflow };
+  }));
+  for (const item of phoneGeometry) {
+    expect(item.phoneTop).toBeLessThan(item.mediaTop);
+    expect(item.overflow).not.toContain("hidden");
+    expect(item.overflow).not.toContain("clip");
   }
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 
   const state = await page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({
     autoplay: video.autoplay,
@@ -174,7 +151,19 @@ test("home hierarchy keeps the statement compact and the journal scannable", asy
   ]);
 });
 
-test("primary navigation responds without colored hover chrome", async ({ page, isMobile }) => {
+test("home reduced motion holds the canvas and pauses phone video", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=ko");
+  await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
+  await page.waitForTimeout(180);
+  await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
+  await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([
+    { autoplay: false, paused: true },
+    { autoplay: false, paused: true },
+  ]);
+});
+
+test("primary navigation responds with a restrained text hover", async ({ page, isMobile }) => {
   test.skip(isMobile, "mouse hover is covered by the desktop project");
   await page.goto("/?lang=ko");
   for (const link of await page.locator(".site-nav > a").all()) {
@@ -182,10 +171,12 @@ test("primary navigation responds without colored hover chrome", async ({ page, 
     await page.waitForTimeout(220);
     const state = await link.evaluate((node) => ({
       background: getComputedStyle(node).backgroundColor,
+      color: getComputedStyle(node).color,
       transform: getComputedStyle(node).transform,
     }));
-    expect(state.background).not.toBe("rgba(0, 0, 0, 0)");
-    expect(state.transform).not.toBe("none");
+    expect(state.background).toBe("rgba(0, 0, 0, 0)");
+    expect(state.color).toBe("rgb(38, 101, 238)");
+    expect(state.transform).toBe("none");
   }
 });
 
@@ -201,8 +192,6 @@ test("foreign House Duck pages keep readers in their selected Blog language", as
   for (const locale of ["en", "de", "ja"]) {
     await page.goto(`/index_${locale}.html?lang=${locale}`);
     await expect(page.locator(".nav-blog")).toHaveAttribute("href", `blog/${locale}/`);
-    await expect(page.locator(".manifesto-action")).toHaveAttribute("href", `blog/${locale}/`);
-    await expect(page.locator(".journal-section .text-link")).toHaveAttribute("href", `blog/${locale}/`);
     for (const route of [`/about/index_${locale}.html`, `/quirky-ball/index_${locale}.html`, `/project-k/index_${locale}.html`]) {
       await page.goto(route);
       await expect(page.locator("[data-site-nav] a", { hasText: "Blog" })).toHaveAttribute("href", `../blog/${locale}/`);
@@ -299,35 +288,10 @@ test("Quirky Ball motion reduction removes the marble intro and pauses the loop"
   await expect.poll(() => page.locator(".hero-device video").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
 
-test("editorial section numbers stay visible without taking over the layout", async ({ page }) => {
-  await page.goto("/?lang=ko");
-  const homeNumbers = await page.evaluate(() => ({
-    games: getComputedStyle(document.querySelector(".device-stage"), "::before").content,
-    blog: getComputedStyle(document.querySelector(".journal-section"), "::before").content,
-    history: document.querySelector(".history-number").textContent,
-  }));
-  expect(["none", '""']).toContain(homeNumbers.games);
-  expect({ blog: homeNumbers.blog, history: homeNumbers.history }).toEqual({ blog: '"01"', history: "02" });
-
+test("the Blog keeps its editorial section number", async ({ page }) => {
   await page.goto("/blog/kr/");
   const blogNumber = await page.locator(".mirror-grid").evaluate((node) => getComputedStyle(node, "::before").content);
   expect(blogNumber).toBe('"01 BLOG"');
-});
-
-test("the last three home journal rows show complete artwork in square frames", async ({ page, isMobile }) => {
-  await page.goto("/?lang=ko");
-  await expect(page.locator(".post-preview-card:not(.post-preview-empty)")).toHaveCount(6);
-  const media = page.locator(".post-preview-card-wide .post-preview-media");
-  await expect(media).toHaveCount(3);
-  const frames = await media.evaluateAll((nodes) => nodes.map((node) => {
-    const box = node.getBoundingClientRect();
-    const image = node.querySelector(".post-preview-image");
-    return { width: box.width, height: box.height, objectFit: getComputedStyle(image).objectFit };
-  }));
-  for (const frame of frames) {
-    expect(frame.objectFit).toBe("contain");
-    if (!isMobile) expect(Math.abs(frame.width - frame.height)).toBeLessThan(2);
-  }
 });
 
 test("the static Blog footer matches House Duck and exposes legal contact routes", async ({ page }) => {
@@ -346,7 +310,6 @@ test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => 
   test.skip(isMobile, "mouse hover is covered by the desktop project");
 
   for (const target of [
-    { path: "/?lang=ko", card: ".post-preview-card:not(.post-preview-empty)", image: ".post-preview-image", settle: 900 },
     { path: "/blog/kr/", card: ".mirror-grid article", image: "img", settle: 0 },
   ]) {
     await page.goto(target.path);
@@ -372,13 +335,6 @@ test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => 
 });
 
 test("journal cards stay fully visible and type their previews quickly", async ({ page }) => {
-  await page.goto("/?lang=ko");
-  const lastHomeCard = page.locator(".post-preview-card:not(.post-preview-empty)").last();
-  expect(await lastHomeCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
-  await lastHomeCard.scrollIntoViewIfNeeded();
-  await expect(lastHomeCard.locator("[data-preview-type]")).toHaveCount(2);
-  await expect(lastHomeCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 4000 });
-
   await page.goto("/blog/kr/");
   const lastMirrorCard = page.locator(".mirror-grid article").last();
   expect(await lastMirrorCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");

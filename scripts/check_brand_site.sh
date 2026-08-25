@@ -119,19 +119,23 @@ done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
-  require_token "$page" 'class="manifesto-bubble'
-  require_token "$page" 'class="manifesto-mark"'
-  require_token "$page" 'data-typewriter'
-  require_token "$page" 'id="games"'
-  require_token "$page" 'data-section="blog-posts"'
+  require_token "$page" 'data-studio-hero'
+  require_token "$page" 'data-youtube-feed'
+  require_token "$page" 'data-quirky-mechanic'
+  require_token "$page" 'data-project="quirky-ball"'
+  require_token "$page" 'data-project="project-k"'
   require_token "$page" 'assets/studio-home.css'
+  require_token "$page" 'assets/studio-home.js'
+  require_token "$page" 'assets/red-quirky.svg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
-  require_token "$page" 'data-post-feed'
-  require_token "$page" "quirky-ball/store/feature-graphic.png"
   require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
   require_token "$page" "assets/media/project-k-highlight.mp4"
+  require_token "$page" "https://www.youtube.com/@houseduck_in"
   require_token "$page" "https://blog.houseduck.in/"
+  reject_token "$page" 'history-section'
+  reject_token "$page" 'journal-section'
+  reject_token "$page" '작게 만들더라도 오래 기억되는 게임'
   reject_token "$page" "European Restroom Map"
 done
 
@@ -153,7 +157,9 @@ fi
 
 require_css_property ".brand-lockup .brand-duck-image" "width: 38px"
 require_css_property ".brand-lockup .brand-wordmark-image" "width: 132px"
-require_token "assets/studio-home.css" ".manifesto-bubble::after"
+require_token "assets/studio-home.css" ".project-phone"
+require_token "assets/studio-home.css" "overflow: visible"
+require_token "assets/studio-home.js" "shotsPerSecond: 8"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"
 

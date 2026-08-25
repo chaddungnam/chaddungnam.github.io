@@ -147,28 +147,20 @@ test("product navigation stays on the localized House Duck Blog route and return
   }
 });
 
-test("home leads with the approved statement and two real game previews", () => {
-  const expected = {
-    "index.html": ["House Duck,", "게임 및 기타 소프트웨어 개발과 일기를 보여줍니다."],
-    "index_en.html": ["House Duck,", "games, other software, and the development journal."],
-    "index_de.html": ["House Duck,", "Spiele, andere Software und das Entwicklungstagebuch."],
-    "index_ja.html": ["House Duck,", "ゲームやその他のソフトウェア、そして開発日誌。"],
-  };
-
-  for (const [file, lines] of Object.entries(expected)) {
+test("home leads with the studio slogan, YouTube, and exactly two game previews", () => {
+  for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
-    assert.match(html, /class="manifesto-bubble/);
-    assert.match(html, /data-typewriter/);
-    for (const line of lines) assert.ok(html.includes(line), `${file}: ${line}`);
+    assert.match(html, /data-studio-hero/);
+    assert.match(html, /Made in Germany/);
+    assert.match(html, /from South Korea/);
+    assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
+    assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
     assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);
-    assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG/);
-    assert.ok(html.indexOf("manifesto-bubble") < html.indexOf("data-post-feed"), `${file} Blog follows statement`);
+    assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }
 
   const brandCss = read("assets/brand-site.css");
   assert.doesNotMatch(brandCss, /\.js-ready\s+\.reveal\s*\{[^}]*opacity:\s*0/s, "JavaScript must not hide authored content");
-  assert.match(brandScript, /\.history-heading, \.history-event/, "History needs the shared scroll reveal behavior");
-  assert.match(brandScript, /dataset\.revealDelay/, "History reveals need a top-to-bottom stagger");
 });
 
 test("home footer exposes the business inquiry address", () => {
@@ -239,13 +231,12 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
   const brandMark = cssDeclarations(brandCss, ".brand-lockup");
   const duckMark = cssDeclarations(brandCss, ".brand-lockup .brand-duck-image");
   const wordmark = cssDeclarations(brandCss, ".brand-lockup .brand-wordmark-image");
-  const postCopy = cssDeclarations(brandCss, 'body[data-page="studio"] .post-preview-copy p');
 
   assert.equal(brandMark.display, "inline-flex", "public headers must show the complete brand lockup");
   assert.ok(parseFloat(duckMark.width) >= 34, "the duck mark must remain legible");
   assert.equal(wordmark.width, "132px", "the House Duck wordmark must remain visible beside the duck");
-  assert.equal(cssDeclarations(studioCss, ".journal-section::before").color, cssDeclarations(studioCss, ".history-number").color, "01 and 02 need the same visual tone");
-  assert.ok(parseFloat(postCopy["font-size"]) >= 0.9, "Blog summaries need readable mobile type");
+  assert.equal(cssDeclarations(studioCss, ".project-card").overflow, "visible", "phone tops must not be clipped by project cards");
+  assert.match(studioCss, /^\.project-media\s*\{[^}]*overflow:\s*visible/m, "phone tops must not be clipped by media stages");
 });
 
 test("pre-launch terms describe the effective date and business status as pending", () => {

@@ -11,6 +11,7 @@ const projectPages = [
   ["project-k/index_de.html", "de"],
   ["project-k/index_ja.html", "ja"]
 ];
+const projectReleaseStatus = { ko: "출시 예정 미정", en: "Release date TBD", de: "Veröffentlichungstermin offen", ja: "発売時期未定" };
 const aboutPages = [
   ["about/index.html", "ko"],
   ["about/index_en.html", "en"],
@@ -60,7 +61,8 @@ for (const [file, locale] of projectPages) {
   assert.match(html, new RegExp(`data-locale="${locale}"`), `${file} locale`);
   assert.match(html, /data-page="project-k"/, `${file} page marker`);
   assert.match(html, /class="language-picker"/, `${file} language picker`);
-  assert.match(publicText, /2026[\s\S]{0,80}2027/, `${file} release window`);
+  assert.ok(publicText.includes(projectReleaseStatus[locale]), `${file} open release status`);
+  assert.doesNotMatch(publicText, /2026[\s\S]{0,80}2027/, `${file} must not promise a release window`);
   assert.doesNotMatch(publicText, /세로형/, `${file} public copy`);
 
   const imageTags = (html.match(/<img\b[^>]*data-project-k-asset[^>]*>/g) || []);
@@ -128,18 +130,19 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
   assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
-  assert.match(html, /data-post-feed/, `${file} synchronized post feed`);
-  assert.match(html, /class="post-preview-image/, `${file} post preview image`);
-  assert.match(html, /class="manifesto-bubble/, `${file} approved statement bubble`);
-  assert.match(html, /data-typewriter/, `${file} statement typewriter`);
+  assert.match(html, /data-youtube-feed/, `${file} synchronized YouTube feed`);
+  assert.match(html, /data-studio-hero/, `${file} studio hero`);
+  assert.match(html, /data-quirky-mechanic/, `${file} Quirky shooting mechanic`);
+  assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} latest videos`);
+  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} two projects only`);
   assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two game previews`);
   assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
   assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
   assert.match(html, locale === "ko" ? /href="https:\/\/blog\.houseduck\.in\/"/ : new RegExp(`href="blog/${locale}/"`), `${file} localized Blog link`);
   assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation uses Blog`);
-  assert.match(publicText, /01 · Blog/, `${file} Blog section label`);
+  assert.match(publicText, /Made in Germany/, `${file} studio origin statement`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
-  assert.doesNotMatch(publicText, /Kronberg|Germany|Deutschland|독일|ドイツ/i, `${file} should not foreground the founder's location`);
+  assert.doesNotMatch(html, /history-section|journal-section/, `${file} keeps only the approved sections`);
 }
 
 for (const [file, locale] of legacyStoryPages) {
@@ -157,9 +160,9 @@ assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "si
 
 const studioCss = read("assets/studio-home.css");
 assert.doesNotMatch(studioCss, /@keyframes studio-grid-shift/, "studio background should stay calm and static");
-assert.match(studioCss, /\.iphone-shell video/, "live builds should show inside real phone frames");
-assert.match(studioCss, /\.manifesto-bubble::after/, "statement bubble should point at the phones");
-assert.match(studioCss, /\.post-preview-link/, "synchronized post cards should be fully clickable");
+assert.match(studioCss, /\.project-phone video/, "live builds should show inside real phone frames");
+assert.match(studioCss, /\.project-card\s*\{[^}]*overflow:\s*visible/s, "phone cards must allow upward overflow");
+assert.match(studioCss, /\.youtube-card/, "latest videos should be fully clickable");
 assert.match(studioCss, /prefers-reduced-motion:\s*reduce[\s\S]*animation/, "studio motion must respect reduced-motion settings");
 
 console.log("brand catalog contract: PASS");

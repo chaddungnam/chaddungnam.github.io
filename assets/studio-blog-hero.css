@@ -1,0 +1,52 @@
+@font-face { font-family: "House Duck Display"; src: url("/assets/fonts/DoHyeon-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "House Duck Sans"; src: url("/assets/fonts/Montserrat-Variable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+
+.manifesto-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: center; gap: clamp(24px, 3vw, 44px); isolation: isolate; }
+.manifesto-bubble { position: relative; z-index: 2; padding: 82px clamp(26px, 3vw, 42px) 26px; border: 3px solid var(--studio-ink); border-radius: 28px 8px 28px 8px; background: var(--studio-surface); box-shadow: 8px 8px 0 var(--studio-cyan), 14px 14px 0 var(--studio-neon); }
+.manifesto-mark { position: absolute; top: 26px; left: 28px; display: grid; width: 46px; height: 46px; place-items: center; border: 2px solid var(--studio-ink); border-radius: 13px 13px 13px 5px; color: var(--studio-ink); background: var(--studio-yellow); box-shadow: 4px 4px 0 var(--studio-ink); font: 900 .78rem/1 "House Duck Sans", sans-serif; transform: rotate(-6deg); }
+.manifesto-bubble::after { position: absolute; top: 55%; right: -22px; z-index: -1; width: 40px; height: 40px; border-top: 2px solid var(--studio-ink); border-right: 2px solid var(--studio-ink); content: ""; background: var(--studio-surface); transform: translateY(-50%) rotate(45deg); }
+.manifesto-dialogue { width: 100%; }
+.manifesto-bubble h1 { margin: 0; color: var(--studio-ink); font-family: "House Duck Display", sans-serif; font-weight: 400; letter-spacing: -.03em; line-height: 1.12; }
+.manifesto-note { margin: 14px 0 0; color: var(--studio-copy); font-size: .86rem; line-height: 1.65; }
+.manifesto-bubble [data-type-line] { display: block; min-height: 1.16em; white-space: normal; word-break: keep-all; }
+.manifesto-action { display: inline-flex; min-height: 44px; align-items: center; margin-top: 16px; padding: 0 15px; border: 2px solid var(--studio-ink); border-radius: 8px; color: var(--studio-ink); background: var(--studio-yellow); box-shadow: 4px 4px 0 var(--studio-ink); font: 900 .72rem/1 "House Duck Sans", sans-serif; }
+.quirky-sticker { position: absolute; top: 24px; left: 86px; z-index: 3; transform: rotate(-8deg); }
+.quirky-sticker img { width: 100%; height: 100%; filter: drop-shadow(3px 3px 0 var(--studio-ink)); }
+
+.device-stage { position: relative; min-width: 0; perspective: 1000px; }
+.device-stage::before,
+.device-stage::after { position: absolute; z-index: 0; width: clamp(120px, 13vw, 180px); aspect-ratio: 1; border: 3px solid var(--studio-ink); border-radius: 50%; content: ""; pointer-events: none; }
+.device-stage::before { top: 10%; right: 2%; background: var(--studio-yellow); box-shadow: 9px 9px 0 var(--studio-neon); }
+.device-stage::after { bottom: 4%; left: 2%; background: var(--studio-cyan); transform: scale(.52); }
+.game-device { position: absolute; z-index: 2; display: grid; gap: 8px; color: var(--studio-ink); text-decoration: none; }
+.game-device-quirky { top: 0; left: 3%; transform: rotate(-2deg); }
+.game-device-k { right: 12%; bottom: 0; z-index: 1; transform: rotate(2deg); }
+.game-device-label { display: grid; gap: 2px; text-align: center; }
+.game-device-label strong { justify-self: center; padding: 5px 9px; border: 2px solid var(--studio-ink); border-radius: 7px; color: var(--studio-surface); background: var(--studio-ink); font: 850 .68rem/1 "House Duck Sans", sans-serif; }
+.game-device-label small { color: var(--studio-muted); font-size: .6rem; }
+.iphone-shell { position: relative; display: block; aspect-ratio: 9 / 19.5; padding: 8px; overflow: hidden; border-radius: 34px; background: #050607; }
+.iphone-shell video { display: block; width: 100%; height: 100%; border-radius: 27px; object-fit: cover; }
+.phone-camera { position: absolute; top: 12px; left: 50%; z-index: 3; width: 38%; height: 20px; border-radius: 0 0 13px 13px; background: #050607; transform: translateX(-50%); }
+.phone-home-indicator { position: absolute; bottom: 12px; left: 50%; z-index: 3; width: 34%; height: 4px; border-radius: 99px; background: rgba(255,255,255,.8); transform: translateX(-50%); }
+.phone-side-button { position: absolute; left: -5px; z-index: 3; width: 4px; border-radius: 3px 0 0 3px; background: #292d33; }
+.phone-side-button-top { top: 76px; height: 32px; }
+.phone-side-button-bottom { top: 118px; height: 54px; }
+
+@media (max-width: 760px) {
+  .manifesto-hero { grid-template-columns: 1fr; }
+  .manifesto-bubble { padding-top: 78px; }
+  .manifesto-bubble::after { top: auto; right: 18%; bottom: -20px; transform: rotate(135deg); }
+  .device-stage { width: 100%; max-width: 390px; margin-inline: auto; }
+  .game-device-quirky { left: 6%; }
+  .game-device-k { right: 6%; }
+}
+
+@media (max-width: 390px) {
+  .manifesto-bubble { padding-inline: 20px; }
+  .manifesto-note { font-size: .8rem; }
+  .mirror-manifesto .iphone-shell { width: min(36vw, 140px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+}
