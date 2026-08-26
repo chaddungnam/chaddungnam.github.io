@@ -126,6 +126,7 @@
     const context = canvas.getContext("2d");
     const marbles = [];
     let shots = [];
+    let particles = [];
     let width = 0;
     let height = 0;
     let active = true;
@@ -133,6 +134,7 @@
     let previous = start;
     let pairCount = -1;
     let frame = 0;
+    let impactCount = 0;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -145,19 +147,66 @@
       for (let index = 0; index < 14; index += 1) {
         const angle = index * 2.39996;
         const distance = Math.min(width, height) * (.28 + (index % 5) * .055);
+        const speed = 17 + index % 4 * 4;
         marbles[index] = {
           x: width / 2 + Math.cos(angle) * distance,
           y: height / 2 + Math.sin(angle) * distance * .68,
           radius: marbles[index]?.radius || 13 + index % 4 * 3,
           color: palette[index % palette.length],
+          vx: marbles[index]?.vx || Math.cos(angle + 1.2) * speed,
+          vy: marbles[index]?.vy || Math.sin(angle + 1.2) * speed,
+          spin: marbles[index]?.spin || angle,
         };
       }
     }
 
+    function emitParticles(x, y, vx, vy, color, count) {
+      const heading = Math.atan2(vy, vx);
+      for (let index = 0; index < count; index += 1) {
+        const spread = (index - (count - 1) / 2) * .27;
+        const speed = 55 + index % 3 * 28;
+        particles.push({ x, y, vx: Math.cos(heading + spread) * speed, vy: Math.sin(heading + spread) * speed, life: .38, size: 2 + index % 2, color });
+      }
+      if (particles.length > 100) particles.splice(0, particles.length - 100);
+    }
+
     function spawnPair(rotation, index) {
       for (const angle of shotAngles(rotation, index)) {
-        shots.push({ x: width / 2, y: height / 2, vx: Math.cos(angle) * 330, vy: Math.sin(angle) * 330, angle, bounces: 0 });
+        const vx = Math.cos(angle) * 390;
+        const vy = Math.sin(angle) * 390;
+        shots.push({ x: width / 2, y: height / 2, vx, vy, angle, bounces: 0, hits: new Set() });
+        emitParticles(width / 2, height / 2, -vx, -vy, "#ef3f38", 3);
       }
+    }
+
+    function launchBurst(rotation) {
+      shots = [];
+      pairCount = 2;
+      for (let index = 0; index < 3; index += 1) spawnPair(rotation + index * .32, index);
+    }
+
+    function updateMarbles(delta) {
+      for (const marble of marbles) {
+        const radius = Math.max(7, marble.radius);
+        marble.x += marble.vx * delta;
+        marble.y += marble.vy * delta;
+        marble.spin += Math.hypot(marble.vx, marble.vy) * delta / radius;
+        if (marble.x < radius || marble.x > width - radius) { marble.vx *= -1; marble.x = Math.max(radius, Math.min(width - radius, marble.x)); }
+        if (marble.y < radius || marble.y > height - radius) { marble.vy *= -1; marble.y = Math.max(radius, Math.min(height - radius, marble.y)); }
+        const speed = Math.hypot(marble.vx, marble.vy);
+        if (speed > 82) { marble.vx *= 82 / speed; marble.vy *= 82 / speed; }
+      }
+    }
+
+    function updateParticles(delta) {
+      particles = particles.filter((particle) => {
+        particle.x += particle.vx * delta;
+        particle.y += particle.vy * delta;
+        particle.vx *= .94;
+        particle.vy *= .94;
+        particle.life -= delta;
+        return particle.life > 0;
+      });
     }
 
     function updateShots(delta) {
@@ -169,10 +218,14 @@
         if (shot.x < padding || shot.x > width - padding) { shot.vx *= -1; shot.x = Math.max(padding, Math.min(width - padding, shot.x)); hitWall = true; }
         if (shot.y < padding || shot.y > height - padding) { shot.vy *= -1; shot.y = Math.max(padding, Math.min(height - padding, shot.y)); hitWall = true; }
         if (hitWall && shot.bounces++ >= QUIRKY_RULES.maxBounces) return false;
-        for (const marble of marbles) {
-          if (Math.hypot(shot.x - marble.x, shot.y - marble.y) < marble.radius + 6) {
+        for (const [index, marble] of marbles.entries()) {
+          if (!shot.hits.has(index) && Math.hypot(shot.x - marble.x, shot.y - marble.y) < marble.radius + 7) {
+            shot.hits.add(index);
             marble.radius = shrinkRadius(marble.radius, ((marble.x + marble.y + frame) % 100) / 100);
-            return false;
+            marble.vx += shot.vx * .11;
+            marble.vy += shot.vy * .11;
+            emitParticles(shot.x, shot.y, shot.vx, shot.vy, marble.color, 7);
+            impactCount += 1;
           }
         }
         return true;
@@ -187,18 +240,37 @@
       context.arc(width / 2, height / 2, Math.min(width, height) * .34, 0, TAU);
       context.stroke();
       for (const marble of marbles) {
+        const radius = Math.max(7, marble.radius);
         context.beginPath();
-        context.arc(marble.x, marble.y, Math.max(7, marble.radius), 0, TAU);
+        context.arc(marble.x + 2, marble.y + 3, radius, 0, TAU);
+        context.fillStyle = "rgba(17,19,25,.12)";
+        context.fill();
+        context.beginPath();
+        context.arc(marble.x, marble.y, radius, 0, TAU);
         context.fillStyle = marble.color;
         context.fill();
         context.strokeStyle = "#172033";
         context.lineWidth = 2;
         context.stroke();
+        context.beginPath();
+        context.arc(marble.x + Math.cos(marble.spin) * radius * .34, marble.y + Math.sin(marble.spin) * radius * .34, Math.max(2, radius * .16), 0, TAU);
+        context.fillStyle = "rgba(255,255,255,.72)";
+        context.fill();
       }
       for (const shot of shots) {
+        const heading = Math.atan2(shot.vy, shot.vx);
+        const trail = context.createLinearGradient(shot.x, shot.y, shot.x - Math.cos(heading) * 34, shot.y - Math.sin(heading) * 34);
+        trail.addColorStop(0, "rgba(239,63,56,.85)");
+        trail.addColorStop(1, "rgba(239,63,56,0)");
+        context.strokeStyle = trail;
+        context.lineWidth = 5;
+        context.beginPath();
+        context.moveTo(shot.x, shot.y);
+        context.lineTo(shot.x - Math.cos(heading) * 34, shot.y - Math.sin(heading) * 34);
+        context.stroke();
         context.save();
         context.translate(shot.x, shot.y);
-        context.rotate(Math.atan2(shot.vy, shot.vx));
+        context.rotate(heading);
         context.fillStyle = "#ef3f38";
         context.strokeStyle = "#172033";
         context.lineWidth = 2;
@@ -212,18 +284,30 @@
         context.stroke();
         context.restore();
       }
+      for (const particle of particles) {
+        context.globalAlpha = Math.min(1, particle.life * 3);
+        context.fillStyle = particle.color;
+        context.fillRect(particle.x, particle.y, particle.size * 2.5, particle.size);
+      }
+      context.globalAlpha = 1;
       canvas.dataset.rotation = rotation.toFixed(3);
       canvas.dataset.frame = String(++frame);
+      canvas.dataset.marbleState = marbles.slice(0, 4).map((marble) => `${marble.x.toFixed(1)},${marble.y.toFixed(1)}`).join(";");
+      canvas.dataset.shotCount = String(shots.length);
+      canvas.dataset.impactCount = String(impactCount);
     }
 
     function tick(now) {
       if (!active) { previous = now; requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
-      if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) { pairCount = -1; shots = []; }
+      if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) launchBurst(0);
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;
       const nextPair = Math.floor(elapsed / QUIRKY_RULES.pairInterval);
       while (pairCount < nextPair) spawnPair(rotation, ++pairCount);
-      updateShots(Math.min(.034, (now - previous) / 1000));
+      const delta = Math.min(.034, (now - previous) / 1000);
+      updateMarbles(delta);
+      updateShots(delta);
+      updateParticles(delta);
       draw(rotation);
       previous = now;
       requestAnimationFrame(tick);
@@ -232,6 +316,7 @@
     resize();
     addEventListener("resize", resize);
     if (reducedMotion) { draw(0); return; }
+    launchBurst(0);
     if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; }, { threshold: .05 }).observe(stage);
     requestAnimationFrame(tick);
   }

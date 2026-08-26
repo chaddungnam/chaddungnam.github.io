@@ -151,6 +151,31 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   ]);
 });
 
+test("home keeps the hero heavy and the footer lockup compact", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const hero = page.locator("[data-studio-hero] h1");
+  expect(Number(await hero.evaluate((node) => getComputedStyle(node).fontWeight))).toBeGreaterThanOrEqual(800);
+
+  const footerSizes = await page.locator(".site-footer").evaluate((footer) => {
+    const rect = (selector) => footer.querySelector(selector).getBoundingClientRect();
+    const duck = rect(".brand-duck-image");
+    const wordmark = rect(".footer-wordmark-image");
+    return { duck: [duck.width, duck.height], wordmark: [wordmark.width, wordmark.height] };
+  });
+  expect(footerSizes.duck).toEqual([34, 34]);
+  expect(footerSizes.wordmark[0]).toBe(116);
+  expect(footerSizes.wordmark[1]).toBeLessThan(34);
+});
+
+test("home launch immediately moves marbles and builds a rapid shot burst", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const canvas = page.locator("[data-quirky-canvas]");
+  await expect(canvas).toHaveAttribute("data-marble-state", /\d/);
+  const initialState = await canvas.getAttribute("data-marble-state");
+  await expect.poll(() => canvas.getAttribute("data-marble-state")).not.toBe(initialState);
+  await expect.poll(async () => Number(await canvas.getAttribute("data-shot-count"))).toBeGreaterThanOrEqual(4);
+});
+
 test("home reduced motion holds the canvas and pauses phone video", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=ko");
