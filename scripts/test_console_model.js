@@ -1,6 +1,28 @@
 const assert = require("node:assert/strict");
 const model = require("../console/model.js");
 
+const diagnosticsFixture = {
+  issueSignals: [{ signal: "tutorial_incomplete", count: 2 }],
+  tutorial: {
+    started: 5, completed: 3, aborted: 1, incomplete: 1, completionRate: 0.6,
+    stages: [{ stage: "intro", stageIndex: 0, entered: 5, completed: 3, aborted: 1, incomplete: 1 }],
+  },
+  growthChoices: {
+    presented: 8, selected: 6, confirmed: 5, selectionRate: null,
+    byLevel: [{ level: 3, presented: 4, selected: 3, confirmed: 2, selectionRate: 0.75 }],
+    choices: [{ choice: "fast_growth", selected: 3 }],
+  },
+  mechakucha: { started: 2, completed: 1, aborted: 1, incomplete: 0, completionRate: 0.5, avgScoreGain: 120, avgMarblesRestored: 3 },
+  gameOver: {
+    total: 4, medianScore: 1000, medianLevel: 4,
+    byDay: [{ day: "2026-08-26", games: 4, avgScore: 1120, medianScore: 1000, avgLevel: 4 }],
+    levelBuckets: [{ bucket: "1-3", games: 4, avgScore: 1120, medianScore: 1000, avgLevel: 4 }],
+  },
+};
+assert.equal(diagnosticsFixture.growthChoices.selectionRate, null, "legacy selected choices must preserve a null selection rate");
+assert.deepEqual(Object.keys(diagnosticsFixture.gameOver.byDay[0]), ["day", "games", "avgScore", "medianScore", "avgLevel"]);
+assert.deepEqual(Object.keys(diagnosticsFixture.tutorial.stages[0]), ["stage", "stageIndex", "entered", "completed", "aborted", "incomplete"]);
+
 assert.deepEqual(model.routeFromHash("#/analytics"), { page: "analytics" });
 assert.deepEqual(model.routeFromHash("#/players/abc%20123"), { page: "player", userId: "abc 123" });
 assert.deepEqual(model.routeFromHash("#/players/"), { page: "players" });

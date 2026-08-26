@@ -143,6 +143,7 @@ function renderDashboard() {
   renderAppStatus();
   renderPurchaseTrend();
   renderChoices();
+  renderDiagnostics();
   renderInteractionInsights();
   renderAttention(pulseModel);
   renderPeriodPlayers();
@@ -177,6 +178,98 @@ function renderChoices() {
   };
   renderRows("growthChoicesTable", state.payload?.choices?.growth ?? []);
   renderRows("rouletteResultsTable", state.payload?.choices?.roulette ?? []);
+}
+
+function diagnosticsWaiting(id, label, detail) {
+  renderCoverageCards(id, [{ status: "waiting", label, value: "1.1.0 데이터 수집 대기", detail }]);
+}
+
+function diagnosticsTable(id, columns, rows, emptyText) {
+  byId(id).innerHTML = rows.length === 0
+    ? `<tr><td class="empty-row" colspan="${columns}">${emptyText}</td></tr>`
+    : rows.join("");
+}
+
+function diagnosticsSignalLabel(signal) {
+  const key = String(signal ?? "").toLowerCase();
+  if (key.includes("tutorial")) return key.includes("abort") ? "튜토리얼 중단" : "튜토리얼 미완료";
+  if (key.includes("growth")) return "성장 선택 미선택";
+  if (key.includes("mechakucha")) return key.includes("abort") ? "메차쿠차 중단" : "메차쿠차 미완료";
+  return "플레이 흐름 이슈";
+}
+
+function renderGameOverChart(rows) {
+  const canvas = byId("gameOverChart");
+  const width = canvas.clientWidth || 800;
+  const height = canvas.clientHeight || 154;
+  const ratio = root.devicePixelRatio || 1;
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  const context = canvas.getContext("2d");
+  context.scale(ratio, ratio);
+  context.clearRect(0, 0, width, height);
+  if (rows.length === 0) return;
+  const top = 12;
+  const bottom = 24;
+  const chartHeight = height - top - bottom;
+  const scoreMax = Math.max(1, ...rows.map((row) => Number(row.medianScore ?? 0)));
+  const levelMax = Math.max(1, ...rows.map((row) => Number(row.avgLevel ?? 0)));
+  const step = (width - 28) / rows.length;
+  context.font = "10px system-ui";
+  rows.forEach((row, index) => {
+    const x = 14 + step * index + step / 2;
+    const scoreHeight = chartHeight * Number(row.medianScore ?? 0) / scoreMax;
+    const levelHeight = chartHeight * Number(row.avgLevel ?? 0) / levelMax;
+    context.fillStyle = "#42bdb0";
+    context.fillRect(x - 7, top + chartHeight - scoreHeight, 6, scoreHeight);
+    context.fillStyle = "#ee6f5e";
+    context.fillRect(x + 1, top + chartHeight - levelHeight, 6, levelHeight);
+    context.fillStyle = "#8990a5";
+    context.textAlign = "center";
+    context.fillText(String(row.day ?? "").slice(5), x, height - 8);
+  });
+}
+
+function renderDiagnostics() {
+  const diagnostics = state.payload?.diagnostics ?? {};
+  const issueSignals = Array.isArray(diagnostics.issueSignals) ? diagnostics.issueSignals : [];
+  if (issueSignals.length === 0) diagnosticsWaiting("diagnosticsIssueSignals", "이슈 신호", "튜토리얼·메차쿠차 전환 이벤트가 쌓이면 표시됩니다.");
+  else renderCoverageCards("diagnosticsIssueSignals", issueSignals.map((row) => ({
+    status: Number(row.count ?? 0) > 0 ? "available" : "empty",
+    label: diagnosticsSignalLabel(row.signal),
+    value: `${formatNumber(Number(row.count ?? 0))}건`,
+    detail: "플레이 흐름에서 중단 또는 미완료로 집계된 신호",
+  })));
+
+  const tutorial = diagnostics.tutorial ?? {};
+  const stages = Array.isArray(tutorial.stages) ? tutorial.stages : [];
+  const tutorialWaiting = stages.length === 0;
+  setText("tutorialStatus", tutorialWaiting ? "1.1.0 데이터 수집 대기" : `완료율 ${formatRate(tutorial.completionRate)}`);
+  diagnosticsTable("tutorialStagesTable", 5, stages.map((row) => `<tr><td><strong>단계 ${formatNumber(Number(row.stageIndex ?? 0) + 1)}</strong></td><td>${formatNumber(row.entered)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.aborted)}</td><td>${formatNumber(row.incomplete)}</td></tr>`), "1.1.0 데이터 수집 대기");
+
+  const growthChoices = diagnostics.growthChoices ?? {};
+  const byLevel = Array.isArray(growthChoices.byLevel) ? growthChoices.byLevel : [];
+  const legacyChoices = growthChoices.selectionRate === null && Number(growthChoices.selected ?? 0) > 0;
+  setText("growthChoiceStatus", byLevel.length ? `${formatNumber(Number(growthChoices.selected ?? 0))}회 선택${legacyChoices ? " · 레거시 기록" : ""}` : "1.1.0 데이터 수집 대기");
+  diagnosticsTable("growthChoiceLevelTable", 5, byLevel.map((row) => `<tr><td><strong>Lv.${formatNumber(row.level)}</strong></td><td>${formatNumber(row.presented)}</td><td>${formatNumber(row.selected)}</td><td>${formatNumber(row.confirmed)}</td><td>${row.selectionRate === null ? "레거시 선택 기록" : formatRate(row.selectionRate)}</td></tr>`), "1.1.0 데이터 수집 대기");
+
+  const mechakucha = diagnostics.mechakucha ?? {};
+  const mechakuchaEvents = ["started", "completed", "aborted", "incomplete"].some((key) => Number(mechakucha[key] ?? 0) > 0);
+  if (!mechakuchaEvents) diagnosticsWaiting("mechakuchaSummary", "메차쿠차", "특수 효과 전환 이벤트가 쌓이면 완료율과 회복량을 표시합니다.");
+  else renderCoverageCards("mechakuchaSummary", [
+    { status: "available", label: "완료율", value: formatRate(mechakucha.completionRate), detail: `시작 ${formatNumber(mechakucha.started)} · 완료 ${formatNumber(mechakucha.completed)}` },
+    { status: "available", label: "중단·미완료", value: `${formatNumber(mechakucha.aborted)} · ${formatNumber(mechakucha.incomplete)}`, detail: "특수 효과 진행 중 끝나지 않은 기록" },
+    { status: "available", label: "평균 점수 증가", value: `${formatNumber(mechakucha.avgScoreGain)}점`, detail: "완료된 메차쿠차의 점수 변화" },
+    { status: "available", label: "평균 복구 구슬", value: `${formatDecimal(mechakucha.avgMarblesRestored)}개`, detail: "완료된 메차쿠차의 복구량" },
+  ]);
+
+  const gameOver = diagnostics.gameOver ?? {};
+  const byDay = Array.isArray(gameOver.byDay) ? gameOver.byDay.slice(-state.rangeDays) : [];
+  const buckets = Array.isArray(gameOver.levelBuckets) ? gameOver.levelBuckets : [];
+  setText("gameOverStatus", byDay.length ? `${formatNumber(Number(gameOver.total ?? 0))}회 · 중앙 ${formatNumber(gameOver.medianScore)}점` : "1.1.0 데이터 수집 대기");
+  renderGameOverChart(byDay);
+  diagnosticsTable("gameOverDailyTable", 5, [...byDay].reverse().map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "1.1.0 데이터 수집 대기");
+  diagnosticsTable("gameOverBucketTable", 5, buckets.map((row) => `<tr><td><strong>${escapeHtml(row.bucket)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "1.1.0 데이터 수집 대기");
 }
 
 function renderInteractionInsights() {
@@ -824,7 +917,11 @@ function bindControls() {
   let resizeTimer;
   root.addEventListener("resize", () => {
     root.clearTimeout(resizeTimer);
-    resizeTimer = root.setTimeout(() => { if (state.payload) renderDailyChart(); }, 120);
+    resizeTimer = root.setTimeout(() => {
+      if (!state.payload) return;
+      renderDailyChart();
+      renderGameOverChart(state.payload?.diagnostics?.gameOver?.byDay ?? []);
+    }, 120);
   });
 }
 

@@ -175,6 +175,9 @@
         <details id="operatorDetails" class="operator-details">
           <summary><span><p class="eyebrow">FOR OPERATORS</p><strong>운영자 상세보기</strong><small>시간대, 종료 이유, 광고 오류와 스토어별 수치를 확인해요.</small></span><b>필요할 때 열기</b></summary>
           <div class="content-grid detail-grid">
+            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLAY FLOW DIAGNOSTICS</p><h2>플레이 흐름 진단</h2><small>튜토리얼과 특수 흐름에서 멈춘 신호를 서버 요약으로 확인합니다.</small></div><span id="tutorialStatus" class="panel-total">—</span></div><div id="diagnosticsIssueSignals" class="coverage-grid" aria-live="polite"></div><div class="table-scroll"><table><thead><tr><th>튜토리얼 단계</th><th>진입</th><th>완료</th><th>중단</th><th>미완료</th></tr></thead><tbody id="tutorialStagesTable"></tbody></table></div></article>
+            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">CHOICES &amp; SPECIAL EFFECTS</p><h2>선택과 특수 효과</h2><small>레벨별 성장 선택과 메차쿠차 완료 흐름을 분리해 확인합니다.</small></div><span id="growthChoiceStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>레벨</th><th>제시</th><th>선택</th><th>확정</th><th>선택률</th></tr></thead><tbody id="growthChoiceLevelTable"></tbody></table></div><div id="mechakuchaSummary" class="coverage-grid" aria-live="polite"></div></article>
+            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">GAME OVER TREND</p><h2>게임 종료 추이</h2><small>정상 완료된 게임의 날짜별 중앙 점수와 평균 레벨입니다.</small></div><span id="gameOverStatus" class="panel-total">—</span></div><div class="legend"><span><i class="legend-teal"></i>중앙 점수</span><span><i class="legend-coral"></i>평균 레벨</span></div><div class="chart-wrap"><canvas id="gameOverChart" height="154" aria-label="날짜별 게임 종료 중앙 점수와 평균 레벨 차트"></canvas></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverDailyTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>레벨 구간</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverBucketTable"></tbody></table></div></article>
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">ARRIVAL TIME</p><h2>주로 몇 시에 오나</h2></div></div><div id="hourlyChart" class="hourly-chart"></div></article>
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RAW EVENT VIEW</p><h2>전체 이벤트 사람 수</h2></div></div><div id="funnelChart" class="funnel-chart"></div></article>
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GAME EXIT</p><h2>플레이 후 어떻게 나가나</h2></div></div><div id="exitBreakdown" class="metric-list"></div></article>
@@ -312,7 +315,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260824-2"></script>
+  <script src="analytics.js?v=20260826-1"></script>
   <script src="analytics-exclusions.js?v=20260823-1"></script>
   <script src="players.js?v=20260822-2"></script>
   <script src="operations.js?v=20260822-2"></script>

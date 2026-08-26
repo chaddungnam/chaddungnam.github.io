@@ -32,6 +32,22 @@ assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="chal
 assert.match(consoleHtml, /data-route="analytics-exclusions"/, "the console must expose an analytics exclusion route");
 assert.match(read("console/analytics-exclusions.js"), /analytics_exclusions\.list/, "the exclusion route must use the secured admin action");
 assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
+assert.match(consoleHtml, /id="diagnosticsIssueSignals"/, "the gameplay diagnostics issue-signal panel must exist");
+assert.match(consoleHtml, /id="tutorialStagesTable"/, "the gameplay diagnostics tutorial funnel table must exist");
+assert.match(consoleHtml, /id="growthChoiceLevelTable"/, "the gameplay diagnostics level-choice table must exist");
+assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Mechakucha panel must exist");
+assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
+assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
+assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
+assert.match(consoleHtml, /analytics\.js\?v=20260826-1/, "the Console must cache-bust the updated diagnostics renderer");
+assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
+assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
+assert.match(analyticsSource, /diagnostics\.growthChoices/, "legacy growth choices must render from diagnostics.growthChoices");
+assert.match(analyticsSource, /1\.1\.0 데이터 수집 대기/, "empty tutorial and Mechakucha panels must use the exact collection-waiting text");
+assert.doesNotMatch(analyticsSource, /Chart\.js|new Chart\(/, "diagnostics charts must reuse Canvas without a chart dependency");
+assert.match(analyticsSource, /function diagnosticsSignalLabel/, "diagnostics issue signals must map internal event keys to operator-facing labels");
+assert.match(analyticsSource, /튜토리얼 미완료/, "diagnostics issue labels must not expose raw event identifiers");
+assert.match(analyticsSource, /renderGameOverChart\(state\.payload\?\.diagnostics\?\.gameOver\?\.byDay \?\? \[\]\)/, "the game-over Canvas must redraw when the viewport changes");
 
 const playersSource = read("console/players.js");
 assert.match(playersSource, /icon_jakwon_tongue[\s\S]*yakwon 프로필/, "the admin inventory list must expose the retired yakwon profile item");
