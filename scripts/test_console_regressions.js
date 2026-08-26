@@ -22,6 +22,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
+const consoleStyles = read("console/styles.css");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
 assert.match(consoleHtml, /id="kpiActiveLabel"/, "the active-player KPI must expose a range-aware label");
 assert.match(consoleHtml, /id="dailyTrendEyebrow"/, "the daily trend heading must follow the selected range");
@@ -40,6 +41,7 @@ assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-o
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
 assert.match(consoleHtml, /analytics\.js\?v=20260826-1/, "the Console must cache-bust the updated diagnostics renderer");
+assert.match(consoleHtml, /styles\.css\?v=20260826-1/, "the Console must cache-bust diagnostics responsive styles");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
 assert.match(analyticsSource, /diagnostics\.growthChoices/, "legacy growth choices must render from diagnostics.growthChoices");
@@ -47,7 +49,12 @@ assert.match(analyticsSource, /1\.1\.0 데이터 수집 대기/, "empty tutorial
 assert.doesNotMatch(analyticsSource, /Chart\.js|new Chart\(/, "diagnostics charts must reuse Canvas without a chart dependency");
 assert.match(analyticsSource, /function diagnosticsSignalLabel/, "diagnostics issue signals must map internal event keys to operator-facing labels");
 assert.match(analyticsSource, /튜토리얼 미완료/, "diagnostics issue labels must not expose raw event identifiers");
-assert.match(analyticsSource, /renderGameOverChart\(state\.payload\?\.diagnostics\?\.gameOver\?\.byDay \?\? \[\]\)/, "the game-over Canvas must redraw when the viewport changes");
+assert.match(analyticsSource, /renderGameOverChart\(\(state\.payload\?\.diagnostics\?\.gameOver\?\.byDay \?\? \[\]\)\.slice\(-state\.rangeDays\)\)/, "the game-over Canvas must redraw the selected range when the viewport changes");
+assert.match(analyticsSource, /canvas\.parentElement\?\.clientWidth/, "the game-over Canvas bitmap must use its stable container width");
+assert.match(analyticsSource, /canvas\.style\.width = "100%"/, "the game-over Canvas CSS width must not grow with its high-DPI bitmap");
+assert.match(analyticsSource, /tutorialStageLabel\(row\.stage, row\.stageIndex\)/, "tutorial dropoff rows must show an operator-facing stage name");
+assert.doesNotMatch(analyticsSource, /stageIndex[^\n]*\+\s*1/, "tutorial enum stage indexes must not be shifted by one");
+assert.match(consoleStyles, /#growthChoiceStatus\s*\{[^}]*white-space:\s*nowrap/s, "the growth choice total must stay readable on narrow screens");
 
 const playersSource = read("console/players.js");
 assert.match(playersSource, /icon_jakwon_tongue[\s\S]*yakwon 프로필/, "the admin inventory list must expose the retired yakwon profile item");

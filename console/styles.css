@@ -210,6 +210,7 @@ textarea:focus-visible {
 .console-main .table-scroll tbody tr { transition: background-color .15s ease; }
 .console-main .table-scroll tbody tr:nth-child(even) td { background: rgba(247,244,236,.5); }
 .console-main .table-scroll tbody tr:hover td { background: var(--teal-soft); }
+#growthChoiceStatus { flex: 0 0 auto; white-space: nowrap; }
 .country-label { display: inline-flex; align-items: center; gap: 7px; min-width: 105px; text-align: left; }
 .country-label > span:last-child { display: grid; gap: 1px; }
 .country-label strong { color: var(--ink); font-size: 11px; }

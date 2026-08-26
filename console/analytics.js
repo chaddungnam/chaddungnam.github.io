@@ -168,6 +168,7 @@ function renderChoices() {
     hard_mode: "하드모드",
     breakthrough: "돌파",
     time_rewind: "처음부터 재시작",
+    mechakucha_quake: "메차쿠차 지진",
     unknown: "확인 필요",
   };
   const renderRows = (id, rows) => {
@@ -176,7 +177,17 @@ function renderChoices() {
       ? '<tr><td class="empty-row" colspan="3">아직 수집된 선택이 없습니다.</td></tr>'
       : rows.map((row) => `<tr><td><strong>${escapeHtml(labels[row.key] ?? row.key)}</strong></td><td>${formatNumber(row.count)}</td><td>${formatRate(row.rate)}</td></tr>`).join("");
   };
-  renderRows("growthChoicesTable", state.payload?.choices?.growth ?? []);
+  let growthRows = state.payload?.choices?.growth ?? [];
+  if (growthRows.length === 0) {
+    const diagnosticRows = state.payload?.diagnostics?.growthChoices?.choices ?? [];
+    const total = diagnosticRows.reduce((sum, row) => sum + Number(row.selected ?? 0), 0);
+    growthRows = diagnosticRows.map((row) => ({
+      key: String(row.choice ?? "unknown"),
+      count: Number(row.selected ?? 0),
+      rate: total > 0 ? Number(row.selected ?? 0) / total : null,
+    }));
+  }
+  renderRows("growthChoicesTable", growthRows);
   renderRows("rouletteResultsTable", state.payload?.choices?.roulette ?? []);
 }
 
@@ -198,15 +209,41 @@ function diagnosticsSignalLabel(signal) {
   return "플레이 흐름 이슈";
 }
 
+function tutorialStageLabel(stage, stageIndex) {
+  const labels = {
+    hook: "첫 목표 소개",
+    aim_drop: "첫 구슬 조준",
+    merge: "같은 구슬 합치기",
+    score: "점수·탈출 목표",
+    mixed_drops: "혼합 구슬 드롭",
+    bomb_drop: "폭탄 구슬 준비",
+    bomb_roulette: "폭탄 룰렛",
+    golden_shooting: "골든 슈팅",
+    level_up: "레벨 2 성장 선택",
+    mad_shooting: "매드사이언티스트 슈팅",
+    level3_play: "레벨 3 진행",
+    bomb_warning: "폭탄 카운트 경고",
+    bomb_demo: "폭탄 폭발 데모",
+    bomb_confirm: "폭탄 결과 확인",
+    escape_goal: "레벨 10 탈출 목표",
+    ranking_goal: "랭킹 경쟁 안내",
+    complete: "튜토리얼 완료",
+  };
+  return labels[String(stage ?? "").toLowerCase()] ?? `단계 ${formatNumber(Number(stageIndex ?? 0))}`;
+}
+
 function renderGameOverChart(rows) {
   const canvas = byId("gameOverChart");
-  const width = canvas.clientWidth || 800;
-  const height = canvas.clientHeight || 154;
+  canvas.style.width = "100%";
+  canvas.style.height = "154px";
+  const width = Math.max(1, canvas.parentElement?.clientWidth || canvas.clientWidth || 800);
+  const height = 154;
   const ratio = root.devicePixelRatio || 1;
-  canvas.width = width * ratio;
-  canvas.height = height * ratio;
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
   const context = canvas.getContext("2d");
-  context.scale(ratio, ratio);
+  if (!context) return;
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
   context.clearRect(0, 0, width, height);
   if (rows.length === 0) return;
   const top = 12;
@@ -245,12 +282,13 @@ function renderDiagnostics() {
   const stages = Array.isArray(tutorial.stages) ? tutorial.stages : [];
   const tutorialWaiting = stages.length === 0;
   setText("tutorialStatus", tutorialWaiting ? "1.1.0 데이터 수집 대기" : `완료율 ${formatRate(tutorial.completionRate)}`);
-  diagnosticsTable("tutorialStagesTable", 5, stages.map((row) => `<tr><td><strong>단계 ${formatNumber(Number(row.stageIndex ?? 0) + 1)}</strong></td><td>${formatNumber(row.entered)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.aborted)}</td><td>${formatNumber(row.incomplete)}</td></tr>`), "1.1.0 데이터 수집 대기");
+  diagnosticsTable("tutorialStagesTable", 5, stages.map((row) => `<tr><td><strong>${escapeHtml(tutorialStageLabel(row.stage, row.stageIndex))}</strong><small>단계 ${formatNumber(row.stageIndex)}</small></td><td>${formatNumber(row.entered)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.aborted)}</td><td>${formatNumber(row.incomplete)}</td></tr>`), "1.1.0 데이터 수집 대기");
 
   const growthChoices = diagnostics.growthChoices ?? {};
   const byLevel = Array.isArray(growthChoices.byLevel) ? growthChoices.byLevel : [];
-  const legacyChoices = growthChoices.selectionRate === null && Number(growthChoices.selected ?? 0) > 0;
-  setText("growthChoiceStatus", byLevel.length ? `${formatNumber(Number(growthChoices.selected ?? 0))}회 선택${legacyChoices ? " · 레거시 기록" : ""}` : "1.1.0 데이터 수집 대기");
+  const choiceRows = Array.isArray(growthChoices.choices) ? growthChoices.choices : [];
+  const selectedCount = Math.max(Number(growthChoices.selected ?? 0), choiceRows.reduce((sum, row) => sum + Number(row.selected ?? 0), 0));
+  setText("growthChoiceStatus", selectedCount > 0 || byLevel.length ? `${formatNumber(selectedCount)}회 선택` : "수집 대기");
   diagnosticsTable("growthChoiceLevelTable", 5, byLevel.map((row) => `<tr><td><strong>Lv.${formatNumber(row.level)}</strong></td><td>${formatNumber(row.presented)}</td><td>${formatNumber(row.selected)}</td><td>${formatNumber(row.confirmed)}</td><td>${row.selectionRate === null ? "레거시 선택 기록" : formatRate(row.selectionRate)}</td></tr>`), "1.1.0 데이터 수집 대기");
 
   const mechakucha = diagnostics.mechakucha ?? {};
@@ -914,13 +952,17 @@ function bindControls() {
     state.playerPage += 1;
     changeFilters();
   });
+  byId("operatorDetails").addEventListener("toggle", (event) => {
+    if (!event.currentTarget.open || !state.payload) return;
+    root.setTimeout(() => renderGameOverChart((state.payload?.diagnostics?.gameOver?.byDay ?? []).slice(-state.rangeDays)), 0);
+  });
   let resizeTimer;
   root.addEventListener("resize", () => {
     root.clearTimeout(resizeTimer);
     resizeTimer = root.setTimeout(() => {
       if (!state.payload) return;
       renderDailyChart();
-      renderGameOverChart(state.payload?.diagnostics?.gameOver?.byDay ?? []);
+      renderGameOverChart((state.payload?.diagnostics?.gameOver?.byDay ?? []).slice(-state.rangeDays));
     }, 120);
   });
 }
