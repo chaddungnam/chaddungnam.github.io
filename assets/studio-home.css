@@ -59,7 +59,7 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .hero-copy h1 span,
 .hero-copy h1 strong { display: block; }
 .hero-copy h1 strong { color: var(--studio-blue); font-weight: inherit; }
-.hero-description-wrap { display: grid; max-width: 480px; margin: clamp(38px, 7vw, 82px) 0 0 auto; grid-template-columns: 1fr; }
+.hero-description-wrap { display: grid; max-width: 480px; margin: clamp(38px, 7vw, 82px) 0 0; grid-template-columns: 1fr; }
 .hero-description-wrap > span { width: 100%; height: 4px; margin-bottom: 18px; background: #f4bf25; }
 .hero-description { margin: 0; color: var(--studio-copy); font-family: "Chilgok KwonAnJa", "Do Hyeon", sans-serif; font-size: clamp(1rem, 1.25vw, 1.28rem); line-height: 1.55; word-break: keep-all; }
 .hero-description-wrap small { display: block; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--studio-line); color: var(--studio-muted); font-size: .57rem; font-weight: 800; letter-spacing: .18em; }
