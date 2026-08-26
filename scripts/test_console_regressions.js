@@ -40,7 +40,7 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260826-1/, "the Console must cache-bust the updated diagnostics renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260826-2/, "the Console must cache-bust the updated diagnostics renderer");
 assert.match(consoleHtml, /styles\.css\?v=20260826-1/, "the Console must cache-bust diagnostics responsive styles");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
