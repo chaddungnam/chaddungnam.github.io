@@ -88,8 +88,8 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
 
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
-  await expect(page.locator("[data-studio-hero] h1")).toContainText("Made in Germany");
-  await expect(page.locator("[data-studio-hero] h1")).toContainText("from South Korea");
+  await expect(page.locator("[data-studio-hero] h1")).toContainText("Are you ready?");
+  await expect(page.locator("[data-studio-hero] h1")).toContainText("Houseduck.in");
   await expect(page.locator(".hero-description")).toContainText("기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);

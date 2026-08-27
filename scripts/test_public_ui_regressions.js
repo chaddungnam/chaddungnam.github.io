@@ -151,8 +151,8 @@ test("home leads with the studio slogan, YouTube, and exactly two game previews"
   for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
     assert.match(html, /data-studio-hero/);
-    assert.match(html, /Made in Germany/);
-    assert.match(html, /from South Korea/);
+    assert.match(html, /Are you ready\?/);
+    assert.match(html, /Houseduck\.in/);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
     assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);

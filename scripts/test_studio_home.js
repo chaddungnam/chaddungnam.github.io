@@ -29,10 +29,10 @@ assert.match(svg, /data-part="right-foot"/);
 assert.match(svg, /data-part="face"/);
 
 const expectedCopy = {
-  "index.html": ["Made in Germany", "from South Korea", "기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.", "출시 예정 미정"],
-  "index_en.html": ["Made in Germany", "from South Korea", "Release date TBD"],
-  "index_de.html": ["Made in Germany", "from South Korea", "Veröffentlichungstermin offen"],
-  "index_ja.html": ["Made in Germany", "from South Korea", "発売時期未定"],
+  "index.html": ["Are you ready?", "Houseduck.in", "기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.", "출시 예정 미정"],
+  "index_en.html": ["Are you ready?", "Houseduck.in", "Release date TBD"],
+  "index_de.html": ["Are you ready?", "Houseduck.in", "Veröffentlichungstermin offen"],
+  "index_ja.html": ["Are you ready?", "Houseduck.in", "発売時期未定"],
 };
 
 for (const [file, copy] of Object.entries(expectedCopy)) {

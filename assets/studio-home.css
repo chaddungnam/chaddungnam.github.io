@@ -151,7 +151,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
 @media (max-width: 700px) {
   body[data-page="studio"] .header-inner { min-height: 58px; }
   .studio-hero { padding-top: 64px; }
-  .hero-copy h1 { font-size: clamp(3.25rem, 16vw, 5.2rem); line-height: .88; }
+  .hero-copy h1 { font-size: clamp(3rem, 13.5vw, 4.7rem); line-height: .88; }
   .hero-description { font-size: 1.05rem; }
   .mechanic-stage { min-height: 330px; }
   .youtube-section { padding: 74px 0 90px; }
