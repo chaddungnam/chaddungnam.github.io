@@ -1,21 +1,21 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-08-26T09:00:03.000Z",
+  "updated": "2026-08-27T09:00:36.000Z",
   "videos": [
+    {
+      "videoId": "l_t2G09Zye4",
+      "title": "피드백 모두 반영해봤습니다 | 1인 게임 개발일지",
+      "published": "2026-08-27T09:00:36.000Z"
+    },
+    {
+      "videoId": "uHgzc85Fb2k",
+      "title": "애플: \"안돼, 돌아가\"",
+      "published": "2026-08-27T06:16:00.000Z"
+    },
     {
       "videoId": "K2LUkguJwJs",
       "title": "게임은 다 만들었는데, 친구가 없어서 출시 못할 뻔했읍니다.",
       "published": "2026-08-26T09:00:03.000Z"
-    },
-    {
-      "videoId": "Y6uukWpHU7c",
-      "title": "\"아몰랑 AI는 일단 싫어요\"",
-      "published": "2026-08-25T07:47:34.000Z"
-    },
-    {
-      "videoId": "-OnOWZ6jufM",
-      "title": "요즘 누가 크롬씀?",
-      "published": "2026-08-24T06:48:45.000Z"
     }
   ]
 }
