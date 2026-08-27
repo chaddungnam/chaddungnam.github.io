@@ -65,7 +65,8 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .hero-description-wrap small { display: block; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--studio-line); color: var(--studio-muted); font-size: .57rem; font-weight: 800; letter-spacing: .18em; }
 .hero-background-word { position: absolute; right: 0; bottom: -1.6vw; left: 0; z-index: -1; margin: 0; overflow: hidden; color: rgba(17,19,25,.045); font-size: clamp(5rem, 13.5vw, 14rem); font-weight: 900; letter-spacing: -.075em; line-height: .7; white-space: nowrap; pointer-events: none; }
 
-.mechanic-stage { position: relative; min-height: clamp(360px, 42vw, 570px); border-left: 1px solid var(--studio-line); }
+.mechanic-stage { position: relative; min-height: clamp(360px, 42vw, 570px); }
+.mechanic-stage::before { position: absolute; inset: 10% 2%; content: ""; background: radial-gradient(circle at 50% 50%, rgba(38,101,238,.09), rgba(239,63,56,.035) 34%, transparent 68%); filter: blur(10px); pointer-events: none; animation: mechanic-field-pulse 2.25s ease-in-out infinite; }
 .mechanic-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-quirky { position: absolute; top: 50%; left: 50%; z-index: 2; width: clamp(116px, 11vw, 176px); height: auto; object-fit: contain; filter: drop-shadow(0 18px 20px rgba(17,19,25,.16)); transform: translate(-50%, -50%) rotate(-4deg); animation: hero-quirky-pulse 2.25s ease-in-out infinite; }
 
@@ -118,6 +119,18 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 
 .scroll-quirky { position: fixed; top: 18vh; right: clamp(12px, 3vw, 48px); z-index: 8; width: clamp(76px, 7vw, 112px); height: auto; object-fit: contain; opacity: 0; pointer-events: none; filter: drop-shadow(0 9px 8px rgba(17,19,25,.18)); transform: translate3d(0, 0, 0) rotate(5deg); transition: opacity 180ms linear; will-change: transform, opacity; }
 
+@media (prefers-reduced-motion: no-preference) {
+  body[data-page="studio"].has-game-cursor,
+  body[data-page="studio"].has-game-cursor a,
+  body[data-page="studio"].has-game-cursor button,
+  body[data-page="studio"].has-game-cursor summary { cursor: none; }
+  .game-cursor { position: fixed; top: 0; left: 0; z-index: 1000; width: 25px; height: 16px; opacity: 0; pointer-events: none; will-change: transform; transition: opacity 120ms linear; }
+  .game-cursor::before { position: absolute; inset: 0; content: ""; background: var(--studio-red); border: 2px solid #172033; clip-path: polygon(100% 50%, 0 0, 22% 50%, 0 100%); filter: drop-shadow(0 2px 2px rgba(17,19,25,.2)); }
+  .game-cursor::after { position: absolute; top: 6px; right: 17px; width: 28px; height: 4px; content: ""; background: linear-gradient(90deg, transparent, rgba(239,63,56,.72)); filter: blur(1px); transform-origin: right center; animation: cursor-trail 180ms ease-in-out infinite alternate; }
+  .game-cursor.is-target::before { background: var(--studio-blue); }
+  .cursor-impact { position: fixed; z-index: 999; width: 12px; height: 12px; border: 2px solid var(--studio-red); border-radius: 50%; pointer-events: none; animation: cursor-impact 420ms cubic-bezier(.1,.7,.2,1) forwards; }
+}
+
 body[data-page="studio"] .site-footer { border-top: 1px solid var(--studio-line); color: var(--studio-ink); background: rgba(245,244,239,.72); }
 body[data-page="studio"] .footer-brand-images { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
 body[data-page="studio"] .site-footer .brand-duck-image { width: 34px; height: 34px; flex: 0 0 34px; object-fit: contain; }
@@ -127,6 +140,21 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
 @keyframes hero-quirky-pulse {
   0%, 100% { transform: translate(-50%, -50%) rotate(-4deg) scale(1); }
   50% { transform: translate(-50%, -52%) rotate(5deg) scale(1.025); }
+}
+
+@keyframes mechanic-field-pulse {
+  0%, 100% { opacity: .55; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes cursor-trail {
+  from { opacity: .38; transform: scaleX(.72); }
+  to { opacity: .8; transform: scaleX(1.08); }
+}
+
+@keyframes cursor-impact {
+  from { opacity: .9; transform: translate(-50%, -50%) scale(.45); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(4.6); }
 }
 
 @media (max-width: 900px) {
@@ -174,7 +202,8 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   body[data-page="studio"] { transition: none; }
-  .hero-quirky { animation: none; }
+  .hero-quirky,
+  .mechanic-stage::before { animation: none; }
   .youtube-card,
   .project-phone,
   .scroll-quirky { transition: none; }

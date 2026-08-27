@@ -176,10 +176,26 @@ test("home launch immediately moves marbles and builds a rapid shot burst", asyn
   await expect.poll(async () => Number(await canvas.getAttribute("data-shot-count"))).toBeGreaterThanOrEqual(4);
 });
 
+test("home desktop removes the hero divider and turns the pointer into a Quirky shot", async ({ page, isMobile }) => {
+  test.skip(isMobile, "touch keeps the platform cursor behavior");
+  await page.goto("/?lang=ko");
+  await expect(page.locator(".mechanic-stage")).toHaveCSS("border-left-width", "0px");
+
+  const cursor = page.locator("[data-game-cursor]");
+  await expect(cursor).toHaveCount(1);
+  await page.mouse.move(320, 220);
+  await expect(cursor).toHaveCSS("opacity", "1");
+
+  await page.mouse.click(320, 220);
+  await expect(page.locator("[data-cursor-impact]")).toHaveCount(1);
+  await expect(page.locator("[data-cursor-impact]")).toHaveCount(0, { timeout: 1000 });
+});
+
 test("home reduced motion holds the canvas and pauses phone video", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
+  await expect(page.locator("[data-game-cursor]")).toHaveCount(0);
   await page.waitForTimeout(180);
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([

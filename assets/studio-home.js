@@ -119,6 +119,39 @@
     for (const video of videos) observer.observe(video);
   }
 
+  function setupGameCursor(reducedMotion) {
+    if (reducedMotion || matchMedia("(pointer: coarse)").matches) return;
+    const cursor = document.createElement("span");
+    cursor.className = "game-cursor";
+    cursor.dataset.gameCursor = "";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.append(cursor);
+    document.body.classList.add("has-game-cursor");
+    let x = -100;
+    let y = -100;
+    let angle = 0;
+
+    addEventListener("pointermove", (event) => {
+      const distance = Math.hypot(event.clientX - x, event.clientY - y);
+      if (distance > 2) angle = Math.atan2(event.clientY - y, event.clientX - x) * 180 / Math.PI;
+      x = event.clientX;
+      y = event.clientY;
+      cursor.style.opacity = "1";
+      cursor.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}deg) translate(-30%, -50%)`;
+      cursor.classList.toggle("is-target", Boolean(event.target.closest("a, button, summary")));
+    }, { passive: true });
+    addEventListener("pointerdown", (event) => {
+      const impact = document.createElement("span");
+      impact.className = "cursor-impact";
+      impact.dataset.cursorImpact = "";
+      impact.style.left = `${event.clientX}px`;
+      impact.style.top = `${event.clientY}px`;
+      document.body.append(impact);
+      impact.addEventListener("animationend", () => impact.remove(), { once: true });
+    });
+    document.documentElement.addEventListener("mouseleave", () => { cursor.style.opacity = "0"; });
+  }
+
   function setupCanvas(reducedMotion) {
     const canvas = document.querySelector("[data-quirky-canvas]");
     const stage = canvas?.closest("[data-quirky-mechanic]");
@@ -326,6 +359,7 @@
     setupYouTube();
     setupToneAndMascot();
     setupVideos(reducedMotion);
+    setupGameCursor(reducedMotion);
     setupCanvas(reducedMotion);
   }
 
