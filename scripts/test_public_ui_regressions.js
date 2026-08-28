@@ -19,16 +19,24 @@ const productPages = [
   "project-k/index_de.html",
   "project-k/index_ja.html",
 ];
-const nonKoreanMarketingPages = [
+const englishSupportPages = [
   "index_en.html",
-  "index_de.html",
   "index_ja.html",
+  "about/index_en.html",
+  "about/index_ja.html",
   "quirky-ball/index_en.html",
-  "quirky-ball/index_de.html",
   "quirky-ball/index_ja.html",
+  "quirky-ball/terms/en.html",
+  "quirky-ball/terms/ja.html",
   "project-k/index_en.html",
-  "project-k/index_de.html",
   "project-k/index_ja.html",
+];
+const germanSupportPages = [
+  "index_de.html",
+  "about/index_de.html",
+  "quirky-ball/index_de.html",
+  "quirky-ball/terms/de.html",
+  "project-k/index_de.html",
 ];
 
 function read(file) {
@@ -192,19 +200,28 @@ test("brand controls keep localized mobile-menu labels", () => {
   }
 });
 
-test("Support offers a direct English section to EN, DE, and JA readers", () => {
+test("Support offers Korean, English, and German sections with localized routes", () => {
   const support = read("support/index.html");
   assert.match(support, /href="#korean"/, "Support language navigation needs a Korean target");
   assert.match(support, /href="#english"/, "Support language navigation needs an English target");
+  assert.match(support, /href="#german"/, "Support language navigation needs a German target");
   assert.match(support, /id="korean"[^>]*lang="ko"/, "Support needs a Korean-language section");
   assert.match(support, /id="english"[^>]*lang="en"/, "Support needs an English-language section");
+  assert.match(support, /id="german"[^>]*lang="de"/, "Support needs a German-language section");
   assert.match(support, /Contact email/i, "English support must expose the contact route");
   assert.match(support, /Delete (?:my|your) account/i, "English support must explain account deletion");
+  assert.match(support, /Kontakt-E-Mail/i, "German support must expose the contact route");
+  assert.match(support, /Konto und Daten löschen/i, "German support must explain account deletion");
 
-  for (const file of nonKoreanMarketingPages) {
+  for (const file of englishSupportPages) {
     const html = read(file);
-    assert.match(html, /href="(?:\.\.\/)?support\/#english"/, `${file} must route non-Korean readers to English support`);
-    assert.doesNotMatch(html, /href="(?:\.\.\/)?support\/"/, `${file} must not drop non-Korean readers on Korean-only support`);
+    assert.match(html, /href="(?:\.\.\/|\/)?support\/#english"/, `${file} must route readers to English support`);
+    assert.doesNotMatch(html, /href="(?:\.\.\/|\/)?support\/"/, `${file} must not drop readers on the default section`);
+  }
+  for (const file of germanSupportPages) {
+    const html = read(file);
+    assert.match(html, /href="(?:\.\.\/|\/)?support\/#german"/, `${file} must route readers to German support`);
+    assert.doesNotMatch(html, /href="(?:\.\.\/|\/)?support\/"/, `${file} must not drop readers on the default section`);
   }
 });
 
