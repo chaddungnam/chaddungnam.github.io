@@ -239,16 +239,16 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
   assert.match(studioCss, /^\.project-media\s*\{[^}]*overflow:\s*visible/m, "phone tops must not be clipped by media stages");
 });
 
-test("pre-launch terms describe the effective date and business status as pending", () => {
+test("terms show the effective date and avoid unconfirmed business status", () => {
   const expectations = [
-    ["quirky-ball/terms/ko.html", /시행 예정일:\s*2026년 8월 24일/, /영업하는 개인사업자/],
-    ["quirky-ball/terms/en.html", /Scheduled effective date:\s*August 24, 2026/i, /sole proprietor/i],
-    ["quirky-ball/terms/de.html", /Voraussichtliches Inkrafttreten:\s*24\. August 2026/i, /Einzelunternehmer/i],
-    ["quirky-ball/terms/ja.html", /施行予定日:\s*2026年8月24日/, /個人事業主/],
+    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 8월 24일/, /영업하는 개인사업자/],
+    ["quirky-ball/terms/en.html", /Effective date:\s*August 24, 2026/i, /sole proprietor/i],
+    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*24\. August 2026/i, /Einzelunternehmer/i],
+    ["quirky-ball/terms/ja.html", /施行日:\s*2026年8月24日/, /個人事業主/],
   ];
-  for (const [file, pendingDate, settledBusiness] of expectations) {
+  for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);
-    assert.match(html, pendingDate, `${file} must label the future date as scheduled`);
+    assert.match(html, effectiveDate, `${file} must show the current effective date`);
     assert.doesNotMatch(html, settledBusiness, `${file} must not present unconfirmed business status as settled`);
   }
 });
