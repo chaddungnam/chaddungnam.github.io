@@ -43,7 +43,8 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260829-5/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260829-6/, "the Console must cache-bust the updated analytics renderer");
+assert.match(analyticsSource, /row\.count \?\? row\.selected/, "choice distributions must use the dashboard count instead of rendering every choice as zero");
 assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
 assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
 assert.match(consoleHtml, /정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료/, "the period account panel must explain every supported activity signal");

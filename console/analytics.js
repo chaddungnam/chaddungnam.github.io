@@ -186,12 +186,15 @@ function renderChoices() {
   let growthRows = state.payload?.choices?.growth ?? [];
   const diagnosticRows = state.payload?.diagnostics?.growthChoices?.choices ?? [];
   if (diagnosticRows.length > 0) {
-    const total = diagnosticRows.reduce((sum, row) => sum + Number(row.selected ?? 0), 0);
-    growthRows = diagnosticRows.map((row) => ({
-      key: String(row.choice ?? "unknown"),
-      count: Number(row.selected ?? 0),
-      rate: total > 0 ? Number(row.selected ?? 0) / total : null,
-    }));
+    const total = diagnosticRows.reduce((sum, row) => sum + Number(row.count ?? row.selected ?? 0), 0);
+    growthRows = diagnosticRows.map((row) => {
+      const count = Number(row.count ?? row.selected ?? 0);
+      return {
+        key: String(row.choice ?? "unknown"),
+        count,
+        rate: total > 0 ? count / total : null,
+      };
+    });
   }
   const growthDiagnostics = state.payload?.diagnostics?.growthChoices ?? {};
   setText("growthDistributionStatus", Number(growthDiagnostics.presented || 0) > 0
