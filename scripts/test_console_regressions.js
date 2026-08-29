@@ -28,6 +28,8 @@ assert.match(consoleHtml, /id="kpiActiveLabel"/, "the active-player KPI must exp
 assert.match(consoleHtml, /id="dailyTrendEyebrow"/, "the daily trend heading must follow the selected range");
 assert.match(analyticsSource, /setText\("kpiActive", formatNumber\(summary\.installs\)\)/, "the active-player KPI must count unique installs across the selected range");
 assert.match(analyticsSource, /ConsoleAPI\.post\("analytics-dashboard-v2"/, "the Console must load account visits through the secured analytics wrapper");
+assert.match(read("console/api.js"), /"analytics-dashboard-v2"/, "the secured Console API allowlist must permit the analytics wrapper");
+assert.match(consoleHtml, /api\.js\?v=20260829-1/, "the Console must cache-bust the updated API allowlist");
 assert.match(analyticsSource, /activePlayers: Number\(summary\.installs \?\? 0\)/, "AI advice must use the selected-range active player count");
 assert.doesNotMatch(analyticsSource, /summary\.activeInstallsToday/, "selected-range analytics must not silently fall back to today's count");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
