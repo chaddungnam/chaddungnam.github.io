@@ -249,9 +249,9 @@
     const idle = Number(item?.avgIdleSec || 0);
     const visits = Number(item?.installs || 0);
     if (label.includes("구버전") || label.includes("기록되지 않은")) {
-      return "다음 빌드에서 버튼 이름을 고정해 어떤 선택인지 분리합니다.";
+      return "구버전 식별자라 정확한 기능 이름을 분리할 수 없습니다.";
     }
-    if (idle >= 20) return "누르기 전 오래 머뭅니다. 버튼 문구, 보상 설명, 다음 결과를 더 직접적으로 보여주세요.";
+    if (idle >= 3.5) return "5초 미만 표본 안에서도 비교적 오래 머뭅니다. 버튼 문구와 다음 결과를 더 직접적으로 보여주세요.";
     if (visits <= 1) return "한 계정·설치에 몰린 신호일 수 있습니다. 표본이 더 쌓이기 전에는 UI를 바꾸지 마세요.";
     return "반복 사용되는 경로입니다. 바로 앞 화면의 노출 수와 함께 눌림률을 비교하세요.";
   }

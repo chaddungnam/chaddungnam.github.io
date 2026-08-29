@@ -43,8 +43,8 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260829-6/, "the Console must cache-bust the updated analytics renderer");
-assert.match(consoleHtml, /model\.js\?v=20260829-3/, "the Console must cache-bust the Korean analytics labels");
+assert.match(consoleHtml, /analytics\.js\?v=20260829-7/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /model\.js\?v=20260829-4/, "the Console must cache-bust the Korean analytics labels");
 assert.match(analyticsSource, /row\.count \?\? row\.selected/, "choice distributions must use the dashboard count instead of rendering every choice as zero");
 assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
 assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
@@ -59,7 +59,12 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260829-2/, "the Console must cache-bust player tracking styles");
+assert.match(consoleHtml, /styles\.css\?v=20260829-3/, "the Console must cache-bust the card-based analytics redesign");
+assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
+assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
+assert.doesNotMatch(analyticsSource, /다음 앱 빌드부터 계측/, "account visit coverage must identify version 1.1.0 without future-build wording");
+assert.match(analyticsSource, /1\.1\.0부터 계측/, "account visit coverage must identify version 1.1.0");
+assert.match(analyticsSource, /renderPriorityInsights/, "the dashboard must render ad-to-choice drop-off as a priority insight");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
 assert.match(analyticsSource, /diagnostics\.growthChoices/, "legacy growth choices must render from diagnostics.growthChoices");

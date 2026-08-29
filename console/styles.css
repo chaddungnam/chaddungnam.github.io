@@ -477,3 +477,121 @@ textarea:focus-visible {
 @media (max-width: 560px) {
   .account-activity-grid { grid-template-columns: 1fr; }
 }
+
+
+/* 1.1.0 분석 화면: 표 대신 한눈에 읽는 카드와 큰 글꼴 */
+#analyticsView { font-size: 15px; }
+#analyticsView .panel { padding: 24px; border-radius: 20px; box-shadow: 0 10px 28px rgba(23,32,59,.035); }
+#analyticsView .panel-heading { gap: 14px; }
+#analyticsView .panel-heading h2 { font-size: clamp(19px, 2vw, 23px); line-height: 1.25; }
+#analyticsView .panel-heading small { display: block; margin-top: 6px; color: #737b8f; font-size: 12px; line-height: 1.55; white-space: normal; }
+#analyticsView .panel-total { flex: 0 0 auto; padding: 7px 10px; font-size: 12px; }
+#analyticsView .eyebrow { font-size: 10px; letter-spacing: .13em; }
+#analyticsView .coverage-card { padding: 17px 18px; border-radius: 15px; }
+#analyticsView .coverage-card span { font-size: 11px; }
+#analyticsView .coverage-card strong { font-size: 22px; }
+#analyticsView .coverage-card small { font-size: 11px; line-height: 1.5; white-space: normal; }
+
+.priority-insight-panel {
+  --priority-tone: var(--teal);
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 17px;
+  margin: 0 0 18px;
+  padding: 20px 22px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--priority-tone) 13%, white), var(--paper));
+  border: 1px solid color-mix(in srgb, var(--priority-tone) 42%, var(--line));
+  border-left: 6px solid var(--priority-tone);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(23,32,59,.055);
+}
+.priority-insight-panel[data-status="risk"] { --priority-tone: var(--coral); }
+.priority-insight-icon { display: grid; width: 54px; height: 54px; place-items: center; color: white; background: var(--priority-tone); border-radius: 17px; font-size: 29px; font-weight: 950; }
+.priority-insight-panel h2 { margin: 2px 0 5px; font-size: clamp(20px, 2.2vw, 27px); }
+.priority-insight-panel p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
+.priority-insight-panel > strong { color: var(--priority-tone); font-size: clamp(21px, 2.5vw, 30px); white-space: nowrap; }
+
+.insight-card-grid { align-items: start; gap: 18px; }
+.visual-data-panel { background: linear-gradient(155deg, var(--paper), #fffaf0 150%); }
+.distribution-list, .behavior-card-list { display: grid; gap: 10px; }
+.distribution-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 14px;
+  align-items: center;
+  padding: 13px 14px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid #eee7da;
+  border-radius: 14px;
+}
+.distribution-item[data-legacy="true"] { margin-top: 6px; opacity: .66; background: #f3f0e9; }
+.distribution-copy { min-width: 0; }
+.distribution-copy strong { display: block; color: var(--ink); font-size: 14px; line-height: 1.25; }
+.distribution-copy small { display: block; margin-top: 3px; color: #9298a7; font-size: 10px; overflow-wrap: anywhere; }
+.distribution-metric { display: flex; align-items: baseline; gap: 8px; }
+.distribution-metric strong { color: var(--ink); font-size: 17px; }
+.distribution-metric span { color: var(--coral); font-size: 12px; font-weight: 900; }
+.distribution-item .distribution-bar { grid-column: 1 / -1; min-width: 0; height: 9px; margin: 0; }
+
+.behavior-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 8px 12px;
+  padding: 15px;
+  background: rgba(255,255,255,.76);
+  border: 1px solid #ebe5da;
+  border-radius: 15px;
+}
+.behavior-card[data-legacy="true"] { margin-top: 7px; opacity: .62; background: #f1eee7; }
+.behavior-card[data-risk="true"] { border-left: 5px solid var(--coral); }
+.behavior-rank { display: grid; grid-row: 1 / 4; width: 32px; height: 32px; place-items: center; color: var(--ink); background: var(--gold-soft); border-radius: 10px; font-size: 12px; font-weight: 950; }
+.behavior-copy { min-width: 0; }
+.behavior-copy h3 { margin: 0; color: var(--ink); font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.behavior-copy small { display: block; margin-top: 3px; color: #858c9c; font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.behavior-metrics { display: flex; flex-wrap: wrap; gap: 6px; }
+.behavior-metrics span { padding: 6px 8px; color: var(--ink-soft); background: #f4f1ea; border-radius: 999px; font-size: 10px; font-weight: 800; }
+.behavior-metrics b { color: var(--ink); font-size: 12px; }
+.behavior-card p { margin: 0; padding: 10px 11px; color: var(--ink-soft); background: var(--teal-soft); border-radius: 10px; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.behavior-card[data-legacy="true"] p { background: rgba(255,255,255,.7); }
+
+/* 분석 화면은 숨은 가로 영역을 만들지 않는다. 긴 값은 셀 안에서 줄바꿈한다. */
+#analyticsView .table-scroll { max-width: 100%; overflow-x: clip; }
+#analyticsView .table-scroll table { min-width: 0; table-layout: fixed; }
+#analyticsView .table-scroll th,
+#analyticsView .table-scroll td { padding: 10px 7px; font-size: 11px; white-space: normal; overflow-wrap: anywhere; }
+#analyticsView .table-scroll td small { white-space: normal; }
+
+/* 계정 활동 표도 가로 표가 아니라 계정별 카드로 읽는다. */
+.period-players-panel .table-scroll { overflow: visible !important; border: 0 !important; }
+.period-players-panel table,
+.period-players-panel tbody { display: block; width: 100%; }
+.period-players-panel thead { display: none; }
+.period-players-panel tbody { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.period-players-panel tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; padding: 15px; background: rgba(255,255,255,.72); border: 1px solid var(--line); border-radius: 15px; }
+.period-players-panel tbody td { position: static !important; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; align-items: start; padding: 8px 4px; background: transparent !important; border-top: 1px solid #f0ece3; box-shadow: none !important; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.period-players-panel tbody td:first-child { grid-column: 1 / -1; border-top: 0; }
+.period-players-panel tbody td::before { content: attr(data-label); color: #9096a5; font-size: 10px; font-weight: 900; }
+.period-players-panel tbody td:first-child::before { display: none; }
+.period-players-panel .empty-row { display: block; grid-column: 1 / -1; }
+
+@media (max-width: 900px) {
+  #analyticsView .panel { padding: 20px; }
+  .priority-insight-panel { grid-template-columns: 48px minmax(0, 1fr); }
+  .priority-insight-icon { width: 48px; height: 48px; }
+  .priority-insight-panel > strong { grid-column: 2; justify-self: start; }
+  .period-players-panel tbody { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  #analyticsView { font-size: 16px; }
+  .priority-insight-panel { grid-template-columns: 1fr; padding: 18px; }
+  .priority-insight-panel > strong { grid-column: auto; }
+  .distribution-copy strong, .behavior-copy h3 { font-size: 16px; }
+  .distribution-metric strong { font-size: 18px; }
+  .behavior-card { grid-template-columns: 32px minmax(0, 1fr); padding: 13px; }
+  .period-players-panel tbody tr { grid-template-columns: 1fr; }
+  .period-players-panel tbody td,
+  .period-players-panel tbody td:first-child { grid-column: 1; }
+}

@@ -168,6 +168,7 @@ function renderDashboard() {
   renderChoices();
   renderDiagnostics();
   renderInteractionInsights();
+  renderPriorityInsights();
   renderAttention(pulseModel);
   renderAccountActivity();
   renderPeriodPlayers();
@@ -179,9 +180,23 @@ function renderDashboard() {
 function renderChoices() {
   const renderRows = (id, rows) => {
     const body = byId(id);
-    body.innerHTML = rows.length === 0
-      ? '<tr><td class="empty-row" colspan="3">아직 수집된 선택이 없습니다.</td></tr>'
-      : rows.map((row) => `<tr><td><strong>${escapeHtml(root.ConsoleModel.analyticsChoiceName(row.key))}</strong><small>${escapeHtml(String(row.key || "unknown"))}</small></td><td>${formatNumber(row.count)}</td><td><strong>${formatRate(row.rate)}</strong><span class="distribution-bar"><i style="width:${Math.max(0, Math.min(100, Number(row.rate || 0) * 100))}%"></i></span></td></tr>`).join("");
+    const sorted = [...rows].sort((left, right) => {
+      const leftLegacy = root.ConsoleModel.analyticsChoiceName(left.key).includes("구버전");
+      const rightLegacy = root.ConsoleModel.analyticsChoiceName(right.key).includes("구버전");
+      return Number(leftLegacy) - Number(rightLegacy) || Number(right.count || 0) - Number(left.count || 0);
+    });
+    body.innerHTML = sorted.length === 0
+      ? '<p class="empty-panel">아직 수집된 선택이 없습니다.</p>'
+      : sorted.map((row) => {
+        const label = root.ConsoleModel.analyticsChoiceName(row.key);
+        const legacy = label.includes("구버전");
+        const percent = Math.max(0, Math.min(100, Number(row.rate || 0) * 100));
+        return `<article class="distribution-item" data-legacy="${legacy}">
+          <div class="distribution-copy"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(String(row.key || "unknown"))}</small></div>
+          <div class="distribution-metric"><strong>${formatNumber(row.count)}회</strong><span>${formatRate(row.rate)}</span></div>
+          <span class="distribution-bar" aria-hidden="true"><i style="width:${percent}%"></i></span>
+        </article>`;
+      }).join("");
   };
   let growthRows = state.payload?.choices?.growth ?? [];
   const diagnosticRows = state.payload?.diagnostics?.growthChoices?.choices ?? [];
@@ -334,24 +349,37 @@ function renderDiagnostics() {
 
 function renderInteractionInsights() {
   const interactions = state.payload?.interactions ?? {};
-  const buttons = interactions.buttons ?? [];
+  const buttonRows = (interactions.buttons ?? []).map((row) => {
+    const label = root.ConsoleModel.analyticsButtonName(row.buttonId, row.screen);
+    return { ...row, label, legacy: row.legacy === true || label.includes("구버전") || label.includes("기록되지 않은") };
+  }).sort((left, right) => Number(left.legacy) - Number(right.legacy) || Number(right.presses || 0) - Number(left.presses || 0));
   const buttonBody = byId("buttonInsightsTable");
-  buttonBody.innerHTML = buttons.length === 0
-    ? '<tr><td class="empty-row" colspan="4">버튼 데이터가 쌓이면 표시됩니다.</td></tr>'
-    : buttons.slice(0, 20).map((row) => {
-      const label = root.ConsoleModel.analyticsButtonName(row.buttonId, row.screen);
-      return `<tr><td><strong>${escapeHtml(label)}</strong><small title="구버전·진단용 식별자">${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</small></td><td>${formatNumber(row.presses)}회 · ${formatNumber(row.users)}설치</td><td>${formatDuration(row.medianScreenElapsedSec ?? row.avgScreenElapsedSec)} · ${formatDuration(row.medianIdleBeforeSec ?? row.avgIdleBeforeSec)}</td><td><small class="insight-cell">${escapeHtml(root.ConsoleModel.interactionRecommendation({ ...row, installs: row.users, avgIdleSec: row.medianIdleBeforeSec ?? row.avgIdleBeforeSec }))}</small></td></tr>`;
+  buttonBody.innerHTML = buttonRows.length === 0
+    ? '<p class="empty-panel">버튼 데이터가 쌓이면 표시됩니다.</p>'
+    : buttonRows.slice(0, 20).map((row, index) => {
+      const hesitation = row.medianIdleBeforeSec ?? row.avgIdleBeforeSec;
+      const recommendation = root.ConsoleModel.interactionRecommendation({ ...row, installs: row.users, avgIdleSec: hesitation });
+      return `<article class="behavior-card" data-legacy="${row.legacy}">
+        <div class="behavior-rank">${index + 1}</div>
+        <div class="behavior-copy"><h3>${escapeHtml(row.label)}</h3><small>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}${row.legacy ? " · 구버전" : ""}</small></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 누름</span><span><b>${formatNumber(row.users)}</b>설치</span><span><b>${formatDuration(hesitation)}</b> 망설임</span></div>
+        <p>${escapeHtml(recommendation)}</p>
+      </article>`;
     }).join("");
 
   const dropoffByScreen = new Map();
   for (const row of interactions.dropoffs ?? []) {
     if (!dropoffByScreen.has(row.screen)) dropoffByScreen.set(row.screen, row);
   }
-  const screens = interactions.screens ?? [];
+  const screens = [...(interactions.screens ?? [])].sort((left, right) => {
+    const leftLegacy = root.ConsoleModel.analyticsScreenName(left.screen) === "화면 미식별";
+    const rightLegacy = root.ConsoleModel.analyticsScreenName(right.screen) === "화면 미식별";
+    return Number(leftLegacy) - Number(rightLegacy) || Number(right.visits || 0) - Number(left.visits || 0);
+  });
   const screenBody = byId("screenInsightsTable");
   screenBody.innerHTML = screens.length === 0
-    ? '<tr><td class="empty-row" colspan="4">화면 이동 데이터가 쌓이면 표시됩니다.</td></tr>'
-    : screens.map((row) => {
+    ? '<p class="empty-panel">화면 이동 데이터가 쌓이면 표시됩니다.</p>'
+    : screens.map((row, index) => {
       const dropoff = dropoffByScreen.get(row.screen);
       const lastButton = dropoff?.lastButtonId && dropoff.lastButtonId !== "unknown"
         ? root.ConsoleModel.analyticsButtonName(dropoff.lastButtonId, row.screen)
@@ -362,8 +390,33 @@ function renderInteractionInsights() {
         : Number(row.avgDwellSec || 0) >= 30
           ? "오래 머문 뒤 이동합니다. 화면의 첫 행동을 더 눈에 띄게 보여주세요."
           : "표본이 쌓일 때까지 유지하고, 다음 화면 진입과 함께 비교하세요.";
-      return `<tr><td><strong>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</strong></td><td>${formatNumber(row.visits)}회 · ${formatRate(exitRate)}</td><td>${formatDuration(row.avgDwellSec)}<small>${escapeHtml(lastButton)}</small></td><td><small class="insight-cell">${escapeHtml(recommendation)}</small></td></tr>`;
+      return `<article class="behavior-card behavior-card-exit" data-risk="${exitRate !== null && exitRate >= 0.3}">
+        <div class="behavior-rank">${index + 1}</div>
+        <div class="behavior-copy"><h3>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</h3><small>마지막 행동 · ${escapeHtml(lastButton)}</small></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.visits)}</b>회 방문</span><span><b>${formatRate(exitRate)}</b> 종료</span><span><b>${formatDuration(row.avgDwellSec)}</b> 체류</span></div>
+        <p>${escapeHtml(recommendation)}</p>
+      </article>`;
     }).join("");
+}
+
+function renderPriorityInsights() {
+  const insight = state.payload?.priorityInsights?.growthChoiceAdStop ?? {};
+  const stopped = Number(insight.stoppedSessions || 0);
+  const exposed = Number(insight.exposedSessions || 0);
+  const users = Number(insight.stoppedUsers || 0);
+  const rewarded = Number(insight.rewardedStoppedSessions || 0);
+  const panel = byId("priorityInsightPanel");
+  if (stopped > 0) {
+    panel.dataset.status = "risk";
+    setText("priorityInsightTitle", "성장 선택 광고 뒤 선택 없이 멈춤");
+    setText("priorityInsightValue", `${formatNumber(stopped)}회 · ${formatNumber(users)}설치`);
+    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다.`);
+    return;
+  }
+  panel.dataset.status = "clear";
+  setText("priorityInsightTitle", "선택창 광고 뒤 이탈 신호 없음");
+  setText("priorityInsightValue", exposed > 0 ? `${formatNumber(exposed)}회 확인` : "표본 없음");
+  setText("priorityInsightDetail", "성장 선택 광고 이후 실제 선택까지 이어지는지 계속 확인합니다.");
 }
 
 function renderGameMetrics() {
@@ -427,8 +480,8 @@ function renderAccountActivity() {
   const d1 = retention.find((row) => Number(row.day) === 1);
   const d7 = retention.find((row) => Number(row.day) === 7);
   const coverage = activity.coverageSince
-    ? `계측 시작 ${String(activity.coverageSince)}`
-    : "다음 앱 빌드부터 계측";
+    ? `1.1.0부터 계측 · ${String(activity.coverageSince)} 시작`
+    : "1.1.0부터 계측";
   setText("accountActivityCoverage", coverage);
   renderCoverageCards("accountActivitySummary", [
     { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "새 실행 방문 계정", value: `${formatNumber(Number(activity.activeAccounts || 0))}명`, detail: `총 ${formatNumber(Number(activity.totalVisits || 0))}회 · 앱 실행별 1회` },
@@ -465,17 +518,17 @@ function renderPeriodPlayers() {
   byId("periodPlayersTable").innerHTML = rows.length === 0
     ? '<tr><td class="empty-row" colspan="11">이 기간에 조건과 일치하는 계정 활동 신호가 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
-        <td>${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
-        <td>${countryMarkup(row.country)}</td>
-        <td>${periodPlayerActivityMarkup(row)}</td>
-        <td>${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "신규 계측 전"}</small></td>
-        <td>${formatNumber(row.gamesPlayed)}</td>
-        <td>${row.gamesPlayed > 0 ? `${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small>` : "—"}</td>
-        <td>${formatNumber(row.gems)}</td>
-        <td>${formatNumber(row.stamina)}</td>
-        <td>${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
-        <td>${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
-        <td><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">바로 처리</a></td>
+        <td data-label="플레이어">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
+        <td data-label="국가">${countryMarkup(row.country)}</td>
+        <td data-label="활동 근거">${periodPlayerActivityMarkup(row)}</td>
+        <td data-label="새 실행 방문">${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "방문 없음"}</small></td>
+        <td data-label="완료 수">${formatNumber(row.gamesPlayed)}</td>
+        <td data-label="기간 최고">${row.gamesPlayed > 0 ? `${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small>` : "—"}</td>
+        <td data-label="젬">${formatNumber(row.gems)}</td>
+        <td data-label="스태미나">${formatNumber(row.stamina)}</td>
+        <td data-label="티켓">${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
+        <td data-label="최근 활동">${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
+        <td data-label="처리"><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">바로 처리</a></td>
       </tr>`).join("");
 }
 
