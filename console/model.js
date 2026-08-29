@@ -187,6 +187,73 @@
     return [];
   }
 
+  const analyticsChoiceNames = Object.freeze({
+    breakthrough: "돌파", mad_scientist: "매드 사이언티스트", space: "공간 축소",
+    shooting_drop: "슈팅 드롭", fast_growth: "빠른 성장", unstable_growth: "불안정 성장",
+    mechakucha_quake: "메챠쿠챠 지진", size_restore: "크기 복원", blood_game: "블러드 게임",
+    bonus: "보너스 점수", nothing: "꽝", hard_mode: "하드 모드", time_rewind: "시간 되감기",
+  });
+
+  const analyticsScreenNames = Object.freeze({
+    home: "홈", main: "게임", loading: "첫 실행·로그인", settings: "설정", shop: "상점",
+    scorerecord: "점수 기록", attendance: "미션·출석", profile: "프로필", mailbox: "우편함",
+    origincutscene: "오프닝 이야기", ranking: "랭킹", friends: "친구", notice: "공지",
+  });
+
+  function analyticsChoiceName(value) {
+    const key = String(value || "unknown").trim().toLowerCase();
+    return analyticsChoiceNames[key] || "기타·구버전 값";
+  }
+
+  function analyticsScreenName(value) {
+    const key = String(value || "unknown").trim().toLowerCase();
+    return analyticsScreenNames[key] || "화면 미식별";
+  }
+
+  function analyticsButtonName(buttonId, screen) {
+    const raw = String(buttonId || "unknown").trim().toLowerCase();
+    const screenName = analyticsScreenName(screen || raw.split("/")[0]);
+    const semanticNames = {
+      start_game: "게임 시작", pause_menu: "일시정지 메뉴", chance_pop: "찬스 구슬 터뜨리기",
+      game_speed_toggle: "게임 배속 전환", level_roulette_screen_tap: "레벨 룰렛 화면 탭",
+      level_roulette_stop: "레벨 룰렛 멈추기", level_roulette_ticket: "돌파 티켓 사용",
+      bomb_roulette_stop: "폭탄 룰렛 멈추기",
+    };
+    for (const [key, label] of Object.entries(semanticNames)) {
+      if (raw === key || raw.endsWith(`/${key}`)) return `${screenName} · ${label}`;
+    }
+    const growth = raw.match(/growthchoice_([a-z0-9_]+)$/);
+    if (growth) return `성장 선택 팝업 · ${analyticsChoiceName(growth[1])}`;
+    if (raw.endsWith("/backbutton")) return `${screenName} · 뒤로가기`;
+    if (raw.endsWith("/advancebutton")) return `${screenName} · 다음 대사`;
+    if (raw.includes("shoporbbutton")) return "홈 · 상점 열기";
+    if (raw.includes("settingsorbbutton")) return "홈 · 설정 열기";
+    if (raw.includes("rankingorbbutton")) return "홈 · 랭킹 열기";
+    if (raw.includes("questshortcutbutton")) return "홈 · 미션 바로가기";
+    if (raw.includes("settingsprofileopenbutton")) return "설정 · 프로필 열기";
+    if (raw.includes("growthchoicehistorybutton")) return "게임 · 성장 효과 기록 열기";
+    if (raw === "home/button_0") return "홈 · 게임 시작 (구버전)";
+    if (raw === "main/hud/button_0") return "게임 · 일시정지 메뉴 (구버전)";
+    if (raw === "main/hud/button_1") return "게임 · 찬스 구슬 터뜨리기 (구버전)";
+    const legacyPopup = raw.match(/^main\/ui\/control_\d+\/panel_\d+\/button_(\d+)$/);
+    if (legacyPopup) return `게임 중 팝업 · ${Number(legacyPopup[1]) + 1}번째 행동 버튼 (구버전)`;
+    const genericButton = raw.match(/button_(\d+)$/);
+    if (genericButton) return `${screenName} · ${Number(genericButton[1]) + 1}번째 버튼 (구버전)`;
+    return `${screenName} · 이름이 기록되지 않은 버튼`;
+  }
+
+  function interactionRecommendation(item) {
+    const label = analyticsButtonName(item?.buttonId, item?.screen);
+    const idle = Number(item?.avgIdleSec || 0);
+    const visits = Number(item?.installs || 0);
+    if (label.includes("구버전") || label.includes("기록되지 않은")) {
+      return "다음 빌드에서 버튼 이름을 고정해 어떤 선택인지 분리합니다.";
+    }
+    if (idle >= 20) return "누르기 전 오래 머뭅니다. 버튼 문구, 보상 설명, 다음 결과를 더 직접적으로 보여주세요.";
+    if (visits <= 1) return "한 계정·설치에 몰린 신호일 수 있습니다. 표본이 더 쌓이기 전에는 UI를 바꾸지 마세요.";
+    return "반복 사용되는 경로입니다. 바로 앞 화면의 노출 수와 함께 눌림률을 비교하세요.";
+  }
+
   function diffPlayerChanges(current, next) {
     const allowed = ["gems", "stamina", "stamina_max", "breakthrough_tickets", "speed_boost_tickets"];
     return Object.fromEntries(allowed
@@ -217,6 +284,10 @@
     playerDeepLink,
     safeConsoleReturnHash,
     buildAttentionItems,
+    analyticsChoiceName,
+    analyticsScreenName,
+    analyticsButtonName,
+    interactionRecommendation,
     diffPlayerChanges,
     canSubmitMutation,
   };

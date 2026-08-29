@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260829-1">
+  <link rel="stylesheet" href="styles.css?v=20260829-2">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -150,13 +150,18 @@
           <p id="aiBriefMessage" class="dashboard-message" role="status"></p>
         </section>
 
+        <section class="panel account-activity-panel" aria-labelledby="accountActivityTitle">
+          <div class="panel-heading"><div><p class="eyebrow">ACCOUNT VISITS</p><h2 id="accountActivityTitle">계정 방문과 재방문</h2><small>앱을 완전히 새로 실행해 홈에 도달한 계정만 셉니다. 백그라운드 복귀·세션 확인·계정 동기화는 방문에서 제외합니다.</small></div><span id="accountActivityCoverage" class="panel-total">신규 계측</span></div>
+          <div id="accountActivitySummary" class="coverage-grid account-activity-grid" aria-live="polite"></div>
+        </section>
+
         <section class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
-          <div class="panel-heading period-heading"><div><p class="eyebrow">ACCOUNT ACTIVITY EVIDENCE</p><h2 id="periodPlayersTitle">기간 내 계정 활동 신호</h2><small>서버가 확인한 로그인, 앱 RPC, 계정 동기화, 정확한 홈 진입과 게임 완료입니다. 상태 열에서 포함 근거를 구분합니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
+          <div class="panel-heading period-heading"><div><p class="eyebrow">ACCOUNT ACTIVITY EVIDENCE</p><h2 id="periodPlayersTitle">기간 내 계정 활동 신호</h2><small>정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료를 섞지 않고 표시합니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
           <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
             <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
             <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
           </form>
-          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어</button></th><th><button data-player-sort="country" type="button">국가</button></th><th>상태</th><th><button data-player-sort="games_played" type="button">완료 수</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="gems" type="button">젬</button></th><th>스태미나</th><th>티켓</th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어</button></th><th><button data-player-sort="country" type="button">국가</button></th><th>활동 근거</th><th><button data-player-sort="visit_count" type="button">새 실행 방문</button></th><th><button data-player-sort="games_played" type="button">완료 수</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="gems" type="button">젬</button></th><th>스태미나</th><th>티켓</th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
         </section>
 
@@ -166,10 +171,10 @@
         </section>
 
         <section class="content-grid" aria-label="게임 내 선택 분포">
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>플레이어가 실제로 고른 선택지 비율입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>선택지</th><th>횟수</th><th>비율</th></tr></thead><tbody id="growthChoicesTable"></tbody></table></div></article>
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>돌파·하드모드·시간 되감기 결과 분포입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>결과</th><th>횟수</th><th>비율</th></tr></thead><tbody id="rouletteResultsTable"></tbody></table></div></article>
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>화면 진입과 이전 행동 뒤 버튼을 누르기까지 걸린 시간입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>버튼</th><th>누름·사람</th><th>진입 후·행동 후</th></tr></thead><tbody id="buttonInsightsTable"></tbody></table></div></article>
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">SCREEN DROPOFF</p><h2>어디서 나가나</h2><small>화면 체류 시간과 마지막 행동입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>화면</th><th>방문·종료</th><th>평균 체류·마지막 버튼</th></tr></thead><tbody id="screenInsightsTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>중복 offer_id를 제거한 실제 확정 선택 분포입니다.</small></div><span id="growthDistributionStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>선택지</th><th>횟수</th><th>비율</th></tr></thead><tbody id="growthChoicesTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>룰렛 제시→결과 확정률과 결과별 분포입니다.</small></div><span id="rouletteDistributionStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>결과</th><th>횟수</th><th>비율</th></tr></thead><tbody id="rouletteResultsTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>실제 화면·팝업·버튼 이름과 누르기 전 시간을 함께 봅니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>버튼</th><th>누름·설치</th><th>진입 후·행동 후</th><th>개선 인사이트</th></tr></thead><tbody id="buttonInsightsTable"></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">SCREEN DROPOFF</p><h2>어디서 나가나</h2><small>화면별 종료 비율, 체류 시간, 마지막 행동과 조치 제안입니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>화면</th><th>방문·종료율</th><th>평균 체류·마지막 행동</th><th>개선 인사이트</th></tr></thead><tbody id="screenInsightsTable"></tbody></table></div></article>
         </section>
 
         <details id="operatorDetails" class="operator-details">
@@ -312,11 +317,11 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260824-1"></script>
-  <script src="model.js?v=20260829-1"></script>
+  <script src="model.js?v=20260829-2"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260829-4"></script>
+  <script src="analytics.js?v=20260829-5"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>
