@@ -16,9 +16,8 @@ test("notice has one localized source and twelve fallbacks", () => {
   }
 });
 
-test("notice page renders the JSON instead of duplicating notice copy", async () => {
+test("notice page reads the active console notice instead of a static copy", async () => {
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
-  assert.match(html, /fetch\("\.\/v1\.json"/);
-  assert.match(html, /locales\[nextLanguage\] \?\? data\.locales\.en/);
+  assert.match(html, /functions\/v1\/public-notice/);
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });

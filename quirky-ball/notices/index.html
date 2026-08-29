@@ -47,23 +47,28 @@
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
     const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
     const requested = new URLSearchParams(location.search).get("lang") ?? normalizeLanguage(navigator.language || "en");
+    const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
+    const localized = (language) => language === "ko" ? { title: "공지", kicker: "QUIRKY BALL · 공지" } : { title: "Notice", kicker: "QUIRKY BALL · NOTICE" };
 
-    fetch("./v1.json", { cache: "no-store" })
+    fetch(endpoint, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
-        const language = data.locales[requested] ? requested : "en";
+        const notice = Array.isArray(data.notices) ? data.notices[0] : null;
+        if (!notice?.body || !notice?.created_at) return Promise.reject();
+        const language = languageNames[requested] ? requested : "en";
         const render = (nextLanguage) => {
-          const notice = data.locales[nextLanguage] ?? data.locales.en;
+          const copy = localized(nextLanguage);
           document.documentElement.lang = nextLanguage.replace("_", "-");
           document.documentElement.dir = ["ar", "ur"].includes(nextLanguage) ? "rtl" : "ltr";
-          document.querySelector("#notice-title").textContent = notice.title;
-          document.querySelector("#notice-date").textContent = notice.published_at;
-          document.querySelector("#notice-date").dateTime = notice.published_at;
+          document.querySelector(".kicker").textContent = copy.kicker;
+          document.querySelector("#notice-title").textContent = copy.title;
+          document.querySelector("#notice-date").textContent = notice.created_at.slice(0, 10);
+          document.querySelector("#notice-date").dateTime = notice.created_at;
           document.querySelector("#notice-body").textContent = notice.body;
-          document.title = `${notice.title} — House Duck`;
+          document.title = `${copy.title} — House Duck`;
         };
         const select = document.querySelector("#language");
-        for (const key of Object.keys(data.locales)) select.add(new Option(languageNames[key] ?? key, key));
+        for (const key of Object.keys(languageNames)) select.add(new Option(languageNames[key] ?? key, key));
         select.value = language;
         select.addEventListener("change", () => render(select.value));
         render(language);

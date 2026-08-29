@@ -136,6 +136,18 @@
         shopControlsEnabled: form.elements.shopControlsEnabled.checked, reason: values.reason.trim(),
       }, "QA 권한 변경", `${values.userId}\nQA 상점: ${form.elements.shopControlsEnabled.checked ? "허용" : "미허용"}\n사유: ${values.reason}`);
     });
+    byId("announcementForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const values = Object.fromEntries(new FormData(form));
+      const startsAt = iso(values.startsAt);
+      const endsAt = values.endsAt ? iso(values.endsAt) : null;
+      form.elements.endsAt.setCustomValidity(endsAt && startsAt && Date.parse(endsAt) <= Date.parse(startsAt) ? "게시 종료는 시작보다 뒤여야 합니다." : "");
+      if (!startsAt || !form.reportValidity()) return;
+      submit(form, {
+        action: "announcements.publish", body: values.body.trim(), startsAt, endsAt, reason: values.reason.trim(),
+      }, "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`);
+    });
   }
 
   function mount() { bind(); renderRewardTemplate(); syncRewardInput(); load(); }
