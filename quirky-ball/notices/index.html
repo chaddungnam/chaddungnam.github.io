@@ -32,6 +32,9 @@
     .back { display: inline-flex; margin-top: 28px; border: 0; border-radius: 999px; background: #ea623c; color: white; padding: 13px 20px; font: inherit; font-weight: 900; text-decoration: none; cursor: pointer; }
     .error { color: #8b6e5d; }
     footer { padding: 0 0 36px; color: #8b6e5d; font-size: .84rem; }
+    body.embedded header, body.embedded footer { display: none; }
+    body.embedded main { padding: 20px 0; }
+    body.embedded .notice-shell { border: 0; border-radius: 0; box-shadow: none; background: transparent; padding: 0; }
     @media (prefers-reduced-motion: no-preference) { .notice-shell { animation: enter .45s ease-out both; } @keyframes enter { from { opacity: 0; transform: translateY(10px); } } }
   </style>
 </head>
@@ -57,6 +60,7 @@
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
     const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
     const requested = new URLSearchParams(location.search).get("lang") ?? normalizeLanguage(navigator.language || "en");
+    if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embedded");
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
     const localized = (language) => language === "ko"
       ? { title: "공지사항", kicker: "QUIRKY BALL · 공지", kind: "공지사항", all: "전체 공지" }
