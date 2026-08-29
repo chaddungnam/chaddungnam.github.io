@@ -104,6 +104,25 @@ async function loadDashboard() {
       }),
       loadPurchaseSnapshot(),
     ]);
+    const playerIds = [...new Set((data.periodPlayers || []).map((player) => player.userId).filter(Boolean))].slice(0, 50);
+    if (playerIds.length) {
+      try {
+        const noteData = await root.ConsoleAPI.post("admin-console", { action: "players.notes.list", userIds: playerIds });
+        const notes = new Map((noteData.rows || []).map((row) => [row.user_id, row]));
+        data.periodPlayers = data.periodPlayers.map((player) => {
+          const operatorNote = notes.get(player.userId);
+          return operatorNote ? {
+            ...player,
+            operatorTracked: operatorNote.operator_tracked,
+            operatorTags: operatorNote.operator_tags,
+            operatorNote: operatorNote.operator_note,
+            operatorNoteUpdatedAt: operatorNote.operator_note_updated_at,
+          } : player;
+        });
+      } catch (_error) {
+        // 분석 본문은 유지하고 운영 메모 배지만 생략한다.
+      }
+    }
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
@@ -401,7 +420,7 @@ function renderPeriodPlayers() {
   byId("periodPlayersTable").innerHTML = rows.length === 0
     ? '<tr><td class="empty-row" colspan="9">이 기간에 조건과 일치하는 플레이 기록 계정이 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
-        <td><strong>${escapeHtml(root.ConsoleModel.playerDisplayName(row))}</strong><small>${escapeHtml(row.accountType)}</small></td>
+        <td>${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
         <td>${countryMarkup(row.country)}</td>
         <td>${formatNumber(row.gamesPlayed)}</td>
         <td>${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small></td>

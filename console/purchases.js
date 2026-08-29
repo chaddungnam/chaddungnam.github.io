@@ -12,6 +12,14 @@
     return Number.isNaN(date.getTime()) ? "—" : new Intl.DateTimeFormat("ko-KR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Berlin" }).format(date);
   }
   function cell(row, value, className = "") { const td = row.insertCell(); td.textContent = text(value); if (className) td.className = className; return td; }
+  function playerCell(row, item) {
+    const td = row.insertCell();
+    td.className = "purchase-player-cell";
+    td.innerHTML = item.user_id
+      ? `${root.ConsoleModel.playerIdentityMarkup(item, root.location.hash)}<small title="${text(item.user_id)}">${shortUser(item.user_id)}</small>`
+      : '<span class="player-identity-unlinked">계정 미연결</span>';
+    return td;
+  }
   function filters() {
     return {
       action: "purchases.list", rangeDays: Number(byId("purchaseRange").value), platform: byId("purchasePlatform").value,
@@ -26,7 +34,7 @@
       const tr = body.insertRow();
       tr.dataset.status = item.status || "unknown";
       tr.dataset.review = String(Boolean(item.repeat_refund_review));
-      cell(tr, dateTime(item)); cell(tr, shortUser(item.user_id)); cell(tr, model.PRODUCT_LABELS[item.product_id] || item.product_id);
+      cell(tr, dateTime(item)); playerCell(tr, item); cell(tr, model.PRODUCT_LABELS[item.product_id] || item.product_id);
       cell(tr, item.platform === "ios" ? "App Store" : "Google Play"); cell(tr, model.formatMoney(item.amount_micros, item.currency));
       cell(tr, model.STATUS_LABELS[item.status] || item.status, `purchase-status purchase-status-${item.status}`);
       cell(tr, model.ENTITLEMENT_LABELS[item.entitlement_status] || item.entitlement_status);

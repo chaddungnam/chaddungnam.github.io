@@ -261,7 +261,7 @@
     if (!displayCode) { byId("csPlayerMatches").replaceChildren(); return; }
     try {
       const result = await root.ConsoleAPI.post("admin-console", { action: "players.list", rangeDays: 0, query: displayCode, sort: "latest_played_at", direction: "desc", page: 1 });
-      byId("csPlayerMatches").innerHTML = `<div class="cs-player-match"><strong>연결 가능한 플레이어 · ${escapeHtml(displayCode)}</strong>${(result.rows || []).map((row) => `<a href="#/players/${encodeURIComponent(row.user_id)}?return=${encodeURIComponent("#/cs")}">${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: row.nickname, displayCode: row.display_code }))}</a>`).join("") || "<small>일치 계정 없음</small>"}</div>`;
+      byId("csPlayerMatches").innerHTML = `<div class="cs-player-match"><strong>연결 가능한 플레이어 · ${escapeHtml(displayCode)}</strong>${(result.rows || []).map((row) => root.ConsoleModel.playerIdentityMarkup(row, "#/cs")).join("") || "<small>일치 계정 없음</small>"}</div>`;
     } catch (_error) {
       byId("csPlayerMatches").innerHTML = '<p class="empty-panel">플레이어 검색을 완료하지 못했습니다.</p>';
     }

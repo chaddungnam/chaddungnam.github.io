@@ -44,12 +44,21 @@ assert.equal(players[0].nickname, "Duck");
 assert.equal(model.playerDisplayName({ nickname: "Duck", displayCode: "AB12" }), "Duck · AB12");
 assert.equal(model.playerDisplayName({ nickname: "Duck", displayCode: "" }), "Duck");
 assert.equal(model.playerDisplayName({ nickname: "", displayCode: "AB12" }), "이름 없음 · AB12");
+assert.deepEqual(model.normalizePlayerNote({ operator_tracked: true, operator_tags: ["구독자"], operator_note: "재현 확인" }), {
+  tracked: true, tags: ["구독자"], note: "재현 확인", updatedAt: "",
+});
+assert.deepEqual(model.parsePlayerTags("구독자, 지인, 구독자,  "), ["구독자", "지인"]);
+assert.match(model.playerNoteMarkup({ tracked: true, tags: ["<지인>"], note: '"확인"' }), /추적/);
+assert.match(model.playerNoteMarkup({ tracked: true, tags: ["<지인>"], note: '"확인"' }), /&lt;지인&gt;/);
+assert.match(model.playerIdentityMarkup({ user_id: "user/1", nickname: "Duck", display_code: "AB12", operator_tags: ["구독자"] }, "#/analytics"), /#\/players\/user%2F1/);
+assert.match(model.playerIdentityMarkup({ user_id: "user/1", nickname: "Duck", display_code: "AB12", operator_tags: ["구독자"] }, "#/analytics"), /구독자/);
 assert.deepEqual(model.countryDisplay("KR"), { code: "KR", name: "대한민국", flag: "🇰🇷", custom: false });
 assert.deepEqual(model.countryDisplay("aln"), { code: "ALN", name: "외계인", flag: "👽", custom: true });
 assert.deepEqual(model.countryDisplay("SGV"), { code: "SGV", name: "그림자정부", flag: "🕶️", custom: true });
 assert.deepEqual(model.countryDisplay("RPT"), { code: "RPT", name: "렙틸리언", flag: "🦎", custom: true });
 assert.deepEqual(model.countryDisplay(""), { code: "", name: "국가 미설정", flag: "", custom: false });
 assert.equal(model.actionDisplayName("player_mutation"), "플레이어 재화 변경");
+assert.equal(model.actionDisplayName("player_note_update"), "플레이어 메모 업데이트");
 assert.equal(model.actionDisplayName("reward_mail_broadcast"), "전체 보상 우편");
 assert.equal(model.actionDisplayName("future_action"), "future_action");
 

@@ -43,6 +43,58 @@
     return displayCode ? `${nickname} · ${displayCode}` : nickname;
   }
 
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
+
+  function normalizePlayerNote(value) {
+    const nested = value?.operatorNote ?? (value?.operator_note && typeof value.operator_note === "object" ? value.operator_note : null);
+    const source = nested || value || {};
+    const tagsValue = source.tags ?? source.operator_tags ?? source.operatorTags ?? [];
+    const tags = Array.isArray(tagsValue)
+      ? tagsValue.map((tag) => String(tag || "").trim()).filter(Boolean).slice(0, 8)
+      : [];
+    const noteValue = nested ? source.note : (source.note ?? source.operator_note ?? source.operatorNote);
+    return {
+      tracked: Boolean(source.tracked ?? source.operator_tracked ?? source.operatorTracked),
+      tags,
+      note: String(noteValue || "").trim().slice(0, 1000),
+      updatedAt: String(source.updated_at ?? source.operator_note_updated_at ?? source.operatorNoteUpdatedAt ?? ""),
+    };
+  }
+
+  function parsePlayerTags(value) {
+    const seen = new Set();
+    const tags = [];
+    for (const item of String(value || "").split(",")) {
+      const tag = item.trim();
+      const key = tag.toLocaleLowerCase("ko-KR");
+      if (!tag || seen.has(key)) continue;
+      seen.add(key);
+      tags.push(tag);
+    }
+    return tags;
+  }
+
+  function playerNoteMarkup(value) {
+    const operatorNote = normalizePlayerNote(value);
+    const badges = [];
+    if (operatorNote.tracked) badges.push('<span class="player-note-badge player-note-tracked">추적</span>');
+    operatorNote.tags.forEach((tag) => badges.push(`<span class="player-note-badge">${escapeHtml(tag)}</span>`));
+    if (operatorNote.note) badges.push(`<span class="player-note-badge player-note-has-memo" title="${escapeHtml(operatorNote.note)}">메모</span>`);
+    return badges.length ? `<span class="player-note-badges">${badges.join("")}</span>` : "";
+  }
+
+  function playerIdentityMarkup(player, returnHash) {
+    const userId = String(player?.userId ?? player?.user_id ?? "").trim();
+    const displayName = playerDisplayName({
+      nickname: player?.nickname,
+      displayCode: player?.displayCode ?? player?.display_code,
+    });
+    const content = `<span class="player-identity-name">${escapeHtml(displayName)}</span>${playerNoteMarkup(player)}`;
+    return userId
+      ? `<a class="player-identity-link" href="${escapeHtml(playerDeepLink(userId, returnHash))}">${content}</a>`
+      : `<span class="player-identity-link player-identity-unlinked">${content}</span>`;
+  }
+
   const specialCountries = Object.freeze({
     ALN: { name: "외계인", flag: "👽" },
     SGV: { name: "그림자정부", flag: "🕶️" },
@@ -73,6 +125,7 @@
     player_mutation: "플레이어 재화 변경",
     player_mutation_revert: "플레이어 재화 되돌리기",
     player_wipe: "플레이어 데이터 초기화",
+    player_note_update: "플레이어 메모 업데이트",
     inventory_mutation: "아이템 지급·회수",
     score_correction: "점수 기록 보정",
     reward_mail_send: "개별 보상 우편",
@@ -154,6 +207,10 @@
     decodeJwtPayload,
     dedupePlayers,
     playerDisplayName,
+    normalizePlayerNote,
+    parsePlayerTags,
+    playerNoteMarkup,
+    playerIdentityMarkup,
     countryDisplay,
     actionDisplayName,
     serializeAnalyticsFilters,

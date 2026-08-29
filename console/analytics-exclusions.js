@@ -11,11 +11,11 @@
 
   function render() {
     const query = state.query.toLowerCase();
-    const rows = state.rows.filter((row) => [row.nickname, row.display_code, row.user_id, row.reason, row.note]
+    const rows = state.rows.filter((row) => [row.nickname, row.display_code, row.user_id, row.reason, row.note, row.operator_note, ...(row.operator_tags || [])]
       .some((value) => String(value ?? "").toLowerCase().includes(query)));
     byId("analyticsExclusionsTotal").textContent = `${rows.length}명`;
     byId("analyticsExclusionsTable").innerHTML = rows.length ? rows.map((row) => `<tr>
-      <td><strong>${escapeHtml(row.nickname || "이름 없음")}</strong><small>${escapeHtml(row.account_type || "unknown")}</small></td>
+      <td>${root.ConsoleModel.playerIdentityMarkup(row, "#/analytics-exclusions")}<small>${escapeHtml(row.account_type || "unknown")}</small></td>
       <td><code>${escapeHtml(row.display_code || "—")}</code><small>${escapeHtml(row.user_id)}</small></td>
       <td><span class="analytics-exclusion-badge">로컬/QA 제외</span><small>${escapeHtml(row.reason)}</small></td>
       <td>${escapeHtml(row.note || "—")}</td>

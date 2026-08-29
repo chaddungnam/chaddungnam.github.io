@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260826-1">
+  <link rel="stylesheet" href="styles.css?v=20260829-1">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -153,8 +153,8 @@
         <section class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
           <div class="panel-heading period-heading"><div><p class="eyebrow">COMPLETED PLAY RECORDS</p><h2 id="periodPlayersTitle">기간 내 완료 기록 계정</h2><small>서버에 정상 완료 game_records가 저장된 계정입니다. 앱만 열었거나 게임 중 종료한 설치는 포함되지 않습니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
           <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
-            <label for="periodPlayerSearch">닉네임·표시코드·국가·사용자 ID 검색</label>
-            <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
+            <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
+            <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
           </form>
           <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어</button></th><th><button data-player-sort="country" type="button">국가</button></th><th><button data-player-sort="games_played" type="button">플레이 수</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="gems" type="button">젬</button></th><th>스태미나</th><th>티켓</th><th><button data-player-sort="latest_played_at" type="button">최근 플레이</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
@@ -206,10 +206,11 @@
       <section id="playersView" class="route-view" data-route="players" hidden>
         <div id="playerMutationBanner" class="read-only-banner" role="status"></div>
         <form id="playerSearchForm" class="panel admin-toolbar" role="search">
-          <label>플레이어 검색<input id="playerSearch" type="search" maxlength="100" placeholder="닉네임 · 표시코드 · 국가 · 사용자 ID"></label>
+          <label>플레이어 검색<input id="playerSearch" type="search" maxlength="100" placeholder="닉네임 · 표시코드 · 태그 · 메모 · 사용자 ID"></label>
           <label>활동 기간<select id="playerRange"><option value="0">전체 계정</option><option value="1">오늘 플레이</option><option value="7">최근 7일 플레이</option><option value="28">최근 28일 플레이</option></select></label>
           <label>정렬<select id="playerSort"><option value="latest_played_at">최근 플레이</option><option value="best_score">최고 점수</option><option value="gems">젬</option><option value="state_version">상태 버전</option><option value="nickname">닉네임</option><option value="country">국가</option></select></label>
           <label>방향<select id="playerDirection"><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
+          <label class="check-label"><input id="playerTrackedOnly" type="checkbox"> 추적 중만</label>
           <button class="primary-button" type="submit">검색</button>
         </form>
         <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PLAYER ACCOUNTS</p><h2>플레이어</h2></div><span id="playerTotal" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>플레이어</th><th>국가</th><th>플레이</th><th>최고 점수</th><th>젬</th><th>스태미나</th><th>티켓</th><th>최근 플레이</th><th>처리</th></tr></thead><tbody id="playersTable"></tbody></table></div><div class="pagination"><button id="playersPrevious" type="button">이전</button><span id="playersPage">1 / 1</span><button id="playersNext" type="button">다음</button></div></section>
@@ -311,17 +312,17 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260824-1"></script>
-  <script src="model.js?v=20260822-2"></script>
+  <script src="model.js?v=20260829-1"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260826-2"></script>
-  <script src="analytics-exclusions.js?v=20260823-1"></script>
-  <script src="players.js?v=20260822-2"></script>
+  <script src="analytics.js?v=20260829-1"></script>
+  <script src="analytics-exclusions.js?v=20260829-1"></script>
+  <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>
   <script src="purchases-model.js"></script>
-  <script src="purchases.js?v=20260822-2"></script>
-  <script src="audit.js?v=20260822-2"></script>
+  <script src="purchases.js?v=20260829-1"></script>
+  <script src="audit.js?v=20260829-1"></script>
   <script src="gmail-model.js"></script>
   <script src="gmail-api.js"></script>
   <script src="cs-intelligence.js"></script>

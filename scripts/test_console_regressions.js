@@ -40,8 +40,8 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260826-2/, "the Console must cache-bust the updated diagnostics renderer");
-assert.match(consoleHtml, /styles\.css\?v=20260826-1/, "the Console must cache-bust diagnostics responsive styles");
+assert.match(consoleHtml, /analytics\.js\?v=20260829-1/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /styles\.css\?v=20260829-1/, "the Console must cache-bust player tracking styles");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
 assert.match(analyticsSource, /diagnostics\.growthChoices/, "legacy growth choices must render from diagnostics.growthChoices");
@@ -60,6 +60,13 @@ const playersSource = read("console/players.js");
 assert.match(playersSource, /icon_jakwon_tongue[\s\S]*yakwon 프로필/, "the admin inventory list must expose the retired yakwon profile item");
 assert.match(playersSource, /skin_jakwon[\s\S]*yakwon 구슬/, "the admin inventory list must expose the retired yakwon marble item");
 assert.match(playersSource, /const grantCatalog = catalog\.concat\(ADMIN_GRANT_ITEMS\.filter/, "admin-only grant items must not leak into the active store/mail catalog");
+assert.match(playersSource, /id=\"playerNoteForm\"/, "player detail must expose the tracking note editor");
+assert.match(playersSource, /action: \"players\.note\.set\"/, "tracking notes must use the secured admin action");
+assert.match(consoleHtml, /id=\"playerTrackedOnly\"/, "the player list must support tracked-only monitoring");
+assert.match(analyticsSource, /ConsoleModel\.playerIdentityMarkup/, "analytics player names must deep-link to player detail");
+assert.match(read("console/purchases.js"), /ConsoleModel\.playerIdentityMarkup/, "purchase player identities must deep-link to player detail");
+assert.match(read("console/audit.js"), /ConsoleModel\.playerIdentityMarkup/, "audit player identities must deep-link to player detail");
+assert.match(consoleStyles, /\.player-note-badge/, "global player note badges must have shared styling");
 
 const robots = read("robots.txt");
 for (const agent of ["Google-adstxt", "Mediapartners-Google", "Googlebot", "*"]) {
