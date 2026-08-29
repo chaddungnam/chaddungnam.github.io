@@ -191,6 +191,8 @@
     breakthrough: "돌파", mad_scientist: "매드 사이언티스트", space: "공간 축소",
     shooting_drop: "슈팅 드롭", fast_growth: "빠른 성장", unstable_growth: "불안정 성장",
     mechakucha_quake: "메챠쿠챠 지진", size_restore: "크기 복원", blood_game: "블러드 게임",
+    all_or_nothing: "모 아니면 도", score_double: "점수 2배", roulette_reroll: "룰렛 다시하기",
+    drag_drop_level: "드래그 앤 드롭",
     bonus: "보너스 점수", nothing: "꽝", hard_mode: "하드 모드", time_rewind: "시간 되감기",
   });
 

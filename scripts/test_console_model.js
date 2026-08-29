@@ -62,6 +62,8 @@ assert.equal(model.actionDisplayName("player_note_update"), "플레이어 메모
 assert.equal(model.actionDisplayName("reward_mail_broadcast"), "전체 보상 우편");
 assert.equal(model.actionDisplayName("future_action"), "future_action");
 assert.equal(model.analyticsChoiceName("mechakucha_quake"), "메챠쿠챠 지진");
+assert.equal(model.analyticsChoiceName("roulette_reroll"), "룰렛 다시하기");
+assert.equal(model.analyticsChoiceName("drag_drop_level"), "드래그 앤 드롭");
 assert.equal(model.analyticsButtonName("main/ui/control_0/panel_1/growthchoice_space", "main"), "성장 선택 팝업 · 공간 축소");
 assert.equal(model.analyticsButtonName("main/hud/button_0", "main"), "게임 · 일시정지 메뉴 (구버전)");
 assert.equal(model.analyticsButtonName("home/start_game", "home"), "홈 · 게임 시작");
