@@ -129,6 +129,10 @@ async function loadDashboard() {
     setText("dataStatus", `${updated} 기준 · 독일 시간 · ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
+    state.payload = null;
+    byId("periodPlayerTotal").textContent = "—";
+    byId("periodPage").textContent = "1 / 1";
+    byId("periodPlayersTable").innerHTML = '<tr><td class="empty-row" colspan="10">선택한 기간의 계정 목록을 불러오지 못했습니다. 다시 시도해 주세요.</td></tr>';
     setMessage(readFunctionError(error), true);
   } finally {
     state.loading = false;
