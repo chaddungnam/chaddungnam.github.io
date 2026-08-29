@@ -139,6 +139,7 @@
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 설치만 묶어 게임 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">AD FORMAT MIX</p><h2>어떤 광고를 보고 있나</h2><small>전체 합계 대신 강제 전면·자발적 보상·배너·네이티브를 나눕니다.</small></div><span id="adFormatStatus" class="panel-total">—</span></div><div id="adFormatSummary" class="coverage-grid" aria-live="polite"></div></article>
           <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">REMOVE ADS FUNNEL</p><h2>광고 제거 구매로 이어지나</h2><small>QA 기능·TestFlight·Google Play 테스트 결제를 제외한 운영 구매만 확인합니다.</small></div><span id="removeAdsFunnelStatus" class="panel-total">—</span></div><div id="removeAdsFunnel" class="coverage-grid" aria-live="polite"></div></article>
+          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">MARKETING REVIEW</p><h2 id="marketingGateTitle">유료 마케팅 검토 조건</h2><small>네 조건을 모두 충족해도 광고비를 자동 집행하지 않고 검토만 시작합니다.</small></div><span id="marketingGateStatus" class="panel-total">대기</span></div><div id="marketingGateSummary" class="coverage-grid" aria-live="polite"></div></article>
         </section>
 
         <section class="operations-pulse" aria-labelledby="operationsPulseTitle">
@@ -183,7 +184,7 @@
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>선택 횟수와 비율을 막대 길이로 바로 비교합니다.</small></div><span id="growthDistributionStatus" class="panel-total">—</span></div><div id="growthChoicesTable" class="distribution-list" aria-live="polite"></div></article>
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>결과별 비중과 실제 횟수를 한 줄에 붙여 표시합니다.</small></div><span id="rouletteDistributionStatus" class="panel-total">—</span></div><div id="rouletteResultsTable" class="distribution-list" aria-live="polite"></div></article>
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>홈 진입 뒤 3초 초과·5초 미만으로 멈춘 횟수와 사람만 집계합니다. 구버전 항목은 아래로 보냅니다.</small></div></div><div id="buttonInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
-          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">SCREEN DROPOFF</p><h2>어디서 나가나</h2><small>종료율, 체류 시간, 마지막 행동과 개선 제안을 카드로 묶었습니다.</small></div></div><div id="screenInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
+          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">SCREEN DROPOFF</p><h2>어디서 나가나</h2><small id="screenDropoffDefinition">session_end는 해당 화면에서 앱 세션이 끝난 신호입니다. 게임 완료나 단순 화면 이동으로 세지 않습니다.</small></div></div><div id="screenInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
         </section>
 
         <details id="operatorDetails" class="operator-details">
@@ -330,7 +331,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260829-12"></script>
+  <script src="analytics.js?v=20260829-13"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>

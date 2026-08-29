@@ -180,6 +180,7 @@ function renderDashboard() {
   renderExitBreakdown();
   renderAds();
   renderDecisionPanels();
+  renderMarketingGate();
   renderAppStatus();
   renderPurchaseTrend();
   renderChoices();
@@ -839,6 +840,42 @@ function renderDecisionPanels() {
     const liveStatus = hasIntent ? `운영 ${formatNumber(removeAds.startedUsers)}명 시작` : "운영 구매 시작 없음";
     setText("removeAdsFunnelStatus", excludedInstalls > 0 ? `${liveStatus} · 테스트 ${formatNumber(excludedInstalls)}설치 제외` : liveStatus);
   }
+}
+
+function renderMarketingGate() {
+  const gate = state.payload?.marketingGate ?? {};
+  const d1Eligible = Number(gate.d1Eligible ?? 0);
+  const dailyCohorts = Number(gate.dailyCohorts ?? 0);
+  const d1Rate = typeof gate.d1Rate === "number" ? gate.d1Rate : null;
+  const exitTrend = typeof gate.exitTrend === "number" ? gate.exitTrend : null;
+
+  setText("marketingGateStatus", gate.eligible === true ? "검토 가능" : "대기");
+  renderCoverageCards("marketingGateSummary", [
+    {
+      status: d1Eligible >= 50 ? "available" : "waiting",
+      label: "D1 대상 표본",
+      value: `${formatNumber(d1Eligible)}명 / 50명`,
+      detail: "QA를 제외하고 다음 날까지 관찰 가능한 최초 실행 설치",
+    },
+    {
+      status: dailyCohorts >= 5 ? "available" : "waiting",
+      label: "성숙 일별 코호트",
+      value: `${formatNumber(dailyCohorts)}일 / 5일`,
+      detail: "설치별 최초 first_open의 독일 날짜 기준 · 오늘 제외",
+    },
+    {
+      status: d1Rate !== null && d1Rate >= 0.2 ? "available" : "waiting",
+      label: "D1 유지율",
+      value: `${formatRate(d1Rate)} / 20.0%`,
+      detail: "최초 실행 다음 날 session_start가 기록된 비율",
+    },
+    {
+      status: exitTrend !== null && exitTrend < 0.4 ? "available" : "waiting",
+      label: "게임 중 이탈률",
+      value: `${formatRate(exitTrend)} / 40.0% 미만`,
+      detail: "game_start 뒤 game_over 없이 끝난 선택 기간 비율",
+    },
+  ]);
 }
 
 function measuredCard(label, value, detail, hasData, formatter = (count) => `${formatNumber(count)}회`) {

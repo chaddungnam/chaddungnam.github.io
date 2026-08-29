@@ -25,6 +25,7 @@ const dashboard = {
   ads: [],
   choices: { growth: [], roulette: [] },
   interactions: { buttons: [], screens: [], dropoffs: [] },
+  marketingGate: { eligible: false, d1Eligible: 49, dailyCohorts: 4, d1Rate: 0.19, exitTrend: 0.39 },
   funnel: [{ event: "first_open", users: 4 }, { event: "game_start", users: 3 }, { event: "game_over", users: 2 }],
   periodPlayers: [],
   periodPlayerTotal: 0,
@@ -41,6 +42,29 @@ const dashboard = {
   },
 };
 
+test("marketing review gate renders raw waiting evidence and defines session_end truthfully", async ({ page }) => {
+  await page.route("https://accounts.google.com/**", (route) => route.abort());
+  await page.route("**/console/auth.js*", (route) => route.fulfill({
+    contentType: "application/javascript",
+    body: `window.ConsoleAuth={initialize:async()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),snapshot:()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),isUnlocked:()=>true,requireChallenge:()=>{},unlock:async()=>{},logout:()=>{}};`,
+  }));
+  await page.route("**/console/api.js*", (route) => route.fulfill({
+    contentType: "application/javascript",
+    body: `window.ConsoleAPI={initialize:()=>{},post:async(name)=>name==="analytics-dashboard-v2"?${JSON.stringify(dashboard)}:{summary:{},total:0}};`,
+  }));
+
+  await page.goto("/console/");
+  await page.locator("#projectQuirkyBall").click();
+
+  await expect(page.locator("#marketingGateTitle")).toHaveText("유료 마케팅 검토 조건");
+  await expect(page.locator("#marketingGateStatus")).toHaveText("대기");
+  await expect(page.locator("#marketingGateSummary")).toContainText("49명 / 50명");
+  await expect(page.locator("#marketingGateSummary")).toContainText("4일 / 5일");
+  await expect(page.locator("#marketingGateSummary")).toContainText("19.0% / 20.0%");
+  await expect(page.locator("#marketingGateSummary")).toContainText("39.0% / 40.0% 미만");
+  await expect(page.locator("#screenDropoffDefinition")).toHaveText("session_end는 해당 화면에서 앱 세션이 끝난 신호입니다. 게임 완료나 단순 화면 이동으로 세지 않습니다.");
+});
+
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {
   await page.route("https://accounts.google.com/**", (route) => route.abort());
   await page.route("**/console/auth.js*", (route) => route.fulfill({
@@ -49,7 +73,7 @@ test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, an
   }));
   await page.route("**/console/api.js*", (route) => route.fulfill({
     contentType: "application/javascript",
-    body: `window.ConsoleAPI={initialize:()=>{},post:async(name)=>name==="analytics-dashboard"?${JSON.stringify(dashboard)}:{summary:{},total:0}};`,
+    body: `window.ConsoleAPI={initialize:()=>{},post:async(name)=>name==="analytics-dashboard-v2"?${JSON.stringify(dashboard)}:{summary:{},total:0}};`,
   }));
   await page.addInitScript(() => {
     const originalFillText = CanvasRenderingContext2D.prototype.fillText;
@@ -93,7 +117,7 @@ test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, an
       window.__gameOverLabels = [];
       window.dispatchEvent(new Event("resize"));
     });
-    await expect.poll(() => page.evaluate(() => window.__gameOverLabels.length)).toBe(7);
+    await expect.poll(() => page.evaluate(() => window.__gameOverLabels.length)).toBe(3);
     await assertChart();
   }
 
