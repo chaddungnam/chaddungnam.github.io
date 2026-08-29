@@ -18,14 +18,21 @@
     select { border: 1px solid #d7c3af; border-radius: 999px; background: #fffaf3; padding: 8px 12px; color: inherit; }
     main { padding: clamp(34px, 8vw, 88px) 0 60px; }
     .kicker { margin: 0 0 14px; color: #d85832; font-size: .78rem; font-weight: 900; letter-spacing: .14em; }
-    article { border: 1px solid #ead6c1; border-radius: 28px; background: rgba(255,255,255,.86); padding: clamp(26px, 6vw, 56px); box-shadow: 0 18px 60px rgba(91,50,29,.1); }
-    h1 { margin: 0; max-width: 15ch; font-size: clamp(2.1rem, 8vw, 4.4rem); line-height: .98; letter-spacing: -.045em; word-break: keep-all; }
-    time { display: block; margin: 20px 0 32px; color: #8b6e5d; font-weight: 700; }
+    .notice-shell { border: 1px solid #ead6c1; border-radius: 28px; background: rgba(255,255,255,.86); padding: clamp(22px, 5vw, 42px); box-shadow: 0 18px 60px rgba(91,50,29,.1); }
+    h1 { margin: 0; max-width: 15ch; font-size: clamp(2rem, 7vw, 3.5rem); line-height: .98; letter-spacing: -.045em; word-break: keep-all; }
+    #notice-list { display: grid; gap: 12px; max-height: min(62vh, 620px); margin-top: 28px; overflow-y: auto; padding-right: 4px; }
+    .notice-card { width: 100%; border: 2px solid #e6b178; border-radius: 18px; background: #fffaf3; color: inherit; padding: 18px; text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+    .notice-card:hover, .notice-card:focus-visible { border-color: #e55d36; box-shadow: 0 8px 24px rgba(216,88,50,.15); outline: none; transform: translateY(-2px); }
+    .notice-meta { display: flex; align-items: center; justify-content: flex-start; gap: 8px; color: #8b6e5d; font-size: .83rem; font-weight: 800; }
+    .notice-kind { color: #d85832; letter-spacing: .08em; }
+    .notice-card p { margin: 12px 0 0; font-size: 1.02rem; line-height: 1.55; white-space: pre-line; }
+    #notice-detail[hidden], #notice-list[hidden] { display: none; }
+    #notice-detail time { display: block; margin: 20px 0 28px; color: #8b6e5d; font-weight: 700; }
     #notice-body { margin: 0; font-size: clamp(1.03rem, 2.5vw, 1.2rem); line-height: 1.85; white-space: pre-line; }
-    .back { display: inline-flex; margin-top: 32px; border-radius: 999px; background: #ea623c; color: white; padding: 13px 20px; font-weight: 900; text-decoration: none; }
+    .back { display: inline-flex; margin-top: 28px; border: 0; border-radius: 999px; background: #ea623c; color: white; padding: 13px 20px; font: inherit; font-weight: 900; text-decoration: none; cursor: pointer; }
     .error { color: #8b6e5d; }
     footer { padding: 0 0 36px; color: #8b6e5d; font-size: .84rem; }
-    @media (prefers-reduced-motion: no-preference) { article { animation: enter .45s ease-out both; } @keyframes enter { from { opacity: 0; transform: translateY(10px); } } }
+    @media (prefers-reduced-motion: no-preference) { .notice-shell { animation: enter .45s ease-out both; } @keyframes enter { from { opacity: 0; transform: translateY(10px); } } }
   </style>
 </head>
 <body>
@@ -35,12 +42,15 @@
   </header>
   <main>
     <p class="kicker">QUIRKY BALL · UPDATE</p>
-    <article aria-live="polite">
+    <section class="notice-shell" aria-live="polite">
       <h1 id="notice-title">Loading…</h1>
-      <time id="notice-date"></time>
-      <p id="notice-body"></p>
-      <a class="back" href="/quirky-ball/">Quirky Ball</a>
-    </article>
+      <div id="notice-list" aria-label="Notices"></div>
+      <section id="notice-detail" hidden>
+        <time id="notice-date"></time>
+        <p id="notice-body"></p>
+        <button id="back-to-list" class="back" type="button">All notices</button>
+      </section>
+    </section>
   </main>
   <footer>© 2026 House Duck. Small games. Big personality.</footer>
   <script>
@@ -48,29 +58,66 @@
     const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
     const requested = new URLSearchParams(location.search).get("lang") ?? normalizeLanguage(navigator.language || "en");
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
-    const localized = (language) => language === "ko" ? { title: "공지", kicker: "QUIRKY BALL · 공지" } : { title: "Notice", kicker: "QUIRKY BALL · NOTICE" };
+    const localized = (language) => language === "ko"
+      ? { title: "공지사항", kicker: "QUIRKY BALL · 공지", kind: "공지사항", all: "전체 공지" }
+      : { title: "Notices", kicker: "QUIRKY BALL · NOTICE", kind: "NOTICE", all: "All notices" };
 
     fetch(endpoint, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
-        const notice = Array.isArray(data.notices) ? data.notices[0] : null;
-        if (!notice?.body || !notice?.created_at) return Promise.reject();
+        const notices = Array.isArray(data.notices)
+          ? data.notices.filter((notice) => notice?.body && notice?.created_at)
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          : [];
+        if (!notices.length) return Promise.reject();
         const language = languageNames[requested] ? requested : "en";
+        const list = document.querySelector("#notice-list");
+        const detail = document.querySelector("#notice-detail");
+        const date = document.querySelector("#notice-date");
+        const body = document.querySelector("#notice-body");
+        const renderDetail = (notice) => {
+          date.textContent = notice.created_at.slice(0, 10);
+          date.dateTime = notice.created_at;
+          body.textContent = notice.body;
+          list.hidden = true;
+          detail.hidden = false;
+        };
         const render = (nextLanguage) => {
           const copy = localized(nextLanguage);
           document.documentElement.lang = nextLanguage.replace("_", "-");
           document.documentElement.dir = ["ar", "ur"].includes(nextLanguage) ? "rtl" : "ltr";
           document.querySelector(".kicker").textContent = copy.kicker;
           document.querySelector("#notice-title").textContent = copy.title;
-          document.querySelector("#notice-date").textContent = notice.created_at.slice(0, 10);
-          document.querySelector("#notice-date").dateTime = notice.created_at;
-          document.querySelector("#notice-body").textContent = notice.body;
+          document.querySelector("#back-to-list").textContent = copy.all;
+          list.replaceChildren(...notices.map((notice) => {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className = "notice-card";
+            const meta = document.createElement("span");
+            meta.className = "notice-meta";
+            const kind = document.createElement("span");
+            kind.className = "notice-kind";
+            kind.textContent = copy.kind;
+            const created = document.createElement("time");
+            created.dateTime = notice.created_at;
+            created.textContent = notice.created_at.slice(0, 10);
+            meta.append(kind, created);
+            const preview = document.createElement("p");
+            preview.textContent = notice.body;
+            card.append(meta, preview);
+            card.addEventListener("click", () => renderDetail(notice));
+            return card;
+          }));
           document.title = `${copy.title} — House Duck`;
         };
         const select = document.querySelector("#language");
         for (const key of Object.keys(languageNames)) select.add(new Option(languageNames[key] ?? key, key));
         select.value = language;
         select.addEventListener("change", () => render(select.value));
+        document.querySelector("#back-to-list").addEventListener("click", () => {
+          detail.hidden = true;
+          list.hidden = false;
+        });
         render(language);
       })
       .catch(() => {

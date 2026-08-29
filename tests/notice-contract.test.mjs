@@ -19,5 +19,9 @@ test("notice has one localized source and twelve fallbacks", () => {
 test("notice page reads the active console notice instead of a static copy", async () => {
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
   assert.match(html, /functions\/v1\/public-notice/);
+  assert.match(html, /id="notice-list"/);
+  assert.match(html, /notice-card/);
+  assert.match(html, /sort\(\(a, b\).*created_at/s);
+  assert.match(html, /id="notice-detail"/);
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });
