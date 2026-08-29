@@ -22,6 +22,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
+const modelSource = read("console/model.js");
 const consoleStyles = read("console/styles.css");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
 assert.match(consoleHtml, /id="kpiActiveLabel"/, "the active-player KPI must expose a range-aware label");
@@ -43,11 +44,15 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260829-9/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260829-10/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
+assert.match(consoleHtml, /data-range="3"[^>]*>최근 3일</, "the Console must offer a three-day range");
+assert.match(consoleHtml, /data-range="5"[^>]*>최근 5일</, "the Console must offer a five-day range");
 assert.match(analyticsSource, /보상만 받고 나가려 했거나/, "the priority insight must explain the likely player intent");
 assert.match(analyticsSource, /보상 완료 · 하나를 선택하세요/, "the priority insight must propose a concrete post-ad treatment");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20260829-4/, "the Console must cache-bust the Korean analytics labels");
+assert.match(consoleHtml, /model\.js\?v=20260829-5/, "the Console must cache-bust the Korean analytics labels");
+assert.match(modelSource, /문의 지원 페이지로 이동 \(외부 브라우저\)/, "the old settings popup path must be identified as the support-page handoff");
 assert.match(analyticsSource, /row\.count \?\? row\.selected/, "choice distributions must use the dashboard count instead of rendering every choice as zero");
 assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
 assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
@@ -62,11 +67,13 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260829-3/, "the Console must cache-bust the card-based analytics redesign");
+assert.match(consoleHtml, /styles\.css\?v=20260829-4/, "the Console must cache-bust the compact account-activity redesign");
+assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
-assert.doesNotMatch(analyticsSource, /다음 앱 빌드부터 계측/, "account visit coverage must identify version 1.1.0 without future-build wording");
-assert.match(analyticsSource, /1\.1\.0부터 계측/, "account visit coverage must identify version 1.1.0");
+assert.match(analyticsSource, /현재 1\.1\.0 배포본에는 방문 RPC 호출 코드가 없어 0으로 표시/, "account visit coverage must explain why released 1.1.0 stays at zero");
+assert.match(analyticsSource, /String\(row\.screen \|\| ""\)\.toLowerCase\(\) !== "home"/, "ordinary home exits must be hidden from screen drop-off cards");
+assert.match(analyticsSource, /개 설치 기기에서 발생했고, 같은 기기의 반복 중단도 포함/, "the priority insight must explain what the install count means");
 assert.match(analyticsSource, /renderPriorityInsights/, "the dashboard must render ad-to-choice drop-off as a priority insight");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");

@@ -2,6 +2,7 @@
 const state = {
   payload: null,
   rangeDays: 7,
+  rangeOffsetDays: 0,
   distributionKey: "all",
   playerQuery: "",
   playerSort: "latest_played_at",
@@ -43,6 +44,10 @@ function countryMarkup(value) {
 }
 function selectedDays() {
   return (state.payload?.daily ?? []).slice(-state.rangeDays);
+}
+function selectedRangeLabel() {
+  if (state.rangeOffsetDays === 1) return "어제";
+  return state.rangeDays === 1 ? "오늘" : `최근 ${state.rangeDays}일`;
 }
 function setMessage(message, error = false) {
   const element = byId("dashboardMessage");
@@ -90,13 +95,14 @@ async function loadDashboard() {
   state.loading = true;
   byId("analyticsView").setAttribute("aria-busy", "true");
   setFiltersDisabled(true);
-  setMessage(`Quirky Ball · 최근 ${state.rangeDays}일 이벤트와 플레이 계정을 집계하는 중...`);
+  setMessage(`Quirky Ball · ${selectedRangeLabel()} 이벤트와 플레이 계정을 집계하는 중...`);
   try {
     const [data] = await Promise.all([
       root.ConsoleAPI.post("analytics-dashboard-v2", {
         projectKey: "quirky_ball",
         distributionKey: state.distributionKey,
         rangeDays: state.rangeDays,
+        rangeOffsetDays: state.rangeOffsetDays,
         playerQuery: state.playerQuery,
         playerSort: state.playerSort,
         playerDirection: state.playerDirection,
@@ -126,13 +132,13 @@ async function loadDashboard() {
     state.payload = data;
     renderDashboard();
     const updated = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
-    setText("dataStatus", `${updated} 기준 · 독일 시간 · ${data.rangeDays ?? state.rangeDays}일 · ${distributionLabel(state.distributionKey)}`);
+    setText("dataStatus", `${updated} 기준 · 독일 시간 · ${selectedRangeLabel()} · ${distributionLabel(state.distributionKey)}`);
     setMessage(data?.truncated ? "데이터가 많아 최근 100,000건까지만 표시했습니다." : "원본 이벤트는 브라우저로 내려오지 않고 서버에서 요약됩니다.");
   } catch (error) {
     state.payload = null;
     byId("periodPlayerTotal").textContent = "—";
     byId("periodPage").textContent = "1 / 1";
-    byId("periodPlayersTable").innerHTML = '<tr><td class="empty-row" colspan="11">선택한 기간의 계정 목록을 불러오지 못했습니다. 다시 시도해 주세요.</td></tr>';
+    byId("periodPlayersTable").innerHTML = '<tr><td class="empty-row" colspan="7">선택한 기간의 계정 목록을 불러오지 못했습니다. 다시 시도해 주세요.</td></tr>'; 
     setMessage(readFunctionError(error), true);
   } finally {
     state.loading = false;
@@ -144,10 +150,10 @@ async function loadDashboard() {
 function renderDashboard() {
   const { summary, retention } = state.payload;
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
-  const rangeLabel = state.rangeDays === 1 ? "오늘" : `최근 ${state.rangeDays}일`;
+  const rangeLabel = selectedRangeLabel();
   setText("kpiActiveLabel", `${rangeLabel} 온 사람`);
   setText("kpiActive", formatNumber(summary.installs));
-  setText("dailyTrendEyebrow", `${state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
+  setText("dailyTrendEyebrow", `${state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const d7 = retention?.find((item) => item.day === 7)?.rate;
   setText("metricD7", formatRate(d7));
@@ -375,7 +381,7 @@ function renderInteractionInsights() {
   for (const row of interactions.dropoffs ?? []) {
     if (!dropoffByScreen.has(row.screen)) dropoffByScreen.set(row.screen, row);
   }
-  const screens = [...(interactions.screens ?? [])].sort((left, right) => {
+  const screens = [...(interactions.screens ?? [])].filter((row) => String(row.screen || "").toLowerCase() !== "home").sort((left, right) => {
     const leftLegacy = root.ConsoleModel.analyticsScreenName(left.screen) === "화면 미식별";
     const rightLegacy = root.ConsoleModel.analyticsScreenName(right.screen) === "화면 미식별";
     return Number(leftLegacy) - Number(rightLegacy) || Number(right.visits || 0) - Number(left.visits || 0);
@@ -389,12 +395,15 @@ function renderInteractionInsights() {
         ? root.ConsoleModel.analyticsButtonName(dropoff.lastButtonId, row.screen)
         : "버튼을 누르지 않고 종료";
       const exitRate = typeof row.exitRate === "number" ? row.exitRate : (Number(row.visits) > 0 ? Number(row.exits || 0) / Number(row.visits) : null);
-      const recommendation = exitRate !== null && exitRate >= 0.3
-        ? "종료 비율이 높습니다. 마지막 행동 다음의 기대 결과와 돌아갈 길을 먼저 점검하세요."
-        : Number(row.avgDwellSec || 0) >= 30
-          ? "오래 머문 뒤 이동합니다. 화면의 첫 행동을 더 눈에 띄게 보여주세요."
-          : "표본이 쌓일 때까지 유지하고, 다음 화면 진입과 함께 비교하세요.";
-      return `<article class="behavior-card behavior-card-exit" data-risk="${exitRate !== null && exitRate >= 0.3}">
+      const expectedExternalExit = lastButton.includes("외부 브라우저");
+      const recommendation = expectedExternalExit
+        ? "문의 지원 페이지를 열면서 앱이 백그라운드로 간 정상 흐름입니다. 최초 로그인 닉네임 설정 종료가 아닙니다."
+        : exitRate !== null && exitRate >= 0.3
+          ? "종료 비율이 높습니다. 마지막 행동 다음의 기대 결과와 돌아갈 길을 먼저 점검하세요."
+          : Number(row.avgDwellSec || 0) >= 30
+            ? "오래 머문 뒤 이동합니다. 화면의 첫 행동을 더 눈에 띄게 보여주세요."
+            : "표본이 쌓일 때까지 유지하고, 다음 화면 진입과 함께 비교하세요.";
+      return `<article class="behavior-card behavior-card-exit" data-risk="${!expectedExternalExit && exitRate !== null && exitRate >= 0.3}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</h3><small>마지막 행동 · ${escapeHtml(lastButton)}</small></div>
         <div class="behavior-metrics"><span><b>${formatNumber(row.visits)}</b>회 방문</span><span><b>${formatRate(exitRate)}</b> 종료</span><span><b>${formatDuration(row.avgDwellSec)}</b> 체류</span></div>
@@ -413,8 +422,8 @@ function renderPriorityInsights() {
   if (stopped > 0) {
     panel.dataset.status = "risk";
     setText("priorityInsightTitle", "성장 선택 광고 뒤 선택 없이 멈춤");
-    setText("priorityInsightValue", `${formatNumber(stopped)}회 · ${formatNumber(users)}설치`);
-    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다. 보상만 받고 나가려 했거나, 광고 뒤에도 선택이 필요하다는 안내를 놓친 흐름일 가능성이 큽니다. 광고 종료 직후 “보상 완료 · 하나를 선택하세요”를 크게 보여준 뒤 선택 전환을 비교하세요.`);
+    setText("priorityInsightValue", `${formatNumber(stopped)}회 · ${formatNumber(users)}개 설치 기기`);
+    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. ${formatNumber(users)}개 설치 기기에서 발생했고, 같은 기기의 반복 중단도 포함됩니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다. 보상만 받고 나가려 했거나, 광고 뒤에도 선택이 필요하다는 안내를 놓친 흐름일 가능성이 큽니다. 광고 종료 직후 “보상 완료 · 하나를 선택하세요”를 크게 보여준 뒤 선택 전환을 비교하세요.`);
     return;
   }
   panel.dataset.status = "clear";
@@ -484,11 +493,14 @@ function renderAccountActivity() {
   const d1 = retention.find((row) => Number(row.day) === 1);
   const d7 = retention.find((row) => Number(row.day) === 7);
   const coverage = activity.coverageSince
-    ? `1.1.0부터 계측 · ${String(activity.coverageSince)} 시작`
-    : "1.1.0부터 계측";
+    ? `정확 계측 시작 · ${String(activity.coverageSince)}`
+    : "현재 1.1.0 배포본 미지원 · 1.1.1 코드 준비";
+  const waitingDetail = activity.coverageSince
+    ? `총 ${formatNumber(Number(activity.totalVisits || 0))}회 · 앱 실행별 1회`
+    : "현재 1.1.0 배포본에는 방문 RPC 호출 코드가 없어 0으로 표시됩니다.";
   setText("accountActivityCoverage", coverage);
   renderCoverageCards("accountActivitySummary", [
-    { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "새 실행 방문 계정", value: `${formatNumber(Number(activity.activeAccounts || 0))}명`, detail: `총 ${formatNumber(Number(activity.totalVisits || 0))}회 · 앱 실행별 1회` },
+    { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "새 실행 방문 계정", value: `${formatNumber(Number(activity.activeAccounts || 0))}명`, detail: waitingDetail },
     { status: Number(activity.repeatAccounts || 0) > 0 ? "available" : "waiting", label: "2회 이상 방문", value: `${formatNumber(Number(activity.repeatAccounts || 0))}명`, detail: `방문 계정 중 ${formatRate(activity.repeatRate)}` },
     { status: Number(activity.zeroCompletedGameAccounts || 0) > 0 ? "watch" : "available", label: "방문했지만 완료 0회", value: `${formatNumber(Number(activity.zeroCompletedGameAccounts || 0))}명`, detail: `${formatNumber(Number(activity.zeroCompletedGameVisits || 0))}번 방문 · 기간 내 완료 게임 없음` },
     { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "방문 계정의 게임 완료", value: formatRate(activity.visitToCompleteAccountRate), detail: `${formatNumber(Number(activity.accountsWithCompletedGame || 0))}명이 기간 내 1판 이상 완료` },
@@ -520,19 +532,15 @@ function renderPeriodPlayers() {
   byId("periodPrevious").disabled = state.playerPage <= 1;
   byId("periodNext").disabled = state.playerPage >= totalPages;
   byId("periodPlayersTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="11">이 기간에 조건과 일치하는 계정 활동 신호가 없습니다.</td></tr>'
+    ? '<tr><td class="empty-row" colspan="7">이 기간에 조건과 일치하는 계정 활동 신호가 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
-        <td data-label="플레이어">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
-        <td data-label="국가">${countryMarkup(row.country)}</td>
+        <td data-label="플레이어·국가"><div class="period-player-identity">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}${countryMarkup(row.country)}</div></td>
         <td data-label="활동 근거">${periodPlayerActivityMarkup(row)}</td>
-        <td data-label="새 실행 방문">${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "방문 없음"}</small></td>
-        <td data-label="완료 수">${formatNumber(row.gamesPlayed)}</td>
+        <td data-label="새 실행">${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "없음"}</small></td>
+        <td data-label="완료">${formatNumber(row.gamesPlayed)}</td>
         <td data-label="기간 최고">${row.gamesPlayed > 0 ? `${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small>` : "—"}</td>
-        <td data-label="젬">${formatNumber(row.gems)}</td>
-        <td data-label="스태미나">${formatNumber(row.stamina)}</td>
-        <td data-label="티켓">${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
         <td data-label="최근 활동">${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
-        <td data-label="처리"><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">바로 처리</a></td>
+        <td data-label="처리"><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">열기</a></td>
       </tr>`).join("");
 }
 
@@ -983,6 +991,7 @@ async function runAiBrief() {
 function syncFilterHash() {
   const query = root.ConsoleModel.serializeAnalyticsFilters({
     rangeDays: state.rangeDays,
+    rangeOffsetDays: state.rangeOffsetDays,
     distributionKey: state.distributionKey,
     sort: state.playerSort,
     direction: state.playerDirection,
@@ -995,7 +1004,9 @@ function syncFilterHash() {
 function readFilterHash() {
   const params = new URLSearchParams((root.location.hash.split("?")[1] || ""));
   const range = Number(params.get("rangeDays"));
-  if ([1, 7, 28].includes(range)) state.rangeDays = range;
+  if ([1, 3, 5, 7, 28].includes(range)) state.rangeDays = range;
+  const rangeOffset = Number(params.get("rangeOffsetDays"));
+  state.rangeOffsetDays = range === 1 && rangeOffset === 1 ? 1 : 0;
   const distribution = params.get("distributionKey");
   if (["all", "google_play", "app_store", "onestore"].includes(distribution)) state.distributionKey = distribution;
   const sort = params.get("sort");
@@ -1009,7 +1020,7 @@ function readFilterHash() {
 
 function updateFilterControls() {
   document.querySelectorAll(".range-button").forEach((button) => {
-    const active = Number(button.dataset.range) === state.rangeDays;
+    const active = Number(button.dataset.range) === state.rangeDays && Number(button.dataset.rangeOffset || 0) === state.rangeOffsetDays;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
@@ -1039,6 +1050,7 @@ function bindControls() {
   });
   document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
     state.rangeDays = Number(button.dataset.range);
+    state.rangeOffsetDays = Number(button.dataset.rangeOffset || 0);
     state.playerPage = 1;
     changeFilters();
   }));

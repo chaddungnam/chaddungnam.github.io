@@ -67,17 +67,20 @@ assert.equal(model.analyticsChoiceName("drag_drop_level"), "드래그 앤 드롭
 assert.equal(model.analyticsButtonName("main/ui/control_0/panel_1/growthchoice_space", "main"), "성장 선택 팝업 · 공간 축소");
 assert.equal(model.analyticsButtonName("main/hud/button_0", "main"), "게임 · 일시정지 메뉴 (구버전)");
 assert.equal(model.analyticsButtonName("home/start_game", "home"), "홈 · 게임 시작");
+assert.equal(model.analyticsButtonName("settings/control_1/panel_1/button_0", "settings"), "설정 · 문의 지원 페이지로 이동 (외부 브라우저)");
+assert.equal(model.analyticsButtonName("loading/onboarding_profile_confirm", "loading"), "첫 실행·로그인 · 닉네임·국가 설정 완료");
 assert.match(model.analyticsButtonName("main/ui/control_0/panel_1/button_2", "main"), /게임 중 팝업.*3번째 행동 버튼.*구버전/);
 assert.match(model.interactionRecommendation({ buttonId: "home/start_game", screen: "home", avgIdleSec: 25, installs: 5 }), /오래 머뭅니다/);
 
 assert.equal(model.serializeAnalyticsFilters({
   rangeDays: 28,
+  rangeOffsetDays: 0,
   distributionKey: "google_play",
   sort: "gems",
   direction: "asc",
   page: 3,
   query: "Duck",
-}), "rangeDays=28&distributionKey=google_play&sort=gems&direction=asc&page=3&query=Duck");
+}), "rangeDays=28&rangeOffsetDays=0&distributionKey=google_play&sort=gems&direction=asc&page=3&query=Duck");
 assert.equal(
   model.playerDeepLink("user/1", "#/analytics?rangeDays=7&sort=gems"),
   "#/players/user%2F1?return=%23%2Fanalytics%3FrangeDays%3D7%26sort%3Dgems",

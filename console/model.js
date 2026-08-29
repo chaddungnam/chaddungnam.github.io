@@ -142,6 +142,7 @@
   function serializeAnalyticsFilters(filters) {
     const params = new URLSearchParams();
     params.set("rangeDays", String(filters.rangeDays));
+    params.set("rangeOffsetDays", String(filters.rangeOffsetDays || 0));
     params.set("distributionKey", String(filters.distributionKey));
     params.set("sort", String(filters.sort));
     params.set("direction", String(filters.direction));
@@ -233,6 +234,10 @@
     if (raw.includes("rankingorbbutton")) return "홈 · 랭킹 열기";
     if (raw.includes("questshortcutbutton")) return "홈 · 미션 바로가기";
     if (raw.includes("settingsprofileopenbutton")) return "설정 · 프로필 열기";
+    if (raw.endsWith("/settings_contact_open") || raw.includes("settingsinfogrid/button_2")) return "설정 · 문의하기 열기";
+    if (raw.endsWith("/settings_contact_support_open") || raw === "settings/control_1/panel_1/button_0") return "설정 · 문의 지원 페이지로 이동 (외부 브라우저)";
+    if (raw.endsWith("/onboarding_profile_confirm")) return "첫 실행·로그인 · 닉네임·국가 설정 완료";
+    if (raw.endsWith("/onboarding_country_open")) return "첫 실행·로그인 · 국가 선택 열기";
     if (raw.includes("growthchoicehistorybutton")) return "게임 · 성장 효과 기록 열기";
     if (raw === "home/button_0") return "홈 · 게임 시작 (구버전)";
     if (raw === "main/hud/button_0") return "게임 · 일시정지 메뉴 (구버전)";
