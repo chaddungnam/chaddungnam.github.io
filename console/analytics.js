@@ -407,6 +407,13 @@ function renderAttention(pulseModel) {
   }));
 }
 
+function periodPlayerActivityMarkup(row) {
+  const source = String(row.activitySource || (Number(row.gamesPlayed) === 0 ? "home" : "completed_game"));
+  if (source === "home") return "<strong>홈 접속</strong><small>완료 기록 없음</small>";
+  if (source === "home_and_game") return "<strong>홈 + 게임</strong><small>완료 기록 있음</small>";
+  return "<strong>게임 완료</strong><small>홈 추적 전 기록</small>";
+}
+
 function renderPeriodPlayers() {
   const rows = root.ConsoleModel.dedupePlayers(state.payload?.periodPlayers ?? []);
   const total = Number(state.payload?.periodPlayerTotal ?? 0);
@@ -418,16 +425,17 @@ function renderPeriodPlayers() {
   byId("periodPrevious").disabled = state.playerPage <= 1;
   byId("periodNext").disabled = state.playerPage >= totalPages;
   byId("periodPlayersTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="9">이 기간에 조건과 일치하는 플레이 기록 계정이 없습니다.</td></tr>'
+    ? '<tr><td class="empty-row" colspan="10">이 기간에 조건과 일치하는 접속 계정이 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
         <td>${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
         <td>${countryMarkup(row.country)}</td>
+        <td>${periodPlayerActivityMarkup(row)}</td>
         <td>${formatNumber(row.gamesPlayed)}</td>
-        <td>${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small></td>
+        <td>${row.gamesPlayed > 0 ? `${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small>` : "—"}</td>
         <td>${formatNumber(row.gems)}</td>
         <td>${formatNumber(row.stamina)}</td>
         <td>${formatNumber(row.breakthroughTickets)} · ${formatNumber(row.speedBoostTickets)}</td>
-        <td>${escapeHtml(formatServerTime(row.latestPlayedAt))}</td>
+        <td>${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
         <td><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">바로 처리</a></td>
       </tr>`).join("");
 }

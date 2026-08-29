@@ -151,12 +151,12 @@
         </section>
 
         <section class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
-          <div class="panel-heading period-heading"><div><p class="eyebrow">COMPLETED PLAY RECORDS</p><h2 id="periodPlayersTitle">기간 내 완료 기록 계정</h2><small>서버에 정상 완료 game_records가 저장된 계정입니다. 앱만 열었거나 게임 중 종료한 설치는 포함되지 않습니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
+          <div class="panel-heading period-heading"><div><p class="eyebrow">SIGNED-IN ACTIVITY</p><h2 id="periodPlayersTitle">기간 내 접속 계정</h2><small>로그인 후 홈에 도달했거나 서버에 정상 완료 기록이 저장된 계정입니다. 홈만 보고 나간 계정도 포함합니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
           <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
             <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
             <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
           </form>
-          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어</button></th><th><button data-player-sort="country" type="button">국가</button></th><th><button data-player-sort="games_played" type="button">플레이 수</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="gems" type="button">젬</button></th><th>스태미나</th><th>티켓</th><th><button data-player-sort="latest_played_at" type="button">최근 플레이</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어</button></th><th><button data-player-sort="country" type="button">국가</button></th><th>상태</th><th><button data-player-sort="games_played" type="button">완료 수</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="gems" type="button">젬</button></th><th>스태미나</th><th>티켓</th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
         </section>
 
@@ -316,7 +316,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js"></script>
   <script src="api.js"></script>
-  <script src="analytics.js?v=20260829-1"></script>
+  <script src="analytics.js?v=20260829-2"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>
