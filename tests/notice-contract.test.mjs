@@ -24,5 +24,6 @@ test("notice page reads the active console notice instead of a static copy", asy
   assert.match(html, /sort\(\(a, b\).*created_at/s);
   assert.match(html, /id="notice-detail"/);
   assert.match(html, /has\("embed"\)/);
+  assert.match(html, /body\.embedded \.kicker, body\.embedded h1/);
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });
