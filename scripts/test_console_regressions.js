@@ -41,6 +41,7 @@ assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-o
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
 assert.match(consoleHtml, /analytics\.js\?v=20260829-3/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
 assert.match(consoleHtml, /기간 내 접속 계정/, "the period account panel must include signed-in home visitors");
 assert.match(consoleHtml, /새 빌드부터는 홈 도달 여부를 정확히 구분합니다/, "the period account panel must explain exact home coverage timing");
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
@@ -130,11 +131,15 @@ function memoryStorage() {
 }
 
 const authStorage = memoryStorage();
+const legacyAuthStorage = memoryStorage();
+const adminSessionPayload = Buffer.from(JSON.stringify({ sub: "google-1", email: "admin@example.com", iat: 1, exp: 9999999999 })).toString("base64url");
+const adminSessionTicket = `${adminSessionPayload}.signature`;
 let googleCredentialCallback;
 let authFetchRequest;
-let authReply = { adminTicket: "ticket", expiresIn: 1800, email: "admin@example.com" };
+let authReply = { adminTicket: adminSessionTicket, expiresIn: 259200, email: "admin@example.com" };
 const authWindow = {
-  sessionStorage: authStorage,
+  localStorage: authStorage,
+  sessionStorage: legacyAuthStorage,
   ConsoleModel: {
     decodeJwtPayload(token) {
       try { return JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString("utf8")); }
@@ -168,9 +173,37 @@ assert.equal(authWindow.ConsoleAuth.snapshot().signedIn, true);
 const unlocked = await authWindow.ConsoleAuth.unlock("answer");
 assert.equal(unlocked.unlocked, true);
 assert.deepEqual(JSON.parse(authFetchRequest.body), { answer: "answer" });
-assert.equal(authWindow.ConsoleAuth.headers()["X-Admin-Session"], "ticket");
+assert.equal(authWindow.ConsoleAuth.headers()["X-Admin-Session"], adminSessionTicket);
+assert.equal(authStorage.getItem("house_duck_console_admin_ticket"), adminSessionTicket, "the 72-hour session must persist across browser restarts");
+assert.equal(legacyAuthStorage.getItem("house_duck_console_admin_ticket"), null, "the old tab-only session storage must be cleared");
 authReply = { adminTicket: "", expiresIn: 0, email: "admin@example.com" };
 await assert.rejects(() => authWindow.ConsoleAuth.unlock("answer"), /admin_auth_failed/);
+
+const expiredGooglePayload = Buffer.from(JSON.stringify({ email: "admin@example.com", exp: 1 })).toString("base64url");
+authStorage.setItem("house_duck_console_google_id_token", `header.${expiredGooglePayload}.signature`);
+const reloadWindow = {
+  localStorage: authStorage,
+  sessionStorage: memoryStorage(),
+  ConsoleModel: authWindow.ConsoleModel,
+  google: { accounts: { id: { initialize() {}, renderButton() {} } } },
+  dispatchEvent() {},
+  setTimeout,
+};
+vm.runInNewContext(read("console/auth.js"), {
+  Buffer,
+  CustomEvent: authContext.CustomEvent,
+  Date,
+  document: { getElementById: () => ({}) },
+  fetch: authContext.fetch,
+  setTimeout,
+  window: reloadWindow,
+}, { filename: "console/auth.js" });
+const reloadedAuth = await reloadWindow.ConsoleAuth.initialize({ clientId: "client", publishableKey: "public", authUrl: "https://example.test/admin-auth" });
+assert.equal(reloadedAuth.unlocked, true, "an expired Google ID token must not end a valid 72-hour admin session");
+assert.equal(reloadedAuth.email, "admin@example.com");
+assert.equal(reloadWindow.ConsoleAuth.headers().Authorization, undefined, "expired Google credentials must not be sent to admin APIs");
+reloadWindow.ConsoleAuth.logout();
+assert.equal(authStorage.getItem("house_duck_console_admin_ticket"), null, "explicit logout must still clear the persistent session");
 
 let apiResponse;
 let logoutCalls = 0;

@@ -2,10 +2,21 @@
   const GOOGLE_TOKEN_KEY = "house_duck_console_google_id_token";
   const ADMIN_TICKET_KEY = "house_duck_console_admin_ticket";
   const TICKET_EXPIRY_KEY = "house_duck_console_ticket_expires_at";
+  const storage = root.localStorage;
+  const legacyStorage = root.sessionStorage;
+  const storedValue = (key) => storage.getItem(key) || legacyStorage.getItem(key) || "";
+  const storeValue = (key, value) => {
+    storage.setItem(key, value);
+    legacyStorage.removeItem(key);
+  };
+  const removeValue = (key) => {
+    storage.removeItem(key);
+    legacyStorage.removeItem(key);
+  };
   let config = {};
-  let googleIdToken = root.sessionStorage.getItem(GOOGLE_TOKEN_KEY) || "";
-  let adminTicket = root.sessionStorage.getItem(ADMIN_TICKET_KEY) || "";
-  let ticketExpiresAt = Number(root.sessionStorage.getItem(TICKET_EXPIRY_KEY) || 0);
+  let googleIdToken = storedValue(GOOGLE_TOKEN_KEY);
+  let adminTicket = storedValue(ADMIN_TICKET_KEY);
+  let ticketExpiresAt = Number(storedValue(TICKET_EXPIRY_KEY) || 0);
   let email = "";
 
   function hasValidGoogleIdentity() {
@@ -15,14 +26,24 @@
     return true;
   }
 
+  function hasValidAdminSession() {
+    const encodedClaims = adminTicket.split(".")[0] || "";
+    const claims = root.ConsoleModel.decodeJwtPayload(`header.${encodedClaims}.signature`);
+    if (!claims?.sub || !claims?.email || Number(claims.exp) * 1_000 <= Date.now()) return false;
+    if (ticketExpiresAt <= Date.now() || ticketExpiresAt > Number(claims.exp) * 1_000 + 5_000) return false;
+    email = claims.email;
+    return true;
+  }
+
   function isUnlocked() {
-    return hasValidGoogleIdentity() && Boolean(adminTicket) && ticketExpiresAt > Date.now();
+    return hasValidAdminSession();
   }
 
   function snapshot() {
+    const unlocked = isUnlocked();
     return {
-      signedIn: hasValidGoogleIdentity(),
-      unlocked: isUnlocked(),
+      signedIn: unlocked || hasValidGoogleIdentity(),
+      unlocked,
       email,
     };
   }
@@ -34,20 +55,20 @@
   function clearTicket() {
     adminTicket = "";
     ticketExpiresAt = 0;
-    root.sessionStorage.removeItem(ADMIN_TICKET_KEY);
-    root.sessionStorage.removeItem(TICKET_EXPIRY_KEY);
+    removeValue(ADMIN_TICKET_KEY);
+    removeValue(TICKET_EXPIRY_KEY);
   }
 
   function handleGoogleCredential(response) {
     googleIdToken = typeof response?.credential === "string" ? response.credential : "";
     if (!hasValidGoogleIdentity()) {
       googleIdToken = "";
-      root.sessionStorage.removeItem(GOOGLE_TOKEN_KEY);
+      removeValue(GOOGLE_TOKEN_KEY);
       notify();
       return;
     }
     clearTicket();
-    root.sessionStorage.setItem(GOOGLE_TOKEN_KEY, googleIdToken);
+    storeValue(GOOGLE_TOKEN_KEY, googleIdToken);
     notify();
   }
 
@@ -65,12 +86,16 @@
 
   async function initialize(options) {
     config = { ...options };
-    if (!hasValidGoogleIdentity()) {
+    const validGoogleIdentity = hasValidGoogleIdentity();
+    const validAdminSession = hasValidAdminSession();
+    if (!validGoogleIdentity) {
       googleIdToken = "";
-      clearTicket();
-      root.sessionStorage.removeItem(GOOGLE_TOKEN_KEY);
-    } else if (ticketExpiresAt <= Date.now()) {
-      clearTicket();
+      removeValue(GOOGLE_TOKEN_KEY);
+    }
+    if (!validAdminSession) clearTicket();
+    else {
+      storeValue(ADMIN_TICKET_KEY, adminTicket);
+      storeValue(TICKET_EXPIRY_KEY, String(ticketExpiresAt));
     }
 
     await waitForGoogleIdentity();
@@ -110,19 +135,20 @@
     adminTicket = body.adminTicket;
     ticketExpiresAt = Date.now() + expiresIn * 1_000;
     email = body.email || email;
-    root.sessionStorage.setItem(ADMIN_TICKET_KEY, adminTicket);
-    root.sessionStorage.setItem(TICKET_EXPIRY_KEY, String(ticketExpiresAt));
+    storeValue(ADMIN_TICKET_KEY, adminTicket);
+    storeValue(TICKET_EXPIRY_KEY, String(ticketExpiresAt));
     notify();
     return snapshot();
   }
 
   function headers() {
-    return {
+    const result = {
       ["api" + "key"]: config.publishableKey,
-      ["Author" + "ization"]: `Bearer ${googleIdToken}`,
       "X-Admin-Session": adminTicket,
       "Content-Type": "application/json",
     };
+    if (hasValidGoogleIdentity()) result["Author" + "ization"] = `Bearer ${googleIdToken}`;
+    return result;
   }
 
   function requireChallenge() {
@@ -136,7 +162,7 @@
     googleIdToken = "";
     email = "";
     clearTicket();
-    root.sessionStorage.removeItem(GOOGLE_TOKEN_KEY);
+    removeValue(GOOGLE_TOKEN_KEY);
     root.google?.accounts?.id?.disableAutoSelect?.();
     if (revokeEmail) root.google?.accounts?.id?.revoke?.(revokeEmail, () => {});
     notify();
