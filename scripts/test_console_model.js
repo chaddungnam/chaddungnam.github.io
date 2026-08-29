@@ -69,6 +69,7 @@ assert.equal(model.analyticsButtonName("main/hud/button_0", "main"), "게임 · 
 assert.equal(model.analyticsButtonName("home/start_game", "home"), "홈 · 게임 시작");
 assert.equal(model.analyticsButtonName("settings/control_1/panel_1/button_0", "settings"), "설정 · 문의 지원 페이지로 이동 (외부 브라우저)");
 assert.equal(model.analyticsButtonName("loading/onboarding_profile_confirm", "loading"), "첫 실행·로그인 · 닉네임·국가 설정 완료");
+assert.equal(model.analyticsScreenName("profilecustomize"), "프로필 꾸미기");
 assert.match(model.analyticsButtonName("main/ui/control_0/panel_1/button_2", "main"), /게임 중 팝업.*3번째 행동 버튼.*구버전/);
 assert.match(model.interactionRecommendation({ buttonId: "home/start_game", screen: "home", avgIdleSec: 25, installs: 5 }), /3초를 넘겨/);
 

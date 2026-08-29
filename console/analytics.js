@@ -32,6 +32,17 @@ function formatDuration(value) {
   if (minutes < 60) return remainder ? `${minutes}분 ${remainder}초` : `${minutes}분`;
   return `${Math.floor(minutes / 60)}시간 ${minutes % 60}분`;
 }
+function formatMeaningfulDuration(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  if (value >= 10) return formatDuration(value);
+  const tenths = Math.max(3.1, Math.round(value * 10) / 10);
+  return `${Number(tenths.toFixed(1))}초`;
+}
+function formatHesitationDuration(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  const tenths = Math.min(4.9, Math.max(3.1, Math.round(value * 10) / 10));
+  return `${Number(tenths.toFixed(1))}초`;
+}
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[character]));
 }
@@ -372,7 +383,7 @@ function renderInteractionInsights() {
       return `<article class="behavior-card" data-legacy="${row.legacy}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(row.label)}</h3><small>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}${row.legacy ? " · 구버전" : ""}</small></div>
-        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>명</span><span>중앙 <b>${formatDuration(hesitation)}</b></span></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>명</span><span>중앙 <b>${formatHesitationDuration(hesitation)}</b></span></div>
         <p>${escapeHtml(recommendation)}</p>
       </article>`;
     }).join("");
@@ -381,7 +392,7 @@ function renderInteractionInsights() {
   for (const row of interactions.dropoffs ?? []) {
     if (!dropoffByScreen.has(row.screen)) dropoffByScreen.set(row.screen, row);
   }
-  const screens = [...(interactions.screens ?? [])].filter((row) => String(row.screen || "").toLowerCase() !== "home").sort((left, right) => {
+  const screens = [...(interactions.screens ?? [])].filter((row) => String(row.screen || "").toLowerCase() !== "home" && Number(row.exits || 0) > 0).sort((left, right) => {
     const leftLegacy = root.ConsoleModel.analyticsScreenName(left.screen) === "화면 미식별";
     const rightLegacy = root.ConsoleModel.analyticsScreenName(right.screen) === "화면 미식별";
     return Number(leftLegacy) - Number(rightLegacy) || Number(right.visits || 0) - Number(left.visits || 0);
@@ -406,7 +417,7 @@ function renderInteractionInsights() {
       return `<article class="behavior-card behavior-card-exit" data-risk="${!expectedExternalExit && exitRate !== null && exitRate >= 0.3}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</h3><small>마지막 행동 · ${escapeHtml(lastButton)}</small></div>
-        <div class="behavior-metrics"><span><b>${formatNumber(row.visits)}</b>회 방문</span><span><b>${formatRate(exitRate)}</b> 종료</span><span><b>${formatDuration(row.avgDwellSec)}</b> 체류</span></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.visits)}</b>회 방문</span><span><b>${formatRate(exitRate)}</b> 종료</span><span><b>${formatMeaningfulDuration(row.avgDwellSec)}</b> 체류</span></div>
         <p>${escapeHtml(recommendation)}</p>
       </article>`;
     }).join("");

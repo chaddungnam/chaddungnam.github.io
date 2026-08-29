@@ -199,7 +199,7 @@
 
   const analyticsScreenNames = Object.freeze({
     home: "홈", main: "게임", loading: "첫 실행·로그인", settings: "설정", shop: "상점",
-    scorerecord: "점수 기록", attendance: "미션·출석", profile: "프로필", mailbox: "우편함",
+    scorerecord: "점수 기록", attendance: "미션·출석", profile: "프로필", profilecustomize: "프로필 꾸미기", mailbox: "우편함",
     origincutscene: "오프닝 이야기", ranking: "랭킹", friends: "친구", notice: "공지",
   });
 
