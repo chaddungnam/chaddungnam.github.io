@@ -40,10 +40,13 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260829-3/, "the Console must cache-bust the updated analytics renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260829-4/, "the Console must cache-bust the updated analytics renderer");
 assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
-assert.match(consoleHtml, /기간 내 접속 계정/, "the period account panel must include signed-in home visitors");
-assert.match(consoleHtml, /새 빌드부터는 홈 도달 여부를 정확히 구분합니다/, "the period account panel must explain exact home coverage timing");
+assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
+assert.match(consoleHtml, /로그인, 앱 RPC, 계정 동기화, 정확한 홈 진입과 게임 완료/, "the period account panel must explain every supported activity signal");
+assert.match(analyticsSource, /source === "app_activity"[\s\S]*앱 서버 접속/, "existing builds must show server-confirmed app activity");
+assert.match(analyticsSource, /source === "account_sync"[\s\S]*계정 동기화/, "historical account synchronization must remain a distinct signal");
+assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 미확인/, "sign-in evidence must not be mislabeled as a home visit");
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");

@@ -413,10 +413,12 @@ function renderAttention(pulseModel) {
 
 function periodPlayerActivityMarkup(row) {
   const source = String(row.activitySource || (Number(row.gamesPlayed) === 0 ? "signed_in" : "completed_game"));
-  if (source === "home") return "<strong>홈 접속</strong><small>완료 기록 없음</small>";
-  if (source === "home_and_game") return "<strong>홈 + 게임</strong><small>완료 기록 있음</small>";
-  if (source === "signed_in") return "<strong>로그인·홈</strong><small>완료 기록 없음</small>";
-  return "<strong>게임 완료</strong><small>홈 추적 전 기록</small>";
+  if (source === "home") return "<strong>홈 접속</strong><small>클라이언트가 정확히 기록</small>";
+  if (source === "home_and_game") return "<strong>홈 + 게임</strong><small>두 신호 모두 확인</small>";
+  if (source === "app_activity") return "<strong>앱 서버 접속</strong><small>기존 1.1.0도 확인</small>";
+  if (source === "account_sync") return "<strong>계정 동기화</strong><small>서버 상태 갱신 근거</small>";
+  if (source === "signed_in") return "<strong>로그인</strong><small>홈 도달 여부 미확인</small>";
+  return "<strong>게임 완료</strong><small>홈 도달 여부 미확인</small>";
 }
 
 function renderPeriodPlayers() {
@@ -430,7 +432,7 @@ function renderPeriodPlayers() {
   byId("periodPrevious").disabled = state.playerPage <= 1;
   byId("periodNext").disabled = state.playerPage >= totalPages;
   byId("periodPlayersTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="10">이 기간에 조건과 일치하는 접속 계정이 없습니다.</td></tr>'
+    ? '<tr><td class="empty-row" colspan="10">이 기간에 조건과 일치하는 계정 활동 신호가 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
         <td>${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.accountType)}</small></td>
         <td>${countryMarkup(row.country)}</td>
