@@ -414,7 +414,7 @@ function renderPriorityInsights() {
     panel.dataset.status = "risk";
     setText("priorityInsightTitle", "성장 선택 광고 뒤 선택 없이 멈춤");
     setText("priorityInsightValue", `${formatNumber(stopped)}회 · ${formatNumber(users)}설치`);
-    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다.`);
+    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다. 보상만 받고 나가려 했거나, 광고 뒤에도 선택이 필요하다는 안내를 놓친 흐름일 가능성이 큽니다. 광고 종료 직후 “보상 완료 · 하나를 선택하세요”를 크게 보여준 뒤 선택 전환을 비교하세요.`);
     return;
   }
   panel.dataset.status = "clear";
