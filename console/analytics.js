@@ -1,7 +1,7 @@
 (function attachConsoleAnalytics(root) {
 const state = {
   payload: null,
-  rangeDays: 7,
+  rangeDays: 3,
   rangeOffsetDays: 0,
   distributionKey: "all",
   playerQuery: "",
@@ -372,7 +372,7 @@ function renderInteractionInsights() {
       return `<article class="behavior-card" data-legacy="${row.legacy}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(row.label)}</h3><small>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}${row.legacy ? " · 구버전" : ""}</small></div>
-        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 누름</span><span><b>${formatNumber(row.users)}</b>설치</span><span><b>${formatDuration(hesitation)}</b> 망설임</span></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>명</span><span>중앙 <b>${formatDuration(hesitation)}</b></span></div>
         <p>${escapeHtml(recommendation)}</p>
       </article>`;
     }).join("");
