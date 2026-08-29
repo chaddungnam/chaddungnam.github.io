@@ -408,9 +408,10 @@ function renderAttention(pulseModel) {
 }
 
 function periodPlayerActivityMarkup(row) {
-  const source = String(row.activitySource || (Number(row.gamesPlayed) === 0 ? "home" : "completed_game"));
+  const source = String(row.activitySource || (Number(row.gamesPlayed) === 0 ? "signed_in" : "completed_game"));
   if (source === "home") return "<strong>홈 접속</strong><small>완료 기록 없음</small>";
   if (source === "home_and_game") return "<strong>홈 + 게임</strong><small>완료 기록 있음</small>";
+  if (source === "signed_in") return "<strong>로그인·홈</strong><small>완료 기록 없음</small>";
   return "<strong>게임 완료</strong><small>홈 추적 전 기록</small>";
 }
 

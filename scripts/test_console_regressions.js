@@ -42,8 +42,8 @@ assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics d
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
 assert.match(consoleHtml, /analytics\.js\?v=20260829-2/, "the Console must cache-bust the updated analytics renderer");
 assert.match(consoleHtml, /기간 내 접속 계정/, "the period account panel must include signed-in home visitors");
-assert.match(consoleHtml, /홈만 보고 나간 계정도 포함합니다/, "the period account panel must explain home-only coverage");
-assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "home"/, "zero-completion accounts must render as home visitors");
+assert.match(consoleHtml, /새 빌드부터는 홈 도달 여부를 정확히 구분합니다/, "the period account panel must explain exact home coverage timing");
+assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(consoleHtml, /styles\.css\?v=20260829-1/, "the Console must cache-bust player tracking styles");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
