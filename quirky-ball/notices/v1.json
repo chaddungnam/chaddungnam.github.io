@@ -1,0 +1,82 @@
+{
+  "active": true,
+  "supported_compatibility_codes": [41],
+  "cta": {
+    "label": "View update",
+    "url": "https://houseduck.in/quirky-ball/notices/"
+  },
+  "locales": {
+    "ko": {
+      "title": "Quirky Ball 1.1.1 업데이트",
+      "body": "게임 진행이 끊기지 않도록 업데이트 후 로그인 흐름과 광고 복귀를 안정화했습니다. 성장 선택과 고레벨 규칙을 더 분명하게 다듬고, 많은 구슬과 연사 상황에서도 같은 화면 품질을 유지하도록 성능을 개선했습니다.",
+      "published_at": "2026-08-29",
+      "cta_label": "업데이트 확인하기"
+    },
+    "en": {
+      "title": "Quirky Ball 1.1.1 Update",
+      "body": "We stabilized account continuity after updates and recovery from ads so play is less likely to be interrupted. Growth choices and later-level rules are clearer, with performance improvements for crowded boards and rapid shooting at the same visual quality.",
+      "published_at": "2026-08-29",
+      "cta_label": "View the update"
+    },
+    "de": {
+      "title": "Quirky Ball Update 1.1.1",
+      "body": "Wir haben die Kontoübernahme nach Updates und die Rückkehr aus Werbung stabilisiert, damit das Spiel nicht unterbrochen wird. Wachstumsoptionen und spätere Levelregeln sind klarer, während volle Spielfelder und schnelles Schießen bei gleicher Bildqualität flüssiger laufen.",
+      "published_at": "2026-08-29",
+      "cta_label": "Update ansehen"
+    },
+    "ja": {
+      "title": "Quirky Ball 1.1.1 アップデート",
+      "body": "アップデート後のアカウント引き継ぎと広告からの復帰を安定させ、プレイが途切れにくくなりました。成長選択と高レベルのルールを分かりやすくし、球が多い場面や連射中も同じ画質で滑らかに動くよう改善しました。",
+      "published_at": "2026-08-29",
+      "cta_label": "アップデートを見る"
+    },
+    "fr": {
+      "title": "Mise à jour 1.1.1 de Quirky Ball",
+      "body": "Nous avons stabilisé la continuité du compte après une mise à jour et le retour après une publicité afin de moins interrompre la partie. Les choix de progression et les règles des niveaux avancés sont plus clairs, avec de meilleures performances sur les plateaux chargés et pendant les tirs rapides, sans réduire la qualité visuelle.",
+      "published_at": "2026-08-29",
+      "cta_label": "Voir la mise à jour"
+    },
+    "es": {
+      "title": "Actualización 1.1.1 de Quirky Ball",
+      "body": "Hemos estabilizado la continuidad de la cuenta tras actualizar y el regreso desde los anuncios para evitar interrupciones. Las elecciones de crecimiento y las reglas de niveles avanzados son más claras, con mejoras de rendimiento en tableros llenos y durante disparos rápidos sin reducir la calidad visual.",
+      "published_at": "2026-08-29",
+      "cta_label": "Ver la actualización"
+    },
+    "it": {
+      "title": "Aggiornamento 1.1.1 di Quirky Ball",
+      "body": "Abbiamo reso più stabile la continuità dell'account dopo gli aggiornamenti e il rientro dalle pubblicità, così la partita si interrompe meno spesso. Le scelte di crescita e le regole dei livelli avanzati sono più chiare, con prestazioni migliori sui tabelloni affollati e durante il tiro rapido senza ridurre la qualità visiva.",
+      "published_at": "2026-08-29",
+      "cta_label": "Vedi l'aggiornamento"
+    },
+    "zh_CN": {
+      "title": "Quirky Ball 1.1.1 更新",
+      "body": "我们提升了更新后的账号连续性与广告返回流程的稳定性，减少游戏中断。成长选择和高等级规则更加清晰，并在保持相同画面质量的同时改善了球体密集和快速射击时的性能。",
+      "published_at": "2026-08-29",
+      "cta_label": "查看更新"
+    },
+    "zh_TW": {
+      "title": "Quirky Ball 1.1.1 更新",
+      "body": "我們提升了更新後的帳號延續性與廣告返回流程的穩定性，減少遊戲中斷。成長選擇和高等級規則更加清楚，並在維持相同畫面品質的同時改善球體密集與快速射擊時的效能。",
+      "published_at": "2026-08-29",
+      "cta_label": "查看更新"
+    },
+    "ar": {
+      "title": "تحديث Quirky Ball 1.1.1",
+      "body": "حسّنا استمرارية الحساب بعد التحديث والعودة من الإعلانات لتقليل انقطاع اللعب. أصبحت خيارات التطور وقواعد المستويات المتقدمة أوضح، مع أداء أفضل عند ازدحام اللوحة وأثناء الإطلاق السريع من دون خفض جودة الصورة.",
+      "published_at": "2026-08-29",
+      "cta_label": "عرض التحديث"
+    },
+    "id": {
+      "title": "Pembaruan Quirky Ball 1.1.1",
+      "body": "Kami menstabilkan kelanjutan akun setelah pembaruan dan pemulihan dari iklan agar permainan tidak mudah terhenti. Pilihan perkembangan dan aturan level lanjut kini lebih jelas, dengan performa yang lebih baik saat papan padat dan tembakan cepat tanpa menurunkan kualitas visual.",
+      "published_at": "2026-08-29",
+      "cta_label": "Lihat pembaruan"
+    },
+    "ur": {
+      "title": "Quirky Ball 1.1.1 اپ ڈیٹ",
+      "body": "ہم نے اپ ڈیٹ کے بعد اکاؤنٹ کے تسلسل اور اشتہار سے واپسی کو زیادہ مستحکم بنایا ہے تاکہ کھیل کم رکے۔ ترقی کے انتخاب اور بعد کی سطحوں کے اصول زیادہ واضح ہیں، جبکہ بھرے ہوئے بورڈ اور تیز فائرنگ میں بصری معیار کم کیے بغیر کارکردگی بہتر کی گئی ہے۔",
+      "published_at": "2026-08-29",
+      "cta_label": "اپ ڈیٹ دیکھیں"
+    }
+  }
+}

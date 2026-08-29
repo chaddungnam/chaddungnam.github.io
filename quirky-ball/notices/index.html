@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f4ec">
+  <meta name="description" content="Quirky Ball update notices from House Duck">
+  <link href="/assets/site-fonts.css" rel="stylesheet">
+  <title>Quirky Ball Updates — House Duck</title>
+  <style>
+    :root { color-scheme: light; font-family: "Noto Sans", system-ui, sans-serif; color: #2c211b; background: #f8f4ec; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 80% 8%, #ffd9a7 0, transparent 34%), #f8f4ec; }
+    a { color: inherit; }
+    header, main, footer { width: min(720px, calc(100% - 36px)); margin-inline: auto; }
+    header { display: flex; justify-content: space-between; align-items: center; min-height: 76px; gap: 20px; }
+    .brand { font-weight: 900; letter-spacing: .08em; text-decoration: none; }
+    select { border: 1px solid #d7c3af; border-radius: 999px; background: #fffaf3; padding: 8px 12px; color: inherit; }
+    main { padding: clamp(34px, 8vw, 88px) 0 60px; }
+    .kicker { margin: 0 0 14px; color: #d85832; font-size: .78rem; font-weight: 900; letter-spacing: .14em; }
+    article { border: 1px solid #ead6c1; border-radius: 28px; background: rgba(255,255,255,.86); padding: clamp(26px, 6vw, 56px); box-shadow: 0 18px 60px rgba(91,50,29,.1); }
+    h1 { margin: 0; max-width: 15ch; font-size: clamp(2.1rem, 8vw, 4.4rem); line-height: .98; letter-spacing: -.045em; word-break: keep-all; }
+    time { display: block; margin: 20px 0 32px; color: #8b6e5d; font-weight: 700; }
+    #notice-body { margin: 0; font-size: clamp(1.03rem, 2.5vw, 1.2rem); line-height: 1.85; white-space: pre-line; }
+    .back { display: inline-flex; margin-top: 32px; border-radius: 999px; background: #ea623c; color: white; padding: 13px 20px; font-weight: 900; text-decoration: none; }
+    .error { color: #8b6e5d; }
+    footer { padding: 0 0 36px; color: #8b6e5d; font-size: .84rem; }
+    @media (prefers-reduced-motion: no-preference) { article { animation: enter .45s ease-out both; } @keyframes enter { from { opacity: 0; transform: translateY(10px); } } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">HOUSE DUCK</a>
+    <label><span hidden>Language</span><select id="language" aria-label="Language"></select></label>
+  </header>
+  <main>
+    <p class="kicker">QUIRKY BALL · UPDATE</p>
+    <article aria-live="polite">
+      <h1 id="notice-title">Loading…</h1>
+      <time id="notice-date"></time>
+      <p id="notice-body"></p>
+      <a class="back" href="/quirky-ball/">Quirky Ball</a>
+    </article>
+  </main>
+  <footer>© 2026 House Duck. Small games. Big personality.</footer>
+  <script>
+    const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
+    const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
+    const requested = new URLSearchParams(location.search).get("lang") ?? normalizeLanguage(navigator.language || "en");
+
+    fetch("./v1.json", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((data) => {
+        const language = data.locales[requested] ? requested : "en";
+        const render = (nextLanguage) => {
+          const notice = data.locales[nextLanguage] ?? data.locales.en;
+          document.documentElement.lang = nextLanguage.replace("_", "-");
+          document.documentElement.dir = ["ar", "ur"].includes(nextLanguage) ? "rtl" : "ltr";
+          document.querySelector("#notice-title").textContent = notice.title;
+          document.querySelector("#notice-date").textContent = notice.published_at;
+          document.querySelector("#notice-date").dateTime = notice.published_at;
+          document.querySelector("#notice-body").textContent = notice.body;
+          document.title = `${notice.title} — House Duck`;
+        };
+        const select = document.querySelector("#language");
+        for (const key of Object.keys(data.locales)) select.add(new Option(languageNames[key] ?? key, key));
+        select.value = language;
+        select.addEventListener("change", () => render(select.value));
+        render(language);
+      })
+      .catch(() => {
+        document.querySelector("#notice-title").textContent = "House Duck";
+        document.querySelector("#notice-body").textContent = "This notice is temporarily unavailable.";
+        document.querySelector("#notice-body").className = "error";
+      });
+  </script>
+</body>
+</html>
