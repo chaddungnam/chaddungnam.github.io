@@ -353,10 +353,14 @@ function renderInteractionInsights() {
     const label = root.ConsoleModel.analyticsButtonName(row.buttonId, row.screen);
     return { ...row, label, legacy: row.legacy === true || label.includes("구버전") || label.includes("기록되지 않은") };
   }).sort((left, right) => Number(left.legacy) - Number(right.legacy) || Number(right.presses || 0) - Number(left.presses || 0));
+  const displayedButtonRows = [
+    ...buttonRows.filter((row) => !row.legacy).slice(0, 20),
+    ...buttonRows.filter((row) => row.legacy),
+  ];
   const buttonBody = byId("buttonInsightsTable");
-  buttonBody.innerHTML = buttonRows.length === 0
+  buttonBody.innerHTML = displayedButtonRows.length === 0
     ? '<p class="empty-panel">버튼 데이터가 쌓이면 표시됩니다.</p>'
-    : buttonRows.slice(0, 20).map((row, index) => {
+    : displayedButtonRows.map((row, index) => {
       const hesitation = row.medianIdleBeforeSec ?? row.avgIdleBeforeSec;
       const recommendation = root.ConsoleModel.interactionRecommendation({ ...row, installs: row.users, avgIdleSec: hesitation });
       return `<article class="behavior-card" data-legacy="${row.legacy}">
