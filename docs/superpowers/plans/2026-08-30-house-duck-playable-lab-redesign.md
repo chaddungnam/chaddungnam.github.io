@@ -24,9 +24,9 @@
 **Files:**
 - Modify: `tests/public-site.spec.js`
 
-- [ ] Add a browser test that asserts the four home pages expose the exact existing localized legal/support links.
-- [ ] Add a browser test that requires a visible `Quirky Ball 1.1.0` hero, one prominent real gameplay video, moving launch marbles, a rapid shot burst, exactly two projects, and three equal-height YouTube cards.
-- [ ] Run the two tests and confirm the new hero test fails against the current design while the route contract passes.
+- [x] Add a browser test that asserts the four home pages expose the exact existing localized legal/support links.
+- [x] Add a browser test that requires a visible `Quirky Ball 1.1.0` hero, one prominent real gameplay video, moving launch marbles, a rapid shot burst, exactly two projects, and three equal-height YouTube cards.
+- [x] Run the two tests and confirm the new hero test fails against the current design while the route contract passes.
 
 ### Task 2: Build the localized playable-lab home
 
@@ -38,21 +38,21 @@
 - Modify: `assets/studio-home.css`
 - Modify: `assets/studio-home.js`
 
-- [ ] Replace the studio-first opening with the Quirky Ball 1.1.0 release chamber and translated copy.
-- [ ] Keep existing feed, project, video, mascot, and navigation data attributes so automation continues to work.
-- [ ] Recompose the two project sections and three-card YouTube section without adding a new section or dependency.
-- [ ] Make the existing canvas fill the hero atmosphere, improve its initial burst and impact rendering, and retain reduced-motion behavior.
-- [ ] Run the targeted tests until they pass.
+- [x] Replace the studio-first opening with the Quirky Ball 1.1.0 release chamber and translated copy.
+- [x] Keep existing feed, project, video, mascot, and navigation data attributes so automation continues to work.
+- [x] Recompose the two project sections and three-card YouTube section without adding a new section or dependency.
+- [x] Make the existing canvas fill the hero atmosphere, improve its initial burst and impact rendering, and retain reduced-motion behavior.
+- [x] Run the targeted tests until they pass.
 
 ### Task 3: Visual and route verification
 
 **Files:**
 - Modify only if a reproduced defect requires it.
 
-- [ ] Capture desktop and 390px mobile screenshots from final local code after motion settles.
-- [ ] Inspect Korean, English, German, and Japanese home pages for clipping, hierarchy, video playback, and exact legal/support links.
-- [ ] Run `bash scripts/check_public_repo.sh --all`, `bash scripts/check_brand_site.sh`, `npm run test:e2e`, and `git diff --check`.
-- [ ] Fix only reproduced defects and rerun the failed check.
+- [x] Capture desktop and 390px mobile screenshots from final local code after motion settles.
+- [x] Inspect Korean, English, German, and Japanese home pages for clipping, hierarchy, video playback, and exact legal/support links.
+- [x] Run `bash scripts/check_public_repo.sh --all`, `bash scripts/check_brand_site.sh`, `npm run test:e2e`, and `git diff --check`.
+- [x] Fix only reproduced defects and rerun the failed check.
 
 ### Task 4: Deploy and verify live
 
@@ -63,4 +63,3 @@
 - [ ] Commit and push the verified redesign.
 - [ ] Confirm the Pages workflow succeeds.
 - [ ] Capture the live desktop and mobile result in Aside and recheck the fixed routes.
-
