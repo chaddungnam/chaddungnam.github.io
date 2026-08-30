@@ -380,6 +380,8 @@
 
     function tick(now) {
       if (!active) { previous = now; requestAnimationFrame(tick); return; }
+      // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
+      if (now - previous < 1000 / 30) { requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
       if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) launchBurst(0);
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;

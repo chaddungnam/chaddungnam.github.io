@@ -150,8 +150,7 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThan(2);
 
   const firstFrame = Number(await page.locator("[data-quirky-canvas]").getAttribute("data-frame"));
-  await page.waitForTimeout(180);
-  expect(Number(await page.locator("[data-quirky-canvas]").getAttribute("data-frame"))).toBeGreaterThan(firstFrame);
+  await expect.poll(async () => Number(await page.locator("[data-quirky-canvas]").getAttribute("data-frame"))).toBeGreaterThan(firstFrame);
 
   await page.locator(".youtube-section").scrollIntoViewIfNeeded();
   await expect(page.locator("html")).toHaveAttribute("data-scroll-tone", "#ffffff");
