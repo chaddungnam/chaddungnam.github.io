@@ -64,7 +64,7 @@ rg -q 'name="templateKey"' "$console_dir/index.html"
 rg -q 'overflow-y: auto' "$console_dir/styles.css"
 rg -F -q 'max-height: min(62vh, 680px)' "$console_dir/styles.css"
 rg -q 'action: "audit.revert"' "$console_dir/audit.js"
-rg -F -q '다음 게임 빌드 연동 후 활성' "$console_dir/index.html"
+rg -F -q '준비 중 · 껍데기만 제공' "$console_dir/index.html"
 for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done

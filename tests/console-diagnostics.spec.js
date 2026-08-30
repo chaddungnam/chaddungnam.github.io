@@ -25,7 +25,7 @@ const dashboard = {
   ads: [],
   choices: { growth: [], roulette: [] },
   interactions: { buttons: [], screens: [], dropoffs: [] },
-  marketingGate: { eligible: false, d1Eligible: 49, dailyCohorts: 4, d1Rate: 0.19, exitTrend: 0.39 },
+  marketingGate: { eligible: false, weightedDailyPeople: 4.9, observedGames: 4, completionRate: 0.49, exitTrend: 0.51 },
   funnel: [{ event: "first_open", users: 4 }, { event: "game_start", users: 3 }, { event: "game_over", users: 2 }],
   periodPlayers: [],
   periodPlayerTotal: 0,
@@ -42,7 +42,7 @@ const dashboard = {
   },
 };
 
-test("marketing review gate renders raw waiting evidence and defines session_end truthfully", async ({ page }) => {
+test("marketing review gate renders raw waiting evidence and defines explicit app quit truthfully", async ({ page }) => {
   await page.route("https://accounts.google.com/**", (route) => route.abort());
   await page.route("**/console/auth.js*", (route) => route.fulfill({
     contentType: "application/javascript",
@@ -58,11 +58,11 @@ test("marketing review gate renders raw waiting evidence and defines session_end
 
   await expect(page.locator("#marketingGateTitle")).toHaveText("유료 마케팅 검토 조건");
   await expect(page.locator("#marketingGateStatus")).toHaveText("대기");
-  await expect(page.locator("#marketingGateSummary")).toContainText("49명 / 50명");
-  await expect(page.locator("#marketingGateSummary")).toContainText("4일 / 5일");
-  await expect(page.locator("#marketingGateSummary")).toContainText("19.0% / 20.0%");
-  await expect(page.locator("#marketingGateSummary")).toContainText("39.0% / 40.0% 미만");
-  await expect(page.locator("#screenDropoffDefinition")).toHaveText("session_end는 해당 화면에서 앱 세션이 끝난 신호입니다. 게임 완료나 단순 화면 이동으로 세지 않습니다.");
+  await expect(page.locator("#marketingGateSummary")).toContainText("4.9명 / 5명");
+  await expect(page.locator("#marketingGateSummary")).toContainText("4판 / 5판");
+  await expect(page.locator("#marketingGateSummary")).toContainText("49.0% / 50.0%");
+  await expect(page.locator("#marketingGateSummary")).toContainText("51.0% / 50.0% 미만");
+  await expect(page.locator("#screenDropoffDefinition")).toHaveText("명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.");
 });
 
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {
