@@ -926,8 +926,6 @@ function renderDailyTable() {
 
 function renderInsight() {
   const summary = state.payload?.summary ?? {};
-  const hourly = state.payload?.hourly ?? [];
-  const topHour = [...hourly].sort((left, right) => right.sessions - left.sessions)[0];
   const observedGames = Number(summary.observedGames ?? (Number(summary.gameOvers || 0) + Number(summary.midGameExits || 0)));
   const exitRate = typeof summary.exitRate === "number"
     ? summary.exitRate
@@ -937,16 +935,13 @@ function renderInsight() {
     setText("insightText", "아직 수집된 이벤트가 없습니다. 테스트 빌드에서 약관 동의 후 게임을 실행하면 여기에 흐름이 나타납니다.");
     return;
   }
-  const timeText = topHour ? `${String(topHour.hour).padStart(2, "0")}시–${String((topHour.hour + 1) % 24).padStart(2, "0")}시` : "—";
-  const acquisition = state.payload?.acquisitionQuality;
-  const cohortText = Number(acquisition?.firstOpens ?? 0) > 0
-    ? `신규 ${formatNumber(acquisition.firstOpens)}명 중 ${formatNumber(acquisition.started)}명이 게임을 시작했고 ${formatNumber(acquisition.completed)}명이 완료했습니다.`
-    : "이 기간에는 신규 첫 실행 코호트가 없습니다.";
+  const completedPeople = Number((state.payload?.funnel ?? []).find((row) => row?.event === "game_over")?.users ?? 0);
   const returnText = Number(periodReturn.previousPlayers ?? 0) > 0
     ? `${formatRate(periodReturn.rate)} (${formatNumber(Number(periodReturn.returnedPlayers))}/${formatNumber(Number(periodReturn.previousPlayers))}명)`
     : "아직 산출 대기";
   const exitText = exitRate == null ? "산출 대기" : formatRate(exitRate);
-  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, 이전 같은 기간 대비 플레이 재방문율은 ${returnText}입니다.`);
+  const averagePlayText = typeof summary.avgGameSeconds === "number" ? formatDuration(summary.avgGameSeconds) : "산출 대기";
+  setText("insightText", `총 ${formatNumber(Number(summary.installs ?? 0))}명이 들어왔고 ${formatNumber(completedPeople)}명이 게임을 완료했습니다. 평균 플레이는 ${averagePlayText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, 이전 같은 기간 대비 플레이 재방문율은 ${returnText}입니다.`);
 }
 
 function setAiMessage(value, error = false) {
