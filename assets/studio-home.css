@@ -147,6 +147,7 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .project-copy .eyebrow { margin-bottom: 26px; }
 .project-copy h2 { margin: 0 0 14px; font-family: "Do Hyeon", "Montserrat", sans-serif; font-size: clamp(2.8rem, 5vw, 5rem); font-weight: 400; letter-spacing: -.045em; line-height: .9; }
 .project-copy > p:not(.eyebrow):not(.project-display):not(.project-keywords):not(.project-status) { max-width: 45ch; margin: 22px 0; color: var(--studio-copy); font-size: clamp(.86rem, 1vw, 1rem); line-height: 1.75; word-break: keep-all; }
+html[lang="ja"] .project-copy > p:not(.eyebrow):not(.project-display):not(.project-keywords):not(.project-status) { overflow-wrap: anywhere; word-break: normal; }
 .project-keywords { max-width: 44ch; margin: 0; color: var(--studio-red); font-size: .68rem; font-weight: 850; letter-spacing: .13em; line-height: 1.75; text-transform: uppercase; }
 .project-status { margin: 2px 0 0; padding: 8px 12px; border: 1px solid var(--studio-ink); color: var(--studio-ink); background: rgba(255,255,255,.58); font-family: "Chilgok KwonAnJa", "Do Hyeon", sans-serif; font-size: 1.08rem; }
 .project-display { position: absolute; bottom: 18px; left: 22px; z-index: -1; margin: 0; color: rgba(38,101,238,.08); font-size: clamp(5.2rem, 9vw, 9rem); font-weight: 900; letter-spacing: -.08em; line-height: .72; pointer-events: none; }
@@ -268,7 +269,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .project-zone { padding: 104px 0 116px; }
   .project-copy { min-height: 410px; padding: 34px 26px; }
   .project-copy h2 { font-size: 3.1rem; }
-  .project-display { bottom: 16px; left: 14px; font-size: clamp(4.2rem, 22vw, 6rem); }
+  .project-display { bottom: 16px; left: 14px; font-size: clamp(4.2rem, 21vw, 6rem); }
   .project-media { min-height: 530px; padding-inline: 20px; }
   .project-phone,
   .project-card-reverse .project-phone { margin-top: -58px; transform: translateY(-18px); }

@@ -101,6 +101,14 @@ test("localized home pages preserve the published legal and support paths", asyn
   }
 });
 
+test("all localized home pages fit a 320px viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const route of ["/?lang=ko", "/index_en.html?lang=en", "/index_de.html?lang=de", "/index_ja.html?lang=ja"]) {
+    await page.goto(route);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  }
+});
+
 test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
   await page.goto("/?lang=ko");
   const chamber = page.locator("[data-release-chamber]");
