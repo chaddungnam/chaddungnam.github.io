@@ -180,11 +180,16 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
     muted: video.muted,
     loop: video.loop,
     playsInline: video.playsInline,
+    preload: video.preload,
   })));
   expect(state).toEqual([
-    { autoplay: true, muted: true, loop: true, playsInline: true },
-    { autoplay: true, muted: true, loop: true, playsInline: true },
+    { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
+    { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
   ]);
+
+  const firstProjectVideo = page.locator("[data-game-preview]").first();
+  await firstProjectVideo.scrollIntoViewIfNeeded();
+  await expect.poll(() => firstProjectVideo.evaluate((video) => video.paused)).toBe(false);
 });
 
 test("home keeps the hero heavy and the footer lockup compact", async ({ page }) => {
