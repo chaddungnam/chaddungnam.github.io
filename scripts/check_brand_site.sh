@@ -126,6 +126,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-project="project-k"'
   require_token "$page" 'assets/studio-home.css'
   require_token "$page" 'assets/studio-home.js'
+  require_token "$page" 'assets/house-duck-social.jpg'
   require_token "$page" 'assets/red-quirky.svg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
