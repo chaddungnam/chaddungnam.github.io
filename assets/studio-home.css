@@ -268,7 +268,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .youtube-card img { height: 100%; aspect-ratio: 1; border-right: 1px solid var(--studio-line); border-bottom: 0; }
   .youtube-card > span { min-height: 0; align-content: center; padding: 14px; }
   .project-zone { padding: 104px 0 116px; }
-  .project-copy { min-height: 410px; padding: 34px 26px; }
+  .project-copy { min-height: 410px; overflow-x: clip; padding: 34px 26px; }
   .project-copy h2 { font-size: 3.1rem; }
   .project-display { bottom: 16px; left: 14px; font-size: clamp(4.2rem, 21vw, 6rem); }
   .project-media { min-height: 530px; padding-inline: 20px; }
