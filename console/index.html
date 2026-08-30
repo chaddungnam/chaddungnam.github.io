@@ -119,7 +119,7 @@
             <span data-signal="good"><i></i><b>좋아요</b></span><span data-signal="watch"><i></i><b>지켜봐요</b></span><span data-signal="risk"><i></i><b>고쳐야 해요</b></span><span data-signal="insufficient"><i></i><b>판단 대기</b></span>
           </div>
           <aside class="today-action"><span>오늘 할 일 1개</span><strong id="todayAction">플레이 데이터를 조금 더 모아요.</strong></aside>
-          <div class="pulse-facts"><span><span id="kpiActiveLabel">최근 3일 활동 설치</span> <strong id="kpiActive">—</strong><span id="kpiActiveUnit">개</span></span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
+          <div class="pulse-facts"><span><span id="kpiActiveLabel">최근 3일 온 사람</span> <strong id="kpiActive">—</strong><span id="kpiActiveUnit">명</span></span><span id="kpiPeopleMix">라이트 —명 · 헤비 —명(2인분) · 판단 —명</span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
         </section>
 
         <section id="priorityInsightPanel" class="priority-insight-panel" data-status="clear" aria-labelledby="priorityInsightTitle" hidden>
@@ -131,15 +131,15 @@
         <section class="question-grid" aria-label="게임 상태를 설명하는 네 가지 질문">
           <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>평균 한 판 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="duration" type="button">왜?</button></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
           <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>확인된 판의 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10판 중 7판쯤이면 좋아요</small></article>
-          <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>다음 날 다시 온 비율</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>7일 뒤 다시 옴 <b id="metricD7">—</b></small></article>
-          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활성 설치당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
+          <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>D1 플레이 재방문</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>다음 날 실제 게임 행동 · D7 <b id="metricD7">—</b></small></article>
+          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활동 인원당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
         </section>
 
         <section class="content-grid decision-grid" aria-label="신규 유입, 광고 형식, 광고 제거 구매 분석">
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 설치만 묶어 게임 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 사람을 고유 설치 ID로 구분해 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">AD FORMAT MIX</p><h2>어떤 광고를 보고 있나</h2><small>전체 합계 대신 강제 전면·자발적 보상·배너·네이티브를 나눕니다.</small></div><span id="adFormatStatus" class="panel-total">—</span></div><div id="adFormatSummary" class="coverage-grid" aria-live="polite"></div></article>
           <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">REMOVE ADS FUNNEL</p><h2>광고 제거 구매로 이어지나</h2><small>QA 기능·TestFlight·Google Play 테스트 결제를 제외한 운영 구매만 확인합니다.</small></div><span id="removeAdsFunnelStatus" class="panel-total">—</span></div><div id="removeAdsFunnel" class="coverage-grid" aria-live="polite"></div></article>
-          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">MARKETING REVIEW</p><h2 id="marketingGateTitle">유료 마케팅 검토 조건</h2><small>네 조건을 모두 충족해도 광고비를 자동 집행하지 않고 검토만 시작합니다.</small></div><span id="marketingGateStatus" class="panel-total">대기</span></div><div id="marketingGateSummary" class="coverage-grid" aria-live="polite"></div></article>
+          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">MARKETING REVIEW</p><h2 id="marketingGateTitle">유료 마케팅 검토 조건</h2><small>이해하기 쉬운 플레이 인원·결과 기준입니다. 모두 충족해도 광고비를 자동 집행하지 않고 검토만 시작합니다.</small></div><span id="marketingGateStatus" class="panel-total">대기</span></div><div id="marketingGateSummary" class="coverage-grid" aria-live="polite"></div></article>
         </section>
 
         <section class="operations-pulse" aria-labelledby="operationsPulseTitle">
@@ -176,8 +176,8 @@
         </section>
 
         <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
-          <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">INSTALL JOURNEY</p><h2>설치가 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 고유 설치 수예요.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
-          <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>활동 설치</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활성 설치와 게임 완료 차트"></canvas></div></article>
+          <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">PLAYER JOURNEY</p><h2>사람들이 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 사람 수예요. 고유 설치 ID로 구분합니다.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
+          <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>온 사람</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활동 인원과 게임 완료 차트"></canvas></div></article>
         </section>
 
         <section class="content-grid insight-card-grid" aria-label="게임 내 선택과 행동 분석">
@@ -194,13 +194,13 @@
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">CHOICES &amp; SPECIAL EFFECTS</p><h2>선택과 특수 효과</h2><small>레벨별 성장 선택과 메차쿠차 완료 흐름을 분리해 확인합니다.</small></div><span id="growthChoiceStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>레벨</th><th>제시</th><th>선택</th><th>확정</th><th>선택률</th></tr></thead><tbody id="growthChoiceLevelTable"></tbody></table></div><div id="mechakuchaSummary" class="coverage-grid" aria-live="polite"></div></article>
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">GAME OVER TREND</p><h2>게임 종료 추이</h2><small>정상 완료된 게임의 날짜별 중앙 점수와 평균 레벨입니다.</small></div><span id="gameOverStatus" class="panel-total">—</span></div><div class="legend"><span><i class="legend-teal"></i>중앙 점수</span><span><i class="legend-coral"></i>평균 레벨</span></div><div class="chart-wrap"><canvas id="gameOverChart" height="154" aria-label="날짜별 게임 종료 중앙 점수와 평균 레벨 차트"></canvas></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverDailyTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>레벨 구간</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverBucketTable"></tbody></table></div></article>
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">ARRIVAL TIME</p><h2>주로 몇 시에 오나</h2></div></div><div id="hourlyChart" class="hourly-chart"></div></article>
-            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RAW EVENT VIEW</p><h2>전체 이벤트 설치 수</h2></div></div><div id="funnelChart" class="funnel-chart"></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RAW EVENT VIEW</p><h2>전체 이벤트 사람 수</h2></div></div><div id="funnelChart" class="funnel-chart"></div></article>
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GAME EXIT</p><h2>플레이 후 어떻게 나가나</h2></div></div><div id="exitBreakdown" class="metric-list"></div></article>
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">AD HEALTH</p><h2>광고 시청 흐름</h2><small>선택한 기간의 서버 집계 · 위치별 시작과 노출 실패</small></div><span id="adTotal" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>형식</th><th>위치</th><th>시작</th><th>노출</th><th>테스트</th><th>보상</th><th>닫힘</th><th>실패</th><th>실패 사유</th><th>일별 실패(최근순)</th></tr></thead><tbody id="adsTable"></tbody></table></div></article>
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">APP STATUS</p><h2>앱 핵심 상태</h2><small>선택한 기간의 analytics_events 서버 집계만 표시합니다.</small></div><span id="appStatusTotal" class="panel-total">—</span></div><div id="appStatusGrid" class="coverage-grid" aria-live="polite"></div></article>
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PURCHASE TREND</p><h2>구매 상태 · 최근 30일</h2><small>전체 스토어의 실제 서버 기록만 표시하며, 현재 집계에 없는 항목은 계측 대기로 남깁니다.</small></div><span id="purchaseTrendStatus" class="panel-total">불러오는 중</span></div><div id="purchaseTrend" class="coverage-grid" aria-live="polite"></div></article>
             <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLATFORM VIEW</p><h2>스토어별로 비교</h2></div><span id="revenueNote" class="panel-note">—</span></div><div id="platformSummary" class="platform-summary"></div></article>
-            <article class="panel panel-wide collapsible-panel"><details id="dailyDetails" class="collapsible-content"><summary><span><p class="eyebrow">DAY BY DAY</p><strong>출시 후 변화를 표로 보기</strong></span><span class="collapsible-hint">클릭해서 열기</span></summary><div class="table-scroll"><table><thead><tr><th>날짜</th><th>활성 설치</th><th>앱 세션</th><th>게임 시작</th><th>완료</th><th>명시적 중간 종료</th><th>결과 미확인</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div></details></article>
+            <article class="panel panel-wide collapsible-panel"><details id="dailyDetails" class="collapsible-content"><summary><span><p class="eyebrow">DAY BY DAY</p><strong>출시 후 변화를 표로 보기</strong></span><span class="collapsible-hint">클릭해서 열기</span></summary><div class="table-scroll"><table><thead><tr><th>날짜</th><th>활동 인원</th><th>앱 세션</th><th>게임 시작</th><th>완료</th><th>명시적 중간 종료</th><th>결과 미확인</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div></details></article>
           </div>
         </details>
         <p id="dashboardMessage" class="dashboard-message" role="status"></p>
@@ -326,12 +326,12 @@
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="../analytics/pulse-model.js?v=20260830-2"></script>
-  <script src="model.js?v=20260830-1"></script>
+  <script src="../analytics/pulse-model.js?v=20260830-4"></script>
+  <script src="model.js?v=20260830-2"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260830-5"></script>
+  <script src="analytics.js?v=20260830-7"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>

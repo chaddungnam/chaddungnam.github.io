@@ -162,9 +162,11 @@ function renderDashboard() {
   const { summary, retention } = state.payload;
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
   const rangeLabel = selectedRangeLabel();
-  setText("kpiActiveLabel", `${rangeLabel} 활동 설치`);
+  setText("kpiActiveLabel", `${rangeLabel} 온 사람`);
   setText("kpiActive", formatNumber(summary.installs));
-  setText("kpiActiveUnit", "개");
+  setText("kpiActiveUnit", "명");
+  const segments = summary.playerSegments ?? {};
+  setText("kpiPeopleMix", `라이트 ${formatNumber(Number(segments.lightPeople ?? summary.installs ?? 0))}명 · 헤비 ${formatNumber(Number(segments.heavyPeople ?? 0))}명(2인분) · 판단 ${formatNumber(Number(segments.weightedPeople ?? summary.installs ?? 0))}명`);
   setText("dailyTrendEyebrow", `${state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const d7 = retention?.find((item) => item.day === 7)?.rate;
@@ -385,7 +387,7 @@ function renderInteractionInsights() {
       return `<article class="behavior-card" data-legacy="${row.legacy}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(row.label)}</h3><small>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}${row.legacy ? " · 구버전" : ""}</small></div>
-        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>개 설치</span><span>중앙 <b>${formatHesitationDuration(hesitation)}</b></span></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>명</span><span>중앙 <b>${formatHesitationDuration(hesitation)}</b></span></div>
         <p>${escapeHtml(recommendation)}</p>
       </article>`;
     }).join("");
@@ -433,7 +435,7 @@ function renderPriorityInsights() {
   panel.dataset.status = "risk";
   setText("priorityInsightIcon", "!");
   setText("priorityInsightTitle", "광고 뒤 선택 전 실제 앱 종료 확인");
-  setText("priorityInsightValue", `${formatNumber(verifiedStops)}회 · ${formatNumber(verifiedStopUsers)}개 설치 기기`);
+  setText("priorityInsightValue", `${formatNumber(verifiedStops)}회 · ${formatNumber(verifiedStopUsers)}명`);
   setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatNumber(selected)}회는 선택까지 확인됐고, ${formatNumber(completedWithoutSelection)}회는 선택 이벤트가 없어도 같은 판의 완료가 확인됐습니다. 명시적인 앱 종료가 선택보다 먼저 기록된 ${formatNumber(verifiedStops)}회만 표시합니다.`);
 }
 
@@ -569,14 +571,14 @@ function renderInsightReasons(model) {
   const metrics = model.metrics || {};
   const d1 = state.payload?.retention?.find((row) => row?.day === 1);
   const d1Sample = d1 && Number(d1.eligible) > 0
-    ? ` 관찰 가능한 ${formatNumber(Number(d1.eligible))}개 설치 중 ${formatNumber(Number(d1.retained))}개가 돌아왔습니다.`
-    : " 아직 다음 날까지 관찰 가능한 신규 설치가 없습니다.";
+    ? ` 관찰 가능한 ${formatNumber(Number(d1.eligible))}명 중 ${formatNumber(Number(d1.retained))}명이 돌아왔습니다.`
+    : " 아직 다음 날까지 관찰 가능한 신규 인원이 없습니다.";
   const reasons = {
-    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 설치 ${formatNumber(state.payload?.summary?.installs)}개, 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다.` },
+    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 인원 ${formatNumber(state.payload?.summary?.installs)}명(고유 설치 ID 기준), 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다.` },
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
     completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 결과 미확인인 판은 제외했습니다.` },
-    retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다.${d1Sample} 실제 first_open 다음 날 session_start가 다시 기록된 운영 설치만 계산합니다.` },
-    ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활성 설치 1개당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `D1 플레이 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${d1Sample} 고유 설치 ID를 사람 구분값으로 사용하며, 첫 실행 다음 날 app_visit·game_start·game_over 중 하나가 기록된 인원만 계산합니다. 광고 복귀 같은 session_start만으로는 세지 않습니다.` },
+    ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활동 인원 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 인원은 고유 설치 ID로 구분하며, 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
     const reason = reasons[key];
@@ -615,7 +617,7 @@ function renderPulseOverview(model) {
   const card = byId("healthCard");
   card.dataset.status = model.verdict.status;
   setText("healthLabel", model.verdict.label);
-  setText("healthScore", model.verdict.score == null ? (model.verdict.status === "insufficient" ? "수집 중" : "카드 기준") : `${model.verdict.score}/100`);
+  setText("healthScore", model.confidence === "estimate" ? "근사 평가" : model.verdict.score == null ? (model.verdict.status === "insufficient" ? "수집 중" : "카드 기준") : `${model.verdict.score}/100`);
   setText("mascotMessage", model.verdict.summary);
   setText("todayAction", model.action);
   byId("signalLights").querySelectorAll("[data-signal]").forEach((signal) => {
@@ -641,8 +643,8 @@ function renderPlatformSummary(platforms) {
   element.innerHTML = platforms.map((row) => `
     <div class="platform-row">
       <div class="platform-name"><strong>${escapeHtml(distributionLabel(row.distributionKey))}</strong><small>${escapeHtml(row.platform || "플랫폼 미지정")}</small></div>
-      <div><span>활성 설치</span><strong>${formatNumber(row.activePlayers)}</strong></div>
-      <div><span>전체 광고/설치</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
+      <div><span>활동 인원</span><strong>${formatNumber(row.activePlayers)}명</strong></div>
+      <div><span>전체 광고/인원</span><strong>${formatDecimal(row.impressionsPerPlayer)}</strong></div>
       <div><span>예상 수익</span><strong>${formatCurrency(row.estimatedRevenueEur)}</strong></div>
     </div>`).join("");
 }
@@ -785,12 +787,12 @@ function renderDecisionPanels() {
     const hasNewUsers = firstOpens > 0;
     const status = hasNewUsers ? "available" : "empty";
     renderCoverageCards("acquisitionQuality", [
-      { status, label: "첫 실행", value: `${formatNumber(firstOpens)}개`, detail: "선택 기간에 first_open이 기록된 신규 설치" },
-      { status, label: "게임 시작", value: `${formatNumber(started)}개`, detail: "같은 신규 설치에서 game_start까지 기록" },
-      { status, label: "첫 실행 → 시작", value: formatRate(acquisition.firstOpenToStartRate), detail: "광고 설치 수가 아닌 실제 앱 실행 코호트 기준" },
-      { status, label: "첫 실행 → 완료", value: `${formatNumber(completed)}개 · ${formatRate(acquisition.firstOpenToCompleteRate)}`, detail: "같은 신규 설치에서 game_over까지 기록" },
+      { status, label: "첫 실행", value: `${formatNumber(firstOpens)}명`, detail: "선택 기간에 first_open이 기록된 신규 인원" },
+      { status, label: "게임 시작", value: `${formatNumber(started)}명`, detail: "같은 인원에서 game_start까지 기록" },
+      { status, label: "첫 실행 → 시작", value: formatRate(acquisition.firstOpenToStartRate), detail: "광고 유입 수가 아닌 실제 앱 실행 코호트 기준" },
+      { status, label: "첫 실행 → 완료", value: `${formatNumber(completed)}명 · ${formatRate(acquisition.firstOpenToCompleteRate)}`, detail: "같은 인원에서 game_over까지 기록" },
     ]);
-    setText("acquisitionQualityStatus", hasNewUsers ? `${formatNumber(firstOpens)}개 설치 코호트` : "신규 없음");
+    setText("acquisitionQualityStatus", hasNewUsers ? `${formatNumber(firstOpens)}명 코호트` : "신규 없음");
   }
 
   const economics = state.payload?.adEconomics ?? {};
@@ -808,7 +810,7 @@ function renderDecisionPanels() {
       status: measured ? (Number(row?.monetizedImpressions ?? 0) > 0 ? "available" : "empty") : "waiting",
       label,
       value: measured ? `${formatNumber(Number(row?.monetizedImpressions ?? 0))}회` : "집계 대기",
-      detail: `${detail} · 활성 설치당 ${formatDecimal(row?.impressionsPerPlayer)}회 · 테스트 ${formatNumber(Number(row?.testImpressions ?? 0))}`,
+      detail: `${detail} · 활동 인원당 ${formatDecimal(row?.impressionsPerPlayer)}회 · 테스트 ${formatNumber(Number(row?.testImpressions ?? 0))}`,
     };
   });
   renderCoverageCards("adFormatSummary", formatCards);
@@ -825,48 +827,48 @@ function renderDecisionPanels() {
     const status = hasIntent ? "available" : "empty";
     const excludedInstalls = Number(purchaseExclusions.excludedInstalls ?? 0);
     renderCoverageCards("removeAdsFunnel", [
-      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "테스트를 제외하고 remove_ads 구매 버튼을 누른 설치" },
-      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "운영 purchase_succeeded가 기록된 설치" },
-      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "테스트 설치를 제외한 운영 전환율" },
+      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "테스트를 제외하고 remove_ads 구매 버튼을 누른 사람" },
+      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "운영 purchase_succeeded가 기록된 사람" },
+      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "테스트 인원을 제외한 운영 전환율" },
       { status, label: "구매 실패", value: `${formatNumber(Number(removeAds?.failedUsers ?? 0))}명 · ${formatNumber(Number(removeAds?.failedEvents ?? 0))}회`, detail: "운영 실패 사용자와 반복 시도 횟수" },
     ]);
     const liveStatus = hasIntent ? `운영 ${formatNumber(removeAds.startedUsers)}명 시작` : "운영 구매 시작 없음";
-    setText("removeAdsFunnelStatus", excludedInstalls > 0 ? `${liveStatus} · 테스트 ${formatNumber(excludedInstalls)}설치 제외` : liveStatus);
+    setText("removeAdsFunnelStatus", excludedInstalls > 0 ? `${liveStatus} · 테스트 ${formatNumber(excludedInstalls)}명 제외` : liveStatus);
   }
 }
 
 function renderMarketingGate() {
   const gate = state.payload?.marketingGate ?? {};
-  const d1Eligible = Number(gate.d1Eligible ?? 0);
-  const dailyCohorts = Number(gate.dailyCohorts ?? 0);
-  const d1Rate = typeof gate.d1Rate === "number" ? gate.d1Rate : null;
+  const weightedDailyPeople = Number(gate.weightedDailyPeople ?? 0);
+  const observedGames = Number(gate.observedGames ?? 0);
+  const completionRate = typeof gate.completionRate === "number" ? gate.completionRate : null;
   const exitTrend = typeof gate.exitTrend === "number" ? gate.exitTrend : null;
 
   setText("marketingGateStatus", gate.eligible === true ? "검토 가능" : "대기");
   renderCoverageCards("marketingGateSummary", [
     {
-      status: d1Eligible >= 50 ? "available" : "waiting",
-      label: "D1 대상 표본",
-      value: `${formatNumber(d1Eligible)}명 / 50명`,
-      detail: "QA를 제외하고 다음 날까지 관찰 가능한 최초 실행 설치",
+      status: weightedDailyPeople >= 5 ? "available" : "waiting",
+      label: "하루 판단 인원",
+      value: `${formatDecimal(weightedDailyPeople)}명 / 5명`,
+      detail: "라이트 1인분 · 결과 확인 3판 이상 헤비 2인분",
     },
     {
-      status: dailyCohorts >= 5 ? "available" : "waiting",
-      label: "성숙 일별 코호트",
-      value: `${formatNumber(dailyCohorts)}일 / 5일`,
-      detail: "설치별 최초 first_open의 독일 날짜 기준 · 오늘 제외",
+      status: observedGames >= 5 ? "available" : "waiting",
+      label: "결과가 확인된 판",
+      value: `${formatNumber(observedGames)}판 / 5판`,
+      detail: "정상 완료 또는 명시적 게임 중 종료가 확인된 판",
     },
     {
-      status: d1Rate !== null && d1Rate >= 0.2 ? "available" : "waiting",
-      label: "D1 유지율",
-      value: `${formatRate(d1Rate)} / 20.0%`,
-      detail: "최초 실행 다음 날 session_start가 기록된 비율",
+      status: completionRate !== null && completionRate >= 0.5 ? "available" : "waiting",
+      label: "게임 완료율",
+      value: `${formatRate(completionRate)} / 50.0%`,
+      detail: "결과가 확인된 판 중 정상 완료 비율",
     },
     {
-      status: exitTrend !== null && exitTrend < 0.4 ? "available" : "waiting",
-      label: "게임 중 이탈률",
-      value: `${formatRate(exitTrend)} / 40.0% 미만`,
-      detail: "정상 완료 또는 명시적 중간 종료가 확인된 판 중 중간 종료 비율",
+      status: exitTrend !== null && exitTrend < 0.5 ? "available" : "waiting",
+      label: "게임 중 종료율",
+      value: `${formatRate(exitTrend)} / 50.0% 미만`,
+      detail: "결과가 확인된 판 중 명시적 중간 종료 비율",
     },
   ]);
 }
@@ -941,13 +943,13 @@ function renderInsight() {
   const timeText = topHour ? `${String(topHour.hour).padStart(2, "0")}시–${String((topHour.hour + 1) % 24).padStart(2, "0")}시` : "—";
   const acquisition = state.payload?.acquisitionQuality;
   const cohortText = Number(acquisition?.firstOpens ?? 0) > 0
-    ? `신규 설치 ${formatNumber(acquisition.firstOpens)}개 중 ${formatNumber(acquisition.started)}개가 게임을 시작했고 ${formatNumber(acquisition.completed)}개가 완료했습니다.`
+    ? `신규 ${formatNumber(acquisition.firstOpens)}명 중 ${formatNumber(acquisition.started)}명이 게임을 시작했고 ${formatNumber(acquisition.completed)}명이 완료했습니다.`
     : "이 기간에는 신규 첫 실행 코호트가 없습니다.";
   const d1Text = Number(d1Row?.eligible ?? 0) > 0
-    ? `${formatRate(d1)} (${formatNumber(Number(d1Row.retained))}/${formatNumber(Number(d1Row.eligible))}개 설치)`
+    ? `${formatRate(d1)} (${formatNumber(Number(d1Row.retained))}/${formatNumber(Number(d1Row.eligible))}명)`
     : "아직 산출 대기";
   const exitText = exitRate == null ? "산출 대기" : formatRate(exitRate);
-  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, D1 유지율은 ${d1Text}입니다.`);
+  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, D1 플레이 재방문율은 ${d1Text}입니다.`);
 }
 
 function setAiMessage(value, error = false) {

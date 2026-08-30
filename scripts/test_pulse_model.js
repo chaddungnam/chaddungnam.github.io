@@ -12,6 +12,8 @@ function payload(overrides = {}) {
       activeInstallsToday: 10,
       ...overrides.summary,
     },
+    rangeDays: overrides.rangeDays ?? 1,
+    daily: overrides.daily ?? [{ activeInstalls: 10 }],
     retention: overrides.retention ?? [{ day: 1, rate: 0.25 }],
     adEconomics: {
       impressionsPerPlayer: 2,
@@ -38,10 +40,30 @@ assert.equal(healthy.metrics.completion.value, 0.75);
 assert.deepEqual(healthy.journey.map((step) => step.users), [10, 8, 6]);
 assert.deepEqual(healthy.journey.map((step) => step.rate), [1, 0.8, 0.75]);
 
-const insufficient = buildPulseModel(payload({ summary: { sessions: 13, installs: 8 } }));
-assert.equal(insufficient.verdict.status, "insufficient");
-assert.equal(insufficient.metrics.duration.status, "insufficient");
-assert.match(insufficient.action, /22개/);
+const smallSampleEstimate = buildPulseModel(payload({ summary: { sessions: 13, installs: 3 }, daily: [{ activeInstalls: 3 }] }));
+assert.equal(smallSampleEstimate.verdict.status, "good");
+assert.equal(smallSampleEstimate.metrics.duration.status, "good");
+assert.equal(smallSampleEstimate.confidence, "estimate");
+assert.match(smallSampleEstimate.action, /근사 평가/);
+assert.match(smallSampleEstimate.verdict.summary, /표본이 적은 근사 평가.*하루 평균 3명/);
+
+const fivePeoplePerDayIsEnough = buildPulseModel(payload({
+  rangeDays: 3,
+  summary: { sessions: 25, installs: 11 },
+  daily: [{ activeInstalls: 4 }, { activeInstalls: 5 }, { activeInstalls: 6 }],
+}));
+assert.equal(fivePeoplePerDayIsEnough.dailyActivePeople, 5);
+assert.equal(fivePeoplePerDayIsEnough.verdict.status, "good");
+assert.equal(fivePeoplePerDayIsEnough.confidence, "standard");
+
+const oneHeavyPlayerAddsOneEffectivePerson = buildPulseModel(payload({
+  rangeDays: 1,
+  summary: { sessions: 20, installs: 4, playerSegments: { lightPeople: 3, heavyPeople: 1, weightedPeople: 5 } },
+  daily: [{ activeInstalls: 4, lightPeople: 3, heavyPeople: 1, weightedPeople: 5 }],
+}));
+assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyActivePeople, 4);
+assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyEffectivePeople, 5);
+assert.equal(oneHeavyPlayerAddsOneEffectivePerson.confidence, "standard");
 
 const risky = buildPulseModel(payload({
   summary: { avgGameSeconds: 45, gamesStarted: 20, gameOvers: 6 },
