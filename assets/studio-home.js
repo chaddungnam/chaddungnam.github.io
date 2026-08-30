@@ -8,14 +8,15 @@
 })(typeof globalThis === "object" ? globalThis : this, function () {
   "use strict";
 
+  // Quirky Ball 1.1.0 red-spinner contract; the first-paint burst is staged separately below.
   const QUIRKY_RULES = Object.freeze({
-    totalTurns: 5.25,
-    eventSeconds: 2.4,
-    shotsPerSecond: 18,
-    pairInterval: 0.11,
-    shrinkMin: 0.84,
-    shrinkMax: 0.95,
-    maxBounces: 2,
+    totalTurns: 4.5,
+    eventSeconds: 1.5 / 1.3,
+    shotsPerSecond: 8,
+    pairInterval: 0.25,
+    shrinkMin: 0.82,
+    shrinkMax: 0.94,
+    maxBounces: 1,
   });
   const TAU = Math.PI * 2;
   const palette = ["#ffcd38", "#ff7d64", "#55b8f8", "#48c7a8", "#9667e9", "#f4f0e8"];
@@ -104,6 +105,7 @@
 
   function setupVideos(reducedMotion) {
     const videos = [...document.querySelectorAll("[data-game-preview], [data-hero-gameplay]")];
+    let manualPaused = false;
     if (reducedMotion) {
       for (const video of videos) { video.autoplay = false; video.pause(); }
       return;
@@ -112,14 +114,15 @@
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         const video = entry.target;
-        if (entry.isIntersecting) video.play().catch(() => {});
+        if (entry.isIntersecting && !manualPaused) video.play().catch(() => {});
         else video.pause();
       }
     }, { threshold: .15 });
     for (const video of videos) observer.observe(video);
     addEventListener("houseduck:motion", (event) => {
+      manualPaused = event.detail.paused;
       for (const video of videos) {
-        if (event.detail.paused) video.pause();
+        if (manualPaused) video.pause();
         else {
           const rect = video.getBoundingClientRect();
           if (rect.bottom > 0 && rect.top < innerHeight) video.play().catch(() => {});
@@ -300,8 +303,8 @@
 
     function launchBurst(rotation) {
       shots = [];
-      pairCount = 8;
       for (let index = 0; index < 9; index += 1) spawnPair(rotation + index * .19, index);
+      pairCount = -1;
     }
 
     function updateMarbles(delta) {
@@ -408,7 +411,7 @@
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
       if (now - previous < 1000 / 30) { requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
-      if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) launchBurst(0);
+      if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) pairCount = -1;
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;
       const nextPair = Math.floor(elapsed / QUIRKY_RULES.pairInterval);
       while (pairCount < nextPair) spawnPair(rotation, ++pairCount);

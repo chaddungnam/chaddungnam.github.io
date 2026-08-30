@@ -10,17 +10,17 @@ assert.ok(fs.existsSync(runtimePath), "assets/studio-home.js must exist");
 const { QUIRKY_RULES, shotAngles, shrinkRadius } = require(runtimePath);
 
 assert.deepEqual(QUIRKY_RULES, {
-  totalTurns: 5.25,
-  eventSeconds: 2.4,
-  shotsPerSecond: 18,
-  pairInterval: 0.11,
-  shrinkMin: 0.84,
-  shrinkMax: 0.95,
-  maxBounces: 2,
+  totalTurns: 4.5,
+  eventSeconds: 1.5 / 1.3,
+  shotsPerSecond: 8,
+  pairInterval: 0.25,
+  shrinkMin: 0.82,
+  shrinkMax: 0.94,
+  maxBounces: 1,
 });
 assert.deepEqual(shotAngles(0, 0), [0, Math.PI]);
-assert.equal(shrinkRadius(100, 0), 84);
-assert.equal(shrinkRadius(100, 1), 95);
+assert.equal(shrinkRadius(100, 0), 82);
+assert.equal(shrinkRadius(100, 1), 94);
 
 const svg = read("assets/red-quirky.svg");
 assert.match(svg, /viewBox="0 0 240 260"/);
