@@ -107,6 +107,8 @@ test("all localized home pages fit a 320px viewport", async ({ page }) => {
     await page.goto(route);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   }
+  const cardHeights = await page.locator("[data-youtube-card]").evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().height));
+  expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThanOrEqual(1);
 });
 
 test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
