@@ -17,6 +17,7 @@ Make the first viewport unmistakably read as a professional game-studio site by 
 ## Motion
 
 - The opening canvas must already contain moving marbles and a rapid Quirky shot burst on first paint.
+- After the staged first-paint burst, the loop mirrors release 1.1.0: 4.5 turns in `1.5 / 1.3` seconds, eight shots per second in opposing pairs, `0.82–0.94` hit shrink, and one wall ricochet.
 - Scroll changes the page tone and moves the red Quirky through the page without scroll-jacking.
 - Desktop gets a small custom shot cursor and click impact. Touch keeps the native pointer model.
 - `prefers-reduced-motion` shows the full content, stops decorative animation, and pauses autoplay video.
