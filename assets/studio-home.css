@@ -160,7 +160,7 @@ html[lang="ja"] .project-copy > p:not(.eyebrow):not(.project-display):not(.proje
 .project-k-category,
 .project-k-title,
 .project-k-display { font-family: Gungsuh, "궁서", "Times New Roman", serif !important; }
-.project-k-display { color: rgba(17,19,25,.055); }
+.project-k-display { color: transparent; -webkit-text-stroke: 1px rgba(17,19,25,.18); }
 .project-media { position: relative; display: grid; min-height: 100%; place-items: center; overflow: visible; padding: 42px clamp(30px, 5vw, 74px) 54px; }
 .project-media::before { position: absolute; inset: 9% 8% 10%; z-index: 0; border: 1px dashed rgba(17,19,25,.16); content: ""; background: linear-gradient(90deg, transparent 49.8%, rgba(17,19,25,.08) 50%, transparent 50.2%), linear-gradient(transparent 49.8%, rgba(17,19,25,.08) 50%, transparent 50.2%), rgba(255,255,255,.2); transform: rotate(-2deg); }
 .project-card-reverse .project-media::before { transform: rotate(2deg); }

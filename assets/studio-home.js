@@ -96,12 +96,15 @@
         const nextDistance = inside ? 0 : Math.min(Math.abs(rect.top - centre), Math.abs(rect.bottom - centre));
         if (nextDistance < distance) { closest = section; distance = nextDistance; }
       }
+      let progress = 0;
+      if (mascot && quirky) {
+        const start = innerHeight * .22;
+        const end = quirky.offsetTop - innerHeight * .45;
+        progress = Math.max(0, Math.min(1, (scrollY - start) / Math.max(1, end - start)));
+      }
       document.body.style.setProperty("--studio-tone", closest.dataset.tone);
       document.documentElement.dataset.scrollTone = closest.dataset.tone;
       if (!mascot || !quirky) return;
-      const start = innerHeight * .22;
-      const end = quirky.offsetTop - innerHeight * .45;
-      const progress = Math.max(0, Math.min(1, (scrollY - start) / Math.max(1, end - start)));
       mascot.style.opacity = progress > .02 && progress < .92 ? String(Math.min(.96, progress * 2.4)) : "0";
       mascot.style.transform = `translate3d(0, ${progress * Math.min(innerHeight * .48, 410)}px, 0) rotate(${5 - progress * 18}deg)`;
     };
@@ -149,7 +152,6 @@
     button.addEventListener("click", () => {
       const paused = button.getAttribute("aria-pressed") !== "true";
       button.setAttribute("aria-pressed", String(paused));
-      button.setAttribute("aria-label", paused ? button.dataset.labelPlay : button.dataset.labelPause);
       button.querySelector("[data-motion-state]").textContent = paused ? "OFF" : "ON";
       document.documentElement.dataset.motionPaused = String(paused);
       dispatchEvent(new CustomEvent("houseduck:motion", { detail: { paused } }));

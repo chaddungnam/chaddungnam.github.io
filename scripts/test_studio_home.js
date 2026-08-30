@@ -69,6 +69,18 @@ const expectedOpenGraph = {
   "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "準備はいい？House DuckのリリースラボでQuirky Ball 1.1.0を紹介します。", "House Duckのリリースラボで動くQuirky Ball 1.1.0"],
 };
 
+const expectedHeroLabels = {
+  "index.html": "LIVE CAPTURE · Quirky Ball 1.1.0 실제 플레이 보기",
+  "index_en.html": "LIVE CAPTURE · Watch real Quirky Ball 1.1.0 gameplay",
+  "index_de.html": "LIVE CAPTURE · Echtes Quirky Ball 1.1.0 Gameplay ansehen",
+  "index_ja.html": "LIVE CAPTURE · Quirky Ball 1.1.0の実際のプレイを見る",
+};
+
+for (const asset of ["assets/house-duck-logo-96.webp", "assets/house-duck-wordmark-360.webp"]) {
+  assert.ok(fs.existsSync(path.join(root, asset)), `${asset} must exist`);
+  assert.ok(fs.statSync(path.join(root, asset)).size < 10_000, `${asset} must stay below 10KB`);
+}
+
 for (const [file, copy] of Object.entries(expectedCopy)) {
   const html = read(file);
   for (const text of copy) assert.ok(html.includes(text), `${file} must include ${text}`);
@@ -79,10 +91,18 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /og:image:height" content="630"/);
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.doesNotMatch(html, /history-section|journal-section|작게 만들더라도 오래 기억되는 게임/);
+  assert.ok(html.includes('rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin'), `${file} must preload the hero font`);
+  assert.ok(html.includes('<script src="assets/brand-site.js" defer></script>'), `${file} must not render-block on shared JavaScript`);
+  assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
+  assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
+  assert.ok(html.includes(expectedHeroLabels[file]), `${file} must include its localized hero label`);
+  assert.doesNotMatch(html, /<button class="motion-toggle"[^>]+aria-label=/, `${file} motion control must use its visible label`);
   const [title, description, imageAlt] = expectedOpenGraph[file];
   assert.ok(html.includes(`property="og:title" content="${title}"`), `${file} needs a localized Open Graph title`);
   assert.ok(html.includes(`property="og:description" content="${description}"`), `${file} needs a localized Open Graph description`);
   assert.ok(html.includes(`property="og:image:alt" content="${imageAlt}"`), `${file} needs localized social-image alt text`);
 }
+
+assert.match(read("assets/studio-home.css"), /\.project-k-display\s*\{[^}]*color:\s*transparent;[^}]*-webkit-text-stroke:/s);
 
 console.log("studio home contract: PASS");
