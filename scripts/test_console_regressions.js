@@ -45,7 +45,7 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-12/, "the Console must cache-bust custom ranges and core-loop visualizations");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-13/, "the Console must cache-bust truthful core-loop sample sizes");
 assert.match(consoleHtml, /id="coreLoopSummary"/, "the Console must expose completed-run core-loop quality metrics");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {

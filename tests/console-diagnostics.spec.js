@@ -38,7 +38,7 @@ const dashboard = {
     ] },
     growthChoices: { presented: 0, selected: 4, confirmed: 0, selectionRate: null, byLevel: [], choices: [{ choice: "mad_scientist", selected: 4 }] },
     mechakucha: { started: 0, completed: 0, aborted: 0, incomplete: 0, completionRate: null, avgScoreGain: null, avgMarblesRestored: null },
-    gameOver: { total: 10, medianScore: 2600, medianLevel: 4, avgScorePerMinute: 1840, avgBestChain: 3.2, level10ReachRate: 0.3, breakthroughUseRate: 0.4, byDay: gameOverDays, levelBuckets: [{ bucket: "1-2", games: 4, avgScore: 1200, medianScore: 1100, avgLevel: 1.5 }] },
+    gameOver: { total: 10, medianScore: 2600, medianLevel: 4, avgScorePerMinute: 1840, avgBestChain: 3.2, level10ReachRate: 0.3, breakthroughUseRate: 0.4, scoreSamples: 10, scorePerMinuteSamples: 7, bestChainSamples: 6, levelSamples: 10, breakthroughSamples: 5, byDay: gameOverDays, levelBuckets: [{ bucket: "1-2", games: 4, avgScore: 1200, medianScore: 1100, avgLevel: 1.5 }] },
   },
 };
 
@@ -69,6 +69,12 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#coreLoopSummary")).toContainText("1,840점");
   await expect(page.locator("#coreLoopSummary")).toContainText("Lv.10 도달");
   await expect(page.locator("#coreLoopSummary")).toContainText("30.0%");
+  await expect(page.locator("#coreLoopStatus")).toHaveText("총 10판");
+  await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "중앙 점수" })).toContainText("표본 10판");
+  await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "분당 점수" })).toContainText("표본 7판");
+  await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "최고 연쇄 평균" })).toContainText("표본 6판");
+  await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "Lv.10 도달" })).toContainText("표본 10판");
+  await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "돌파 사용" })).toContainText("표본 5판");
 });
 
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {
