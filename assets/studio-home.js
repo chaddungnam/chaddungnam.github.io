@@ -131,7 +131,8 @@
   function setupMotionToggle(reducedMotion) {
     const button = document.querySelector("[data-motion-toggle]");
     if (!button) return;
-    if (reducedMotion) { button.hidden = true; return; }
+    if (reducedMotion) return;
+    button.hidden = false;
     button.addEventListener("click", () => {
       const paused = button.getAttribute("aria-pressed") !== "true";
       button.setAttribute("aria-pressed", String(paused));

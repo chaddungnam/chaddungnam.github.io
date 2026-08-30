@@ -99,6 +99,7 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .release-visual::after { top: 50%; left: -34px; width: 68px; height: 1px; background: var(--studio-red); box-shadow: calc(100% + 370px) 0 0 var(--studio-red); }
 .specimen-index { position: absolute; top: 16px; left: 18px; z-index: 5; margin: 0; font-size: .54rem; font-weight: 850; letter-spacing: .16em; }
 .motion-toggle { position: absolute; top: 12px; right: 12px; z-index: 10; display: inline-flex; min-width: 72px; min-height: 44px; align-items: center; justify-content: center; gap: 7px; padding: 0 10px; border: 1px solid var(--studio-ink); color: var(--studio-ink); background: rgba(255,255,255,.88); font: inherit; font-size: .56rem; font-weight: 900; letter-spacing: .1em; cursor: pointer; }
+.motion-toggle[hidden] { display: none; }
 .motion-toggle strong { color: var(--studio-blue); font: inherit; }
 .motion-toggle[aria-pressed="true"] strong { color: var(--studio-red); }
 .motion-toggle:hover,
