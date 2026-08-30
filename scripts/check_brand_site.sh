@@ -160,6 +160,8 @@ require_css_property ".brand-lockup .brand-wordmark-image" "width: 132px"
 require_token "assets/studio-home.css" ".project-phone"
 require_token "assets/studio-home.css" "overflow: visible"
 require_token "assets/studio-home.js" "shotsPerSecond: 18"
+test -s "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2" || fail "Chilgok subset font is missing"
+test "$(wc -c < "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2")" -lt 300000 || fail "Chilgok subset font is too large"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"
 
