@@ -82,6 +82,20 @@ assert.equal(model.serializeAnalyticsFilters({
   page: 3,
   query: "Duck",
 }), "rangeDays=28&rangeOffsetDays=0&distributionKey=google_play&sort=gems&direction=asc&page=3&query=Duck");
+assert.equal(model.serializeAnalyticsFilters({
+  startDate: "2026-08-21",
+  endDate: "2026-08-30",
+  distributionKey: "all",
+  sort: "latest_played_at",
+  direction: "desc",
+  page: 1,
+}), "startDate=2026-08-21&endDate=2026-08-30&distributionKey=all&sort=latest_played_at&direction=desc&page=1");
+assert.deepEqual(model.normalizeCustomAnalyticsRange("2026-08-21", "2026-08-30", "2026-08-30"), {
+  ok: true, startDate: "2026-08-21", endDate: "2026-08-30", days: 10,
+});
+assert.match(model.normalizeCustomAnalyticsRange("2026-08-01", "2026-08-30", "2026-08-30").error, /최대 28일/);
+assert.match(model.normalizeCustomAnalyticsRange("2026-08-31", "2026-08-30", "2026-08-30").error, /확인/);
+assert.match(model.normalizeCustomAnalyticsRange("2026-08-30", "2026-08-31", "2026-08-30").error, /오늘 이후/);
 assert.equal(
   model.playerDeepLink("user/1", "#/analytics?rangeDays=7&sort=gems"),
   "#/players/user%2F1?return=%23%2Fanalytics%3FrangeDays%3D7%26sort%3Dgems",

@@ -45,12 +45,21 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-10/, "the Console must cache-bust executive summary and overall player judgment copy");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-11/, "the Console must cache-bust custom ranges and version visualizations");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {
   assert.match(consoleHtml, new RegExp(`id="${id}"`), `executive summary must expose ${id}`);
 }
 assert.match(analyticsSource, /renderExecutiveSummary\(pulseModel\)/, "the executive snapshot must refresh with every analytics payload");
+for (const id of ["customRangeForm", "customRangeStart", "customRangeEnd", "execCompletionDonut", "execRetentionDonut", "execExitDonut", "versionTrendSelect", "versionTrendChart", "versionUpdateHistory"]) {
+  assert.match(consoleHtml, new RegExp(`id="${id}"`), `analytics visualization must expose ${id}`);
+}
+assert.match(analyticsSource, /\.\.\.rangePayload/, "custom date ranges must be sent as an additive API contract");
+assert.match(analyticsSource, /normalizeCustomAnalyticsRange/, "calendar dates must be validated before loading analytics");
+assert.match(analyticsSource, /renderExecutiveVisuals\(pulseModel\)/, "donut charts must refresh with every analytics payload");
+assert.match(analyticsSource, /state\.payload\?\.versionMonitor/, "version adoption must render from the secured dashboard response");
+assert.match(analyticsSource, /gate\?\.effectiveDay[\s\S]*row\.day >= gate\.effectiveDay/, "version trend must begin at the matching forced-update audit date");
+assert.match(consoleStyles, /\.executive-overview\s*\{[\s\S]*linear-gradient\([^}]*#ffffff/, "the executive snapshot must use a light surface");
 assert.match(consoleStyles, /grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)/, "mobile navigation must fit all seven console routes");
 assert.match(consoleHtml, /pulse-model\.js\?v=20260830-5/, "the Console must cache-bust selected-range return scoring");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
@@ -74,7 +83,7 @@ assert.match(analyticsSource, /find\(\(row\) => row\?\.event === "game_over"\)\?
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20260830-2/, "the Console must cache-bust the Korean analytics labels");
+assert.match(consoleHtml, /model\.js\?v=20260830-3/, "the Console must cache-bust custom date serialization");
 assert.match(consoleHtml, /같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시/, "button hesitation must disclose both the duration and sample gates");
 assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>명/, "button hesitation must use the requested people terminology");
 assert.match(analyticsSource, /Math\.max\(5, Math\.round\(value \* 10\)/, "hesitation formatting must preserve the five-second lower bound");
@@ -95,7 +104,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260830-5/, "the Console must cache-bust the executive dashboard redesign");
+assert.match(consoleHtml, /styles\.css\?v=20260830-6/, "the Console must cache-bust the light visualization redesign");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");

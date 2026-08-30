@@ -139,10 +139,31 @@
     return actionNames[action] || action || "알 수 없는 작업";
   }
 
+  function normalizeCustomAnalyticsRange(startDate, endDate, today, maxDays = 28) {
+    const validDay = (value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))
+      && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+    if (!validDay(startDate) || !validDay(endDate) || startDate > endDate) return { ok: false, error: "시작일과 종료일을 확인해 주세요." };
+    const start = Date.parse(`${startDate}T00:00:00Z`);
+    const end = Date.parse(`${endDate}T00:00:00Z`);
+    const days = Math.round((end - start) / 86400000) + 1;
+    if (days < 1 || days > maxDays) return { ok: false, error: `집계 기간은 최대 ${maxDays}일입니다.` };
+    if (today && endDate > today) return { ok: false, error: "오늘 이후 날짜는 선택할 수 없습니다." };
+    if (today) {
+      const earliest = new Date(Date.parse(`${today}T00:00:00Z`) - (maxDays - 1) * 86400000).toISOString().slice(0, 10);
+      if (startDate < earliest) return { ok: false, error: `원본 이벤트 보관 기간인 최근 ${maxDays}일 안에서 선택해 주세요.` };
+    }
+    return { ok: true, startDate, endDate, days };
+  }
+
   function serializeAnalyticsFilters(filters) {
     const params = new URLSearchParams();
-    params.set("rangeDays", String(filters.rangeDays));
-    params.set("rangeOffsetDays", String(filters.rangeOffsetDays || 0));
+    if (filters.startDate && filters.endDate) {
+      params.set("startDate", String(filters.startDate));
+      params.set("endDate", String(filters.endDate));
+    } else {
+      params.set("rangeDays", String(filters.rangeDays));
+      params.set("rangeOffsetDays", String(filters.rangeOffsetDays || 0));
+    }
     params.set("distributionKey", String(filters.distributionKey));
     params.set("sort", String(filters.sort));
     params.set("direction", String(filters.direction));
@@ -287,6 +308,7 @@
     playerIdentityMarkup,
     countryDisplay,
     actionDisplayName,
+    normalizeCustomAnalyticsRange,
     serializeAnalyticsFilters,
     playerDeepLink,
     safeConsoleReturnHash,

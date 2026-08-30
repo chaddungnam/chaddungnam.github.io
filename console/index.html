@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260830-5">
+  <link rel="stylesheet" href="styles.css?v=20260830-6">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -93,7 +93,7 @@
               <button class="range-button" data-range="5" data-range-offset="0" type="button">최근 5일</button>
               <button class="range-button" data-range="7" data-range-offset="0" type="button">최근 7일</button>
               <button class="range-button" data-range="28" data-range-offset="0" type="button">최근 28일</button>
-            </div></div>
+            </div><details id="customRangePicker" class="custom-range-picker"><summary>달력으로 선택</summary><form id="customRangeForm" class="custom-range-form"><label for="customRangeStart">시작일<input id="customRangeStart" name="startDate" type="date" required></label><span aria-hidden="true">→</span><label for="customRangeEnd">종료일<input id="customRangeEnd" name="endDate" type="date" required></label><button class="primary-button" type="submit">기간 적용</button><button id="customRangeClear" type="button">최근 3일</button><small id="customRangeMessage" role="status">최근 28일 안에서 원하는 기간을 선택하세요.</small></form></details></div>
             <div class="filter-group"><span class="filter-label">스토어</span><div class="range-switch" aria-label="배포 스토어">
               <button class="distribution-button active" data-distribution="all" type="button">전체</button>
               <button class="distribution-button" data-distribution="google_play" type="button">Google Play</button>
@@ -116,6 +116,11 @@
             <article id="execPlayTimeCard" class="executive-card" data-status="insufficient"><span>평균 플레이</span><strong id="execPlayTime">—</strong><small id="execPlayTimeDetail">결과가 확인된 판 기준</small></article>
             <article id="execExitCard" class="executive-card" data-status="insufficient"><span>중간 종료율</span><strong id="execExit">—</strong><small id="execExitDetail">명시적 종료만 집계</small></article>
             <article id="execReturnCard" class="executive-card" data-status="insufficient"><span>플레이 재방문</span><strong id="execReturn">—</strong><small id="execReturnDetail">이전 같은 기간과 비교</small></article>
+          </div>
+          <div id="executiveVisuals" class="executive-visuals" aria-label="핵심 비율 원형 그래프">
+            <figure id="execCompletionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execCompletionDonutTitle"><title id="execCompletionDonutTitle">완료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execCompletionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execCompletionPercent" x="60" y="65">—</text></svg><figcaption><strong>확인된 판 완료율</strong><span id="execCompletionCaption">결과가 확인된 판 기준</span></figcaption></figure>
+            <figure id="execRetentionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execRetentionDonutTitle"><title id="execRetentionDonutTitle">재방문율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execRetentionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execRetentionPercent" x="60" y="65">—</text></svg><figcaption><strong>이전 기간 대비 재방문</strong><span id="execRetentionCaption">같은 길이의 직전 기간과 비교</span></figcaption></figure>
+            <figure id="execExitDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execExitDonutTitle"><title id="execExitDonutTitle">중간 종료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execExitRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execExitPercent" x="60" y="65">—</text></svg><figcaption><strong>명시적 중간 종료율</strong><span id="execExitCaption">낮을수록 좋음</span></figcaption></figure>
           </div>
         </section>
 
@@ -145,6 +150,15 @@
           <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>확인된 판의 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10판 중 7판쯤이면 좋아요</small></article>
           <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>기간 플레이 재방문</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>선택 기간과 바로 이전 같은 기간 비교</small></article>
           <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활동 인원당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
+        </section>
+
+        <section id="versionUpdatePanel" class="panel version-monitor-panel" aria-labelledby="versionUpdateTitle">
+          <div class="panel-heading"><div><p class="eyebrow">VERSION ADOPTION · FORCE UPDATE HISTORY</p><h2 id="versionUpdateTitle">강제 업데이트 이후 버전 추이</h2><small id="versionUpdateDescription">운영 감사 기록의 최소 지원 버전 변경일을 기준선으로 삼아 최근 28일의 실제 실행 버전을 비교합니다.</small></div><div class="version-monitor-controls"><label for="versionTrendSelect">표시 버전</label><select id="versionTrendSelect" aria-label="추이를 볼 앱 버전"><option value="">불러오는 중</option></select><span id="versionCurrentGate" class="status-label">현재 기준 확인 중</span></div></div>
+          <div class="version-monitor-grid">
+            <article class="version-adoption-card"><div><h3>최근 활동 버전 구성</h3><small id="versionAdoptionDay">최근 활동일 기준</small></div><div id="versionAdoptionBar" class="version-adoption-bar" aria-label="버전별 활동 인원 비율"></div><div id="versionAdoptionLegend" class="version-adoption-legend"></div></article>
+            <article class="version-trend-card"><div class="version-trend-head"><div><h3 id="versionTrendTitle">버전 추이</h3><small id="versionTrendSummary">버전을 선택하면 업데이트 이후 추이를 표시합니다.</small></div><div class="legend"><span><i class="legend-teal"></i>활동 인원</span><span><i class="legend-gold"></i>완료 인원</span></div></div><div class="chart-wrap"><canvas id="versionTrendChart" height="176" aria-label="선택 버전의 일별 활동 인원과 완료 인원 추이"></canvas></div></article>
+          </div>
+          <div><div class="version-history-heading"><h3>강제 업데이트 기록</h3><small>표시 버전과 공통 호환 코드를 함께 표시합니다.</small></div><ol id="versionUpdateHistory" class="version-update-history"><li>기록을 불러오는 중입니다.</li></ol></div>
         </section>
 
         <section class="content-grid decision-grid" aria-label="신규 유입, 광고 형식, 광고 제거 구매 분석">
@@ -339,11 +353,11 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260830-5"></script>
-  <script src="model.js?v=20260830-2"></script>
+  <script src="model.js?v=20260830-3"></script>
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260830-10"></script>
+  <script src="analytics.js?v=20260830-11"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>

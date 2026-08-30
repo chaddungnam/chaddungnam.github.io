@@ -3,7 +3,10 @@ const state = {
   payload: null,
   rangeDays: 3,
   rangeOffsetDays: 0,
+  startDate: "",
+  endDate: "",
   distributionKey: "all",
+  versionTrendVersion: "",
   playerQuery: "",
   playerSort: "latest_played_at",
   playerDirection: "desc",
@@ -56,7 +59,20 @@ function countryMarkup(value) {
 function selectedDays() {
   return (state.payload?.daily ?? []).slice(-state.rangeDays);
 }
+function formatShortDay(day) {
+  if (!day) return "";
+  return new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
+}
+function berlinToday() {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+function dayOffset(day, offset) {
+  return new Date(Date.parse(`${day}T00:00:00Z`) + offset * 86400000).toISOString().slice(0, 10);
+}
 function selectedRangeLabel() {
+  if (state.startDate && state.endDate) return `${formatShortDay(state.startDate)}–${formatShortDay(state.endDate)} (${state.rangeDays}일)`;
   if (state.rangeOffsetDays === 1) return "어제";
   return state.rangeDays === 1 ? "오늘" : `최근 ${state.rangeDays}일`;
 }
@@ -67,7 +83,7 @@ function setMessage(message, error = false) {
 }
 
 function setFiltersDisabled(disabled) {
-  document.querySelectorAll(".analytics-toolbar button, .period-players-panel button, .period-players-panel input").forEach((control) => {
+  document.querySelectorAll(".analytics-toolbar button, .analytics-toolbar input, .period-players-panel button, .period-players-panel input").forEach((control) => {
     control.disabled = disabled;
   });
   if (!disabled) {
@@ -108,12 +124,14 @@ async function loadDashboard() {
   setFiltersDisabled(true);
   setMessage(`Quirky Ball · ${selectedRangeLabel()} 이벤트와 플레이 계정을 집계하는 중...`);
   try {
+    const rangePayload = state.startDate && state.endDate
+      ? { startDate: state.startDate, endDate: state.endDate }
+      : { rangeDays: state.rangeDays, rangeOffsetDays: state.rangeOffsetDays };
     const [data] = await Promise.all([
       root.ConsoleAPI.post("analytics-dashboard-v2", {
         projectKey: "quirky_ball",
         distributionKey: state.distributionKey,
-        rangeDays: state.rangeDays,
-        rangeOffsetDays: state.rangeOffsetDays,
+        ...rangePayload,
         playerQuery: state.playerQuery,
         playerSort: state.playerSort,
         playerDirection: state.playerDirection,
@@ -167,16 +185,18 @@ function renderDashboard() {
   setText("kpiActiveUnit", "명");
   const segments = summary.playerSegments ?? {};
   setText("kpiPeopleMix", `라이트 ${formatNumber(Number(segments.lightPeople ?? summary.installs ?? 0))}명 · 헤비 ${formatNumber(Number(segments.heavyPeople ?? 0))}명(2인분) · 판단 ${formatNumber(Number(segments.weightedPeople ?? summary.installs ?? 0))}명`);
-  setText("dailyTrendEyebrow", `${state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
+  setText("dailyTrendEyebrow", `${state.startDate ? "CUSTOM RANGE" : state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `실광고 ${formatNumber(adEconomics.monetizedImpressions)} · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
   renderExecutiveSummary(pulseModel);
+  renderExecutiveVisuals(pulseModel);
   renderPulseOverview(pulseModel);
   renderInsightReasons(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
+  renderVersionMonitor();
   renderHourlyChart();
   renderFunnel();
   renderExitBreakdown();
@@ -677,6 +697,41 @@ function renderExecutiveSummary(model) {
   );
 }
 
+function setExecutiveDonut({ figureId, ringId, percentId, captionId, value, status, caption }) {
+  const figure = byId(figureId);
+  const ring = byId(ringId);
+  const safeRate = typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : null;
+  figure.dataset.status = safeRate == null ? "insufficient" : status;
+  ring.style.strokeDasharray = safeRate == null ? "0 100" : `${(safeRate * 100).toFixed(1)} ${(100 - safeRate * 100).toFixed(1)}`;
+  setText(percentId, safeRate == null ? "—" : `${Math.round(safeRate * 100)}%`);
+  setText(captionId, caption);
+  figure.querySelector("svg").setAttribute("aria-label", safeRate == null ? `${caption}, 데이터 부족` : `${caption}, ${formatRate(safeRate)}`);
+}
+
+function renderExecutiveVisuals(model) {
+  const summary = state.payload?.summary ?? {};
+  const periodReturn = state.payload?.periodReturn ?? {};
+  const observedGames = Number(summary.observedGames ?? 0);
+  const completionRate = observedGames > 0 ? Number(summary.gameOvers ?? 0) / observedGames : null;
+  const exitRate = typeof summary.exitRate === "number" ? summary.exitRate : null;
+  const exitStatus = exitRate == null ? "insufficient" : exitRate < .35 ? "good" : exitRate < .55 ? "watch" : "risk";
+  setExecutiveDonut({
+    figureId: "execCompletionDonut", ringId: "execCompletionRing", percentId: "execCompletionPercent", captionId: "execCompletionCaption",
+    value: completionRate, status: model.metrics.completion.status,
+    caption: observedGames > 0 ? `확인 ${formatNumber(observedGames)}판 · 완료 ${formatNumber(Number(summary.gameOvers ?? 0))}판` : "결과가 확인된 판 기준",
+  });
+  setExecutiveDonut({
+    figureId: "execRetentionDonut", ringId: "execRetentionRing", percentId: "execRetentionPercent", captionId: "execRetentionCaption",
+    value: periodReturn.rate, status: model.metrics.retention.status,
+    caption: Number(periodReturn.previousPlayers ?? 0) > 0 ? `이전 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers ?? 0))}명` : "이전 비교 기간 데이터 없음",
+  });
+  setExecutiveDonut({
+    figureId: "execExitDonut", ringId: "execExitRing", percentId: "execExitPercent", captionId: "execExitCaption",
+    value: exitRate, status: exitStatus,
+    caption: `명시적 종료 ${formatNumber(Number(summary.midGameExits ?? 0))}판 · 낮을수록 좋음`,
+  });
+}
+
 function renderPulseOverview(model) {
   const card = byId("healthCard");
   card.dataset.status = model.verdict.status;
@@ -760,6 +815,150 @@ function renderDailyChart() {
     }
   });
   context.textAlign = "start";
+}
+
+const versionColors = ["#21aa9b", "#e4b94f", "#e96657", "#6272a4", "#8b5cf6", "#3b82f6"];
+
+function compareVersions(left, right) {
+  return String(left).localeCompare(String(right), "en", { numeric: true, sensitivity: "base" });
+}
+
+function renderVersionAdoption(monitor, versions) {
+  const daily = Array.isArray(monitor.daily) ? monitor.daily : [];
+  const latestDay = daily.map((row) => row.day).sort().at(-1);
+  const latestRows = daily.filter((row) => row.day === latestDay && Number(row.activePeople ?? 0) > 0)
+    .sort((left, right) => Number(right.activePeople ?? 0) - Number(left.activePeople ?? 0));
+  const total = latestRows.reduce((sum, row) => sum + Number(row.activePeople ?? 0), 0);
+  setText("versionAdoptionDay", latestDay ? `${formatShortDay(latestDay)} 활동 기록 기준` : "선택 기간에 버전 활동 없음");
+  const bar = byId("versionAdoptionBar");
+  const legend = byId("versionAdoptionLegend");
+  if (!latestRows.length || total === 0) {
+    bar.innerHTML = "";
+    legend.innerHTML = '<p class="version-empty">선택 기간의 버전별 활동 데이터가 없습니다.</p>';
+    return;
+  }
+  const colorByVersion = new Map(versions.map((row, index) => [row.appVersion, versionColors[index % versionColors.length]]));
+  bar.innerHTML = latestRows.map((row) => {
+    const width = Number(row.activePeople ?? 0) / total * 100;
+    const color = colorByVersion.get(row.appVersion) || versionColors[0];
+    return `<i style="width:${width}%;background:${color}" title="${escapeHtml(row.appVersion)} ${formatNumber(Number(row.activePeople))}명"></i>`;
+  }).join("");
+  bar.setAttribute("aria-label", latestRows.map((row) => `${row.appVersion} ${formatNumber(Number(row.activePeople))}명`).join(", "));
+  legend.innerHTML = latestRows.map((row) => {
+    const color = colorByVersion.get(row.appVersion) || versionColors[0];
+    return `<div><i style="background:${color}"></i><span>v${escapeHtml(row.appVersion)}</span><strong>${formatNumber(Number(row.activePeople))}명 · ${formatRate(Number(row.activePeople) / total)}</strong></div>`;
+  }).join("");
+}
+
+function drawVersionTrend(rows) {
+  const canvas = byId("versionTrendChart");
+  const width = Math.max(1, canvas.parentElement?.clientWidth || canvas.clientWidth || 800);
+  const height = canvas.clientHeight || 176;
+  const ratio = root.devicePixelRatio || 1;
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  context.clearRect(0, 0, width, height);
+  context.font = "10px system-ui, sans-serif";
+  if (!rows.length) {
+    context.fillStyle = "#758194";
+    context.textAlign = "center";
+    context.fillText("선택 버전의 업데이트 이후 활동 데이터가 없습니다.", width / 2, height / 2);
+    return;
+  }
+  const left = 28;
+  const right = 10;
+  const top = 14;
+  const bottom = 27;
+  const chartHeight = height - top - bottom;
+  const chartWidth = width - left - right;
+  const max = Math.max(1, ...rows.flatMap((row) => [Number(row.activePeople ?? 0), Number(row.completedPeople ?? 0)]));
+  context.strokeStyle = "#e2e7ea";
+  context.fillStyle = "#8994a3";
+  context.textAlign = "right";
+  for (let line = 0; line <= 4; line += 1) {
+    const y = top + chartHeight - chartHeight * line / 4;
+    context.beginPath(); context.moveTo(left, y); context.lineTo(width - right, y); context.stroke();
+    context.fillText(String(Math.round(max * line / 4)), left - 6, y + 3);
+  }
+  const xAt = (index) => rows.length === 1 ? left + chartWidth / 2 : left + chartWidth * index / (rows.length - 1);
+  const yAt = (value) => top + chartHeight - chartHeight * Number(value ?? 0) / max;
+  const drawLine = (key, color) => {
+    context.strokeStyle = color;
+    context.lineWidth = 2.5;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.beginPath();
+    rows.forEach((row, index) => {
+      const x = xAt(index); const y = yAt(row[key]);
+      if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
+    });
+    context.stroke();
+    rows.forEach((row, index) => {
+      context.fillStyle = "#fff"; context.strokeStyle = color; context.lineWidth = 2;
+      context.beginPath(); context.arc(xAt(index), yAt(row[key]), 3.2, 0, Math.PI * 2); context.fill(); context.stroke();
+    });
+  };
+  drawLine("activePeople", "#21aa9b");
+  drawLine("completedPeople", "#e4b94f");
+  context.fillStyle = "#8994a3";
+  context.textAlign = "center";
+  rows.forEach((row, index) => {
+    if (index % Math.max(1, Math.ceil(rows.length / 7)) === 0 || index === rows.length - 1) context.fillText(String(row.day).slice(5), xAt(index), height - 8);
+  });
+}
+
+function renderVersionTrend(monitor) {
+  const selected = state.versionTrendVersion;
+  const history = Array.isArray(monitor.history) ? monitor.history : [];
+  const gate = [...history].reverse().find((row) => row.version === selected);
+  let rows = (Array.isArray(monitor.daily) ? monitor.daily : []).filter((row) => row.appVersion === selected);
+  if (gate?.effectiveDay) rows = rows.filter((row) => row.day >= gate.effectiveDay);
+  rows.sort((left, right) => String(left.day).localeCompare(String(right.day)));
+  setText("versionTrendTitle", selected ? `v${selected} 업데이트 이후` : "버전 추이");
+  if (selected) {
+    const peak = Math.max(0, ...rows.map((row) => Number(row.activePeople ?? 0)));
+    setText("versionTrendSummary", gate?.effectiveDay
+      ? `${formatShortDay(gate.effectiveDay)} 강제 기준 적용 이후 ${formatNumber(rows.length)}일 · 일간 활동 최대 ${formatNumber(peak)}명`
+      : `선택 기간의 ${formatNumber(rows.length)}일 · 일간 활동 최대 ${formatNumber(peak)}명`);
+  } else setText("versionTrendSummary", "버전을 선택하면 업데이트 이후 추이를 표시합니다.");
+  drawVersionTrend(rows);
+}
+
+function renderVersionHistory(monitor) {
+  const history = (Array.isArray(monitor.history) ? monitor.history : [])
+    .filter((row) => row.version && !String(row.version).startsWith("0."))
+    .slice(-3);
+  const list = byId("versionUpdateHistory");
+  if (!history.length) {
+    list.innerHTML = '<li class="version-empty">강제 업데이트 감사 기록이 없습니다.</li>';
+    return;
+  }
+  list.innerHTML = history.map((row) => {
+    const effectiveAt = row.effectiveAt ? new Date(row.effectiveAt).toLocaleString("ko-KR", { timeZone: "Europe/Berlin", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : formatShortDay(row.effectiveDay);
+    const before = row.beforeVersion ? `이전 v${row.beforeVersion} · 코드 ${row.beforeCode || "—"}` : "이전 기준 없음";
+    return `<li><small>${escapeHtml(effectiveAt)} · 독일 시간</small><b>v${escapeHtml(row.version)}</b><span>공통 호환 코드 ${escapeHtml(row.versionCode || "—")}</span><small>${escapeHtml(before)}${row.reason ? ` · ${escapeHtml(row.reason)}` : ""}</small></li>`;
+  }).join("");
+}
+
+function renderVersionMonitor() {
+  const monitor = state.payload?.versionMonitor ?? {};
+  const versions = (Array.isArray(monitor.versions) ? monitor.versions : []).slice()
+    .sort((left, right) => compareVersions(right.appVersion, left.appVersion));
+  const currentVersion = String(monitor.current?.version || "");
+  const currentCode = String(monitor.current?.versionCode || "");
+  setText("versionCurrentGate", currentVersion ? `현재 최소 v${currentVersion} · 호환 코드 ${currentCode || "—"}` : "현재 강제 기준 없음");
+  const select = byId("versionTrendSelect");
+  select.innerHTML = versions.length ? versions.map((row) => `<option value="${escapeHtml(row.appVersion)}">v${escapeHtml(row.appVersion)} · ${formatNumber(Number(row.activePeople ?? 0))}명</option>`).join("") : '<option value="">버전 데이터 없음</option>';
+  if (!versions.some((row) => row.appVersion === state.versionTrendVersion)) {
+    state.versionTrendVersion = versions.some((row) => row.appVersion === currentVersion) ? currentVersion : (versions[0]?.appVersion || "");
+  }
+  select.value = state.versionTrendVersion;
+  renderVersionAdoption(monitor, versions);
+  renderVersionTrend(monitor);
+  renderVersionHistory(monitor);
 }
 
 function renderHourlyChart() {
@@ -1100,6 +1299,8 @@ function syncFilterHash() {
   const query = root.ConsoleModel.serializeAnalyticsFilters({
     rangeDays: state.rangeDays,
     rangeOffsetDays: state.rangeOffsetDays,
+    startDate: state.startDate,
+    endDate: state.endDate,
     distributionKey: state.distributionKey,
     sort: state.playerSort,
     direction: state.playerDirection,
@@ -1111,10 +1312,18 @@ function syncFilterHash() {
 
 function readFilterHash() {
   const params = new URLSearchParams((root.location.hash.split("?")[1] || ""));
-  const range = Number(params.get("rangeDays"));
-  if ([1, 3, 5, 7, 28].includes(range)) state.rangeDays = range;
-  const rangeOffset = Number(params.get("rangeOffsetDays"));
-  state.rangeOffsetDays = range === 1 && rangeOffset === 1 ? 1 : 0;
+  const custom = root.ConsoleModel.normalizeCustomAnalyticsRange(params.get("startDate"), params.get("endDate"), berlinToday());
+  if (custom.ok) {
+    state.startDate = custom.startDate;
+    state.endDate = custom.endDate;
+    state.rangeDays = custom.days;
+    state.rangeOffsetDays = 0;
+  } else {
+    const range = Number(params.get("rangeDays"));
+    if ([1, 3, 5, 7, 28].includes(range)) state.rangeDays = range;
+    const rangeOffset = Number(params.get("rangeOffsetDays"));
+    state.rangeOffsetDays = range === 1 && rangeOffset === 1 ? 1 : 0;
+  }
   const distribution = params.get("distributionKey");
   if (["all", "google_play", "app_store", "onestore"].includes(distribution)) state.distributionKey = distribution;
   const sort = params.get("sort");
@@ -1127,8 +1336,10 @@ function readFilterHash() {
 }
 
 function updateFilterControls() {
+  const today = berlinToday();
+  const earliest = dayOffset(today, -27);
   document.querySelectorAll(".range-button").forEach((button) => {
-    const active = Number(button.dataset.range) === state.rangeDays && Number(button.dataset.rangeOffset || 0) === state.rangeOffsetDays;
+    const active = !state.startDate && Number(button.dataset.range) === state.rangeDays && Number(button.dataset.rangeOffset || 0) === state.rangeOffsetDays;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
@@ -1137,6 +1348,15 @@ function updateFilterControls() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
+  const startInput = byId("customRangeStart");
+  const endInput = byId("customRangeEnd");
+  startInput.min = earliest; startInput.max = today; startInput.value = state.startDate || dayOffset(today, -2);
+  endInput.min = earliest; endInput.max = today; endInput.value = state.endDate || today;
+  const picker = byId("customRangePicker");
+  picker.classList.toggle("active", Boolean(state.startDate));
+  picker.querySelector("summary").childNodes[0].nodeValue = state.startDate ? `${formatShortDay(state.startDate)}–${formatShortDay(state.endDate)} ` : "달력으로 선택 ";
+  const customMessage = byId("customRangeMessage");
+  if (!customMessage.dataset.error || customMessage.dataset.error === "false") customMessage.textContent = state.startDate ? `${state.rangeDays}일 사용자 지정 기간` : "최근 28일 안에서 원하는 기간을 선택하세요.";
   byId("periodPlayerSearch").value = state.playerQuery;
   document.querySelectorAll("[data-player-sort]").forEach((button) => {
     button.closest("th").setAttribute("aria-sort", button.dataset.playerSort === state.playerSort ? (state.playerDirection === "asc" ? "ascending" : "descending") : "none");
@@ -1157,16 +1377,52 @@ function bindControls() {
     byId("aiBriefOriginal").textContent = original.hidden ? "원문 보기" : "원문 숨기기";
   });
   document.querySelectorAll(".range-button").forEach((button) => button.addEventListener("click", () => {
+    state.startDate = "";
+    state.endDate = "";
     state.rangeDays = Number(button.dataset.range);
     state.rangeOffsetDays = Number(button.dataset.rangeOffset || 0);
     state.playerPage = 1;
+    byId("customRangePicker").open = false;
+    byId("customRangeMessage").dataset.error = "false";
     changeFilters();
   }));
+  byId("customRangeForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const normalized = root.ConsoleModel.normalizeCustomAnalyticsRange(byId("customRangeStart").value, byId("customRangeEnd").value, berlinToday());
+    const message = byId("customRangeMessage");
+    if (!normalized.ok) {
+      message.textContent = normalized.error;
+      message.dataset.error = "true";
+      return;
+    }
+    message.dataset.error = "false";
+    state.startDate = normalized.startDate;
+    state.endDate = normalized.endDate;
+    state.rangeDays = normalized.days;
+    state.rangeOffsetDays = 0;
+    state.playerPage = 1;
+    byId("customRangePicker").open = false;
+    changeFilters();
+  });
+  byId("customRangeClear").addEventListener("click", () => {
+    state.startDate = "";
+    state.endDate = "";
+    state.rangeDays = 3;
+    state.rangeOffsetDays = 0;
+    state.playerPage = 1;
+    byId("customRangePicker").open = false;
+    byId("customRangeMessage").dataset.error = "false";
+    changeFilters();
+  });
   document.querySelectorAll(".distribution-button").forEach((button) => button.addEventListener("click", () => {
     state.distributionKey = button.dataset.distribution;
     state.playerPage = 1;
     changeFilters();
   }));
+  byId("versionTrendSelect").addEventListener("change", (event) => {
+    state.versionTrendVersion = event.currentTarget.value;
+    renderVersionTrend(state.payload?.versionMonitor ?? {});
+  });
   byId("periodPlayerSearchForm").addEventListener("submit", (event) => {
     event.preventDefault();
     state.playerQuery = byId("periodPlayerSearch").value.trim();
@@ -1205,6 +1461,7 @@ function bindControls() {
     resizeTimer = root.setTimeout(() => {
       if (!state.payload) return;
       renderDailyChart();
+      renderVersionTrend(state.payload?.versionMonitor ?? {});
       renderGameOverChart((state.payload?.diagnostics?.gameOver?.byDay ?? []).slice(-state.rangeDays));
     }, 120);
   });
