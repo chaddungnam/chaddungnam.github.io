@@ -6,7 +6,7 @@ body[data-page="studio"] {
   --studio-muted: #6b7079;
   --studio-line: rgba(17, 19, 25, .17);
   --studio-blue: #2665ee;
-  --studio-red: #ef3f38;
+  --studio-red: #be2d28;
   --studio-yellow: #f4bf25;
   min-width: 0;
   color: var(--studio-ink);
