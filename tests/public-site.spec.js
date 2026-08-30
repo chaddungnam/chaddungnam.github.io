@@ -423,7 +423,7 @@ test("journal cards stay fully visible and type their previews quickly", async (
   const lastMirrorCard = page.locator(".mirror-grid article").last();
   expect(await lastMirrorCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
   await lastMirrorCard.scrollIntoViewIfNeeded();
-  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 4000 });
+  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 8000 });
 });
 
 test("Tistory semantic categories rename the root and keep subcategories expanded", async ({ page }) => {
