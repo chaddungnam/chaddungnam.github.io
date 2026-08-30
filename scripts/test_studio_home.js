@@ -8,7 +8,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const runtimePath = path.join(root, "assets/studio-home.js");
 
 assert.ok(fs.existsSync(runtimePath), "assets/studio-home.js must exist");
-const { QUIRKY_RULES, duePairCount, shotAngles, shrinkRadius } = require(runtimePath);
+const { QUIRKY_RULES, duePairCount, nextFrameTime, shotAngles, shrinkRadius } = require(runtimePath);
 
 assert.deepEqual(QUIRKY_RULES, {
   totalTurns: 4.5,
@@ -32,6 +32,17 @@ for (let frame = 0; frame <= 300; frame += 1) {
   nextPairAt += due * QUIRKY_RULES.pairInterval * 1000;
 }
 assert.equal(simulatedShots, 80, "ten seconds of steady 30fps time must fire exactly 80 shots");
+for (const refreshRate of [60, 90, 120]) {
+  let previousFrameAt = 0;
+  let simulatedFrames = 0;
+  for (let refresh = 1; refresh <= refreshRate * 10; refresh += 1) {
+    const next = nextFrameTime(refresh * 1000 / refreshRate, previousFrameAt, 1000 / 30);
+    if (next === null) continue;
+    previousFrameAt = next;
+    simulatedFrames += 1;
+  }
+  assert.equal(simulatedFrames, 300, `ten seconds at ${refreshRate}Hz must retain a steady 30fps draw clock`);
+}
 assert.equal(
   crypto.createHash("sha256").update(fs.readFileSync(path.join(root, "assets/media/quirky-ball-gameplay.mp4"))).digest("hex"),
   "719e199362e3ba0b9eefbc163071927e3969a6193d71fd2800aea0679d77da15",

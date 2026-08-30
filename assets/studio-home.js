@@ -34,6 +34,12 @@
     return now < nextPairAt ? 0 : Math.floor((now - nextPairAt) / interval) + 1;
   }
 
+  function nextFrameTime(now, previous, interval) {
+    const elapsed = now - previous;
+    if (elapsed < interval - 0.01) return null;
+    return elapsed < interval ? previous + interval : now - elapsed % interval;
+  }
+
   function validVideo(video) {
     return video && /^[A-Za-z0-9_-]{11}$/.test(video.videoId) && typeof video.title === "string" && video.title.trim();
   }
@@ -198,6 +204,7 @@
     let start = performance.now();
     let previous = start;
     const pairIntervalMs = QUIRKY_RULES.pairInterval * 1000;
+    const frameIntervalMs = 1000 / 30;
     let nextPairAt = start + pairIntervalMs;
     let pairIndex = 0;
     let frame = 0;
@@ -417,7 +424,8 @@
     function tick(now) {
       if (!active || manualPaused) { previous = now; nextPairAt = now + pairIntervalMs; requestAnimationFrame(tick); return; }
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
-      if (now - previous < 1000 / 30) { requestAnimationFrame(tick); return; }
+      const nextFrameAt = nextFrameTime(now, previous, frameIntervalMs);
+      if (nextFrameAt === null) { requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;
       if (now - nextPairAt > pairIntervalMs * 4) nextPairAt = now;
@@ -431,7 +439,7 @@
       updateShots(delta);
       updateParticles(delta);
       draw(rotation);
-      previous = now;
+      previous = nextFrameAt;
       requestAnimationFrame(tick);
     }
 
@@ -455,5 +463,5 @@
     setupMotionToggle(reducedMotion);
   }
 
-  return { QUIRKY_RULES, duePairCount, shotAngles, shrinkRadius, init };
+  return { QUIRKY_RULES, duePairCount, nextFrameTime, shotAngles, shrinkRadius, init };
 });
