@@ -227,9 +227,10 @@ test("home desktop removes the hero divider and turns the pointer into a Quirky 
   await page.mouse.move(320, 220);
   await expect(cursor).toHaveCSS("opacity", "1");
 
+  await page.addStyleTag({ content: ".cursor-impact { animation-duration: 1200ms !important; }" });
   await page.mouse.click(320, 220);
   await expect(page.locator("[data-cursor-impact]")).toHaveCount(1);
-  await expect(page.locator("[data-cursor-impact]")).toHaveCount(0, { timeout: 1000 });
+  await expect(page.locator("[data-cursor-impact]")).toHaveCount(0, { timeout: 2000 });
 });
 
 test("home reduced motion holds the canvas and pauses phone video", async ({ page }) => {
