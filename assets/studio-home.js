@@ -168,12 +168,73 @@
     let pairCount = -1;
     let frame = 0;
     let impactCount = 0;
+    const marbleSprites = new Map();
+    let shotSprite;
+
+    function getMarbleSprite(color) {
+      if (marbleSprites.has(color)) return marbleSprites.get(color);
+      const sprite = document.createElement("canvas");
+      const spriteContext = sprite.getContext("2d");
+      sprite.width = 64;
+      sprite.height = 64;
+      spriteContext.beginPath();
+      spriteContext.arc(34, 35, 24, 0, TAU);
+      spriteContext.fillStyle = "rgba(17,19,25,.14)";
+      spriteContext.fill();
+      const fill = spriteContext.createRadialGradient(24, 21, 2, 30, 29, 24);
+      fill.addColorStop(0, "rgba(255,255,255,.98)");
+      fill.addColorStop(.22, color);
+      fill.addColorStop(1, color);
+      spriteContext.beginPath();
+      spriteContext.arc(30, 29, 24, 0, TAU);
+      spriteContext.fillStyle = fill;
+      spriteContext.fill();
+      spriteContext.strokeStyle = "#172033";
+      spriteContext.lineWidth = 2;
+      spriteContext.stroke();
+      marbleSprites.set(color, sprite);
+      return sprite;
+    }
+
+    function getShotSprite() {
+      if (shotSprite) return shotSprite;
+      shotSprite = document.createElement("canvas");
+      const spriteContext = shotSprite.getContext("2d");
+      shotSprite.width = 88;
+      shotSprite.height = 28;
+      const trail = spriteContext.createLinearGradient(4, 0, 66, 0);
+      trail.addColorStop(0, "rgba(239,63,56,0)");
+      trail.addColorStop(.72, "rgba(244,191,37,.72)");
+      trail.addColorStop(1, "rgba(239,63,56,1)");
+      spriteContext.shadowColor = "rgba(239,63,56,.55)";
+      spriteContext.shadowBlur = 10;
+      spriteContext.strokeStyle = trail;
+      spriteContext.lineWidth = 7;
+      spriteContext.beginPath();
+      spriteContext.moveTo(4, 14);
+      spriteContext.lineTo(66, 14);
+      spriteContext.stroke();
+      spriteContext.shadowBlur = 0;
+      spriteContext.fillStyle = "#ef3f38";
+      spriteContext.strokeStyle = "#172033";
+      spriteContext.lineWidth = 2;
+      spriteContext.beginPath();
+      spriteContext.moveTo(84, 14);
+      spriteContext.lineTo(64, 8);
+      spriteContext.lineTo(69, 14);
+      spriteContext.lineTo(64, 20);
+      spriteContext.closePath();
+      spriteContext.fill();
+      spriteContext.stroke();
+      return shotSprite;
+    }
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
-      const ratio = Math.min(devicePixelRatio || 1, 2);
       width = Math.max(1, rect.width);
       height = Math.max(1, rect.height);
+      // ponytail: cap the decorative field near 650k pixels; raise only if large-screen blur becomes visible.
+      const ratio = Math.min(devicePixelRatio || 1, 1.25, Math.max(.55, Math.sqrt(650000 / (width * height))));
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -290,21 +351,7 @@
       context.restore();
       for (const marble of marbles) {
         const radius = Math.max(7, marble.radius);
-        context.beginPath();
-        context.arc(marble.x + 2, marble.y + 3, radius, 0, TAU);
-        context.fillStyle = "rgba(17,19,25,.12)";
-        context.fill();
-        const fill = context.createRadialGradient(marble.x - radius * .34, marble.y - radius * .42, radius * .08, marble.x, marble.y, radius);
-        fill.addColorStop(0, "rgba(255,255,255,.98)");
-        fill.addColorStop(.22, marble.color);
-        fill.addColorStop(1, marble.color);
-        context.beginPath();
-        context.arc(marble.x, marble.y, radius, 0, TAU);
-        context.fillStyle = fill;
-        context.fill();
-        context.strokeStyle = "#172033";
-        context.lineWidth = 2;
-        context.stroke();
+        context.drawImage(getMarbleSprite(marble.color), marble.x - radius - 4, marble.y - radius - 4, radius * 2 + 8, radius * 2 + 8);
         context.beginPath();
         context.arc(marble.x + Math.cos(marble.spin) * radius * .34, marble.y + Math.sin(marble.spin) * radius * .34, Math.max(2, radius * .16), 0, TAU);
         context.fillStyle = "rgba(255,255,255,.72)";
@@ -312,35 +359,10 @@
       }
       for (const shot of shots) {
         const heading = Math.atan2(shot.vy, shot.vx);
-        const trailLength = 58;
-        const trail = context.createLinearGradient(shot.x, shot.y, shot.x - Math.cos(heading) * trailLength, shot.y - Math.sin(heading) * trailLength);
-        trail.addColorStop(0, "rgba(239,63,56,1)");
-        trail.addColorStop(.28, "rgba(244,191,37,.72)");
-        trail.addColorStop(1, "rgba(239,63,56,0)");
-        context.save();
-        context.shadowColor = "rgba(239,63,56,.55)";
-        context.shadowBlur = 12;
-        context.strokeStyle = trail;
-        context.lineWidth = 7;
-        context.beginPath();
-        context.moveTo(shot.x, shot.y);
-        context.lineTo(shot.x - Math.cos(heading) * trailLength, shot.y - Math.sin(heading) * trailLength);
-        context.stroke();
-        context.restore();
         context.save();
         context.translate(shot.x, shot.y);
         context.rotate(heading);
-        context.fillStyle = "#ef3f38";
-        context.strokeStyle = "#172033";
-        context.lineWidth = 2;
-        context.beginPath();
-        context.moveTo(12, 0);
-        context.lineTo(-8, -6);
-        context.lineTo(-3, 0);
-        context.lineTo(-8, 6);
-        context.closePath();
-        context.fill();
-        context.stroke();
+        context.drawImage(getShotSprite(), -72, -14);
         context.restore();
       }
       for (const particle of particles) {
