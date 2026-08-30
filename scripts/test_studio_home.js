@@ -51,6 +51,13 @@ const expectedCopy = {
   "index_ja.html": ["Are you ready?", "Houseduck.in", "発売時期未定"],
 };
 
+const expectedOpenGraph = {
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "준비됐나요? House Duck의 릴리스 랩에서 Quirky Ball 1.1.0을 만나보세요.", "House Duck 릴리스 랩의 Quirky Ball 1.1.0 실제 플레이"],
+  "index_en.html": ["House Duck — Independent Game Studio", "Are you ready? Quirky Ball 1.1.0 in the House Duck release lab.", "Quirky Ball 1.1.0 gameplay in the House Duck release lab"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "Bereit? Quirky Ball 1.1.0 im Release-Labor von House Duck.", "Quirky Ball 1.1.0 Gameplay im Release-Labor von House Duck"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "準備はいい？House DuckのリリースラボでQuirky Ball 1.1.0を紹介します。", "House Duckのリリースラボで動くQuirky Ball 1.1.0"],
+};
+
 for (const [file, copy] of Object.entries(expectedCopy)) {
   const html = read(file);
   for (const text of copy) assert.ok(html.includes(text), `${file} must include ${text}`);
@@ -61,6 +68,10 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /og:image:height" content="630"/);
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.doesNotMatch(html, /history-section|journal-section|작게 만들더라도 오래 기억되는 게임/);
+  const [title, description, imageAlt] = expectedOpenGraph[file];
+  assert.ok(html.includes(`property="og:title" content="${title}"`), `${file} needs a localized Open Graph title`);
+  assert.ok(html.includes(`property="og:description" content="${description}"`), `${file} needs a localized Open Graph description`);
+  assert.ok(html.includes(`property="og:image:alt" content="${imageAlt}"`), `${file} needs localized social-image alt text`);
 }
 
 console.log("studio home contract: PASS");
