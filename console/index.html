@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260829-4">
+  <link rel="stylesheet" href="styles.css?v=20260830-5">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -72,6 +72,7 @@
         <a href="#/cs" data-page="cs"><span class="nav-index">06</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
         <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
+      <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
     </aside>
 
@@ -82,30 +83,41 @@
       </header>
 
       <section id="analyticsView" class="route-view" data-route="analytics">
-        <div id="attentionPanel" class="attention-panel">
-          <div><p class="eyebrow">ATTENTION</p><h2>주의 필요</h2></div>
-          <div id="attentionList" class="attention-list"><p>지표를 불러오는 중입니다.</p></div>
-        </div>
-
         <div class="toolbar analytics-toolbar">
-          <div><span class="live-dot"></span><span id="dataStatus">지표를 불러오는 중...</span></div>
+          <div class="toolbar-live"><span class="live-dot"></span><span id="dataStatus">지표를 불러오는 중...</span></div>
           <div class="toolbar-switches">
-            <div class="range-switch" aria-label="조회 기간">
+            <div class="filter-group"><span class="filter-label">기간</span><div class="range-switch" aria-label="조회 기간">
               <button class="range-button" data-range="1" data-range-offset="0" type="button">오늘</button>
               <button class="range-button" data-range="1" data-range-offset="1" type="button">어제</button>
               <button class="range-button active" data-range="3" data-range-offset="0" type="button">최근 3일</button>
               <button class="range-button" data-range="5" data-range-offset="0" type="button">최근 5일</button>
               <button class="range-button" data-range="7" data-range-offset="0" type="button">최근 7일</button>
               <button class="range-button" data-range="28" data-range-offset="0" type="button">최근 28일</button>
-            </div>
-            <div class="range-switch" aria-label="배포 스토어">
+            </div></div>
+            <div class="filter-group"><span class="filter-label">스토어</span><div class="range-switch" aria-label="배포 스토어">
               <button class="distribution-button active" data-distribution="all" type="button">전체</button>
               <button class="distribution-button" data-distribution="google_play" type="button">Google Play</button>
               <button class="distribution-button" data-distribution="app_store" type="button">iOS</button>
               <button class="distribution-button" data-distribution="onestore" type="button">원스토어</button>
-            </div>
+            </div></div>
           </div>
         </div>
+
+        <div id="attentionPanel" class="attention-panel" hidden>
+          <div><p class="eyebrow">ACTION REQUIRED</p><h2>지금 확인할 신호</h2></div>
+          <div id="attentionList" class="attention-list"><p>지표를 확인하는 중입니다.</p></div>
+        </div>
+
+        <section class="executive-overview" aria-labelledby="executiveTitle">
+          <header class="executive-heading"><div><p class="eyebrow">EXECUTIVE SNAPSHOT</p><h2 id="executiveTitle">지금 알아야 할 5가지</h2></div><span id="executivePeriod">최근 3일 · 전체 스토어</span></header>
+          <div class="executive-summary">
+            <article id="execPlayersCard" class="executive-card" data-status="neutral"><span>총 활동 인원</span><strong id="execPlayers">—</strong><small id="execPlayersDetail">선택 기간의 고유 인원</small></article>
+            <article id="execCompletedCard" class="executive-card" data-status="insufficient"><span>완료한 사람</span><strong id="execCompleted">—</strong><small id="execCompletedDetail">한 판 이상 완료</small></article>
+            <article id="execPlayTimeCard" class="executive-card" data-status="insufficient"><span>평균 플레이</span><strong id="execPlayTime">—</strong><small id="execPlayTimeDetail">결과가 확인된 판 기준</small></article>
+            <article id="execExitCard" class="executive-card" data-status="insufficient"><span>중간 종료율</span><strong id="execExit">—</strong><small id="execExitDetail">명시적 종료만 집계</small></article>
+            <article id="execReturnCard" class="executive-card" data-status="insufficient"><span>플레이 재방문</span><strong id="execReturn">—</strong><small id="execReturnDetail">이전 같은 기간과 비교</small></article>
+          </div>
+        </section>
 
         <section id="healthCard" class="pulse-hero" aria-live="polite" data-status="insufficient">
           <div class="duck-guide" aria-hidden="true"><div class="duck-head"><i class="duck-eye"></i><i class="duck-beak"></i></div><span>HOUSE DUCK</span></div>
@@ -331,7 +343,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260830-9"></script>
+  <script src="analytics.js?v=20260830-10"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>

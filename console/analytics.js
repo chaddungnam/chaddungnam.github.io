@@ -172,6 +172,7 @@ function renderDashboard() {
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `실광고 ${formatNumber(adEconomics.monetizedImpressions)} · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
+  renderExecutiveSummary(pulseModel);
   renderPulseOverview(pulseModel);
   renderInsightReasons(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
@@ -483,9 +484,12 @@ function formatServerTime(value) {
 
 function renderAttention(pulseModel) {
   const items = root.ConsoleModel.buildAttentionItems(pulseModel, state.payload?.generatedAt);
+  const panel = byId("attentionPanel");
+  panel.hidden = items.length === 0;
+  panel.dataset.count = String(items.length);
   byId("attentionList").innerHTML = items.length === 0
-    ? "<p>현재 Pulse 경고가 없습니다.</p>"
-    : items.map((item) => `<a class="attention-item" data-severity="${escapeHtml(item.severity)}" data-attention-target="${escapeHtml(item.targetId)}" href="#/analytics?section=${encodeURIComponent(item.targetId)}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.source)} · ${escapeHtml(formatServerTime(item.observedAt))}</small></a>`).join("");
+    ? ""
+    : items.map((item) => `<a class="attention-item" data-severity="${escapeHtml(item.severity)}" data-attention-target="${escapeHtml(item.targetId)}" href="#/analytics?section=${encodeURIComponent(item.targetId)}"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.source)} · ${escapeHtml(formatServerTime(item.observedAt))}</small><span>확인</span></a>`).join("");
   byId("attentionList").querySelectorAll("[data-attention-target]").forEach((link) => link.addEventListener("click", (event) => {
     event.preventDefault();
     byId(link.dataset.attentionTarget)?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -609,6 +613,68 @@ function renderJourney(journey = []) {
         <small>${escapeHtml(step.description)}</small>
       </div>`;
   }).join("");
+}
+
+function setExecutiveMetric(cardId, valueId, detailId, value, detail, status) {
+  byId(cardId).dataset.status = status;
+  setText(valueId, value);
+  setText(detailId, detail);
+}
+
+function renderExecutiveSummary(model) {
+  const summary = state.payload?.summary ?? {};
+  const segments = summary.playerSegments ?? {};
+  const funnel = state.payload?.funnel ?? [];
+  const periodReturn = state.payload?.periodReturn ?? {};
+  const completedPeople = Number(funnel.find((row) => row?.event === "game_over")?.users ?? 0);
+  const observedGames = Number(summary.observedGames ?? 0);
+  const exitRate = typeof summary.exitRate === "number" ? summary.exitRate : null;
+  const exitStatus = exitRate == null ? "insufficient" : exitRate < 0.35 ? "good" : exitRate < 0.55 ? "watch" : "risk";
+  const distribution = distributionLabel(state.distributionKey);
+
+  setText("executivePeriod", `${selectedRangeLabel()} · ${distribution}`);
+  setExecutiveMetric(
+    "execPlayersCard",
+    "execPlayers",
+    "execPlayersDetail",
+    `${formatNumber(Number(summary.installs ?? 0))}명`,
+    `앱 세션 ${formatNumber(Number(summary.sessions ?? 0))}회 · 헤비 ${formatNumber(Number(segments.heavyPeople ?? 0))}명`,
+    Number(summary.installs ?? 0) > 0 ? "neutral" : "insufficient",
+  );
+  setExecutiveMetric(
+    "execCompletedCard",
+    "execCompleted",
+    "execCompletedDetail",
+    `${formatNumber(completedPeople)}명`,
+    `확인된 ${formatNumber(observedGames)}판 중 완료 ${formatNumber(Number(summary.gameOvers ?? 0))}판`,
+    model.metrics.completion.status,
+  );
+  setExecutiveMetric(
+    "execPlayTimeCard",
+    "execPlayTime",
+    "execPlayTimeDetail",
+    formatDuration(summary.avgGameSeconds),
+    "결과가 확인된 판의 평균 플레이",
+    model.metrics.duration.status,
+  );
+  setExecutiveMetric(
+    "execExitCard",
+    "execExit",
+    "execExitDetail",
+    formatRate(exitRate),
+    `명시적 중간 종료 ${formatNumber(Number(summary.midGameExits ?? 0))}판`,
+    exitStatus,
+  );
+  setExecutiveMetric(
+    "execReturnCard",
+    "execReturn",
+    "execReturnDetail",
+    formatRate(periodReturn.rate),
+    Number(periodReturn.previousPlayers ?? 0) > 0
+      ? `이전 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명`
+      : "이전 비교 기간 데이터 없음",
+    model.metrics.retention.status,
+  );
 }
 
 function renderPulseOverview(model) {

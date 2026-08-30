@@ -45,7 +45,13 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-9/, "the Console must cache-bust overall player judgment copy");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-10/, "the Console must cache-bust executive summary and overall player judgment copy");
+assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
+for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {
+  assert.match(consoleHtml, new RegExp(`id="${id}"`), `executive summary must expose ${id}`);
+}
+assert.match(analyticsSource, /renderExecutiveSummary\(pulseModel\)/, "the executive snapshot must refresh with every analytics payload");
+assert.match(consoleStyles, /grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)/, "mobile navigation must fit all seven console routes");
 assert.match(consoleHtml, /pulse-model\.js\?v=20260830-5/, "the Console must cache-bust selected-range return scoring");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
@@ -89,7 +95,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260829-4/, "the Console must cache-bust the compact account-activity redesign");
+assert.match(consoleHtml, /styles\.css\?v=20260830-5/, "the Console must cache-bust the executive dashboard redesign");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
