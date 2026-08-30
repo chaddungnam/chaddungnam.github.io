@@ -169,6 +169,7 @@ require_token "llms.txt" "https://blog.houseduck.in/"
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'application/ld+json'
   require_token "$page" 'https://houseduck.in/#organization'
+  require_token "$page" '"logo":"https://houseduck.in/assets/house-duck-logo.png"'
   require_token "$page" '"@type":"WebSite"'
 done
 
