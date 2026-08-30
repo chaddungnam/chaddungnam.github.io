@@ -14,6 +14,7 @@ function payload(overrides = {}) {
     },
     rangeDays: overrides.rangeDays ?? 1,
     daily: overrides.daily ?? [{ activeInstalls: 10 }],
+    periodReturn: overrides.periodReturn ?? { currentPlayers: 10, previousPlayers: 8, returnedPlayers: 2, rate: 0.25 },
     retention: overrides.retention ?? [{ day: 1, rate: 0.25 }],
     adEconomics: {
       impressionsPerPlayer: 2,
@@ -65,9 +66,16 @@ assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyActivePeople, 4);
 assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyEffectivePeople, 5);
 assert.equal(oneHeavyPlayerAddsOneEffectivePerson.confidence, "standard");
 
+const selectedRangeReturnOverridesCohortD1 = buildPulseModel(payload({
+  periodReturn: { currentPlayers: 3, previousPlayers: 3, returnedPlayers: 3, rate: 1 },
+  retention: [{ day: 1, rate: 0 }],
+}));
+assert.equal(selectedRangeReturnOverridesCohortD1.metrics.retention.value, 1);
+assert.equal(selectedRangeReturnOverridesCohortD1.metrics.retention.status, "good");
+
 const risky = buildPulseModel(payload({
   summary: { avgGameSeconds: 45, gamesStarted: 20, gameOvers: 6 },
-  retention: [{ day: 1, rate: 0.05 }],
+  periodReturn: { currentPlayers: 10, previousPlayers: 10, returnedPlayers: 0, rate: 0.05 },
   adEconomics: { formatBreakdown: [{ format: "interstitial", impressionsPerPlayer: 2.2 }] },
   health: { status: "risk", score: 31, summary: "확인이 필요합니다." },
 }));

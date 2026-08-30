@@ -45,8 +45,8 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-7/, "the Console must cache-bust the weighted-player renderer");
-assert.match(consoleHtml, /pulse-model\.js\?v=20260830-4/, "the Console must cache-bust weighted samples and estimates");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-8/, "the Console must cache-bust selected-range returns");
+assert.match(consoleHtml, /pulse-model\.js\?v=20260830-5/, "the Console must cache-bust selected-range return scoring");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
 assert.match(analyticsSource, /rangeDays:\s*3,/, "the analytics state must default to three days without a URL override");
@@ -60,6 +60,9 @@ assert.match(consoleHtml, /전체 이벤트 사람 수/, "event funnels must use
 assert.match(pulseSource, /MIN_DAILY_ACTIVE_PEOPLE = 5/, "Pulse must start judging at five daily active people");
 assert.match(pulseSource, /dailyRows\.reduce[\s\S]*\/ dailyRows\.length/, "multi-day Pulse must use average daily active people");
 assert.match(pulseSource, /confidence: isEstimate \? "estimate" : "standard"/, "small samples must still produce an explicitly low-confidence estimate");
+assert.match(pulseSource, /periodReturn = payload\.periodReturn/, "Pulse return scoring must follow the selected range");
+assert.match(consoleHtml, /선택 기간과 바로 이전 같은 기간 비교/, "the return card must explain its selected-range comparison");
+assert.match(analyticsSource, /periodReturn\.previousPlayers/, "the return explanation must show the previous-window denominator");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
 assert.match(consoleHtml, /model\.js\?v=20260830-2/, "the Console must cache-bust the Korean analytics labels");

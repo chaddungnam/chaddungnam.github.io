@@ -159,7 +159,7 @@ async function loadDashboard() {
 }
 
 function renderDashboard() {
-  const { summary, retention } = state.payload;
+  const { summary } = state.payload;
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
   const rangeLabel = selectedRangeLabel();
   setText("kpiActiveLabel", `${rangeLabel} 온 사람`);
@@ -169,8 +169,6 @@ function renderDashboard() {
   setText("kpiPeopleMix", `라이트 ${formatNumber(Number(segments.lightPeople ?? summary.installs ?? 0))}명 · 헤비 ${formatNumber(Number(segments.heavyPeople ?? 0))}명(2인분) · 판단 ${formatNumber(Number(segments.weightedPeople ?? summary.installs ?? 0))}명`);
   setText("dailyTrendEyebrow", `${state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
-  const d7 = retention?.find((item) => item.day === 7)?.rate;
-  setText("metricD7", formatRate(d7));
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `실광고 ${formatNumber(adEconomics.monetizedImpressions)} · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
@@ -569,15 +567,15 @@ function renderQuestionMetric(key, metric, formattedValue, progress) {
 
 function renderInsightReasons(model) {
   const metrics = model.metrics || {};
-  const d1 = state.payload?.retention?.find((row) => row?.day === 1);
-  const d1Sample = d1 && Number(d1.eligible) > 0
-    ? ` 관찰 가능한 ${formatNumber(Number(d1.eligible))}명 중 ${formatNumber(Number(d1.retained))}명이 돌아왔습니다.`
-    : " 아직 다음 날까지 관찰 가능한 신규 인원이 없습니다.";
+  const periodReturn = state.payload?.periodReturn ?? {};
+  const returnSample = Number(periodReturn.previousPlayers ?? 0) > 0
+    ? ` 바로 이전 같은 길이의 기간에 플레이한 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명이 선택 기간에도 플레이했습니다.`
+    : " 바로 이전 같은 길이의 기간에 플레이한 사람이 없어 아직 비율을 계산할 수 없습니다.";
   const reasons = {
     insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 인원 ${formatNumber(state.payload?.summary?.installs)}명(고유 설치 ID 기준), 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다.` },
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
     completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 결과 미확인인 판은 제외했습니다.` },
-    retention: { title: "다시 오나? · 판단 근거", body: `D1 플레이 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${d1Sample} 고유 설치 ID를 사람 구분값으로 사용하며, 첫 실행 다음 날 app_visit·game_start·game_over 중 하나가 기록된 인원만 계산합니다. 광고 복귀 같은 session_start만으로는 세지 않습니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `${selectedRangeLabel()} 플레이 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${returnSample} 고유 설치 ID를 사람 구분값으로 사용하며, app_visit·game_start·game_over가 기록된 실제 실행·플레이만 셉니다. 광고 복귀 같은 session_start만으로는 세지 않습니다.` },
     ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활동 인원 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 인원은 고유 설치 ID로 구분하며, 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
@@ -934,8 +932,7 @@ function renderInsight() {
   const exitRate = typeof summary.exitRate === "number"
     ? summary.exitRate
     : observedGames > 0 ? Number(summary.midGameExits || 0) / observedGames : null;
-  const d1Row = state.payload?.retention?.find((item) => item.day === 1);
-  const d1 = d1Row?.rate;
+  const periodReturn = state.payload?.periodReturn ?? {};
   if (!(summary.sessions || summary.installs)) {
     setText("insightText", "아직 수집된 이벤트가 없습니다. 테스트 빌드에서 약관 동의 후 게임을 실행하면 여기에 흐름이 나타납니다.");
     return;
@@ -945,11 +942,11 @@ function renderInsight() {
   const cohortText = Number(acquisition?.firstOpens ?? 0) > 0
     ? `신규 ${formatNumber(acquisition.firstOpens)}명 중 ${formatNumber(acquisition.started)}명이 게임을 시작했고 ${formatNumber(acquisition.completed)}명이 완료했습니다.`
     : "이 기간에는 신규 첫 실행 코호트가 없습니다.";
-  const d1Text = Number(d1Row?.eligible ?? 0) > 0
-    ? `${formatRate(d1)} (${formatNumber(Number(d1Row.retained))}/${formatNumber(Number(d1Row.eligible))}명)`
+  const returnText = Number(periodReturn.previousPlayers ?? 0) > 0
+    ? `${formatRate(periodReturn.rate)} (${formatNumber(Number(periodReturn.returnedPlayers))}/${formatNumber(Number(periodReturn.previousPlayers))}명)`
     : "아직 산출 대기";
   const exitText = exitRate == null ? "산출 대기" : formatRate(exitRate);
-  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, D1 플레이 재방문율은 ${d1Text}입니다.`);
+  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, 이전 같은 기간 대비 플레이 재방문율은 ${returnText}입니다.`);
 }
 
 function setAiMessage(value, error = false) {

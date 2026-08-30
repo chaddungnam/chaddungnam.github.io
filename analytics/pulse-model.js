@@ -55,7 +55,7 @@
     let action;
     if (metrics.completion.status === "risk") action = "완료된 판이 적어요. 첫 1분 난이도를 확인해요.";
     else if (metrics.duration.status === "risk") action = "한 판이 너무 빨리 끝나요. 시작 1분의 재미를 확인해요.";
-    else if (metrics.retention.status === "risk") action = "다음 날 돌아온 사람이 적어요. 재방문 보상을 확인해요.";
+    else if (metrics.retention.status === "risk") action = "이전 같은 기간보다 다시 플레이한 사람이 적어요. 재방문 동기를 확인해요.";
     else if (metrics.ads.status === "risk") action = "강제 전면광고가 많아요. 게임 종료 후 노출 간격을 확인해요.";
     else if (verdictStatus === "risk") action = verdictSummary ?? "종합 상태가 위험해요. 평균 세션과 이탈 기록을 확인해요.";
     else if (Object.values(metrics).some((item) => item.status === "watch")) action = "노란 지표 하나를 골라 7일 변화를 지켜봐요.";
@@ -75,13 +75,13 @@
       risk: {
         completion: "끝까지 플레이하는 비율이 낮아 빨간 신호예요.",
         duration: "한 판이 너무 빨리 끝나서 빨간 신호예요.",
-        retention: "다음 날 돌아오는 비율이 낮아 빨간 신호예요.",
+        retention: "이전 같은 기간의 플레이어가 다시 플레이한 비율이 낮아 빨간 신호예요.",
         ads: "강제 전면광고가 많아 빨간 신호예요.",
       },
       watch: {
         completion: "끝까지 플레이하는 비율을 조금 더 지켜봐야 해요.",
         duration: "한 판 시간이 조금 짧아 더 지켜봐야 해요.",
-        retention: "다음 날 돌아오는 비율을 조금 더 지켜봐야 해요.",
+        retention: "기간 재방문 비율을 조금 더 지켜봐야 해요.",
         ads: "강제 전면광고 횟수를 조금 더 지켜봐야 해요.",
       },
     };
@@ -103,7 +103,7 @@
 
   function buildPulseModel(payload = {}) {
     const summary = payload.summary ?? {};
-    const retention = payload.retention ?? [];
+    const periodReturn = payload.periodReturn ?? {};
     const economics = payload.adEconomics ?? {};
     const funnel = payload.funnel ?? [];
     const sessions = Math.max(0, finiteNumber(summary.sessions) ?? 0);
@@ -125,7 +125,7 @@
     const gameOvers = Math.max(0, finiteNumber(summary.gameOvers) ?? 0);
     const observedGames = Math.max(0, finiteNumber(summary.observedGames) ?? gamesStarted);
     const completionRate = observedGames > 0 ? gameOvers / observedGames : null;
-    const d1Rate = finiteNumber(retention.find((row) => row?.day === 1)?.rate);
+    const returnRate = finiteNumber(periodReturn.rate);
     const hasFormatBreakdown = Array.isArray(economics.formatBreakdown);
     const interstitial = hasFormatBreakdown
       ? economics.formatBreakdown.find((row) => row?.format === "interstitial")
@@ -137,7 +137,7 @@
     const rawMetrics = {
       duration: metric(classify(avgGameSeconds, 180, 60), avgGameSeconds, "평균 한 판 시간"),
       completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "결과가 확인된 판의 완료 비율"),
-      retention: metric(classify(d1Rate, 0.2, 0.1), d1Rate, "다음 날 다시 온 사람 비율"),
+      retention: metric(classify(returnRate, 0.2, 0.1), returnRate, "선택 기간과 바로 이전 같은 기간의 플레이 재방문율"),
       ads: metric(adsStatus, adsPerPlayer, "활동 인원당 강제 전면광고"),
     };
     const metrics = rawMetrics;
