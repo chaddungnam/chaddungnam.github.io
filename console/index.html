@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260830-6">
+  <link rel="stylesheet" href="styles.css?v=20260830-7">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -207,6 +207,7 @@
         </section>
 
         <section class="content-grid insight-card-grid" aria-label="게임 내 선택과 행동 분석">
+          <article class="panel panel-wide visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">CORE LOOP QUALITY</p><h2>한 판의 재미 밀도</h2><small>완료한 일반 판의 성장·연쇄·돌파를 함께 봅니다.</small></div><span id="coreLoopStatus" class="panel-total">—</span></div><div id="coreLoopSummary" class="coverage-grid core-loop-grid" aria-live="polite"></div></article>
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>선택 횟수와 비율을 막대 길이로 바로 비교합니다.</small></div><span id="growthDistributionStatus" class="panel-total">—</span></div><div id="growthChoicesTable" class="distribution-list" aria-live="polite"></div></article>
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>결과별 비중과 실제 횟수를 한 줄에 붙여 표시합니다.</small></div><span id="rouletteDistributionStatus" class="panel-total">—</span></div><div id="rouletteResultsTable" class="distribution-list" aria-live="polite"></div></article>
           <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>성장 선택은 제외하고, 같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시합니다.</small></div></div><div id="buttonInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
@@ -357,7 +358,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260830-11"></script>
+  <script src="analytics.js?v=20260830-12"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260822-2"></script>

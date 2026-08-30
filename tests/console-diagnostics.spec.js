@@ -38,7 +38,7 @@ const dashboard = {
     ] },
     growthChoices: { presented: 0, selected: 4, confirmed: 0, selectionRate: null, byLevel: [], choices: [{ choice: "mad_scientist", selected: 4 }] },
     mechakucha: { started: 0, completed: 0, aborted: 0, incomplete: 0, completionRate: null, avgScoreGain: null, avgMarblesRestored: null },
-    gameOver: { total: 10, medianScore: 2600, medianLevel: 4, byDay: gameOverDays, levelBuckets: [{ bucket: "1-2", games: 4, avgScore: 1200, medianScore: 1100, avgLevel: 1.5 }] },
+    gameOver: { total: 10, medianScore: 2600, medianLevel: 4, avgScorePerMinute: 1840, avgBestChain: 3.2, level10ReachRate: 0.3, breakthroughUseRate: 0.4, byDay: gameOverDays, levelBuckets: [{ bucket: "1-2", games: 4, avgScore: 1200, medianScore: 1100, avgLevel: 1.5 }] },
   },
 };
 
@@ -63,6 +63,12 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#marketingGateSummary")).toContainText("49.0% / 50.0%");
   await expect(page.locator("#marketingGateSummary")).toContainText("51.0% / 50.0% 미만");
   await expect(page.locator("#screenDropoffDefinition")).toHaveText("명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.");
+  await expect(page.locator("#coreLoopSummary")).toContainText("중앙 점수");
+  await expect(page.locator("#coreLoopSummary")).toContainText("2,600점");
+  await expect(page.locator("#coreLoopSummary")).toContainText("분당 점수");
+  await expect(page.locator("#coreLoopSummary")).toContainText("1,840점");
+  await expect(page.locator("#coreLoopSummary")).toContainText("Lv.10 도달");
+  await expect(page.locator("#coreLoopSummary")).toContainText("30.0%");
 });
 
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {

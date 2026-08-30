@@ -513,6 +513,7 @@ textarea:focus-visible {
 .priority-insight-panel > strong { color: var(--priority-tone); font-size: clamp(21px, 2.5vw, 30px); white-space: nowrap; }
 
 .insight-card-grid { align-items: start; gap: 18px; }
+.core-loop-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .visual-data-panel { background: linear-gradient(155deg, var(--paper), #fffaf0 150%); }
 .distribution-list, .behavior-card-list { display: grid; gap: 10px; }
 .distribution-item {
@@ -587,6 +588,7 @@ textarea:focus-visible {
 
 @media (max-width: 900px) {
   #analyticsView .panel { padding: 20px; }
+  .core-loop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .priority-insight-panel { grid-template-columns: 48px minmax(0, 1fr); }
   .priority-insight-icon { width: 48px; height: 48px; }
   .priority-insight-panel > strong { grid-column: 2; justify-self: start; }
@@ -600,6 +602,7 @@ textarea:focus-visible {
 
 @media (max-width: 560px) {
   #analyticsView { font-size: 16px; }
+  .core-loop-grid { grid-template-columns: 1fr; }
   .priority-insight-panel { grid-template-columns: 1fr; padding: 18px; }
   .priority-insight-panel > strong { grid-column: auto; }
   .distribution-copy strong, .behavior-copy h3 { font-size: 16px; }

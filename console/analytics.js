@@ -381,6 +381,21 @@ function renderDiagnostics() {
   const gameOver = diagnostics.gameOver ?? {};
   const byDay = Array.isArray(gameOver.byDay) ? gameOver.byDay.slice(-state.rangeDays) : [];
   const buckets = Array.isArray(gameOver.levelBuckets) ? gameOver.levelBuckets : [];
+  const completedRuns = Number(gameOver.total ?? 0);
+  const loopCard = (label, value, detail, formatter) => ({
+    status: completedRuns > 0 && typeof value === "number" && Number.isFinite(value) ? "available" : "waiting",
+    label,
+    value: completedRuns > 0 && typeof value === "number" && Number.isFinite(value) ? formatter(value) : "수집 대기",
+    detail,
+  });
+  renderCoverageCards("coreLoopSummary", [
+    loopCard("중앙 점수", gameOver.medianScore, "완료한 판의 중앙값", (value) => `${formatNumber(value)}점`),
+    loopCard("분당 점수", gameOver.avgScorePerMinute, "점수 ÷ 실제 플레이 시간", (value) => `${formatNumber(value)}점`),
+    loopCard("최고 연쇄 평균", gameOver.avgBestChain, "각 판의 최고 연쇄 평균", (value) => `${formatDecimal(value)}연쇄`),
+    loopCard("Lv.10 도달", gameOver.level10ReachRate, "완료판 중 슈팅 구간 진입 비율", formatRate),
+    loopCard("돌파 사용", gameOver.breakthroughUseRate, "한 번 이상 돌파한 완료판 비율", formatRate),
+  ]);
+  setText("coreLoopStatus", completedRuns > 0 ? `${formatNumber(completedRuns)}판 기준` : "수집 대기");
   setText("gameOverStatus", byDay.length ? `${formatNumber(Number(gameOver.total ?? 0))}회 · 중앙 ${formatNumber(gameOver.medianScore)}점` : "1.1.0 데이터 수집 대기");
   renderGameOverChart(byDay);
   diagnosticsTable("gameOverDailyTable", 5, [...byDay].reverse().map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "1.1.0 데이터 수집 대기");
