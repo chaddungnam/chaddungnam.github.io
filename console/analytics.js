@@ -390,7 +390,7 @@ function renderDiagnostics() {
   });
   renderCoverageCards("coreLoopSummary", [
     loopCard("중앙 점수", gameOver.medianScore, "완료한 판의 중앙값", (value) => `${formatNumber(value)}점`),
-    loopCard("분당 점수", gameOver.avgScorePerMinute, "점수 ÷ 실제 플레이 시간", (value) => `${formatNumber(value)}점`),
+    loopCard("분당 점수", gameOver.avgScorePerMinute, "점수 ÷ 실제 플레이 시간", (value) => `${formatNumber(Math.round(value))}점`),
     loopCard("최고 연쇄 평균", gameOver.avgBestChain, "각 판의 최고 연쇄 평균", (value) => `${formatDecimal(value)}연쇄`),
     loopCard("Lv.10 도달", gameOver.level10ReachRate, "완료판 중 슈팅 구간 진입 비율", formatRate),
     loopCard("돌파 사용", gameOver.breakthroughUseRate, "한 번 이상 돌파한 완료판 비율", formatRate),
