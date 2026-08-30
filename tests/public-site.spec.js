@@ -245,6 +245,7 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect(page.locator("[data-game-cursor]")).toHaveCount(0);
+  await expect(page.locator("[data-motion-toggle]")).toBeHidden();
   await page.waitForTimeout(180);
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([
@@ -252,6 +253,24 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
     { autoplay: false, paused: true },
   ]);
   await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
+});
+
+test("home lets visitors pause and resume automatic FX", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const toggle = page.locator("[data-motion-toggle]");
+  const canvas = page.locator("[data-quirky-canvas]");
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => video.paused)).toBe(true);
+  const pausedFrame = await canvas.getAttribute("data-frame");
+  await page.waitForTimeout(180);
+  await expect(canvas).toHaveAttribute("data-frame", pausedFrame);
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(pausedFrame);
 });
 
 test("primary navigation responds with a restrained text hover", async ({ page, isMobile }) => {

@@ -117,6 +117,29 @@
       }
     }, { threshold: .15 });
     for (const video of videos) observer.observe(video);
+    addEventListener("houseduck:motion", (event) => {
+      for (const video of videos) {
+        if (event.detail.paused) video.pause();
+        else {
+          const rect = video.getBoundingClientRect();
+          if (rect.bottom > 0 && rect.top < innerHeight) video.play().catch(() => {});
+        }
+      }
+    });
+  }
+
+  function setupMotionToggle(reducedMotion) {
+    const button = document.querySelector("[data-motion-toggle]");
+    if (!button) return;
+    if (reducedMotion) { button.hidden = true; return; }
+    button.addEventListener("click", () => {
+      const paused = button.getAttribute("aria-pressed") !== "true";
+      button.setAttribute("aria-pressed", String(paused));
+      button.setAttribute("aria-label", paused ? button.dataset.labelPlay : button.dataset.labelPause);
+      button.querySelector("[data-motion-state]").textContent = paused ? "OFF" : "ON";
+      document.documentElement.dataset.motionPaused = String(paused);
+      dispatchEvent(new CustomEvent("houseduck:motion", { detail: { paused } }));
+    });
   }
 
   function setupGameCursor(reducedMotion) {
@@ -163,6 +186,7 @@
     let width = 0;
     let height = 0;
     let active = true;
+    let manualPaused = false;
     let start = performance.now();
     let previous = start;
     let pairCount = -1;
@@ -379,7 +403,7 @@
     }
 
     function tick(now) {
-      if (!active) { previous = now; requestAnimationFrame(tick); return; }
+      if (!active || manualPaused) { previous = now; requestAnimationFrame(tick); return; }
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
       if (now - previous < 1000 / 30) { requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
@@ -402,6 +426,7 @@
     draw(0);
     if (reducedMotion) return;
     if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; }, { threshold: .05 }).observe(stage);
+    addEventListener("houseduck:motion", (event) => { manualPaused = event.detail.paused; });
     requestAnimationFrame(tick);
   }
 
@@ -412,6 +437,7 @@
     setupVideos(reducedMotion);
     setupGameCursor(reducedMotion);
     setupCanvas(reducedMotion);
+    setupMotionToggle(reducedMotion);
   }
 
   return { QUIRKY_RULES, shotAngles, shrinkRadius, init };
