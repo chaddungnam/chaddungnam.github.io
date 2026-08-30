@@ -40,7 +40,7 @@ function formatMeaningfulDuration(value) {
 }
 function formatHesitationDuration(value) {
   if (typeof value !== "number" || !Number.isFinite(value)) return "—";
-  const tenths = Math.min(4.9, Math.max(3.1, Math.round(value * 10) / 10));
+  const tenths = Math.max(5, Math.round(value * 10) / 10);
   return `${Number(tenths.toFixed(1))}초`;
 }
 function escapeHtml(value) {
@@ -162,8 +162,9 @@ function renderDashboard() {
   const { summary, retention } = state.payload;
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
   const rangeLabel = selectedRangeLabel();
-  setText("kpiActiveLabel", `${rangeLabel} 온 사람`);
+  setText("kpiActiveLabel", `${rangeLabel} 활동 설치`);
   setText("kpiActive", formatNumber(summary.installs));
+  setText("kpiActiveUnit", "개");
   setText("dailyTrendEyebrow", `${state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const d7 = retention?.find((item) => item.day === 7)?.rate;
@@ -377,14 +378,14 @@ function renderInteractionInsights() {
   ];
   const buttonBody = byId("buttonInsightsTable");
   buttonBody.innerHTML = displayedButtonRows.length === 0
-    ? '<p class="empty-panel">버튼 데이터가 쌓이면 표시됩니다.</p>'
+    ? '<p class="empty-panel">같은 버튼에서 5초 이상 걸린 행동이 5회 이상 모이면 표시됩니다.</p>'
     : displayedButtonRows.map((row, index) => {
       const hesitation = row.medianIdleBeforeSec ?? row.avgIdleBeforeSec;
       const recommendation = root.ConsoleModel.interactionRecommendation({ ...row, installs: row.users, avgIdleSec: hesitation });
       return `<article class="behavior-card" data-legacy="${row.legacy}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(row.label)}</h3><small>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}${row.legacy ? " · 구버전" : ""}</small></div>
-        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>명</span><span>중앙 <b>${formatHesitationDuration(hesitation)}</b></span></div>
+        <div class="behavior-metrics"><span><b>${formatNumber(row.presses)}</b>회 발생</span><span><b>${formatNumber(row.users)}</b>개 설치</span><span>중앙 <b>${formatHesitationDuration(hesitation)}</b></span></div>
         <p>${escapeHtml(recommendation)}</p>
       </article>`;
     }).join("");
@@ -400,22 +401,17 @@ function renderInteractionInsights() {
   });
   const screenBody = byId("screenInsightsTable");
   screenBody.innerHTML = screens.length === 0
-    ? '<p class="empty-panel">화면 이동 데이터가 쌓이면 표시됩니다.</p>'
+    ? '<p class="empty-panel">명시적인 앱 종료가 확인된 화면이 없습니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.</p>'
     : screens.map((row, index) => {
       const dropoff = dropoffByScreen.get(row.screen);
       const lastButton = dropoff?.lastButtonId && dropoff.lastButtonId !== "unknown"
         ? root.ConsoleModel.analyticsButtonName(dropoff.lastButtonId, row.screen)
-        : "버튼을 누르지 않고 종료";
+        : "마지막 버튼 미확인";
       const exitRate = typeof row.exitRate === "number" ? row.exitRate : (Number(row.visits) > 0 ? Number(row.exits || 0) / Number(row.visits) : null);
-      const expectedExternalExit = lastButton.includes("외부 브라우저");
-      const recommendation = expectedExternalExit
-        ? "문의 지원 페이지를 열면서 앱이 백그라운드로 간 정상 흐름입니다. 최초 로그인 닉네임 설정 종료가 아닙니다."
-        : exitRate !== null && exitRate >= 0.3
-          ? "종료 비율이 높습니다. 마지막 행동 다음의 기대 결과와 돌아갈 길을 먼저 점검하세요."
-          : Number(row.avgDwellSec || 0) >= 30
-            ? "오래 머문 뒤 이동합니다. 화면의 첫 행동을 더 눈에 띄게 보여주세요."
-            : "표본이 쌓일 때까지 유지하고, 다음 화면 진입과 함께 비교하세요.";
-      return `<article class="behavior-card behavior-card-exit" data-risk="${!expectedExternalExit && exitRate !== null && exitRate >= 0.3}">
+      const recommendation = exitRate !== null && exitRate >= 0.3
+        ? "명시적 앱 종료가 반복된 화면입니다. 마지막 행동과 복귀 동선을 점검하세요."
+        : "명시적 앱 종료 표본이 더 쌓일 때까지 유지하세요.";
+      return `<article class="behavior-card behavior-card-exit" data-risk="${exitRate !== null && exitRate >= 0.3}">
         <div class="behavior-rank">${index + 1}</div>
         <div class="behavior-copy"><h3>${escapeHtml(root.ConsoleModel.analyticsScreenName(row.screen))}</h3><small>마지막 행동 · ${escapeHtml(lastButton)}</small></div>
         <div class="behavior-metrics"><span><b>${formatNumber(row.visits)}</b>회 방문</span><span><b>${formatRate(exitRate)}</b> 종료</span><span><b>${formatMeaningfulDuration(row.avgDwellSec)}</b> 체류</span></div>
@@ -428,34 +424,17 @@ function renderPriorityInsights() {
   const insight = state.payload?.priorityInsights?.growthChoiceAdStop ?? {};
   const exposed = Number(insight.adExposures ?? insight.exposedSessions ?? 0);
   const selected = Number(insight.selectedAfterAd || 0);
-  const crossSession = Number(insight.crossSessionSelections || 0);
   const completedWithoutSelection = Number(insight.completedWithoutSelection || 0);
   const verifiedStops = Number(insight.verifiedStops ?? insight.stoppedSessions ?? 0);
   const verifiedStopUsers = Number(insight.verifiedStopUsers ?? insight.stoppedUsers ?? 0);
-  const unresolved = Number(insight.unresolved || 0);
   const panel = byId("priorityInsightPanel");
-  if (verifiedStops > 0) {
-    panel.dataset.status = "risk";
-    setText("priorityInsightIcon", "!");
-    setText("priorityInsightTitle", "광고 뒤 선택 전 실제 앱 종료 확인");
-    setText("priorityInsightValue", `${formatNumber(verifiedStops)}회 · ${formatNumber(verifiedStopUsers)}개 설치 기기`);
-    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatNumber(selected)}회는 선택까지 확인됐고, ${formatNumber(completedWithoutSelection)}회는 선택 이벤트가 없어도 같은 판의 완료가 확인됐습니다. 명시적인 앱 종료가 선택보다 먼저 기록된 ${formatNumber(verifiedStops)}회만 중단으로 셉니다.`);
-    return;
-  }
-  panel.dataset.status = "clear";
-  setText("priorityInsightIcon", "✓");
-  if (exposed === 0) {
-    setText("priorityInsightTitle", "성장 선택 광고 표본 없음");
-    setText("priorityInsightValue", "표본 없음");
-    setText("priorityInsightDetail", "광고 노출이 생기면 같은 선택 제안의 실제 선택 여부를 세션이 바뀌어도 연결해 확인합니다.");
-    return;
-  }
-  const normalFlows = selected + completedWithoutSelection;
-  setText("priorityInsightTitle", verifiedStops === 0 && unresolved === 0 ? "성장 선택 광고 흐름 정상" : "성장 선택 광고 뒤 실제 종료 없음");
-  setText("priorityInsightValue", `${formatNumber(normalFlows)} / ${formatNumber(exposed)} 정상 확인`);
-  const crossSessionDetail = crossSession > 0 ? ` 이 중 ${formatNumber(crossSession)}회는 광고 때문에 세션이 바뀐 뒤 선택됐습니다.` : "";
-  const unresolvedDetail = unresolved > 0 ? ` 나머지 ${formatNumber(unresolved)}회는 결과 미확인이며, 미확인만으로 앱 종료나 결함으로 세지 않습니다.` : "";
-  setText("priorityInsightDetail", `광고 뒤 같은 선택 제안에서 ${formatNumber(selected)}회가 실제 선택으로 이어졌고, 선택 이벤트가 빠졌어도 같은 판 완료가 확인된 흐름은 ${formatNumber(completedWithoutSelection)}회입니다.${crossSessionDetail}${unresolvedDetail}`);
+  panel.hidden = verifiedStops === 0;
+  if (verifiedStops === 0) return;
+  panel.dataset.status = "risk";
+  setText("priorityInsightIcon", "!");
+  setText("priorityInsightTitle", "광고 뒤 선택 전 실제 앱 종료 확인");
+  setText("priorityInsightValue", `${formatNumber(verifiedStops)}회 · ${formatNumber(verifiedStopUsers)}개 설치 기기`);
+  setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatNumber(selected)}회는 선택까지 확인됐고, ${formatNumber(completedWithoutSelection)}회는 선택 이벤트가 없어도 같은 판의 완료가 확인됐습니다. 명시적인 앱 종료가 선택보다 먼저 기록된 ${formatNumber(verifiedStops)}회만 표시합니다.`);
 }
 
 function renderGameMetrics() {
@@ -593,9 +572,9 @@ function renderInsightReasons(model) {
     ? ` 관찰 가능한 ${formatNumber(Number(d1.eligible))}개 설치 중 ${formatNumber(Number(d1.retained))}개가 돌아왔습니다.`
     : " 아직 다음 날까지 관찰 가능한 신규 설치가 없습니다.";
   const reasons = {
-    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 ${formatNumber(state.payload?.summary?.sessions)}회 세션, ${formatNumber(state.payload?.summary?.gamesStarted)}회 게임 시작, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다. 원본 이벤트를 그대로 노출하지 않고 지표 기준으로 설명합니다.` },
+    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 설치 ${formatNumber(state.payload?.summary?.installs)}개, 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다.` },
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
-    completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 완료 이벤트와 게임 시작 이벤트를 비교해 계산했습니다.` },
+    completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 결과 미확인인 판은 제외했습니다.` },
     retention: { title: "다시 오나? · 판단 근거", body: `D1 유지율은 ${formatRate(metrics.retention?.value)}입니다.${d1Sample} 실제 first_open 다음 날 session_start가 다시 기록된 운영 설치만 계산합니다.` },
     ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활성 설치 1개당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
@@ -729,7 +708,7 @@ function renderHourlyChart() {
 }
 
 function renderFunnel() {
-  const labels = { first_open: "첫 실행", session_start: "세션 시작", game_start: "게임 시작", game_over: "게임 완료", game_exit: "중간 종료", fullscreen_ad_impression: "전체화면 광고", ad_impression: "전체 광고 노출" };
+  const labels = { first_open: "첫 실행", session_start: "앱 세션 시작", game_start: "게임 시작", game_over: "게임 완료", game_exit: "명시적 게임 중 종료", fullscreen_ad_impression: "전체화면 광고", ad_impression: "전체 광고 노출" };
   const rows = state.payload?.funnel ?? [];
   const first = Math.max(1, rows[0]?.users ?? 0);
   byId("funnelChart").innerHTML = rows.map((row) => `
@@ -745,8 +724,8 @@ function renderExitBreakdown() {
   const total = Math.max(1, summary.gamesStarted ?? 0);
   const items = [
     ["정상 게임 완료", summary.gameOvers, "normal"],
-    ["게임 중 이탈 (10초 이상)", summary.midGameExits, "exit"],
-    ["강제 종료로 미확인", summary.unobservedGames, "unobserved"],
+    ["명시적 게임 중 종료 (10초 이상)", summary.midGameExits, "exit"],
+    ["결과 미확인 (이탈 아님)", summary.unobservedGames, "unobserved"],
   ];
   byId("exitBreakdown").innerHTML = items.map(([label, value, color]) => `
     <div class="metric-row">
@@ -941,15 +920,18 @@ function renderPurchaseTrend() {
 function renderDailyTable() {
   const rows = [...selectedDays()].reverse();
   byId("dailyTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="7">아직 이벤트가 없습니다.</td></tr>'
-    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.activeInstalls)}</td><td>${formatNumber(row.sessions)}</td><td>${formatNumber(row.gamesStarted)}</td><td>${formatNumber(row.gameOvers)}</td><td>${formatNumber(row.midGameExits + row.unobservedGames)}</td><td>${formatNumber(row.adImpressions)}</td></tr>`).join("");
+    ? '<tr><td class="empty-row" colspan="8">아직 이벤트가 없습니다.</td></tr>'
+    : rows.map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.activeInstalls)}</td><td>${formatNumber(row.sessions)}</td><td>${formatNumber(row.gamesStarted)}</td><td>${formatNumber(row.gameOvers)}</td><td>${formatNumber(row.midGameExits)}</td><td>${formatNumber(row.unobservedGames)}</td><td>${formatNumber(row.adImpressions)}</td></tr>`).join("");
 }
 
 function renderInsight() {
   const summary = state.payload?.summary ?? {};
   const hourly = state.payload?.hourly ?? [];
   const topHour = [...hourly].sort((left, right) => right.sessions - left.sessions)[0];
-  const exitRate = summary.gamesStarted ? (summary.midGameExits + summary.unobservedGames) / summary.gamesStarted : null;
+  const observedGames = Number(summary.observedGames ?? (Number(summary.gameOvers || 0) + Number(summary.midGameExits || 0)));
+  const exitRate = typeof summary.exitRate === "number"
+    ? summary.exitRate
+    : observedGames > 0 ? Number(summary.midGameExits || 0) / observedGames : null;
   const d1Row = state.payload?.retention?.find((item) => item.day === 1);
   const d1 = d1Row?.rate;
   if (!(summary.sessions || summary.installs)) {
@@ -964,7 +946,8 @@ function renderInsight() {
   const d1Text = Number(d1Row?.eligible ?? 0) > 0
     ? `${formatRate(d1)} (${formatNumber(Number(d1Row.retained))}/${formatNumber(Number(d1Row.eligible))}개 설치)`
     : "아직 산출 대기";
-  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 전체 게임 중 이탈률은 ${formatRate(exitRate)}, D1 유지율은 ${d1Text}입니다.`);
+  const exitText = exitRate == null ? "산출 대기" : formatRate(exitRate);
+  setText("insightText", `${cohortText} 많이 시작하는 시간은 ${timeText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, D1 유지율은 ${d1Text}입니다.`);
 }
 
 function setAiMessage(value, error = false) {
@@ -979,8 +962,11 @@ function advisorySnapshot() {
   const ad = state.payload?.adEconomics ?? {};
   const d1 = retention.find((item) => item.day === 1)?.rate;
   const d7 = retention.find((item) => item.day === 7)?.rate;
-  const completion = summary.gamesStarted ? (summary.gameOvers ?? 0) / summary.gamesStarted : null;
-  const exitRate = summary.gamesStarted ? ((summary.midGameExits ?? 0) + (summary.unobservedGames ?? 0)) / summary.gamesStarted : null;
+  const observedGames = Number(summary.observedGames ?? (Number(summary.gameOvers || 0) + Number(summary.midGameExits || 0)));
+  const completion = observedGames > 0 ? Number(summary.gameOvers ?? 0) / observedGames : null;
+  const exitRate = typeof summary.exitRate === "number"
+    ? summary.exitRate
+    : observedGames > 0 ? Number(summary.midGameExits ?? 0) / observedGames : null;
   const revenue = Number(ad.estimatedRevenueEur);
   const monthlyRevenue = Number.isFinite(revenue) && state.rangeDays > 0 ? revenue / state.rangeDays * 30 : null;
   const forcedAdsPerPlayer = Number(ad.formatBreakdown?.find((row) => row?.format === "interstitial")?.impressionsPerPlayer);

@@ -5,6 +5,7 @@ function payload(overrides = {}) {
   return {
     summary: {
       sessions: 40,
+      installs: 40,
       avgGameSeconds: 210,
       gamesStarted: 20,
       gameOvers: 15,
@@ -37,10 +38,10 @@ assert.equal(healthy.metrics.completion.value, 0.75);
 assert.deepEqual(healthy.journey.map((step) => step.users), [10, 8, 6]);
 assert.deepEqual(healthy.journey.map((step) => step.rate), [1, 0.8, 0.75]);
 
-const insufficient = buildPulseModel(payload({ summary: { sessions: 8 } }));
+const insufficient = buildPulseModel(payload({ summary: { sessions: 13, installs: 8 } }));
 assert.equal(insufficient.verdict.status, "insufficient");
 assert.equal(insufficient.metrics.duration.status, "insufficient");
-assert.match(insufficient.action, /22회/);
+assert.match(insufficient.action, /22개/);
 
 const risky = buildPulseModel(payload({
   summary: { avgGameSeconds: 45, gamesStarted: 20, gameOvers: 6 },
@@ -52,7 +53,12 @@ assert.equal(risky.metrics.duration.status, "risk");
 assert.equal(risky.metrics.completion.status, "risk");
 assert.equal(risky.metrics.retention.status, "risk");
 assert.equal(risky.metrics.ads.status, "risk");
-assert.match(risky.action, /끝까지/);
+assert.match(risky.action, /완료된 판/);
+
+const unfinishedGamesDoNotLowerCompletion = buildPulseModel(payload({
+  summary: { gamesStarted: 10, observedGames: 5, gameOvers: 4 },
+}));
+assert.equal(unfinishedGamesDoNotLowerCompletion.metrics.completion.value, 0.8);
 
 const serverOnlyRisk = buildPulseModel(payload({
   health: { status: "risk", score: 42, summary: "앱에 머무는 시간이 너무 짧아요." },

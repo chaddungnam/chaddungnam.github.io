@@ -71,7 +71,7 @@ assert.equal(model.analyticsButtonName("settings/control_1/panel_1/button_0", "s
 assert.equal(model.analyticsButtonName("loading/onboarding_profile_confirm", "loading"), "첫 실행·로그인 · 닉네임·국가 설정 완료");
 assert.equal(model.analyticsScreenName("profilecustomize"), "프로필 꾸미기");
 assert.match(model.analyticsButtonName("main/ui/control_0/panel_1/button_2", "main"), /게임 중 팝업.*3번째 행동 버튼.*구버전/);
-assert.match(model.interactionRecommendation({ buttonId: "home/start_game", screen: "home", avgIdleSec: 25, installs: 5 }), /3초를 넘겨/);
+assert.match(model.interactionRecommendation({ buttonId: "home/start_game", screen: "home", avgIdleSec: 25, installs: 5 }), /5초 이상.*5회/);
 
 assert.equal(model.serializeAnalyticsFilters({
   rangeDays: 28,

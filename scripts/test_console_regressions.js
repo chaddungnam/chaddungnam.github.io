@@ -44,20 +44,20 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-1/, "the Console must cache-bust the corrected ad-to-choice renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-4/, "the Console must cache-bust the corrected analytics renderer");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
 assert.match(analyticsSource, /rangeDays:\s*3,/, "the analytics state must default to three days without a URL override");
 assert.match(consoleHtml, /data-range="5"[^>]*>최근 5일</, "the Console must offer a five-day range");
-assert.match(analyticsSource, /같은 선택 제안에서/, "the priority insight must link the ad back to its exact choice offer");
-assert.match(consoleHtml, /세션이 바뀌어도 연결해 확인/, "the priority insight must describe cross-session matching instead of treating ad backgrounding as a quit");
+assert.match(analyticsSource, /panel\.hidden = verifiedStops === 0/, "normal growth-choice ad flow must not create a priority card");
+assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20260829-7/, "the Console must cache-bust the Korean analytics labels");
-assert.match(consoleHtml, /홈 진입 뒤 3초 초과·5초 미만으로 멈춘 횟수와 사람만 집계/, "button hesitation must explain the meaningful three-to-five-second window");
-assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>명/, "button hesitation must label unique actors as people");
-assert.match(analyticsSource, /formatHesitationDuration\(hesitation\)/, "hesitation must not round a valid 3-to-5-second sample to an excluded boundary");
+assert.match(consoleHtml, /model\.js\?v=20260830-1/, "the Console must cache-bust the Korean analytics labels");
+assert.match(consoleHtml, /같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시/, "button hesitation must disclose both the duration and sample gates");
+assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>개 설치/, "button hesitation must label unique install IDs as installs");
+assert.match(analyticsSource, /Math\.max\(5, Math\.round\(value \* 10\)/, "hesitation formatting must preserve the five-second lower bound");
 assert.match(analyticsSource, /Number\(row\.exits \|\| 0\) > 0/, "screen drop-off cards must hide screens with no exits");
-assert.match(modelSource, /한 명에게 몰린 신호/, "single-actor hesitation guidance must use a people-based label");
+assert.match(modelSource, /한 설치에 몰린 신호/, "single-install hesitation guidance must not claim an exact person count");
 assert.match(modelSource, /문의 지원 페이지로 이동 \(외부 브라우저\)/, "the old settings popup path must be identified as the support-page handoff");
 assert.match(analyticsSource, /row\.count \?\? row\.selected/, "choice distributions must use the dashboard count instead of rendering every choice as zero");
 assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust the 72-hour session client");
@@ -80,8 +80,8 @@ assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "
 assert.match(analyticsSource, /현재 1\.1\.0 배포본에는 방문 RPC 호출 코드가 없어 0으로 표시/, "account visit coverage must explain why released 1.1.0 stays at zero");
 assert.match(analyticsSource, /String\(row\.screen \|\| ""\)\.toLowerCase\(\) !== "home"/, "ordinary home exits must be hidden from screen drop-off cards");
 assert.match(analyticsSource, /명시적인 앱 종료가 선택보다 먼저 기록된/, "the priority insight must only call an explicit app quit a stop");
-assert.match(analyticsSource, /광고 때문에 세션이 바뀐 뒤 선택/, "the priority insight must explain cross-session selections as normal ad flow");
-assert.match(analyticsSource, /미확인만으로 앱 종료나 결함으로 세지 않습니다/, "unobserved outcomes must not be reported as defects");
+assert.match(analyticsSource, /명시적인 앱 종료가 선택보다 먼저 기록된/, "the priority insight must only show explicit app quits");
+assert.doesNotMatch(analyticsSource, /성장 선택 광고 흐름 정상/, "normal ad flow must not consume a priority card");
 assert.match(analyticsSource, /renderPriorityInsights/, "the dashboard must render the verified ad-to-choice flow as a priority insight");
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
@@ -437,10 +437,12 @@ const reward = operationForm({
 });
 const minVersion = operationForm({ minVersion: formField("1.2.3"), minVersionCode: formField("42"), reason: formField("release") });
 const qaAccess = operationForm({ userId: formField("user-1"), shopControlsEnabled: formField(""), reason: formField("qa") });
+const announcement = operationForm({ body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
 const operationElements = {
   rewardMailForm: reward.form,
   minVersionForm: minVersion.form,
   qaAccessForm: qaAccess.form,
+  announcementForm: announcement.form,
   rewardTemplatePreview: appElement(),
   rewardValueLabel: Object.assign(appElement(), { firstChild: { textContent: "" } }),
   operationsMessage: appElement(),

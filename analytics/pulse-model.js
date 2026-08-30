@@ -3,7 +3,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.PulseModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createPulseModel() {
-  const MIN_SESSIONS = 30;
+  const MIN_ACTIVE_INSTALLS = 30;
   const STATUS_LABELS = {
     good: "좋아요",
     watch: "지켜봐요",
@@ -51,11 +51,11 @@
     });
   }
 
-  function selectAction(metrics, sessions, verdictStatus, verdictSummary) {
-    if (sessions < MIN_SESSIONS) {
-      return `판단하려면 플레이 세션이 ${MIN_SESSIONS - sessions}회 더 필요해요.`;
+  function selectAction(metrics, activeInstalls, verdictStatus, verdictSummary) {
+    if (activeInstalls < MIN_ACTIVE_INSTALLS) {
+      return `판단하려면 기간 내 활동 설치가 ${MIN_ACTIVE_INSTALLS - activeInstalls}개 더 필요해요.`;
     }
-    if (metrics.completion.status === "risk") return "끝까지 플레이하는 사람이 적어요. 첫 1분 난이도를 확인해요.";
+    if (metrics.completion.status === "risk") return "완료된 판이 적어요. 첫 1분 난이도를 확인해요.";
     if (metrics.duration.status === "risk") return "한 판이 너무 빨리 끝나요. 시작 1분의 재미를 확인해요.";
     if (metrics.retention.status === "risk") return "다음 날 돌아오는 사람이 적어요. 재방문 보상을 확인해요.";
     if (metrics.ads.status === "risk") return "강제 전면광고가 많아요. 게임 종료 후 노출 간격을 확인해요.";
@@ -65,8 +65,8 @@
     return "전체 흐름이 좋아요. 지금 설정을 유지하며 7일 변화를 봐요.";
   }
 
-  function buildVerdictSummary(status, metrics, sessions) {
-    if (status === "insufficient") return `${sessions}회가 모였어요. ${MIN_SESSIONS}회부터 상태를 판단할 수 있어요.`;
+  function buildVerdictSummary(status, metrics, activeInstalls, sessions) {
+    if (status === "insufficient") return `설치 기준 ${activeInstalls}개에서 앱 세션 ${sessions}회가 기록됐어요. 활동 설치 ${MIN_ACTIVE_INSTALLS}개부터 상태를 판단합니다.`;
     const messages = {
       risk: {
         completion: "끝까지 플레이하는 비율이 낮아 빨간 신호예요.",
@@ -101,11 +101,13 @@
     const economics = payload.adEconomics ?? {};
     const funnel = payload.funnel ?? [];
     const sessions = Math.max(0, finiteNumber(summary.sessions) ?? 0);
-    const enoughSamples = sessions >= MIN_SESSIONS;
+    const activeInstalls = Math.max(0, finiteNumber(summary.installs) ?? finiteNumber(summary.activeInstallsToday) ?? 0);
+    const enoughSamples = activeInstalls >= MIN_ACTIVE_INSTALLS;
     const avgGameSeconds = finiteNumber(summary.avgGameSeconds);
     const gamesStarted = Math.max(0, finiteNumber(summary.gamesStarted) ?? 0);
     const gameOvers = Math.max(0, finiteNumber(summary.gameOvers) ?? 0);
-    const completionRate = gamesStarted > 0 ? gameOvers / gamesStarted : null;
+    const observedGames = Math.max(0, finiteNumber(summary.observedGames) ?? gamesStarted);
+    const completionRate = observedGames > 0 ? gameOvers / observedGames : null;
     const d1Rate = finiteNumber(retention.find((row) => row?.day === 1)?.rate);
     const hasFormatBreakdown = Array.isArray(economics.formatBreakdown);
     const interstitial = hasFormatBreakdown
@@ -117,7 +119,7 @@
 
     const rawMetrics = {
       duration: metric(classify(avgGameSeconds, 180, 60), avgGameSeconds, "평균 한 판 시간"),
-      completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "시작한 사람 중 완료 비율"),
+      completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "결과가 확인된 판의 완료 비율"),
       retention: metric(classify(d1Rate, 0.2, 0.1), d1Rate, "다음 날 다시 온 설치 비율"),
       ads: metric(adsStatus, adsPerPlayer, "활성 설치당 강제 전면광고"),
     };
@@ -132,18 +134,19 @@
       status: verdictStatus,
       label: STATUS_LABELS[verdictStatus],
       score: enoughSamples && verdictStatus === healthStatus && finiteNumber(health.score) != null ? health.score : null,
-      summary: buildVerdictSummary(verdictStatus, metrics, sessions),
+      summary: buildVerdictSummary(verdictStatus, metrics, activeInstalls, sessions),
     };
 
     return {
-      minimumSessions: MIN_SESSIONS,
+      minimumActiveInstalls: MIN_ACTIVE_INSTALLS,
+      activeInstalls,
       sessions,
       verdict,
       metrics,
       journey: buildJourney(funnel),
-      action: selectAction(metrics, sessions, verdict.status, verdict.summary),
+      action: selectAction(metrics, activeInstalls, verdict.status, verdict.summary),
     };
   }
 
-  return { MIN_SESSIONS, buildPulseModel };
+  return { MIN_ACTIVE_INSTALLS, buildPulseModel };
 });
