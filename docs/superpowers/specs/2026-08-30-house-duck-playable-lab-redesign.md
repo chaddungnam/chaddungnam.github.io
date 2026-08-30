@@ -36,3 +36,20 @@ Do not rename, move, remove, or redirect the existing `/terms/`, `/privacy/`, `/
 - Public-route, reduced-motion, keyboard, overflow, autoplay, canvas-motion, and localized-copy checks pass.
 - Repository security and brand checks pass.
 - GitHub Pages deployment succeeds and the live page is rechecked in Aside.
+
+## Requirement verification matrix
+
+| Requirement | Status | Implementation | Evidence |
+|---|---|---|---|
+| Product-first game-studio first viewport | 완료 | Four localized home pages + `assets/studio-home.css` | 1440×900 and 390×844 screenshots |
+| Exact Quirky Ball 1.1.0 gameplay | 완료 | `assets/media/quirky-ball-gameplay.mp4` | H.264 540×1200, 30fps, release capture hash recorded in task evidence |
+| Immediate marbles, shots, cursor, impacts | 완료 | `assets/studio-home.js` | Playwright launch-motion and cursor tests |
+| Scroll tone and red Quirky follow | 완료 | `setupToneAndMascot` | Four-section tone/position browser audit |
+| Direct FX pause and reduced-motion fallback | 완료 | Motion toggle + media/canvas listeners | Desktop/mobile pause-resume tests |
+| YouTube automatic refresh and equal cards | 완료 | Existing four-hour feed workflow + three-card renderer | Current RSS IDs match runtime cards; 20 locale/viewport height checks |
+| Exactly two projects; Project K date undecided | 완료 | Four localized home pages | Static contract and browser count |
+| Complete phone tops and mascot | 완료 | Overflow-safe phone shells + complete `red-quirky.svg` | 22–65px phone protrusion audit |
+| Light-only, selective Chilgok/Do Hyeon/Gungsuh | 완료 | Shared font and studio styles | Static visual contract |
+| Published legal/support URLs and contents unchanged | 완료 | Existing route links retained | 13 files hash-identical to `origin/main`; 101-link test |
+| 320px through desktop responsiveness | 완료 | Shared responsive styles | 36 locale/viewport overflow checks, plus 15 landscape checks |
+| GitHub Pages deployment and live recheck | 부분 완료 | Pending four-hour gate | Not yet pushed |
