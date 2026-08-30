@@ -199,6 +199,9 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   const firstProjectVideo = page.locator("[data-game-preview]").first();
   await firstProjectVideo.scrollIntoViewIfNeeded();
   await expect.poll(() => firstProjectVideo.evaluate((video) => video.paused)).toBe(false);
+  const secondProjectVideo = page.locator("[data-game-preview]").nth(1);
+  await secondProjectVideo.scrollIntoViewIfNeeded();
+  await expect.poll(() => secondProjectVideo.evaluate((video) => video.paused)).toBe(false);
 });
 
 test("home keeps the hero heavy and the footer lockup compact", async ({ page }) => {
