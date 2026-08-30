@@ -123,7 +123,7 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .section-heading .eyebrow { margin-bottom: 8px; }
 .section-heading h2 { margin: 0; font-size: clamp(2.8rem, 5vw, 5rem); letter-spacing: -.06em; line-height: .9; }
 .arrow-link,
-.project-link { color: var(--studio-ink); font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+.project-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--studio-ink); font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
 .arrow-link:hover,
 .project-link:hover { color: var(--studio-blue); }
 .youtube-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: clamp(14px, 2vw, 26px); counter-reset: transmission; }
