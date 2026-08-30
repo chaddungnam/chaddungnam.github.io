@@ -1,5 +1,5 @@
-@font-face { font-family: "House Duck Display"; src: url("/assets/fonts/DoHyeon-Regular.ttf") format("truetype"); font-display: swap; }
-@font-face { font-family: "House Duck Sans"; src: url("/assets/fonts/Montserrat-Variable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "House Duck Display"; src: url("/assets/fonts/DoHyeon-Regular.woff2") format("woff2"), url("/assets/fonts/DoHyeon-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "House Duck Sans"; src: url("/assets/fonts/Montserrat-Variable.woff2") format("woff2"), url("/assets/fonts/Montserrat-Variable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
 
 .manifesto-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: center; gap: clamp(24px, 3vw, 44px); isolation: isolate; }
 .manifesto-bubble { position: relative; z-index: 2; padding: 82px clamp(26px, 3vw, 42px) 26px; border: 3px solid var(--studio-ink); border-radius: 28px 8px 28px 8px; background: var(--studio-surface); box-shadow: 8px 8px 0 var(--studio-cyan), 14px 14px 0 var(--studio-neon); }

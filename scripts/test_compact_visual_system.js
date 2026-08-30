@@ -41,6 +41,10 @@ assert.match(mirror, /\.mirror-brand img:first-child\s*\{[^}]*width:\s*32px[^}]*
 assert.match(mirror, /\.mirror-brand img:last-child\s*\{[^}]*width:\s*124px/s);
 
 assert.match(fonts, /font-family:\s*"Montserrat"/);
+for (const file of ["Montserrat-Variable.woff2", "DoHyeon-Regular.woff2", "Chilgok_Kaj-subset.woff2"]) {
+  assert.ok(fs.statSync(path.join(root, "assets", "fonts", file)).size < 300_000, `${file} must stay web-sized`);
+  assert.match(fonts, new RegExp(file.replace(".", "\\.")));
+}
 
 assert.match(brand, /--cream:\s*#f8f9fa/);
 assert.match(brand, /--navy:\s*#202124/);
