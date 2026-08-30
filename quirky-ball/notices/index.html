@@ -61,8 +61,10 @@
   <script>
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
     const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
-    const requested = new URLSearchParams(location.search).get("lang") ?? normalizeLanguage(navigator.language || "en");
-    if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embedded");
+    const search = new URLSearchParams(location.search);
+    const requested = search.get("lang") ?? normalizeLanguage(navigator.language || "en");
+    const selectedNoticeId = search.get("notice");
+    if (search.has("embed")) document.body.classList.add("embedded");
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
     const localized = (language) => language === "ko"
       ? { title: "공지사항", kicker: "QUIRKY BALL · 공지", kind: "공지사항", all: "전체 공지" }
@@ -125,6 +127,8 @@
           list.hidden = false;
         });
         render(language);
+        const selected = notices.find((notice) => String(notice.id) === selectedNoticeId);
+        if (selected) renderDetail(selected);
       })
       .catch(() => {
         document.querySelector("#notice-title").textContent = "House Duck";
