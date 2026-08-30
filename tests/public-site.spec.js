@@ -86,10 +86,46 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
   }
 });
 
+test("localized home pages preserve the published legal and support paths", async ({ page }) => {
+  const contracts = [
+    ["/?lang=ko", ["terms/ko.html", "privacy/ko.html", "impressum/ko.html", "support/"]],
+    ["/index_en.html?lang=en", ["terms/en.html", "privacy/en.html", "impressum/en.html", "support/#english"]],
+    ["/index_de.html?lang=de", ["terms/de.html", "privacy/de.html", "impressum/de.html", "support/#german"]],
+    ["/index_ja.html?lang=ja", ["terms/ja.html", "privacy/ja.html", "impressum/ja.html", "support/#english"]],
+  ];
+
+  for (const [route, hrefs] of contracts) {
+    await page.goto(route);
+    await expect(page.locator(".site-footer .footer-links a")).toHaveCount(6);
+    for (const href of hrefs) await expect(page.locator(`.site-footer a[href="${href}"]`), `${route} keeps ${href}`).toHaveCount(1);
+  }
+});
+
+test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
+  await page.goto("/?lang=ko");
+  const chamber = page.locator("[data-release-chamber]");
+  const video = page.locator("[data-hero-gameplay]");
+
+  await expect(chamber).toBeVisible();
+  await expect(chamber).toContainText("Quirky Ball");
+  await expect(chamber).toContainText("1.1.0");
+  await expect(chamber).toContainText(/AIM.*SHOOT.*MERGE/);
+  await expect(video).toBeVisible();
+  expect(await video.evaluate((node) => ({
+    autoplay: node.autoplay,
+    muted: node.muted,
+    loop: node.loop,
+    playsInline: node.playsInline,
+  }))).toEqual({ autoplay: true, muted: true, loop: true, playsInline: true });
+  const box = await video.boundingBox();
+  expect(box.width).toBeGreaterThan(isMobile ? 200 : 300);
+});
+
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
-  await expect(page.locator("[data-studio-hero] h1")).toContainText("Are you ready?");
-  await expect(page.locator("[data-studio-hero] h1")).toContainText("Houseduck.in");
+  await expect(page.locator("[data-studio-hero] h1")).toHaveText("Quirky Ball");
+  await expect(page.locator("[data-studio-hero]")).toContainText("Are you ready?");
+  await expect(page.locator("[data-studio-hero]")).toContainText("Houseduck.in");
   await expect(page.locator(".hero-description")).toContainText("기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);
@@ -99,8 +135,8 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
   await expect(page.locator("[data-game-preview]")).toHaveCount(2);
-  await expect(page.locator(".phone-side-button")).toHaveCount(4);
-  await expect(page.locator(".phone-home-indicator")).toHaveCount(2);
+  await expect(page.locator("[data-project] .phone-side-button")).toHaveCount(4);
+  await expect(page.locator("[data-project] .phone-home-indicator")).toHaveCount(2);
 
   const cardHeights = await page.locator("[data-youtube-card]").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
   expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThan(2);
@@ -202,6 +238,7 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
     { autoplay: false, paused: true },
     { autoplay: false, paused: true },
   ]);
+  await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
 
 test("primary navigation responds with a restrained text hover", async ({ page, isMobile }) => {

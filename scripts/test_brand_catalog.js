@@ -140,7 +140,7 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
   assert.match(html, locale === "ko" ? /href="https:\/\/blog\.houseduck\.in\/"/ : new RegExp(`href="blog/${locale}/"`), `${file} localized Blog link`);
   assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation uses Blog`);
-  assert.match(publicText, /Are you ready\?\s+Houseduck\.in/, `${file} studio call-and-response slogan`);
+  assert.match(publicText, /Are you ready\?\s*\/\s*Houseduck\.in/, `${file} studio call-and-response slogan`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(html, /history-section|journal-section/, `${file} keeps only the approved sections`);
 }

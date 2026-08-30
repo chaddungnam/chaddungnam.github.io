@@ -9,13 +9,13 @@
   "use strict";
 
   const QUIRKY_RULES = Object.freeze({
-    totalTurns: 4.5,
-    eventSeconds: 2.25,
-    shotsPerSecond: 8,
-    pairInterval: 0.25,
-    shrinkMin: 0.82,
-    shrinkMax: 0.94,
-    maxBounces: 1,
+    totalTurns: 5.25,
+    eventSeconds: 2.4,
+    shotsPerSecond: 18,
+    pairInterval: 0.11,
+    shrinkMin: 0.84,
+    shrinkMax: 0.95,
+    maxBounces: 2,
   });
   const TAU = Math.PI * 2;
   const palette = ["#ffcd38", "#ff7d64", "#55b8f8", "#48c7a8", "#9667e9", "#f4f0e8"];
@@ -103,7 +103,7 @@
   }
 
   function setupVideos(reducedMotion) {
-    const videos = [...document.querySelectorAll("[data-game-preview]")];
+    const videos = [...document.querySelectorAll("[data-game-preview], [data-hero-gameplay]")];
     if (reducedMotion) {
       for (const video of videos) { video.autoplay = false; video.pause(); }
       return;
@@ -177,14 +177,14 @@
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      for (let index = 0; index < 14; index += 1) {
+      for (let index = 0; index < 24; index += 1) {
         const angle = index * 2.39996;
-        const distance = Math.min(width, height) * (.28 + (index % 5) * .055);
-        const speed = 17 + index % 4 * 4;
+        const distance = Math.min(width, height) * (.22 + (index % 7) * .055);
+        const speed = 24 + index % 5 * 5;
         marbles[index] = {
           x: width / 2 + Math.cos(angle) * distance,
           y: height / 2 + Math.sin(angle) * distance * .68,
-          radius: marbles[index]?.radius || 13 + index % 4 * 3,
+          radius: marbles[index]?.radius || 10 + index % 5 * 3,
           color: palette[index % palette.length],
           vx: marbles[index]?.vx || Math.cos(angle + 1.2) * speed,
           vy: marbles[index]?.vy || Math.sin(angle + 1.2) * speed,
@@ -205,17 +205,17 @@
 
     function spawnPair(rotation, index) {
       for (const angle of shotAngles(rotation, index)) {
-        const vx = Math.cos(angle) * 390;
-        const vy = Math.sin(angle) * 390;
+        const vx = Math.cos(angle) * 540;
+        const vy = Math.sin(angle) * 540;
         shots.push({ x: width / 2, y: height / 2, vx, vy, angle, bounces: 0, hits: new Set() });
-        emitParticles(width / 2, height / 2, -vx, -vy, "#ef3f38", 3);
+        emitParticles(width / 2, height / 2, -vx, -vy, "#ef3f38", 5);
       }
     }
 
     function launchBurst(rotation) {
       shots = [];
-      pairCount = 2;
-      for (let index = 0; index < 3; index += 1) spawnPair(rotation + index * .32, index);
+      pairCount = 8;
+      for (let index = 0; index < 9; index += 1) spawnPair(rotation + index * .19, index);
     }
 
     function updateMarbles(delta) {
@@ -227,7 +227,7 @@
         if (marble.x < radius || marble.x > width - radius) { marble.vx *= -1; marble.x = Math.max(radius, Math.min(width - radius, marble.x)); }
         if (marble.y < radius || marble.y > height - radius) { marble.vy *= -1; marble.y = Math.max(radius, Math.min(height - radius, marble.y)); }
         const speed = Math.hypot(marble.vx, marble.vy);
-        if (speed > 82) { marble.vx *= 82 / speed; marble.vy *= 82 / speed; }
+        if (speed > 112) { marble.vx *= 112 / speed; marble.vy *= 112 / speed; }
       }
     }
 
@@ -267,20 +267,40 @@
 
     function draw(rotation) {
       context.clearRect(0, 0, width, height);
-      context.strokeStyle = "rgba(17,19,25,.08)";
-      context.lineWidth = 1;
+      const fieldRadius = Math.min(width, height) * .34;
+      context.save();
+      context.translate(width / 2, height / 2);
+      context.rotate(rotation * .08);
+      context.setLineDash([7, 13]);
+      for (let ring = 1; ring <= 3; ring += 1) {
+        context.strokeStyle = `rgba(17,19,25,${.025 + ring * .018})`;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(0, 0, fieldRadius * (.45 + ring * .25), 0, TAU);
+        context.stroke();
+      }
+      context.setLineDash([]);
+      context.strokeStyle = "rgba(239,63,56,.16)";
       context.beginPath();
-      context.arc(width / 2, height / 2, Math.min(width, height) * .34, 0, TAU);
+      context.moveTo(-fieldRadius * 1.4, 0);
+      context.lineTo(fieldRadius * 1.4, 0);
+      context.moveTo(0, -fieldRadius * 1.4);
+      context.lineTo(0, fieldRadius * 1.4);
       context.stroke();
+      context.restore();
       for (const marble of marbles) {
         const radius = Math.max(7, marble.radius);
         context.beginPath();
         context.arc(marble.x + 2, marble.y + 3, radius, 0, TAU);
         context.fillStyle = "rgba(17,19,25,.12)";
         context.fill();
+        const fill = context.createRadialGradient(marble.x - radius * .34, marble.y - radius * .42, radius * .08, marble.x, marble.y, radius);
+        fill.addColorStop(0, "rgba(255,255,255,.98)");
+        fill.addColorStop(.22, marble.color);
+        fill.addColorStop(1, marble.color);
         context.beginPath();
         context.arc(marble.x, marble.y, radius, 0, TAU);
-        context.fillStyle = marble.color;
+        context.fillStyle = fill;
         context.fill();
         context.strokeStyle = "#172033";
         context.lineWidth = 2;
@@ -292,15 +312,21 @@
       }
       for (const shot of shots) {
         const heading = Math.atan2(shot.vy, shot.vx);
-        const trail = context.createLinearGradient(shot.x, shot.y, shot.x - Math.cos(heading) * 34, shot.y - Math.sin(heading) * 34);
-        trail.addColorStop(0, "rgba(239,63,56,.85)");
+        const trailLength = 58;
+        const trail = context.createLinearGradient(shot.x, shot.y, shot.x - Math.cos(heading) * trailLength, shot.y - Math.sin(heading) * trailLength);
+        trail.addColorStop(0, "rgba(239,63,56,1)");
+        trail.addColorStop(.28, "rgba(244,191,37,.72)");
         trail.addColorStop(1, "rgba(239,63,56,0)");
+        context.save();
+        context.shadowColor = "rgba(239,63,56,.55)";
+        context.shadowBlur = 12;
         context.strokeStyle = trail;
-        context.lineWidth = 5;
+        context.lineWidth = 7;
         context.beginPath();
         context.moveTo(shot.x, shot.y);
-        context.lineTo(shot.x - Math.cos(heading) * 34, shot.y - Math.sin(heading) * 34);
+        context.lineTo(shot.x - Math.cos(heading) * trailLength, shot.y - Math.sin(heading) * trailLength);
         context.stroke();
+        context.restore();
         context.save();
         context.translate(shot.x, shot.y);
         context.rotate(heading);
@@ -308,10 +334,10 @@
         context.strokeStyle = "#172033";
         context.lineWidth = 2;
         context.beginPath();
-        context.moveTo(10, 0);
-        context.lineTo(-7, -5);
+        context.moveTo(12, 0);
+        context.lineTo(-8, -6);
         context.lineTo(-3, 0);
-        context.lineTo(-7, 5);
+        context.lineTo(-8, 6);
         context.closePath();
         context.fill();
         context.stroke();
@@ -348,8 +374,9 @@
 
     resize();
     addEventListener("resize", resize);
-    if (reducedMotion) { draw(0); return; }
     launchBurst(0);
+    draw(0);
+    if (reducedMotion) return;
     if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; }, { threshold: .05 }).observe(stage);
     requestAnimationFrame(tick);
   }

@@ -159,7 +159,7 @@ require_css_property ".brand-lockup .brand-duck-image" "width: 38px"
 require_css_property ".brand-lockup .brand-wordmark-image" "width: 132px"
 require_token "assets/studio-home.css" ".project-phone"
 require_token "assets/studio-home.css" "overflow: visible"
-require_token "assets/studio-home.js" "shotsPerSecond: 8"
+require_token "assets/studio-home.js" "shotsPerSecond: 18"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"
 
