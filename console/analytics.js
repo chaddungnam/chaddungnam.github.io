@@ -426,22 +426,36 @@ function renderInteractionInsights() {
 
 function renderPriorityInsights() {
   const insight = state.payload?.priorityInsights?.growthChoiceAdStop ?? {};
-  const stopped = Number(insight.stoppedSessions || 0);
-  const exposed = Number(insight.exposedSessions || 0);
-  const users = Number(insight.stoppedUsers || 0);
-  const rewarded = Number(insight.rewardedStoppedSessions || 0);
+  const exposed = Number(insight.adExposures ?? insight.exposedSessions ?? 0);
+  const selected = Number(insight.selectedAfterAd || 0);
+  const crossSession = Number(insight.crossSessionSelections || 0);
+  const completedWithoutSelection = Number(insight.completedWithoutSelection || 0);
+  const verifiedStops = Number(insight.verifiedStops ?? insight.stoppedSessions ?? 0);
+  const verifiedStopUsers = Number(insight.verifiedStopUsers ?? insight.stoppedUsers ?? 0);
+  const unresolved = Number(insight.unresolved || 0);
   const panel = byId("priorityInsightPanel");
-  if (stopped > 0) {
+  if (verifiedStops > 0) {
     panel.dataset.status = "risk";
-    setText("priorityInsightTitle", "성장 선택 광고 뒤 선택 없이 멈춤");
-    setText("priorityInsightValue", `${formatNumber(stopped)}회 · ${formatNumber(users)}개 설치 기기`);
-    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatRate(insight.stopRate)}가 다음 선택으로 이어지지 않았습니다. ${formatNumber(users)}개 설치 기기에서 발생했고, 같은 기기의 반복 중단도 포함됩니다. 보상 수령 뒤 멈춘 흐름은 ${formatNumber(rewarded)}회입니다. 보상만 받고 나가려 했거나, 광고 뒤에도 선택이 필요하다는 안내를 놓친 흐름일 가능성이 큽니다. 광고 종료 직후 “보상 완료 · 하나를 선택하세요”를 크게 보여준 뒤 선택 전환을 비교하세요.`);
+    setText("priorityInsightIcon", "!");
+    setText("priorityInsightTitle", "광고 뒤 선택 전 실제 앱 종료 확인");
+    setText("priorityInsightValue", `${formatNumber(verifiedStops)}회 · ${formatNumber(verifiedStopUsers)}개 설치 기기`);
+    setText("priorityInsightDetail", `광고 노출 ${formatNumber(exposed)}회 중 ${formatNumber(selected)}회는 선택까지 확인됐고, ${formatNumber(completedWithoutSelection)}회는 선택 이벤트가 없어도 같은 판의 완료가 확인됐습니다. 명시적인 앱 종료가 선택보다 먼저 기록된 ${formatNumber(verifiedStops)}회만 중단으로 셉니다.`);
     return;
   }
   panel.dataset.status = "clear";
-  setText("priorityInsightTitle", "선택창 광고 뒤 이탈 신호 없음");
-  setText("priorityInsightValue", exposed > 0 ? `${formatNumber(exposed)}회 확인` : "표본 없음");
-  setText("priorityInsightDetail", "성장 선택 광고 이후 실제 선택까지 이어지는지 계속 확인합니다.");
+  setText("priorityInsightIcon", "✓");
+  if (exposed === 0) {
+    setText("priorityInsightTitle", "성장 선택 광고 표본 없음");
+    setText("priorityInsightValue", "표본 없음");
+    setText("priorityInsightDetail", "광고 노출이 생기면 같은 선택 제안의 실제 선택 여부를 세션이 바뀌어도 연결해 확인합니다.");
+    return;
+  }
+  const normalFlows = selected + completedWithoutSelection;
+  setText("priorityInsightTitle", verifiedStops === 0 && unresolved === 0 ? "성장 선택 광고 흐름 정상" : "성장 선택 광고 뒤 실제 종료 없음");
+  setText("priorityInsightValue", `${formatNumber(normalFlows)} / ${formatNumber(exposed)} 정상 확인`);
+  const crossSessionDetail = crossSession > 0 ? ` 이 중 ${formatNumber(crossSession)}회는 광고 때문에 세션이 바뀐 뒤 선택됐습니다.` : "";
+  const unresolvedDetail = unresolved > 0 ? ` 나머지 ${formatNumber(unresolved)}회는 결과 미확인이며, 미확인만으로 앱 종료나 결함으로 세지 않습니다.` : "";
+  setText("priorityInsightDetail", `광고 뒤 같은 선택 제안에서 ${formatNumber(selected)}회가 실제 선택으로 이어졌고, 선택 이벤트가 빠졌어도 같은 판 완료가 확인된 흐름은 ${formatNumber(completedWithoutSelection)}회입니다.${crossSessionDetail}${unresolvedDetail}`);
 }
 
 function renderGameMetrics() {
