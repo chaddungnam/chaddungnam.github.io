@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -7,7 +8,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const runtimePath = path.join(root, "assets/studio-home.js");
 
 assert.ok(fs.existsSync(runtimePath), "assets/studio-home.js must exist");
-const { QUIRKY_RULES, shotAngles, shrinkRadius } = require(runtimePath);
+const { QUIRKY_RULES, duePairCount, shotAngles, shrinkRadius } = require(runtimePath);
 
 assert.deepEqual(QUIRKY_RULES, {
   totalTurns: 4.5,
@@ -21,6 +22,21 @@ assert.deepEqual(QUIRKY_RULES, {
 assert.deepEqual(shotAngles(0, 0), [0, Math.PI]);
 assert.equal(shrinkRadius(100, 0), 82);
 assert.equal(shrinkRadius(100, 1), 94);
+assert.equal(QUIRKY_RULES.shotsPerSecond * QUIRKY_RULES.pairInterval, 2, "each interval must fire one opposing pair");
+let nextPairAt = QUIRKY_RULES.pairInterval * 1000;
+let simulatedShots = 0;
+for (let frame = 0; frame <= 300; frame += 1) {
+  const now = frame * 10_000 / 300;
+  const due = duePairCount(now, nextPairAt, QUIRKY_RULES.pairInterval * 1000);
+  simulatedShots += due * 2;
+  nextPairAt += due * QUIRKY_RULES.pairInterval * 1000;
+}
+assert.equal(simulatedShots, 80, "ten seconds of steady 30fps time must fire exactly 80 shots");
+assert.equal(
+  crypto.createHash("sha256").update(fs.readFileSync(path.join(root, "assets/media/quirky-ball-gameplay.mp4"))).digest("hex"),
+  "719e199362e3ba0b9eefbc163071927e3969a6193d71fd2800aea0679d77da15",
+  "home gameplay must remain the approved Quirky Ball 1.1.0 capture",
+);
 
 const svg = read("assets/red-quirky.svg");
 assert.match(svg, /viewBox="0 0 240 260"/);

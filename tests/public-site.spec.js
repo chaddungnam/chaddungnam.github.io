@@ -226,6 +226,20 @@ test("home launch immediately moves marbles and builds a rapid shot burst", asyn
   await expect.poll(async () => Number(await canvas.getAttribute("data-shot-count"))).toBeGreaterThanOrEqual(4);
 });
 
+test("home replaces its YouTube fallback with the synced feed", async ({ page }) => {
+  const videos = [
+    { videoId: "bOUGPw5Iih4", title: "SYNCED VIDEO ONE" },
+    { videoId: "l_t2G09Zye4", title: "SYNCED VIDEO TWO" },
+    { videoId: "uHgzc85Fb2k", title: "SYNCED VIDEO THREE" },
+  ];
+  await page.route("**/assets/youtube-feed.json", (route) => route.fulfill({ json: { videos } }));
+  await page.goto("/?lang=ko");
+  await expect(page.locator("[data-youtube-feed] strong")).toHaveText(videos.map((video) => video.title));
+  expect(await page.locator("[data-youtube-feed] a").evaluateAll((links) => links.map((link) => link.href))).toEqual(
+    videos.map((video) => `https://www.youtube.com/watch?v=${video.videoId}`),
+  );
+});
+
 test("home desktop removes the hero divider and turns the pointer into a Quirky shot", async ({ page, isMobile }) => {
   test.skip(isMobile, "touch keeps the platform cursor behavior");
   await page.goto("/?lang=ko");
@@ -248,6 +262,10 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect(page.locator("[data-game-cursor]")).toHaveCount(0);
   await expect(page.locator("[data-motion-toggle]")).toBeHidden();
+  const mascot = page.locator("[data-scroll-quirky]");
+  await expect(mascot).toBeHidden();
+  await page.locator("[data-youtube-feed]").scrollIntoViewIfNeeded();
+  await expect(mascot).toBeHidden();
   await page.waitForTimeout(180);
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([

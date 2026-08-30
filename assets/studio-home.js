@@ -30,6 +30,10 @@
     return radius * (QUIRKY_RULES.shrinkMin + Math.max(0, Math.min(1, roll)) * (QUIRKY_RULES.shrinkMax - QUIRKY_RULES.shrinkMin));
   }
 
+  function duePairCount(now, nextPairAt, interval) {
+    return now < nextPairAt ? 0 : Math.floor((now - nextPairAt) / interval) + 1;
+  }
+
   function validVideo(video) {
     return video && /^[A-Za-z0-9_-]{11}$/.test(video.videoId) && typeof video.title === "string" && video.title.trim();
   }
@@ -193,9 +197,12 @@
     let manualPaused = false;
     let start = performance.now();
     let previous = start;
-    let pairCount = -1;
+    const pairIntervalMs = QUIRKY_RULES.pairInterval * 1000;
+    let nextPairAt = start + pairIntervalMs;
+    let pairIndex = 0;
     let frame = 0;
     let impactCount = 0;
+    let shotSpawnCount = 0;
     const marbleSprites = new Map();
     let shotSprite;
 
@@ -299,12 +306,12 @@
         shots.push({ x: width / 2, y: height / 2, vx, vy, angle, bounces: 0, hits: new Set() });
         emitParticles(width / 2, height / 2, -vx, -vy, "#ef3f38", 5);
       }
+      shotSpawnCount += 2;
     }
 
     function launchBurst(rotation) {
       shots = [];
       for (let index = 0; index < 9; index += 1) spawnPair(rotation + index * .19, index);
-      pairCount = -1;
     }
 
     function updateMarbles(delta) {
@@ -403,18 +410,22 @@
       canvas.dataset.frame = String(++frame);
       canvas.dataset.marbleState = marbles.slice(0, 4).map((marble) => `${marble.x.toFixed(1)},${marble.y.toFixed(1)}`).join(";");
       canvas.dataset.shotCount = String(shots.length);
+      canvas.dataset.shotSpawnCount = String(shotSpawnCount);
       canvas.dataset.impactCount = String(impactCount);
     }
 
     function tick(now) {
-      if (!active || manualPaused) { previous = now; requestAnimationFrame(tick); return; }
+      if (!active || manualPaused) { previous = now; nextPairAt = now + pairIntervalMs; requestAnimationFrame(tick); return; }
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
       if (now - previous < 1000 / 30) { requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
-      if (elapsed < (previous - start) / 1000 % QUIRKY_RULES.eventSeconds) pairCount = -1;
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;
-      const nextPair = Math.floor(elapsed / QUIRKY_RULES.pairInterval);
-      while (pairCount < nextPair) spawnPair(rotation, ++pairCount);
+      if (now - nextPairAt > pairIntervalMs * 4) nextPairAt = now;
+      const duePairs = duePairCount(now, nextPairAt, pairIntervalMs);
+      for (let index = 0; index < duePairs; index += 1) {
+        spawnPair(rotation, pairIndex++);
+      }
+      nextPairAt += duePairs * pairIntervalMs;
       const delta = Math.min(.034, (now - previous) / 1000);
       updateMarbles(delta);
       updateShots(delta);
@@ -444,5 +455,5 @@
     setupMotionToggle(reducedMotion);
   }
 
-  return { QUIRKY_RULES, shotAngles, shrinkRadius, init };
+  return { QUIRKY_RULES, duePairCount, shotAngles, shrinkRadius, init };
 });

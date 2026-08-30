@@ -282,6 +282,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   html { scroll-behavior: auto; }
   body[data-page="studio"] { transition: none; }
   .hero-quirky { animation: none; }
+  .scroll-quirky { display: none; }
   .youtube-card,
   .project-phone,
   .hero-phone,
