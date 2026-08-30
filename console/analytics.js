@@ -866,7 +866,7 @@ function renderMarketingGate() {
       status: exitTrend !== null && exitTrend < 0.4 ? "available" : "waiting",
       label: "게임 중 이탈률",
       value: `${formatRate(exitTrend)} / 40.0% 미만`,
-      detail: "game_start 뒤 game_over 없이 끝난 선택 기간 비율",
+      detail: "정상 완료 또는 명시적 중간 종료가 확인된 판 중 중간 종료 비율",
     },
   ]);
 }

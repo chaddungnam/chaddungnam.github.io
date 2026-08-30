@@ -57,7 +57,7 @@
     }
     if (metrics.completion.status === "risk") return "완료된 판이 적어요. 첫 1분 난이도를 확인해요.";
     if (metrics.duration.status === "risk") return "한 판이 너무 빨리 끝나요. 시작 1분의 재미를 확인해요.";
-    if (metrics.retention.status === "risk") return "다음 날 돌아오는 사람이 적어요. 재방문 보상을 확인해요.";
+    if (metrics.retention.status === "risk") return "다음 날 돌아온 설치가 적어요. 재방문 보상을 확인해요.";
     if (metrics.ads.status === "risk") return "강제 전면광고가 많아요. 게임 종료 후 노출 간격을 확인해요.";
     if (verdictStatus === "risk") return verdictSummary ?? "종합 상태가 위험해요. 평균 세션과 이탈 기록을 확인해요.";
     if (Object.values(metrics).some((item) => item.status === "watch")) return "노란 지표 하나를 골라 7일 변화를 지켜봐요.";

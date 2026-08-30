@@ -44,12 +44,14 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-4/, "the Console must cache-bust the corrected analytics renderer");
+assert.match(consoleHtml, /analytics\.js\?v=20260830-5/, "the Console must cache-bust the corrected analytics renderer");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
 assert.match(analyticsSource, /rangeDays:\s*3,/, "the analytics state must default to three days without a URL override");
 assert.match(consoleHtml, /data-range="5"[^>]*>최근 5일</, "the Console must offer a five-day range");
 assert.match(analyticsSource, /panel\.hidden = verifiedStops === 0/, "normal growth-choice ad flow must not create a priority card");
+assert.match(analyticsSource, /정상 완료 또는 명시적 중간 종료가 확인된 판 중 중간 종료 비율/, "marketing exit-rate copy must match the observed-game denominator");
+assert.match(consoleHtml, /전체 이벤트 설치 수/, "event funnels must label unique install IDs as installs");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
 assert.match(consoleHtml, /model\.js\?v=20260830-1/, "the Console must cache-bust the Korean analytics labels");
