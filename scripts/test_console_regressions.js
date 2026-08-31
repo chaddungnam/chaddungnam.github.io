@@ -45,7 +45,7 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260830-13/, "the Console must cache-bust truthful core-loop sample sizes");
+assert.match(consoleHtml, /analytics\.js\?v=20260831-1/, "the Console must cache-bust the evaluation explanation update");
 assert.match(consoleHtml, /id="coreLoopSummary"/, "the Console must expose completed-run core-loop quality metrics");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {
@@ -62,7 +62,7 @@ assert.match(analyticsSource, /state\.payload\?\.versionMonitor/, "version adopt
 assert.match(analyticsSource, /gate\?\.effectiveDay[\s\S]*row\.day >= gate\.effectiveDay/, "version trend must begin at the matching forced-update audit date");
 assert.match(consoleStyles, /\.executive-overview\s*\{[\s\S]*linear-gradient\([^}]*#ffffff/, "the executive snapshot must use a light surface");
 assert.match(consoleStyles, /grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)/, "mobile navigation must fit all seven console routes");
-assert.match(consoleHtml, /pulse-model\.js\?v=20260830-5/, "the Console must cache-bust selected-range return scoring");
+assert.match(consoleHtml, /pulse-model\.js\?v=20260831-1/, "the Console must cache-bust conservative return scoring");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
 assert.match(analyticsSource, /rangeDays:\s*3,/, "the analytics state must default to three days without a URL override");
@@ -74,7 +74,10 @@ assert.match(consoleHtml, /헤비 —명\(2인분\)/, "the Pulse facts must disc
 assert.doesNotMatch(analyticsSource, /성숙 일별 코호트/, "marketing review must not expose an opaque mature-cohort gate");
 assert.match(consoleHtml, /전체 이벤트 사람 수/, "event funnels must use the requested people terminology");
 assert.match(pulseSource, /MIN_DAILY_ACTIVE_PEOPLE = 5/, "Pulse must start judging at five daily active people");
+assert.match(pulseSource, /MIN_RETENTION_COMPARISON_PEOPLE = 20/, "Pulse must require a meaningful return comparison sample");
 assert.match(pulseSource, /dailyRows\.reduce[\s\S]*\/ dailyRows\.length/, "multi-day Pulse must use average daily active people");
+assert.match(pulseSource, /const enoughSamples = dailyActivePeople >= MIN_DAILY_ACTIVE_PEOPLE/, "heavy-player weighting must not inflate statistical sample confidence");
+assert.match(analyticsSource, /MIN_RETENTION_COMPARISON_PEOPLE/, "the return explanation must disclose its minimum comparison sample");
 assert.match(pulseSource, /confidence: isEstimate \? "estimate" : "standard"/, "small samples must still produce an explicitly low-confidence estimate");
 assert.match(pulseSource, /periodReturn = payload\.periodReturn/, "Pulse return scoring must follow the selected range");
 assert.match(consoleHtml, /선택 기간과 바로 이전 같은 기간 비교/, "the return card must explain its selected-range comparison");

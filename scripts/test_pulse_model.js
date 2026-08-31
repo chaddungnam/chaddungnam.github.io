@@ -14,7 +14,7 @@ function payload(overrides = {}) {
     },
     rangeDays: overrides.rangeDays ?? 1,
     daily: overrides.daily ?? [{ activeInstalls: 10 }],
-    periodReturn: overrides.periodReturn ?? { currentPlayers: 10, previousPlayers: 8, returnedPlayers: 2, rate: 0.25 },
+    periodReturn: overrides.periodReturn ?? { currentPlayers: 10, previousPlayers: 20, returnedPlayers: 5, rate: 0.25 },
     retention: overrides.retention ?? [{ day: 1, rate: 0.25 }],
     adEconomics: {
       impressionsPerPlayer: 2,
@@ -57,17 +57,27 @@ assert.equal(fivePeoplePerDayIsEnough.dailyActivePeople, 5);
 assert.equal(fivePeoplePerDayIsEnough.verdict.status, "good");
 assert.equal(fivePeoplePerDayIsEnough.confidence, "standard");
 
-const oneHeavyPlayerAddsOneEffectivePerson = buildPulseModel(payload({
+const oneHeavyPlayerDoesNotAddIndependentSample = buildPulseModel(payload({
   rangeDays: 1,
   summary: { sessions: 20, installs: 4, playerSegments: { lightPeople: 3, heavyPeople: 1, weightedPeople: 5 } },
   daily: [{ activeInstalls: 4, lightPeople: 3, heavyPeople: 1, weightedPeople: 5 }],
 }));
-assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyActivePeople, 4);
-assert.equal(oneHeavyPlayerAddsOneEffectivePerson.dailyEffectivePeople, 5);
-assert.equal(oneHeavyPlayerAddsOneEffectivePerson.confidence, "standard");
+assert.equal(oneHeavyPlayerDoesNotAddIndependentSample.dailyActivePeople, 4);
+assert.equal(oneHeavyPlayerDoesNotAddIndependentSample.dailyEffectivePeople, 5);
+assert.equal(oneHeavyPlayerDoesNotAddIndependentSample.confidence, "estimate");
+
+const sparseReturnSampleStaysConservative = buildPulseModel(payload({
+  periodReturn: { currentPlayers: 13, previousPlayers: 7, returnedPlayers: 4, rate: 4 / 7 },
+}));
+assert.equal(sparseReturnSampleStaysConservative.metrics.retention.value, 4 / 7);
+assert.equal(sparseReturnSampleStaysConservative.metrics.retention.status, "insufficient");
+assert.equal(sparseReturnSampleStaysConservative.verdict.status, "watch");
+assert.equal(sparseReturnSampleStaysConservative.confidence, "estimate");
+assert.equal(sparseReturnSampleStaysConservative.verdict.score, null);
+assert.match(sparseReturnSampleStaysConservative.verdict.summary, /재방문 비교 표본이 7명으로 적어/);
 
 const selectedRangeReturnOverridesCohortD1 = buildPulseModel(payload({
-  periodReturn: { currentPlayers: 3, previousPlayers: 3, returnedPlayers: 3, rate: 1 },
+  periodReturn: { currentPlayers: 20, previousPlayers: 20, returnedPlayers: 20, rate: 1 },
   retention: [{ day: 1, rate: 0 }],
 }));
 assert.equal(selectedRangeReturnOverridesCohortD1.metrics.retention.value, 1);
@@ -75,7 +85,7 @@ assert.equal(selectedRangeReturnOverridesCohortD1.metrics.retention.status, "goo
 
 const risky = buildPulseModel(payload({
   summary: { avgGameSeconds: 45, gamesStarted: 20, gameOvers: 6 },
-  periodReturn: { currentPlayers: 10, previousPlayers: 10, returnedPlayers: 0, rate: 0.05 },
+  periodReturn: { currentPlayers: 10, previousPlayers: 20, returnedPlayers: 1, rate: 0.05 },
   adEconomics: { formatBreakdown: [{ format: "interstitial", impressionsPerPlayer: 2.2 }] },
   health: { status: "risk", score: 31, summary: "확인이 필요합니다." },
 }));

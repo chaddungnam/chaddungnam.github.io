@@ -4,6 +4,7 @@
   root.PulseModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createPulseModel() {
   const MIN_DAILY_ACTIVE_PEOPLE = 5;
+  const MIN_RETENTION_COMPARISON_PEOPLE = 20;
   const STATUS_LABELS = {
     good: "좋아요",
     watch: "지켜봐요",
@@ -56,6 +57,7 @@
     if (metrics.completion.status === "risk") action = "완료된 판이 적어요. 첫 1분 난이도를 확인해요.";
     else if (metrics.duration.status === "risk") action = "한 판이 너무 빨리 끝나요. 시작 1분의 재미를 확인해요.";
     else if (metrics.retention.status === "risk") action = "이전 같은 기간보다 다시 플레이한 사람이 적어요. 재방문 동기를 확인해요.";
+    else if (metrics.retention.status === "insufficient") action = "재방문 표본이 적어요. 같은 기간을 더 모아서 확인해요.";
     else if (metrics.ads.status === "risk") action = "강제 전면광고가 많아요. 게임 종료 후 노출 간격을 확인해요.";
     else if (verdictStatus === "risk") action = verdictSummary ?? "종합 상태가 위험해요. 평균 세션과 이탈 기록을 확인해요.";
     else if (Object.values(metrics).some((item) => item.status === "watch")) action = "노란 지표 하나를 골라 7일 변화를 지켜봐요.";
@@ -64,11 +66,11 @@
     return isEstimate ? `근사 평가: ${action}` : action;
   }
 
-  function buildVerdictSummary(status, metrics, dailyActivePeople, dailyEffectivePeople, sessions, heavyPeople, isEstimate) {
+  function buildVerdictSummary(status, metrics, dailyActivePeople, dailyEffectivePeople, sessions, heavyPeople, retentionSample, isEstimate) {
     const people = Number.isInteger(dailyActivePeople) ? String(dailyActivePeople) : dailyActivePeople.toFixed(1);
     const effective = Number.isInteger(dailyEffectivePeople) ? String(dailyEffectivePeople) : dailyEffectivePeople.toFixed(1);
     const sampleText = heavyPeople > 0
-      ? `하루 평균 실제 ${people}명, 헤비 ${heavyPeople}명 2배 반영 유효 ${effective}명, 앱 세션 ${sessions}회 기준입니다. `
+      ? `하루 평균 실제 ${people}명, 운영 판단용 유효 ${effective}명(헤비 ${heavyPeople}명은 2인분), 앱 세션 ${sessions}회 기준입니다. `
       : `하루 평균 ${people}명, 앱 세션 ${sessions}회 기준입니다. `;
     const prefix = isEstimate ? `표본이 적은 근사 평가예요. ${sampleText}` : "";
     const messages = {
@@ -88,6 +90,7 @@
     const matchingMetric = Object.entries(metrics).find(([, item]) => item.status === status)?.[0];
     if (matchingMetric && messages[status]?.[matchingMetric]) return prefix + messages[status][matchingMetric];
     if (status === "risk") return prefix + "앱에 머무는 시간이나 이탈 지표에서 위험 신호가 잡혔어요.";
+    if (status === "watch" && metrics.retention?.status === "insufficient" && metrics.retention.value !== null) return prefix + `재방문 비교 표본이 ${retentionSample}명으로 적어 아직 좋다고 단정하지 않아요.`;
     if (status === "watch" && Object.values(metrics).some((item) => item.status === "insufficient")) return prefix + "아직 확인되지 않은 지표가 있어 노란 신호로 봅니다.";
     if (status === "watch") return prefix + "노란 신호가 있어 7일 변화를 조금 더 봐야 해요.";
     return prefix + "현재 확인된 주요 플레이 흐름은 좋아요.";
@@ -119,13 +122,18 @@
     const dailyEffectivePeople = dailyRows.length > 0
       ? dailyRows.reduce((sum, row) => sum + (finiteNumber(row.weightedPeople) ?? finiteNumber(row.activeInstalls) ?? 0), 0) / dailyRows.length
       : Math.max(0, finiteNumber(summary.playerSegments?.weightedDailyPeople) ?? (activePeople + heavyPeople) / rangeDays);
-    const enoughSamples = dailyEffectivePeople >= MIN_DAILY_ACTIVE_PEOPLE;
+    // 헤비 플레이어 가중치는 운영 판단용이지 독립 표본을 늘리는 근거가 아니다.
+    const enoughSamples = dailyActivePeople >= MIN_DAILY_ACTIVE_PEOPLE;
     const avgGameSeconds = finiteNumber(summary.avgGameSeconds);
     const gamesStarted = Math.max(0, finiteNumber(summary.gamesStarted) ?? 0);
     const gameOvers = Math.max(0, finiteNumber(summary.gameOvers) ?? 0);
     const observedGames = Math.max(0, finiteNumber(summary.observedGames) ?? gamesStarted);
     const completionRate = observedGames > 0 ? gameOvers / observedGames : null;
     const returnRate = finiteNumber(periodReturn.rate);
+    const retentionSample = Math.max(0, finiteNumber(periodReturn.previousPlayers) ?? 0);
+    const retentionStatus = returnRate === null || retentionSample < MIN_RETENTION_COMPARISON_PEOPLE
+      ? "insufficient"
+      : classify(returnRate, 0.2, 0.1);
     const hasFormatBreakdown = Array.isArray(economics.formatBreakdown);
     const interstitial = hasFormatBreakdown
       ? economics.formatBreakdown.find((row) => row?.format === "interstitial")
@@ -137,7 +145,7 @@
     const rawMetrics = {
       duration: metric(classify(avgGameSeconds, 180, 60), avgGameSeconds, "평균 한 판 시간"),
       completion: metric(classify(completionRate, 0.65, 0.45), completionRate, "결과가 확인된 판의 완료 비율"),
-      retention: metric(classify(returnRate, 0.2, 0.1), returnRate, "선택 기간과 바로 이전 같은 기간의 플레이 재방문율"),
+      retention: metric(retentionStatus, returnRate, "선택 기간과 바로 이전 같은 기간의 플레이 재방문율"),
       ads: metric(adsStatus, adsPerPlayer, "활동 인원당 강제 전면광고"),
     };
     const metrics = rawMetrics;
@@ -145,16 +153,18 @@
     const health = payload.health ?? {};
     const healthStatus = ["good", "watch", "risk"].includes(health.status) ? health.status : "good";
     const verdictStatus = worstStatus(healthStatus, metrics);
-    const isEstimate = !enoughSamples;
+    const hasInsufficientMetric = Object.values(metrics).some((item) => item.status === "insufficient");
+    const isEstimate = !enoughSamples || hasInsufficientMetric;
     const verdict = {
       status: verdictStatus,
       label: isEstimate ? `${STATUS_LABELS[verdictStatus]} (근사)` : STATUS_LABELS[verdictStatus],
-      score: enoughSamples && verdictStatus === healthStatus && finiteNumber(health.score) != null ? health.score : null,
-      summary: buildVerdictSummary(verdictStatus, metrics, dailyActivePeople, dailyEffectivePeople, sessions, heavyPeople, isEstimate),
+      score: !isEstimate && verdictStatus === healthStatus && finiteNumber(health.score) != null ? health.score : null,
+      summary: buildVerdictSummary(verdictStatus, metrics, dailyActivePeople, dailyEffectivePeople, sessions, heavyPeople, retentionSample, isEstimate),
     };
 
     return {
       minimumDailyActivePeople: MIN_DAILY_ACTIVE_PEOPLE,
+      minimumRetentionComparisonPeople: MIN_RETENTION_COMPARISON_PEOPLE,
       activePeople,
       dailyActivePeople,
       dailyEffectivePeople,
@@ -168,5 +178,5 @@
     };
   }
 
-  return { MIN_DAILY_ACTIVE_PEOPLE, buildPulseModel };
+  return { MIN_DAILY_ACTIVE_PEOPLE, MIN_RETENTION_COMPARISON_PEOPLE, buildPulseModel };
 });

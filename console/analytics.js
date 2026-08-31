@@ -607,14 +607,19 @@ function renderQuestionMetric(key, metric, formattedValue, progress) {
 function renderInsightReasons(model) {
   const metrics = model.metrics || {};
   const periodReturn = state.payload?.periodReturn ?? {};
-  const returnSample = Number(periodReturn.previousPlayers ?? 0) > 0
-    ? ` 바로 이전 같은 길이의 기간에 플레이한 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명이 선택 기간에도 플레이했습니다.`
+  const returnSampleCount = Number(periodReturn.previousPlayers ?? 0);
+  const returnSampleMinimum = Number(root.PulseModel?.MIN_RETENTION_COMPARISON_PEOPLE ?? 20);
+  const returnSample = returnSampleCount > 0
+    ? ` 바로 이전 같은 길이의 기간에 플레이한 ${formatNumber(returnSampleCount)}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명이 선택 기간에도 플레이했습니다.`
     : " 바로 이전 같은 길이의 기간에 플레이한 사람이 없어 아직 비율을 계산할 수 없습니다.";
+  const returnConfidence = returnSampleCount > 0 && returnSampleCount < returnSampleMinimum
+    ? ` 표본이 ${formatNumber(returnSampleCount)}명으로 적어 ${formatNumber(returnSampleMinimum)}명부터 상태를 판단합니다.`
+    : "";
   const reasons = {
     insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 인원 ${formatNumber(state.payload?.summary?.installs)}명(고유 설치 ID 기준), 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회, ${formatRate(metrics.completion?.value)} 완료율을 바탕으로 만든 운영용 요약입니다.` },
     duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
     completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 결과 미확인인 판은 제외했습니다.` },
-    retention: { title: "다시 오나? · 판단 근거", body: `${selectedRangeLabel()} 플레이 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${returnSample} 고유 설치 ID를 사람 구분값으로 사용하며, app_visit·game_start·game_over가 기록된 실제 실행·플레이만 셉니다. 광고 복귀 같은 session_start만으로는 세지 않습니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `${selectedRangeLabel()} 플레이 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${returnSample}${returnConfidence} 고유 설치 ID를 사람 구분값으로 사용하며, app_visit·game_start·game_over가 기록된 실제 실행·플레이만 셉니다. 광고 복귀 같은 session_start만으로는 세지 않습니다.` },
     ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활동 인원 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 인원은 고유 설치 ID로 구분하며, 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
@@ -751,7 +756,8 @@ function renderPulseOverview(model) {
   const card = byId("healthCard");
   card.dataset.status = model.verdict.status;
   setText("healthLabel", model.verdict.label);
-  setText("healthScore", model.confidence === "estimate" ? "근사 평가" : model.verdict.score == null ? (model.verdict.status === "insufficient" ? "수집 중" : "카드 기준") : `${model.verdict.score}/100`);
+  const hasInsufficientMetric = Object.values(model.metrics ?? {}).some((metric) => metric.status === "insufficient");
+  setText("healthScore", model.confidence === "estimate" ? "근사 평가" : model.verdict.score == null ? (model.verdict.status === "insufficient" || hasInsufficientMetric ? "판단 대기" : "카드 기준") : `${model.verdict.score}/100`);
   setText("mascotMessage", model.verdict.summary);
   setText("todayAction", model.action);
   byId("signalLights").querySelectorAll("[data-signal]").forEach((signal) => {
