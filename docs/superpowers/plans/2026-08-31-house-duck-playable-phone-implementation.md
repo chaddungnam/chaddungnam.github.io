@@ -100,7 +100,7 @@
 - [ ] Record final dirty-state evidence for both repositories; confirm the game repository was not modified by this task. **차단:** task 시작 전부터 ledger baseline `44a86bd`/`607e…`와 달랐고, task 중에도 외부 작업으로 HEAD/status가 계속 변경되어 동일성 증명을 할 수 없었다. 이 task는 game repo 파일을 편집하지 않았다.
 - [x] Run `bash scripts/check_brand_site.sh`, the full Playwright public-site suite, and syntax/static checks from a fresh command.
 - [x] Confirm `git diff --exit-code b9445c3 -- terms privacy impressum support quirky-ball project-k` and compare local legal/support route hashes to the live pre-deploy hashes.
-- [x] Capture same-viewport desktop and 390×844 mobile after screenshots in Aside after animations settle; compare them with the saved before captures.
+- [x] Capture the English desktop idle after state in Aside at 1440×900 and the exact 390×844, `scrollY=0`, header-included mobile after state with permitted headless Playwright. Aside mobile remains unverified; the older mobile hero crop is excluded from primary evidence.
 - [x] Verify the real iframe sets both readiness flags and receives pointer input; explicitly leave real-iPhone Safari feel as unverified unless a physical device is available.
 - [x] Push `main`, wait for security/browser/Pages workflows, then verify the deployed home and legal/support hashes in Aside.
 - [x] Update the design-audit findings, requirement matrix, and this plan's checkboxes with exact evidence.
@@ -113,10 +113,11 @@
 | Immutable ten-file Godot snapshot | 완료 | `play/quirky-ball/`, `scripts/test_playable_phone.js` | Fresh brand/static PASS; all ten SHA-256 values match |
 | Website iframe avoids false YouTube Playables environment | 완료 | `play/quirky-ball-site/index.html`, four localized homes | Aside local/live: `inEnv=false`, both readiness flags true |
 | PLAY is lazy and EXIT/RETRY/reduced-motion work | 완료 | `assets/studio-home.js`, `tests/public-site.spec.js` | Pre-click iframe/resources 0; full E2E 91 passed, 3 skipped |
-| 390×844 layout, copy size, controls, stable phone | 완료 | `assets/studio-home.css`, hardened browser assertions | Fresh top-aligned capture: 390×844, `scrollY=0`, phone top 233.78px, overflow 0; EXIT ≥44px |
-| Correct Quirky mascot and calmer visual hierarchy | 완료 | `assets/red-quirky.svg`, home CSS | Before/after screenshots and static contract PASS |
-| Protected legal/support/detail routes unchanged | 완료 | 적용 제외 (content-frozen) | `git diff --exit-code b9445c3 ...` PASS; pre/post live SHA-256 match |
-| GitHub deployment and live canary | 완료 | `main` at `e61994f` | Three workflows success; 10m12s canary, 11 checks, no alerts |
+| 390×844 layout, copy size, controls, stable phone | 부분 완료 | `assets/studio-home.css`, hardened browser assertions | Headless Playwright primary: 390×844, `scrollY=0`, header included, phone top 233.78px, overflow 0; EXIT ≥44px. Aside mobile and physical iPhone remain unverified. |
+| Correct Quirky mascot and calmer visual hierarchy | 완료 | `assets/red-quirky.svg`, home CSS | English 1440×900 idle before/after comparison in Aside and static contract PASS |
+| Protected legal/support routes unchanged | 완료 | 적용 제외 (content-frozen) | Four local/live pre/post SHA-256 matches |
+| Protected project-detail routes unchanged | 완료 | 적용 제외 (content-frozen) | `git diff --exit-code b9445c3 -- quirky-ball project-k` PASS |
+| GitHub deployment and live canary | 완료 | implementation `e61994f`; final `main` = this review-correction commit (SHA recorded in the Task 5 report after push) | Three implementation workflows and prior evidence workflows success; 10m12s canary, 11 checks, no alerts |
 | Separate duplicate/stale/access-exception browser branches | 부분 완료 | Shared state machine guards exist | Happy path/timeout/full suite pass; no dedicated forced-branch tests (accepted minor) |
 | Real iPhone Safari touch feel | 차단 | 적용 없음 | Physical iPhone unavailable; browser mobile emulation is not device proof |
 | Ledger game-repo baseline equality | 차단 | 적용 없음 | Baseline already mismatched before Task 5 and changed concurrently; game repo untouched by this task |
