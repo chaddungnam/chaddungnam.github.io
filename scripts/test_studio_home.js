@@ -96,6 +96,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(html.includes('<script src="assets/brand-site.js" defer></script>'), `${file} must not render-block on shared JavaScript`);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
+  assert.equal((html.match(/quirky-ball-gameplay\.mp4\?v=110/g) || []).length, 2, `${file} must cache-bust both released gameplay previews`);
+  assert.equal((html.match(/quirky-ball-gameplay-poster\.jpg\?v=110/g) || []).length, 2, `${file} must cache-bust both released gameplay posters`);
   assert.ok(html.includes(expectedHeroLabels[file]), `${file} must include its localized hero label`);
   assert.doesNotMatch(html, /<button class="motion-toggle"[^>]+aria-label=/, `${file} motion control must use its visible label`);
   assert.doesNotMatch(html, /<p class="hero-loop"[^>]+aria-label=/, `${file} action keywords must use their visible text`);
