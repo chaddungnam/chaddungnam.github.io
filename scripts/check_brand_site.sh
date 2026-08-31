@@ -180,5 +180,6 @@ node "$repo_dir/scripts/test_brand_language.js"
 node "$repo_dir/scripts/test_brand_catalog.js"
 node "$repo_dir/scripts/test_studio_home.js"
 node "$repo_dir/scripts/test_default_theme.js"
+node "$repo_dir/scripts/test_playable_phone.js"
 
 printf 'brand site contract: PASS\n'

@@ -10,7 +10,7 @@ else
   file_list_command=(git diff --cached --name-only --diff-filter=ACMR)
 fi
 
-blocked_path_pattern='(^|/)(\.env($|\.)|credentials?($|[._-])|secrets?($|[._-]))|\.(pem|key|p12|pfx|jks|keystore|apk|aab|db|sqlite|sqlite3|log|bak|zip)$'
+blocked_path_pattern='(^|/)(\.env($|\.)|credentials?($|[._-])|secrets?($|[._-]))|\.(pem|key|p12|pfx|jks|keystore|apk|aab|db|sqlite|sqlite3|log|bak)$'
 secret_pattern='-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----|(^|[^A-Za-z0-9])(sk_live_|sk_test_|gh[pousr]_|AIza[0-9A-Za-z_-]{20,})|service[_-]?role[^A-Za-z0-9]*(key)?[^A-Za-z0-9]*[:=]|(supabase|api|client)[_-]?(secret|key)[^A-Za-z0-9]*[:=]|authorization[^A-Za-z0-9]*:[[:space:]]*bearer[[:space:]]+[A-Za-z0-9._-]+'
 
 while IFS= read -r path; do
@@ -19,6 +19,29 @@ while IFS= read -r path; do
   case "$path" in
     scripts/check_public_repo.sh|.github/*|SECURITY.md) continue ;;
   esac
+
+  if [[ "$path" == *.zip ]]; then
+    case "$path" in
+      play/quirky-ball/index.pck.zip) expected_hash='8ac3f166aa95fe5ac6613a370798b8cf23fc916531a6bf4049b1b3de3379d170' ;;
+      play/quirky-ball/index.wasm.zip) expected_hash='d8e9008dfb8235eb0ba5f40e438428faffd4ba5ee950d2a4a0e3e8ad3e42a609' ;;
+      *)
+        printf '차단: 공개 저장소에 민감하거나 불필요한 파일이 포함되었습니다: %s\n' "$path" >&2
+        failed=1
+        continue
+        ;;
+    esac
+
+    if [[ "$mode" == "--all" ]]; then
+      actual_hash="$(shasum -a 256 -- "$path" | awk '{print $1}')"
+    else
+      actual_hash="$(git show ":$path" | shasum -a 256 | awk '{print $1}')"
+    fi
+    if [[ "$actual_hash" != "$expected_hash" ]]; then
+      printf '차단: 승인된 ZIP 스냅샷 해시가 일치하지 않습니다: %s\n' "$path" >&2
+      failed=1
+    fi
+    continue
+  fi
 
   if [[ "$path" != ".env.example" ]] && printf '%s\n' "$path" | grep -Eiq -- "$blocked_path_pattern"; then
     printf '차단: 공개 저장소에 민감하거나 불필요한 파일이 포함되었습니다: %s\n' "$path" >&2
