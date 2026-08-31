@@ -51,9 +51,18 @@ assert.equal(
 
 const svg = read("assets/red-quirky.svg");
 assert.match(svg, /viewBox="0 0 240 260"/);
-assert.match(svg, /data-part="left-foot"/);
-assert.match(svg, /data-part="right-foot"/);
-assert.match(svg, /data-part="face"/);
+assert.doesNotMatch(svg, /(?:left|right)-(?:foot|leg)|\b(?:foot|feet|leg|legs)\b/i, "Quirky must not have appendages");
+assert.doesNotMatch(svg, /(?:linear|radial)Gradient|url\(#/i, "Quirky shell must use the flat in-game color");
+assert.doesNotMatch(svg, /(?:tooth|teeth|grin)/i, "Quirky must use the in-game smirk, not a toothy grin");
+assert.match(svg, /data-part="body" d="M120 30 207 80v100l-87 50-87-50V80Z" fill="#EF3F38" stroke="#101827" stroke-width="6"/, "Quirky needs the in-game red hex shell and navy ink outline");
+assert.match(svg, /data-part="left-eye" cx="88" cy="118" r="17" fill="#FCFDFE" stroke="#101827" stroke-width="2\.4"/, "Quirky needs the left white eye");
+assert.match(svg, /data-part="right-eye" cx="152" cy="118" r="17" fill="#FCFDFE" stroke="#101827" stroke-width="2\.4"/, "Quirky needs the right white eye");
+assert.match(svg, /data-part="left-pupil" cx="85" cy="111" r="8" fill="#101827"/, "Quirky needs the raised outward left pupil");
+assert.match(svg, /data-part="right-pupil" cx="155" cy="111" r="8" fill="#101827"/, "Quirky needs the raised outward right pupil");
+assert.match(svg, /data-part="left-brow" d="M108 98 65 81" fill="none" stroke="#101827" stroke-width="11"/, "Quirky needs the angled left brow");
+assert.match(svg, /data-part="right-brow" d="M132 98 175 81" fill="none" stroke="#101827" stroke-width="11"/, "Quirky needs the angled right brow");
+assert.match(svg, /data-part="smirk" d="M90 166Q123 180 150 150" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky needs the asymmetric smirk");
+assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky smirk needs its raised curl");
 
 const expectedCopy = {
   "index.html": ["Are you ready?", "Houseduck.in", "기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.", "출시 예정 미정"],
