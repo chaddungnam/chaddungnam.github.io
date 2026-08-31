@@ -86,6 +86,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   for (const text of copy) assert.ok(html.includes(text), `${file} must include ${text}`);
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} needs three equal video cards`);
   assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} needs exactly two projects`);
+  assert.doesNotMatch(html, /<section class="project-zone/, `${file} project articles must not be wrapped in redundant sections`);
   assert.equal((html.match(/data-motion-toggle/g) || []).length, 1, `${file} needs one automatic-motion control`);
   assert.match(html, /og:image:width" content="1200"/);
   assert.match(html, /og:image:height" content="630"/);
