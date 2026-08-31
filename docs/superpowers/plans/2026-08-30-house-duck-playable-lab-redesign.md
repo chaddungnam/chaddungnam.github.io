@@ -59,7 +59,7 @@
 **Files:**
 - No additional source files unless deployment reveals a defect.
 
-- [ ] After the four-hour work gate, fetch remote YouTube-sync changes and integrate without discarding work.
-- [ ] Commit and push the verified redesign.
-- [ ] Confirm the Pages workflow succeeds.
-- [ ] Capture the live desktop and mobile result in Aside and recheck the fixed routes.
+- [x] After the four-hour work gate, fetch remote YouTube-sync changes and integrate without discarding work.
+- [x] Commit and push the verified redesign.
+- [x] Confirm the Pages, public-site security, and browser-QA workflows succeed.
+- [x] Capture the live desktop and 390 px mobile result and recheck all 16 fixed legal/support routes byte-for-byte.

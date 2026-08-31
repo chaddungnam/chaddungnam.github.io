@@ -53,4 +53,4 @@ Do not rename, move, remove, or redirect the existing `/terms/`, `/privacy/`, `/
 | Light-only, selective Chilgok/Do Hyeon/Gungsuh | 완료 | Shared font and studio styles | Static visual contract |
 | Published legal/support URLs and contents unchanged | 완료 | Existing route links retained | 13 files hash-identical to `origin/main`; 101-link test |
 | 320px through desktop responsiveness | 완료 | Shared responsive styles | 36 locale/viewport overflow checks, plus 15 landscape checks |
-| GitHub Pages deployment and live recheck | 부분 완료 | Pending four-hour gate | Not yet pushed |
+| GitHub Pages deployment and live recheck | 완료 | GitHub Pages at `79cbaca` after the four-hour gate | Pages, security, and browser-QA workflows green; live desktop/mobile checks and 16/16 fixed-route byte hashes pass |
