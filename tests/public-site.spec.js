@@ -129,6 +129,8 @@ test("home opens on the released Quirky Ball specimen and real gameplay", async 
   }))).toEqual({ autoplay: true, muted: true, loop: true, playsInline: true });
   const box = await video.boundingBox();
   expect(box.width).toBeGreaterThan(isMobile ? 200 : 300);
+  await video.scrollIntoViewIfNeeded();
+  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
 });
 
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
