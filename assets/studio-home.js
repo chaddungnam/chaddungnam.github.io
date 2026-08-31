@@ -371,7 +371,10 @@
     }
 
     function draw(rotation) {
-      context.clearRect(0, 0, width, height);
+      context.save();
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.restore();
       const fieldRadius = Math.min(width, height) * .34;
       context.save();
       context.translate(width / 2, height / 2);

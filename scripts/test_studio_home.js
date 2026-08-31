@@ -104,5 +104,6 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
 }
 
 assert.match(read("assets/studio-home.css"), /\.project-k-display\s*\{[^}]*color:\s*transparent;[^}]*-webkit-text-stroke:/s);
+assert.match(read("assets/studio-home.js"), /context\.setTransform\(1, 0, 0, 1, 0, 0\);\s*context\.clearRect\(0, 0, canvas\.width, canvas\.height\);/, "each frame must clear the full backing canvas before restoring its logical scale");
 
 console.log("studio home contract: PASS");
