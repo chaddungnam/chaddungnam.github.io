@@ -20,11 +20,14 @@
     byId("operationsMessage").style.color = error ? "var(--coral)" : "";
   }
 
-  function render(data) {
+  function render(data, referrals = {}) {
     rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
     const config = data.config || {};
     const mutationsEnabled = config.admin_player_mutations_enabled === "true";
-    byId("operationsSummary").innerHTML = `<article data-tone="neutral"><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article data-tone="neutral"><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article data-tone="${mutationsEnabled ? "good" : "watch"}"><span>플레이어 수정</span><strong>${mutationsEnabled ? "활성" : "잠김"}</strong></article>`;
+    const referralsEnabled = referrals.enabled === true || config.feature_referral_program === "true";
+    byId("operationsSummary").innerHTML = `<article data-tone="neutral"><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article data-tone="neutral"><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article data-tone="${mutationsEnabled ? "good" : "watch"}"><span>플레이어 수정</span><strong>${mutationsEnabled ? "활성" : "잠김"}</strong></article><article data-tone="${referralsEnabled ? "good" : "watch"}"><span>친구초대</span><strong>${referralsEnabled ? "활성" : "중지"}</strong></article>`;
+    byId("referralMetrics").innerHTML = `<article data-tone="neutral"><span>생성 코드</span><strong>${escapeHtml(referrals.codes_issued || 0)}</strong></article><article data-tone="good"><span>성공 초대</span><strong>${escapeHtml(referrals.accepted_total || 0)}</strong></article><article data-tone="neutral"><span>오늘 성공</span><strong>${escapeHtml(referrals.accepted_today_utc || 0)}</strong></article><article data-tone="watch"><span>3회 완료</span><strong>${escapeHtml(referrals.tier_3_total || 0)}</strong></article>`;
+    byId("referralConfigForm").elements.enabled.checked = referralsEnabled;
     const notices = (data.notices || []).map((notice) => `<article class="audit-item"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code></article>`);
     const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.summary))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
@@ -35,7 +38,11 @@
   async function load() {
     setMessage("운영 상태를 불러오는 중...");
     try {
-      render(await root.ConsoleAPI.post("admin-console", { action: "operations.get" }));
+      const [operations, referrals] = await Promise.all([
+        root.ConsoleAPI.post("admin-console", { action: "operations.get" }),
+        root.ConsoleAPI.post("admin-console", { action: "referrals.get" }).catch(() => ({})),
+      ]);
+      render(operations, referrals);
       setMessage("공지·우편·버전·QA 변경은 모두 사유와 함께 기록됩니다.");
     } catch (error) {
       setMessage(`운영 상태를 불러오지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
@@ -126,6 +133,16 @@
         action: "min_version.update", minVersion: values.minVersion.trim(),
         minVersionCode: Number(values.minVersionCode), reason: values.reason.trim(),
       }, "최소 버전 변경", `표시 버전 ${values.minVersion} · 공통 호환 코드 ${values.minVersionCode}\n사유: ${values.reason}`);
+    });
+    byId("referralConfigForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const values = Object.fromEntries(new FormData(form));
+      submit(form, {
+        action: "referrals.config.update",
+        enabled: form.elements.enabled.checked,
+        reason: values.reason.trim(),
+      }, "친구초대 설정 변경", `친구초대: ${form.elements.enabled.checked ? "활성" : "중지"}\n사유: ${values.reason.trim()}`);
     });
     byId("qaAccessForm").addEventListener("submit", (event) => {
       event.preventDefault();

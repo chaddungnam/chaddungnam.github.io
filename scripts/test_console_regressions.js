@@ -36,6 +36,10 @@ assert.match(analyticsSource, /activePlayers: Number\(summary\.installs \?\? 0\)
 assert.doesNotMatch(analyticsSource, /summary\.activeInstallsToday/, "selected-range analytics must not silently fall back to today's count");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
 assert.match(consoleHtml, /data-route="analytics-exclusions"/, "the console must expose an analytics exclusion route");
+assert.match(consoleHtml, /id="referralConfigForm"/, "operations must expose the referral kill switch");
+assert.match(consoleHtml, /id="referralMetrics"/, "operations must expose referral health metrics");
+assert.match(read("console/operations.js"), /action: "referrals\.config\.update"/, "the referral switch must use the secured admin action");
+assert.match(read("console/operations.js"), /action: "referrals\.get"/, "referral metrics must use the secured read action");
 assert.match(read("console/analytics-exclusions.js"), /analytics_exclusions\.list/, "the exclusion route must use the secured admin action");
 assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
 assert.match(consoleHtml, /id="diagnosticsIssueSignals"/, "the gameplay diagnostics issue-signal panel must exist");
@@ -471,11 +475,14 @@ const reward = operationForm({
   reason: formField("launch"),
 });
 const minVersion = operationForm({ minVersion: formField("1.2.3"), minVersionCode: formField("42"), reason: formField("release") });
+const referralConfig = operationForm({ enabled: formField(""), reason: formField("launch") });
+referralConfig.form.elements.enabled.checked = true;
 const qaAccess = operationForm({ userId: formField("user-1"), shopControlsEnabled: formField(""), reason: formField("qa") });
 const announcement = operationForm({ body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
 const operationElements = {
   rewardMailForm: reward.form,
   minVersionForm: minVersion.form,
+  referralConfigForm: referralConfig.form,
   qaAccessForm: qaAccess.form,
   announcementForm: announcement.form,
   rewardTemplatePreview: appElement(),
@@ -483,6 +490,7 @@ const operationElements = {
   operationsMessage: appElement(),
   operationsSummary: appElement(),
   operationsHistory: appElement(),
+  referralMetrics: appElement(),
 };
 let mutationGate = deferred();
 const mutationPayloads = [];
@@ -493,6 +501,7 @@ const operationWindow = {
   ConsoleAPI: {
     post(_name, payload) {
       if (payload.action === "operations.get") return Promise.resolve({ config: { min_version: "1.2.3", min_version_code: 42 }, catalog: [], notices: [], reward_mail_broadcasts: [] });
+      if (payload.action === "referrals.get") return Promise.resolve({ enabled: true, codes_issued: 2, accepted_total: 1, accepted_today_utc: 1, tier_3_total: 0 });
       mutationPayloads.push(payload);
       return mutationGate.promise;
     },
