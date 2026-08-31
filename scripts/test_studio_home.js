@@ -45,8 +45,8 @@ for (const refreshRate of [60, 90, 120]) {
 }
 assert.equal(
   crypto.createHash("sha256").update(fs.readFileSync(path.join(root, "assets/media/quirky-ball-gameplay.mp4"))).digest("hex"),
-  "719e199362e3ba0b9eefbc163071927e3969a6193d71fd2800aea0679d77da15",
-  "home gameplay must remain the approved Quirky Ball 1.1.0 capture",
+  "c2cc501efa44a28db7adc5ba214f963086206c314ce2b26b04d01df294c8d49d",
+  "home gameplay must remain the approved engine recording capture",
 );
 
 const svg = read("assets/red-quirky.svg");
