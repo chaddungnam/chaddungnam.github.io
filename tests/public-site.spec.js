@@ -306,9 +306,9 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
 async function stubPlayable(page, { ready = true } = {}) {
   const requests = [];
   page.on("request", (request) => {
-    if (new URL(request.url()).pathname.startsWith("/play/quirky-ball/")) requests.push(request.url());
+    if (new URL(request.url()).pathname.startsWith("/play/quirky-ball")) requests.push(request.url());
   });
-  await page.route("**/play/quirky-ball/index.html", (route) => route.fulfill({
+  await page.route("**/play/quirky-ball-site/index.html", (route) => route.fulfill({
     contentType: "text/html",
     body: ready ? `<script>
       setTimeout(() => window.__quirkyBallPlayablesFirstFrameReady = true, 20);
@@ -354,7 +354,9 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.readout.top).toBeGreaterThanOrEqual(layout.phone.bottom - 1);
     expect(layout.signatureTop).toBeGreaterThanOrEqual(layout.readout.bottom - 1);
     expect(layout.overflow).toBeLessThanOrEqual(0);
+    expect(layout.bodyFonts).not.toHaveLength(0);
     expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
+    expect(layout.controlHeights).not.toHaveLength(0);
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
     expect(layout.afterProjectK).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
@@ -368,6 +370,9 @@ test("localized homes place a stable playable phone before supporting copy at 39
     await page.locator("[data-playable-launch]").click();
     await page.mouse.move(0, 0);
     await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "loading");
+    const exitBox = await page.locator("[data-playable-exit]").boundingBox();
+    expect(exitBox, `${route} EXIT is visible after PLAY`).not.toBeNull();
+    expect(exitBox.height, `${route} EXIT is at least 44px tall`).toBeGreaterThanOrEqual(44);
     const loading = await geometry();
     await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready");
     const ready = await geometry();

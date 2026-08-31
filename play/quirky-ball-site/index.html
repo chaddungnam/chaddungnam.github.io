@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Quirky Ball</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #1d2738; touch-action: none; }
+    body { display: flex; align-items: center; justify-content: center; }
+    #app-shell { position: relative; width: min(100vw, calc(100vh * 9 / 16)); height: min(100vh, calc(100vw * 16 / 9)); max-width: 100%; max-height: 100%; aspect-ratio: 9 / 16; overflow: hidden; background: #e5ebf2; }
+    #canvas, #status { position: absolute; inset: 0; }
+    #canvas { display: block; width: 100% !important; height: 100% !important; border: 0; outline: none; }
+    #status { display: flex; visibility: hidden; flex-direction: column; align-items: center; justify-content: center; background: #e5ebf2; }
+    #status-splash { max-width: 100%; max-height: 100%; object-fit: contain; }
+    #status-splash.show-image--false, #status-progress, #status-notice { display: none; }
+    #status-progress { width: 54%; margin-top: 24px; }
+    #status-notice { max-width: 80%; padding: 16px; border-radius: 12px; color: #f7efdf; background: #5b3943; line-height: 1.4; text-align: center; }
+  </style>
+  <script src="../quirky-ball/YTGameSDK.js"></script>
+  <link rel="icon" type="image/png" href="../quirky-ball/index.icon.png">
+  <link rel="apple-touch-icon" href="../quirky-ball/index.apple-touch-icon.png">
+</head>
+<body>
+  <div id="app-shell">
+    <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+    <div id="status">
+      <img id="status-splash" class="show-image--false fullsize--true use-filter--true" src="../quirky-ball/index.png" alt="">
+      <progress id="status-progress"></progress>
+      <div id="status-notice"></div>
+    </div>
+  </div>
+  <script>
+    (function installCompressedBundleFetch() {
+      "use strict";
+      const nativeFetch = window.fetch.bind(window);
+
+      async function unzipSingleEntry(bytes) {
+        const view = new DataView(bytes);
+        let eocd = bytes.byteLength - 22;
+        const lowerBound = Math.max(0, bytes.byteLength - 65557);
+        while (eocd >= lowerBound && view.getUint32(eocd, true) !== 0x06054b50) eocd -= 1;
+        if (eocd < lowerBound) throw new Error("Invalid Playables ZIP: EOCD missing");
+        const centralOffset = view.getUint32(eocd + 16, true);
+        if (view.getUint32(centralOffset, true) !== 0x02014b50) throw new Error("Invalid Playables ZIP: central directory missing");
+        const method = view.getUint16(centralOffset + 10, true);
+        const compressedSize = view.getUint32(centralOffset + 20, true);
+        const expectedSize = view.getUint32(centralOffset + 24, true);
+        const localOffset = view.getUint32(centralOffset + 42, true);
+        if (view.getUint32(localOffset, true) !== 0x04034b50) throw new Error("Invalid Playables ZIP: local entry missing");
+        const nameLength = view.getUint16(localOffset + 26, true);
+        const extraLength = view.getUint16(localOffset + 28, true);
+        const dataOffset = localOffset + 30 + nameLength + extraLength;
+        const compressed = bytes.slice(dataOffset, dataOffset + compressedSize);
+        let output;
+        if (method === 0) output = compressed;
+        else if (method === 8 && typeof DecompressionStream === "function") {
+          const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+          output = await new Response(stream).arrayBuffer();
+        } else throw new Error("Unsupported Playables ZIP compression method: " + method);
+        if (output.byteLength !== expectedSize) throw new Error("Playables ZIP size mismatch");
+        return output;
+      }
+
+      window.fetch = async function (input, init) {
+        const originalUrl = input instanceof Request ? input.url : String(input);
+        const url = new URL(originalUrl, window.location.href);
+        if (url.origin === window.location.origin && (url.pathname.endsWith(".wasm") || url.pathname.endsWith(".pck"))) {
+          const archiveUrl = new URL(url.href);
+          archiveUrl.pathname += ".zip";
+          const archiveResponse = await nativeFetch(archiveUrl.href, init);
+          if (!archiveResponse.ok) throw new Error("Unable to fetch " + archiveUrl.pathname);
+          const output = await unzipSingleEntry(await archiveResponse.arrayBuffer());
+          const contentType = url.pathname.endsWith(".wasm") ? "application/wasm" : "application/octet-stream";
+          return new Response(output, { status: 200, headers: { "Content-Type": contentType } });
+        }
+        return nativeFetch(input, init);
+      };
+    }());
+  </script>
+  <script src="../quirky-ball/index.js"></script>
+  <script>
+    const GODOT_CONFIG = {"args":[],"canvasResizePolicy":1,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"../quirky-ball/index","experimentalVK":true,"fileSizes":{"index.pck":15938508,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+    const engine = new Engine(GODOT_CONFIG);
+    (function startGame() {
+      const status = document.getElementById("status");
+      const progress = document.getElementById("status-progress");
+      const notice = document.getElementById("status-notice");
+      function fail(error) {
+        console.error(error);
+        progress.style.display = "none";
+        notice.textContent = error instanceof Error ? error.message : String(error);
+        notice.style.display = "block";
+        status.style.visibility = "visible";
+      }
+      const missing = Engine.getMissingFeatures({ threads: false });
+      if (missing.length) { fail("Missing browser features: " + missing.join(", ")); return; }
+      status.style.visibility = "visible";
+      progress.style.display = "block";
+      engine.startGame({
+        canvasResizePolicy: 1,
+        onProgress(current, total) {
+          if (current > 0 && total > 0) { progress.value = current; progress.max = total; }
+          else progress.removeAttribute("value");
+        }
+      }).then(() => status.remove(), fail);
+    }());
+  </script>
+</body>
+</html>

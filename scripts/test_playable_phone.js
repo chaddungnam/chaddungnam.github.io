@@ -5,6 +5,7 @@ const { existsSync, readdirSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
 const snapshotDir = join(__dirname, "..", "play", "quirky-ball");
+const siteWrapper = join(__dirname, "..", "play", "quirky-ball-site", "index.html");
 const expectedHashes = {
   "YTGameSDK.js": "1c107b3876282f37a5331b8e46b744fcb1d6017ea8944c56e4826209201d4a11",
   "index.apple-touch-icon.png": "7c8f89e26faff90c5e7b6b4da73d5d5244b860f802a7ae85945c7904f1acf138",
@@ -32,10 +33,18 @@ for (const [filename, expectedHash] of Object.entries(expectedHashes)) {
   assert.equal(actualHash, expectedHash, `${filename} must match the verified source snapshot`);
 }
 
+assert.ok(existsSync(siteWrapper), "site-only playable wrapper must exist");
+const wrapperHtml = readFileSync(siteWrapper, "utf8");
+assert.doesNotMatch(wrapperHtml, /youtube\.com\/game_api/, "site wrapper must not load the YouTube host SDK");
+for (const asset of ["YTGameSDK.js", "index.js", "index.png"]) {
+  assert.ok(wrapperHtml.includes(`../quirky-ball/${asset}`), `site wrapper must reuse ${asset} from the immutable snapshot`);
+}
+assert.match(wrapperHtml, /"executable":"\.\.\/quirky-ball\/index"/, "site wrapper must load the immutable PCK and WASM base path");
+
 for (const [filename, labels] of Object.entries(homeContracts)) {
   const html = readFileSync(join(__dirname, "..", filename), "utf8");
   assert.equal((html.match(/data-playable-phone(?:[\s=>])/g) || []).length, 1, `${filename} must have one playable phone`);
-  assert.match(html, /data-playable-src="play\/quirky-ball\/index\.html"/, `${filename} must reference the playable snapshot`);
+  assert.match(html, /data-playable-src="play\/quirky-ball-site\/index\.html"/, `${filename} must reference the site wrapper`);
   assert.doesNotMatch(html, /<iframe\b/i, `${filename} must not load the playable before PLAY`);
   for (const label of labels) assert.ok(html.includes(label), `${filename} must include ${label}`);
 }
