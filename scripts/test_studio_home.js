@@ -97,6 +97,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
   assert.ok(html.includes(expectedHeroLabels[file]), `${file} must include its localized hero label`);
   assert.doesNotMatch(html, /<button class="motion-toggle"[^>]+aria-label=/, `${file} motion control must use its visible label`);
+  assert.doesNotMatch(html, /<p class="hero-loop"[^>]+aria-label=/, `${file} action keywords must use their visible text`);
   const [title, description, imageAlt] = expectedOpenGraph[file];
   assert.ok(html.includes(`property="og:title" content="${title}"`), `${file} needs a localized Open Graph title`);
   assert.ok(html.includes(`property="og:description" content="${description}"`), `${file} needs a localized Open Graph description`);
