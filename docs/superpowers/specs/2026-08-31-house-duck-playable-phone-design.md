@@ -40,7 +40,7 @@ The active player provides a small localized exit control. Exiting removes the i
 
 ## Verification gates
 
-- Test-first regression: no playable network request before activation; click inserts one iframe at `play/quirky-ball/`; exit removes it.
+- Test-first regression: no playable network request before activation; click inserts one iframe at `play/quirky-ball-site/index.html`; exit removes it.
 - Local browser proof that the iframe reaches both first-frame and game-ready flags and accepts a real pointer/touch sequence.
 - Corrected mascot dimensions and visual screenshot comparison against the running Godot build.
 - Korean, English, German, and Japanese desktop plus 390 px mobile checks for clipping and horizontal overflow.
@@ -62,5 +62,5 @@ The playable integration also resolves the seven rendered-home findings recorded
 - Raise meaningful hero and project body copy to at least 16 px. Labels and specimen metadata may remain smaller.
 - Replace constant decorative-only motion with a short staged hero entrance plus explicit `PLAY`, `LOADING`, `READY`, `ERROR`, and `EXIT` feedback. Animate only transform and opacity and keep reduced-motion behavior.
 - End the Project K zone after one deliberate breathing interval instead of leaving a second empty viewport before the footer.
-- Keep the existing equal YouTube cards, project ordering, localized text, and two-project limit.
+- Keep the existing three equal YouTube cards, project ordering, localized text, and two-project limit.
 - Treat the Quirky Ball and Project K detail pages as visual references; do not redesign them in this pass.

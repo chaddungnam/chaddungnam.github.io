@@ -6,6 +6,7 @@ const { join } = require("node:path");
 
 const snapshotDir = join(__dirname, "..", "play", "quirky-ball");
 const siteWrapper = join(__dirname, "..", "play", "quirky-ball-site", "index.html");
+const thirdPartyLicenses = join(__dirname, "..", "play", "THIRD_PARTY_LICENSES.txt");
 const expectedHashes = {
   "YTGameSDK.js": "1c107b3876282f37a5331b8e46b744fcb1d6017ea8944c56e4826209201d4a11",
   "index.apple-touch-icon.png": "7c8f89e26faff90c5e7b6b4da73d5d5244b860f802a7ae85945c7904f1acf138",
@@ -33,8 +34,20 @@ for (const [filename, expectedHash] of Object.entries(expectedHashes)) {
   assert.equal(actualHash, expectedHash, `${filename} must match the verified source snapshot`);
 }
 
+assert.ok(existsSync(thirdPartyLicenses), "playable third-party license notice must exist");
+const licenseText = readFileSync(thirdPartyLicenses, "utf8");
+assert.match(licenseText, /Google web-game-samples/, "notice must attribute Google web-game-samples");
+assert.match(licenseText, /github\.com\/google\/web-game-samples/, "notice must identify the upstream project");
+assert.match(licenseText, /Modifications by House Duck:/, "notice must identify House Duck modifications");
+assert.match(licenseText, /Apache License\s+Version 2\.0, January 2004/, "notice must include the Apache 2.0 heading");
+assert.match(licenseText, /4\. Redistribution\./, "notice must include Apache 2.0 redistribution terms");
+assert.match(licenseText, /END OF TERMS AND CONDITIONS/, "notice must include the end of the Apache 2.0 terms");
+assert.match(licenseText, /Godot Engine contributors/, "notice must attribute the Godot Engine");
+assert.match(licenseText, /Permission is hereby granted, free of charge/, "notice must include the Godot MIT grant");
+
 assert.ok(existsSync(siteWrapper), "site-only playable wrapper must exist");
 const wrapperHtml = readFileSync(siteWrapper, "utf8");
+assert.match(wrapperHtml, /<link rel="license" href="\.\.\/THIRD_PARTY_LICENSES\.txt">/, "site wrapper must expose the third-party license notice");
 assert.doesNotMatch(wrapperHtml, /youtube\.com\/game_api/, "site wrapper must not load the YouTube host SDK");
 for (const asset of ["YTGameSDK.js", "index.js", "index.png"]) {
   assert.ok(wrapperHtml.includes(`../quirky-ball/${asset}`), `site wrapper must reuse ${asset} from the immutable snapshot`);

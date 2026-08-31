@@ -13,7 +13,7 @@
 - Treat `/Users/junheechoi/projects/houseduck/quirky-ball/캡쳐비디오유튜브/YouTube_Playable_Final/` as read-only source material.
 - Preserve `/terms`, `/privacy`, `/impressum`, `/support`, and both project-detail routes byte-for-byte.
 - Do not request the PCK, WASM, or iframe before an explicit PLAY action.
-- Keep all four home languages feature-equivalent and retain two equal YouTube cards plus two project sections.
+- Keep all four home languages feature-equivalent and retain three equal YouTube cards plus two project sections.
 - Keep reduced-motion, keyboard focus, minimum 44px controls, and an error/retry path.
 - Add no dependency, build framework, analytics event, or game-code change.
 
@@ -113,11 +113,12 @@
 | Immutable ten-file Godot snapshot | 완료 | `play/quirky-ball/`, `scripts/test_playable_phone.js` | Fresh brand/static PASS; all ten SHA-256 values match |
 | Website iframe avoids false YouTube Playables environment | 완료 | `play/quirky-ball-site/index.html`, four localized homes | Aside local/live: `inEnv=false`, both readiness flags true |
 | PLAY is lazy and EXIT/RETRY/reduced-motion work | 완료 | `assets/studio-home.js`, `tests/public-site.spec.js` | Pre-click iframe/resources 0; full E2E 91 passed, 3 skipped |
-| 390×844 layout, copy size, controls, stable phone | 부분 완료 | `assets/studio-home.css`, hardened browser assertions | Headless Playwright primary: 390×844, `scrollY=0`, header included, phone top 233.78px, overflow 0; EXIT ≥44px. Aside mobile and physical iPhone remain unverified. |
+| 390×844 layout, copy size, controls, stable phone | 완료 | `assets/studio-home.css`, hardened browser assertions | Headless Playwright primary: 390×844, `scrollY=0`, header included, phone top 233.78px, overflow 0; EXIT ≥44px. This is browser-layout proof, not physical-device proof. |
 | Correct Quirky mascot and calmer visual hierarchy | 완료 | `assets/red-quirky.svg`, home CSS | English 1440×900 idle before/after comparison in Aside and static contract PASS |
+| Third-party playable licenses published | 완료 | `play/THIRD_PARTY_LICENSES.txt`, site-wrapper `rel=license` | Static license contract covers Google attribution, House Duck modification notice, full Apache 2.0 boundaries, and Godot MIT notice |
 | Protected legal/support routes unchanged | 완료 | 적용 제외 (content-frozen) | Four local/live pre/post SHA-256 matches |
 | Protected project-detail routes unchanged | 완료 | 적용 제외 (content-frozen) | `git diff --exit-code b9445c3 -- quirky-ball project-k` PASS |
-| GitHub deployment and live canary | 완료 | implementation `e61994f`; final `main` = this review-correction commit (SHA recorded in the Task 5 report after push) | Three implementation workflows and prior evidence workflows success; 10m12s canary, 11 checks, no alerts |
+| GitHub deployment and live canary | 완료 | implementation `e61994f`; final `main` is current `main`, exact SHA in Task 5 report | Three implementation workflows and prior evidence workflows success; 10m12s canary, 11 checks, no alerts |
 | Separate duplicate/stale/access-exception browser branches | 부분 완료 | Shared state machine guards exist | Happy path/timeout/full suite pass; no dedicated forced-branch tests (accepted minor) |
 | Real iPhone Safari touch feel | 차단 | 적용 없음 | Physical iPhone unavailable; browser mobile emulation is not device proof |
 | Ledger game-repo baseline equality | 차단 | 적용 없음 | Baseline already mismatched before Task 5 and changed concurrently; game repo untouched by this task |
