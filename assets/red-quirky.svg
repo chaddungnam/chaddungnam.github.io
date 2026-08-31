@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="240" height="260" viewBox="0 0 240 260" role="img" aria-labelledby="title desc">
   <title id="title">Red Quirky</title>
   <desc id="desc">The red hexagonal Quirky Ball character with a raised asymmetric smirk.</desc>
-  <path data-part="body" d="M120 30 207 80v100l-87 50-87-50V80Z" fill="#EF3F38" stroke="#101827" stroke-width="6" stroke-linejoin="round"/>
+  <path data-part="body" d="M120 30 207 80v100l-87 50-87-50V80Z" fill="#EF3F38" stroke="#101827" stroke-width="5.5" stroke-opacity=".92" stroke-linejoin="round"/>
+  <path data-part="shell-highlight" d="M33 80 120 30 207 80" fill="none" stroke="#FFEAE6" stroke-opacity=".72" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
   <g data-part="gloss" fill="#fff">
     <circle cx="86" cy="94" r="34" opacity=".18"/>
     <circle cx="102" cy="110" r="18" opacity=".1"/>

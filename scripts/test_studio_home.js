@@ -50,11 +50,13 @@ assert.equal(
 );
 
 const svg = read("assets/red-quirky.svg");
+assert.match(svg, /<svg[^>]*width="240"[^>]*height="260"/, "Quirky must keep its 240×260 natural size");
 assert.match(svg, /viewBox="0 0 240 260"/);
 assert.doesNotMatch(svg, /(?:left|right)-(?:foot|leg)|\b(?:foot|feet|leg|legs)\b/i, "Quirky must not have appendages");
 assert.doesNotMatch(svg, /(?:linear|radial)Gradient|url\(#/i, "Quirky shell must use the flat in-game color");
 assert.doesNotMatch(svg, /(?:tooth|teeth|grin)/i, "Quirky must use the in-game smirk, not a toothy grin");
-assert.match(svg, /data-part="body" d="M120 30 207 80v100l-87 50-87-50V80Z" fill="#EF3F38" stroke="#101827" stroke-width="6"/, "Quirky needs the in-game red hex shell and navy ink outline");
+assert.match(svg, /data-part="body" d="M120 30 207 80v100l-87 50-87-50V80Z" fill="#EF3F38" stroke="#101827" stroke-width="5\.5" stroke-opacity="\.92"/, "Quirky needs the in-game red hex shell and 92%-alpha navy ink outline");
+assert.match(svg, /data-part="shell-highlight" d="M33 80 120 30 207 80" fill="none" stroke="#FFEAE6" stroke-opacity="\.72" stroke-width="3\.5"/, "Quirky needs the source-equivalent upper-edge pink highlight");
 assert.match(svg, /data-part="left-eye" cx="88" cy="118" r="17" fill="#FCFDFE" stroke="#101827" stroke-width="2\.4"/, "Quirky needs the left white eye");
 assert.match(svg, /data-part="right-eye" cx="152" cy="118" r="17" fill="#FCFDFE" stroke="#101827" stroke-width="2\.4"/, "Quirky needs the right white eye");
 assert.match(svg, /data-part="left-pupil" cx="85" cy="111" r="8" fill="#101827"/, "Quirky needs the raised outward left pupil");
