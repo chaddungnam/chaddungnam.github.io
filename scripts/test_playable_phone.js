@@ -18,11 +18,26 @@ const expectedHashes = {
   "index.wasm.zip": "d8e9008dfb8235eb0ba5f40e438428faffd4ba5ee950d2a4a0e3e8ad3e42a609",
 };
 
+const homeContracts = {
+  "index.html": ["지금 플레이", "게임 불러오는 중…", "플레이 준비 완료", "게임을 불러오지 못했습니다", "종료", "다시 시도"],
+  "index_en.html": ["Play now", "Loading game…", "Ready to play", "Could not load game", "Exit", "Retry"],
+  "index_de.html": ["Jetzt spielen", "Spiel wird geladen…", "Spiel bereit", "Spiel konnte nicht geladen werden", "Beenden", "Erneut versuchen"],
+  "index_ja.html": ["今すぐプレイ", "ゲームを読み込み中…", "プレイ準備完了", "ゲームを読み込めませんでした", "終了", "再試行"],
+};
+
 assert.ok(existsSync(snapshotDir), "play/quirky-ball snapshot directory must exist");
 assert.deepEqual(readdirSync(snapshotDir).sort(), Object.keys(expectedHashes).sort());
 for (const [filename, expectedHash] of Object.entries(expectedHashes)) {
   const actualHash = createHash("sha256").update(readFileSync(join(snapshotDir, filename))).digest("hex");
   assert.equal(actualHash, expectedHash, `${filename} must match the verified source snapshot`);
+}
+
+for (const [filename, labels] of Object.entries(homeContracts)) {
+  const html = readFileSync(join(__dirname, "..", filename), "utf8");
+  assert.equal((html.match(/data-playable-phone(?:[\s=>])/g) || []).length, 1, `${filename} must have one playable phone`);
+  assert.match(html, /data-playable-src="play\/quirky-ball\/index\.html"/, `${filename} must reference the playable snapshot`);
+  assert.doesNotMatch(html, /<iframe\b/i, `${filename} must not load the playable before PLAY`);
+  for (const label of labels) assert.ok(html.includes(label), `${filename} must include ${label}`);
 }
 
 console.log("quirky ball playable snapshot: PASS");

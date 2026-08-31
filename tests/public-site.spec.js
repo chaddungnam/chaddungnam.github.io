@@ -280,6 +280,82 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
   await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
 
+async function stubPlayable(page, { ready = true } = {}) {
+  const requests = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.startsWith("/play/quirky-ball/")) requests.push(request.url());
+  });
+  await page.route("**/play/quirky-ball/index.html", (route) => route.fulfill({
+    contentType: "text/html",
+    body: ready ? `<script>
+      setTimeout(() => window.__quirkyBallPlayablesFirstFrameReady = true, 20);
+      setTimeout(() => window.__quirkyBallPlayablesGameReady = true, 40);
+    </script>` : "<!doctype html><title>waiting</title>",
+  }));
+  return requests;
+}
+
+test("playable phone stays lazy, reaches ready, and EXIT restores the ambient hero", async ({ page }) => {
+  const requests = await stubPlayable(page);
+  await page.goto("/?lang=ko");
+  const player = page.locator("[data-playable-phone]");
+  const launch = page.locator("[data-playable-launch]");
+  const video = page.locator("[data-hero-gameplay]");
+  const canvas = page.locator("[data-quirky-canvas]");
+  const cursor = page.locator("[data-game-cursor]");
+
+  expect(requests).toEqual([]);
+  await expect(player.locator("iframe")).toHaveCount(0);
+  await launch.click();
+  await expect(player).toHaveAttribute("data-playable-state", "loading");
+  await expect(player.locator("iframe")).toHaveCount(1);
+  await expect(player).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("[data-playable-status]")).toHaveText("게임 불러오는 중…");
+  await expect(video).toBeHidden();
+  await expect(player).toHaveAttribute("data-playable-state", "ready");
+  await expect(player).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("[data-playable-status]")).toHaveText("플레이 준비 완료");
+  expect(requests).toHaveLength(1);
+  await page.waitForTimeout(100);
+  const pausedFrame = await canvas.getAttribute("data-frame");
+  await page.waitForTimeout(160);
+  await expect(canvas).toHaveAttribute("data-frame", pausedFrame);
+  if (await cursor.count()) await expect(cursor).toHaveAttribute("hidden", "");
+
+  await page.locator("[data-playable-exit]").click();
+  await expect(player.locator("iframe")).toHaveCount(0);
+  await expect(player).toHaveAttribute("data-playable-state", "idle");
+  await expect(video).toBeVisible();
+  await expect(launch).toBeFocused();
+  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(pausedFrame);
+  if (await cursor.count()) await expect(cursor).not.toHaveAttribute("hidden", "");
+});
+
+test("playable phone timeout cleans up and exposes RETRY", async ({ page }) => {
+  await stubPlayable(page, { ready: false });
+  await page.goto("/?lang=ko");
+  const player = page.locator("[data-playable-phone]");
+  await player.evaluate((node) => { node.dataset.playableTimeout = "80"; });
+  const launch = page.locator("[data-playable-launch]");
+
+  await launch.click();
+  await expect(player).toHaveAttribute("data-playable-state", "error");
+  await expect(player.locator("iframe")).toHaveCount(0);
+  await expect(page.locator("[data-playable-status]")).toHaveText("게임을 불러오지 못했습니다");
+  await expect(launch).toHaveText("다시 시도");
+  await expect(launch).toBeFocused();
+});
+
+test("reduced motion still permits explicit playable launch", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await stubPlayable(page);
+  await page.goto("/?lang=ko");
+  await page.locator("[data-playable-launch]").click();
+  await expect(page.locator("[data-playable-phone] iframe")).toHaveCount(1);
+  await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready");
+});
+
 test("home lets visitors pause and resume automatic FX", async ({ page }) => {
   await page.goto("/?lang=ko");
   const toggle = page.locator("[data-motion-toggle]");

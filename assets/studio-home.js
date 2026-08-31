@@ -116,9 +116,88 @@
     update();
   }
 
+  function setupPlayablePhone() {
+    const player = document.querySelector("[data-playable-phone]");
+    if (!player) return;
+    const host = player.querySelector("[data-playable-runtime-host]");
+    const video = player.querySelector("[data-hero-gameplay]");
+    const launch = player.querySelector("[data-playable-launch]");
+    const status = player.querySelector("[data-playable-status]");
+    const exit = player.querySelector("[data-playable-exit]");
+    if (!host || !video || !launch || !status || !exit) return;
+    let frame;
+    let timer;
+    let generation = 0;
+
+    function setState(state) {
+      player.dataset.playableState = state;
+      player.setAttribute("aria-busy", String(state === "loading"));
+      launch.hidden = state === "loading" || state === "ready";
+      launch.textContent = state === "error" ? launch.dataset.playableRetry : launch.dataset.playablePlay;
+      exit.hidden = state === "idle" || state === "error";
+      status.hidden = state === "idle";
+      status.textContent = state === "loading" ? player.dataset.playableLoading
+        : state === "ready" ? player.dataset.playableReady
+          : state === "error" ? player.dataset.playableError : "";
+    }
+
+    function cleanup(state) {
+      generation += 1;
+      clearTimeout(timer);
+      frame?.remove();
+      frame = undefined;
+      video.hidden = false;
+      video.style.removeProperty("display");
+      dispatchEvent(new CustomEvent("houseduck:playable", { detail: { active: false } }));
+      setState(state);
+      launch.focus();
+    }
+
+    function start() {
+      if (player.dataset.playableState === "loading" || player.dataset.playableState === "ready") return;
+      const token = ++generation;
+      const configuredTimeout = Number(player.dataset.playableTimeout);
+      const timeout = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 25000;
+      const deadline = performance.now() + timeout;
+      setState("loading");
+      video.pause();
+      video.hidden = true;
+      video.style.display = "none";
+      dispatchEvent(new CustomEvent("houseduck:playable", { detail: { active: true } }));
+      frame = document.createElement("iframe");
+      frame.title = player.dataset.playableTitle;
+      frame.allow = "autoplay; fullscreen";
+      frame.src = player.dataset.playableSrc;
+      frame.addEventListener("error", () => { if (token === generation) cleanup("error"); }, { once: true });
+      host.append(frame);
+
+      function poll() {
+        if (token !== generation) return;
+        try {
+          const game = frame.contentWindow;
+          if (game.__quirkyBallPlayablesFirstFrameReady && game.__quirkyBallPlayablesGameReady) {
+            setState("ready");
+            return;
+          }
+        } catch (_) {
+          cleanup("error");
+          return;
+        }
+        if (performance.now() >= deadline) cleanup("error");
+        else timer = setTimeout(poll, 40);
+      }
+      timer = setTimeout(poll, 40);
+    }
+
+    launch.addEventListener("click", start);
+    exit.addEventListener("click", () => cleanup("idle"));
+    setState("idle");
+  }
+
   function setupVideos(reducedMotion) {
     const videos = [...document.querySelectorAll("[data-game-preview], [data-hero-gameplay]")];
     let manualPaused = false;
+    let playableActive = false;
     if (reducedMotion) {
       for (const video of videos) { video.autoplay = false; video.pause(); }
       return;
@@ -127,20 +206,27 @@
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         const video = entry.target;
-        if (entry.isIntersecting && !manualPaused) video.play().catch(() => {});
+        if (entry.isIntersecting && !manualPaused && !playableActive) video.play().catch(() => {});
         else video.pause();
       }
     }, { threshold: .15 });
     for (const video of videos) observer.observe(video);
-    addEventListener("houseduck:motion", (event) => {
-      manualPaused = event.detail.paused;
+    const updatePlayback = () => {
       for (const video of videos) {
-        if (manualPaused) video.pause();
+        if (manualPaused || playableActive) video.pause();
         else {
           const rect = video.getBoundingClientRect();
           if (rect.bottom > 0 && rect.top < innerHeight) video.play().catch(() => {});
         }
       }
+    };
+    addEventListener("houseduck:motion", (event) => {
+      manualPaused = event.detail.paused;
+      updatePlayback();
+    });
+    addEventListener("houseduck:playable", (event) => {
+      playableActive = event.detail.active;
+      updatePlayback();
     });
   }
 
@@ -169,8 +255,10 @@
     let x = -100;
     let y = -100;
     let angle = 0;
+    let playableActive = false;
 
     addEventListener("pointermove", (event) => {
+      if (playableActive) return;
       const distance = Math.hypot(event.clientX - x, event.clientY - y);
       if (distance > 2) angle = Math.atan2(event.clientY - y, event.clientX - x) * 180 / Math.PI;
       x = event.clientX;
@@ -180,6 +268,7 @@
       cursor.classList.toggle("is-target", Boolean(event.target.closest("a, button, summary")));
     }, { passive: true });
     addEventListener("pointerdown", (event) => {
+      if (playableActive) return;
       const impact = document.createElement("span");
       impact.className = "cursor-impact";
       impact.dataset.cursorImpact = "";
@@ -189,6 +278,10 @@
       impact.addEventListener("animationend", () => impact.remove(), { once: true });
     });
     document.documentElement.addEventListener("mouseleave", () => { cursor.style.opacity = "0"; });
+    addEventListener("houseduck:playable", (event) => {
+      playableActive = event.detail.active;
+      cursor.hidden = playableActive;
+    });
   }
 
   function setupCanvas(reducedMotion) {
@@ -203,6 +296,7 @@
     let height = 0;
     let active = true;
     let manualPaused = false;
+    let playableActive = false;
     let start = performance.now();
     let previous = start;
     const pairIntervalMs = QUIRKY_RULES.pairInterval * 1000;
@@ -427,7 +521,7 @@
     }
 
     function tick(now) {
-      if (!active || manualPaused) { previous = now; nextPairAt = now + pairIntervalMs; requestAnimationFrame(tick); return; }
+      if (!active || manualPaused || playableActive) { previous = now; nextPairAt = now + pairIntervalMs; requestAnimationFrame(tick); return; }
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
       const nextFrameAt = nextFrameTime(now, previous, frameIntervalMs);
       if (nextFrameAt === null) { requestAnimationFrame(tick); return; }
@@ -455,6 +549,7 @@
     if (reducedMotion) return;
     if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; }, { threshold: .05 }).observe(stage);
     addEventListener("houseduck:motion", (event) => { manualPaused = event.detail.paused; });
+    addEventListener("houseduck:playable", (event) => { playableActive = event.detail.active; });
     requestAnimationFrame(tick);
   }
 
@@ -466,6 +561,7 @@
     setupGameCursor(reducedMotion);
     setupCanvas(reducedMotion);
     setupMotionToggle(reducedMotion);
+    setupPlayablePhone();
   }
 
   return { QUIRKY_RULES, duePairCount, nextFrameTime, shotAngles, shrinkRadius, init };
