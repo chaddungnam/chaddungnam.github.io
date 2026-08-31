@@ -300,6 +300,7 @@ test("playable phone stays lazy, reaches ready, and EXIT restores the ambient he
   await page.goto("/?lang=ko");
   const player = page.locator("[data-playable-phone]");
   const launch = page.locator("[data-playable-launch]");
+  const exit = page.locator("[data-playable-exit]");
   const video = page.locator("[data-hero-gameplay]");
   const canvas = page.locator("[data-quirky-canvas]");
   const cursor = page.locator("[data-game-cursor]");
@@ -308,6 +309,7 @@ test("playable phone stays lazy, reaches ready, and EXIT restores the ambient he
   await expect(player.locator("iframe")).toHaveCount(0);
   await launch.click();
   await expect(player).toHaveAttribute("data-playable-state", "loading");
+  await expect(exit).toBeFocused();
   await expect(player.locator("iframe")).toHaveCount(1);
   await expect(player).toHaveAttribute("aria-busy", "true");
   await expect(page.locator("[data-playable-status]")).toHaveText("게임 불러오는 중…");
@@ -322,7 +324,7 @@ test("playable phone stays lazy, reaches ready, and EXIT restores the ambient he
   await expect(canvas).toHaveAttribute("data-frame", pausedFrame);
   if (await cursor.count()) await expect(cursor).toHaveAttribute("hidden", "");
 
-  await page.locator("[data-playable-exit]").click();
+  await exit.click();
   await expect(player.locator("iframe")).toHaveCount(0);
   await expect(player).toHaveAttribute("data-playable-state", "idle");
   await expect(video).toBeVisible();

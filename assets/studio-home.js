@@ -160,6 +160,7 @@
       const timeout = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 25000;
       const deadline = performance.now() + timeout;
       setState("loading");
+      exit.focus();
       video.pause();
       video.hidden = true;
       video.style.display = "none";

@@ -62,3 +62,26 @@ Results:
 ## Not verified here
 
 - Real 26MB Godot runtime startup, live deployment, final player styling, matched before/after screenshots, and real-device input are intentionally left to the later integration/visual tasks.
+
+## Fix round 1 — loading focus continuity
+
+Covering test file: `tests/public-site.spec.js`.
+
+RED command:
+
+```sh
+npx playwright test tests/public-site.spec.js --project=desktop-chromium --grep 'playable phone stays lazy'
+```
+
+RED result: exit 1 as expected. The EXIT locator was `inactive` after PLAY hid the focused launch button, so `expect(exit).toBeFocused()` failed.
+
+Minimal fix: call `exit.focus()` immediately after the loading state reveals EXIT.
+
+GREEN commands:
+
+```sh
+npx playwright test tests/public-site.spec.js --grep 'playable phone|reduced motion still permits explicit playable'
+git diff --check
+```
+
+GREEN result: exit 0; targeted Playwright passed 6/6 across desktop and mobile Chromium, and the whitespace check produced no output.
