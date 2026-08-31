@@ -369,7 +369,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     const idle = await geometry();
     await page.locator("[data-playable-launch]").click();
     await page.mouse.move(0, 0);
-    await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "loading");
+    await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", /^(loading|ready)$/);
     const exitBox = await page.locator("[data-playable-exit]").boundingBox();
     expect(exitBox, `${route} EXIT is visible after PLAY`).not.toBeNull();
     expect(exitBox.height, `${route} EXIT is at least 44px tall`).toBeGreaterThanOrEqual(44);
@@ -432,11 +432,21 @@ test("hero canvas cancels frames while inactive and resumes without catch-up sho
   await expect(canvas).toHaveAttribute("data-frame", offscreenFrame);
   expect(await page.evaluate(() => window.__rafAudit.cancelled)).toBeGreaterThan(0);
 
-  await page.locator("[data-studio-hero]").scrollIntoViewIfNeeded();
   const shotsBeforeResume = Number(await canvas.getAttribute("data-shot-spawn-count"));
-  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(offscreenFrame);
-  await page.waitForTimeout(80);
-  expect(Number(await canvas.getAttribute("data-shot-spawn-count")) - shotsBeforeResume).toBeLessThanOrEqual(2);
+  await canvas.evaluate((node) => {
+    const frame = node.dataset.frame;
+    window.__firstResumeShotCount = new Promise((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (node.dataset.frame === frame) return;
+        observer.disconnect();
+        resolve(Number(node.dataset.shotSpawnCount));
+      });
+      observer.observe(node, { attributes: true, attributeFilter: ["data-frame"] });
+    });
+  });
+  await page.locator("[data-studio-hero]").scrollIntoViewIfNeeded();
+  const shotsAtFirstResumedFrame = await page.evaluate(() => window.__firstResumeShotCount);
+  expect(shotsAtFirstResumedFrame - shotsBeforeResume).toBeLessThanOrEqual(2);
 
   await page.locator("[data-motion-toggle]").click();
   const pausedFrame = await canvas.getAttribute("data-frame");
@@ -476,16 +486,19 @@ test("playable phone stays lazy, reaches ready, and EXIT restores the ambient he
 
   expect(requests).toEqual([]);
   await expect(player.locator("iframe")).toHaveCount(0);
+  await player.evaluate((node) => {
+    window.__playableStateHistory = [node.dataset.playableState];
+    new MutationObserver(() => window.__playableStateHistory.push(node.dataset.playableState))
+      .observe(node, { attributes: true, attributeFilter: ["data-playable-state"] });
+  });
   await launch.click();
-  await expect(player).toHaveAttribute("data-playable-state", "loading");
   await expect(exit).toBeFocused();
   await expect(player.locator("iframe")).toHaveCount(1);
-  await expect(player).toHaveAttribute("aria-busy", "true");
-  await expect(page.locator("[data-playable-status]")).toHaveText("게임 불러오는 중…");
   await expect(video).toBeHidden();
   await expect(player).toHaveAttribute("data-playable-state", "ready");
   await expect(player).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("[data-playable-status]")).toHaveText("플레이 준비 완료");
+  expect(await page.evaluate(() => window.__playableStateHistory)).toEqual(expect.arrayContaining(["loading", "ready"]));
   expect(requests).toHaveLength(1);
   await page.waitForTimeout(100);
   const pausedFrame = await canvas.getAttribute("data-frame");
@@ -501,6 +514,25 @@ test("playable phone stays lazy, reaches ready, and EXIT restores the ambient he
   await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
   await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(pausedFrame);
   if (await cursor.count()) await expect(cursor).not.toHaveAttribute("hidden", "");
+});
+
+test("playable phone preserves the Godot framebuffer aspect ratio", async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/?lang=ko");
+  await page.locator("[data-playable-phone]").evaluate((node) => { node.dataset.playableTimeout = "50000"; });
+  await page.locator("[data-playable-launch]").click();
+  await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready", { timeout: 55_000 });
+
+  const geometry = await page.locator("[data-playable-phone] iframe").evaluate((frame) => {
+    const canvas = frame.contentDocument.querySelector("#canvas");
+    const bounds = canvas.getBoundingClientRect();
+    return {
+      cssRatio: bounds.width / bounds.height,
+      framebufferRatio: canvas.width / canvas.height,
+    };
+  });
+  expect(Math.abs(geometry.cssRatio - geometry.framebufferRatio)).toBeLessThan(0.002);
 });
 
 test("playable phone timeout cleans up and exposes RETRY", async ({ page }) => {

@@ -22,8 +22,8 @@ while IFS= read -r path; do
 
   if [[ "$path" == *.zip ]]; then
     case "$path" in
-      play/quirky-ball/index.pck.zip) expected_hash='8ac3f166aa95fe5ac6613a370798b8cf23fc916531a6bf4049b1b3de3379d170' ;;
-      play/quirky-ball/index.wasm.zip) expected_hash='d8e9008dfb8235eb0ba5f40e438428faffd4ba5ee950d2a4a0e3e8ad3e42a609' ;;
+      play/quirky-ball/index.pck.zip) expected_hash='59af7ef41c8a1e12401556b8960d8b8ef50d7ac7d95675058cd773381015f5a2' ;;
+      play/quirky-ball/index.wasm.zip) expected_hash='1340875de37bf8cfe9c070c1fea13a50e9e8f19af3e7137a3d6fdea9711e01b9' ;;
       *)
         printf '차단: 공개 저장소에 민감하거나 불필요한 파일이 포함되었습니다: %s\n' "$path" >&2
         failed=1
