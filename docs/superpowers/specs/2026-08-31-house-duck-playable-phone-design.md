@@ -52,3 +52,15 @@ The active player provides a small localized exit control. Exiting removes the i
 ## Explicit boundaries
 
 This integrates the existing playable; it does not change game logic, regenerate the Godot export, add analytics, or claim real-device input parity. Real iPhone Safari play feel remains a separate verification boundary unless a device is connected during this task.
+
+## Approved homepage polish extension
+
+The playable integration also resolves the seven rendered-home findings recorded in the 2026-08-31 design audit:
+
+- Preserve the existing shot rate and game energy while protecting the hero copy from shot trails and impact clutter.
+- On 390 px mobile, bring the hero phone top into the first 844 px viewport; move secondary readout/signature content below the playable rather than removing it.
+- Raise meaningful hero and project body copy to at least 16 px. Labels and specimen metadata may remain smaller.
+- Replace constant decorative-only motion with a short staged hero entrance plus explicit `PLAY`, `LOADING`, `READY`, `ERROR`, and `EXIT` feedback. Animate only transform and opacity and keep reduced-motion behavior.
+- End the Project K zone after one deliberate breathing interval instead of leaving a second empty viewport before the footer.
+- Keep the existing equal YouTube cards, project ordering, localized text, and two-project limit.
+- Treat the Quirky Ball and Project K detail pages as visual references; do not redesign them in this pass.
