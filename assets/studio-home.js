@@ -105,7 +105,7 @@
       document.body.style.setProperty("--studio-tone", closest.dataset.tone);
       document.documentElement.dataset.scrollTone = closest.dataset.tone;
       if (!mascot || !quirky) return;
-      mascot.style.opacity = progress > .02 && progress < .92 ? String(Math.min(.96, progress * 2.4)) : "0";
+      mascot.style.opacity = progress > .02 && progress < .92 ? String(Math.min(.72, progress * 2)) : "0";
       mascot.style.transform = `translate3d(0, ${progress * Math.min(innerHeight * .48, 410)}px, 0) rotate(${5 - progress * 18}deg)`;
     };
     const requestUpdate = () => {
@@ -258,18 +258,19 @@
     let angle = 0;
     let playableActive = false;
 
+    const isDecoration = (target) => Boolean(target.closest?.(".release-visual") && !target.closest("a, button, iframe, .hero-phone"));
+
     addEventListener("pointermove", (event) => {
-      if (playableActive) return;
+      if (playableActive || !isDecoration(event.target)) { cursor.style.opacity = "0"; return; }
       const distance = Math.hypot(event.clientX - x, event.clientY - y);
       if (distance > 2) angle = Math.atan2(event.clientY - y, event.clientX - x) * 180 / Math.PI;
       x = event.clientX;
       y = event.clientY;
       cursor.style.opacity = "1";
       cursor.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}deg) translate(-30%, -50%)`;
-      cursor.classList.toggle("is-target", Boolean(event.target.closest("a, button, summary")));
     }, { passive: true });
     addEventListener("pointerdown", (event) => {
-      if (playableActive) return;
+      if (playableActive || !isDecoration(event.target)) return;
       const impact = document.createElement("span");
       impact.className = "cursor-impact";
       impact.dataset.cursorImpact = "";
@@ -309,6 +310,7 @@
     let shotSpawnCount = 0;
     const marbleSprites = new Map();
     let shotSprite;
+    let animationFrame = 0;
 
     function getMarbleSprite(color) {
       if (marbleSprites.has(color)) return marbleSprites.get(color);
@@ -522,10 +524,11 @@
     }
 
     function tick(now) {
-      if (!active || manualPaused || playableActive) { previous = now; nextPairAt = now + pairIntervalMs; requestAnimationFrame(tick); return; }
+      animationFrame = 0;
+      if (!active || manualPaused || playableActive || document.hidden) return;
       // ponytail: 30fps is enough for this decorative field; raise only if measured motion quality needs it.
       const nextFrameAt = nextFrameTime(now, previous, frameIntervalMs);
-      if (nextFrameAt === null) { requestAnimationFrame(tick); return; }
+      if (nextFrameAt === null) { animationFrame = requestAnimationFrame(tick); return; }
       const elapsed = ((now - start) / 1000) % QUIRKY_RULES.eventSeconds;
       const rotation = elapsed / QUIRKY_RULES.eventSeconds * QUIRKY_RULES.totalTurns * TAU;
       if (now - nextPairAt > pairIntervalMs * 4) nextPairAt = now;
@@ -540,7 +543,22 @@
       updateParticles(delta);
       draw(rotation);
       previous = nextFrameAt;
-      requestAnimationFrame(tick);
+      animationFrame = requestAnimationFrame(tick);
+    }
+
+    function syncAnimation() {
+      const shouldRun = active && !manualPaused && !playableActive && !document.hidden;
+      if (!shouldRun) {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        return;
+      }
+      if (animationFrame) return;
+      const now = performance.now();
+      start = now;
+      previous = now;
+      nextPairAt = now + pairIntervalMs;
+      animationFrame = requestAnimationFrame(tick);
     }
 
     resize();
@@ -548,10 +566,11 @@
     launchBurst(0);
     draw(0);
     if (reducedMotion) return;
-    if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; }, { threshold: .05 }).observe(stage);
-    addEventListener("houseduck:motion", (event) => { manualPaused = event.detail.paused; });
-    addEventListener("houseduck:playable", (event) => { playableActive = event.detail.active; });
-    requestAnimationFrame(tick);
+    if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { active = entry.isIntersecting; syncAnimation(); }, { threshold: .05 }).observe(stage);
+    addEventListener("houseduck:motion", (event) => { manualPaused = event.detail.paused; syncAnimation(); });
+    addEventListener("houseduck:playable", (event) => { playableActive = event.detail.active; syncAnimation(); });
+    document.addEventListener("visibilitychange", syncAnimation);
+    syncAnimation();
   }
 
   function init() {

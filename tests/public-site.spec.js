@@ -245,20 +245,43 @@ test("home replaces its YouTube fallback with the synced feed", async ({ page })
   );
 });
 
-test("home desktop removes the hero divider and turns the pointer into a Quirky shot", async ({ page, isMobile }) => {
+test("home desktop scopes the Quirky cursor and impact to hero decoration", async ({ page, isMobile }) => {
   test.skip(isMobile, "touch keeps the platform cursor behavior");
+  await stubPlayable(page);
   await page.goto("/?lang=ko");
+  await page.waitForTimeout(650);
   await expect(page.locator(".mechanic-stage")).toHaveCSS("border-left-width", "0px");
+
+  const phoneTop = () => page.locator(".hero-phone .iphone-shell").evaluate((node) => node.getBoundingClientRect().top + scrollY);
+  await page.mouse.move(0, 0);
+  const restingTop = await phoneTop();
+  await page.locator("[data-playable-launch]").hover();
+  await page.waitForTimeout(240);
+  const liftedTop = await phoneTop();
+  expect(restingTop - liftedTop).toBeGreaterThanOrEqual(2);
+  expect(restingTop - liftedTop).toBeLessThanOrEqual(3.1);
+  await page.locator("[data-playable-launch]").click();
+  await page.mouse.move(0, 0);
+  await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready");
+  expect(Math.abs(await phoneTop() - restingTop)).toBeLessThanOrEqual(1);
+  await expect(page.locator("[data-playable-phone] iframe")).not.toHaveCSS("cursor", "none");
+  await page.locator("[data-playable-exit]").click();
 
   const cursor = page.locator("[data-game-cursor]");
   await expect(cursor).toHaveCount(1);
-  await page.mouse.move(320, 220);
+  const visual = await page.locator(".release-visual").boundingBox();
+  await page.mouse.move(visual.x + 12, visual.y + visual.height / 2);
   await expect(cursor).toHaveCSS("opacity", "1");
 
   await page.addStyleTag({ content: ".cursor-impact { animation-duration: 1200ms !important; }" });
-  await page.mouse.click(320, 220);
+  await page.mouse.click(visual.x + 12, visual.y + visual.height / 2);
   await expect(page.locator("[data-cursor-impact]")).toHaveCount(1);
-  await expect(page.locator("[data-cursor-impact]")).toHaveCount(0, { timeout: 2000 });
+  await page.locator(".site-nav a").first().hover();
+  await expect(cursor).toHaveCSS("opacity", "0");
+  await expect(page.locator(".site-nav a").first()).not.toHaveCSS("cursor", "none");
+  await page.locator("[data-motion-toggle]").click();
+  await expect(page.locator("[data-cursor-impact]")).toHaveCount(1);
+  await expect(page.locator("[data-motion-toggle]")).not.toHaveCSS("cursor", "none");
 });
 
 test("home reduced motion holds the canvas and pauses phone video", async ({ page }) => {
@@ -294,6 +317,147 @@ async function stubPlayable(page, { ready = true } = {}) {
   }));
   return requests;
 }
+
+test("localized homes place a stable playable phone before supporting copy at 390px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await stubPlayable(page);
+  for (const route of ["/?lang=ko", "/index_en.html?lang=en", "/index_de.html?lang=de", "/index_ja.html?lang=ja"]) {
+    await page.goto(route);
+    await page.waitForTimeout(650);
+    const layout = await page.evaluate(() => {
+      const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+      const title = rect(".release-heading h1");
+      const phone = rect(".hero-phone .iphone-shell");
+      const readout = rect(".release-readout");
+      const signature = rect(".studio-signature");
+      const bodyFonts = [".release-lede", ".hero-description", ".project-copy > p:not(.eyebrow):not(.project-display):not(.project-keywords):not(.project-status)"]
+        .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
+      const controlHeights = [...document.querySelectorAll(".release-button, [data-playable-launch], [data-motion-toggle]")]
+        .filter((node) => getComputedStyle(node).display !== "none")
+        .map((node) => node.getBoundingClientRect().height);
+      const projectCard = document.querySelector('[data-project="project-k"] .project-card').getBoundingClientRect();
+      const footer = rect(".site-footer");
+      return {
+        titleBottom: title.bottom,
+        phone: { top: phone.top + scrollY, left: phone.left + scrollX, width: phone.width, height: phone.height, bottom: phone.bottom + scrollY },
+        readout: { top: readout.top + scrollY, bottom: readout.bottom + scrollY },
+        signatureTop: signature.top + scrollY,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        bodyFonts,
+        controlHeights,
+        afterProjectK: footer.top - projectCard.bottom,
+        cacheAssets: [...document.querySelectorAll('link[href*="studio-home.css"], script[src*="studio-home.js"]')].map((node) => node.href || node.src),
+      };
+    });
+    expect(layout.phone.top).toBeGreaterThanOrEqual(layout.titleBottom - 1);
+    expect(layout.phone.top).toBeLessThan(844);
+    expect(layout.readout.top).toBeGreaterThanOrEqual(layout.phone.bottom - 1);
+    expect(layout.signatureTop).toBeGreaterThanOrEqual(layout.readout.bottom - 1);
+    expect(layout.overflow).toBeLessThanOrEqual(0);
+    expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
+    expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
+    expect(layout.afterProjectK).toBeLessThanOrEqual(72);
+    expect(layout.cacheAssets).toHaveLength(2);
+    for (const asset of layout.cacheAssets) expect(asset).toContain("?v=20260831-playable");
+
+    const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      return { top: box.top + scrollY, left: box.left + scrollX, width: box.width, height: box.height };
+    });
+    const idle = await geometry();
+    await page.locator("[data-playable-launch]").click();
+    await page.mouse.move(0, 0);
+    await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "loading");
+    const loading = await geometry();
+    await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready");
+    const ready = await geometry();
+    for (const state of [loading, ready]) {
+      for (const key of ["top", "left", "width", "height"]) expect(Math.abs(state[key] - idle[key]), `${route} ${key} stays stable`).toBeLessThanOrEqual(1);
+    }
+    await page.locator("[data-playable-exit]").click();
+  }
+});
+
+test("hero entrance is one-shot and reduced motion is immediately settled", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const entrance = await page.locator("[data-studio-hero]").evaluate((hero) => hero.getAnimations({ subtree: true }).map((animation) => animation.effect.getTiming()));
+  expect(entrance.length).toBeGreaterThanOrEqual(2);
+  for (const timing of entrance) {
+    expect(timing.iterations).toBe(1);
+    expect(timing.duration).toBeGreaterThanOrEqual(360);
+    expect(timing.duration).toBeLessThanOrEqual(520);
+  }
+  await page.waitForTimeout(650);
+  expect(await page.locator("[data-studio-hero]").evaluate((hero) => hero.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length)).toBe(0);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  expect(await page.locator("[data-studio-hero]").evaluate((hero) => hero.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await page.locator(".release-heading").evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+  expect(await page.locator(".release-visual").evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+});
+
+test("hero canvas cancels frames while inactive and resumes without catch-up shots", async ({ page }) => {
+  await page.addInitScript(() => {
+    const request = window.requestAnimationFrame.bind(window);
+    const cancel = window.cancelAnimationFrame.bind(window);
+    const pending = new Set();
+    let cancelled = 0;
+    window.requestAnimationFrame = (callback) => {
+      let id;
+      id = request((time) => { pending.delete(id); callback(time); });
+      pending.add(id);
+      return id;
+    };
+    window.cancelAnimationFrame = (id) => { if (pending.delete(id)) cancelled += 1; cancel(id); };
+    window.__rafAudit = { get pending() { return pending.size; }, get cancelled() { return cancelled; } };
+    let forcedHidden = false;
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => forcedHidden });
+    window.__setDocumentHidden = (hidden) => { forcedHidden = hidden; document.dispatchEvent(new Event("visibilitychange")); };
+  });
+  await stubPlayable(page);
+  await page.goto("/?lang=ko");
+  const canvas = page.locator("[data-quirky-canvas]");
+  await expect.poll(async () => Number(await canvas.getAttribute("data-frame"))).toBeGreaterThan(1);
+
+  await page.locator("[data-youtube-feed]").scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => window.__rafAudit.pending)).toBe(0);
+  const offscreenFrame = await canvas.getAttribute("data-frame");
+  await page.waitForTimeout(120);
+  await expect(canvas).toHaveAttribute("data-frame", offscreenFrame);
+  expect(await page.evaluate(() => window.__rafAudit.cancelled)).toBeGreaterThan(0);
+
+  await page.locator("[data-studio-hero]").scrollIntoViewIfNeeded();
+  const shotsBeforeResume = Number(await canvas.getAttribute("data-shot-spawn-count"));
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(offscreenFrame);
+  await page.waitForTimeout(80);
+  expect(Number(await canvas.getAttribute("data-shot-spawn-count")) - shotsBeforeResume).toBeLessThanOrEqual(2);
+
+  await page.locator("[data-motion-toggle]").click();
+  const pausedFrame = await canvas.getAttribute("data-frame");
+  await expect.poll(() => page.evaluate(() => window.__rafAudit.pending)).toBe(0);
+  await page.waitForTimeout(120);
+  await expect(canvas).toHaveAttribute("data-frame", pausedFrame);
+
+  await page.locator("[data-motion-toggle]").click();
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(pausedFrame);
+  await page.locator("[data-playable-launch]").click();
+  await expect(page.locator("[data-playable-phone]")).toHaveAttribute("data-playable-state", "ready");
+  await expect.poll(() => page.evaluate(() => window.__rafAudit.pending)).toBe(0);
+  const playingFrame = await canvas.getAttribute("data-frame");
+  await page.waitForTimeout(120);
+  await expect(canvas).toHaveAttribute("data-frame", playingFrame);
+
+  await page.locator("[data-playable-exit]").click();
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(playingFrame);
+  await page.evaluate(() => window.__setDocumentHidden(true));
+  await expect.poll(() => page.evaluate(() => window.__rafAudit.pending)).toBe(0);
+  const hiddenFrame = await canvas.getAttribute("data-frame");
+  await page.waitForTimeout(120);
+  await expect(canvas).toHaveAttribute("data-frame", hiddenFrame);
+  await page.evaluate(() => window.__setDocumentHidden(false));
+  await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(hiddenFrame);
+});
 
 test("playable phone stays lazy, reaches ready, and EXIT restores the ambient hero", async ({ page }) => {
   const requests = await stubPlayable(page);
