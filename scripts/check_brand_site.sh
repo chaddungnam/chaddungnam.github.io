@@ -165,6 +165,8 @@ test -s "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2" || fail "Chilgok subse
 test "$(wc -c < "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2")" -lt 300000 || fail "Chilgok subset font is too large"
 require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
 require_token "llms.txt" "https://blog.houseduck.in/"
+require_token "llms.txt" "https://houseduck.in/assets/youtube-feed.json"
+require_token "llms.txt" "https://www.youtube.com/@houseduck_in"
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'application/ld+json'

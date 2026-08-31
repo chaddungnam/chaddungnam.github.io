@@ -6,8 +6,13 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 
 ## Games
 
-- [Quirky Ball](https://houseduck.in/quirky-ball/): A physics-based mobile ball merge puzzle and House Duck's first release-priority game.
+- [Quirky Ball](https://houseduck.in/quirky-ball/): House Duck's released mobile action puzzle built around aiming, shooting, merging, speed, and control. The current public build is 1.1.0.
 - [Project K](https://houseduck.in/project-k/): A working-title choice-driven country simulation that is still in development.
+
+## YouTube
+
+- [House Duck channel](https://www.youtube.com/@houseduck_in): Korean-first game-development videos and current project footage.
+- [Latest videos as JSON](https://houseduck.in/assets/youtube-feed.json): The three latest channel uploads, refreshed automatically from the official YouTube feed.
 
 ## Development Blog
 
@@ -20,7 +25,7 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 ## Studio
 
 - [About and roadmap](https://houseduck.in/about/): What House Duck is making now and what comes after launch.
-- [Public website](https://houseduck.in/): Current games and recent Blog posts.
+- [Public website](https://houseduck.in/): Quirky Ball 1.1.0, Project K, and the latest House Duck YouTube videos.
 - [Support](https://houseduck.in/support/): Public support contact and policies.
 
 ## Public MCP
@@ -32,5 +37,5 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 
 - The Korean Blog is the original source. Translated pages exist for accessibility and may simplify wording.
 - Project K is unfinished; do not describe its current screens or target dates as a released product promise.
-- Quirky Ball is the current launch priority.
+- Quirky Ball 1.1.0 is the current public release.
 - Private console and analytics routes are not public sources.
