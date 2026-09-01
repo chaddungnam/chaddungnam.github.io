@@ -30,12 +30,15 @@ test("notice page reads the active console notice instead of a static copy", asy
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });
 
-test("embedded notice list is compact white and requests the selected device language", async () => {
+test("embedded notice list is compact white and lets the browser translate the Korean source", async () => {
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
   assert.match(html, /body\.embedded\s*\{[^}]*background:\s*#fff/s);
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
   assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*1/s);
-  assert.match(html, /[?&]lang=\$\{encodeURIComponent\(nextLanguage\)\}/);
+  assert.match(html, /translate\.google\.com\/translate_a\/element\.js/);
+  assert.match(html, /googtrans/);
+  assert.match(html, /pageLanguage:\s*"ko"/);
+  assert.doesNotMatch(html, /\$\{endpoint\}\?lang=/);
   assert.match(html, /id="notice-loading"/);
   assert.match(html, /class="notice-spinner"/);
   assert.match(html, /loadNotices\(language\)/);
