@@ -42,4 +42,7 @@ test("embedded notice list is compact white and lets the browser translate the K
   assert.match(html, /id="notice-loading"/);
   assert.match(html, /class="notice-spinner"/);
   assert.match(html, /loadNotices\(language\)/);
+  assert.match(html, /body\.embedded\s*\{[^}]*overflow:\s*hidden/s);
+  assert.match(html, /scrollbar-color:\s*#d85832\s+#f5e8dc/);
+  assert.match(html, /::-webkit-scrollbar-thumb/);
 });
