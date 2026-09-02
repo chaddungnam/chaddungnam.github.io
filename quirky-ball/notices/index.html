@@ -150,7 +150,7 @@
       try {
         const target = encodeURIComponent(googleLanguage);
         const query = encodeURIComponent(text);
-        const response = await fetch(`https://translate.google.com/translate_a/single?client=gtx&sl=ko&tl=${target}&dt=t&q=${query}`);
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=${target}&dt=t&q=${query}`);
         if (!response.ok) return text;
         const translated = await response.json();
         const joined = Array.isArray(translated?.[0])

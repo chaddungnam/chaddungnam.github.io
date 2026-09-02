@@ -36,6 +36,7 @@ test("embedded notice list is compact white and lets the browser translate the K
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
   assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*1/s);
   assert.match(html, /translate\.google\.com\/translate_a\/element\.js/);
+  assert.match(html, /translate\.googleapis\.com\/translate_a\/single/);
   assert.match(html, /googtrans/);
   assert.match(html, /pageLanguage:\s*"ko"/);
   assert.doesNotMatch(html, /\$\{endpoint\}\?lang=/);
