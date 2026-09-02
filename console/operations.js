@@ -28,7 +28,7 @@
     byId("operationsSummary").innerHTML = `<article data-tone="neutral"><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article data-tone="neutral"><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article data-tone="${mutationsEnabled ? "good" : "watch"}"><span>플레이어 수정</span><strong>${mutationsEnabled ? "활성" : "잠김"}</strong></article><article data-tone="${referralsEnabled ? "good" : "watch"}"><span>친구초대</span><strong>${referralsEnabled ? "활성" : "중지"}</strong></article>`;
     byId("referralMetrics").innerHTML = `<article data-tone="neutral"><span>생성 코드</span><strong>${escapeHtml(referrals.codes_issued || 0)}</strong></article><article data-tone="good"><span>성공 초대</span><strong>${escapeHtml(referrals.accepted_total || 0)}</strong></article><article data-tone="neutral"><span>오늘 성공</span><strong>${escapeHtml(referrals.accepted_today_utc || 0)}</strong></article><article data-tone="watch"><span>3회 완료</span><strong>${escapeHtml(referrals.tier_3_total || 0)}</strong></article>`;
     byId("referralConfigForm").elements.enabled.checked = referralsEnabled;
-    const notices = (data.notices || []).map((notice) => `<article class="audit-item"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code></article>`);
+    const notices = (data.notices || []).map((notice) => `<article class="audit-item" data-notice-id="${escapeHtml(notice.id)}" data-starts-at="${escapeHtml(notice.starts_at || "")}" data-ends-at="${escapeHtml(notice.ends_at || "")}"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code><button type="button" class="warning-button" data-edit-notice="${escapeHtml(notice.id)}">수정</button></article>`);
     const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.summary))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
     byId("minVersionForm").elements.minVersion.value = config.min_version || "";
@@ -43,6 +43,7 @@
         root.ConsoleAPI.post("admin-console", { action: "referrals.get" }).catch(() => ({})),
       ]);
       render(operations, referrals);
+      syncAnnouncementSubmit(byId("announcementForm"));
       setMessage("공지·우편·버전·QA 변경은 모두 사유와 함께 기록됩니다.");
     } catch (error) {
       setMessage(`운영 상태를 불러오지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
@@ -74,6 +75,31 @@
   function iso(value) {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+  }
+
+  function toLocalInput(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function syncAnnouncementSubmit(form) {
+    const editing = Boolean(form.elements.announcementId.value);
+    const button = form.querySelector("button[type=submit]");
+    if (button) button.textContent = editing ? (button.dataset.editLabel || "공지 수정") : (button.dataset.submitLabel || "공지 발행");
+  }
+
+  function fillAnnouncement(notice) {
+    const form = byId("announcementForm");
+    form.elements.announcementId.value = notice.id || "";
+    form.elements.body.value = notice.body || "";
+    form.elements.startsAt.value = toLocalInput(notice.starts_at);
+    form.elements.endsAt.value = toLocalInput(notice.ends_at);
+    form.elements.reason.value = "";
+    syncAnnouncementSubmit(form);
+    form.elements.body.focus();
   }
 
   function renderRewardTemplate() {
@@ -159,11 +185,33 @@
       const values = Object.fromEntries(new FormData(form));
       const startsAt = iso(values.startsAt);
       const endsAt = values.endsAt ? iso(values.endsAt) : null;
+      const announcementId = Number(values.announcementId);
+      const editing = Number.isInteger(announcementId) && announcementId > 0;
       form.elements.endsAt.setCustomValidity(endsAt && startsAt && Date.parse(endsAt) <= Date.parse(startsAt) ? "게시 종료는 시작보다 뒤여야 합니다." : "");
       if (!startsAt || !form.reportValidity()) return;
       submit(form, {
-        action: "announcements.publish", body: values.body.trim(), startsAt, endsAt, reason: values.reason.trim(),
-      }, "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`);
+        action: editing ? "announcements.update" : "announcements.publish",
+        ...(editing ? { announcementId } : {}),
+        body: values.body.trim(), startsAt, endsAt, reason: values.reason.trim(),
+      }, editing ? "게임 공지 수정" : "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`);
+    });
+    byId("announcementReset").addEventListener("click", () => {
+      const form = byId("announcementForm");
+      form.reset();
+      form.elements.announcementId.value = "";
+      syncAnnouncementSubmit(form);
+    });
+    byId("operationsHistory").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-edit-notice]");
+      if (!button) return;
+      const article = button.closest("[data-notice-id]");
+      if (!article) return;
+      fillAnnouncement({
+        id: Number(article.dataset.noticeId),
+        body: article.querySelector("p")?.textContent || "",
+        starts_at: article.dataset.startsAt,
+        ends_at: article.dataset.endsAt === "계속" ? "" : article.dataset.endsAt,
+      });
     });
   }
 
