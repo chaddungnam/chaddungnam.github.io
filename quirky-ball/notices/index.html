@@ -65,7 +65,7 @@
       <h1 id="notice-title">공지사항</h1>
       <div id="notice-loading" class="notice-loading">
         <span class="notice-spinner" aria-hidden="true"></span>
-        <span id="notice-loading-text">공지를 번역하는 중…</span>
+        <span id="notice-loading-text">Loading</span>
       </div>
       <div id="notice-list" aria-label="Notices"></div>
       <section id="notice-detail" hidden>
@@ -81,10 +81,12 @@
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
     const normalizeLanguage = (value) => ({ "zh-cn": "zh_CN", "zh-tw": "zh_TW", "zh-hans": "zh_CN", "zh-hant": "zh_TW" }[value.toLowerCase()] ?? value.split("-")[0]);
     const search = new URLSearchParams(location.search);
-    const requested = search.get("lang") ?? normalizeLanguage(navigator.language || "en");
+    const requestedParam = search.get("lang");
+    const requested = requestedParam && requestedParam.trim() ? requestedParam : normalizeLanguage(navigator.language || "en");
     const selectedNoticeId = search.get("notice");
     if (search.has("embed")) document.body.classList.add("embedded");
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
+    const fallbackManifestEndpoint = "/quirky-ball/notices/v1.json";
     const language = languageNames[requested] ? requested : "en";
     const googleLanguage = { zh_CN: "zh-CN", zh_TW: "zh-TW" }[language] ?? language;
 
@@ -94,8 +96,28 @@
     const date = document.querySelector("#notice-date");
     const body = document.querySelector("#notice-body");
     const select = document.querySelector("#language");
+    const loadingText = document.querySelector("#notice-loading-text");
+    let loadingDots = 1;
+    let loadingTimer = null;
     for (const key of Object.keys(languageNames)) select.add(new Option(languageNames[key] ?? key, key));
     select.value = language;
+
+    const renderLoading = () => {
+      loadingText.textContent = `Loading${".".repeat(loadingDots)}`;
+    };
+    const startLoadingAnimation = () => {
+      loadingDots = 1;
+      renderLoading();
+      if (loadingTimer) clearInterval(loadingTimer);
+      loadingTimer = setInterval(() => {
+        loadingDots = loadingDots % 3 + 1;
+        renderLoading();
+      }, 450);
+    };
+    const stopLoadingAnimation = () => {
+      if (loadingTimer) clearInterval(loadingTimer);
+      loadingTimer = null;
+    };
 
     const renderChrome = (nextLanguage) => {
       document.documentElement.lang = "ko";
@@ -123,6 +145,37 @@
       document.head.append(script);
       return waitForBrowserTranslation();
     };
+    const translateText = async (text, targetLanguage) => {
+      if (targetLanguage === "ko" || !text) return text;
+      try {
+        const target = encodeURIComponent(googleLanguage);
+        const query = encodeURIComponent(text);
+        const response = await fetch(`https://translate.google.com/translate_a/single?client=gtx&sl=ko&tl=${target}&dt=t&q=${query}`);
+        if (!response.ok) return text;
+        const translated = await response.json();
+        const joined = Array.isArray(translated?.[0])
+          ? translated[0].map((part) => part?.[0] ?? "").join("")
+          : "";
+        return joined || text;
+      } catch (_error) {
+        return text;
+      }
+    };
+    const localizeKnownNotice = (notice, manifest, nextLanguage) => {
+      const source = manifest?.locales?.ko;
+      const translation = manifest?.locales?.[nextLanguage];
+      if (String(notice.id) !== "3" || !source || !translation || notice.body.trim() !== source.body.trim()) return notice;
+      return { ...notice, title: translation.title, body: translation.body };
+    };
+    const localizeNotice = async (notice, manifest, nextLanguage) => {
+      const known = localizeKnownNotice(notice, manifest, nextLanguage);
+      if (known !== notice || nextLanguage === "ko") return known;
+      return {
+        ...notice,
+        title: await translateText(String(notice.title ?? "공지"), nextLanguage),
+        body: await translateText(String(notice.body), nextLanguage),
+      };
+    };
     const renderDetail = (notice) => {
       document.querySelector("#back-to-list").hidden = false;
       date.hidden = false;
@@ -136,19 +189,25 @@
     };
     const loadNotices = async (nextLanguage) => {
       renderChrome(nextLanguage);
+      startLoadingAnimation();
       loading.hidden = false;
       list.hidden = true;
       detail.hidden = true;
       try {
-        const response = await fetch(endpoint, { cache: "no-store" });
+        const [response, manifestResponse] = await Promise.all([
+          fetch(endpoint, { cache: "no-store" }),
+          fetch(fallbackManifestEndpoint, { cache: "force-cache" }).catch(() => null),
+        ]);
         if (!response.ok) throw new Error("notice_unavailable");
         const data = await response.json();
-        const notices = Array.isArray(data.notices)
+        const manifest = manifestResponse?.ok ? await manifestResponse.json() : null;
+        const notices = (Array.isArray(data.notices)
           ? data.notices.filter((notice) => notice?.body && notice?.created_at)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          : [];
+          : []);
         if (!notices.length) throw new Error("notice_unavailable");
-        list.replaceChildren(...notices.map((notice) => {
+        const localizedNotices = await Promise.all(notices.map((notice) => localizeNotice(notice, manifest, nextLanguage)));
+        list.replaceChildren(...localizedNotices.map((notice) => {
             const card = document.createElement("button");
             card.type = "button";
             card.className = "notice-card";
@@ -167,12 +226,16 @@
             card.addEventListener("click", () => renderDetail(notice));
             return card;
           }));
-        await startBrowserTranslation();
+        if (localizedNotices.some((notice, index) => notice.body === notices[index].body)) {
+          await startBrowserTranslation();
+        }
+        stopLoadingAnimation();
         loading.hidden = true;
         list.hidden = false;
-        const selected = notices.find((notice) => String(notice.id) === selectedNoticeId);
+        const selected = localizedNotices.find((notice) => String(notice.id) === selectedNoticeId);
         if (selected) renderDetail(selected);
       } catch (_error) {
+        stopLoadingAnimation();
         loading.hidden = true;
         list.hidden = true;
         detail.hidden = false;

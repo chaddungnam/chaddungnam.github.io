@@ -47,3 +47,11 @@ test("embedded notice list is compact white and lets the browser translate the K
   assert.match(html, /::-webkit-scrollbar-thumb/);
   assert.match(html, /body\.embedded #notice-list\s*\{[^}]*align-content:\s*start[^}]*grid-auto-rows:\s*max-content/s);
 });
+
+test("notice loading is English with a one-two-three dot loop and locale fallback data", async () => {
+  const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
+  assert.match(html, /id="notice-loading-text">Loading<\/span>/);
+  assert.match(html, /repeat\(loadingDots\)/);
+  assert.match(html, /v1\.json/);
+  assert.match(html, /localizeKnownNotice/);
+});
