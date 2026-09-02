@@ -56,3 +56,10 @@ test("notice loading is English with a one-two-three dot loop and locale fallbac
   assert.match(html, /v1\.json/);
   assert.match(html, /localizeKnownNotice/);
 });
+
+test("notice chrome labels follow the selected locale", async () => {
+  const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
+  assert.match(html, /noticeLabels/);
+  assert.match(html, /noticeLabels\[nextLanguage\]/);
+  assert.match(html, /labels\.back/);
+});
