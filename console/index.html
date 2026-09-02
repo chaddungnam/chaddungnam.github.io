@@ -201,6 +201,11 @@
           <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
         </section>
 
+        <section class="panel unfinished-plays-panel" aria-labelledby="unfinishedPlaysTitle">
+          <div class="panel-heading"><div><p class="eyebrow">UNFINISHED PLAY DETAILS</p><h2 id="unfinishedPlaysTitle">완료되지 않은 플레이</h2><small>게임을 시작했지만 정상 완료가 없는 설치의 마지막 레벨·점수·화면을 표시합니다. 백그라운드는 앱 종료로 단정하지 않습니다.</small></div><span id="unfinishedPlaysStatus" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>플레이어·설치</th><th>상태</th><th>마지막 확인 위치</th><th>도달치</th><th>마지막 신호</th></tr></thead><tbody id="unfinishedPlaysTable"></tbody></table></div>
+        </section>
+
         <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
           <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">PLAYER JOURNEY</p><h2>사람들이 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 사람 수예요. 고유 설치 ID로 구분합니다.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
           <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>온 사람</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활동 인원과 게임 완료 차트"></canvas></div></article>

@@ -214,6 +214,7 @@ function renderDashboard() {
   renderAttention(pulseModel);
   renderAccountActivity();
   renderPeriodPlayers();
+  renderUnfinishedPlays();
   renderGameMetrics();
   renderDailyTable();
   renderInsight();
@@ -588,6 +589,52 @@ function renderPeriodPlayers() {
         <td data-label="최근 활동">${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
         <td data-label="처리"><a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}">열기</a></td>
       </tr>`).join("");
+}
+
+function unfinishedPlayStatus(status) {
+  const labels = {
+    verified_exit: ["중간 종료 확인", "홈 이동 등 명시적 장면 이탈"],
+    app_quit: ["앱 종료 감지", "판 결과 미확인 · 이어하기 가능"],
+    background: ["백그라운드 전환", "앱 종료 여부는 확인되지 않음"],
+    active_recent: ["진행 중일 수 있음", "최근 2분 안에 신호 수신"],
+    unobserved: ["결과 미확인", "완료·종료 이벤트 없음"],
+  };
+  return labels[String(status || "unobserved")] || labels.unobserved;
+}
+
+function formatAnalyticsEventTime(value) {
+  const numeric = Number(value);
+  return formatServerTime(Number.isFinite(numeric) && numeric > 0 && numeric < 1e12 ? numeric * 1000 : value);
+}
+
+function renderUnfinishedPlays() {
+  const rows = Array.isArray(state.payload?.unfinishedPlays) ? state.payload.unfinishedPlays : [];
+  setText("unfinishedPlaysStatus", `${formatNumber(rows.length)}명`);
+  byId("unfinishedPlaysTable").innerHTML = rows.length === 0
+    ? '<tr><td class="empty-row" colspan="5">이 기간에 완료되지 않은 플레이가 없습니다.</td></tr>'
+    : rows.map((row) => {
+      const status = unfinishedPlayStatus(row.status);
+      const identity = row.userId
+        ? `<a class="player-open-link" href="${root.ConsoleModel.playerDeepLink(row.userId, root.location.hash)}"><strong>${escapeHtml(row.nickname || "이름 없음")}</strong><small>${escapeHtml(row.displayCode || "표시코드 없음")}</small></a>`
+        : `<strong>${escapeHtml(row.installKey || "익명 설치")}</strong><small>계정 연결 없음</small>`;
+      const stage = row.tutorial && row.tutorialStage
+        ? `튜토리얼 · ${tutorialStageLabel(row.tutorialStage, row.tutorialStageIndex)}`
+        : root.ConsoleModel.analyticsScreenName(row.lastScreen);
+      const action = row.lastButtonId ? root.ConsoleModel.analyticsButtonName(row.lastButtonId, row.lastScreen) : "마지막 버튼 기록 없음";
+      const level = row.level !== null && row.level !== undefined && Number.isFinite(Number(row.level))
+        ? `Lv.${formatNumber(Number(row.level))}`
+        : "레벨 미확인";
+      const score = row.score !== null && row.score !== undefined && Number.isFinite(Number(row.score))
+        ? `${formatNumber(Number(row.score))}점`
+        : "점수 미확인";
+      return `<tr>
+        <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${row.identityMatch === "time_window" ? "<small>계정·플레이 시각 일치</small>" : ""}</div></td>
+        <td data-label="상태"><strong>${escapeHtml(status[0])}</strong><small>${escapeHtml(status[1])}</small></td>
+        <td data-label="마지막 확인 위치"><strong>${escapeHtml(stage)}</strong><small>${escapeHtml(action)}</small></td>
+        <td data-label="도달치"><strong>${escapeHtml(level)}</strong><small>${escapeHtml(score)}</small></td>
+        <td data-label="마지막 신호">${escapeHtml(formatAnalyticsEventTime(row.lastSeenAt))}</td>
+      </tr>`;
+    }).join("");
 }
 
 function distributionLabel(value) {
@@ -1054,7 +1101,7 @@ function renderAds() {
 }
 
 function renderCoverageCards(id, cards) {
-  const statusLabels = { available: "수집됨", empty: "데이터 없음", waiting: "계측 대기", error: "조회 실패" };
+  const statusLabels = { available: "수집됨", watch: "확인 필요", empty: "데이터 없음", waiting: "계측 대기", error: "조회 실패" };
   byId(id).innerHTML = cards.map((card) => `
     <article class="coverage-card" data-status="${card.status}">
       <div class="coverage-card-top"><span class="coverage-status">${statusLabels[card.status]}</span><strong>${escapeHtml(card.value)}</strong></div>

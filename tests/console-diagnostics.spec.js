@@ -27,6 +27,13 @@ const dashboard = {
   interactions: { buttons: [], screens: [], dropoffs: [] },
   marketingGate: { eligible: false, weightedDailyPeople: 4.9, observedGames: 4, completionRate: 0.49, exitTrend: 0.51 },
   funnel: [{ event: "first_open", users: 4 }, { event: "game_start", users: 3 }, { event: "game_over", users: 2 }],
+  unfinishedPlays: [{
+    installKey: "설치 123456", userId: "user-pop", nickname: "팝팝", displayCode: "POP1", country: "KR",
+    startedAt: 1788333072, lastSeenAt: 1788333114, level: 1, score: 157, tutorial: true,
+    tutorialStage: "bomb_roulette", tutorialStageIndex: 9, lastScreen: "main",
+    lastButtonId: "main/ui/control_0/panel_1/button_0", status: "background", isNewPlayer: true,
+    identityMatch: "time_window",
+  }],
   periodPlayers: [],
   periodPlayerTotal: 0,
   gameMetrics: { current: null, daily: [] },
@@ -63,6 +70,13 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#marketingGateSummary")).toContainText("49.0% / 50.0%");
   await expect(page.locator("#marketingGateSummary")).toContainText("51.0% / 50.0% 미만");
   await expect(page.locator("#screenDropoffDefinition")).toHaveText("명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.");
+  await expect(page.locator("#unfinishedPlaysStatus")).toHaveText("1명");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("팝팝");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("신규 첫 실행");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("백그라운드 전환");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("튜토리얼 · 폭탄 룰렛");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("Lv.1");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("157점");
   await expect(page.locator("#coreLoopSummary")).toContainText("중앙 점수");
   await expect(page.locator("#coreLoopSummary")).toContainText("2,600점");
   await expect(page.locator("#coreLoopSummary")).toContainText("분당 점수");
