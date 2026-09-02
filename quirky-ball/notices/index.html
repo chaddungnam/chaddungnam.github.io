@@ -184,9 +184,9 @@
       if (String(notice.id) !== "3" || !source || !translation || notice.body.trim() !== source.body.trim()) return notice;
       return { ...notice, title: translation.title, body: translation.body };
     };
-    const localizeNotice = async (notice, manifest, nextLanguage) => {
+    const localizeNotice = async (notice, manifest, nextLanguage, serverLocale) => {
       const known = localizeKnownNotice(notice, manifest, nextLanguage);
-      if (known !== notice || nextLanguage === "ko") return known;
+      if (known !== notice || nextLanguage === "ko" || (serverLocale === nextLanguage && notice.localized !== false)) return known;
       return {
         ...notice,
         title: await translateText(String(notice.title ?? "공지"), nextLanguage),
@@ -211,19 +211,23 @@
       list.hidden = true;
       detail.hidden = true;
       try {
+        const noticeEndpoint = new URL(endpoint);
+        noticeEndpoint.searchParams.set("lang", nextLanguage);
         const [response, manifestResponse] = await Promise.all([
-          fetch(endpoint, { cache: "no-store" }),
+          fetch(noticeEndpoint, { cache: "no-store" }),
           fetch(fallbackManifestEndpoint, { cache: "force-cache" }).catch(() => null),
         ]);
         if (!response.ok) throw new Error("notice_unavailable");
         const data = await response.json();
         const manifest = manifestResponse?.ok ? await manifestResponse.json() : null;
+        const responseLocale = typeof data.locale === "string" ? normalizeLanguage(data.locale) : "";
+        const serverLocale = languageNames[responseLocale] ? responseLocale : "";
         const notices = (Array.isArray(data.notices)
           ? data.notices.filter((notice) => notice?.body && notice?.created_at)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           : []);
         if (!notices.length) throw new Error("notice_unavailable");
-        const localizedNotices = await Promise.all(notices.map((notice) => localizeNotice(notice, manifest, nextLanguage)));
+        const localizedNotices = await Promise.all(notices.map((notice) => localizeNotice(notice, manifest, nextLanguage, serverLocale)));
         list.replaceChildren(...localizedNotices.map((notice) => {
             const card = document.createElement("button");
             card.type = "button";
