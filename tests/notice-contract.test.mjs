@@ -40,6 +40,7 @@ test("embedded notice list is compact white and lets the browser translate the K
   assert.match(html, /googtrans/);
   assert.match(html, /pageLanguage:\s*"ko"/);
   assert.match(html, /noticeEndpoint\.searchParams\.set\("lang"/);
+  assert.match(html, /notice\.localized === true/);
   assert.match(html, /id="notice-loading"/);
   assert.match(html, /class="notice-spinner"/);
   assert.match(html, /loadNotices\(language\)/);
