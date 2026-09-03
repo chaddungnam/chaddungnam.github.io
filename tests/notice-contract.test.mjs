@@ -36,6 +36,8 @@ test("embedded notice list is compact white and directly translates the Korean s
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
   assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*1/s);
   assert.match(html, /translate\.googleapis\.com\/translate_a\/single/);
+  assert.match(html, /for \(let attempt = 0; attempt < 2; attempt \+= 1\)/);
+  assert.match(html, /fetch\(url, \{ cache: "no-store" \}\)/);
   assert.doesNotMatch(html, /notice\.localized === true/);
   assert.match(html, /noticeEndpoint\.searchParams\.set\("lang"/);
   assert.match(html, /if \(known !== notice \|\| nextLanguage === "ko"\) return known/);
