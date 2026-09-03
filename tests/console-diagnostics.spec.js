@@ -45,6 +45,16 @@ const dashboard = {
   periodPlayers: [],
   periodPlayerTotal: 0,
   gameMetrics: { current: null, daily: [] },
+  gameRunSummary: {
+    total: 4,
+    rows: [
+      { status: "completed", games: 1, suspendCount: 1, resumeCount: 1, checkpointCount: 1, lastCheckpointAgeSec: 100, lastSeenAgeSec: 80, lastLevel: 5, lastScore: 300, stale: false },
+      { status: "scene_exit", games: 1, suspendCount: 0, resumeCount: 0, checkpointCount: 0, lastCheckpointAgeSec: null, lastSeenAgeSec: 60, lastLevel: null, lastScore: null, stale: false },
+      { status: "app_quit", games: 1, suspendCount: 0, resumeCount: 0, checkpointCount: 0, lastCheckpointAgeSec: null, lastSeenAgeSec: 40, lastLevel: null, lastScore: null, stale: false },
+      { status: "unknown_stale", games: 1, suspendCount: 0, resumeCount: 0, checkpointCount: 1, lastCheckpointAgeSec: 30, lastSeenAgeSec: 30, lastLevel: 1, lastScore: 80, stale: true },
+    ],
+    latestCheckpoint: { ageSec: 30, level: 1, score: 80, status: "unknown_stale" },
+  },
   diagnostics: {
     issueSignals: [{ signal: "tutorial_incomplete", count: 1 }],
     tutorial: { started: 4, completed: 2, aborted: 1, incomplete: 1, completionRate: 0.5, stages: [
@@ -102,6 +112,13 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "최고 연쇄 평균" })).toContainText("표본 6판");
   await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "Lv.10 도달" })).toContainText("표본 10판");
   await expect(page.locator("#coreLoopSummary .coverage-card").filter({ hasText: "돌파 사용" })).toContainText("표본 5판");
+  await expect(page.locator("#gameRunStatusTotal")).toHaveText("4판");
+  await expect(page.locator("#gameRunStatusTable")).toContainText("정상 완료");
+  await expect(page.locator("#gameRunStatusTable")).toContainText("장면 종료");
+  await expect(page.locator("#gameRunStatusTable")).toContainText("앱 종료 감지");
+  await expect(page.locator("#gameRunStatusTable")).toContainText("미확인·stale");
+  await expect(page.locator("#gameRunStatusTable")).toContainText("1회 · 1회");
+  await expect(page.locator("#gameRunLatestCheckpoint")).toContainText("30초 전");
 });
 
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {

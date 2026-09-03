@@ -215,6 +215,7 @@ function renderDashboard() {
   renderAccountActivity();
   renderPeriodPlayers();
   renderUnfinishedPlays();
+  renderGameRunSummary();
   renderGameMetrics();
   renderDailyTable();
   renderInsight();
@@ -657,6 +658,53 @@ function renderUnfinishedPlays() {
         <td data-label="도달치"><strong>${escapeHtml(level)}</strong><small>${escapeHtml(score)}</small></td>
         <td data-label="마지막 신호">${escapeHtml(formatAnalyticsEventTime(row.lastSeenAt))}</td>
         <td data-label="계정·판 맥락">${unfinishedPlayContext(row)}</td>
+      </tr>`;
+    }).join("");
+}
+
+function gameRunStatusLabel(status, stale) {
+  const labels = {
+    completed: ["정상 완료", "game_over 확인"],
+    scene_exit: ["장면 종료", "scene_exit 확인"],
+    app_quit: ["앱 종료 감지", "app_quit 확인"],
+    unknown_stale: ["미확인·stale", stale ? "마지막 신호가 오래됨" : "완료·종료 신호 없음"],
+  };
+  return labels[String(status)] || labels.unknown_stale;
+}
+
+function formatRunAge(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  const seconds = Math.max(0, Math.round(value));
+  if (seconds < 60) return `${seconds}초 전`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}분 전`;
+  return `${Math.floor(seconds / 3600)}시간 전`;
+}
+
+function renderGameRunSummary() {
+  const summary = state.payload?.gameRunSummary ?? {};
+  const rows = Array.isArray(summary.rows) ? summary.rows : [];
+  setText("gameRunStatusTotal", `${formatNumber(Number(summary.total ?? 0))}판`);
+  const latest = summary.latestCheckpoint;
+  if (!latest || typeof latest !== "object") {
+    setText("gameRunLatestCheckpoint", "마지막 체크포인트 없음");
+  } else {
+    const level = latest.level !== null && latest.level !== undefined && Number.isFinite(Number(latest.level)) ? `Lv.${formatNumber(Number(latest.level))}` : "레벨 미확인";
+    const score = latest.score !== null && latest.score !== undefined && Number.isFinite(Number(latest.score)) ? `${formatNumber(Number(latest.score))}점` : "점수 미확인";
+    setText("gameRunLatestCheckpoint", `마지막 체크포인트 ${formatRunAge(Number(latest.ageSec))} · ${score} · ${level}`);
+  }
+  byId("gameRunStatusTable").innerHTML = rows.length === 0
+    ? '<tr><td class="empty-row" colspan="6">판 상태 신호가 아직 없습니다.</td></tr>'
+    : rows.map((row) => {
+      const [label, detail] = gameRunStatusLabel(row.status, row.stale === true);
+      const level = row.lastLevel !== null && row.lastLevel !== undefined && Number.isFinite(Number(row.lastLevel)) ? `Lv.${formatNumber(Number(row.lastLevel))}` : "레벨 미확인";
+      const score = row.lastScore !== null && row.lastScore !== undefined && Number.isFinite(Number(row.lastScore)) ? `${formatNumber(Number(row.lastScore))}점` : "점수 미확인";
+      return `<tr>
+        <td data-label="상태"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></td>
+        <td data-label="판 수">${formatNumber(Number(row.games ?? 0))}판</td>
+        <td data-label="일시중지·복귀">${formatNumber(Number(row.suspendCount ?? 0))}회 · ${formatNumber(Number(row.resumeCount ?? 0))}회</td>
+        <td data-label="체크포인트">${formatNumber(Number(row.checkpointCount ?? 0))}회<small>${escapeHtml(formatRunAge(row.lastCheckpointAgeSec))}</small></td>
+        <td data-label="마지막 확인치"><strong>${escapeHtml(score)}</strong><small>${escapeHtml(level)}</small></td>
+        <td data-label="마지막 신호">${escapeHtml(formatRunAge(row.lastSeenAgeSec))}</td>
       </tr>`;
     }).join("");
 }

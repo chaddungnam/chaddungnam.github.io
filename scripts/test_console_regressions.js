@@ -49,7 +49,11 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260903-1/, "the Console must cache-bust the unfinished-play context update");
+assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose privacy-safe per-game terminal status rows");
+assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
+assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
+assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
+assert.match(consoleHtml, /analytics\.js\?v=20260903-2/, "the Console must cache-bust the game-run status update");
 assert.match(consoleHtml, /id="coreLoopSummary"/, "the Console must expose completed-run core-loop quality metrics");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {
