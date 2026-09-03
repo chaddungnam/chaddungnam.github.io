@@ -30,17 +30,18 @@ test("notice page reads the active console notice instead of a static copy", asy
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });
 
-test("embedded notice list is compact white and directly translates the Korean source", async () => {
+test("embedded notice list is compact white and translates through the Google page widget", async () => {
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
   assert.match(html, /body\.embedded\s*\{[^}]*background:\s*#fff/s);
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
   assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*1/s);
-  assert.match(html, /translate\.googleapis\.com\/translate_a\/single/);
-  assert.match(html, /for \(let attempt = 0; attempt < 2; attempt \+= 1\)/);
-  assert.match(html, /fetch\(url, \{ cache: "no-store" \}\)/);
+  assert.doesNotMatch(html, /translate\.googleapis\.com\/translate_a\/single/);
+  assert.match(html, /translate\.google\.com\/translate_a\/element\.js/);
+  assert.match(html, /google\.translate\.TranslateElement/);
+  assert.match(html, /applyGooglePageTranslation\(nextLanguage\)/);
   assert.doesNotMatch(html, /notice\.localized === true/);
   assert.match(html, /noticeEndpoint\.searchParams\.set\("lang"/);
-  assert.match(html, /if \(known !== notice \|\| nextLanguage === "ko"\) return known/);
+  assert.match(html, /const localizeNotice = \(notice, manifest, nextLanguage\) => localizeKnownNotice/);
   assert.match(html, /id="notice-loading"/);
   assert.match(html, /class="notice-spinner"/);
   assert.match(html, /loadNotices\(language\)/);

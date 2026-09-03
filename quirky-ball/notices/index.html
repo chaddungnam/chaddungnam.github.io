@@ -139,41 +139,47 @@
       document.querySelector("#back-to-list").textContent = labels.back;
       document.title = `${labels.title} — House Duck`;
     };
-    const translateText = async (text, targetLanguage) => {
-      if (targetLanguage === "ko" || !text) return text;
-      const target = encodeURIComponent(googleLanguage);
-      const query = encodeURIComponent(text);
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=${target}&dt=t&q=${query}`;
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        try {
-          const response = await fetch(url, { cache: "no-store" });
-          if (!response.ok) continue;
-          const translated = await response.json();
-          const joined = Array.isArray(translated?.[0])
-            ? translated[0].map((part) => part?.[0] ?? "").join("")
-            : "";
-          if (joined) return joined;
-        } catch (_error) {
-          // 첫 WebView 네트워크 요청이 늦게 붙는 경우 한 번만 다시 시도한다.
-        }
-      }
-      return text;
-    };
+    const applyGooglePageTranslation = (nextLanguage) => new Promise((done) => {
+      if (nextLanguage === "ko") return done();
+      const host = document.createElement("div");
+      host.id = "google_translate_element";
+      host.hidden = true;
+      document.body.append(host);
+      const style = document.createElement("style");
+      style.textContent = "#google_translate_element,.goog-te-banner-frame{display:none!important}body{top:0!important}";
+      document.head.append(style);
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        done();
+      };
+      const apply = () => {
+        if (finished) return;
+        const select = document.querySelector(".goog-te-combo");
+        if (!(select instanceof HTMLSelectElement)) return window.setTimeout(apply, 40);
+        select.value = googleLanguage;
+        select.dispatchEvent(new Event("change"));
+        window.setTimeout(finish, 550);
+      };
+      window.googleTranslateElementInit = () => {
+        new google.translate.TranslateElement({ pageLanguage: "ko", includedLanguages: Object.keys(languageNames).filter((locale) => locale !== "ko").map((locale) => ({ zh_CN: "zh-CN", zh_TW: "zh-TW" }[locale] ?? locale)).join(","), autoDisplay: false }, "google_translate_element");
+        window.setTimeout(apply, 250);
+      };
+      const script = document.createElement("script");
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      script.onerror = finish;
+      document.head.append(script);
+      window.setTimeout(finish, 1800);
+    });
     const localizeKnownNotice = (notice, manifest, nextLanguage) => {
       const source = manifest?.locales?.ko;
       const translation = manifest?.locales?.[nextLanguage];
       if (String(notice.id) !== "3" || !source || !translation || notice.body.trim() !== source.body.trim()) return notice;
       return { ...notice, title: translation.title, body: translation.body };
     };
-    const localizeNotice = async (notice, manifest, nextLanguage) => {
-      const known = localizeKnownNotice(notice, manifest, nextLanguage);
-      if (known !== notice || nextLanguage === "ko") return known;
-      return {
-        ...notice,
-        title: await translateText(String(notice.title ?? "공지"), nextLanguage),
-        body: await translateText(String(notice.body), nextLanguage),
-      };
-    };
+    const localizeNotice = (notice, manifest, nextLanguage) => localizeKnownNotice(notice, manifest, nextLanguage);
     const renderDetail = (notice) => {
       document.querySelector("#back-to-list").hidden = false;
       date.hidden = false;
@@ -206,7 +212,7 @@
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           : []);
         if (!notices.length) throw new Error("notice_unavailable");
-        const localizedNotices = await Promise.all(notices.map((notice) => localizeNotice(notice, manifest, nextLanguage)));
+        const localizedNotices = notices.map((notice) => localizeNotice(notice, manifest, nextLanguage));
         list.replaceChildren(...localizedNotices.map((notice) => {
             const card = document.createElement("button");
             card.type = "button";
@@ -226,6 +232,7 @@
             card.addEventListener("click", () => renderDetail(notice));
             return card;
           }));
+        await applyGooglePageTranslation(nextLanguage);
         stopLoadingAnimation();
         loading.hidden = true;
         list.hidden = false;
@@ -238,7 +245,7 @@
         detail.hidden = false;
         date.hidden = true;
         document.querySelector("#back-to-list").hidden = true;
-        body.textContent = "현재 이 공지를 불러올 수 없어요.";
+        body.textContent = language === "ko" ? "현재 이 공지를 불러올 수 없어요." : "Unable to load this notice.";
         body.className = "error";
       }
     };
