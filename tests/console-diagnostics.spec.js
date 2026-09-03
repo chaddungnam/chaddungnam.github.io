@@ -32,7 +32,15 @@ const dashboard = {
     startedAt: 1788333072, lastSeenAt: 1788333114, level: 1, score: 157, tutorial: true,
     tutorialStage: "bomb_roulette", tutorialStageIndex: 9, lastScreen: "main",
     lastButtonId: "main/ui/control_0/panel_1/button_0", status: "background", isNewPlayer: true,
-    identityMatch: "time_window",
+    identityMatch: "time_window", accountCompletedGameCount: 0,
+    sameInstallCompletedAfterCount: 0,
+  }, {
+    installKey: "설치 654321", userId: "user-scapy", nickname: "스카피", displayCode: "SCAPY1", country: "KR",
+    startedAt: 1788332000, lastSeenAt: 1788332400, level: 16, score: 538961, tutorial: false,
+    tutorialStage: "", tutorialStageIndex: null, lastScreen: "gameloading",
+    lastButtonId: "main/ui/control_0/panel_1/button_0", status: "verified_exit", isNewPlayer: false,
+    identityMatch: "same_install", accountCompletedGameCount: 3,
+    sameInstallCompletedAfterCount: 1, latestCompletedScore: 2005262, latestCompletedLevel: 16,
   }],
   periodPlayers: [],
   periodPlayerTotal: 0,
@@ -70,13 +78,18 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#marketingGateSummary")).toContainText("49.0% / 50.0%");
   await expect(page.locator("#marketingGateSummary")).toContainText("51.0% / 50.0% 미만");
   await expect(page.locator("#screenDropoffDefinition")).toHaveText("명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.");
-  await expect(page.locator("#unfinishedPlaysStatus")).toHaveText("1명");
+  await expect(page.locator("#unfinishedPlaysTitle")).toHaveText("완료되지 않은 판");
+  await expect(page.locator("#unfinishedPlaysStatus")).toHaveText("2판");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("팝팝");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("스카피");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("신규 첫 실행");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("백그라운드 전환");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("튜토리얼 · 폭탄 룰렛");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("Lv.1");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("157점");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("계정 완료 0판");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("이후 완료 1판");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("2,005,262점 · Lv.16");
   await expect(page.locator("#coreLoopSummary")).toContainText("중앙 점수");
   await expect(page.locator("#coreLoopSummary")).toContainText("2,600점");
   await expect(page.locator("#coreLoopSummary")).toContainText("분당 점수");

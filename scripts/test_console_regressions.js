@@ -28,7 +28,7 @@ const consoleStyles = read("console/styles.css");
 assert.match(consoleHtml, /<a\s+id="skipLink"[^>]+href="#loginPanel"/i, "the initial skip link must target the visible login panel");
 assert.match(consoleHtml, /id="kpiActiveLabel"/, "the active-player KPI must expose a range-aware label");
 assert.match(consoleHtml, /id="dailyTrendEyebrow"/, "the daily trend heading must follow the selected range");
-assert.match(analyticsSource, /setText\("kpiActive", formatNumber\(summary\.installs\)\)/, "the active-player KPI must count unique installs across the selected range");
+assert.match(analyticsSource, /setText\("kpiActive", formatNumber\(activeAccounts\)\)/, "the active-account KPI must count selected-range account activity");
 assert.match(analyticsSource, /ConsoleAPI\.post\("analytics-dashboard-v2"/, "the Console must load account visits through the secured analytics wrapper");
 assert.match(read("console/api.js"), /"analytics-dashboard-v2"/, "the secured Console API allowlist must permit the analytics wrapper");
 assert.match(consoleHtml, /api\.js\?v=20260829-1/, "the Console must cache-bust the updated API allowlist");
@@ -49,7 +49,7 @@ assert.match(consoleHtml, /id="mechakuchaSummary"/, "the gameplay diagnostics Me
 assert.match(consoleHtml, /id="gameOverChart"/, "the gameplay diagnostics game-over canvas must exist");
 assert.match(consoleHtml, /id="gameOverDailyTable"/, "the gameplay diagnostics daily game-over table must exist");
 assert.match(consoleHtml, /id="gameOverBucketTable"/, "the gameplay diagnostics level-bucket table must exist");
-assert.match(consoleHtml, /analytics\.js\?v=20260831-1/, "the Console must cache-bust the evaluation explanation update");
+assert.match(consoleHtml, /analytics\.js\?v=20260903-1/, "the Console must cache-bust the unfinished-play context update");
 assert.match(consoleHtml, /id="coreLoopSummary"/, "the Console must expose completed-run core-loop quality metrics");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {
@@ -86,7 +86,7 @@ assert.match(pulseSource, /confidence: isEstimate \? "estimate" : "standard"/, "
 assert.match(pulseSource, /periodReturn = payload\.periodReturn/, "Pulse return scoring must follow the selected range");
 assert.match(consoleHtml, /선택 기간과 바로 이전 같은 기간 비교/, "the return card must explain its selected-range comparison");
 assert.match(analyticsSource, /periodReturn\.previousPlayers/, "the return explanation must show the previous-window denominator");
-assert.match(analyticsSource, /총 \$\{formatNumber\(Number\(summary\.installs/, "the overall judgment must start with all selected-range players");
+assert.match(analyticsSource, /총 활동 계정은 \$\{formatNumber\(activeAccounts/, "the overall judgment must start with all selected-range active accounts");
 assert.match(analyticsSource, /find\(\(row\) => row\?\.event === "game_over"\)\?\.users/, "the overall judgment must count distinct people who completed a game");
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
@@ -103,7 +103,7 @@ assert.match(consoleHtml, /auth\.js\?v=20260829-1/, "the Console must cache-bust
 assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
 assert.match(consoleHtml, /정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료/, "the period account panel must explain every supported activity signal");
 assert.match(consoleHtml, /id="accountActivitySummary"/, "the Console must expose exact account visits and account retention");
-assert.match(consoleHtml, /백그라운드 복귀·세션 확인·계정 동기화는 방문에서 제외/, "the account visit definition must exclude resumes and polling");
+assert.match(consoleHtml, /백그라운드 복귀 같은 session_start만으로는 세지 않습니다/, "the account visit definition must exclude session-only resumes");
 assert.match(analyticsSource, /source === "app_visit"[\s\S]*새 실행 방문/, "fresh process visits must remain a distinct activity source");
 assert.match(analyticsSource, /zeroCompletedGameAccounts/, "zero-completion visiting accounts must be visible");
 assert.match(analyticsSource, /source === "app_activity"[\s\S]*앱 서버 접속/, "existing builds must show server-confirmed app activity");
@@ -116,7 +116,7 @@ assert.match(consoleHtml, /styles\.css\?v=20260830-7/, "the Console must cache-b
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
-assert.match(analyticsSource, /현재 1\.1\.0 배포본에는 방문 RPC 호출 코드가 없어 0으로 표시/, "account visit coverage must explain why released 1.1.0 stays at zero");
+assert.match(consoleHtml, /정확 계측 지원 빌드 대기/, "account visit coverage must disclose instrumentation readiness");
 assert.match(analyticsSource, /String\(row\.screen \|\| ""\)\.toLowerCase\(\) !== "home"/, "ordinary home exits must be hidden from screen drop-off cards");
 assert.match(analyticsSource, /명시적인 앱 종료가 선택보다 먼저 기록된/, "the priority insight must only call an explicit app quit a stop");
 assert.match(analyticsSource, /명시적인 앱 종료가 선택보다 먼저 기록된/, "the priority insight must only show explicit app quits");
@@ -485,6 +485,7 @@ const operationElements = {
   referralConfigForm: referralConfig.form,
   qaAccessForm: qaAccess.form,
   announcementForm: announcement.form,
+  announcementReset: appElement(),
   rewardTemplatePreview: appElement(),
   rewardValueLabel: Object.assign(appElement(), { firstChild: { textContent: "" } }),
   operationsMessage: appElement(),

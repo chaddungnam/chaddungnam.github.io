@@ -607,11 +607,29 @@ function formatAnalyticsEventTime(value) {
   return formatServerTime(Number.isFinite(numeric) && numeric > 0 && numeric < 1e12 ? numeric * 1000 : value);
 }
 
+function unfinishedPlayContext(row) {
+  const laterCompleted = Number(row.sameInstallCompletedAfterCount || 0);
+  const accountCompleted = Number(row.accountCompletedGameCount);
+  if (laterCompleted > 0) {
+    const score = Number(row.latestCompletedScore);
+    const level = Number(row.latestCompletedLevel);
+    const result = Number.isFinite(score) && Number.isFinite(level)
+      ? `${formatNumber(score)}점 · Lv.${formatNumber(level)}`
+      : "완료 결과 확인";
+    return `<strong>이후 완료 ${formatNumber(laterCompleted)}판</strong><small>같은 설치 · ${result}</small>`;
+  }
+  if (Number.isFinite(accountCompleted) && accountCompleted > 0) {
+    return `<strong>계정 완료 ${formatNumber(accountCompleted)}판</strong><small>이 미완료 판과는 별개</small>`;
+  }
+  if (row.userId) return "<strong>계정 완료 0판</strong><small>이 기간에 정상 완료 신호 없음</small>";
+  return "<strong>완료 이력 미확인</strong><small>계정 연결 필요</small>";
+}
+
 function renderUnfinishedPlays() {
   const rows = Array.isArray(state.payload?.unfinishedPlays) ? state.payload.unfinishedPlays : [];
-  setText("unfinishedPlaysStatus", `${formatNumber(rows.length)}명`);
+  setText("unfinishedPlaysStatus", `${formatNumber(rows.length)}판`);
   byId("unfinishedPlaysTable").innerHTML = rows.length === 0
-    ? '<tr><td class="empty-row" colspan="5">이 기간에 완료되지 않은 플레이가 없습니다.</td></tr>'
+    ? '<tr><td class="empty-row" colspan="6">이 기간에 완료되지 않은 판이 없습니다.</td></tr>'
     : rows.map((row) => {
       const status = unfinishedPlayStatus(row.status);
       const identity = row.userId
@@ -627,12 +645,18 @@ function renderUnfinishedPlays() {
       const score = row.score !== null && row.score !== undefined && Number.isFinite(Number(row.score))
         ? `${formatNumber(Number(row.score))}점`
         : "점수 미확인";
+      const identityEvidence = row.identityMatch === "same_install"
+        ? "<small>같은 설치의 완료 판과 대조</small>"
+        : row.identityMatch === "time_window"
+          ? "<small>계정·플레이 시각 추정 연결</small>"
+          : "";
       return `<tr>
-        <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${row.identityMatch === "time_window" ? "<small>계정·플레이 시각 일치</small>" : ""}</div></td>
+        <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${identityEvidence}</div></td>
         <td data-label="상태"><strong>${escapeHtml(status[0])}</strong><small>${escapeHtml(status[1])}</small></td>
         <td data-label="마지막 확인 위치"><strong>${escapeHtml(stage)}</strong><small>${escapeHtml(action)}</small></td>
         <td data-label="도달치"><strong>${escapeHtml(level)}</strong><small>${escapeHtml(score)}</small></td>
         <td data-label="마지막 신호">${escapeHtml(formatAnalyticsEventTime(row.lastSeenAt))}</td>
+        <td data-label="계정·판 맥락">${unfinishedPlayContext(row)}</td>
       </tr>`;
     }).join("");
 }
