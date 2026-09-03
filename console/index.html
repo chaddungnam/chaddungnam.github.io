@@ -212,6 +212,13 @@
           <div class="table-scroll"><table><thead><tr><th>상태</th><th>판 수</th><th>일시중지·복귀</th><th>체크포인트</th><th>마지막 확인치</th><th>마지막 신호</th></tr></thead><tbody id="gameRunStatusTable"></tbody></table></div>
         </section>
 
+        <section class="panel panel-wide balance-telemetry-panel" aria-labelledby="balanceTelemetryTitle">
+          <div class="panel-heading"><div><p class="eyebrow">BALANCE SIGNALS</p><h2 id="balanceTelemetryTitle">밸런스 신호</h2><small>판 종료·성장 선택·30초 체크포인트에서만 요약합니다. 식별자와 샷 단위 기록은 표시하지 않으며, 선택별 비교는 인과관계로 단정하지 않습니다.</small></div><span id="balanceTelemetryStatus" class="panel-total">수집 대기</span></div>
+          <div class="table-scroll"><table><thead><tr><th>판 상태</th><th>판 수</th><th>중앙 도달 레벨</th><th>중앙 점수</th><th>중앙 플레이 시간</th></tr></thead><tbody id="balanceTerminalTable"></tbody></table></div>
+          <p id="balancePressureSummary" class="dashboard-message">보드 압력 체크포인트 수집 대기</p>
+          <div class="table-scroll"><table><thead><tr><th>성장 선택</th><th>선택 판</th><th>정상 완료율</th><th>완료 중앙 레벨</th><th>완료 중앙 점수</th><th>종료 분포</th></tr></thead><tbody id="balanceChoiceTable"></tbody></table></div>
+        </section>
+
         <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
           <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">PLAYER JOURNEY</p><h2>사람들이 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 사람 수예요. 고유 설치 ID로 구분합니다.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
           <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>온 사람</span><span><i class="legend-coral"></i>완료</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="일별 활동 인원과 게임 완료 차트"></canvas></div></article>
@@ -371,7 +378,7 @@
   <script src="ui-state.js"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260903-2"></script>
+  <script src="analytics.js?v=20260903-3"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260829-1"></script>
   <script src="operations.js?v=20260902-2"></script>

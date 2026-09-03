@@ -53,7 +53,12 @@ assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose pr
 assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
 assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
 assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
-assert.match(consoleHtml, /analytics\.js\?v=20260903-2/, "the Console must cache-bust the game-run status update");
+assert.match(consoleHtml, /analytics\.js\?v=20260903-3/, "the Console must cache-bust the balance signal update");
+assert.match(consoleHtml, /id="balanceTerminalTable"/, "the Console must expose privacy-safe balance terminal outcomes");
+assert.match(consoleHtml, /id="balancePressureSummary"/, "the Console must expose checkpoint board pressure");
+assert.match(consoleHtml, /id="balanceChoiceTable"/, "the Console must expose growth-choice outcomes");
+assert.match(analyticsSource, /renderBalanceSummary\(\)/, "the Console must render balance telemetry");
+assert.match(analyticsSource, /balanceSummary/, "the Console must consume the dashboard balance summary response");
 assert.match(consoleHtml, /id="coreLoopSummary"/, "the Console must expose completed-run core-loop quality metrics");
 assert.match(consoleHtml, /id="executiveTitle"[^>]*>지금 알아야 할 5가지</, "analytics must begin with a plain-language executive snapshot");
 for (const id of ["execPlayers", "execCompleted", "execPlayTime", "execExit", "execReturn"]) {

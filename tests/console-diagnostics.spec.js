@@ -55,6 +55,19 @@ const dashboard = {
     ],
     latestCheckpoint: { ageSec: 30, level: 1, score: 80, status: "unknown_stale" },
   },
+  balanceSummary: {
+    runs: 4,
+    terminalOutcomes: [
+      { status: "completed", games: 1, medianLevel: 6, medianScore: 500, medianDurationSec: 100 },
+      { status: "scene_exit", games: 1, medianLevel: 2, medianScore: 100, medianDurationSec: 30 },
+      { status: "app_quit", games: 1, medianLevel: 1, medianScore: 60, medianDurationSec: 20 },
+      { status: "unknown_stale", games: 1, medianLevel: 1, medianScore: 80, medianDurationSec: null },
+    ],
+    pressure: { checkpointSamples: 2, medianMarbles: 10.5, p90Marbles: 12, medianMaxLevel: 4.5, p90MaxLevel: 5, medianOccupancyPct: 52.5, p90OccupancyPct: 80 },
+    choiceOutcomes: [
+      { choice: "watcher_eye", selectedRuns: 1, completedRuns: 1, sceneExitRuns: 0, appQuitRuns: 0, unknownStaleRuns: 0, completionRate: 1, medianFinalLevel: 6, medianFinalScore: 500 },
+    ],
+  },
   diagnostics: {
     issueSignals: [{ signal: "tutorial_incomplete", count: 1 }],
     tutorial: { started: 4, completed: 2, aborted: 1, incomplete: 1, completionRate: 0.5, stages: [
@@ -119,6 +132,13 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#gameRunStatusTable")).toContainText("미확인·stale");
   await expect(page.locator("#gameRunStatusTable")).toContainText("1회 · 1회");
   await expect(page.locator("#gameRunLatestCheckpoint")).toContainText("30초 전");
+  await expect(page.locator("#balanceTerminalTable")).toContainText("정상 완료");
+  await expect(page.locator("#balanceTerminalTable")).toContainText("500점");
+  await expect(page.locator("#balancePressureSummary")).toContainText("중앙 10.5개");
+  await expect(page.locator("#balancePressureSummary")).toContainText("P90 12개");
+  await expect(page.locator("#balancePressureSummary")).toContainText("중앙 52.5%");
+  await expect(page.locator("#balanceChoiceTable")).toContainText("Watcher Eye");
+  await expect(page.locator("#balanceChoiceTable")).toContainText("100.0%");
 });
 
 test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, and mobile width", async ({ page, isMobile }) => {

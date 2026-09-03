@@ -216,6 +216,7 @@ function renderDashboard() {
   renderPeriodPlayers();
   renderUnfinishedPlays();
   renderGameRunSummary();
+  renderBalanceSummary();
   renderGameMetrics();
   renderDailyTable();
   renderInsight();
@@ -707,6 +708,58 @@ function renderGameRunSummary() {
         <td data-label="마지막 신호">${escapeHtml(formatRunAge(row.lastSeenAgeSec))}</td>
       </tr>`;
     }).join("");
+}
+
+function balanceTerminalLabel(status) {
+  return ({
+    completed: "정상 완료",
+    scene_exit: "장면 종료",
+    app_quit: "앱 종료 감지",
+    unknown_stale: "미확인·stale",
+  })[String(status)] || "미확인·stale";
+}
+
+function balanceChoiceLabel(choice) {
+  if (String(choice) === "watcher_eye") return "Watcher Eye";
+  return root.ConsoleModel?.analyticsChoiceName?.(choice) || String(choice || "알 수 없음");
+}
+
+function balanceValue(value, suffix = "") {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  const formatted = Number.isInteger(value) ? formatNumber(value) : value.toFixed(1);
+  return `${formatted}${suffix}`;
+}
+
+function renderBalanceSummary() {
+  const summary = state.payload?.balanceSummary ?? {};
+  const terminalRows = Array.isArray(summary.terminalOutcomes) ? summary.terminalOutcomes : [];
+  const pressure = summary.pressure && typeof summary.pressure === "object" ? summary.pressure : {};
+  const choices = Array.isArray(summary.choiceOutcomes) ? summary.choiceOutcomes : [];
+  const runCount = Number(summary.runs ?? 0);
+  const checkpointCount = Number(pressure.checkpointSamples ?? 0);
+  setText("balanceTelemetryStatus", runCount > 0 ? `${formatNumber(runCount)}판 · ${formatNumber(checkpointCount)}개 체크포인트` : "수집 대기");
+  byId("balanceTerminalTable").innerHTML = terminalRows.length === 0
+    ? '<tr><td class="empty-row" colspan="5">판 종료 신호 수집 대기</td></tr>'
+    : terminalRows.map((row) => `<tr>
+        <td data-label="판 상태"><strong>${escapeHtml(balanceTerminalLabel(row.status))}</strong></td>
+        <td data-label="판 수">${formatNumber(Number(row.games ?? 0))}판</td>
+        <td data-label="중앙 도달 레벨">${escapeHtml(balanceValue(row.medianLevel, "레벨"))}</td>
+        <td data-label="중앙 점수">${escapeHtml(balanceValue(row.medianScore, "점"))}</td>
+        <td data-label="중앙 플레이 시간">${escapeHtml(formatDuration(row.medianDurationSec))}</td>
+      </tr>`).join("");
+  setText("balancePressureSummary", checkpointCount > 0
+    ? `보드 압력 · ${formatNumber(checkpointCount)}개 샘플 · 점유율 중앙 ${balanceValue(pressure.medianOccupancyPct, "%")} · P90 ${balanceValue(pressure.p90OccupancyPct, "%")} · 구슬 중앙 ${balanceValue(pressure.medianMarbles, "개")} · P90 ${balanceValue(pressure.p90Marbles, "개")} · 최고 레벨 중앙 ${balanceValue(pressure.medianMaxLevel, "레벨")} · P90 ${balanceValue(pressure.p90MaxLevel, "레벨")}`
+    : "보드 압력 체크포인트 수집 대기");
+  byId("balanceChoiceTable").innerHTML = choices.length === 0
+    ? '<tr><td class="empty-row" colspan="6">성장 선택 결과 수집 대기</td></tr>'
+    : choices.map((row) => `<tr>
+        <td data-label="성장 선택"><strong>${escapeHtml(balanceChoiceLabel(row.choice))}</strong></td>
+        <td data-label="선택 판">${formatNumber(Number(row.selectedRuns ?? 0))}판</td>
+        <td data-label="정상 완료율">${escapeHtml(formatRate(row.completionRate))}</td>
+        <td data-label="완료 중앙 레벨">${escapeHtml(balanceValue(row.medianFinalLevel, "레벨"))}</td>
+        <td data-label="완료 중앙 점수">${escapeHtml(balanceValue(row.medianFinalScore, "점"))}</td>
+        <td data-label="종료 분포">완료 ${formatNumber(Number(row.completedRuns ?? 0))} · 장면 ${formatNumber(Number(row.sceneExitRuns ?? 0))} · 앱 ${formatNumber(Number(row.appQuitRuns ?? 0))} · 미확인 ${formatNumber(Number(row.unknownStaleRuns ?? 0))}</td>
+      </tr>`).join("");
 }
 
 function distributionLabel(value) {
