@@ -28,6 +28,13 @@
     setMessage(value, error);
   }
 
+  function operationError(error) {
+    const messages = {
+      notice_translation_unavailable: "공지 자동 번역 서버가 응답하지 않았습니다. 입력한 본문은 유지됐으니 잠시 후 다시 시도해 주세요.",
+    };
+    return messages[error?.message] || error?.message || "알 수 없는 오류";
+  }
+
   function render(data, referrals = {}) {
     rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
     const config = data.config || {};
@@ -81,7 +88,7 @@
       report(`${title} 작업을 완료했습니다.`);
     } catch (error) {
       if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
-      report(`작업을 완료하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+      report(`작업을 완료하지 못했습니다: ${operationError(error)}`, true);
     } finally {
       finishRequest();
     }
