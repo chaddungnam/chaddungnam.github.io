@@ -146,7 +146,7 @@
       host.hidden = true;
       document.body.append(host);
       const style = document.createElement("style");
-      style.textContent = "#google_translate_element,.goog-te-banner-frame{display:none!important}body{top:0!important}";
+      style.textContent = "#google_translate_element,.goog-te-banner-frame,iframe.VIpgJd-ZVi9od-ORHb-OEVmcd{display:none!important;visibility:hidden!important}body{top:0!important;position:static!important}";
       document.head.append(style);
       let finished = false;
       const finish = () => {
