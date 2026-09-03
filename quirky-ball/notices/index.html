@@ -29,8 +29,6 @@
     #notice-detail[hidden], #notice-list[hidden], #notice-loading[hidden] { display: none; }
     .notice-loading { min-height: 180px; display: grid; place-content: center; gap: 12px; color: #8b6e5d; font-weight: 800; text-align: center; }
     .notice-spinner { width: 30px; height: 30px; margin-inline: auto; border: 3px solid #f1d9c0; border-top-color: #ea623c; border-radius: 50%; animation: spin .8s linear infinite; }
-    #google_translate_element { position: fixed; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
-    .goog-te-banner-frame.skiptranslate { display: none !important; }
     #notice-detail time { display: block; margin: 20px 0 28px; color: #8b6e5d; font-weight: 700; }
     #notice-body { margin: 0; font-size: clamp(1.03rem, 2.5vw, 1.2rem); line-height: 1.85; white-space: pre-line; }
     .back { display: inline-flex; margin-top: 28px; border: 0; border-radius: 999px; background: #ea623c; color: white; padding: 13px 20px; font: inherit; font-weight: 900; text-decoration: none; cursor: pointer; }
@@ -75,7 +73,6 @@
       </section>
     </section>
   </main>
-  <div id="google_translate_element" aria-hidden="true"></div>
   <footer>© 2026 House Duck. 작은 게임, 큰 개성.</footer>
   <script>
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
@@ -142,26 +139,6 @@
       document.querySelector("#back-to-list").textContent = labels.back;
       document.title = `${labels.title} — House Duck`;
     };
-    const waitForBrowserTranslation = () => new Promise((resolve) => {
-      if (language === "ko") return resolve();
-      const startedAt = Date.now();
-      const check = () => document.documentElement.className.includes("translated-") || Date.now() - startedAt > 8000
-        ? resolve()
-        : setTimeout(check, 100);
-      check();
-    });
-    const startBrowserTranslation = () => {
-      if (language === "ko") return Promise.resolve();
-      document.cookie = `googtrans=/ko/${googleLanguage};path=/;SameSite=Lax`;
-      window.googleTranslateElementInit = () => {
-        new google.translate.TranslateElement({ pageLanguage: "ko", includedLanguages: googleLanguage, autoDisplay: false }, "google_translate_element");
-      };
-      const script = document.createElement("script");
-      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.onerror = () => document.documentElement.classList.add("translation-fallback");
-      document.head.append(script);
-      return waitForBrowserTranslation();
-    };
     const translateText = async (text, targetLanguage) => {
       if (targetLanguage === "ko" || !text) return text;
       try {
@@ -186,7 +163,7 @@
     };
     const localizeNotice = async (notice, manifest, nextLanguage) => {
       const known = localizeKnownNotice(notice, manifest, nextLanguage);
-      if (known !== notice || nextLanguage === "ko" || notice.localized === true) return known;
+      if (known !== notice || nextLanguage === "ko") return known;
       return {
         ...notice,
         title: await translateText(String(notice.title ?? "공지"), nextLanguage),
@@ -245,9 +222,6 @@
             card.addEventListener("click", () => renderDetail(notice));
             return card;
           }));
-        if (localizedNotices.some((notice, index) => notice.body === notices[index].body)) {
-          await startBrowserTranslation();
-        }
         stopLoadingAnimation();
         loading.hidden = true;
         list.hidden = false;
