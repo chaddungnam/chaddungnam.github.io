@@ -2,6 +2,7 @@
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "계속";
+  const noticeMarkup = (notice) => `<article class="audit-item" data-notice-id="${escapeHtml(notice.id)}" data-starts-at="${escapeHtml(notice.starts_at || "")}" data-ends-at="${escapeHtml(notice.ends_at || "")}"><div><strong>공지 #${escapeHtml(notice.id)}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code><button type="button" class="warning-button" data-edit-notice="${escapeHtml(notice.id)}">수정</button></article>`;
   let bound = false;
   let rewardCatalog = [];
   const pendingRequests = new WeakMap();
@@ -20,6 +21,13 @@
     byId("operationsMessage").style.color = error ? "var(--coral)" : "";
   }
 
+  function setAnnouncementMessage(value, error = false) {
+    const message = byId("announcementMessage");
+    root.ConsoleUiState.setMessage(message, value, error);
+    message.style.color = error ? "var(--coral)" : "";
+    setMessage(value, error);
+  }
+
   function render(data, referrals = {}) {
     rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
     const config = data.config || {};
@@ -28,7 +36,7 @@
     byId("operationsSummary").innerHTML = `<article data-tone="neutral"><span>최소 표시 버전</span><strong>${escapeHtml(config.min_version || "—")}</strong></article><article data-tone="neutral"><span>공통 호환 코드</span><strong>${escapeHtml(config.min_version_code || "—")}</strong></article><article data-tone="${mutationsEnabled ? "good" : "watch"}"><span>플레이어 수정</span><strong>${mutationsEnabled ? "활성" : "잠김"}</strong></article><article data-tone="${referralsEnabled ? "good" : "watch"}"><span>친구초대</span><strong>${referralsEnabled ? "활성" : "중지"}</strong></article>`;
     byId("referralMetrics").innerHTML = `<article data-tone="neutral"><span>생성 코드</span><strong>${escapeHtml(referrals.codes_issued || 0)}</strong></article><article data-tone="good"><span>성공 초대</span><strong>${escapeHtml(referrals.accepted_total || 0)}</strong></article><article data-tone="neutral"><span>오늘 성공</span><strong>${escapeHtml(referrals.accepted_today_utc || 0)}</strong></article><article data-tone="watch"><span>3회 완료</span><strong>${escapeHtml(referrals.tier_3_total || 0)}</strong></article>`;
     byId("referralConfigForm").elements.enabled.checked = referralsEnabled;
-    const notices = (data.notices || []).map((notice) => `<article class="audit-item" data-notice-id="${escapeHtml(notice.id)}" data-starts-at="${escapeHtml(notice.starts_at || "")}" data-ends-at="${escapeHtml(notice.ends_at || "")}"><div><strong>공지 #${notice.id}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code><button type="button" class="warning-button" data-edit-notice="${escapeHtml(notice.id)}">수정</button></article>`);
+    const notices = (data.notices || []).map(noticeMarkup);
     const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.summary))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
     byId("minVersionForm").elements.minVersion.value = config.min_version || "";
@@ -50,25 +58,46 @@
     }
   }
 
-  async function submit(form, payload, title, summary) {
+  async function submit(form, payload, title, summary, options = {}) {
+    const report = options.report || setMessage;
+    if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
     const finishRequest = root.ConsoleUiState.beginRequest(form);
     if (!finishRequest) return;
     try {
-      if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
+      report(options.progressMessage || `${title} 처리 중입니다...`);
       const fingerprint = JSON.stringify(payload);
       const pending = pendingRequests.get(form);
       const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
       pendingRequests.set(form, { fingerprint, requestId });
-      await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
+      const result = await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
       pendingRequests.delete(form);
+      if (options.onSuccess) options.onSuccess(result);
       form.reset();
-      setMessage(`${title} 작업을 완료했습니다.`);
-      await load();
+      if (form === byId("announcementForm")) {
+        form.elements.announcementId.value = "";
+        syncAnnouncementSubmit(form);
+      }
+      if (options.reload !== false) await load();
+      report(`${title} 작업을 완료했습니다.`);
     } catch (error) {
       if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
-      setMessage(`작업을 완료하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+      report(`작업을 완료하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
       finishRequest();
+    }
+  }
+
+  function upsertNotice(notice) {
+    const id = Number(notice.id);
+    if (!Number.isSafeInteger(id) || id < 1) return;
+    const history = byId("operationsHistory");
+    const existing = Array.from(history.querySelectorAll("[data-notice-id]"))
+      .find((item) => Number(item.dataset.noticeId) === id);
+    const markup = noticeMarkup({ ...notice, id });
+    if (existing) existing.outerHTML = markup;
+    else {
+      history.querySelector(".empty-panel")?.remove();
+      history.insertAdjacentHTML("afterbegin", markup);
     }
   }
 
@@ -189,12 +218,28 @@
       const editing = Number.isInteger(announcementId) && announcementId > 0;
       form.elements.endsAt.setCustomValidity(endsAt && startsAt && Date.parse(endsAt) <= Date.parse(startsAt) ? "게시 종료는 시작보다 뒤여야 합니다." : "");
       if (!startsAt || !form.reportValidity()) return;
-      submit(form, {
+      const payload = {
         action: editing ? "announcements.update" : "announcements.publish",
         ...(editing ? { announcementId } : {}),
         body: values.body.trim(), startsAt, endsAt, reason: values.reason.trim(),
-      }, editing ? "게임 공지 수정" : "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`);
+      };
+      submit(form, payload, editing ? "게임 공지 수정" : "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`, {
+        reload: false,
+        report: setAnnouncementMessage,
+        progressMessage: "공지 번역과 저장을 처리 중입니다. 완료될 때까지 기다려 주세요.",
+        onSuccess: (result) => upsertNotice({
+          id: editing ? announcementId : Number(result?.announcement_id),
+          body: payload.body,
+          starts_at: startsAt,
+          ends_at: endsAt,
+          active: true,
+        }),
+      });
     });
+    byId("announcementForm").addEventListener("invalid", (event) => {
+      const label = event.target?.name === "reason" ? "수정·발행 사유" : "필수 항목";
+      setAnnouncementMessage(`${label}를 입력해 주세요. 아직 서버에는 반영되지 않았습니다.`, true);
+    }, true);
     byId("announcementReset").addEventListener("click", () => {
       const form = byId("announcementForm");
       form.reset();
