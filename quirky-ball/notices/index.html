@@ -97,9 +97,7 @@
     const selectedNoticeId = search.get("notice");
     if (search.has("embed")) document.body.classList.add("embedded");
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
-    const fallbackManifestEndpoint = "/quirky-ball/notices/v1.json";
     const language = languageNames[requested] ? requested : "en";
-    const googleLanguage = { zh_CN: "zh-CN", zh_TW: "zh-TW" }[language] ?? language;
 
     const list = document.querySelector("#notice-list");
     const loading = document.querySelector("#notice-loading");
@@ -140,47 +138,6 @@
       document.querySelector("#back-to-list").textContent = labels.back;
       document.title = `${labels.title} — House Duck`;
     };
-    const applyGooglePageTranslation = (nextLanguage) => new Promise((done) => {
-      if (nextLanguage === "ko") return done();
-      const host = document.createElement("div");
-      host.id = "google_translate_element";
-      host.hidden = true;
-      document.body.append(host);
-      const style = document.createElement("style");
-      style.textContent = "#google_translate_element,.goog-te-banner-frame,iframe.VIpgJd-ZVi9od-ORHb-OEVmcd{display:none!important;visibility:hidden!important}body{top:0!important;position:static!important}";
-      document.head.append(style);
-      let finished = false;
-      const finish = () => {
-        if (finished) return;
-        finished = true;
-        done();
-      };
-      const apply = () => {
-        if (finished) return;
-        const select = document.querySelector(".goog-te-combo");
-        if (!(select instanceof HTMLSelectElement)) return window.setTimeout(apply, 40);
-        select.value = googleLanguage;
-        select.dispatchEvent(new Event("change"));
-        window.setTimeout(finish, 550);
-      };
-      window.googleTranslateElementInit = () => {
-        new google.translate.TranslateElement({ pageLanguage: "ko", includedLanguages: Object.keys(languageNames).filter((locale) => locale !== "ko").map((locale) => ({ zh_CN: "zh-CN", zh_TW: "zh-TW" }[locale] ?? locale)).join(","), autoDisplay: false }, "google_translate_element");
-        window.setTimeout(apply, 250);
-      };
-      const script = document.createElement("script");
-      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.async = true;
-      script.onerror = finish;
-      document.head.append(script);
-      window.setTimeout(finish, 1800);
-    });
-    const localizeKnownNotice = (notice, manifest, nextLanguage) => {
-      const source = manifest?.locales?.ko;
-      const translation = manifest?.locales?.[nextLanguage];
-      if (String(notice.id) !== "3" || !source || !translation || notice.body.trim() !== source.body.trim()) return notice;
-      return { ...notice, title: translation.title, body: translation.body };
-    };
-    const localizeNotice = (notice, manifest, nextLanguage) => localizeKnownNotice(notice, manifest, nextLanguage);
     const renderDetail = (notice) => {
       document.querySelector("#back-to-list").hidden = false;
       date.hidden = false;
@@ -202,20 +159,15 @@
       try {
         const noticeEndpoint = new URL(endpoint);
         noticeEndpoint.searchParams.set("lang", nextLanguage);
-        const [response, manifestResponse] = await Promise.all([
-          fetch(noticeEndpoint, { cache: "no-store" }),
-          fetch(fallbackManifestEndpoint, { cache: "force-cache" }).catch(() => null),
-        ]);
+        const response = await fetch(noticeEndpoint, { cache: "no-store" });
         if (!response.ok) throw new Error("notice_unavailable");
         const data = await response.json();
-        const manifest = manifestResponse?.ok ? await manifestResponse.json() : null;
         const notices = (Array.isArray(data.notices)
           ? data.notices.filter((notice) => notice?.body && notice?.created_at)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           : []);
         if (!notices.length) throw new Error("notice_unavailable");
-        const localizedNotices = notices.map((notice) => localizeNotice(notice, manifest, nextLanguage));
-        list.replaceChildren(...localizedNotices.map((notice) => {
+        list.replaceChildren(...notices.map((notice) => {
             const card = document.createElement("button");
             card.type = "button";
             card.className = "notice-card";
@@ -234,11 +186,10 @@
             card.addEventListener("click", () => renderDetail(notice));
             return card;
           }));
-        await applyGooglePageTranslation(nextLanguage);
         stopLoadingAnimation();
         loading.hidden = true;
         list.hidden = false;
-        const selected = localizedNotices.find((notice) => String(notice.id) === selectedNoticeId);
+        const selected = notices.find((notice) => String(notice.id) === selectedNoticeId);
         if (selected) renderDetail(selected);
       } catch (_error) {
         stopLoadingAnimation();

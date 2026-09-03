@@ -12,12 +12,12 @@ const expectedHashes = {
   "index.apple-touch-icon.png": "7c8f89e26faff90c5e7b6b4da73d5d5244b860f802a7ae85945c7904f1acf138",
   "index.audio.position.worklet.js": "be33985bc7160d6bf9646f259cd86b259cd67b02ccb297ee5c44f8ac84327bc8",
   "index.audio.worklet.js": "5b476a9c9ce642c0ee4256436d1bc31d9c38f868aca0f9a8e2a57c18d2dec2a3",
-  "index.html": "3f6c14e1cb1ecd7e94f103be13fdd2ae96a7cfbc74d04d884f209183c060096e",
+  "index.html": "6eac6f9804fa3b3764f06fc3517a87c8e890228067a21d57c635bc847e6bca1c",
   "index.icon.png": "fa378acf6c37f33d4071db74fb39cd1873fd33681d8a0f4980512db055e48ddf",
   "index.js": "05f22332236b9c234eb18d1833e57a17d0802ab6e65333de4a8317bed68202c6",
-  "index.pck.zip": "59af7ef41c8a1e12401556b8960d8b8ef50d7ac7d95675058cd773381015f5a2",
+  "index.pck.zip": "4a692f81e0f542193248ab1e0e5a2f2f53d509087e86ec7114b1a57e748e3e78",
   "index.png": "f30ee1ca60eba998b83b87f2947f76865011345a6a410a7e395ad41ddc4d80b4",
-  "index.wasm.zip": "1340875de37bf8cfe9c070c1fea13a50e9e8f19af3e7137a3d6fdea9711e01b9",
+  "index.wasm.zip": "3f2dd16b100fa92356fa0cd82ff8980ee06c0e3831ef869ca7a60361d6c583ea",
 };
 
 const homeContracts = {

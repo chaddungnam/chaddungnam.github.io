@@ -8,13 +8,13 @@
   "locales": {
     "ko": {
       "title": "Quirky Ball 1.1.1 업데이트",
-      "body": "게임 진행이 끊기지 않도록 업데이트 후 로그인 흐름과 광고 복귀를 안정화했습니다. 성장 선택과 고레벨 규칙을 더 분명하게 다듬고, 많은 구슬과 연사 상황에서도 같은 화면 품질을 유지하도록 성능을 개선했습니다.",
+      "body": "안녕하세요, House Duck입니다.\n\n1.1.1에서는 첫 플레이와 성장 구간의 흐름을 더 분명하게 다듬었습니다.\n\n• 계정 생성 직후 튜토리얼에서 구슬을 떨어뜨리면, 다음에 올 구슬이 위쪽 미리보기에 바로 보입니다.\n• 레벨 2 매드 구간의 HUD와 햄버거 메뉴가 어두운 화면에 맞춰집니다.\n• 최초 튜토리얼 레벨 3에서 레벨 4로 가는 경험치가 빨라집니다. 레벨 4에 도달하면 홈으로 돌아와 한 호흡 쉰 뒤 본 게임을 시작합니다. 튜토리얼 다시하기도 같은 흐름입니다.\n• 홈으로 돌아온 뒤에는 “다시 와” 대사가 바로 사라지지 않고, 노란색·붉은 쿼키와 시작 영역을 보여 준 다음 터치하면 평소 홈으로 돌아갑니다.\n• 랭킹의 시즌·친구 탭 하단에도 내 순위 고정칸이 빠지지 않습니다.\n• 라이브에서 받은 무지개 테두리를 장착할 수 있게 고쳤습니다.\n\n로그인·광고 복귀, 성장 선택, 고레벨 규칙, 구슬이 많은 화면의 성능도 함께 안정화했습니다.\n\n궁금한 점은 설정 > 고객지원으로 알려 주세요.\nHouse Duck",
       "published_at": "2026-08-29",
       "cta_label": "업데이트 확인하기"
     },
     "en": {
       "title": "Quirky Ball 1.1.1 Update",
-      "body": "We stabilized account continuity after updates and recovery from ads so play is less likely to be interrupted. Growth choices and later-level rules are clearer, with performance improvements for crowded boards and rapid shooting at the same visual quality.",
+      "body": "Hello from House Duck.\n\n1.1.1 makes the first play and growth flow easier to read.\n\n• After you drop a marble in the opening tutorial, the next marble now appears in the top preview.\n• The level 2 mad HUD and hamburger menu match the dark screen.\n• The first tutorial reaches level 4 faster. At level 4 you return home for a short rest before the real game. Tutorial replay uses the same path.\n• Back at home, the “come back later” line stays until you tap to continue, with the yellow and red Quirky and the start area spotlighted.\n• Season and Friends ranking keep your pinned rank box at the bottom.\n• Rainbow frames already granted on live can be equipped.\n\nLogin after updates, ad return, growth choices, later-level rules, and crowded boards are also more stable.\n\nFor questions, use Settings > Support.\nHouse Duck",
       "published_at": "2026-08-29",
       "cta_label": "View the update"
     },
