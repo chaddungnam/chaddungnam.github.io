@@ -30,11 +30,15 @@ test("notice page reads the active console notice instead of a static copy", asy
   assert.doesNotMatch(html, /Quirky Ball 1\.1\.1 업데이트/);
 });
 
-test("embedded notice list is compact white and renders the server-cached locale", async () => {
+test("embedded notice list is compact, balanced, and renders two preview lines", async () => {
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
   assert.match(html, /body\.embedded\s*\{[^}]*background:\s*#fff/s);
+  assert.match(html, /body\.embedded main\s*\{[^}]*padding:\s*8px/s);
+  assert.match(html, /scrollbar-gutter:\s*stable both-edges/);
+  assert.match(html, /body\.embedded #notice-list\s*\{[^}]*padding:\s*0 4px/s);
+  assert.match(html, /body\.embedded #notice-detail\s*\{[^}]*padding:\s*4px 4px 12px/s);
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
-  assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*1/s);
+  assert.match(html, /body\.embedded \.notice-card p\s*\{[^}]*-webkit-line-clamp:\s*2/s);
   assert.doesNotMatch(html, /translate\.google\.com\/translate_a\/element\.js/);
   assert.doesNotMatch(html, /google\.translate\.TranslateElement/);
   assert.doesNotMatch(html, /applyGooglePageTranslation/);
