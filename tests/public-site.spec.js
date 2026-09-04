@@ -360,7 +360,8 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
     expect(layout.afterProjectK).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    for (const asset of layout.cacheAssets) expect(asset).toContain("?v=20260831-playable");
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260904-hero"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260831-playable"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
       const box = node.getBoundingClientRect();
