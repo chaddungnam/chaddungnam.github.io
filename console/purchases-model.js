@@ -28,9 +28,12 @@
   }
 
   function formatMoney(micros, currency) {
-    if (!Number.isFinite(Number(micros)) || !currency) return "—";
-    try { return new Intl.NumberFormat("ko-KR", { style: "currency", currency }).format(Number(micros) / 1_000_000); }
-    catch (_error) { return `${Number(micros) / 1_000_000} ${currency}`; }
+    const amount = Number(micros);
+    if (!Number.isFinite(amount) || amount < 0) return "금액 미기록";
+    const code = String(currency || "").trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(code)) return `${(amount / 1_000_000).toLocaleString("ko-KR")} (통화 미기록)`;
+    try { return new Intl.NumberFormat("ko-KR", { style: "currency", currency: code }).format(amount / 1_000_000); }
+    catch (_error) { return `${amount / 1_000_000} ${code}`; }
   }
 
   function formatRate(value) {

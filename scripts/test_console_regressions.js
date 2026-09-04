@@ -41,7 +41,7 @@ assert.match(consoleHtml, /id="referralMetrics"/, "operations must expose referr
 assert.match(read("console/operations.js"), /action: "referrals\.config\.update"/, "the referral switch must use the secured admin action");
 assert.match(read("console/operations.js"), /action: "referrals\.get"/, "referral metrics must use the secured read action");
 assert.match(read("console/analytics-exclusions.js"), /analytics_exclusions\.list/, "the exclusion route must use the secured admin action");
-assert.ok(consoleHtml.indexOf('<script src="ui-state.js"></script>') < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
+assert.ok(consoleHtml.search(/<script src="ui-state\.js(?:\?[^\"]+)?"><\/script>/) < consoleHtml.search(/<script src="app\.js(?:\?[^\"]+)?" defer><\/script>/), "the UI state helper must load before the console app");
 assert.match(consoleHtml, /id="diagnosticsIssueSignals"/, "the gameplay diagnostics issue-signal panel must exist");
 assert.match(consoleHtml, /id="tutorialStagesTable"/, "the gameplay diagnostics tutorial funnel table must exist");
 assert.match(consoleHtml, /id="growthChoiceLevelTable"/, "the gameplay diagnostics level-choice table must exist");
@@ -100,7 +100,7 @@ assert.match(analyticsSource, /find\(\(row\) => row\?\.event === "game_over"\)\?
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20260830-3/, "the Console must cache-bust custom date serialization");
+assert.match(consoleHtml, /model\.js\?v=20260904-1/, "the Console must cache-bust catalog labels and mail summaries");
 assert.match(consoleHtml, /같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시/, "button hesitation must disclose both the duration and sample gates");
 assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>명/, "button hesitation must use the requested people terminology");
 assert.match(analyticsSource, /Math\.max\(5, Math\.round\(value \* 10\)/, "hesitation formatting must preserve the five-second lower bound");
@@ -121,7 +121,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260830-7/, "the Console must cache-bust the core-loop layout");
+assert.match(consoleHtml, /styles\.css\?v=20260904-1/, "the Console must cache-bust player-table spacing");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
@@ -487,7 +487,7 @@ const minVersion = operationForm({ minVersion: formField("1.2.3"), minVersionCod
 const referralConfig = operationForm({ enabled: formField(""), reason: formField("launch") });
 referralConfig.form.elements.enabled.checked = true;
 const qaAccess = operationForm({ userId: formField("user-1"), shopControlsEnabled: formField(""), reason: formField("qa") });
-const announcement = operationForm({ body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
+const announcement = operationForm({ announcementId: formField(""), body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
 const operationElements = {
   rewardMailForm: reward.form,
   minVersionForm: minVersion.form,

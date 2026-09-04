@@ -44,7 +44,11 @@
     byId("referralMetrics").innerHTML = `<article data-tone="neutral"><span>생성 코드</span><strong>${escapeHtml(referrals.codes_issued || 0)}</strong></article><article data-tone="good"><span>성공 초대</span><strong>${escapeHtml(referrals.accepted_total || 0)}</strong></article><article data-tone="neutral"><span>오늘 성공</span><strong>${escapeHtml(referrals.accepted_today_utc || 0)}</strong></article><article data-tone="watch"><span>3회 완료</span><strong>${escapeHtml(referrals.tier_3_total || 0)}</strong></article>`;
     byId("referralConfigForm").elements.enabled.checked = referralsEnabled;
     const notices = (data.notices || []).map(noticeMarkup);
-    const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(JSON.stringify(row.summary))}</code></article>`);
+    const mailSummary = (row) => {
+      const model = root.ConsoleModel;
+      return model && typeof model.mailSummaryText === "function" ? model.mailSummaryText(row.summary) : "";
+    };
+    const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(mailSummary(row))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
     byId("minVersionForm").elements.minVersion.value = config.min_version || "";
     byId("minVersionForm").elements.minVersionCode.value = config.min_version_code || "";
@@ -67,9 +71,12 @@
 
   async function submit(form, payload, title, summary, options = {}) {
     const report = options.report || setMessage;
-    if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) return;
     const finishRequest = root.ConsoleUiState.beginRequest(form);
     if (!finishRequest) return;
+    if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) {
+      finishRequest();
+      return;
+    }
     try {
       report(options.progressMessage || `${title} 처리 중입니다...`);
       const fingerprint = JSON.stringify(payload);
@@ -153,7 +160,7 @@
     const label = byId("rewardValueLabel");
     if (form.elements.kind.value === "entitlement") {
       label.firstChild.textContent = "상점 아이템";
-      select.outerHTML = `<select name="rewardValue" required>${rewardCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}">${escapeHtml(item.item_id)} · ${escapeHtml(item.item_type)} · ${escapeHtml(item.rarity || "common")}</option>`).join("")}</select>`;
+      select.outerHTML = `<select name="rewardValue" required>${rewardCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}">${escapeHtml((root.ConsoleModel && root.ConsoleModel.catalogItemLabel) ? root.ConsoleModel.catalogItemLabel(item) : item.item_id)}</option>`).join("")}</select>`;
     } else {
       label.firstChild.textContent = "수량";
       select.outerHTML = '<input name="rewardValue" type="number" min="1" step="1" required>';

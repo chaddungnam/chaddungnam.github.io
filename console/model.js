@@ -139,6 +139,67 @@
     return actionNames[action] || action || "알 수 없는 작업";
   }
 
+  const catalogLabels = Object.freeze({
+    profile_icon: "아이콘",
+    profile_frame: "테두리",
+    marble_skin: "마블",
+    icon_joker: "흑백 쿼키",
+    icon_joker_red: "붉은 쿼키",
+    icon_rebel: "반항아 쿼키",
+    icon_midnight: "미드나이트 쿼키",
+    icon_winter_joker: "윈터 쿼키",
+    icon_pumpkin_joker: "펌킨 쿼키",
+    icon_korean_joker: "한복 쿼키",
+    icon_aurora: "오로라 쿼키",
+    icon_scientist: "과학자 쿼키",
+    icon_pass_lab: "패스 쿼키",
+    icon_jakwon_tongue: "yakwon 프로필",
+    frame_basic: "기본 테두리",
+    frame_lab: "연구소 테두리",
+    frame_pass_lab: "패스 연구소 테두리",
+    frame_quirky_rainbow: "쿼키 무지개 테두리",
+    skin_classic: "클래식 마블",
+    skin_mint: "민트 마블",
+    skin_galaxy: "갤럭시 마블",
+    skin_science_crate: "과학 상자 마블",
+    skin_pass_lab: "패스 연구소 마블",
+    skin_jakwon: "yakwon 구슬",
+  });
+
+  function catalogItemLabel(item) {
+    const id = String(item?.item_id || item || "").trim();
+    const type = String(item?.item_type || "").trim();
+    const name = item?.admin_label || catalogLabels[id] || id;
+    const kind = catalogLabels[type] || type;
+    return kind ? `${name} · ${kind}` : name;
+  }
+
+  function rewardKindLabel(kind) {
+    return ({ gems: "젬", breakthrough_ticket: "돌파 티켓", speed_ticket: "스피드 티켓", entitlement: "상점 아이템" })[kind] || kind || "보상";
+  }
+
+  function mailSummaryText(summary) {
+    const data = summary && typeof summary === "object" ? summary : {};
+    const count = Number(data.recipient_count);
+    const template = String(data.template_key || "");
+    const expires = data.expires_at ? new Date(data.expires_at) : null;
+    const expireText = expires && !Number.isNaN(expires.getTime())
+      ? expires.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" })
+      : "";
+    const rewards = Array.isArray(data.rewards) ? data.rewards.map((reward) => {
+      if (reward?.kind === "entitlement") return catalogItemLabel(reward.item_id);
+      const amount = Number(reward?.amount);
+      return Number.isFinite(amount) ? `${rewardKindLabel(reward.kind)} ${amount.toLocaleString("ko-KR")}` : rewardKindLabel(reward?.kind);
+    }).filter(Boolean) : [];
+    const parts = [
+      count >= 0 && Number.isFinite(count) ? `${count.toLocaleString("ko-KR")}명` : "",
+      template,
+      rewards.join(" · "),
+      expireText ? `기한 ${expireText}` : "",
+    ].filter(Boolean);
+    return parts.join(" · ") || "우편 발송";
+  }
+
   function normalizeCustomAnalyticsRange(startDate, endDate, today, maxDays = 28) {
     const validDay = (value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))
       && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
@@ -319,5 +380,8 @@
     interactionRecommendation,
     diffPlayerChanges,
     canSubmitMutation,
+    catalogItemLabel,
+    rewardKindLabel,
+    mailSummaryText,
   };
 });

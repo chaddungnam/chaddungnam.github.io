@@ -97,7 +97,7 @@
     let reject;
     const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
     pendingAuthorization = { promise, resolve, reject };
-    tokenClient.requestAccessToken({ prompt: "consent" });
+    tokenClient.requestAccessToken({ prompt: isAuthorized() ? "" : "consent" });
     return promise;
   }
 

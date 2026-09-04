@@ -131,4 +131,11 @@ assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 
 assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: false, stateVersion: 4 }), false);
 assert.equal(model.canSubmitMutation({ reason: "CS 보상", changes: { gems: 12 }, mutationsEnabled: true, stateVersion: null }), false);
 
+assert.equal(model.catalogItemLabel({ item_id: "icon_joker", item_type: "profile_icon" }), "흑백 쿼키 · 아이콘");
+assert.equal(model.rewardKindLabel("speed_ticket"), "스피드 티켓");
+assert.match(model.mailSummaryText({ template_key: "update", recipient_count: 63, expires_at: "2026-09-04T05:39:00+00:00", rewards: [{ kind: "gems", amount: 50 }] }), /63명/);
+assert.match(model.mailSummaryText({ template_key: "update", recipient_count: 63 }), /update/);
+assert.equal(require("../console/purchases-model.js").formatMoney(undefined, "KRW"), "금액 미기록");
+assert.match(require("../console/purchases-model.js").formatMoney(3900000000, "KRW"), /3,900|₩3900|₩3,900/);
+
 console.log("console model: PASS");

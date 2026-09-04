@@ -989,3 +989,10 @@ body::before { opacity: .18; background-size: 22px 22px; }
   .custom-range-form > span { display: none; }
   .custom-range-form .primary-button, .custom-range-form #customRangeClear, .custom-range-form small { grid-column: 1; }
 }
+#playersView .table-scroll { max-width: 100%; overflow-x: auto; }
+#playersView .table-scroll table { min-width: 860px; table-layout: auto; }
+#playersView .table-scroll th,
+#playersView .table-scroll td { padding: 10px 9px; vertical-align: top; white-space: normal; overflow-wrap: anywhere; }
+#playersView .table-scroll td small { display: block; margin-top: 3px; color: var(--ink-soft); }
+.analytics-more { margin: 12px 0 18px; }
+.analytics-more > summary { cursor: pointer; }
