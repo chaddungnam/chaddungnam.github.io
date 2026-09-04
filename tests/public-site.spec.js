@@ -360,7 +360,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
     expect(layout.afterProjectK).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260904-hero"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260904-ui"))).toBeTruthy();
     expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260831-playable"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
@@ -590,7 +590,7 @@ test("primary navigation responds with a restrained text hover", async ({ page, 
       transform: getComputedStyle(node).transform,
     }));
     expect(state.background).toBe("rgba(0, 0, 0, 0)");
-    expect(state.color).toBe("rgb(38, 101, 238)");
+    expect(state.color).toBe("rgb(51, 92, 255)");
     expect(state.transform).toBe("none");
   }
 });

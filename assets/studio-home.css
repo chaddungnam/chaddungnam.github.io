@@ -1,13 +1,13 @@
 html { color-scheme: light; scroll-behavior: smooth; }
 
 body[data-page="studio"] {
-  --studio-ink: #111319;
+  --studio-ink: #101827;
   --studio-copy: #343943;
   --studio-muted: #6b7079;
-  --studio-line: rgba(17, 19, 25, .17);
-  --studio-blue: #2665ee;
-  --studio-red: #be2d28;
-  --studio-yellow: #f4bf25;
+  --studio-line: rgba(16, 24, 39, .17);
+  --studio-blue: #335CFF;
+  --studio-red: #FF4B45;
+  --studio-yellow: #FFD21F;
   min-width: 0;
   color: var(--studio-ink);
   background: var(--studio-tone, #f5f4ef);
@@ -66,15 +66,17 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .release-heading h1 { max-width: 760px; margin: 0; font-size: clamp(3.6rem, 5.6vw, 6.2rem); font-weight: 900; letter-spacing: -.075em; line-height: .82; }
 .release-version { display: inline-flex; min-width: 76px; min-height: 34px; align-items: center; justify-content: center; margin-top: 6px; border: 1px solid var(--studio-ink); background: var(--studio-yellow); font-size: .68rem; font-weight: 900; letter-spacing: .12em; }
 .hero-loop { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 14px; }
-.hero-loop span { display: inline-flex; min-height: 42px; align-items: center; padding: 0 12px; border: 1px solid var(--studio-ink); background: rgba(255,255,255,.74); font-size: clamp(.82rem, 1.3vw, 1.08rem); font-weight: 900; letter-spacing: .13em; }
+.hero-loop span { display: inline-flex; min-height: 38px; align-items: center; padding: 0 11px; border: 3px solid var(--studio-ink); border-radius: 20px; background: #fff; box-shadow: 4px 5px 0 rgba(16,24,39,.18); font-size: .78rem; font-weight: 900; letter-spacing: .12em; }
+.hero-loop span:nth-child(1) { background: #FFF2A8; }
 .hero-loop span:nth-child(2) { color: #fff; background: var(--studio-red); }
+.hero-loop span:nth-child(3) { background: #D6F8F2; }
 .release-lede { max-width: 42ch; margin: 0; color: var(--studio-copy); font-size: 1rem; line-height: 1.65; word-break: keep-all; }
 html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .release-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-.release-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 18px; border: 1px solid var(--studio-ink); color: var(--studio-ink); background: rgba(255,255,255,.7); font-size: .7rem; font-weight: 850; letter-spacing: .06em; text-decoration: none; text-transform: uppercase; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+.release-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid var(--studio-ink); border-radius: 20px; color: var(--studio-ink); background: #fff; box-shadow: 4px 5px 0 rgba(16,24,39,.18); font-size: .7rem; font-weight: 850; letter-spacing: .06em; text-decoration: none; text-transform: uppercase; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
 .release-button:hover,
 .release-button:focus-visible { color: #fff; background: var(--studio-blue); transform: translateY(-2px); }
-.release-button-primary { color: #fff; background: var(--studio-ink); }
+.release-button-primary { color: var(--studio-ink); background: var(--studio-yellow); }
 .release-readout { display: grid; max-width: 420px; margin: 18px 0 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .release-readout div { padding: 13px 14px; }
 .release-readout div + div { border-left: 1px solid var(--studio-line); }
@@ -102,13 +104,14 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .hero-phone video { display: block; width: 100%; height: 100%; border-radius: calc(clamp(46px, 4.5vw, 60px) - 11px); background: #111; object-fit: cover; }
 .hero-phone iframe { position: absolute; inset: 10px; z-index: 3; width: calc(100% - 20px); height: calc(100% - 20px); border: 0; border-radius: calc(clamp(46px, 4.5vw, 60px) - 11px); background: #050607; }
 .hero-phone [data-playable-launch],
-.hero-phone [data-playable-exit] { position: absolute; z-index: 9; min-width: 44px; min-height: 44px; border: 1px solid var(--studio-ink); color: #fff; background: var(--studio-ink); font: inherit; font-size: .74rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.hero-phone [data-playable-exit] { position: absolute; z-index: 9; min-width: 44px; min-height: 44px; border: 3px solid var(--studio-ink); border-radius: 20px; color: var(--studio-ink); background: var(--studio-yellow); box-shadow: 4px 5px 0 rgba(16,24,39,.22); font: inherit; font-size: .74rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.hero-phone [data-playable-exit] { color: #fff; background: var(--studio-red); }
 .hero-phone [data-playable-launch] { top: 50%; left: 50%; padding: 0 18px; transform: translate(-50%, -50%); }
 .hero-phone [data-playable-exit] { top: 24px; right: 18px; padding: 0 12px; background: rgba(17,19,25,.88); }
 .hero-phone [data-playable-status] { position: absolute; right: 18px; bottom: 28px; left: 18px; z-index: 8; padding: 10px 12px; color: #fff; background: rgba(17,19,25,.84); font-size: .72rem; font-weight: 850; letter-spacing: .06em; text-align: center; pointer-events: none; }
 .hero-phone [hidden] { display: none; }
 .hero-phone[data-playable-state="loading"] [data-playable-status] { color: var(--studio-yellow); }
-.hero-phone[data-playable-state="ready"] [data-playable-status] { color: #fff; background: rgba(38,101,238,.88); }
+.hero-phone[data-playable-state="ready"] [data-playable-status] { color: var(--studio-ink); background: var(--studio-yellow); }
 .hero-phone[data-playable-state="error"] [data-playable-status] { background: rgba(190,45,40,.92); }
 .hero-phone .phone-camera { position: absolute; top: 16px; left: 50%; z-index: 5; width: 36%; height: 26px; border-radius: 0 0 16px 16px; background: #050607; transform: translateX(-50%); }
 .hero-phone .phone-home-indicator { position: absolute; bottom: 15px; left: 50%; z-index: 5; width: 34%; height: 4px; border-radius: 99px; background: rgba(255,255,255,.82); transform: translateX(-50%); }
