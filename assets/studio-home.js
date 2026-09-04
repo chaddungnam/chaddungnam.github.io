@@ -79,6 +79,22 @@
       .catch(() => {});
   }
 
+  const LIVE_VERSION = /^\d+(?:\.\d+){1,3}$/;
+  const PUBLIC_VERSION_URL = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-version";
+
+  function applyLiveVersion(version) {
+    if (!LIVE_VERSION.test(version)) return;
+    for (const node of document.querySelectorAll("[data-live-version]")) node.textContent = version;
+  }
+
+  function setupLiveVersion() {
+    if (!document.querySelector("[data-live-version]")) return;
+    fetch(PUBLIC_VERSION_URL, { cache: "no-cache" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("version unavailable")))
+      .then((data) => applyLiveVersion(String(data?.min_version || "").trim()))
+      .catch(() => {});
+  }
+
   function setupToneAndMascot() {
     const sections = [...document.querySelectorAll("[data-tone]")];
     const mascot = document.querySelector("[data-scroll-quirky]");
@@ -576,6 +592,7 @@
   function init() {
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     setupYouTube();
+    setupLiveVersion();
     setupToneAndMascot();
     setupVideos(reducedMotion);
     setupGameCursor(reducedMotion);

@@ -112,6 +112,7 @@ test("all localized home pages fit a 320px viewport", async ({ page }) => {
 });
 
 test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
+  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.1.0" } }));
   await page.goto("/?lang=ko");
   const chamber = page.locator("[data-release-chamber]");
   const video = page.locator("[data-hero-gameplay]");
@@ -318,6 +319,17 @@ async function stubPlayable(page, { ready = true } = {}) {
   return requests;
 }
 
+test("home shows the console min_version and keeps 1.1.0 when the lookup fails", async ({ page }) => {
+  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.2.3" } }));
+  await page.goto("/?lang=ko");
+  await expect(page.locator("[data-live-version]").first()).toHaveText("1.2.3");
+  await expect(page.locator("[data-live-version]")).toHaveText(["1.2.3", "1.2.3", "1.2.3"]);
+
+  await page.route("**/functions/v1/public-version", (route) => route.abort());
+  await page.reload();
+  await expect(page.locator("[data-live-version]").first()).toHaveText("1.1.0");
+});
+
 test("localized homes place a stable playable phone before supporting copy at 390px", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await stubPlayable(page);
@@ -361,7 +373,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.afterProjectK).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
     expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260904-ui"))).toBeTruthy();
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260831-playable"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260904-version"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
       const box = node.getBoundingClientRect();
