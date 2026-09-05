@@ -56,6 +56,21 @@ function countryMarkup(value) {
     <span><strong>${escapeHtml(country.name)}</strong><small>${escapeHtml(country.code)}</small></span>
   </span>`;
 }
+function playerPlatformMarkup(row) {
+  const periodKeys = Array.isArray(row.periodDistributionKeys) ? row.periodDistributionKeys : [];
+  const keys = periodKeys.length ? periodKeys : row.distributionKey ? [row.distributionKey] : [];
+  const platforms = [...new Map(keys.map((key) => {
+    const display = root.ConsoleModel.platformDisplay(key);
+    return [display.label, display];
+  })).values()];
+  if (!platforms.length || platforms.every((item) => !item.known)) {
+    return '<span class="platform-label platform-unknown" title="구버전 등 계정과 기기 정보가 아직 연결되지 않은 활동입니다.">기기 미확인</span>';
+  }
+  const lastKnown = row.platformSource === "last_known";
+  const sourceText = lastKnown ? "마지막으로 확인된 기기" : "선택 기간에 확인된 접속 기기";
+  const seenAt = row.platformSeenAt ? ` · ${formatServerTime(row.platformSeenAt)}` : "";
+  return `<span class="platform-label${lastKnown ? " platform-last-known" : ""}" title="${escapeHtml(sourceText + seenAt)}">${lastKnown ? "최근 " : ""}${platforms.map((item) => escapeHtml(item.label)).join(" · ")}</span>`;
+}
 function selectedDays() {
   return (state.payload?.daily ?? []).slice(-state.rangeDays);
 }
@@ -583,7 +598,7 @@ function renderPeriodPlayers() {
   byId("periodPlayersTable").innerHTML = rows.length === 0
     ? '<tr><td class="empty-row" colspan="7">이 기간에 조건과 일치하는 계정 활동 신호가 없습니다.</td></tr>'
     : rows.map((row) => `<tr>
-        <td data-label="플레이어·국가"><div class="period-player-identity">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}${countryMarkup(row.country)}</div></td>
+        <td data-label="플레이어·국가·기기"><div class="period-player-identity">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<div class="period-player-meta">${countryMarkup(row.country)}${playerPlatformMarkup(row)}</div></div></td>
         <td data-label="활동 근거">${periodPlayerActivityMarkup(row)}</td>
         <td data-label="새 실행">${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "없음"}</small></td>
         <td data-label="완료">${formatNumber(row.gamesPlayed)}</td>

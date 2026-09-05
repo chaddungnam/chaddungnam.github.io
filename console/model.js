@@ -121,6 +121,14 @@
     return { code, name: `알 수 없는 국가 (${code})`, flag: "", custom: false };
   }
 
+  function platformDisplay(value) {
+    const key = String(value || "").trim().toLowerCase();
+    if (key === "google_play" || key === "android") return { key, label: "AOS", known: true };
+    if (key === "app_store" || key === "ios") return { key, label: "iOS", known: true };
+    if (key === "onestore") return { key, label: "AOS · 원스토어", known: true };
+    return { key, label: "기기 미확인", known: false };
+  }
+
   const actionNames = Object.freeze({
     player_mutation: "플레이어 재화 변경",
     player_mutation_revert: "플레이어 재화 되돌리기",
@@ -368,6 +376,7 @@
     playerNoteMarkup,
     playerIdentityMarkup,
     countryDisplay,
+    platformDisplay,
     actionDisplayName,
     normalizeCustomAnalyticsRange,
     serializeAnalyticsFilters,

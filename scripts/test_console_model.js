@@ -57,6 +57,10 @@ assert.deepEqual(model.countryDisplay("aln"), { code: "ALN", name: "외계인", 
 assert.deepEqual(model.countryDisplay("SGV"), { code: "SGV", name: "그림자정부", flag: "🕶️", custom: true });
 assert.deepEqual(model.countryDisplay("RPT"), { code: "RPT", name: "렙틸리언", flag: "🦎", custom: true });
 assert.deepEqual(model.countryDisplay(""), { code: "", name: "국가 미설정", flag: "", custom: false });
+assert.deepEqual(model.platformDisplay("google_play"), { key: "google_play", label: "AOS", known: true });
+assert.deepEqual(model.platformDisplay("app_store"), { key: "app_store", label: "iOS", known: true });
+assert.deepEqual(model.platformDisplay("ios"), { key: "ios", label: "iOS", known: true });
+assert.deepEqual(model.platformDisplay(""), { key: "", label: "기기 미확인", known: false });
 assert.equal(model.actionDisplayName("player_mutation"), "플레이어 재화 변경");
 assert.equal(model.actionDisplayName("player_note_update"), "플레이어 메모 업데이트");
 assert.equal(model.actionDisplayName("reward_mail_broadcast"), "전체 보상 우편");

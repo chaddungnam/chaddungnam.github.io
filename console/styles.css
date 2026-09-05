@@ -226,6 +226,9 @@ textarea:focus-visible {
 .country-label strong { color: var(--ink); font-size: 11px; }
 .country-label small { margin: 0 !important; color: #8990a5; font-size: 8px; letter-spacing: .05em; }
 .country-flag { width: 20px; font-size: 16px; line-height: 1; text-align: center; }
+.platform-label { display: inline-flex; align-items: center; width: max-content; min-height: 22px; padding: 3px 7px; color: #13786e; border: 1px solid rgba(33,170,155,.28); border-radius: 999px; background: var(--teal-soft); font-size: 9px; font-weight: 900; white-space: nowrap; }
+.platform-label.platform-last-known { color: #667386; border-color: rgba(102,115,134,.24); background: #f1f3f5; }
+.platform-label.platform-unknown { color: #9298a7; border-color: rgba(146,152,167,.2); background: #f5f6f7; }
 .console-main button, .player-open-link, .player-identity-link { transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
 .console-main button:not(:disabled):hover, .player-open-link:hover, .player-identity-link:not(.player-identity-unlinked):hover { transform: translateY(-1px); }
 .console-main button:disabled { cursor: not-allowed; }
@@ -569,22 +572,25 @@ textarea:focus-visible {
 /* 계정 활동은 상세 카드 대신 한 계정 한 줄로 압축한다. 재화 상세는 플레이어 화면에서 본다. */
 .period-players-panel .table-scroll { overflow: hidden !important; border: 1px solid var(--line) !important; }
 .period-players-panel table { width: 100%; min-width: 0 !important; table-layout: fixed; }
-.period-players-panel th:nth-child(1) { width: 25%; }
-.period-players-panel th:nth-child(2) { width: 18%; }
+.period-players-panel th:nth-child(1) { width: 30%; }
+.period-players-panel th:nth-child(2) { width: 17%; }
 .period-players-panel th:nth-child(3),
-.period-players-panel th:nth-child(4) { width: 9%; }
-.period-players-panel th:nth-child(5) { width: 13%; }
-.period-players-panel th:nth-child(6) { width: 17%; }
+.period-players-panel th:nth-child(4) { width: 7%; }
+.period-players-panel th:nth-child(5) { width: 12%; }
+.period-players-panel th:nth-child(6) { width: 18%; }
 .period-players-panel th:nth-child(7) { width: 9%; }
 .period-players-panel tbody tr { background: rgba(255,255,255,.72); }
 .period-players-panel tbody tr:nth-child(even) { background: rgba(248,246,240,.84); }
 .period-players-panel tbody td { position: static !important; padding: 9px 7px !important; vertical-align: middle; line-height: 1.25; }
 .period-players-panel tbody td::before { display: none; }
 .period-players-panel tbody td small { display: block; margin-top: 2px; color: #8e94a2; font-size: 9px; line-height: 1.2; }
-.period-player-identity { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; min-width: 0; }
-.period-player-identity .country-label { gap: 3px; }
-.period-player-identity .country-label > span:last-child { display: none; }
+.period-player-identity { display: grid; gap: 6px; align-items: start; min-width: 0; }
+.period-player-meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; min-width: 0; }
+.period-player-identity .country-label { gap: 5px; min-width: 0; }
+.period-player-identity .country-label > span:last-child { display: grid; }
 .period-player-identity .country-flag { font-size: 16px; }
+.period-player-identity .country-label strong { font-size: 10px; }
+.period-player-identity .country-label small { font-size: 8px; }
 .period-players-panel .player-open-link { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
 .period-players-panel .empty-row { text-align: center; }
 

@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260905-1">
+  <link rel="stylesheet" href="styles.css?v=20260905-2">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -196,7 +196,7 @@
             <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
             <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
           </form>
-          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어·국가</button></th><th>활동 근거</th><th><button data-player-sort="visit_count" type="button">새 실행</button></th><th><button data-player-sort="games_played" type="button">완료</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어·국가·기기</button></th><th>활동 근거</th><th><button data-player-sort="visit_count" type="button">새 실행</button></th><th><button data-player-sort="games_played" type="button">완료</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
         </section>
 
@@ -377,11 +377,11 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260904-1"></script>
+  <script src="model.js?v=20260905-1"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260829-1"></script>
-  <script src="analytics.js?v=20260903-3"></script>
+  <script src="analytics.js?v=20260905-1"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260905-1"></script>
   <script src="operations.js?v=20260904-1"></script>
