@@ -15,7 +15,8 @@ const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css")
 const quirky = fs.readFileSync(path.join(root, "assets", "quirky-ball-site.css"), "utf8");
 
 assert.match(studio, /background:\s*var\(--studio-tone,\s*#f5f4ef\)/);
-assert.match(studio, /--studio-blue:\s*#2665ee/);
+// Keep the approved studio palette explicit instead of reverting the refreshed design.
+assert.match(studio, /--studio-blue:\s*#335cff/i);
 assert.doesNotMatch(studio, /html\[data-theme="dark"\]/);
 assert.doesNotMatch(studio, /#0d1525|#131f33|#132342/i);
 assert.match(studio, /\.release-grid\s*\{[^}]*grid-template-columns:/s);
@@ -57,13 +58,13 @@ assert.match(brand, /\.game-title\s*\{[^}]*font-size:\s*clamp\(2\.75rem,\s*5\.2v
 assert.match(brand, /\.feature-card\s*\{[^}]*min-height:\s*280px/s);
 assert.match(brand, /\.closing-card h2\s*\{[^}]*font-size:\s*clamp\(1\.85rem,\s*3\.6vw,\s*3rem\)/s);
 
-assert.match(legal, /--legal-cream:\s*#f8f5ec/);
+assert.match(legal, /--legal-cream:\s*#f5f4ef/);
 assert.match(legal, /--legal-paper:\s*#fff/);
 assert.doesNotMatch(legal, /html\[data-theme="dark"\]/);
 assert.match(legal, /\.legal-header-inner\s*\{[^}]*min-height:\s*64px/s);
 assert.match(legal, /\.legal-brand > span:last-child\s*\{[^}]*width:\s*132px/s);
 assert.match(legal, /\.legal-duck-mark\s*\{[^}]*width:\s*34px[^}]*height:\s*34px/s);
-assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*3rem\)/s);
+assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*3\.3rem\)/s);
 assert.match(legal, /\.legal-paper\s*\{[^}]*padding:\s*clamp\(24px,\s*4vw,\s*40px\)/s);
 
 assert.match(projectK, /--k-void:\s*#f8f5ec/);

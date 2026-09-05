@@ -30,7 +30,7 @@
         <h2 id="section-2">2. 처리하는 정보</h2>
         <div class="table-scroll" role="region" aria-label="처리 정보 표" tabindex="0"><table>
           <tr><th>정보</th><th>발생 시점과 이용처</th></tr>
-          <tr><td>게스트 식별자(UID), 계정 제공자 식별자</td><td>게임 최초 이용 및 Google 계정 또는 Apple 계정 연동 시 생성되어 로그인과 계정 동기화에 사용됩니다.</td></tr>
+          <tr><td>계정 프로필(게스트 식별자(UID), 계정 제공자 식별자)</td><td>게임 최초 이용 및 Google 계정 또는 Apple 계정 연동 시 생성되어 로그인과 계정 동기화에 사용됩니다.</td></tr>
           <tr><td>이메일 주소, 프로필 이름</td><td>이용자가 Google 로그인 또는 Apple 로그인을 선택하고 제공에 동의한 범위에서 처리됩니다. Apple의 이메일 가리기 기능을 사용하면 중계 주소가 전달될 수 있습니다.</td></tr>
           <tr><td>게임·계정 정보</td><td>점수, 레벨, 플레이 기록, 닉네임, 표시 코드, 이용자가 선택한 국가, 스태미나·젬·티켓, 출석·미션·상점 진행, 친구·선물·우편함, 보유·장착한 꾸미기 정보가 기기와 Supabase에 저장될 수 있습니다.</td></tr>
           <tr><td>구매 정보</td><td>상품 ID, 스토어 거래 ID 또는 구매 토큰, 구매 상태, 플랫폼, 구매·복원·환불 상태와 지급 권한을 처리합니다. House Duck은 카드번호나 은행계좌 등 결제수단 전체를 직접 받지 않습니다.</td></tr>
@@ -38,7 +38,7 @@
           <tr><td>자체 이용 분석</td><td>동의 및 적용 법률에 따라 앱 실행·세션, 게임 시작·종료, 광고 요청·노출·보상, 앱 버전·플랫폼·시간대가 기록될 수 있습니다. 자체 분석에는 계정 UID와 분리한 임의 설치·세션 식별자를 사용하며 광고 ID를 넣지 않습니다.</td></tr>
           <tr><td>기기 설정</td><td>언어, 음량, 진동, 프레임 설정은 기기에 저장됩니다.</td></tr>
           <tr><td>문의 정보</td><td>이메일 문의 내용과 회신에 필요한 연락처를 고객지원 목적으로 처리합니다.</td></tr>
-          <tr><td>웹사이트 기술 정보</td><td>정적 사이트 호스팅 사업자가 보안과 전송을 위해 IP 주소, 요청 시각, 브라우저·기기 정보를 기술 로그로 처리할 수 있습니다. House Duck은 웹사이트에 별도 광고·분석 추적기를 설치하지 않습니다.</td></tr>
+          <tr><td>웹사이트 네트워크·저장 정보</td><td>웹페이지는 GitHub Pages에서 제공됩니다. 브라우저는 페이지 자원과 보안·전송 로그를 위해 GitHub에 요청을 보내며, YouTube 썸네일은 Google의 <code>i.ytimg.com</code>에 요청될 수 있습니다. 웹사이트는 공개 버전 정보만 확인하는 Supabase 공개 버전 엔드포인트에 요청할 수 있습니다. 이 요청을 받는 사업자는 IP 주소와 HTTP 요청 메타데이터를 처리할 수 있습니다. 언어를 직접 선택하면 <code>house_duck_site_language</code> 키가 브라우저 localStorage에 저장될 수 있습니다. 이메일 버튼은 이용자의 이메일 앱을 열기 위한 것이며, 이용자가 이메일 앱에서 직접 보내기 전에는 웹사이트 백엔드로 문의 내용을 전송하지 않습니다.</td></tr>
         </table></div>
         <p>Quirky Ball은 정밀 위치, 연락처, 사진, 카메라, 마이크 등 게임 제공에 필요하지 않은 정보를 의도적으로 수집하지 않습니다.</p>
 
@@ -46,20 +46,14 @@
         <ul>
           <li>게임, 계정, 랭킹, 친구, 구매 상품 및 고객지원 제공: 계약 이행 또는 계약 전 조치(GDPR 제6조 제1항 b호)</li>
           <li>결제·환불·부정 구매 확인 및 법적 기록 보관: 법적 의무(GDPR 제6조 제1항 c호)와 정당한 이익(GDPR 제6조 제1항 f호)</li>
-          <li>서비스 안정성, 보안, 오류 분석 및 최소한의 자체 이용 분석: 정당한 이익(GDPR 제6조 제1항 f호)</li>
+          <li>서비스 운영·보호에 필요한 안정성, 보안 및 오류 분석: 정당한 이익(GDPR 제6조 제1항 f호)</li><li>선택적 자체 이용 분석: 적용 법률에서 요구하는 경우 동의. 이 방침은 아래의 Google UMP 흐름 외에 분석 동의 게이트가 구현되었다고 밝히지 않습니다.</li>
           <li>맞춤형 광고 및 추적이 필요한 처리: 동의(GDPR 제6조 제1항 a호). 동의는 언제든 철회할 수 있습니다.</li>
           <li>제한적·비맞춤형 광고와 부정행위 방지: 적용 법률상 허용되는 동의 또는 정당한 이익</li>
         </ul>
 
         <h2 id="section-4">4. 외부 서비스와 수신자</h2>
         <p>House Duck은 개인정보를 판매하지 않습니다. 서비스 제공을 위해 다음 사업자가 자체 개인정보처리자 또는 처리수탁자로 정보를 처리할 수 있습니다.</p>
-        <div class="table-scroll" role="region" aria-label="외부 서비스 표" tabindex="0"><table>
-          <tr><th>서비스</th><th>목적</th></tr>
-          <tr><td>Supabase (Supabase Inc.)</td><td>인증, 계정 동기화, 게임 상태, 랭킹·소셜 기능, 자체 분석 저장</td></tr>
-          <tr><td>Google Sign-In, Google AdMob/UMP, Google Play Billing (Google 계열사)</td><td>선택형 로그인, 광고·동의 관리, Android 앱 내 결제·복원·환불 처리</td></tr>
-          <tr><td>Sign in with Apple, App Store/StoreKit (Apple 계열사)</td><td>iOS에서 선택형 로그인과 앱 내 결제·복원·환불 처리</td></tr>
-          <tr><td>GitHub Pages (GitHub, Inc.)</td><td>houseduck.in 정적 웹사이트 제공과 보안 로그</td></tr>
-        </table></div>
+        <div class="table-scroll" role="region" aria-label="외부 서비스 표" tabindex="0"><table><tr><th>서비스</th><th>목적</th></tr><tr><td>Supabase (Supabase Inc.)</td><td>인증, 계정 동기화, 게임 상태, 랭킹·소셜 기능, 자체 분석 저장 및 공개 버전 정보 확인</td></tr><tr><td>Google Sign-In, Google AdMob/UMP, Google Play Billing (Google 계열사)</td><td>선택형 로그인, 광고·동의 관리, Android 앱 내 결제·복원·환불 처리 및 YouTube 썸네일 제공</td></tr><tr><td>Sign in with Apple, App Store/StoreKit (Apple 계열사)</td><td>iOS에서 선택형 로그인과 앱 내 결제·복원·환불 처리</td></tr><tr><td>GitHub Pages (GitHub, Inc.)</td><td>houseduck.in 정적 웹사이트 제공과 보안·전송 로그</td></tr></table></div>
         <ul><li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 개인정보처리방침</a></li><li><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple 개인정보처리방침</a></li><li><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase 개인정보처리방침</a></li><li><a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub 개인정보처리방침</a></li></ul>
 
         <h2 id="section-5">5. 국외 이전</h2>
@@ -67,7 +61,7 @@
 
         <h2 id="section-6">6. 보관 기간</h2>
         <ul>
-          <li>원본 플레이·시즌·주간 기록과 계정에서 분리된 자체 분석 이벤트: 원칙적으로 최대 28일</li>
+          <li>원본 플레이·시즌·주간 기록과 계정에서 분리된 자체 분석 이벤트: 생성 후 원칙적으로 최대 28일</li>
           <li>계정과 현재 동기화 상태: 계정 삭제 시까지</li>
           <li>구매 권한, 거래 참조값 및 환불·부정행위 대응 기록: 구매 지원과 권한 제공에 필요한 기간 또는 법률상 보관기간</li>
           <li>고객지원 기록: 문의 해결과 분쟁 대응에 필요한 기간</li>
@@ -76,20 +70,15 @@
         </ul>
 
         <h2 id="section-7">7. 계정 삭제</h2>
-        <p>Quirky Ball 설정의 <strong>계정 삭제</strong>에서 직접 삭제하거나 <a href="/quirky-ball/privacy/delete_ko.html">외부 계정 삭제 안내</a>에 따라 요청할 수 있습니다. 계정과 연결된 게임·소셜 데이터는 삭제되며 복구할 수 없습니다. 다만 법적 의무, 결제·환불 처리, 사기 방지 또는 권리 주장에 꼭 필요한 최소 기록과 스토어가 독립적으로 관리하는 거래 기록은 해당 목적이 끝날 때까지 보관될 수 있습니다.</p>
+        <p>Quirky Ball 설정의 <strong>계정 삭제</strong>에서 직접 삭제하거나 <a href="/quirky-ball/privacy/delete_ko.html">외부 계정 삭제 안내</a>에 따라 요청할 수 있습니다. 계정 프로필, 동기화 상태 및 소셜 연결은 삭제되며 복구할 수 없습니다. 일부 원본 플레이 및 보관 기록은 생성 후 최대 28일까지 남을 수 있고, 보관 기간에 따라 자동 삭제됩니다. 현재 일부 플레이 기록은 계정 연결이 분리될 수 있으며, 이것이 모든 기록의 즉시 삭제를 뜻하지는 않습니다. 다만 법적 의무, 결제·환불 처리, 사기 방지 또는 권리 주장에 꼭 필요한 최소 기록과 스토어가 독립적으로 관리하는 거래 기록은 해당 목적이 끝날 때까지 보관될 수 있습니다.</p>
 
         <h2 id="section-8">8. 광고 동의와 선택</h2>
-        <ul>
-          <li>EEA, 영국, 스위스 등 동의가 필요한 지역에는 Google UMP 메시지가 표시될 수 있습니다.</li>
-          <li>iOS에서 앱 간 추적 권한이 필요한 경우 Apple의 App Tracking Transparency(ATT) 요청이 별도로 표시됩니다.</li>
-          <li>해당 이용자는 앱 설정의 <strong>광고 개인정보 설정</strong>에서 선택을 다시 관리할 수 있습니다. 기기 설정에서도 광고 추적과 광고 식별자를 관리할 수 있습니다.</li>
-          <li>동의 철회 전의 적법한 처리는 철회로 영향을 받지 않습니다. 선택에 따라 맞춤형 광고 대신 제한적 또는 비맞춤형 광고가 제공될 수 있습니다.</li>
-        </ul>
+        <ul><li>EEA, 영국, 스위스 등 동의가 필요한 지역에는 Google UMP 메시지가 표시될 수 있습니다.</li><li>iOS에서 앱 간 추적 권한이 필요한 경우 Apple의 App Tracking Transparency(ATT) 요청이 별도로 표시됩니다.</li><li>해당 이용자는 앱 설정의 <strong>광고 개인정보 설정</strong>에서 선택을 다시 관리할 수 있습니다. 기기 설정에서도 광고 추적과 광고 식별자를 관리할 수 있습니다.</li><li>맞춤형 광고인지 제한적·비맞춤형 광고인지의 구분만으로 동의 필요 여부가 결정되지는 않습니다. 적용 법률 및 기기 저장·접근의 성격에 따라 필요한 동의가 달라질 수 있습니다. 독일에서는 TDDDG 제25조가 적용되는 저장 또는 접근에 동의 요건이 있을 수 있습니다.</li><li>동의 철회 전의 적법한 처리는 철회로 영향을 받지 않습니다.</li></ul>
 
         <h2 id="section-9">9. 이용자의 권리</h2>
-        <p>적용 법률에 따라 열람, 정정, 삭제, 처리 제한, 데이터 이동, 반대 및 동의 철회 권리를 행사할 수 있습니다. 요청은 <a href="mailto:support@houseduck.in">support@houseduck.in</a>으로 보내 주세요. EU/EEA 이용자는 감독기관에 불만을 제기할 수 있으며, 헤센주 관할 기관은 <a href="https://datenschutz.hessen.de/" target="_blank" rel="noopener noreferrer">Der Hessische Beauftragte für Datenschutz und Informationsfreiheit</a>입니다.</p>
+        <p>적용 법률에 따라 열람, 정정, 삭제, 처리 제한, 데이터 이동, 반대 및 동의 철회 권리를 행사할 수 있습니다. 요청은 <a href="mailto:support@houseduck.in">support@houseduck.in</a>으로 보내 주세요. GDPR이 적용되는 요청에는 통상 한 달 안에 답변합니다. 요청의 복잡성 또는 다수의 요청 때문에 필요한 경우 최대 두 달을 추가로 연장할 수 있으며, 첫 한 달 안에 연장 사유와 함께 알려드립니다. 감독기관에 불만을 제기할 권리는 영향을 받지 않습니다. 헤센주 관할 기관은 <a href="https://datenschutz.hessen.de/" target="_blank" rel="noopener noreferrer">Der Hessische Beauftragte für Datenschutz und Informationsfreiheit</a>입니다.</p>
 
-        <h2 id="section-10">10. 아동의 개인정보</h2>
+  <h2 id="section-10">10. 아동의 개인정보</h2>
         <p>Quirky Ball은 만 14세 미만 또는 현지 법률이 정한 더 높은 최소 연령의 아동을 대상으로 하지 않습니다. 해당 연령 미만 이용자의 정보가 처리된 사실을 알게 되면 확인 후 삭제합니다.</p>
 
         <h2 id="section-11">11. 보안</h2>
@@ -99,11 +88,11 @@
         <p>게스트 UID와 기본 게임 상태는 서비스를 제공하는 데 필요합니다. 선택형 로그인·광고 동의를 제공하지 않아도 게스트 이용은 가능하지만 일부 동기화 또는 맞춤형 광고 기능이 제한될 수 있습니다. House Duck은 이용자에게 법적 또는 이와 유사하게 중대한 영향을 주는 완전 자동화된 의사결정을 하지 않습니다.</p>
 
         <h2 id="section-13">13. 개정</h2>
-        <ul><li>2026년 8월 24일 시행 — House Duck 공용 정책으로 전환하고 Android/Google Play, iOS의 Apple 로그인, 광고 동의 및 일회성 구매 처리를 반영 (v3.0)</li></ul>
-        <p>중요한 변경은 시행 전에 웹사이트 또는 앱 안에서 알립니다.</p>
-      </div>
+<ul><li>2026년 8월 24일 시행 — House Duck 공용 정책으로 전환하고 Android/Google Play, iOS의 Apple 로그인, 광고 동의 및 일회성 구매 처리를 반영 (v3.0)</li><li>2026년 9월 5일 명확성 업데이트 — 웹사이트 요청·로컬 환경설정, 삭제 요청 확인, 권리 요청 절차를 명확히 했습니다. 2026년 8월 24일의 원래 시행일은 변경되지 않습니다.</li></ul><p>중요한 변경은 시행 전에 웹사이트 또는 앱 안에서 알립니다.</p>
+
+  </div>
       <!-- 문서 본문 끝 -->
-      <footer class="legal-document-footer"><p>공식 House Duck 문서 · 개인정보처리방침</p></footer>
+      <footer class="legal-document-footer"><p>공식 House Duck 문서 · 개인정보처리방침</p><p class="legal-update">최종 업데이트: <time datetime="2026-09-05">2026년 9월 5일</time> · 명확성 업데이트(원래 시행일은 변경되지 않음)</p></footer>
     </article>
   </div></main>
   <footer class="legal-site-footer"><div class="legal-site-footer-inner"><p>© <span data-current-year>2026</span> House Duck.</p><p><a href="/impressum/ko.html">Impressum</a> · <a href="/support/">문의</a></p></div></footer>

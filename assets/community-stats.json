@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "total_score": "34552932",
+  "record_count": 202,
+  "as_of": "2026-09-05T14:28:18.351218Z",
+  "coverage_start": "2026-08-09T14:40:58Z",
+  "coverage_end": "2026-09-05T10:11:42Z",
+  "window_days": 28,
+  "source": "server-records-snapshot",
+  "exclusions": [
+    "registered-test-and-operator-accounts",
+    "admin-excluded-records",
+    "admin-corrected-records",
+    "unlinked-records",
+    "duplicate-records"
+  ],
+  "all_time": false
+}

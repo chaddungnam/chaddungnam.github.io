@@ -1,18 +1,18 @@
 :root {
   color-scheme: light;
-  --legal-cream: #f8f5ec;
-  --legal-cream-deep: #eef1f3;
+  --legal-cream: #f5f4ef;
+  --legal-cream-deep: #e9e8e2;
   --legal-paper: #fff;
   --legal-navy: #17191d;
   --legal-navy-soft: #3c4043;
   --legal-ink: #202124;
   --legal-muted: #62676e;
-  --legal-coral: #d93662;
-  --legal-coral-deep: #aa2348;
-  --legal-teal: #007e74;
+  --legal-coral: #233fbc;
+  --legal-coral-deep: #253eaa;
+  --legal-teal: #254cdd;
   --legal-gold: #d99300;
   --legal-line: rgba(23, 25, 29, .16);
-  --legal-shadow: 7px 8px 0 rgba(0, 168, 150, .16), 0 14px 30px rgba(23, 25, 29, .08);
+  --legal-shadow: 6px 6px 0 rgba(23, 25, 29, .06);
   --legal-gutter: clamp(18px, 4vw, 40px);
   --legal-page: 1180px;
 }
@@ -27,7 +27,7 @@ html {
 }
 
 body {
-  min-width: 320px;
+  min-width: 0;
   margin: 0;
   overflow-x: hidden;
   color: var(--legal-ink);
@@ -90,7 +90,7 @@ a:hover {
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--legal-line);
-  background: color-mix(in srgb, var(--legal-cream) 92%, transparent);
+  background: #111419;
   backdrop-filter: blur(14px);
 }
 
@@ -209,10 +209,10 @@ a:hover {
   margin: 0;
   color: var(--legal-navy);
   font-family: "Montserrat", "Noto Sans KR", "Noto Sans JP", sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-weight: 900;
   letter-spacing: -0.045em;
-  line-height: 0.98;
+  line-height: 1.15;
   text-wrap: balance;
 }
 
@@ -342,7 +342,7 @@ body > .legal-hero { display: block; padding: 0; }
   min-width: 0;
   padding: clamp(24px, 4vw, 40px);
   border: 1px solid var(--legal-line);
-  border-radius: 16px;
+  border-radius: 6px 6px 20px 6px;
   background: var(--legal-paper);
   box-shadow: var(--legal-shadow);
 }
@@ -818,4 +818,38 @@ body > .legal-hero { display: block; padding: 0; }
   .legal-paper a {
     color: #000;
   }
+}
+
+/* Shared public-document refinements. Documents stay readable without scripts. */
+.legal-site-header .legal-brand { color: #fff; }
+.legal-site-header .legal-brand > span:last-child { filter: invert(1); }
+.legal-site-header .legal-header-links a,
+.legal-site-header .legal-language-links a { color: #fff; }
+.legal-site-header .legal-header-links a:hover,
+.legal-site-header .legal-header-links a[aria-current="page"],
+.legal-site-header .legal-language-links a:hover,
+.legal-site-header .legal-language-links a[aria-current="page"] { color: #111419; background: #ffdc35; }
+.legal-site-header :focus-visible { outline-color: #ffdc35; }
+.legal-toc { position: sticky; top: 88px; }
+.legal-toc details > summary { min-height: 44px; padding: 10px; font-size: .8rem; font-weight: 800; cursor: pointer; }
+.legal-toc-list a[aria-current="location"] { border-left-color: #111419; color: #111419; background: #ffe987; }
+.legal-update { padding: 16px; border: 1px solid #d3c36a; border-radius: 6px; color: #363528; background: #fff8cf; line-height: 1.7; }
+.legal-update time { font-weight: 800; white-space: nowrap; }
+.legal-tools { display: flex; justify-content: flex-end; gap: 10px; margin: 0 0 16px; }
+.legal-tools button, .legal-tools a { display: inline-flex; min-height: 44px; align-items: center; padding: 8px 14px; border: 1px solid #959aa0; border-radius: 6px; color: #22272f; background: #fff; font: inherit; font-size: .8rem; font-weight: 700; text-decoration: none; cursor: pointer; }
+.legal-tools button:hover, .legal-tools a:hover { background: #ffdc35; }
+.legal-paper { overflow-wrap: anywhere; }
+.legal-paper table { overflow-wrap: normal; }
+.language-switcher a[aria-current="page"] { border-color: #17191d; background: #ffdc35; }
+@media (max-width: 900px) { .legal-toc { position: static; } }
+@media (max-width: 640px) {
+  .legal-header-inner { flex-wrap: wrap; gap: 4px; padding-block: 6px; }
+  .legal-header-links { flex-wrap: wrap; gap: 2px; }
+  .legal-header-links a { padding-inline: 9px; font-size: .7rem; }
+  .legal-paper { padding: 22px 18px; }
+  .legal-tools { justify-content: flex-start; }
+}
+@media print {
+  .legal-tools, .legal-toc { display: none !important; }
+  .legal-update { border-color: #777; color: #000; background: #fff; }
 }

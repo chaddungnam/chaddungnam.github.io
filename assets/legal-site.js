@@ -36,6 +36,42 @@
     });
   }
 
+  function setupDocumentTools(documentRef) {
+    var paper = documentRef.querySelector(".legal-paper");
+    var layout = documentRef.querySelector(".legal-layout");
+    if (!paper || !layout || documentRef.querySelector(".legal-tools")) return;
+    var locale = documentRef.documentElement.lang || "en";
+    var labels = {
+      ko: ["문서 도구", "문서 인쇄 / PDF", "맨 위로"],
+      en: ["Document tools", "Print / save PDF", "Back to top"],
+      de: ["Dokumentwerkzeuge", "Drucken / PDF", "Nach oben"],
+      ja: ["文書ツール", "印刷 / PDF保存", "先頭へ"]
+    }[locale] || ["Document tools", "Print / save PDF", "Back to top"];
+    var tools = documentRef.createElement("nav");
+    tools.className = "legal-tools";
+    tools.setAttribute("aria-label", labels[0]);
+    var print = documentRef.createElement("button");
+    print.type = "button";
+    print.textContent = labels[1];
+    print.addEventListener("click", function () { if (root && root.print) root.print(); });
+    var top = documentRef.createElement("a");
+    top.href = "#legal-content";
+    top.textContent = labels[2];
+    tools.append(print, top);
+    layout.before(tools);
+    if (!root || !root.IntersectionObserver) return;
+    var links = Array.from(documentRef.querySelectorAll("[data-toc-list] a"));
+    var observer = new root.IntersectionObserver(function (entries) {
+      entries.filter(function (entry) { return entry.isIntersecting; }).forEach(function (entry) {
+        links.forEach(function (link) {
+          if (link.getAttribute("href") === "#" + entry.target.id) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      });
+    }, { rootMargin: "-100px 0px -60% 0px", threshold: 0 });
+    paper.querySelectorAll("h2[id]").forEach(function (heading) { observer.observe(heading); });
+  }
+
   function init(documentRef) {
     documentRef.documentElement.dataset.theme = "light";
     documentRef.querySelectorAll("[data-current-year]").forEach(function (node) {
@@ -44,6 +80,7 @@
 
     var headings = documentRef.querySelectorAll("[data-legal-content] h2[id]");
     fillToc(documentRef, buildTocEntries(headings));
+    setupDocumentTools(documentRef);
   }
 
   var api = { buildTocEntries: buildTocEntries, init: init };
