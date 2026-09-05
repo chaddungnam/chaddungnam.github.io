@@ -34,7 +34,8 @@ test("embedded notice list is compact, balanced, and renders two preview lines",
   const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
   assert.match(html, /body\.embedded\s*\{[^}]*background:\s*#fff/s);
   assert.match(html, /body\.embedded main\s*\{[^}]*padding:\s*8px/s);
-  assert.match(html, /scrollbar-gutter:\s*stable both-edges/);
+  assert.match(html, /body\.embedded #notice-list, body\.embedded #notice-detail\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-width:\s*none/s);
+  assert.doesNotMatch(html, /scrollbar-gutter:\s*stable/);
   assert.match(html, /body\.embedded #notice-list\s*\{[^}]*padding:\s*0 4px/s);
   assert.match(html, /body\.embedded #notice-detail\s*\{[^}]*padding:\s*4px 4px 12px/s);
   assert.match(html, /body\.embedded \.notice-card\s*\{[^}]*padding:\s*10px 12px/s);
@@ -48,8 +49,8 @@ test("embedded notice list is compact, balanced, and renders two preview lines",
   assert.match(html, /class="notice-spinner"/);
   assert.match(html, /loadNotices\(language\)/);
   assert.match(html, /body\.embedded\s*\{[^}]*overflow:\s*hidden/s);
-  assert.match(html, /scrollbar-color:\s*#d85832\s+#f5e8dc/);
-  assert.match(html, /::-webkit-scrollbar-thumb/);
+  assert.match(html, /body\.embedded #notice-list::-webkit-scrollbar, body\.embedded #notice-detail::-webkit-scrollbar\s*\{[^}]*display:\s*none[^}]*width:\s*0/s);
+  assert.doesNotMatch(html, /::-webkit-scrollbar-thumb/);
   assert.match(html, /body\.embedded #notice-list\s*\{[^}]*align-content:\s*start[^}]*grid-auto-rows:\s*max-content/s);
 });
 

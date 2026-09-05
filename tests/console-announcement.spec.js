@@ -9,7 +9,21 @@ test("operator can publish a notice from operations", async ({ page }) => {
   await page.locator("#projectQuirkyBall").click();
   await page.locator('#consoleNav a[data-page="operations"]').click();
   await page.evaluate(() => { window.ConsoleApp.confirmChange = async () => true; });
-  await page.locator("#announcementForm [name=body]").fill("1.1.1 공지 테스트입니다.");
+  const noticeForm = page.locator("#announcementForm");
+  const noticeBody = noticeForm.locator("[name=body]");
+  const [gridBox, formBox, bodyBox] = await Promise.all([
+    page.locator("#operationsView .admin-card-grid").boundingBox(),
+    noticeForm.boundingBox(),
+    noticeBody.boundingBox(),
+  ]);
+  expect(Math.abs(gridBox.width - formBox.width)).toBeLessThanOrEqual(1);
+  expect(bodyBox.height).toBeGreaterThanOrEqual(350);
+  expect(bodyBox.height).toBeLessThanOrEqual(500);
+  await expect(noticeBody).toHaveCSS("font-size", "16px");
+  await expect(noticeBody).toHaveCSS("line-height", "26.4px");
+  await expect(noticeBody).toHaveCSS("resize", "vertical");
+  await expect(noticeBody).toHaveAttribute("maxlength", "2000");
+  await noticeBody.fill("1.1.1 공지 테스트입니다.");
   await page.locator("#announcementForm [name=startsAt]").fill("2026-08-29T10:00");
   await page.locator("#announcementForm [name=reason]").fill("에디터 공지 경로 확인");
   await page.locator("#announcementForm button[type=submit]").click();
