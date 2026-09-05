@@ -138,8 +138,9 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .youtube-section { background: #f5f4ef; padding: clamp(72px, 8vw, 112px) 0; border-block: 1px solid var(--studio-line); }
 .youtube-section::before { position: absolute; top: 0; right: clamp(18px, 5vw, 76px); width: 1px; height: 82px; content: ""; background: var(--studio-red); }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
+.section-heading > div { min-width: 0; max-width: 100%; }
 .section-heading .eyebrow { margin-bottom: 8px; }
-.section-heading h2 { margin: 0; font-size: clamp(2.2rem, 4vw, 4.2rem); letter-spacing: -.06em; line-height: 1.12; text-wrap: balance; }
+.section-heading h2 { margin: 0; font-size: clamp(2.2rem, 4vw, 4.2rem); letter-spacing: -.06em; line-height: 1.12; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto; }
 .arrow-link,
 .project-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--studio-ink); font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
 .arrow-link:hover,

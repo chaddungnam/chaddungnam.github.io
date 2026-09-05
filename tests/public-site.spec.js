@@ -348,6 +348,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
         .filter((node) => getComputedStyle(node).display !== "none")
         .map((node) => node.getBoundingClientRect().height);
       const projectCard = document.querySelector('[data-project="project-k"] .project-card').getBoundingClientRect();
+      const support = rect(".home-support");
       const footer = rect(".site-footer");
       return {
         titleBottom: title.bottom,
@@ -357,7 +358,9 @@ test("localized homes place a stable playable phone before supporting copy at 39
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyFonts,
         controlHeights,
-        afterProjectK: footer.top - projectCard.bottom,
+        afterProjectK: support.top - projectCard.bottom,
+        afterSupport: footer.top - support.bottom,
+        supportHeight: support.height,
         cacheAssets: [...document.querySelectorAll('link[href*="studio-home.css"], script[src*="studio-home.js"]')].map((node) => node.href || node.src),
       };
     });
@@ -370,10 +373,14 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
     expect(layout.controlHeights).not.toHaveLength(0);
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
+    expect(layout.afterProjectK).toBeGreaterThanOrEqual(0);
     expect(layout.afterProjectK).toBeLessThanOrEqual(72);
+    expect(layout.supportHeight).toBeGreaterThan(0);
+    expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
+    expect(layout.afterSupport).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260904-ui"))).toBeTruthy();
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260904-version"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260905-refine2"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260905-refine"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
       const box = node.getBoundingClientRect();
@@ -590,7 +597,7 @@ test("home lets visitors pause and resume automatic FX", async ({ page }) => {
   await expect.poll(() => canvas.getAttribute("data-frame")).not.toBe(pausedFrame);
 });
 
-test("primary navigation responds with a restrained text hover", async ({ page, isMobile }) => {
+test("primary navigation uses a high-contrast yellow hover without motion", async ({ page, isMobile }) => {
   test.skip(isMobile, "mouse hover is covered by the desktop project");
   await page.goto("/?lang=ko");
   for (const link of await page.locator(".site-nav > a").all()) {
@@ -601,8 +608,8 @@ test("primary navigation responds with a restrained text hover", async ({ page, 
       color: getComputedStyle(node).color,
       transform: getComputedStyle(node).transform,
     }));
-    expect(state.background).toBe("rgba(0, 0, 0, 0)");
-    expect(state.color).toBe("rgb(51, 92, 255)");
+    expect(state.background).toBe("rgb(255, 210, 31)");
+    expect(state.color).toBe("rgb(16, 24, 39)");
     expect(state.transform).toBe("none");
   }
 });
