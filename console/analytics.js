@@ -57,17 +57,20 @@ function countryMarkup(value) {
   </span>`;
 }
 function playerPlatformMarkup(row) {
+  const observedKeys = Array.isArray(row.observedDistributionKeys) ? row.observedDistributionKeys : [];
   const periodKeys = Array.isArray(row.periodDistributionKeys) ? row.periodDistributionKeys : [];
-  const keys = periodKeys.length ? periodKeys : row.distributionKey ? [row.distributionKey] : [];
+  const keys = observedKeys.length ? observedKeys : periodKeys.length ? periodKeys : row.distributionKey ? [row.distributionKey] : [];
   const platforms = [...new Map(keys.map((key) => {
     const display = root.ConsoleModel.platformDisplay(key);
     return [display.label, display];
   })).values()];
   if (!platforms.length || platforms.every((item) => !item.known)) {
-    return '<span class="platform-label platform-unknown" title="구버전 등 계정과 기기 정보가 아직 연결되지 않은 활동입니다.">기기 미확인</span>';
+    return '<span class="platform-label platform-unknown" title="인증 세션에 Android 또는 iOS 정보가 기록되면 자동으로 표시됩니다.">추적 대기</span>';
   }
   const lastKnown = row.platformSource === "last_known";
-  const sourceText = lastKnown ? "마지막으로 확인된 기기" : "선택 기간에 확인된 접속 기기";
+  const sourceText = row.platformSource === "apple_identity"
+    ? "Apple 연동 계정이므로 iOS로 확정"
+    : lastKnown ? "마지막으로 확인된 실제 접속 기기" : "인증 세션에서 실제 확인된 접속 기기";
   const seenAt = row.platformSeenAt ? ` · ${formatServerTime(row.platformSeenAt)}` : "";
   return `<span class="platform-label${lastKnown ? " platform-last-known" : ""}" title="${escapeHtml(sourceText + seenAt)}">${lastKnown ? "최근 " : ""}${platforms.map((item) => escapeHtml(item.label)).join(" · ")}</span>`;
 }

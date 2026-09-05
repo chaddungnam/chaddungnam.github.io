@@ -43,9 +43,9 @@ const dashboard = {
     sameInstallCompletedAfterCount: 1, latestCompletedScore: 2005262, latestCompletedLevel: 16,
   }],
   periodPlayers: [
-    { userId: "user-pop", nickname: "팝팝", displayCode: "POP1", country: "KR", distributionKey: "app_store", platformSource: "period_visit", platformSeenAt: "2026-08-26T06:40:00Z", periodDistributionKeys: ["app_store"], gamesPlayed: 1, visitCount: 1, visitDays: 1, bestScore: 157, bestLevel: 1, latestActivityAt: "2026-08-26T06:40:00Z", activitySource: "visit_and_game" },
-    { userId: "user-scapy", nickname: "스카피", displayCode: "SCAPY1", country: "JP", distributionKey: "google_play", platformSource: "last_known", platformSeenAt: "2026-08-25T06:40:00Z", periodDistributionKeys: [], gamesPlayed: 0, visitCount: 0, visitDays: 0, bestScore: 0, bestLevel: 0, latestActivityAt: "2026-08-26T06:30:00Z", activitySource: "app_activity" },
-    { userId: "user-legacy", nickname: "구버전", displayCode: "OLD1", country: "DE", distributionKey: "", platformSource: "unknown", platformSeenAt: "", periodDistributionKeys: [], gamesPlayed: 0, visitCount: 0, visitDays: 0, bestScore: 0, bestLevel: 0, latestActivityAt: "2026-08-26T06:20:00Z", activitySource: "signed_in" },
+    { userId: "user-pop", nickname: "팝팝", displayCode: "POP1", country: "KR", distributionKey: "app_store", platformSource: "apple_identity", platformSeenAt: "2026-08-26T06:40:00Z", periodDistributionKeys: [], observedDistributionKeys: ["app_store"], gamesPlayed: 1, visitCount: 1, visitDays: 1, bestScore: 157, bestLevel: 1, latestActivityAt: "2026-08-26T06:40:00Z", activitySource: "visit_and_game" },
+    { userId: "user-scapy", nickname: "스카피", displayCode: "SCAPY1", country: "JP", distributionKey: "google_play", platformSource: "observed", platformSeenAt: "2026-08-25T06:40:00Z", periodDistributionKeys: [], observedDistributionKeys: ["app_store", "google_play"], gamesPlayed: 0, visitCount: 0, visitDays: 0, bestScore: 0, bestLevel: 0, latestActivityAt: "2026-08-26T06:30:00Z", activitySource: "app_activity" },
+    { userId: "user-legacy", nickname: "구버전", displayCode: "OLD1", country: "DE", distributionKey: "", platformSource: "unknown", platformSeenAt: "", periodDistributionKeys: [], observedDistributionKeys: [], gamesPlayed: 0, visitCount: 0, visitDays: 0, bestScore: 0, bestLevel: 0, latestActivityAt: "2026-08-26T06:20:00Z", activitySource: "signed_in" },
   ],
   periodPlayerTotal: 3,
   gameMetrics: { current: null, daily: [] },
@@ -120,7 +120,7 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#periodPlayersTable")).toContainText("대한민국");
   await expect(page.locator("#periodPlayersTable")).toContainText("일본");
   await expect(page.locator("#periodPlayersTable")).toContainText("독일");
-  await expect(page.locator("#periodPlayersTable .platform-label")).toHaveText(["iOS", "최근 AOS", "기기 미확인"]);
+  await expect(page.locator("#periodPlayersTable .platform-label")).toHaveText(["iOS", "iOS · AOS", "추적 대기"]);
   await expect(page.locator("#coreLoopSummary")).toContainText("중앙 점수");
   await expect(page.locator("#coreLoopSummary")).toContainText("2,600점");
   await expect(page.locator("#coreLoopSummary")).toContainText("분당 점수");
