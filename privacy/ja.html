@@ -26,32 +26,34 @@
           <tr><td>ゲーム・アカウント情報</td><td>スコア、レベル、プレイ履歴、ニックネーム、表示コード、選択した国、スタミナ、ジェム、チケット、出席、ミッション、ショップ進行、フレンド、ギフト、メールボックス、所有・装備中のカスタマイズ情報が端末とSupabaseに保存される場合があります。</td></tr>
           <tr><td>購入情報</td><td>商品ID、ストア取引IDまたは購入トークン、購入状態、プラットフォーム、復元・返金状態、権利情報を処理します。House Duckがカード番号や銀行口座などの完全な決済情報を直接受け取ることはありません。</td></tr>
           <tr><td>広告・端末情報</td><td>Google Mobile Ads SDKは、広告配信・測定・エラー対応・不正防止のため、IPから推定されるおおよその位置、アプリ・広告操作、診断情報、広告ID、App Set ID等を処理する場合があります。</td></tr>
-          <tr><td>自社利用分析</td><td>同意および適用法令に従い、アプリ・セッション、ゲーム開始・終了、広告要求・表示・報酬、アプリ版、プラットフォーム、タイムゾーンを記録する場合があります。ランダムなインストール・セッション識別子はアカウントUIDと分離し、自社イベントには広告IDを含めません。</td></tr>
-          <tr><td>端末設定</td><td>言語、音量、振動、フレーム設定は端末内に保存されます。</td></tr>
+          <tr><td>Supabaseに保存する自社利用分析</td><td>サービスの運営・保護・改善のため、アプリ・セッション、ゲーム開始・終了、広告要求・表示・報酬、アプリ版、プラットフォーム、タイムゾーンのイベントを記録し、Supabaseに保存する場合があります。ランダムなインストール・セッション識別子はアカウントUIDと分離し、自社イベントには広告IDを含めません。この自社分析は、以下の任意のFirebase Analyticsとは別です。</td></tr>
+          <tr><td>任意のFirebase Analytics</td><td>利用者が別途同意した場合に限り、Firebase Analyticsは自動収集イベント、チュートリアル完了等のアプリ利用情報、およびアプリインスタンスIDを含むアプリ・端末情報を処理する場合があります。任意であり、拒否してもゲームは同じように利用できます。選択はアプリの設定でいつでも変更または撤回できます。</td></tr>
+          <tr><td>端末設定</td><td>言語、音量、振動、フレーム設定、およびFirebase分析への同意選択は端末内に保存されます。</td></tr>
           <tr><td>サポート情報</td><td>問い合わせメールの内容と連絡先を回答のために処理します。</td></tr>
           <tr><td>ウェブサイトの通信・保存情報</td><td>ウェブサイトはGitHub Pagesを通じて提供されます。ブラウザはページ資源および配信・安全性ログのためGitHubへリクエストを送信し、Googleの<code>i.ytimg.com</code>からYouTubeサムネイルをリクエストする場合があります。また、公開バージョン情報のみを返すSupabaseの公開バージョンエンドポイントをリクエストする場合があります。これらのリクエストの受信者はIPアドレスとHTTPリクエストのメタデータを処理する場合があります。利用者が言語を選択すると、<code>house_duck_site_language</code>キーがブラウザのlocalStorageに保存される場合があります。メールボタンは利用者のメールアプリを開くもので、利用者がそのアプリから送信する前に、ウェブサイトがメッセージをバックエンドへ送信することはありません。</td></tr>
         </table></div>
         <p>Quirky Ballは、正確な位置、連絡先、写真、カメラ、マイクなどゲームに不要な情報を収集することを目的としていません。</p>
 
         <h2 id="section-3">3. 目的と法的根拠</h2>
-        <ul><li>ゲーム、アカウント、ランキング、フレンド機能、購入商品、サポートの提供：契約履行または契約前措置（GDPR第6条1項(b)）。</li><li>決済・返金・不正購入確認および法定記録：法的義務（(c)）および正当な利益（(f)）。</li><li>安全性、安定性、エラー分析、限定的な自社利用分析：正当な利益（(f)）。</li><li>パーソナライズ広告および同意が必要なトラッキング：同意（(a)）。同意はいつでも撤回できます。</li><li>制限付き・非パーソナライズ広告と不正防止：法令上許される同意または正当な利益。</li></ul>
+        <ul><li>ゲーム、アカウント、ランキング、フレンド機能、購入商品、サポートの提供：契約履行または契約前措置（GDPR第6条1項(b)）。</li><li>決済・返金・不正購入確認および法定記録：法的義務（(c)）および正当な利益（(f)）。</li><li>サービスの運営・保護に必要な安全性、安定性、エラー分析、限定的な自社運営分析：正当な利益（(f)）。その他の自社分析は、適用法令が求める法的根拠に従います。</li><li>任意のFirebase Analyticsによる利用分析：同意（(a)）。同意はいつでも撤回できます。</li><li>パーソナライズ広告および同意が必要なトラッキング：同意（(a)）。同意はいつでも撤回できます。</li><li>制限付き・非パーソナライズ広告と不正防止：法令上許される同意または正当な利益。</li></ul>
 
         <h2 id="section-4">4. 外部サービスと受領者</h2>
         <p>House Duckは個人情報を販売しません。以下の事業者が、サービスに応じて独立した管理者または処理者として情報を扱う場合があります。</p>
-        <div class="table-scroll" role="region" aria-label="外部サービスの表" tabindex="0"><table><tr><th>サービス</th><th>目的</th></tr><tr><td>Supabase (Supabase Inc.)</td><td>認証、アカウント同期、ゲーム状態、ランキング・ソーシャル機能、自社分析の保存、公開バージョン確認</td></tr><tr><td>Google Sign-In、Google AdMob/UMP、Google Play Billing（Google関連会社）</td><td>任意のログイン、広告・同意管理、Androidアプリ内購入・復元・返金処理</td></tr><tr><td>Google YouTubeサムネイルサービス（<code>i.ytimg.com</code>）</td><td>ブラウザがリクエストするYouTubeサムネイルの提供</td></tr><tr><td>Sign in with Apple、App Store/StoreKit（Apple関連会社）</td><td>iOSでの任意ログインとアプリ内購入・復元・返金処理</td></tr><tr><td>GitHub Pages（GitHub, Inc.）</td><td>houseduck.inの静的ホスティングおよび配信・安全性ログ</td></tr></table></div>
-        <ul><li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Googleプライバシーポリシー</a></li><li><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Appleプライバシーポリシー</a></li><li><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabaseプライバシーポリシー</a></li><li><a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHubプライバシーステートメント</a></li></ul>
+        <p>House DuckはSupabaseにホストされる顧客データの管理者であり、SupabaseはHouse Duckの指示に従う処理者として当該データを処理します。Supabaseが公開する<a href="https://supabase.com/legal/customer-resources/data-processing-addendum" target="_blank" rel="noopener noreferrer">データ処理補遺</a>で、これらの役割に関する情報を確認できます。</p>
+        <div class="table-scroll" role="region" aria-label="外部サービスの表" tabindex="0"><table><tr><th>サービス</th><th>目的</th></tr><tr><td>Supabase (Supabase Inc.)</td><td>認証、アカウント同期、ゲーム状態、ランキング・ソーシャル機能、購入権利・報酬状態、自社分析の保存、公開バージョン確認</td></tr><tr><td>Firebase Analytics（Google関連会社）</td><td>利用者が別途同意した場合の任意のアプリ利用分析</td></tr><tr><td>Google Sign-In、Google AdMob/UMP、Google Play Billing（Google関連会社）</td><td>任意のログイン、広告・同意管理、Androidアプリ内購入・復元・返金処理</td></tr><tr><td>Google YouTubeサムネイルサービス（<code>i.ytimg.com</code>）</td><td>ブラウザがリクエストするYouTubeサムネイルの提供</td></tr><tr><td>Sign in with Apple、App Store/StoreKit（Apple関連会社）</td><td>iOSでの任意ログインとアプリ内購入・復元・返金処理</td></tr><tr><td>GitHub Pages（GitHub, Inc.）</td><td>houseduck.inの静的ホスティングおよび配信・安全性ログ</td></tr></table></div>
+        <ul><li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Googleプライバシーポリシー</a></li><li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebaseのプライバシーとセキュリティ情報</a></li><li><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Appleプライバシーポリシー</a></li><li><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabaseプライバシーポリシー</a></li><li><a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHubプライバシーステートメント</a></li></ul>
 
         <h2 id="section-5">5. 国際移転</h2>
         <p>各事業者のグローバル基盤により、EU/EEA域外で処理される場合があります。必要に応じ、十分性認定、標準契約条項その他の適法な保護措置に基づきます。詳細は各事業者のポリシーをご確認ください。</p>
 
         <h2 id="section-6">6. 保存期間</h2>
-        <ul><li>元のプレイ・シーズン・週間記録およびアカウントと分離した自社分析イベント：作成後、原則最大28日。</li><li>アカウントと現在の同期状態：アカウント削除まで。</li><li>権利、取引参照値、返金・不正対応記録：購入サポートまたは法定保存に必要な期間。</li><li>サポート記録：問い合わせ解決と紛争対応に必要な期間。</li><li>端末設定：アプリまたは端末データ削除まで。</li><li>ストア、認証、広告、ホスティング事業者が独自に保有する情報：各事業者の方針による期間。</li></ul>
+        <ul><li>元のプレイ・シーズン・週間記録およびアカウントと分離した自社分析イベント：作成後、原則最大28日。</li><li>アカウントと現在の同期状態：アカウント削除まで。</li><li>権利、取引参照値、返金・不正対応記録：購入サポートまたは法定保存に必要な期間。</li><li>サポート記録：問い合わせ解決と紛争対応に必要な期間。</li><li>端末設定：アプリまたは端末データ削除まで。</li><li>ストア、認証、広告、分析、ホスティング事業者が独自に保有する情報：各事業者の方針および設定による期間。</li></ul>
 
         <h2 id="section-7">7. アカウント削除</h2>
         <p>Quirky Ballの<strong>設定 → アカウント削除</strong>、または<a href="/quirky-ball/privacy/delete_ja.html">外部削除案内</a>から手続きできます。アカウントプロフィール、同期状態、ソーシャル接続は削除され、復元できません。一部の元のプレイ記録および保管記録は作成後最大28日間残る場合があり、保有期間に従って自動削除されます。現在の一部のプレイ記録はアカウント接続から切り離される場合がありますが、これはすべての記録が直ちに削除されることを意味しません。ただし、法的義務、決済・返金、不正防止、権利主張に厳密に必要な最小記録は目的終了まで残る場合があります。AppleやGoogleが独立して管理するストア取引記録はゲームアカウント削除では消去されません。</p>
 
-        <h2 id="section-8">8. 広告同意と選択</h2>
-<ul><li>EEA、英国、スイス等、同意が必要な地域ではGoogle UMPメッセージが表示される場合があります。</li><li>iOSで、アプリ横断トラッキング権限を求める場合はAppleのApp Tracking Transparency（ATT）が別途表示されます。</li><li>必要な利用者は設定の<strong>広告プライバシー設定</strong>を再度開き、端末設定でも広告識別子やトラッキングを管理できます。</li><li>パーソナライズ、制限付き、非パーソナライズ広告の区分だけで、同意が必要かどうかは決まりません。適用法令および端末への保存または端末へのアクセスの性質によって決まります。ドイツでは、該当する保存またはアクセスについてTDDDG第25条により同意が必要となる場合があります。</li><li>撤回前の適法な処理は撤回の影響を受けません。</li></ul>
+        <h2 id="section-8">8. 広告・分析の同意と選択</h2>
+<ul><li>任意のFirebase利用分析は、必須文書への同意および広告同意とは別です。最初の案内画面で明示的に選択し、拒否してもゲームの機能や報酬は制限されません。この案内と設定機能はQuirky Ball 1.1.2（ビルド53）から適用されます。</li><li>Firebase分析の選択は、アプリの設定でいつでも変更または撤回できます。撤回すると、その後のFirebase Analyticsによる収集は停止し、撤回前に適法に行われた処理には影響しません。</li><li>EEA、英国、スイス等、同意が必要な地域ではGoogle UMPメッセージが表示される場合があります。</li><li>iOSで、アプリ横断トラッキング権限を求める場合はAppleのApp Tracking Transparency（ATT）が別途表示されます。</li><li>必要な利用者は設定の<strong>広告プライバシー設定</strong>を再度開き、端末設定でも広告識別子やトラッキングを管理できます。</li><li>パーソナライズ、制限付き、非パーソナライズ広告の区分だけで、同意が必要かどうかは決まりません。適用法令および端末への保存または端末へのアクセスの性質によって決まります。ドイツでは、該当する保存またはアクセスについてTDDDG第25条により同意が必要となる場合があります。</li></ul>
 
         <h2 id="section-9">9. 利用者の権利</h2>
 <p>適用法令に従い、<a href="mailto:support@houseduck.in">support@houseduck.in</a>への連絡により、アクセス、訂正、削除、処理制限、データポータビリティ、異議申立て、同意撤回を求めることができます。GDPRが適用される請求には通常1か月以内に回答します。請求が複雑である場合または件数が多い場合に必要なときは、最長さらに2か月延長でき、その理由を含め最初の1か月以内にお知らせします。監督機関に苦情を申し立てる権利は影響を受けません。ヘッセン州の管轄機関は<a href="https://datenschutz.hessen.de/" target="_blank" rel="noopener noreferrer">Der Hessische Beauftragte für Datenschutz und Informationsfreiheit</a>です。</p>
@@ -63,10 +65,10 @@
         <p>House DuckはTLS、アクセス制御、Supabase Row Level Security、最小権限、取引重複防止等の合理的措置を講じます。ただし、完全な安全性を保証できる送信・保存方法はありません。</p>
 
         <h2 id="section-12">12. 必須情報と自動意思決定</h2>
-        <p>ゲストUIDと基本ゲーム状態はサービス提供に必要です。任意ログインや広告同意がなくてもゲスト利用できますが、同期やパーソナライズ広告が利用できない場合があります。House Duckは法的または同様に重大な影響を与える完全自動の意思決定を行いません。</p>
+        <p>ゲストUID、基本ゲーム状態、およびそれらを保存・同期するSupabaseベースの運営は、サービス提供に必要です。Supabaseに保存する自社運営分析は、任意のFirebase Analyticsとは別です。Firebase分析への同意を拒否しても、ゲームは同じように利用できます。任意ログインや広告同意がない場合は、同期やパーソナライズ広告が利用できないことがあります。House Duckは法的または同様に重大な影響を与える完全自動の意思決定を行いません。</p>
 
         <h2 id="section-13">13. 改定</h2>
-<ul><li>2026年8月24日発効 — House Duck共通ポリシーへ移行し、Android・Google Play、iOSでのAppleログイン、広告同意、一回限りの購入処理を反映（v3.0）。</li><li>2026年9月5日の明確化更新 — ウェブサイトのリクエスト・ローカル設定、削除リクエストの確認、権利請求の手順を明確にしました。2026年8月24日の元の発効日は変更されません。</li></ul><p>重要な変更は発効前にウェブサイトまたはアプリ内でお知らせします。</p>
+<ul><li>2026年8月24日発効 — House Duck共通ポリシーへ移行し、Android・Google Play、iOSでのAppleログイン、広告同意、一回限りの購入処理を反映（v3.0）。</li><li>2026年9月5日の明確化更新 — ウェブサイトのリクエスト・ローカル設定、削除リクエストの確認、権利請求の手順を明確にしました。2026年8月24日の元の発効日は変更されません。</li><li>2026年9月5日の分析告知更新 — Supabaseベースの運営・自社分析と任意のFirebase Analyticsを区別し、同意・拒否・設定での撤回を反映しました。元の発効日は変更されません。</li></ul><p>重要な変更は発効前にウェブサイトまたはアプリ内でお知らせします。</p>
 
   </div>
       <!-- 문서 본문 끝 -->

@@ -74,7 +74,7 @@
   <ul>
     <li>Ad-based monetization — rewarded, interstitial, banner, and native ads (Google AdMob)</li>
     <li>Optional account linking through Google Sign-In on Android or Sign in with Apple on iOS</li>
-    <li>Online leaderboards powered by Supabase</li>
+    <li>Supabase-backed guest accounts/authentication, game-state synchronization, online rankings/social features, purchase entitlements/reward state, and first-party operational analytics</li>
     <li>Friends and gifts, mailbox, and profile/marble customization</li>
     <li>Gameplay using virtual currency such as stamina and gems</li>
   </ul>
@@ -108,11 +108,14 @@
     <li>The Operator may adjust how virtual currency is earned or spent to keep the game balanced.</li>
   </ul>
 
-  <h2 id="section-6">6. Advertising and Consent</h2>
+  <h2 id="section-6">6. Advertising and Optional Analytics Consent</h2>
   <ul>
     <li>The Software displays ads served by Google AdMob; watching rewarded ads is optional.</li>
+    <li>Usage analytics through Firebase Analytics is a separate, optional choice and is not preselected. If allowed, automatically collected events and app-use information such as tutorial completion may be analyzed. This control applies from Quirky Ball 1.1.2 (build 53).</li>
+    <li>Declining Firebase Analytics does not restrict the game, its features, or rewards. The analytics choice can be changed or withdrawn at any time in the app settings.</li>
+    <li>The Firebase analytics choice is separate from advertising consent through Google UMP and the iOS ATT choice.</li>
     <li>Users in regions where consent is required (such as the EEA and the UK) may be shown a Google UMP consent flow. Advertising choices can be managed through the UMP flow and device settings.</li>
-    <li>Data processing related to ads is governed by the <a href="/privacy/en.html">Privacy Policy</a>.</li>
+    <li>Data processing related to ads and analytics is governed by the <a href="/privacy/en.html">Privacy Policy</a>.</li>
   </ul>
 
   <h2 id="section-7">7. Leaderboards and Social Features</h2>
@@ -162,7 +165,7 @@
   <p><strong>Address:</strong> Ringstr. 23, 61476 Kronberg im Taunus, Hessen, Germany<br><a href="/impressum/en.html">Impressum</a></p>
 
   <h2 id="section-16">16. Effective Date and Revision History</h2>
-<ul><li>Effective August 24, 2026 — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products (v2.0)</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification. This does not change the original effective date of August 24, 2026.</li></ul>
+<ul><li>Effective August 24, 2026 — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products (v2.0)</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification. This does not change the original effective date of August 24, 2026.</li><li>Analytics notice update September 5, 2026 — Distinguished Supabase-backed operations and first-party analytics from optional Firebase Analytics, and documented Firebase consent, refusal, and withdrawal in settings. The original effective date remains unchanged.</li></ul>
 
   </div>
         <!-- 문서 본문 끝 -->
