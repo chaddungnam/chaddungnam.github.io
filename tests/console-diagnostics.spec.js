@@ -32,14 +32,14 @@ const dashboard = {
     startedAt: 1788333072, lastSeenAt: 1788333114, level: 1, score: 157, tutorial: true,
     tutorialStage: "bomb_roulette", tutorialStageIndex: 9, lastScreen: "main",
     lastButtonId: "main/ui/control_0/panel_1/button_0", status: "background", isNewPlayer: true,
-    identityMatch: "time_window", accountCompletedGameCount: 0,
+    identityMatch: "auth_window", platformKey: "ios", platformSource: "analytics_event", accountCompletedGameCount: 0,
     sameInstallCompletedAfterCount: 0,
   }, {
     installKey: "설치 654321", userId: "user-scapy", nickname: "스카피", displayCode: "SCAPY1", country: "KR",
     startedAt: 1788332000, lastSeenAt: 1788332400, level: 16, score: 538961, tutorial: false,
     tutorialStage: "", tutorialStageIndex: null, lastScreen: "gameloading",
     lastButtonId: "main/ui/control_0/panel_1/button_0", status: "verified_exit", isNewPlayer: false,
-    identityMatch: "same_install", accountCompletedGameCount: 3,
+    identityMatch: "same_runtime", platformKey: "android", platformSource: "analytics_event", accountCompletedGameCount: 3,
     sameInstallCompletedAfterCount: 1, latestCompletedScore: 2005262, latestCompletedLevel: 16,
   }],
   periodPlayers: [
@@ -117,6 +117,9 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("계정 완료 0판");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("이후 완료 1판");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("2,005,262점 · Lv.16");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("유일한 인증·플레이 시각 연결");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("같은 앱 실행의 인증 계정 확인");
+  await expect(page.locator("#unfinishedPlaysTable .platform-label")).toHaveText(["iOS", "AOS"]);
   await expect(page.locator("#periodPlayersTable")).toContainText("대한민국");
   await expect(page.locator("#periodPlayersTable")).toContainText("일본");
   await expect(page.locator("#periodPlayersTable")).toContainText("독일");

@@ -70,7 +70,9 @@ function playerPlatformMarkup(row) {
   const lastKnown = row.platformSource === "last_known";
   const sourceText = row.platformSource === "apple_identity"
     ? "Apple 연동 계정이므로 iOS로 확정"
-    : lastKnown ? "마지막으로 확인된 실제 접속 기기" : "인증 세션에서 실제 확인된 접속 기기";
+    : row.platformSource === "analytics_event"
+      ? "해당 판의 분석 이벤트에서 실제 확인된 접속 기기"
+      : lastKnown ? "마지막으로 확인된 실제 접속 기기" : "인증 세션에서 실제 확인된 접속 기기";
   const seenAt = row.platformSeenAt ? ` · ${formatServerTime(row.platformSeenAt)}` : "";
   return `<span class="platform-label${lastKnown ? " platform-last-known" : ""}" title="${escapeHtml(sourceText + seenAt)}">${lastKnown ? "최근 " : ""}${platforms.map((item) => escapeHtml(item.label)).join(" · ")}</span>`;
 }
@@ -665,13 +667,21 @@ function renderUnfinishedPlays() {
       const score = row.score !== null && row.score !== undefined && Number.isFinite(Number(row.score))
         ? `${formatNumber(Number(row.score))}점`
         : "점수 미확인";
-      const identityEvidence = row.identityMatch === "same_install"
-        ? "<small>같은 설치의 완료 판과 대조</small>"
-        : row.identityMatch === "time_window"
-          ? "<small>계정·플레이 시각 추정 연결</small>"
-          : "";
+      const identityEvidence = row.identityMatch === "same_runtime"
+        ? "<small>같은 앱 실행의 인증 계정 확인</small>"
+        : row.identityMatch === "auth_window"
+          ? "<small>유일한 인증·플레이 시각 연결</small>"
+          : row.identityMatch === "same_install"
+            ? "<small>같은 설치의 완료 판과 대조</small>"
+            : row.identityMatch === "time_window"
+              ? "<small>계정·플레이 시각 추정 연결</small>"
+              : "";
+      const platform = playerPlatformMarkup({
+        distributionKey: row.platformKey || row.distributionKey,
+        platformSource: row.platformSource || "analytics_event",
+      });
       return `<tr>
-        <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${identityEvidence}</div></td>
+        <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${identityEvidence}<div class="period-player-meta">${platform}</div></div></td>
         <td data-label="상태"><strong>${escapeHtml(status[0])}</strong><small>${escapeHtml(status[1])}</small></td>
         <td data-label="마지막 확인 위치"><strong>${escapeHtml(stage)}</strong><small>${escapeHtml(action)}</small></td>
         <td data-label="도달치"><strong>${escapeHtml(level)}</strong><small>${escapeHtml(score)}</small></td>
