@@ -310,7 +310,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .motion-toggle { top: auto; right: 0; bottom: 8px; }
   .youtube-section { padding: 76px 0 92px; }
   .section-heading { align-items: start; flex-direction: column; }
-  .youtube-grid { grid-template-columns: 1fr; }
+  .youtube-grid { grid-template-columns: 1fr; grid-auto-rows: 1fr; }
   .youtube-card { min-height: 132px; grid-template-columns: 42% 1fr; grid-template-rows: 1fr; }
   .youtube-card img { height: 100%; aspect-ratio: 1; border-right: 1px solid var(--studio-line); border-bottom: 0; }
   .youtube-card > span { min-height: 0; align-content: center; padding: 14px; }
