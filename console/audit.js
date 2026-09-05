@@ -1,5 +1,5 @@
 (function attachConsoleAudit(root) {
-  const state = { userId: "", page: 1, bound: false };
+  const state = { userId: "", page: 1, bound: false, requestSeq: 0 };
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
@@ -22,24 +22,27 @@
     byId("auditNext").disabled = state.page >= pages;
     byId("auditList").innerHTML = rows.length ? rows.map((row) => {
       const reversible = row.action_type === "player_mutation" && row.success && !row.reverts_action_id && row.target_user_id;
-      const status = row.success ? "성공" : `실패 · ${escapeHtml(row.error_code)}`;
+      const status = row.success ? "성공" : `실패 · ${escapeHtml(row.error_code || "사유 미기록")}`;
       return `<article class="audit-item" data-success="${row.success}"><div><strong>${escapeHtml(root.ConsoleModel.actionDisplayName(row.action_type))}</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><div class="audit-meta"><span class="audit-status">${status}</span>${row.target_user_id ? `${root.ConsoleModel.playerIdentityMarkup({ user_id: row.target_user_id, nickname: row.target_nickname, display_code: row.target_display_code, operator_tracked: row.operator_tracked, operator_tags: row.operator_tags, operator_note: row.operator_note }, root.location.hash)}<code>${escapeHtml(row.target_user_id)}</code>` : ""}</div><details class="audit-diff"><summary>변경값 보기</summary><code>변경 전\n${escapeHtml(prettyJson(row.before))}\n\n변경 후\n${escapeHtml(prettyJson(row.after))}</code></details>${reversible ? `<details class="audit-revert"><summary>이 변경 되돌리기</summary><form class="revert-form" data-action-id="${row.id}" data-user-id="${row.target_user_id}"><label>되돌리기 사유<input name="reason" maxlength="300" required></label><button class="danger-button" type="submit">되돌리기</button></form></details>` : ""}</article>`;
     }).join("") : '<p class="empty-panel">조건과 일치하는 감사 기록이 없습니다.</p>';
     byId("auditList").querySelectorAll(".revert-form").forEach((form) => form.addEventListener("submit", revert));
   }
 
   async function load() {
+    const requestSeq = ++state.requestSeq;
     const panel = byId("auditList").closest(".panel");
     panel?.setAttribute("aria-busy", "true");
     setMessage("감사 기록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.");
     try {
       const data = await root.ConsoleAPI.post("admin-console", { action: "audit.list", userId: state.userId || undefined, page: state.page });
+      if (requestSeq !== state.requestSeq) return;
       render(data);
       setMessage("되돌리기는 새 변경으로 기록되며, 발송된 우편과 공지는 되돌릴 수 없습니다.");
     } catch (error) {
+      if (requestSeq !== state.requestSeq) return;
       setMessage(`감사 기록을 불러오지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
-      panel?.setAttribute("aria-busy", "false");
+      if (requestSeq === state.requestSeq) panel?.setAttribute("aria-busy", "false");
     }
   }
 
@@ -74,7 +77,8 @@
 
   function mount() {
     const params = new URLSearchParams(root.location.hash.split("?")[1] || "");
-    state.userId = (params.get("userId") || state.userId).slice(0, 36);
+    state.userId = (params.get("userId") || "").slice(0, 36);
+    state.page = 1;
     byId("auditUserId").value = state.userId;
     bind(); load();
   }
