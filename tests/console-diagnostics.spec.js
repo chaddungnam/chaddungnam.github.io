@@ -11,6 +11,9 @@ const gameOverDays = Array.from({ length: 10 }, (_, index) => ({
 const dashboard = {
   generatedAt: "2026-08-26T07:00:00.000Z",
   rangeDays: 7,
+  accountActivity: {activeAccounts:3,accountsWithCompletedGame:1,completedGames:1,zeroCompletedGameAccounts:2,totalVisits:4,activityAccountDays:4,freshLaunches:5,repeatAccounts:null,repeatRate:null,retention:[]},
+  accountScope: {mode:"all_accounts",description:"전체 인증 계정"},
+  analyticsCoverage: {eventRows:20,observedPlatforms:["android","ios"],message:"계정 기록과 텔레메트리는 별도 집계"},
   truncated: false,
   summary: { installs: 4, activeInstallsToday: 2, sessions: 8, gamesStarted: 6, gameOvers: 4, midGameExits: 1, unobservedGames: 1, avgSessionSeconds: 180, avgGameSeconds: 150 },
   retention: [{ day: 1, rate: 0.25 }, { day: 7, rate: 0.1 }],
@@ -98,6 +101,11 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await page.goto("/console/");
   await page.locator("#projectQuirkyBall").click();
 
+  await expect(page.locator("#execCompleted")).toHaveText("1명");
+  await expect(page.locator("#execCompletedDetail")).toContainText("1판");
+  await expect(page.locator("#analyticsCoverageMessage")).toContainText("계정 기록과 텔레메트리는 별도 집계");
+  await expect(page.locator("#accountActivitySummary")).toContainText("4계정·일");
+  await expect(page.locator("#accountActivitySummary")).toContainText("5회");
   await expect(page.locator("#marketingGateTitle")).toHaveText("유료 마케팅 검토 조건");
   await expect(page.locator("#marketingGateStatus")).toHaveText("대기");
   await expect(page.locator("#marketingGateSummary")).toContainText("4.9명 / 5명");
@@ -117,7 +125,7 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("계정 완료 0판");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("이후 완료 1판");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("2,005,262점 · Lv.16");
-  await expect(page.locator("#unfinishedPlaysTable")).toContainText("유일한 인증·플레이 시각 연결");
+  await expect(page.locator("#unfinishedPlaysTable")).toContainText("인증·플레이 시각 추정 연결");
   await expect(page.locator("#unfinishedPlaysTable")).toContainText("같은 앱 실행의 인증 계정 확인");
   await expect(page.locator("#unfinishedPlaysTable .platform-label")).toHaveText(["iOS", "AOS"]);
   await expect(page.locator("#periodPlayersTable")).toContainText("대한민국");

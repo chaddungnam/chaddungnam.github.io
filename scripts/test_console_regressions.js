@@ -22,6 +22,9 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
+assert.match(consoleHtml, /analytics\.js\?v=20260905-4/, "cache must refresh corrected account metrics");
+assert.match(consoleHtml, /id="analyticsCoverageMessage"/, "telemetry coverage must be prominent");
+assert.doesNotMatch(analyticsSource, /10초 미만 즉시 이탈 제외|종료 \(10초 이상\)/, "all explicit exits belong in the lifecycle sample");
 const modelSource = read("console/model.js");
 const pulseSource = read("analytics/pulse-model.js");
 const consoleStyles = read("console/styles.css");
@@ -53,7 +56,7 @@ assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose pr
 assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
 assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
 assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
-assert.match(consoleHtml, /analytics\.js\?v=20260905-3/, "the Console must cache-bust the balance signal update");
+assert.match(consoleHtml, /analytics\.js\?v=20260905-4/, "the Console must cache-bust the balance signal update");
 assert.match(consoleHtml, /id="balanceTerminalTable"/, "the Console must expose privacy-safe balance terminal outcomes");
 assert.match(consoleHtml, /id="balancePressureSummary"/, "the Console must expose checkpoint board pressure");
 assert.match(consoleHtml, /id="balanceChoiceTable"/, "the Console must expose growth-choice outcomes");
@@ -83,9 +86,9 @@ assert.match(consoleHtml, /data-range="5"[^>]*>최근 5일</, "the Console must 
 assert.match(analyticsSource, /panel\.hidden = verifiedStops === 0/, "normal growth-choice ad flow must not create a priority card");
 assert.match(analyticsSource, /결과가 확인된 판 중 명시적 중간 종료 비율/, "marketing exit-rate copy must match the observed-game denominator");
 assert.match(analyticsSource, /결과 확인 3판 이상 헤비 2인분/, "marketing review must count a verified heavy player as two people");
-assert.match(consoleHtml, /헤비 —명\(2인분\)/, "the Pulse facts must disclose the light/heavy weighting");
+assert.match(consoleHtml, /헤비 —설치\(2인분\)/, "the Pulse facts must disclose the light/heavy weighting");
 assert.doesNotMatch(analyticsSource, /성숙 일별 코호트/, "marketing review must not expose an opaque mature-cohort gate");
-assert.match(consoleHtml, /전체 이벤트 사람 수/, "event funnels must use the requested people terminology");
+assert.match(consoleHtml, /이벤트별 고유 설치 수/, "event funnels must use the requested people terminology");
 assert.match(pulseSource, /MIN_DAILY_ACTIVE_PEOPLE = 5/, "Pulse must start judging at five daily active people");
 assert.match(pulseSource, /MIN_RETENTION_COMPARISON_PEOPLE = 20/, "Pulse must require a meaningful return comparison sample");
 assert.match(pulseSource, /dailyRows\.reduce[\s\S]*\/ dailyRows\.length/, "multi-day Pulse must use average daily active people");
@@ -95,8 +98,8 @@ assert.match(pulseSource, /confidence: isEstimate \? "estimate" : "standard"/, "
 assert.match(pulseSource, /periodReturn = payload\.periodReturn/, "Pulse return scoring must follow the selected range");
 assert.match(consoleHtml, /선택 기간과 바로 이전 같은 기간 비교/, "the return card must explain its selected-range comparison");
 assert.match(analyticsSource, /periodReturn\.previousPlayers/, "the return explanation must show the previous-window denominator");
-assert.match(analyticsSource, /총 활동 계정은 \$\{formatNumber\(activeAccounts/, "the overall judgment must start with all selected-range active accounts");
-assert.match(analyticsSource, /find\(\(row\) => row\?\.event === "game_over"\)\?\.users/, "the overall judgment must count distinct people who completed a game");
+assert.match(analyticsSource, /총 활동 계정은/, "the overall judgment must start with all selected-range active accounts");
+assert.match(analyticsSource, /knownNumber\(state\.payload\?\.accountActivity\?\.accountsWithCompletedGame\)/, "completion KPI must use authenticated account totals");
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");

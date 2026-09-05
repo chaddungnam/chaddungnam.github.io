@@ -18,6 +18,21 @@ const state = {
 };
 const byId = (id) => document.getElementById(id);
 
+function knownNumber(value) { return typeof value === "number" && Number.isFinite(value) ? value : null; }
+function accountScopeText() {
+  const scope = state.payload?.accountScope;
+  return scope?.description || (scope?.mode === "observed_device_accounts" ? "선택 기기에서 관측된 인증 계정" : "인증 계정 집계 · 범위 확인 대기");
+}
+function renderAnalyticsCoverage() {
+  const coverage = state.payload?.analyticsCoverage;
+  const platforms = coverage?.observedPlatforms;
+  const noIos = Array.isArray(platforms) && !platforms.some((key) => /ios|app_store/i.test(String(key)));
+  const distribution = state.payload?.accountScope?.distributionKey ?? state.distributionKey;
+  const iosScope = distribution === "all" || distribution === "app_store";
+  const message = coverage?.message || ("분석 이벤트 수집 범위 확인 대기. 이벤트가 없다는 것은 사용자가 없다는 뜻이 아닙니다." + (noIos && iosScope ? " iOS 텔레메트리 미수집: iOS 사용자 없음으로 해석하지 마세요." : ""));
+  setText("analyticsCoverageMessage", message + " " + accountScopeText());
+}
+
 function setText(id, value) { byId(id).textContent = value; }
 function formatNumber(value) { return typeof value === "number" ? value.toLocaleString("ko-KR") : "—"; }
 function formatRate(value) { return typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—"; }
@@ -102,14 +117,31 @@ function setMessage(message, error = false) {
   element.style.color = error ? "var(--coral)" : "";
 }
 
+function periodPlayersAvailable() {
+  return Array.isArray(state.payload?.periodPlayers) && knownNumber(state.payload?.periodPlayerTotal) !== null && state.payload.periodPlayerTotal >= 0;
+}
+
+function periodReturnView() {
+  const periodReturn = state.payload?.periodReturn ?? {};
+  const previous = knownNumber(periodReturn.previousPlayers);
+  const returned = knownNumber(periodReturn.returnedPlayers);
+  const unavailable = String(periodReturn.status || periodReturn.mode || "").startsWith("unavailable") || state.payload?.accountScope?.mode === "unavailable" || previous === null || returned === null;
+  if (unavailable) return { rate: null, detail: "재방문 비교 조회 실패 / 집계 대기", previous: null };
+  return {
+    rate: previous > 0 ? knownNumber(periodReturn.rate) : null,
+    detail: previous > 0 ? `이전 ${formatNumber(previous)}명 중 ${formatNumber(returned)}명` : "이전 비교 기간의 활동 계정 0명 · 비율 산출 불가",
+    previous,
+  };
+}
+
 function setFiltersDisabled(disabled) {
   document.querySelectorAll(".analytics-toolbar button, .analytics-toolbar input, .period-players-panel button, .period-players-panel input").forEach((control) => {
     control.disabled = disabled;
   });
   if (!disabled) {
     const totalPages = Math.max(1, Math.ceil(Number(state.payload?.periodPlayerTotal ?? 0) / 50));
-    byId("periodPrevious").disabled = !state.payload || state.playerPage <= 1;
-    byId("periodNext").disabled = !state.payload || state.playerPage >= totalPages;
+    byId("periodPrevious").disabled = !periodPlayersAvailable() || state.playerPage <= 1;
+    byId("periodNext").disabled = !periodPlayersAvailable() || state.playerPage >= totalPages;
   }
 }
 
@@ -201,17 +233,18 @@ function renderDashboard() {
   const pulseModel = window.PulseModel.buildPulseModel(state.payload);
   const rangeLabel = selectedRangeLabel();
   const accountActivity = state.payload?.accountActivity ?? {};
-  const activeAccounts = Number(accountActivity.activeAccounts ?? summary.installs ?? 0);
+  const activeAccounts = knownNumber(accountActivity.activeAccounts);
   setText("kpiActiveLabel", `${rangeLabel} 활동 계정`);
   setText("kpiActive", formatNumber(activeAccounts));
   setText("kpiActiveUnit", "명");
   const segments = summary.playerSegments ?? {};
-  setText("kpiPeopleMix", `게임 플레이 ${formatNumber(Number(summary.installs ?? 0))}명 · 헤비 ${formatNumber(Number(segments.heavyPeople ?? 0))}명(2인분) · 판단 ${formatNumber(Number(segments.weightedPeople ?? summary.installs ?? 0))}명`);
+  setText("kpiPeopleMix", `별도 텔레메트리 표본 ${formatNumber(summary.installs)}설치 · 헤비 ${formatNumber(segments.heavyPeople)}설치(2인분) · 가중 표본 ${formatNumber(segments.weightedPeople)}`);
   setText("dailyTrendEyebrow", `${state.startDate ? "CUSTOM RANGE" : state.rangeOffsetDays === 1 ? "YESTERDAY" : state.rangeDays === 1 ? "TODAY" : `${state.rangeDays} DAY CHANGE`} · BERLIN`);
   setText("kpiSession", formatDuration(summary.avgSessionSeconds));
   const adEconomics = state.payload?.adEconomics ?? {};
   setText("kpiRevenue", formatCurrency(adEconomics.estimatedRevenueEur));
   setText("adTotal", `실광고 ${formatNumber(adEconomics.monetizedImpressions)} · 테스트 ${formatNumber(adEconomics.testImpressions)}`);
+  renderAnalyticsCoverage();
   renderExecutiveSummary(pulseModel);
   renderExecutiveVisuals(pulseModel);
   renderPulseOverview(pulseModel);
@@ -561,20 +594,19 @@ function renderAccountActivity() {
   const retention = Array.isArray(activity.retention) ? activity.retention : [];
   const d1 = retention.find((row) => Number(row.day) === 1);
   const d7 = retention.find((row) => Number(row.day) === 7);
-  const coverage = activity.coverageSince
-    ? `계정 활동 기록 시작 · ${String(activity.coverageSince)}`
-    : "계정 활동 기록 대기";
-  const waitingDetail = activity.coverageSince
-    ? `로그인·홈·랭킹·서버 활동·동기화·완료 게임 신호 ${formatNumber(Number(activity.totalVisits || 0))}일`
-    : "로그인·홈·랭킹·서버 활동·동기화·완료 게임 신호를 모아 집계합니다.";
-  setText("accountActivityCoverage", coverage);
+  // totalVisits is the legacy distinct account-day count, not fresh launches.
+  const accountDays = Object.hasOwn(activity, "activityAccountDays") ? activity.activityAccountDays : activity.totalVisits;
+  const value = (count, unit) => knownNumber(count) === null ? "집계 대기" : formatNumber(count) + unit;
+  const status = (count) => knownNumber(count) === null ? "waiting" : "available";
+  setText("accountActivityCoverage", state.payload?.accountActivity ? accountScopeText() : "조회 실패 / 집계 대기");
   renderCoverageCards("accountActivitySummary", [
-    { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "활동 계정", value: `${formatNumber(Number(activity.activeAccounts || 0))}명`, detail: waitingDetail },
-    { status: Number(activity.repeatAccounts || 0) > 0 ? "available" : "waiting", label: "2일 이상 활동", value: `${formatNumber(Number(activity.repeatAccounts || 0))}명`, detail: `활동 계정 중 ${formatRate(activity.repeatRate)}` },
-    { status: Number(activity.zeroCompletedGameAccounts || 0) > 0 ? "watch" : "available", label: "활동했지만 완료 0회", value: `${formatNumber(Number(activity.zeroCompletedGameAccounts || 0))}명`, detail: `${formatNumber(Number(activity.zeroCompletedGameVisits || 0))}일 활동 · 기간 내 완료 게임 없음` },
-    { status: Number(activity.activeAccounts || 0) > 0 ? "available" : "waiting", label: "활동 계정의 게임 완료", value: formatRate(activity.visitToCompleteAccountRate), detail: `${formatNumber(Number(activity.accountsWithCompletedGame || 0))}명이 기간 내 1판 이상 완료` },
-    { status: Number(d1?.eligible || 0) > 0 ? "available" : "waiting", label: "계정 D1 재방문", value: formatRate(d1?.rate), detail: `관찰 가능 ${formatNumber(Number(d1?.eligible || 0))}명 중 ${formatNumber(Number(d1?.retained || 0))}명` },
-    { status: Number(d7?.eligible || 0) > 0 ? "available" : "waiting", label: "계정 D7 재방문", value: formatRate(d7?.rate), detail: `관찰 가능 ${formatNumber(Number(d7?.eligible || 0))}명 중 ${formatNumber(Number(d7?.retained || 0))}명` },
+    { status: status(activity.activeAccounts), label: "활동 계정", value: value(activity.activeAccounts, "명"), detail: accountScopeText() },
+    { status: status(accountDays), label: "활동 계정·일", value: value(accountDays, "계정·일"), detail: "동일 계정의 같은 날 활동은 한 번 · 실행 횟수 아님" },
+    { status: status(activity.freshLaunches), label: "새 실행 방문", value: value(activity.freshLaunches, "회"), detail: "새 앱 실행 신호만 집계" },
+    { status: status(activity.repeatAccounts), label: "2일 이상 활동", value: value(activity.repeatAccounts, "명"), detail: "활동 계정 중 " + formatRate(activity.repeatRate) },
+    { status: status(activity.zeroCompletedGameAccounts), label: "활동했지만 완료 0회", value: value(activity.zeroCompletedGameAccounts, "명"), detail: "기간 내 완료 기록이 0인 인증 계정" },
+    { status: status(activity.accountsWithCompletedGame), label: "게임을 완료한 계정", value: value(activity.accountsWithCompletedGame, "명"), detail: "계정 완료 기록 " + value(activity.completedGames, "판") },
+    ...[[1, d1], [7, d7]].map(([day, row]) => ({ status: row ? status(row.rate) : "waiting", label: "계정 D" + day + " 재방문", value: row ? formatRate(row.rate) : "집계 대기", detail: row ? "관찰 가능 " + value(row.eligible, "명") + " 중 " + value(row.retained, "명") : "재방문 관측 자료 없음" })),
   ]);
 }
 
@@ -591,8 +623,16 @@ function periodPlayerActivityMarkup(row) {
 }
 
 function renderPeriodPlayers() {
-  const rows = root.ConsoleModel.dedupePlayers(state.payload?.periodPlayers ?? []);
-  const total = Number(state.payload?.periodPlayerTotal ?? 0);
+  if (!periodPlayersAvailable()) {
+    setText("periodPlayerTotal", "조회 실패 / 집계 대기");
+    setText("periodPage", "집계 대기");
+    byId("periodPrevious").disabled = true;
+    byId("periodNext").disabled = true;
+    byId("periodPlayersTable").innerHTML = '<tr><td class="empty-row" colspan="7">계정 목록 조회 실패 / 집계 대기. 계정 0명으로 판단하지 않습니다.</td></tr>';
+    return;
+  }
+  const rows = root.ConsoleModel.dedupePlayers(state.payload.periodPlayers);
+  const total = state.payload.periodPlayerTotal;
   const totalPages = Math.max(1, Math.ceil(total / 50));
   const rangeStart = total ? (state.playerPage - 1) * 50 + 1 : 0;
   const rangeEnd = Math.min(state.playerPage * 50, total);
@@ -605,7 +645,7 @@ function renderPeriodPlayers() {
     : rows.map((row) => `<tr>
         <td data-label="플레이어·국가·기기"><div class="period-player-identity">${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<div class="period-player-meta">${countryMarkup(row.country)}${playerPlatformMarkup(row)}</div></div></td>
         <td data-label="활동 근거">${periodPlayerActivityMarkup(row)}</td>
-        <td data-label="새 실행">${formatNumber(row.visitCount)}<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "없음"}</small></td>
+        <td data-label="새 실행">${formatNumber(row.visitCount)}회<small>${row.visitDays ? `${formatNumber(row.visitDays)}일` : "없음"}</small></td>
         <td data-label="완료">${formatNumber(row.gamesPlayed)}</td>
         <td data-label="기간 최고">${row.gamesPlayed > 0 ? `${formatNumber(row.bestScore)}<small>Lv.${formatNumber(row.bestLevel)}</small>` : "—"}</td>
         <td data-label="최근 활동">${escapeHtml(formatServerTime(row.latestActivityAt || row.latestPlayedAt))}</td>
@@ -631,24 +671,35 @@ function formatAnalyticsEventTime(value) {
 
 function unfinishedPlayContext(row) {
   const laterCompleted = Number(row.sameInstallCompletedAfterCount || 0);
-  const accountCompleted = Number(row.accountCompletedGameCount);
+  const accountCompleted = knownNumber(row.accountCompletedGameCount);
   if (laterCompleted > 0) {
-    const score = Number(row.latestCompletedScore);
-    const level = Number(row.latestCompletedLevel);
+    const score = knownNumber(row.latestCompletedScore);
+    const level = knownNumber(row.latestCompletedLevel);
     const result = Number.isFinite(score) && Number.isFinite(level)
       ? `${formatNumber(score)}점 · Lv.${formatNumber(level)}`
-      : "완료 결과 확인";
+      : "완료 점수·레벨 미확인";
     return `<strong>이후 완료 ${formatNumber(laterCompleted)}판</strong><small>같은 설치 · ${result}</small>`;
   }
   if (Number.isFinite(accountCompleted) && accountCompleted > 0) {
     return `<strong>계정 완료 ${formatNumber(accountCompleted)}판</strong><small>이 미완료 판과는 별개</small>`;
   }
-  if (row.userId) return "<strong>계정 완료 0판</strong><small>이 기간에 정상 완료 신호 없음</small>";
+  if (row.userId && accountCompleted === 0) return "<strong>계정 완료 0판</strong><small>이 기간의 계정 완료 기록 0 확인</small>";
+  if (row.userId) return "<strong>계정 완료 집계 대기</strong><small>완료 0판으로 판단하지 않음</small>";
   return "<strong>완료 이력 미확인</strong><small>계정 연결 필요</small>";
 }
 
 function renderUnfinishedPlays() {
-  const rows = Array.isArray(state.payload?.unfinishedPlays) ? state.payload.unfinishedPlays : [];
+  if (!Array.isArray(state.payload?.unfinishedPlays)) {
+    setText("unfinishedPlaysStatus", "조회 실패 / 집계 대기");
+    byId("unfinishedPlaysTable").innerHTML = '<tr><td class="empty-row" colspan="6">미완료 판 조회 실패 / 집계 대기. 0판으로 판단하지 않습니다.</td></tr>';
+    return;
+  }
+  const rows = state.payload.unfinishedPlays;
+  if (rows.length === 0 && state.payload?.analyticsCoverage?.eventRows === 0) {
+    setText("unfinishedPlaysStatus", "분석 이벤트 미수집 · 미완료 여부 판단 불가");
+    byId("unfinishedPlaysTable").innerHTML = '<tr><td class="empty-row" colspan="6">분석 이벤트 미수집 · 미완료 여부 판단 불가. 계정 완료 기록과 별개의 텔레메트리 표본입니다.</td></tr>';
+    return;
+  }
   setText("unfinishedPlaysStatus", `${formatNumber(rows.length)}판`);
   byId("unfinishedPlaysTable").innerHTML = rows.length === 0
     ? '<tr><td class="empty-row" colspan="6">이 기간에 완료되지 않은 판이 없습니다.</td></tr>'
@@ -667,18 +718,18 @@ function renderUnfinishedPlays() {
       const score = row.score !== null && row.score !== undefined && Number.isFinite(Number(row.score))
         ? `${formatNumber(Number(row.score))}점`
         : "점수 미확인";
-      const identityEvidence = row.identityMatch === "same_runtime"
-        ? "<small>같은 앱 실행의 인증 계정 확인</small>"
-        : row.identityMatch === "auth_window"
-          ? "<small>유일한 인증·플레이 시각 연결</small>"
-          : row.identityMatch === "same_install"
-            ? "<small>같은 설치의 완료 판과 대조</small>"
-            : row.identityMatch === "time_window"
-              ? "<small>계정·플레이 시각 추정 연결</small>"
-              : "";
+      const identityLabels = {
+        same_runtime: "같은 앱 실행의 인증 계정 확인",
+        auth_window: "인증·플레이 시각 추정 연결",
+        same_runtime_record: "같은 앱 실행·완료 기록 추정 연결",
+        record_match: "완료 기록 대조 추정 연결",
+        same_install: "같은 설치의 완료 기록 추정 연결",
+        time_window: "계정·플레이 시각 추정 연결",
+      };
+      const identityEvidence = identityLabels[row.identityMatch] ? "<small>" + identityLabels[row.identityMatch] + "</small>" : "";
       const platform = playerPlatformMarkup({
-        distributionKey: row.platformKey || row.distributionKey,
-        platformSource: row.platformSource || "analytics_event",
+        distributionKey: row.platformKey,
+        platformSource: "analytics_event",
       });
       return `<tr>
         <td data-label="플레이어·설치"><div class="period-player-identity">${identity}${row.isNewPlayer ? "<small>신규 첫 실행</small>" : ""}${identityEvidence}<div class="period-player-meta">${platform}</div></div></td>
@@ -809,19 +860,18 @@ function renderQuestionMetric(key, metric, formattedValue, progress) {
 function renderInsightReasons(model) {
   const metrics = model.metrics || {};
   const periodReturn = state.payload?.periodReturn ?? {};
-  const returnSampleCount = Number(periodReturn.previousPlayers ?? 0);
+  const returnView = periodReturnView();
+  const returnSampleCount = returnView.previous;
   const returnSampleMinimum = Number(root.PulseModel?.MIN_RETENTION_COMPARISON_PEOPLE ?? 20);
-  const returnSample = returnSampleCount > 0
-    ? ` 바로 이전 같은 길이의 기간에 활동한 ${formatNumber(returnSampleCount)}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명이 선택 기간에도 다시 왔습니다.`
-    : "바로 이전 같은 길이의 기간에 활동한 계정이 없어 아직 비율을 계산할 수 없습니다.";
+  const returnSample = ` ${returnView.detail}.`;
   const returnConfidence = returnSampleCount > 0 && returnSampleCount < returnSampleMinimum
     ? ` 표본이 ${formatNumber(returnSampleCount)}명으로 적어 ${formatNumber(returnSampleMinimum)}명부터 상태를 판단합니다.`
     : "";
   const reasons = {
-    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 계정 ${formatNumber(state.payload?.accountActivity?.activeAccounts ?? state.payload?.summary?.installs)}명(로그인·홈·랭킹·플레이 포함), 게임 플레이 ${formatNumber(state.payload?.summary?.installs)}명, 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회를 구분해 보여줍니다.` },
-    duration: { title: "오래 하나? · 판단 근거", body: `평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
-    completion: { title: "끝까지 하나? · 판단 근거", body: `게임 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 결과 미확인인 판은 제외했습니다.` },
-    retention: { title: "다시 오나? · 판단 근거", body: `${selectedRangeLabel()} 계정 재방문율은 ${formatRate(metrics.retention?.value)}입니다.${returnSample}${returnConfidence} 로그인, 홈·랭킹 확인, 앱 서버 활동, 계정 동기화, 완료 게임 중 하나가 기간에 남은 인증 계정을 셉니다. 백그라운드 복귀 같은 session_start만으로는 세지 않습니다.` },
+    insight: { title: "오늘의 인사이트 · 판단 근거", body: `현재 인사이트는 활동 계정 ${formatNumber(state.payload?.accountActivity?.activeAccounts)}명(로그인·홈·랭킹·플레이 포함), 별도 텔레메트리 표본 ${formatNumber(state.payload?.summary?.installs)}설치, 앱 세션 ${formatNumber(state.payload?.summary?.sessions)}회, 집계된 게임 시작 ${formatNumber(state.payload?.summary?.gamesStarted)}회를 구분해 보여줍니다.` },
+    duration: { title: "오래 하나? · 판단 근거", body: `텔레메트리 결과 확인 표본 ${formatNumber(state.payload?.summary?.observedGames)}판의 평균 플레이 시간은 ${formatDuration(metrics.duration?.value)}입니다. 기준은 3분이며, ${metrics.duration?.statusLabel || "현재 상태"}로 분류했습니다.` },
+    completion: { title: "끝까지 하나? · 판단 근거", body: `텔레메트리 표본 완료율은 ${formatRate(metrics.completion?.value)}입니다. 결과가 확인된 판(정상 완료와 명시적 중간 종료)만 분모로 쓰고, 진행 중이거나 app_quit 등 결과 미확인인 판은 제외하며, 명시적 장면 종료는 10초 미만도 포함합니다.` },
+    retention: { title: "다시 오나? · 판단 근거", body: `${selectedRangeLabel()} 계정 재방문율은 ${formatRate(returnView.rate)}입니다.${returnSample}${returnConfidence} 로그인, 홈·랭킹 확인, 앱 서버 활동, 계정 동기화, 완료 게임 중 하나가 기간에 남은 인증 계정을 셉니다. 백그라운드 복귀 같은 session_start만으로는 세지 않습니다.` },
     ads: { title: "강제 광고는 적당한가? · 판단 근거", body: `활동 인원 1명당 강제 전면광고는 ${metrics.ads?.value == null ? "—" : `${formatDecimal(metrics.ads.value)}회`}입니다. 인원은 고유 설치 ID로 구분하며, 자발적 보상형·배너·네이티브와 테스트 광고는 이 경고에서 제외합니다.` },
   };
   const open = (key) => {
@@ -846,13 +896,13 @@ function renderJourney(journey = []) {
     const connector = index === 0 ? "" : `
       <div class="journey-link" style="--journey-progress:${Math.min(100, Math.max(0, (step.rate ?? 0) * 100))}%">
         <div><i style="width:${Math.min(100, Math.max(4, (step.rate ?? 0) * 100))}%"></i></div>
-        <small>${step.rate == null ? "연결 없음" : `이전 수 대비 ${formatRate(step.rate)}`}</small>
+        <small>${step.rate == null ? "연결 없음" : `별도 설치 수 비교 ${formatRate(step.rate)}`}</small>
       </div>`;
     return `${connector}
       <div class="journey-step">
         <div class="journey-bubble"><strong>${formatNumber(step.users)}</strong><small>${icons[step.event] ?? "명"}</small></div>
         <strong>${escapeHtml(step.label)}</strong>
-        <small>${escapeHtml(step.description)}</small>
+        <small>이벤트별 고유 설치 수 · 동일 코호트 아님</small>
       </div>`;
   }).join("");
 }
@@ -868,13 +918,13 @@ function renderExecutiveSummary(model) {
   const segments = summary.playerSegments ?? {};
   const funnel = state.payload?.funnel ?? [];
   const periodReturn = state.payload?.periodReturn ?? {};
-  const completedPeople = Number(funnel.find((row) => row?.event === "game_over")?.users ?? 0);
+  const completedPeople = knownNumber(state.payload?.accountActivity?.accountsWithCompletedGame);
   const observedGames = Number(summary.observedGames ?? 0);
   const exitRate = typeof summary.exitRate === "number" ? summary.exitRate : null;
   const exitStatus = exitRate == null ? "insufficient" : exitRate < 0.35 ? "good" : exitRate < 0.55 ? "watch" : "risk";
   const distribution = distributionLabel(state.distributionKey);
   const accountActivity = state.payload?.accountActivity ?? {};
-  const activeAccounts = Number(accountActivity.activeAccounts ?? summary.installs ?? 0);
+  const activeAccounts = knownNumber(accountActivity.activeAccounts);
 
   setText("executivePeriod", `${selectedRangeLabel()} · ${distribution}`);
   setExecutiveMetric(
@@ -882,7 +932,7 @@ function renderExecutiveSummary(model) {
     "execPlayers",
     "execPlayersDetail",
     `${formatNumber(activeAccounts)}명`,
-    `로그인·홈·랭킹·플레이 포함 · 게임 플레이 ${formatNumber(Number(summary.installs ?? 0))}명`,
+    accountScopeText(),
     activeAccounts > 0 ? "neutral" : "insufficient", 
   );
   setExecutiveMetric(
@@ -890,15 +940,15 @@ function renderExecutiveSummary(model) {
     "execCompleted",
     "execCompletedDetail",
     `${formatNumber(completedPeople)}명`,
-    `확인된 ${formatNumber(observedGames)}판 중 완료 ${formatNumber(Number(summary.gameOvers ?? 0))}판`,
-    model.metrics.completion.status,
+    `인증 계정 완료 기록 ${formatNumber(accountActivity.completedGames)}판 · 텔레메트리와 별도 집계`,
+    completedPeople === null ? "insufficient" : "neutral",
   );
   setExecutiveMetric(
     "execPlayTimeCard",
     "execPlayTime",
     "execPlayTimeDetail",
     formatDuration(summary.avgGameSeconds),
-    "결과가 확인된 판의 평균 플레이",
+    `텔레메트리 결과 확인 표본 ${formatNumber(summary.observedGames)}판의 평균`,
     model.metrics.duration.status,
   );
   setExecutiveMetric(
@@ -906,18 +956,16 @@ function renderExecutiveSummary(model) {
     "execExit",
     "execExitDetail",
     formatRate(exitRate),
-    `명시적 중간 종료 ${formatNumber(Number(summary.midGameExits ?? 0))}판`,
+    `텔레메트리 결과 확인 ${formatNumber(summary.observedGames)}판 중 명시적 종료 ${formatNumber(summary.midGameExits)}판`,
     exitStatus,
   );
   setExecutiveMetric(
     "execReturnCard",
     "execReturn",
     "execReturnDetail",
-    formatRate(periodReturn.rate),
-    Number(periodReturn.previousPlayers ?? 0) > 0
-      ? `이전 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers))}명`
-      : "이전 비교 기간 데이터 없음",
-    model.metrics.retention.status,
+    formatRate(periodReturnView().rate),
+    periodReturnView().detail,
+    periodReturnView().rate === null ? "insufficient" : model.metrics.retention.status,
   );
 }
 
@@ -942,17 +990,17 @@ function renderExecutiveVisuals(model) {
   setExecutiveDonut({
     figureId: "execCompletionDonut", ringId: "execCompletionRing", percentId: "execCompletionPercent", captionId: "execCompletionCaption",
     value: completionRate, status: model.metrics.completion.status,
-    caption: observedGames > 0 ? `확인 ${formatNumber(observedGames)}판 · 완료 ${formatNumber(Number(summary.gameOvers ?? 0))}판` : "결과가 확인된 판 기준",
+    caption: observedGames > 0 ? `텔레메트리 표본 ${formatNumber(observedGames)}판 · 완료 ${formatNumber(summary.gameOvers)}판` : "텔레메트리 결과 확인 표본 없음",
   });
   setExecutiveDonut({
     figureId: "execRetentionDonut", ringId: "execRetentionRing", percentId: "execRetentionPercent", captionId: "execRetentionCaption",
-    value: periodReturn.rate, status: model.metrics.retention.status,
-    caption: Number(periodReturn.previousPlayers ?? 0) > 0 ? `이전 ${formatNumber(Number(periodReturn.previousPlayers))}명 중 ${formatNumber(Number(periodReturn.returnedPlayers ?? 0))}명` : "이전 비교 기간 데이터 없음",
+    value: periodReturnView().rate, status: model.metrics.retention.status,
+    caption: periodReturnView().detail,
   });
   setExecutiveDonut({
     figureId: "execExitDonut", ringId: "execExitRing", percentId: "execExitPercent", captionId: "execExitCaption",
     value: exitRate, status: exitStatus,
-    caption: `명시적 종료 ${formatNumber(Number(summary.midGameExits ?? 0))}판 · 낮을수록 좋음`,
+    caption: `텔레메트리 표본 ${formatNumber(summary.observedGames)}판 · 명시적 종료 ${formatNumber(summary.midGameExits)}판`,
   });
 }
 
@@ -971,7 +1019,8 @@ function renderPulseOverview(model) {
   });
   renderQuestionMetric("Duration", model.metrics.duration, formatDuration(model.metrics.duration.value), metricProgress(model.metrics.duration.value, 180));
   renderQuestionMetric("Completion", model.metrics.completion, formatRate(model.metrics.completion.value), metricProgress(model.metrics.completion.value, 0.65));
-  renderQuestionMetric("Retention", model.metrics.retention, formatRate(model.metrics.retention.value), metricProgress(model.metrics.retention.value, 0.2));
+  const returnMetric = periodReturnView().rate === null ? { ...model.metrics.retention, value: null, status: "insufficient", statusLabel: "집계 대기" } : model.metrics.retention;
+  renderQuestionMetric("Retention", returnMetric, formatRate(returnMetric.value), metricProgress(returnMetric.value, 0.2));
   renderQuestionMetric("Ads", model.metrics.ads, model.metrics.ads.value == null ? "—" : `${formatDecimal(model.metrics.ads.value)}회`, metricProgress(model.metrics.ads.value, 2));
   renderJourney(model.journey);
 }
@@ -1204,7 +1253,7 @@ function renderFunnel() {
   byId("funnelChart").innerHTML = rows.map((row) => `
     <div class="funnel-row">
       <span class="funnel-label">${labels[row.event] ?? row.event}</span>
-      <div class="funnel-track"><div class="funnel-fill" style="width:${Math.max(2, row.users / first * 100)}%"></div></div>
+      <div class="funnel-track"><div class="funnel-fill" style="width:${Math.min(100, Math.max(0, row.users / first * 100))}%"></div></div>
       <span class="funnel-value">${formatNumber(row.users)}</span>
     </div>`).join("");
 }
@@ -1214,7 +1263,7 @@ function renderExitBreakdown() {
   const total = Math.max(1, summary.gamesStarted ?? 0);
   const items = [
     ["정상 게임 완료", summary.gameOvers, "normal"],
-    ["명시적 게임 중 종료 (10초 이상)", summary.midGameExits, "exit"],
+    ["명시적 게임 중 종료 (짧은 판 포함)", summary.midGameExits, "exit"],
     ["결과 미확인 (이탈 아님)", summary.unobservedGames, "unobserved"],
   ];
   byId("exitBreakdown").innerHTML = items.map(([label, value, color]) => `
@@ -1374,8 +1423,8 @@ function renderAppStatus() {
   const cards = [
     measuredCard("세션 시작", summary.sessions, "session_start · 고유 세션", hasEvents),
     measuredCard("평균 세션", summary.avgSessionSeconds, "session_end 기반 · 종료 건수는 현재 응답 미제공", hasEvents, formatDuration),
-    measuredCard("게임 시작", summary.gamesStarted, "game_start · 10초 미만 즉시 이탈 제외", hasEvents),
-    measuredCard("게임 완료", summary.gameOvers, "game_over · 정상 종료", hasEvents),
+    measuredCard("게임 시작", summary.gamesStarted, "텔레메트리 game_start · 이어하기 제외, 짧은 판 포함", hasEvents),
+    measuredCard("게임 완료", summary.gameOvers, "텔레메트리 game_over · 정상 종료", hasEvents),
     measuredCard("광고 노출", summary.adImpressions, "ad_impression · 테스트 광고 포함", hasAds),
     measuredCard("광고 표시 실패", hasAds ? ads.reduce((sum, row) => sum + Number(row.failed ?? 0), 0) : null, "ad_show_failed · 로드 실패는 현재 집계 제외", hasAds),
   ];
@@ -1416,23 +1465,13 @@ function renderDailyTable() {
 
 function renderInsight() {
   const summary = state.payload?.summary ?? {};
-  const observedGames = Number(summary.observedGames ?? (Number(summary.gameOvers || 0) + Number(summary.midGameExits || 0)));
-  const exitRate = typeof summary.exitRate === "number"
-    ? summary.exitRate
-    : observedGames > 0 ? Number(summary.midGameExits || 0) / observedGames : null;
+  const activity = state.payload?.accountActivity ?? {};
+  const activeAccounts = knownNumber(activity.activeAccounts);
+  const completedPeople = knownNumber(activity.accountsWithCompletedGame);
   const periodReturn = state.payload?.periodReturn ?? {};
-  const activeAccounts = Number(state.payload?.accountActivity?.activeAccounts ?? summary.installs ?? 0);
-  if (!(summary.sessions || summary.installs || activeAccounts)) {
-    setText("insightText", "아직 수집된 계정 활동이나 게임 이벤트가 없습니다. 로그인 후 홈·랭킹을 보거나 게임을 실행하면 여기에 흐름이 나타납니다.");
-    return;
-  }
-  const completedPeople = Number((state.payload?.funnel ?? []).find((row) => row?.event === "game_over")?.users ?? 0);
-  const returnText = Number(periodReturn.previousPlayers ?? 0) > 0
-    ? `${formatRate(periodReturn.rate)} (${formatNumber(Number(periodReturn.returnedPlayers))}/${formatNumber(Number(periodReturn.previousPlayers))}명)`
-    : "아직 산출 대기";
-  const exitText = exitRate == null ? "산출 대기" : formatRate(exitRate);
-  const averagePlayText = typeof summary.avgGameSeconds === "number" ? formatDuration(summary.avgGameSeconds) : "산출 대기";
-  setText("insightText", `총 활동 계정은 ${formatNumber(activeAccounts)}명이고, 그중 게임 플레이는 ${formatNumber(Number(summary.installs ?? 0))}명, 완료는 ${formatNumber(completedPeople)}명입니다. 평균 플레이는 ${averagePlayText}, 결과가 확인된 판의 중간 종료율은 ${exitText}, 이전 같은 기간 대비 계정 재방문율은 ${returnText}입니다.`);
+  const accountText = activeAccounts === null ? "활동 계정은 집계 대기입니다." : "총 활동 계정은 " + formatNumber(activeAccounts) + "명입니다.";
+  const completionText = completedPeople === null ? "계정 완료 인원은 집계 대기" : "완료한 계정 " + formatNumber(completedPeople) + "명";
+  setText("insightText", accountText + " " + completionText + " · 계정 완료 기록 " + formatNumber(activity.completedGames) + "판. 별도 텔레메트리 표본은 " + formatNumber(summary.installs) + "설치이며, 결과 확인 " + formatNumber(summary.observedGames) + "판의 평균 플레이 " + formatDuration(summary.avgGameSeconds) + ", 명시적 중간 종료율 " + formatRate(summary.exitRate) + "입니다. 이전 같은 기간 대비 계정 재방문율 " + formatRate(periodReturnView().rate) + " (" + periodReturnView().detail + "). 텔레메트리 미수집은 사용자 없음이 아닙니다.");
 }
 
 function setAiMessage(value, error = false) {
