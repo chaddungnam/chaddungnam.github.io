@@ -134,8 +134,9 @@ for (const periodReturn of [undefined, null, {}, {previousPlayers:8,returnedPlay
   render({periodReturn});
   assert.equal(text("execReturn"), "—");
   assert.equal(text("execRetentionPercent"), "—");
-  assert.match(text("execReturnDetail"), /집계 대기/);
-  assert.match(text("execRetentionCaption"), /집계 대기/);
+  const expected = periodReturn?.status === "unavailable_device_cohort" ? /기기별 과거 계정 연결 자료 부족/ : /집계 대기/;
+  assert.match(text("execReturnDetail"), expected);
+  assert.match(text("execRetentionCaption"), expected);
   assert.doesNotMatch(text("execReturnDetail") + text("execRetentionCaption") + text("insightText"), /이전 0명|재방문율 0\.0%/);
 }
 render({periodReturn:{previousPlayers:8,returnedPlayers:0,rate:0}});

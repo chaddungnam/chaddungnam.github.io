@@ -22,7 +22,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
-assert.match(consoleHtml, /analytics\.js\?v=20260905-4/, "cache must refresh corrected account metrics");
+assert.match(consoleHtml, /analytics\.js\?v=20260905-5/, "cache must refresh corrected account metrics");
 assert.match(consoleHtml, /id="analyticsCoverageMessage"/, "telemetry coverage must be prominent");
 assert.doesNotMatch(analyticsSource, /10초 미만 즉시 이탈 제외|종료 \(10초 이상\)/, "all explicit exits belong in the lifecycle sample");
 const modelSource = read("console/model.js");
@@ -56,7 +56,7 @@ assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose pr
 assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
 assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
 assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
-assert.match(consoleHtml, /analytics\.js\?v=20260905-4/, "the Console must cache-bust the balance signal update");
+assert.match(consoleHtml, /analytics\.js\?v=20260905-5/, "the Console must cache-bust the balance signal update");
 assert.match(consoleHtml, /id="balanceTerminalTable"/, "the Console must expose privacy-safe balance terminal outcomes");
 assert.match(consoleHtml, /id="balancePressureSummary"/, "the Console must expose checkpoint board pressure");
 assert.match(consoleHtml, /id="balanceChoiceTable"/, "the Console must expose growth-choice outcomes");

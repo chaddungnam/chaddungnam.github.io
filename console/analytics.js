@@ -126,6 +126,7 @@ function periodReturnView() {
   const previous = knownNumber(periodReturn.previousPlayers);
   const returned = knownNumber(periodReturn.returnedPlayers);
   const unavailable = String(periodReturn.status || periodReturn.mode || "").startsWith("unavailable") || state.payload?.accountScope?.mode === "unavailable" || previous === null || returned === null;
+  if (periodReturn.status === "unavailable_device_cohort") return { rate: null, detail: "기기별 과거 계정 연결 자료 부족 · 비교 미집계", previous: null };
   if (unavailable) return { rate: null, detail: "재방문 비교 조회 실패 / 집계 대기", previous: null };
   return {
     rate: previous > 0 ? knownNumber(periodReturn.rate) : null,
