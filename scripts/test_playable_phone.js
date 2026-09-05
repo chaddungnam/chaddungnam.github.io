@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const { createHash } = require("node:crypto");
 const { existsSync, readdirSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
+const { runInNewContext } = require("node:vm");
 
 const snapshotDir = join(__dirname, "..", "play", "quirky-ball");
 const siteWrapper = join(__dirname, "..", "play", "quirky-ball-site", "index.html");
@@ -12,12 +13,12 @@ const expectedHashes = {
   "index.apple-touch-icon.png": "7c8f89e26faff90c5e7b6b4da73d5d5244b860f802a7ae85945c7904f1acf138",
   "index.audio.position.worklet.js": "be33985bc7160d6bf9646f259cd86b259cd67b02ccb297ee5c44f8ac84327bc8",
   "index.audio.worklet.js": "5b476a9c9ce642c0ee4256436d1bc31d9c38f868aca0f9a8e2a57c18d2dec2a3",
-  "index.html": "6eac6f9804fa3b3764f06fc3517a87c8e890228067a21d57c635bc847e6bca1c",
+  "index.html": "9bd02e2fdc1ebb52ababda35dc6b1f1c232514bd1d1b22255ff95b63d0e08605",
   "index.icon.png": "fa378acf6c37f33d4071db74fb39cd1873fd33681d8a0f4980512db055e48ddf",
   "index.js": "05f22332236b9c234eb18d1833e57a17d0802ab6e65333de4a8317bed68202c6",
-  "index.pck.zip": "4a692f81e0f542193248ab1e0e5a2f2f53d509087e86ec7114b1a57e748e3e78",
+  "index.pck.zip": "c67501f533d1b83be8530b1c93a588971c212d90c5aaaf623a54141df75357e7",
   "index.png": "f30ee1ca60eba998b83b87f2947f76865011345a6a410a7e395ad41ddc4d80b4",
-  "index.wasm.zip": "3f2dd16b100fa92356fa0cd82ff8980ee06c0e3831ef869ca7a60361d6c583ea",
+  "index.wasm.zip": "29b5bea06061f80658986bc07185d3b69c6ae6e1487ffa95c325632a4f818a0e",
 };
 
 const homeContracts = {
@@ -28,6 +29,7 @@ const homeContracts = {
 };
 
 assert.ok(existsSync(snapshotDir), "play/quirky-ball snapshot directory must exist");
+assert.ok(existsSync(join(__dirname, "..", ".gdignore")), "parent Godot scans must not recreate website import sidecars");
 assert.deepEqual(readdirSync(snapshotDir).sort(), Object.keys(expectedHashes).sort());
 for (const [filename, expectedHash] of Object.entries(expectedHashes)) {
   const actualHash = createHash("sha256").update(readFileSync(join(snapshotDir, filename))).digest("hex");
@@ -49,6 +51,14 @@ assert.ok(existsSync(siteWrapper), "site-only playable wrapper must exist");
 const wrapperHtml = readFileSync(siteWrapper, "utf8");
 assert.match(wrapperHtml, /<link rel="license" href="\.\.\/THIRD_PARTY_LICENSES\.txt">/, "site wrapper must expose the third-party license notice");
 assert.doesNotMatch(wrapperHtml, /youtube\.com\/game_api/, "site wrapper must not load the YouTube host SDK");
+const siteLanguage = wrapperHtml.match(/<script id="site-language">([\s\S]*?)<\/script>/)[1];
+for (const [navigator, expected] of [[{ languages: ["id-ID"], language: "en" }, "id-ID"], [{ language: "de-DE" }, "de-DE"], [{}, "en"]]) {
+  let received;
+  const window = { YTGameSDK_Godot: {}, GodotYTCallbacks: { onLanguageReceived: value => { received = value; } } };
+  runInNewContext(siteLanguage, { window, navigator });
+  window.YTGameSDK_Godot.getLanguage();
+  assert.equal(received, expected, "site-only language follows the browser, including Indonesia");
+}
 for (const asset of ["YTGameSDK.js", "index.js", "index.png"]) {
   assert.ok(wrapperHtml.includes(`../quirky-ball/${asset}`), `site wrapper must reuse ${asset} from the immutable snapshot`);
 }

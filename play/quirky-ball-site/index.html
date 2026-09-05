@@ -17,6 +17,12 @@
     #status-notice { max-width: 80%; padding: 16px; border-radius: 12px; color: #f7efdf; background: #5b3943; line-height: 1.4; text-align: center; }
   </style>
   <script src="../quirky-ball/YTGameSDK.js"></script>
+  <script id="site-language">
+    // The website has no YouTube host; only this wrapper uses the browser locale.
+    window.YTGameSDK_Godot.getLanguage = function () {
+      window.GodotYTCallbacks.onLanguageReceived(navigator.languages?.[0] || navigator.language || "en");
+    };
+  </script>
   <link rel="license" href="../THIRD_PARTY_LICENSES.txt">
   <link rel="icon" type="image/png" href="../quirky-ball/index.icon.png">
   <link rel="apple-touch-icon" href="../quirky-ball/index.apple-touch-icon.png">
@@ -80,7 +86,7 @@
   </script>
   <script src="../quirky-ball/index.js"></script>
   <script>
-    const GODOT_CONFIG = {"args":[],"canvasResizePolicy":1,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"../quirky-ball/index","experimentalVK":true,"fileSizes":{"index.pck":15938508,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+    const GODOT_CONFIG = {"args":[],"canvasResizePolicy":1,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"../quirky-ball/index","experimentalVK":true,"fileSizes":{"index.pck":20951596,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
     const engine = new Engine(GODOT_CONFIG);
     (function startGame() {
       const status = document.getElementById("status");
