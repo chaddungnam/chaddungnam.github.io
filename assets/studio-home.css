@@ -82,7 +82,7 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .release-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 /* Official artwork stays unmodified; 14px clear space exceeds 1/4 of its 54px height. */
-.google-play-badge { display: inline-flex; width: fit-content; align-items: center; padding: 14px; background: #f5f4ef; text-decoration: none; }
+.google-play-badge { display: inline-flex; width: fit-content; align-items: center; margin-left: -14px; padding: 14px; background: #f5f4ef; text-decoration: none; }
 .google-play-badge img { display: block; width: auto; height: 54px; max-width: none; }
 .google-play-badge:focus-visible { outline: 3px solid var(--studio-blue); outline-offset: 2px; }
 .release-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid var(--studio-ink); border-radius: 20px; color: var(--studio-ink); background: #fff; box-shadow: 4px 5px 0 rgba(16,24,39,.18); font-size: .8rem; font-weight: 850; letter-spacing: .015em; text-decoration: none; text-transform: none; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }

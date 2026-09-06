@@ -376,7 +376,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-store-badge"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-store-badge2"))).toBeTruthy();
     expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260905-refine"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
@@ -808,9 +808,11 @@ test("home hero uses official localized Play badges without removed copy or deta
     const metrics = await badge.evaluate(node => {
       const img = node.querySelector("img");
       const style = getComputedStyle(node);
-      return { loaded: img.complete && img.naturalWidth > 0, height: img.getBoundingClientRect().height, padding: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft].map(parseFloat) };
+      return { loaded: img.complete && img.naturalWidth > 0, height: img.getBoundingClientRect().height, padding: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft].map(parseFloat), left: img.getBoundingClientRect().left, aboveLeft: document.querySelector(".release-lede").getBoundingClientRect().left, belowLeft: document.querySelector(".store-disclosure").getBoundingClientRect().left };
     });
     expect(metrics.loaded).toBe(true);
+    expect(Math.abs(metrics.left - metrics.aboveLeft)).toBeLessThan(1);
+    expect(Math.abs(metrics.left - metrics.belowLeft)).toBeLessThan(1);
     expect(metrics.height).toBeGreaterThanOrEqual(28);
     expect(Math.min(...metrics.padding)).toBeGreaterThanOrEqual(metrics.height / 4);
   }
