@@ -35,3 +35,13 @@ node scripts/test_gmail_model.js
 - 섹션 제목의 `id="section-..."`는 자동 목차가 사용하므로 지우지 않습니다.
 - 색상·간격·모바일·인쇄 모양은 `assets/legal-site.css`, 목차·연도는 `assets/legal-site.js`가 공통 관리합니다.
 - 문구 수정 후 `scripts/check_legal_site.sh`와 `scripts/check_policy_content.sh`를 실행합니다.
+
+### 공지 블록 편집
+
+`운영 → 게임 공지 → 블록 편집 사용`에서 선택한 문단 뒤에 이미지·문단·구분선을 넣고 순서를 바꿉니다. 문단 크기, 굵게·기울임·밑줄, 정렬, 이미지 너비·대체 텍스트와 미리보기를 지원합니다. 기존 일반 텍스트 공지는 그대로 유지됩니다. 분류 선택에서 `[공지]`·`[이벤트]`·`[예고]`를 고르며 목록·상세에는 문구와 색상 배지가 함께 표시됩니다. 기존 글의 `수정`으로 분류·본문·날짜를 바꾸고 `삭제`는 사유와 확인란을 거친 뒤 노출을 중지합니다. 삭제된 글의 감사 기록과 공용 이미지는 보관합니다.
+
+- PNG/JPEG/정적 WebP를 브라우저에서 최대 긴 변 1,600px의 WebP로 변환합니다. 목표는 200 KiB, 업로드 상한은 300 KiB입니다. 필요하면 품질과 해상도를 단계적으로 낮춥니다. 큰 원본을 별도로 보관하지 않고 검증된 최종 WebP만 전송합니다. 이미 작고 메타데이터가 없는 정적 WebP는 재압축으로 더 커지지 않도록 그대로 사용합니다.
+- 공지당 최대 60블록·이미지 8개를 허용합니다. 본문·문단 구분·이미지 설명을 포함한 원문 한도는 2,000자입니다.
+- 서버는 구조화된 문단만 번역하고 이미지 경로·서식은 보존합니다. 이미지는 `announcement-media`의 SHA-256 경로로 중복 저장을 피하며 공개 공지용 자산입니다. 공개 화면은 HTML을 실행하지 않고 텍스트와 허용된 이미지 경로만 렌더링합니다.
+- 배포 순서: 게임 서버 저장소의 `20260906120000_rich_announcement_content_and_media.sql`와 `20260906130000_announcement_category_and_soft_delete.sql` 마이그레이션, `admin-console`·`public-notice` Edge Function, 이 웹사이트 순서입니다. 서버 반영 전에는 새 편집기만 먼저 배포하지 않습니다. 기존 앱의 텍스트 폴백은 유지되며 웹뷰에서 서식·이미지를 표시합니다.
+- 검사: `node --test tests/notice-content.test.mjs tests/notice-contract.test.mjs`, `node scripts/test_console_regressions.js`, `npx playwright test tests/console-announcement.spec.js tests/console-announcement-editor.spec.js tests/console-announcement-delete.spec.js tests/notice-rich-content.spec.js`.

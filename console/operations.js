@@ -2,9 +2,16 @@
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "계속";
-  const noticeMarkup = (notice) => `<article class="audit-item" data-notice-id="${escapeHtml(notice.id)}" data-starts-at="${escapeHtml(notice.starts_at || "")}" data-ends-at="${escapeHtml(notice.ends_at || "")}"><div><strong>공지 #${escapeHtml(notice.id)}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code><button type="button" class="warning-button" data-edit-notice="${escapeHtml(notice.id)}">수정</button></article>`;
+  const categories = { notice: "[공지]", event: "[이벤트]", preview: "[예고]" };
+  const categoryOf = (notice) => Object.hasOwn(categories, notice?.category) ? notice.category : "notice";
+  const noticeMarkup = (notice) => `<article class="audit-item" data-notice-id="${escapeHtml(notice.id)}" data-starts-at="${escapeHtml(notice.starts_at || "")}" data-ends-at="${escapeHtml(notice.ends_at || "")}"><div><strong><span class="announcement-category category-${categoryOf(notice)}">${categories[categoryOf(notice)]}</span> #${escapeHtml(notice.id)}</strong><small>${escapeHtml(time(notice.starts_at))} → ${escapeHtml(time(notice.ends_at))}</small></div><p>${escapeHtml(notice.body)}</p><code>${notice.active ? "활성" : "비활성"}</code><div class="announcement-history-actions"><button type="button" class="warning-button" data-edit-notice="${escapeHtml(notice.id)}">수정</button><button type="button" class="danger-button" data-delete-notice="${escapeHtml(notice.id)}" aria-label="공지 #${escapeHtml(notice.id)} 삭제">삭제</button></div></article>`;
   let bound = false;
   let rewardCatalog = [];
+  let announcementEditor = null;
+  let announcementMutationPending = false;
+  let deletionPending = false;
+  let deleteNoticeId = null;
+  const noticesById = new Map();
   const pendingRequests = new WeakMap();
   const templateCopy = {
     general: ["안내 보상", "House Duck에서 보낸 보상입니다."],
@@ -37,6 +44,11 @@
 
   function render(data, referrals = {}) {
     rewardCatalog = Array.isArray(data.catalog) ? data.catalog : [];
+    noticesById.clear();
+    (data.notices || []).forEach((notice) => {
+      const id = Number(notice?.id);
+      if (Number.isSafeInteger(id) && id > 0) noticesById.set(id, { ...notice });
+    });
     const config = data.config || {};
     const mutationsEnabled = config.admin_player_mutations_enabled === "true";
     const referralsEnabled = referrals.enabled === true || config.feature_referral_program === "true";
@@ -50,6 +62,7 @@
     };
     const mail = (data.reward_mail_broadcasts || []).map((row) => `<article class="audit-item" data-success="${row.success}"><div><strong>전체 보상 우편</strong><small>${escapeHtml(time(row.created_at))} · ${escapeHtml(row.actor_email)}</small></div><p>${escapeHtml(row.reason)}</p><code>${escapeHtml(mailSummary(row))}</code></article>`);
     byId("operationsHistory").innerHTML = [...notices, ...mail].join("") || '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
+    lockAnnouncementActions(announcementBusy());
     byId("minVersionForm").elements.minVersion.value = config.min_version || "";
     byId("minVersionForm").elements.minVersionCode.value = config.min_version_code || "";
   }
@@ -73,11 +86,10 @@
     const report = options.report || setMessage;
     const finishRequest = root.ConsoleUiState.beginRequest(form);
     if (!finishRequest) return;
-    if (!form.reportValidity() || !await root.ConsoleApp.confirmChange(title, summary)) {
-      finishRequest();
-      return;
-    }
+    if (!form.reportValidity()) { finishRequest(); return; }
+    const unlockAnnouncement = form === byId("announcementForm") ? lockAnnouncementMutation() : () => {};
     try {
+      if (!await root.ConsoleApp.confirmChange(title, summary)) return;
       report(options.progressMessage || `${title} 처리 중입니다...`);
       const fingerprint = JSON.stringify(payload);
       const pending = pendingRequests.get(form);
@@ -89,6 +101,7 @@
       form.reset();
       if (form === byId("announcementForm")) {
         form.elements.announcementId.value = "";
+        announcementEditor?.reset();
         syncAnnouncementSubmit(form);
       }
       if (options.reload !== false) await load();
@@ -97,6 +110,7 @@
       if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
       report(`작업을 완료하지 못했습니다: ${operationError(error)}`, true);
     } finally {
+      unlockAnnouncement();
       finishRequest();
     }
   }
@@ -104,6 +118,7 @@
   function upsertNotice(notice) {
     const id = Number(notice.id);
     if (!Number.isSafeInteger(id) || id < 1) return;
+    noticesById.set(id, { ...notice, id });
     const history = byId("operationsHistory");
     const existing = Array.from(history.querySelectorAll("[data-notice-id]"))
       .find((item) => Number(item.dataset.noticeId) === id);
@@ -136,13 +151,105 @@
 
   function fillAnnouncement(notice) {
     const form = byId("announcementForm");
+    if (!notice || announcementBusy() || !announcementEditor?.load(notice)) return;
     form.elements.announcementId.value = notice.id || "";
-    form.elements.body.value = notice.body || "";
+    form.elements.category.value = categoryOf(notice);
     form.elements.startsAt.value = toLocalInput(notice.starts_at);
     form.elements.endsAt.value = toLocalInput(notice.ends_at);
     form.elements.reason.value = "";
     syncAnnouncementSubmit(form);
-    form.elements.body.focus();
+    if (!announcementEditor.isRich()) form.elements.body.focus();
+  }
+
+  function lockAnnouncementActions(locked) {
+    document.querySelectorAll("[data-edit-notice], [data-delete-notice]").forEach((control) => { control.disabled = locked; });
+  }
+
+  function announcementBusy() {
+    return announcementMutationPending || Boolean(announcementEditor?.isBusy());
+  }
+
+  function lockAnnouncementMutation() {
+    announcementMutationPending = true;
+    const form = byId("announcementForm");
+    const controls = Array.from(form.querySelectorAll("button, input, select, textarea"));
+    const disabled = controls.map((control) => control.disabled);
+    controls.forEach((control) => { control.disabled = true; });
+    lockAnnouncementActions(true);
+    return () => {
+      announcementMutationPending = false;
+      controls.forEach((control, index) => { control.disabled = disabled[index]; });
+      lockAnnouncementActions(announcementBusy());
+    };
+  }
+
+  function resetAnnouncement() {
+    const form = byId("announcementForm");
+    form.reset();
+    announcementEditor.reset();
+    form.elements.announcementId.value = "";
+    form.elements.category.value = "notice";
+    pendingRequests.delete(form);
+    syncAnnouncementSubmit(form);
+  }
+
+  function openAnnouncementDelete(notice) {
+    if (!notice || announcementBusy()) return;
+    const dialog = byId("announcementDeleteDialog");
+    if (dialog.open) return;
+    deleteNoticeId = Number(notice.id);
+    const form = byId("announcementDeleteForm");
+    form.reset();
+    form.elements.reason.setCustomValidity("");
+    const excerpt = Array.from(String(notice.body || "").replace(/\s+/g, " ")).slice(0, 100).join("");
+    byId("announcementDeleteTarget").textContent = categories[categoryOf(notice)] + " #" + deleteNoticeId + " · " + (excerpt || "본문 없음");
+    root.ConsoleUiState.setMessage(byId("announcementDeleteMessage"), "삭제할 공지와 사유를 확인해 주세요.");
+    dialog.showModal();
+    form.elements.reason.focus();
+  }
+
+  async function deleteAnnouncement(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (announcementBusy() || deletionPending || !byId("announcementDeleteDialog").open || !noticesById.has(deleteNoticeId)) return;
+    const reason = form.elements.reason.value.trim();
+    form.elements.reason.setCustomValidity(!reason ? "삭제 사유를 입력해 주세요." : reason.length > 300 ? "삭제 사유는 300자까지 입력할 수 있습니다." : "");
+    if (!form.reportValidity()) return;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
+    const announcementId = deleteNoticeId;
+    const payload = { action: "announcements.delete", announcementId, reason };
+    const fingerprint = JSON.stringify(payload);
+    const pending = pendingRequests.get(form);
+    const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
+    pendingRequests.set(form, { fingerprint, requestId });
+    deletionPending = true;
+    const unlockAnnouncement = lockAnnouncementMutation();
+    form.elements.reason.disabled = true;
+    form.elements.confirmed.disabled = true;
+    const report = (value, error = false) => root.ConsoleUiState.setMessage(byId("announcementDeleteMessage"), value, error);
+    try {
+      report("공지를 삭제하는 중입니다. 완료될 때까지 기다려 주세요.");
+      const result = await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
+      if (result?.ok !== true) throw new Error("delete_not_confirmed");
+      pendingRequests.delete(form);
+      noticesById.delete(announcementId);
+      const history = byId("operationsHistory");
+      Array.from(history.querySelectorAll("[data-notice-id]")).find((item) => Number(item.dataset.noticeId) === announcementId)?.remove();
+      if (!history.querySelector(".audit-item")) history.innerHTML = '<p class="empty-panel">최근 운영 기록이 없습니다.</p>';
+      if (Number(byId("announcementForm").elements.announcementId.value) === announcementId) resetAnnouncement();
+      byId("announcementDeleteDialog").close();
+      deleteNoticeId = null;
+      setAnnouncementMessage("공지 #" + announcementId + " 삭제를 완료했습니다. 삭제 사유와 운영 기록은 보관됩니다.");
+    } catch (_error) {
+      report("삭제를 완료하지 못했습니다. 공지와 작성 중인 내용은 유지했습니다. 삭제 사유를 확인하고 다시 시도해 주세요.", true);
+    } finally {
+      deletionPending = false;
+      form.elements.reason.disabled = false;
+      form.elements.confirmed.disabled = false;
+      unlockAnnouncement();
+      finishRequest();
+    }
   }
 
   function renderRewardTemplate() {
@@ -170,6 +277,26 @@
   function bind() {
     if (bound) return;
     bound = true;
+    announcementEditor = root.ConsoleAnnouncementEditor.create(byId("announcementForm"), {
+      onBusy: (busy) => lockAnnouncementActions(busy || announcementMutationPending),
+      onMessage: (value, error) => setAnnouncementMessage(value, error),
+    });
+    ["click", "input", "change"].forEach((type) => byId("announcementForm").addEventListener(type, (event) => {
+      if (!announcementMutationPending) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true));
+    byId("announcementDeleteForm").addEventListener("submit", deleteAnnouncement);
+    byId("announcementDeleteForm").elements.reason.addEventListener("input", (event) => event.target.setCustomValidity(""));
+    byId("announcementDeleteForm").addEventListener("invalid", (event) => {
+      root.ConsoleUiState.setMessage(byId("announcementDeleteMessage"), event.target.name === "reason" ? "삭제 사유를 입력해 주세요. 아직 삭제하지 않았습니다." : "삭제 확인란을 선택해 주세요. 아직 삭제하지 않았습니다.", true);
+    }, true);
+    byId("announcementDeleteCancel").addEventListener("click", () => {
+      if (!deletionPending) byId("announcementDeleteDialog").close();
+    });
+    byId("announcementDeleteDialog").addEventListener("cancel", (event) => {
+      if (deletionPending) event.preventDefault();
+    });
     byId("rewardMailForm").addEventListener("submit", (event) => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -225,6 +352,13 @@
     byId("announcementForm").addEventListener("submit", (event) => {
       event.preventDefault();
       const form = event.currentTarget;
+      if (announcementBusy() || byId("announcementDeleteDialog").open) return;
+      const draft = announcementEditor.value();
+      if (draft.error) {
+        setAnnouncementMessage(`${draft.error} 아직 서버에는 반영되지 않았습니다.`, true);
+        form.reportValidity();
+        return;
+      }
       const values = Object.fromEntries(new FormData(form));
       const startsAt = iso(values.startsAt);
       const endsAt = values.endsAt ? iso(values.endsAt) : null;
@@ -235,15 +369,17 @@
       const payload = {
         action: editing ? "announcements.update" : "announcements.publish",
         ...(editing ? { announcementId } : {}),
-        body: values.body.trim(), startsAt, endsAt, reason: values.reason.trim(),
+        category: categoryOf(values), body: draft.body, ...(draft.content ? { content: draft.content } : {}), startsAt, endsAt, reason: values.reason.trim(),
       };
-      submit(form, payload, editing ? "게임 공지 수정" : "게임 공지 발행", `${values.body.trim()}\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`, {
+      submit(form, payload, editing ? "게임 공지 수정" : "게임 공지 발행", `분류: ${categories[payload.category]}\n${draft.body}\n이미지: ${draft.content?.blocks.filter((block) => block.type === "image").length || 0}개\n시작: ${startsAt}\n종료: ${endsAt || "없음"}\n사유: ${values.reason.trim()}`, {
         reload: false,
         report: setAnnouncementMessage,
         progressMessage: "공지 번역과 저장을 처리 중입니다. 완료될 때까지 기다려 주세요.",
         onSuccess: (result) => upsertNotice({
           id: editing ? announcementId : Number(result?.announcement_id),
+          category: payload.category,
           body: payload.body,
+          ...(payload.content ? { content: payload.content } : {}),
           starts_at: startsAt,
           ends_at: endsAt,
           active: true,
@@ -255,22 +391,17 @@
       setAnnouncementMessage(`${label}를 입력해 주세요. 아직 서버에는 반영되지 않았습니다.`, true);
     }, true);
     byId("announcementReset").addEventListener("click", () => {
-      const form = byId("announcementForm");
-      form.reset();
-      form.elements.announcementId.value = "";
-      syncAnnouncementSubmit(form);
+      if (announcementBusy()) return;
+      resetAnnouncement();
     });
     byId("operationsHistory").addEventListener("click", (event) => {
-      const button = event.target.closest("[data-edit-notice]");
+      const button = event.target.closest("[data-edit-notice], [data-delete-notice]");
       if (!button) return;
       const article = button.closest("[data-notice-id]");
-      if (!article) return;
-      fillAnnouncement({
-        id: Number(article.dataset.noticeId),
-        body: article.querySelector("p")?.textContent || "",
-        starts_at: article.dataset.startsAt,
-        ends_at: article.dataset.endsAt === "계속" ? "" : article.dataset.endsAt,
-      });
+      if (!article || announcementBusy()) return;
+      const notice = noticesById.get(Number(article.dataset.noticeId));
+      if (button.hasAttribute("data-delete-notice")) openAnnouncementDelete(notice);
+      else fillAnnouncement(notice);
     });
   }
 

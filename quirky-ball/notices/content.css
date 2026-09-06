@@ -1,0 +1,22 @@
+/* Notice documents have a deliberately bounded, mobile-friendly formatting vocabulary. */
+#notice-body.notice-rich-content { white-space: normal; overflow-wrap: anywhere; }
+.notice-rich-content .notice-paragraph { margin: 0 0 1em; min-height: 1em; line-height: 1.7; white-space: pre-wrap; font-weight: 400; }
+.notice-rich-content .notice-size-small { font-size: .875em; }
+.notice-rich-content .notice-size-normal { font-size: 1em; }
+.notice-rich-content .notice-size-large { font-size: 1.25em; }
+.notice-rich-content .notice-size-title { font-size: 1.6em; line-height: 1.35; letter-spacing: -.025em; }
+.notice-rich-content .notice-align-left { text-align: left; }
+.notice-rich-content .notice-align-center { text-align: center; }
+.notice-rich-content .notice-align-right { text-align: right; }
+.notice-rich-content .notice-bold { font-weight: 800; }
+.notice-rich-content .notice-italic { font-style: italic; }
+.notice-rich-content .notice-underline { text-decoration: underline; text-underline-offset: .16em; }
+.notice-rich-content .notice-image { margin: 1.2em auto; max-width: 100%; }
+.notice-rich-content .notice-width-50 { width: 50%; }
+.notice-rich-content .notice-width-75 { width: 75%; }
+.notice-rich-content .notice-width-100 { width: 100%; }
+.notice-rich-content img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.notice-rich-content img[hidden] { display: none; }
+.notice-rich-content .notice-image-unavailable { width: 100%; padding: 12px; border: 1px dashed #d7c3af; border-radius: 12px; color: #705745; }
+.notice-rich-content .notice-image-unavailable p { margin: 0; font-size: .875em; }
+.notice-rich-content hr { border: 0; border-top: 1px solid #d7c3af; margin: 1.5em 0; }

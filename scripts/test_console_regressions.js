@@ -124,7 +124,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20260905-2/, "the Console must cache-bust the long-form notice editor layout");
+assert.match(consoleHtml, /styles\.css\?v=20260906-2/, "the Console must cache-bust the rich notice editor layout");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");
@@ -340,8 +340,8 @@ function appElement() {
       if (!listeners.has(type)) listeners.set(type, []);
       listeners.get(type).push(listener);
     },
-    emit(type) {
-      const event = { currentTarget: this, preventDefault() {} };
+    emit(type, details = {}) {
+      const event = { currentTarget: this, target: this, preventDefault() {}, ...details };
       return Promise.all((listeners.get(type) || []).map((listener) => listener(event)));
     },
     focus() { this.focusCount += 1; },
@@ -490,8 +490,15 @@ const minVersion = operationForm({ minVersion: formField("1.2.3"), minVersionCod
 const referralConfig = operationForm({ enabled: formField(""), reason: formField("launch") });
 referralConfig.form.elements.enabled.checked = true;
 const qaAccess = operationForm({ userId: formField("user-1"), shopControlsEnabled: formField(""), reason: formField("qa") });
-const announcement = operationForm({ announcementId: formField(""), body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
+const announcement = operationForm({ announcementId: formField(""), category: formField("notice"), body: formField("notice"), startsAt: formField("2026-08-10T12:00"), endsAt: formField(""), reason: formField("ops") });
+const deletion = operationForm({ reason: formField(""), confirmed: formField("") });
 const operationElements = {
+  announcementDeleteForm: deletion.form,
+  announcementDeleteDialog: appElement(),
+  announcementDeleteCancel: appElement(),
+  announcementDeleteTarget: appElement(),
+  announcementDeleteMessage: appElement(),
+  announcementMessage: appElement(),
   rewardMailForm: reward.form,
   minVersionForm: minVersion.form,
   referralConfigForm: referralConfig.form,
@@ -509,11 +516,17 @@ let mutationGate = deferred();
 const mutationPayloads = [];
 let confirmationCalls = 0;
 const operationWindow = {
+  // This unit harness tests operation request locking, not editor DOM behavior.
+  // The real editor is covered in console-announcement-editor.spec.js.
+  ConsoleAnnouncementEditor: { create: (form) => ({
+    value: () => ({ body: form.elements.body.value }),
+    load: () => true, reset: () => true, isBusy: () => false, isRich: () => false,
+  }) },
   ConsoleUiState: ui,
   ConsoleApp: { confirmChange: async () => { confirmationCalls += 1; return true; } },
   ConsoleAPI: {
     post(_name, payload) {
-      if (payload.action === "operations.get") return Promise.resolve({ config: { min_version: "1.2.3", min_version_code: 42 }, catalog: [], notices: [], reward_mail_broadcasts: [] });
+      if (payload.action === "operations.get") return Promise.resolve({ config: { min_version: "1.2.3", min_version_code: 42 }, catalog: [], notices: [{ id: 7, category: "event", body: "기존 공지", starts_at: "2026-09-06T10:00:00.000Z", active: true }], reward_mail_broadcasts: [] });
       if (payload.action === "referrals.get") return Promise.resolve({ enabled: true, codes_issued: 2, accepted_total: 1, accepted_today_utc: 1, tier_3_total: 0 });
       mutationPayloads.push(payload);
       return mutationGate.promise;
@@ -525,7 +538,7 @@ const operationWindow = {
 const operationContext = {
   console,
   crypto: { randomUUID: (() => { let next = 0; return () => `request-${++next}`; })() },
-  document: { getElementById: (id) => operationElements[id] },
+  document: { getElementById: (id) => operationElements[id], querySelectorAll: () => [] },
   FormData: FakeFormData,
   window: operationWindow,
 };
@@ -552,6 +565,67 @@ await new Promise((resolve) => setTimeout(resolve, 0));
 assert.equal(mutationPayloads[1].requestId, firstRequestId, `a retry after a server error must keep the idempotency request ID: ${JSON.stringify(mutationPayloads)}`);
 mutationGate.resolve({ ok: true });
 await new Promise((resolve) => setTimeout(resolve, 0));
+
+// Execute deletion through the bound UI handlers without a browser process.
+const deleteDialog = operationElements.announcementDeleteDialog;
+deleteDialog.showModal = () => { deleteDialog.open = true; };
+deleteDialog.close = () => { deleteDialog.open = false; };
+let removed = false;
+const article = { dataset: { noticeId: "7" }, remove() { removed = true; } };
+const deleteButton = { closest: () => article, hasAttribute: () => true };
+operationElements.operationsHistory.querySelectorAll = () => removed ? [] : [article];
+operationElements.operationsHistory.querySelector = () => removed ? null : article;
+const clickDelete = () => operationElements.operationsHistory.emit("click", { target: { closest: () => deleteButton } });
+const beforeDeleteCount = mutationPayloads.length;
+announcement.form.elements.body.value = "보존할 작성 중인 공지";
+announcement.form.elements.category.value = "preview";
+await clickDelete();
+assert.equal(deleteDialog.open, true);
+assert.match(operationElements.announcementDeleteTarget.textContent, /\[이벤트\] #7/);
+await operationElements.announcementDeleteCancel.emit("click");
+assert.equal(deleteDialog.open, false);
+assert.equal(mutationPayloads.length, beforeDeleteCount, "cancel must never publish or delete");
+await clickDelete();
+// Required reason and explicit checkbox both gate the network request.
+deletion.form.reportValidity = () => Boolean(deletion.form.elements.reason.value.trim() && deletion.form.elements.confirmed.checked);
+await deletion.form.emit("submit");
+assert.equal(mutationPayloads.length, beforeDeleteCount);
+deletion.form.elements.reason.value = "지난 행사 정리";
+await deletion.form.emit("submit");
+assert.equal(mutationPayloads.length, beforeDeleteCount);
+deletion.form.elements.confirmed.checked = true;
+mutationGate = deferred();
+const failedDelete = deletion.form.emit("submit");
+deletion.form.emit("submit");
+assert.equal(mutationPayloads.length, beforeDeleteCount + 1, "duplicate deletion must be suppressed");
+assert.equal(announcement.button.disabled, true, "deletion must lock publishing");
+assert.equal(removed, false, "the row must remain until the server confirms success");
+mutationGate.reject(new Error("temporary_failure"));
+await failedDelete;
+assert.equal(removed, false);
+assert.match(operationElements.announcementDeleteMessage.textContent, /삭제를 완료하지 못했습니다/);
+assert.equal(announcement.form.elements.body.value, "보존할 작성 중인 공지");
+assert.equal(announcement.form.elements.category.value, "preview");
+const failedDeletePayload = mutationPayloads.at(-1);
+mutationGate = deferred();
+const unconfirmedDelete = deletion.form.emit("submit");
+mutationGate.resolve({ ok: false });
+await unconfirmedDelete;
+assert.equal(removed, false, "HTTP success alone cannot remove a notice");
+mutationGate = deferred();
+const successfulDelete = deletion.form.emit("submit");
+assert.equal(mutationPayloads.at(-1).requestId, failedDeletePayload.requestId, "same deletion payload must reuse its request ID");
+mutationGate.resolve({ ok: true });
+await successfulDelete;
+assert.equal(removed, true);
+assert.equal(deleteDialog.open, false);
+assert.equal(announcement.button.disabled, false);
+assert.equal(announcement.form.elements.body.value, "보존할 작성 중인 공지");
+assert.match(operationElements.operationsHistory.innerHTML, /최근 운영 기록이 없습니다/);
+await clickDelete();
+assert.equal(deleteDialog.open, false, "success must also remove the notice from the ID map");
+assert.ok(mutationPayloads.slice(beforeDeleteCount).every(payload => payload.action === "announcements.delete"), "deletion must never publish or update");
+
 
 console.log("console regressions: PASS");
 }
