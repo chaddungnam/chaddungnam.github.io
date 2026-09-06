@@ -376,7 +376,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-store-badge2"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-stores-soon"))).toBeTruthy();
     expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260905-refine"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
@@ -801,6 +801,9 @@ test("home hero uses custom light localized Play badges without removed copy or 
     await page.goto(route);
     await expect(page.locator(".hero-hook, .studio-signature")).toHaveCount(0);
     await expect(page.locator(".release-actions a")).toHaveCount(1);
+    await expect(page.locator(".app-store-badge")).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(".app-store-badge")).not.toHaveAttribute("href", /.+/);
+    await expect(page.locator(".coming-soon-bubble")).toHaveText("Coming soon");
     const badge = page.locator(".google-play-badge");
     await expect(badge).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
     await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + "-light.svg");
