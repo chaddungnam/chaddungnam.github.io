@@ -6,3 +6,7 @@ https://partnermarketinghub.withgoogle.com/brands/google-play/google-play/lockup
 Source files: GetItOnGooglePlay_Badge_Web_color_{Korean,English,German}.svg and GetItOnGooglePlay_Badge_Print_color_Japanese.svg (the Japanese file is supplied in the official Digital/svg folder).
 
 Render at 54px high, preserve aspect ratio, and reserve at least 14px clear space on every side. Do not recolor, crop, distort, or add effects to the artwork.
+
+## Custom light variants
+
+The `*-light.svg` files are House Duck custom variants explicitly requested by the owner on 2026-09-06: white background, black lettering, unchanged colored prism, geometry, and gray border. They are NOT official Google-issued light badges and are not represented as Google branding-compliant. Original downloads above remain unmodified.

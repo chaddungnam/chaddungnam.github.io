@@ -796,14 +796,14 @@ test("YouTube Shorts keep their portrait ratio", async ({ page }) => {
 });
 
 
-test("home hero uses official localized Play badges without removed copy or details CTA", async ({ page }) => {
+test("home hero uses custom light localized Play badges without removed copy or details CTA", async ({ page }) => {
   for (const [route, lang] of [["/?lang=ko", "ko"], ["/index_en.html?lang=en", "en"], ["/index_de.html?lang=de", "de"], ["/index_ja.html?lang=ja", "ja"]]) {
     await page.goto(route);
     await expect(page.locator(".hero-hook, .studio-signature")).toHaveCount(0);
     await expect(page.locator(".release-actions a")).toHaveCount(1);
     const badge = page.locator(".google-play-badge");
     await expect(badge).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
-    await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + ".svg");
+    await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + "-light.svg");
     await expect(badge.locator("img")).toBeVisible();
     const metrics = await badge.evaluate(node => {
       const img = node.querySelector("img");
