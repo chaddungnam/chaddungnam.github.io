@@ -47,8 +47,9 @@ test("tracked player identity opens detail and memo tags persist", async ({ page
   await expect(page.locator("#playerNoteForm [name=tracked]")).toBeChecked();
   await expect(page.locator("#playerNoteForm [name=tags]")).toHaveValue("유튜브 구독자");
   await expect(page.locator("#playerNoteForm [name=note]")).toHaveValue("첫 실행 버그 확인 중");
-  await expect(page.locator(".player-facts")).toContainText("최근 완료");
-  await expect(page.locator(".player-facts")).toContainText("계정 생성");
+  await expect(page.locator("article.player-facts")).toContainText("최근 완료");
+  await expect(page.locator("article.player-facts")).toContainText("계정 생성");
+  await expect(page.getByRole("region", { name: "최초 튜토리얼" })).toContainText("확인 불가");
 
   await page.locator("#playerNoteForm [name=tags]").fill("유튜브 구독자, 지인");
   await page.locator("#playerNoteForm [name=note]").fill("튜토리얼 재현 영상 요청");

@@ -366,7 +366,16 @@
       && stateVersion >= 0;
   }
 
+  function tutorialStatus(tutorial) {
+    if (!tutorial) return "확인 불가";
+    if (tutorial.home_at) return "완료 후 홈 도착 확인";
+    if (tutorial.completed_at) return "완료 확인";
+    if (tutorial.started_at) return "시작 확인 · 완료 기록 없음";
+    return "기록 없음";
+  }
+
   return {
+    tutorialStatus,
     routeFromHash,
     decodeJwtPayload,
     dedupePlayers,

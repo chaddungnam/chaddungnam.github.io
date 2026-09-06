@@ -1,6 +1,13 @@
 const assert = require("node:assert/strict");
 const model = require("../console/model.js");
 
+// Missing/legacy evidence must not be reported as failed or completed onboarding.
+assert.equal(model.tutorialStatus(null), "확인 불가");
+assert.equal(model.tutorialStatus({}), "기록 없음");
+assert.equal(model.tutorialStatus({ started_at: "2026-09-06T08:46:17Z" }), "시작 확인 · 완료 기록 없음");
+assert.equal(model.tutorialStatus({ completed_at: "2026-09-06T08:47:50Z" }), "완료 확인");
+assert.equal(model.tutorialStatus({ home_at: "2026-09-06T08:47:51Z" }), "완료 후 홈 도착 확인");
+
 const diagnosticsFixture = {
   issueSignals: [{ signal: "tutorial_incomplete", count: 2 }],
   tutorial: {
