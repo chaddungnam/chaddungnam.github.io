@@ -155,12 +155,13 @@ test("product navigation stays on the localized House Duck Blog route and return
   }
 });
 
-test("home leads with the studio slogan, YouTube, and exactly two game previews", () => {
+test("home leads with store badges, YouTube, and exactly two game previews", () => {
   for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
     assert.match(html, /data-studio-hero/);
-    assert.match(html, /Are you ready\?/);
-    assert.match(html, /Houseduck\.in/);
+    assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/);
+    assert.match(html, /class="google-play-badge"/);
+    assert.match(html, /class="app-store-badge"[^>]*aria-disabled="true"/);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
     assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);

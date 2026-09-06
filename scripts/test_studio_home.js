@@ -67,10 +67,10 @@ assert.match(svg, /data-part="smirk" d="M90 166Q123 180 150 150" fill="none" str
 assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky smirk needs its raised curl");
 
 const expectedCopy = {
-  "index.html": ["Are you ready?", "Houseduck.in", "기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.", "출시 예정 미정"],
-  "index_en.html": ["Are you ready?", "Houseduck.in", "Release date TBD"],
-  "index_de.html": ["Are you ready?", "Houseduck.in", "Veröffentlichungstermin offen"],
-  "index_ja.html": ["Are you ready?", "Houseduck.in", "発売時期未定"],
+  "index.html": ["Coming soon", "출시 예정 미정"],
+  "index_en.html": ["Coming soon", "Release date TBD"],
+  "index_de.html": ["Coming soon", "Veröffentlichungstermin offen"],
+  "index_ja.html": ["Coming soon", "発売時期未定"],
 };
 
 const expectedOpenGraph = {
