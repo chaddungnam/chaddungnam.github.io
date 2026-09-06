@@ -80,7 +80,7 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .hero-loop span:nth-child(3) { background: #D6F8F2; }
 .release-lede { max-width: 42ch; margin: 0; color: var(--studio-copy); font-size: 1rem; line-height: 1.65; word-break: keep-all; }
 html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
-.release-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 32px; }
+.release-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0; margin-top: 32px; }
 /* Custom store artwork keeps its geometry and surrounding clear space. */
 .google-play-badge { display: inline-flex; width: fit-content; align-items: center; margin-left: -14px; padding: 14px; background: #f5f4ef; text-decoration: none; }
 .google-play-badge img { display: block; width: auto; height: 54px; max-width: none; }
@@ -299,7 +299,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .release-version { justify-self: start; margin-top: 0; }
   .hero-loop { gap: 5px; margin-top: 10px; }
   .hero-loop span { min-height: 38px; padding-inline: 9px; font-size: .74rem; }
-  .release-actions { display: flex; gap: 8px; }
+  .release-actions { display: flex; gap: 0; }
   .google-play-badge img { height: 44px; }
   .app-store-badge { width: 148px; height: 44px; gap: 8px; padding: 5px 10px; }
   .app-store-icon { width: 24px; height: 27px; }
