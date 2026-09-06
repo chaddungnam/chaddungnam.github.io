@@ -70,7 +70,6 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .eyebrow { margin: 0 0 18px; color: var(--studio-red); font-size: clamp(.6rem, .7vw, .72rem); font-weight: 850; letter-spacing: .22em; line-height: 1.4; text-transform: uppercase; }
 .release-heading { display: flex; align-items: start; gap: 16px; }
 .release-heading h1 { max-width: 7ch; margin: 0; font-size: clamp(4rem, 7.1vw, 7.4rem); font-weight: 900; letter-spacing: -.075em; line-height: .86; }
-.hero-hook { margin: 24px 0 10px; font-size: clamp(1.25rem, 2vw, 1.7rem); font-weight: 800; letter-spacing: -.055em; line-height: 1.35; text-wrap: balance; }
 .store-disclosure { margin: 14px 0 0; color: #515761; font-size: .75rem; line-height: 1.5; }
 .demo-disclosure { position: absolute; right: 0; bottom: -44px; left: 0; margin: 0; color: #515761; font-size: .68rem; line-height: 1.5; text-align: center; }
 .release-version { display: inline-flex; min-width: 76px; min-height: 34px; align-items: center; justify-content: center; margin-top: 6px; border: 1px solid var(--studio-ink); background: var(--studio-yellow); font-size: .68rem; font-weight: 900; letter-spacing: .12em; }
@@ -82,6 +81,10 @@ body[data-page="studio"] .language-menu { border: 1px solid var(--studio-line); 
 .release-lede { max-width: 42ch; margin: 0; color: var(--studio-copy); font-size: 1rem; line-height: 1.65; word-break: keep-all; }
 html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .release-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+/* Official artwork stays unmodified; 14px clear space exceeds 1/4 of its 54px height. */
+.google-play-badge { display: inline-flex; width: fit-content; align-items: center; padding: 14px; background: #f5f4ef; text-decoration: none; }
+.google-play-badge img { display: block; width: auto; height: 54px; max-width: none; }
+.google-play-badge:focus-visible { outline: 3px solid var(--studio-blue); outline-offset: 2px; }
 .release-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 18px; border: 3px solid var(--studio-ink); border-radius: 20px; color: var(--studio-ink); background: #fff; box-shadow: 4px 5px 0 rgba(16,24,39,.18); font-size: .8rem; font-weight: 850; letter-spacing: .015em; text-decoration: none; text-transform: none; transition: color 160ms ease, background-color 160ms ease, transform 160ms ease; }
 .release-button:hover,
 .release-button:focus-visible { color: #fff; background: var(--studio-blue); transform: translateY(-2px); }
@@ -91,11 +94,6 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 .release-readout div + div { border-left: 1px solid var(--studio-line); }
 .release-readout dt { color: var(--studio-muted); font-size: .52rem; font-weight: 850; letter-spacing: .16em; }
 .release-readout dd { margin: 5px 0 0; font-size: .76rem; font-weight: 900; letter-spacing: .06em; }
-.studio-signature { max-width: 420px; margin-top: 22px; padding-top: 14px; border-top: 3px solid var(--studio-yellow); }
-.studio-signature > p:first-child { display: flex; flex-wrap: wrap; align-items: baseline; gap: 9px; margin: 0 0 10px; }
-.studio-signature strong { font-size: clamp(1.05rem, 1.6vw, 1.5rem); font-weight: 900; letter-spacing: -.025em; }
-.studio-signature span { color: var(--studio-blue); font-size: .76rem; font-weight: 850; letter-spacing: .08em; }
-.hero-description { margin: 0; color: var(--studio-copy); font-family: "Chilgok KwonAnJa", "Do Hyeon", sans-serif; font-size: clamp(1rem, 1vw, 1.05rem); line-height: 1.55; word-break: keep-all; }
 
 .release-visual { position: relative; display: grid; min-height: 680px; place-items: center; overflow: visible; }
 .release-visual::before { position: absolute; inset: 10% -5% 9%; display: block; content: ""; border: 1px solid #abb3bf; border-radius: 44px 12px 44px 12px; background: repeating-linear-gradient(135deg, transparent 0 22px, rgba(16,24,39,.045) 22px 23px), #e2e7ee; transform: rotate(-5deg); }
@@ -270,8 +268,7 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
 @media (max-width: 700px) {
   body[data-page="studio"] .header-inner { min-height: 58px; }
   .studio-hero { padding: 34px 0 72px; }
-  .release-grid { grid-template-areas: "eyebrow" "heading" "hook" "loop" "lede" "actions" "store" "visual" "readout" "signature"; align-items: start; gap: 0; }
-  .hero-hook { grid-area: hook; margin-top: 18px; }
+  .release-grid { grid-template-areas: "eyebrow" "heading" "loop" "lede" "actions" "store" "visual" "readout"; align-items: start; gap: 0; }
   .store-disclosure { grid-area: store; }
   .demo-disclosure { bottom: -42px; }
   .safety-note { bottom: -20px; }
@@ -286,7 +283,6 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .release-lede { grid-area: lede; }
   .release-actions { grid-area: actions; }
   .release-readout { grid-area: readout; }
-  .studio-signature { grid-area: signature; }
   .release-visual { grid-area: visual; }
   .release-heading { display: flex; align-items: start; gap: 10px; }
   .release-version { min-width: 60px; font-size: .62rem; }
@@ -299,7 +295,6 @@ body[data-page="studio"] .footer-links a { color: var(--studio-copy); font-size:
   .release-button { width: 100%; }
   .release-readout div { padding-inline: 9px; }
   .release-readout dd { font-size: .65rem; }
-  .studio-signature { margin-top: 28px; }
   .release-visual { min-height: 520px; margin: 18px 0 24px; }
   .hero-phone,
   .hero-phone[data-playable-state="loading"],

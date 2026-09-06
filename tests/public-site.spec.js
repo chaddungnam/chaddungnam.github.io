@@ -341,7 +341,6 @@ test("localized homes place a stable playable phone before supporting copy at 39
       const title = rect(".release-heading h1");
       const phone = rect(".hero-phone .iphone-shell");
       const readout = rect(".release-readout");
-      const signature = rect(".studio-signature");
       const bodyFonts = [".release-lede", ".hero-description", ".project-copy > p:not(.eyebrow):not(.project-display):not(.project-keywords):not(.project-status)"]
         .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
       const controlHeights = [...document.querySelectorAll(".release-button, [data-playable-launch], [data-motion-toggle]")]
@@ -354,7 +353,6 @@ test("localized homes place a stable playable phone before supporting copy at 39
         titleBottom: title.bottom,
         phone: { top: phone.top + scrollY, left: phone.left + scrollX, width: phone.width, height: phone.height, bottom: phone.bottom + scrollY },
         readout: { top: readout.top + scrollY, bottom: readout.bottom + scrollY },
-        signatureTop: signature.top + scrollY,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyFonts,
         controlHeights,
@@ -367,7 +365,6 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.phone.top).toBeGreaterThanOrEqual(layout.titleBottom - 1);
     expect(layout.phone.top).toBeLessThan(844);
     expect(layout.readout.top).toBeGreaterThanOrEqual(layout.phone.bottom - 1);
-    expect(layout.signatureTop).toBeGreaterThanOrEqual(layout.readout.bottom - 1);
     expect(layout.overflow).toBeLessThanOrEqual(0);
     expect(layout.bodyFonts).not.toHaveLength(0);
     expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
@@ -379,7 +376,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260905-refine3"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-store-badge"))).toBeTruthy();
     expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260905-refine"))).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
@@ -796,4 +793,25 @@ test("YouTube Shorts keep their portrait ratio", async ({ page }) => {
   await expect(frame).toBeVisible();
   const box = await frame.boundingBox();
   expect(box.height / box.width).toBeCloseTo(16 / 9, 1);
+});
+
+
+test("home hero uses official localized Play badges without removed copy or details CTA", async ({ page }) => {
+  for (const [route, lang] of [["/?lang=ko", "ko"], ["/index_en.html?lang=en", "en"], ["/index_de.html?lang=de", "de"], ["/index_ja.html?lang=ja", "ja"]]) {
+    await page.goto(route);
+    await expect(page.locator(".hero-hook, .studio-signature")).toHaveCount(0);
+    await expect(page.locator(".release-actions a")).toHaveCount(1);
+    const badge = page.locator(".google-play-badge");
+    await expect(badge).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
+    await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + ".svg");
+    await expect(badge.locator("img")).toBeVisible();
+    const metrics = await badge.evaluate(node => {
+      const img = node.querySelector("img");
+      const style = getComputedStyle(node);
+      return { loaded: img.complete && img.naturalWidth > 0, height: img.getBoundingClientRect().height, padding: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft].map(parseFloat) };
+    });
+    expect(metrics.loaded).toBe(true);
+    expect(metrics.height).toBeGreaterThanOrEqual(28);
+    expect(Math.min(...metrics.padding)).toBeGreaterThanOrEqual(metrics.height / 4);
+  }
 });
