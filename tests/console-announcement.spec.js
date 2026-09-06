@@ -23,6 +23,8 @@ test("operator can publish a notice from operations", async ({ page }) => {
   await expect(noticeBody).toHaveCSS("line-height", "26.4px");
   await expect(noticeBody).toHaveCSS("resize", "vertical");
   await expect(noticeBody).toHaveAttribute("maxlength", "2000");
+  await expect(noticeForm.getByLabel("분류")).toHaveValue("notice");
+  await noticeForm.getByLabel("분류").selectOption("event");
   await noticeBody.fill("1.1.1 공지 테스트입니다.");
   await page.locator("#announcementForm [name=startsAt]").fill("2026-08-29T10:00");
   await page.locator("#announcementForm [name=reason]").fill("에디터 공지 경로 확인");
@@ -30,9 +32,13 @@ test("operator can publish a notice from operations", async ({ page }) => {
 
   await expect.poll(() => page.evaluate(() => window.__noticePayload)).toMatchObject({
     action: "announcements.publish",
+    category: "event",
     body: "1.1.1 공지 테스트입니다.",
     reason: "에디터 공지 경로 확인",
   });
+  expect(await page.evaluate(() => window.__noticePayload)).not.toHaveProperty("content");
+  await expect(page.locator("[data-notice-id='8'] .announcement-category")).toHaveText("[이벤트]");
+  await expect(noticeForm.getByLabel("분류")).toHaveValue("notice");
   await expect(page.locator("[data-notice-id='8'] p")).toHaveText("1.1.1 공지 테스트입니다.");
   await expect(page.locator("#announcementMessage")).toContainText("작업을 완료했습니다");
 });
@@ -56,6 +62,7 @@ test("operator can edit an existing notice including start and end dates", async
   await expect.poll(() => page.evaluate(() => window.__noticePayload)).toMatchObject({
     action: "announcements.update",
     announcementId: 7,
+    category: "notice",
     body: "1.1.1 공지 본문과 날짜를 수정합니다.",
     reason: "게시 시작일 수정",
   });

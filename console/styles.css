@@ -1004,3 +1004,100 @@ body::before { opacity: .18; background-size: 22px 22px; }
 #playersView .table-scroll td small { display: block; margin-top: 3px; color: var(--ink-soft); }
 .analytics-more { margin: 12px 0 18px; }
 .analytics-more > summary { cursor: pointer; }
+
+
+/* 공지 블록 에디터 */
+.announcement-editor { display: grid; gap: 12px; min-width: 0; }
+.announcement-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.announcement-editor-heading h3 { margin: 0 0 4px; color: var(--ink); font-size: 14px; }
+.announcement-editor-heading p { max-width: 720px; margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.5; }
+.editor-mode-button,
+.announcement-block-toolbar button,
+.announcement-addbar button,
+.editor-file-button,
+.announcement-block-actions button,
+.editor-retry-button,
+#announcementPlainMode { min-height: 44px; padding: 9px 12px; color: var(--ink); background: #f2f5f6; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 10px; font-weight: 900; cursor: pointer; }
+.editor-mode-button { flex: 0 0 auto; color: #17665e; background: var(--teal-soft); border-color: rgba(33,170,155,.32); }
+.editor-mode-button[aria-expanded="true"] { color: white; background: var(--ink); border-color: var(--ink); }
+.announcement-body-label { display: block !important; }
+.announcement-rich-panel { display: grid; gap: 10px; min-width: 0; }
+.announcement-block-toolbar { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; padding: 10px; background: #f6f8f9; border: 1px solid var(--line); border-radius: 12px; }
+.announcement-block-toolbar label { width: 116px; }
+#announcementForm .announcement-block-toolbar select { min-height: 44px; }
+.editor-button-group { display: flex; gap: 4px; }
+.announcement-block-toolbar button[aria-pressed="true"] { color: white; background: var(--ink); border-color: var(--ink); }
+.announcement-addbar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.announcement-addbar > span { margin-right: 3px; color: var(--ink-soft); font-size: 10px; font-weight: 900; }
+.editor-file-button { position: relative; display: inline-flex !important; align-items: center; justify-content: center; color: #17665e !important; background: var(--teal-soft); border-color: rgba(33,170,155,.32); overflow: hidden; }
+.editor-file-button input { position: absolute; width: 1px !important; height: 1px; min-height: 0 !important; padding: 0 !important; opacity: 0; }
+.editor-file-button:focus-within { outline: 3px solid color-mix(in srgb, var(--teal) 55%, white); outline-offset: 3px; }
+.announcement-editor-status { min-height: 18px; margin: 0; color: #17665e; font-size: 10px; font-weight: 800; line-height: 1.5; }
+.announcement-editor-status.is-error { color: #a93f34; }
+.announcement-blocks { display: grid; gap: 9px; }
+.announcement-block { display: grid; gap: 9px; min-width: 0; padding: 11px; background: #fbfcfc; border: 1px solid var(--line); border-left: 4px solid #c8d0d8; border-radius: 11px; }
+.announcement-block.is-selected { border-left-color: var(--teal); box-shadow: 0 0 0 2px rgba(33,170,155,.08); }
+.announcement-block > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.announcement-block > header > strong { color: var(--ink-soft); font-size: 10px; }
+.announcement-block-actions { display: flex; gap: 4px; }
+.announcement-block-actions button { min-width: 44px; padding-inline: 9px; }
+.announcement-block-actions button:last-child { color: #a93f34; background: var(--coral-soft); }
+#announcementForm .announcement-block textarea { min-height: 92px; font-size: 14px; line-height: 1.55; }
+.announcement-block > hr { width: 100%; margin: 12px 0; border: 0; border-top: 2px solid var(--line); }
+.announcement-image-fields { display: grid; grid-template-columns: minmax(0, 1fr) 120px; align-items: end; gap: 9px; }
+.announcement-image-fields > img { grid-column: 1 / -1; display: block; max-width: min(100%, 520px); max-height: 260px; object-fit: contain; border-radius: 9px; }
+.announcement-compression-result,
+.announcement-upload-error,
+.announcement-upload-progress { grid-column: 1 / -1; margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.announcement-upload-error { color: #a93f34; }
+.editor-retry-button { justify-self: start; color: #17665e; background: var(--teal-soft); }
+.announcement-editor-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--ink-soft); font-size: 10px; font-weight: 800; }
+#announcementPlainMode { margin-left: auto; }
+.announcement-preview-wrap { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.announcement-preview-wrap > summary { min-height: 44px; padding: 13px 14px; color: var(--ink); background: #f6f8f9; cursor: pointer; font-size: 11px; font-weight: 900; }
+.announcement-preview { display: grid; gap: 14px; max-width: 760px; margin: 0 auto; padding: 22px; color: var(--ink); overflow-wrap: anywhere; }
+.announcement-preview p,
+.announcement-preview h3 { margin: 0; white-space: pre-wrap; }
+.announcement-preview p[data-size="small"] { font-size: 13px; }
+.announcement-preview p[data-size="normal"] { font-size: 16px; }
+.announcement-preview p[data-size="large"] { font-size: 20px; }
+.announcement-preview h3 { font-size: 28px; line-height: 1.25; }
+.announcement-preview hr { width: 100%; border: 0; border-top: 2px solid var(--line); }
+.announcement-preview figure { display: grid; gap: 6px; justify-self: center; max-width: 100%; margin: 0; }
+.announcement-preview figure img { display: block; width: 100%; max-height: 520px; object-fit: contain; border-radius: 10px; }
+.announcement-preview figure > span { padding: 18px; color: var(--ink-soft); background: #f2f5f6; border-radius: 10px; font-size: 9px; overflow-wrap: anywhere; }
+.announcement-preview figcaption { color: var(--ink-soft); font-size: 10px; text-align: center; }
+.announcement-preview-empty { color: var(--ink-soft); font-size: 11px; }
+#announcementForm[data-editor-processing="true"] { cursor: progress; }
+#announcementForm[data-editor-processing="true"] .announcement-editor { opacity: .78; }
+
+@media (max-width: 760px) {
+  .announcement-editor-heading { align-items: stretch; flex-direction: column; }
+  .editor-mode-button { width: 100%; }
+  .announcement-block-toolbar { display: grid; grid-template-columns: 1fr; align-items: stretch; }
+  .announcement-block-toolbar label { width: 100%; }
+  .editor-button-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .editor-button-group button { min-width: 0; padding-inline: 5px; }
+  .announcement-addbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .announcement-addbar > span { grid-column: 1 / -1; }
+  .announcement-addbar button, .editor-file-button { min-width: 0; }
+  .announcement-block > header { align-items: flex-start; flex-direction: column; }
+  .announcement-block-actions { width: 100%; }
+  .announcement-block-actions button { flex: 1; }
+  .announcement-image-fields { grid-template-columns: 1fr; }
+  .announcement-editor-footer { align-items: stretch; flex-direction: column; gap: 7px; }
+  #announcementPlainMode { width: 100%; margin-left: 0; }
+  .announcement-preview { padding: 16px 12px; }
+}
+
+/* Text labels keep announcement categories accessible without color. */
+.announcement-category { display: inline-block; padding: 5px 8px; border: 1px solid currentColor; border-radius: 7px; font-size: 12px; font-weight: 900; line-height: 1.4; }
+.category-notice { color: #145a50; background: #e1f5ef; }
+.category-event { color: #854000; background: #fff0d7; }
+.category-preview { color: #56309a; background: #f0e8ff; }
+.announcement-history-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.announcement-history-actions button { min-height: 44px; min-width: 64px; }
+#announcementDeleteTarget { padding: 12px; background: #f5f6f8; border-radius: 10px; overflow-wrap: anywhere; }
+#announcementDeleteForm h2, #announcementDeleteForm p { margin: 0; }
+#announcementDeleteForm .check-label { align-items: flex-start; line-height: 1.5; }
+#announcementDeleteForm textarea { min-height: 96px; resize: vertical; }

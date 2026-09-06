@@ -68,3 +68,14 @@ test("notice chrome labels follow the selected locale", async () => {
   assert.match(html, /noticeLabels\[nextLanguage\]/);
   assert.match(html, /labels\.back/);
 });
+
+test("notice, event, and preview categories remain visible and localized", async () => {
+  const html = await readFile(new URL("../quirky-ball/notices/index.html", import.meta.url), "utf8");
+  assert.match(html, /id="notice-category"/);
+  assert.match(html, /\["notice", "event", "preview"\]\.includes\(category\)/);
+  assert.match(html, /renderCategory\(kind, notice\.category, nextLanguage\)/);
+  assert.match(html, /renderCategory\(document\.querySelector\("#notice-category"\), notice\.category, select\.value\)/);
+  assert.match(html, /data-category="event"/);
+  assert.match(html, /data-category="preview"/);
+  assert.match(html, /ko: \{ event: "이벤트", preview: "예고" \}/);
+});
