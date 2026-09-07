@@ -137,9 +137,7 @@ test("home opens on the released Quirky Ball specimen and real gameplay", async 
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-studio-hero] h1")).toHaveText("Quirky Ball");
-  await expect(page.locator("[data-studio-hero]")).toContainText("Are you ready?");
-  await expect(page.locator("[data-studio-hero]")).toContainText("Houseduck.in");
-  await expect(page.locator(".hero-description")).toContainText("기술과 속도의 강국 한국에서 온 인재가 품질의 나라 독일에서 소프트웨어를 만듭니다.");
+  await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("각도를 읽고, 쏘고, 합치세요. 위험선을 넘기 전에 탈출 게이트를 여는 액션 퍼즐.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);
   await expect(page.locator("[data-project='project-k']")).toContainText("출시 예정 미정");
@@ -376,8 +374,14 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);
     expect(layout.cacheAssets).toHaveLength(2);
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.css?v=20260906-stores-compact"))).toBeTruthy();
-    expect(layout.cacheAssets.some((asset) => asset.includes("studio-home.js?v=20260905-refine"))).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => {
+      const url = new URL(asset);
+      return url.pathname.endsWith("/assets/studio-home.css") && url.search.length > 1;
+    })).toBeTruthy();
+    expect(layout.cacheAssets.some((asset) => {
+      const url = new URL(asset);
+      return url.pathname.endsWith("/assets/studio-home.js") && url.search.length > 1;
+    })).toBeTruthy();
 
     const geometry = async () => page.locator(".hero-phone .iphone-shell").evaluate((node) => {
       const box = node.getBoundingClientRect();
