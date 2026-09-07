@@ -17,11 +17,12 @@ function fixture(script, post) {
       innerHTML: "", textContent: "", value: "", style: {}, events: {},
       elements: { kind: { addEventListener() {} } },
       addEventListener(type, callback) { this.events[type] = callback; },
+      setAttribute(name, value) { this[name] = value; },
       querySelectorAll() { return []; }, closest() { return null; },
     });
     return elements.get(id);
   };
-  const window = { ConsoleModel: model, location: { hash: `#/audit?userId=${userA}` }, ConsoleAPI: { post } };
+  const window = { ConsoleModel: model, ConsoleUiState: { setMessage(node, text) { node.textContent = text; } }, location: { hash: `#/audit?userId=${userA}` }, ConsoleAPI: { post } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../console", script), "utf8"), {
     window, document: { getElementById: element }, URLSearchParams,
   });

@@ -34,6 +34,7 @@ const byId = (id) => document.getElementById(id);
 
 function confirmChange(title, body) {
   const dialog = byId("confirmDialog");
+  if (dialog.open) return Promise.resolve(false);
   byId("confirmTitle").textContent = title;
   byId("confirmBody").textContent = body;
   dialog.returnValue = "cancel";
@@ -76,7 +77,7 @@ function selectProject(projectKey) {
   byId("currentProject").textContent = projectK ? "Project K" : "Quirky Ball";
   byId("consoleNav").hidden = projectK;
   showOnly("consoleApp");
-  window.location.hash = projectK ? "#/project-k" : "#/analytics";
+  window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
   renderRoute();
 }
 
@@ -94,7 +95,7 @@ function renderRoute() {
     view.hidden = view.dataset.route !== route.page;
   });
   document.querySelectorAll("#consoleNav a").forEach((link) => {
-    if (link.dataset.page === route.page) link.setAttribute("aria-current", "page");
+    if (link.dataset.page === route.page || route.page === "player" && link.dataset.page === "players") link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
   const routeKey = `${route.page}:${route.userId || ""}`;
@@ -164,6 +165,18 @@ byId("refreshRouteButton").addEventListener("click", () => {
 });
 byId("scrollToTop").addEventListener("click", () => {
   if (typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "smooth" });
+});
+byId("mainContent").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-console-jump]");
+  if (!button) return;
+  const target = byId(button.dataset.consoleJump);
+  if (!target) return;
+  for (let node = target; node; node = node.parentElement) {
+    if (node.tagName === "DETAILS") node.open = true;
+  }
+  target.scrollIntoView({ block: "start", behavior: "auto" });
+  const focus = target.matches("details") ? target.querySelector("summary") : target.querySelector("h2, h3");
+  if (focus) { focus.tabIndex = -1; focus.focus({ preventScroll: true }); }
 });
 window.addEventListener("scroll", () => {
   byId("scrollToTop").hidden = !(Number(window.scrollY) > 640);

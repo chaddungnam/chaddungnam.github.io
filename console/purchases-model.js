@@ -28,6 +28,7 @@
   }
 
   function formatMoney(micros, currency) {
+    if (micros == null || typeof micros === "boolean" || String(micros).trim() === "") return "금액 미기록";
     const amount = Number(micros);
     if (!Number.isFinite(amount) || amount < 0) return "금액 미기록";
     const code = String(currency || "").trim().toUpperCase();

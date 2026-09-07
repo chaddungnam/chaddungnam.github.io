@@ -1,5 +1,6 @@
 (function attachConsoleAudit(root) {
   const state = { userId: "", page: 1, bound: false, requestSeq: 0 };
+  const pendingRequests = new WeakMap();
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
@@ -51,17 +52,30 @@
     const form = event.currentTarget;
     const reason = form.elements.reason.value.trim();
     if (!reason) return;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
+    const viewHash = root.location.hash;
     try {
       const detail = await root.ConsoleAPI.post("admin-console", { action: "players.get", userId: form.dataset.userId });
       if (!await root.ConsoleApp.confirmChange("플레이어 변경 되돌리기", `현재 상태 버전 ${detail.player.state_version}에서 선택한 변경 전 값으로 복원합니다.\n사유: ${reason}`)) return;
+      if (viewHash !== root.location.hash) return;
+      const pending = pendingRequests.get(form);
+      const requestId = pending?.reason === reason ? pending.requestId : crypto.randomUUID();
+      pendingRequests.set(form, { reason, requestId });
       await root.ConsoleAPI.post("admin-console", {
         action: "audit.revert", actionId: form.dataset.actionId, expectedVersion: detail.player.state_version,
-        reason, requestId: crypto.randomUUID(),
+        reason, requestId,
       });
-      setMessage("변경을 되돌리고 새 감사 기록을 남겼습니다.");
+      pendingRequests.delete(form);
+      if (viewHash !== root.location.hash) return;
       await load();
+      setMessage("변경을 되돌리고 새 감사 기록을 남겼습니다.");
     } catch (error) {
+      if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
+      if (viewHash !== root.location.hash) return;
       setMessage(`되돌리지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+    } finally {
+      finishRequest();
     }
   }
 

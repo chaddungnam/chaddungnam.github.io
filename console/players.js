@@ -3,7 +3,9 @@
     { item_id: "icon_jakwon_tongue", item_type: "profile_icon", admin_label: "yakwon 프로필" },
     { item_id: "skin_jakwon", item_type: "marble_skin", admin_label: "yakwon 구슬" },
   ];
-  const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", trackedOnly: false, page: 1, loading: false, bound: false, exclusions: new Map() };
+  const state = { query: "", rangeDays: 0, sort: "latest_played_at", direction: "desc", trackedOnly: false, page: 1, listSeq: 0, detailSeq: 0, detailUserId: "", mutationPending: false, bound: false, exclusions: new Map() };
+  const pendingRequests = new WeakMap();
+  const economyLabels = { gems: "젬", stamina: "스태미나", stamina_max: "최대 스태미나", breakthrough_tickets: "돌파 티켓", speed_boost_tickets: "스피드 티켓" };
   const byId = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[character]);
   const countryMarkup = (value) => {
@@ -14,14 +16,16 @@
     </span>`;
   };
   const number = (value) => Number(value ?? 0).toLocaleString("ko-KR");
+  const level = (value) => value == null || Number(value) < 0 ? "기록 없음" : `Lv.${number(value)}`;
   const time = (value) => value ? new Date(value).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
   const prettyJson = (value) => value == null ? "없음" : JSON.stringify(value, null, 2);
   const message = (id, value, error = false) => {
-    byId(id).textContent = value;
+    root.ConsoleUiState.setMessage(byId(id), value, error);
     byId(id).style.color = error ? "var(--coral)" : "";
   };
 
   function errorText(error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError" || error?.message === "console_invalid_response") return "서버 응답을 확인하지 못했습니다. 감사 기록에서 처리 여부를 확인하거나 같은 입력으로 다시 시도해 주세요.";
     if (error?.message === "version_conflict") return "다른 저장이 먼저 반영되었습니다. 최신 값을 다시 불러왔습니다.";
     if (error?.message === "mutations_disabled") return "호환 게임 빌드 배포 전까지 직접 수정은 잠겨 있습니다.";
     if (error?.message === "invalid_player_note") return "태그 수·길이와 메모 길이를 확인해 주세요.";
@@ -35,7 +39,7 @@
     state.sort = ["latest_played_at", "best_score", "nickname", "country", "gems", "state_version"].includes(params.get("sort")) ? params.get("sort") : "latest_played_at";
     state.direction = ["asc", "desc"].includes(params.get("direction")) ? params.get("direction") : "desc";
     state.trackedOnly = params.get("tracked") === "true";
-    state.page = Math.max(1, Number(params.get("page")) || 1);
+    state.page = Math.min(100000, Math.max(1, Math.floor(Number(params.get("page")) || 1)));
   }
 
   function syncListHash() {
@@ -62,7 +66,7 @@
     byId("playersTable").innerHTML = rows.length ? rows.map((row) => `<tr>
       <td>${root.ConsoleModel.playerIdentityMarkup(row, root.location.hash)}<small>${escapeHtml(row.account_type)}</small>${state.exclusions.has(row.user_id) ? '<span class="analytics-exclusion-badge">로컬/QA 제외</span>' : ""}</td>
       <td>${countryMarkup(row.country)}</td><td>${number(row.games_played)}</td>
-      <td>${number(row.best_score)}<small>Lv.${number(row.best_level)}</small></td>
+      <td>${number(row.best_score)}<small>${level(row.best_level)}</small></td>
       <td>${number(row.gems)}</td><td>${number(row.stamina)} / ${number(row.stamina_max)}</td>
       <td><small>돌파 ${number(row.breakthrough_tickets)}</small><small>스피드 ${number(row.speed_boost_tickets)}</small></td>
       <td>${escapeHtml(time(row.latest_played_at))}<small>${Number(row.games_played) > 0 ? "최근 활동" : "접속·동기화"}</small></td>
@@ -71,8 +75,7 @@
   }
 
   async function loadList() {
-    if (state.loading) return;
-    state.loading = true;
+    const requestSeq = ++state.listSeq;
     const panel = byId("playersTable").closest(".panel");
     panel?.setAttribute("aria-busy", "true");
     message("playersMessage", "플레이어 목록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.");
@@ -84,15 +87,18 @@
         }),
         root.ConsoleAPI.post("admin-console", { action: "analytics_exclusions.list" }).catch(() => []),
       ]);
+      if (requestSeq !== state.listSeq) return;
+      const pages = Math.max(1, Math.ceil(Number(data.total || 0) / 50));
+      if (state.page > pages) { state.page = pages; syncListHash(); return loadList(); }
       const exclusionRows = Array.isArray(exclusions) ? exclusions : Array.isArray(exclusions?.rows) ? exclusions.rows : [];
       state.exclusions = new Map(exclusionRows.map((row) => [row.user_id, row]));
       renderList(data);
       message("playersMessage", "닉네임이 같아도 표시코드와 사용자 ID가 다른 계정은 각각 표시됩니다.");
     } catch (error) {
+      if (requestSeq !== state.listSeq) return;
       message("playersMessage", errorText(error), true);
     } finally {
-      state.loading = false;
-      panel?.setAttribute("aria-busy", "false");
+      if (requestSeq === state.listSeq) panel?.setAttribute("aria-busy", "false");
     }
   }
 
@@ -115,10 +121,7 @@
   }
 
   function economyFields(player, disabled) {
-    const fields = [
-      ["gems", "젬"], ["stamina", "스태미나"], ["stamina_max", "최대 스태미나"],
-      ["breakthrough_tickets", "돌파 티켓"], ["speed_boost_tickets", "스피드 티켓"],
-    ];
+    const fields = Object.entries(economyLabels);
     return fields.map(([key, label]) => `<label>${label}<input name="${key}" type="number" min="0" step="1" value="${Number(player[key] || 0)}" ${disabled ? "disabled" : ""}></label>`).join("");
   }
 
@@ -132,7 +135,7 @@
   function recordRows(records, disabled) {
     return records.length ? records.map((record) => `<tr>
       <td>${escapeHtml(time(record.played_at))}<small>${escapeHtml(record.source)}</small></td>
-      <td>${number(record.score)}</td><td>Lv.${number(record.level)}</td><td>${record.excluded ? "제외됨" : "반영 중"}</td>
+      <td>${number(record.score)}</td><td>${level(record.level)}</td><td>${record.excluded ? "제외됨" : "반영 중"}</td>
       <td><details><summary>${disabled ? "보기" : "보정"}</summary><form class="score-form" data-record-id="${record.record_id}">
         <div class="form-pair"><label>점수<input name="score" type="number" min="0" step="1" value="${record.score}" ${disabled ? "disabled" : ""}></label><label>레벨<input name="level" type="number" min="0" step="1" value="${record.level}" ${disabled ? "disabled" : ""}></label></div>
         <label class="check-label"><input name="excluded" type="checkbox" ${record.excluded ? "checked" : ""} ${disabled ? "disabled" : ""}> 랭킹에서 기록 제외</label>
@@ -153,20 +156,20 @@
     const grantCatalog = catalog.concat(ADMIN_GRANT_ITEMS.filter((item) => !catalog.some((entry) => entry.item_id === item.item_id)));
     const catalogOptions = grantCatalog.map((item) => `<option value="${escapeHtml(item.item_id)}" ${owned.has(item.item_id) ? "disabled" : ""}>${escapeHtml(root.ConsoleModel.catalogItemLabel(item))}${owned.has(item.item_id) ? " · 보유 중" : ""}</option>`).join("");
     const entitlementRows = (data.entitlements || []).map((item) => `<li><span><strong>${escapeHtml(root.ConsoleModel.catalogItemLabel(item))}</strong><small>${escapeHtml(item.acquired_source || "-")}</small></span><button type="button" class="secondary-button inventory-revoke" data-item-id="${escapeHtml(item.item_id)}" ${disabled ? "disabled" : ""}>회수</button></li>`).join("");
-    byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))} ${root.ConsoleModel.playerNoteMarkup(operatorNote)} ${exclusion ? '<span class="analytics-exclusion-badge">로컬/QA 제외</span>' : ""}</h2><code>${escapeHtml(userId)}</code>${exclusion ? `<p class="status-label">통계 제외 · ${escapeHtml(exclusion.reason)} · ${escapeHtml(exclusion.note || "메모 없음")}</p>` : ""}</div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/audit?userId=${encodeURIComponent(userId)}">감사 기록에서 보기</a><a href="#/cs?userId=${encodeURIComponent(userId)}">CS에서 보기</a></div></div>
-      <section class="panel player-facts" aria-label="최초 튜토리얼"><p class="eyebrow">INITIAL TUTORIAL</p><h2>최초 튜토리얼 · ${escapeHtml(root.ConsoleModel.tutorialStatus(tutorial))}</h2><dl><div><dt>시작</dt><dd>${escapeHtml(time(tutorial?.started_at))}</dd></div><div><dt>완료</dt><dd>${escapeHtml(time(tutorial?.completed_at))}</dd></div><div><dt>완료 후 홈 도착</dt><dd>${escapeHtml(time(tutorial?.home_at))}</dd></div></dl><p class="status-label">계정에 연결된 최초 튜토리얼 기록입니다. 다시하기는 제외합니다. 기록 없음은 미완료 확정이 아닙니다(구버전·수집 지연·계정 연결 미확인 포함). Google 광고 전환 수신 여부와는 별개입니다. 시각은 현재 브라우저 시간대입니다.</p></section>
-      <form id="playerNoteForm" class="panel admin-form player-note-editor"><div class="panel-heading"><div><p class="eyebrow">TRACKING NOTE</p><h2>추적 메모</h2><small>저장한 태그는 분석·플레이어·구매·CS·감사 화면에서 같이 보입니다.</small></div><label class="check-label player-track-toggle"><input name="tracked" type="checkbox" ${operatorNote.tracked ? "checked" : ""}> 계속 추적</label></div><label>태그<input name="tags" maxlength="200" value="${escapeHtml(operatorNote.tags.join(", "))}" placeholder="예: 유튜브 구독자, 지인, 버그 재현"></label><label>메모<textarea name="note" maxlength="1000" placeholder="확인할 행동, 재현 상황, 연락 맥락 등을 남겨두세요.">${escapeHtml(operatorNote.note)}</textarea></label><div class="note-editor-footer"><small>쉼표로 최대 8개 · 태그당 24자</small><button class="primary-button" type="submit">메모 저장</button></div></form>
-      <div class="read-only-banner" data-enabled="${enabled}">${enabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
+    byId("playerDetail").innerHTML = `<div class="player-detail-head panel"><div><p class="eyebrow">PLAYER</p><h2>${escapeHtml(root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code }))} ${root.ConsoleModel.playerNoteMarkup(operatorNote)} ${exclusion ? '<span class="analytics-exclusion-badge">로컬/QA 제외</span>' : ""}</h2><code>${escapeHtml(userId)}</code>${exclusion ? `<p class="status-label">통계 제외 · ${escapeHtml(exclusion.reason)} · ${escapeHtml(exclusion.note || "메모 없음")}</p>` : ""}</div><div class="detail-actions"><button id="copyPlayerId" type="button">ID 복사</button><a href="#/purchases?query=${encodeURIComponent(userId)}">구매 기록</a><a href="#/audit?userId=${encodeURIComponent(userId)}">감사 기록에서 보기</a><a href="#/cs?userId=${encodeURIComponent(userId)}&query=${encodeURIComponent(player.display_code || userId)}">CS에서 보기</a></div></div>
+      <details class="panel player-facts player-fold"><summary>최초 튜토리얼 · ${escapeHtml(root.ConsoleModel.tutorialStatus(tutorial))}</summary><dl><div><dt>시작</dt><dd>${escapeHtml(time(tutorial?.started_at))}</dd></div><div><dt>완료</dt><dd>${escapeHtml(time(tutorial?.completed_at))}</dd></div><div><dt>완료 후 홈 도착</dt><dd>${escapeHtml(time(tutorial?.home_at))}</dd></div></dl><p class="detail-note">계정에 연결된 최초 튜토리얼 기록입니다. 다시하기는 제외합니다. 기록 없음은 미완료 확정이 아닙니다(구버전·수집 지연·계정 연결 미확인 포함). Google 광고 전환 수신 여부와는 별개입니다. 시각은 현재 브라우저 시간대입니다.</p></details>
+      <details class="panel player-fold"><summary>추적 메모${operatorNote.tracked ? " · 추적 중" : ""}${operatorNote.tags.length ? ` · ${escapeHtml(operatorNote.tags.join(", "))}` : ""}</summary><form id="playerNoteForm" class="admin-form player-note-editor"><div class="panel-heading"><div><p class="eyebrow">TRACKING NOTE</p><h2>추적 메모</h2><small>저장한 태그는 분석·플레이어·구매·CS·감사 화면에서 같이 보입니다.</small></div><label class="check-label player-track-toggle"><input name="tracked" type="checkbox" ${operatorNote.tracked ? "checked" : ""}> 계속 추적</label></div><label>태그<input name="tags" maxlength="200" value="${escapeHtml(operatorNote.tags.join(", "))}" placeholder="예: 유튜브 구독자, 지인, 버그 재현"></label><label>메모<textarea name="note" maxlength="1000" placeholder="확인할 행동, 재현 상황, 연락 맥락 등을 남겨두세요.">${escapeHtml(operatorNote.note)}</textarea></label><div class="note-editor-footer"><small>쉼표로 최대 8개 · 태그당 24자</small><button class="primary-button" type="submit">메모 저장</button></div></form></details>
+      <div class="read-only-banner" data-enabled="${!disabled}">${!disabled ? `수정 가능 · 현재 상태 버전 ${player.state_version}` : player.state_version == null ? "계정 동기화 대기 · 재화 상태가 아직 없어 직접 수정할 수 없습니다." : "읽기 전용 · 호환 빌드 배포 후 수정 기능을 켤 수 있습니다."}</div>
       <div class="admin-card-grid"><form id="economyForm" class="panel admin-form"><p class="eyebrow">ECONOMY</p><h2>재화 직접 조정</h2><div class="economy-grid">${economyFields(player, disabled)}</div><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled ? "disabled" : ""}>변경 내용 확인</button></form>
       <form id="playerMailForm" class="panel admin-form"><p class="eyebrow">TARGETED MAIL</p><h2>이 플레이어에게 우편</h2><label>고정 다국어 문구<select name="templateKey"><option value="general">안내 보상</option><option value="compensation">불편 보상</option><option value="maintenance">점검 보상</option><option value="welcome">환영 보상</option><option value="support">문의 지원 보상</option><option value="update">업데이트 보상</option><option value="launch">출시 기념 보상</option></select></label><div class="form-pair"><label>보상<select name="kind"><option value="gems">젬</option><option value="breakthrough_ticket">돌파 티켓</option><option value="speed_ticket">스피드 티켓</option><option value="entitlement">상점 아이템</option></select></label><label id="playerMailValueLabel">수량<input name="rewardValue" type="number" min="1" required></label></div><label>수령 기한<input name="expiresAt" type="datetime-local" required></label><label>발송 사유<input name="reason" maxlength="300" required></label><button class="primary-button" type="submit">이 플레이어에게 발송</button></form>
-      <article class="panel"><p class="eyebrow">INVENTORY</p><h2>소지 아이템</h2><form id="inventoryForm" class="form-pair"><label>상점 아이템<select name="itemId">${catalogOptions || '<option value="">판매 상품 없음</option>'}</select></label><label>변경 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled || !catalogOptions ? "disabled" : ""}>지급</button></form><ul class="inventory-list">${entitlementRows || '<li class="empty-panel">보유 아이템이 없습니다.</li>'}</ul></article>
-      <article class="panel player-facts"><p class="eyebrow">ACCOUNT</p><h2>계정 상태</h2><dl><div><dt>최고 점수</dt><dd>${number(player.best_score)}</dd></div><div><dt>최고 레벨</dt><dd>${number(player.best_level)}</dd></div><div><dt>게임 수</dt><dd>${number(player.game_count)}</dd></div><div><dt>최근 활동</dt><dd>${escapeHtml(time(player.latest_activity_at || player.latest_played_at))}</dd></div><div><dt>최근 완료</dt><dd>${escapeHtml(time(player.latest_game_at))}</dd></div><div><dt>계정 생성</dt><dd>${escapeHtml(time(player.account_created_at))}</dd></div><div><dt>계정 유형</dt><dd>${escapeHtml(player.account_type || "unknown")}</dd></div><div><dt>국가</dt><dd>${countryMarkup(player.country)}</dd></div><div><dt>대기 우편</dt><dd>${number(data.operations?.pending_mail_count)}</dd></div><div><dt>광고 제거</dt><dd>${player.ads_removed ? "예" : "아니오"}</dd></div><div><dt>QA 상점</dt><dd>${data.operations?.qa_shop_controls_enabled ? "허용" : "미허용"}</dd></div></dl></article></div>
+      <article class="panel"><p class="eyebrow">INVENTORY</p><h2>소지 아이템</h2><form id="inventoryForm" class="form-pair"><label>상점 아이템<select name="itemId">${catalogOptions || '<option value="">판매 상품 없음</option>'}</select></label><label>변경 사유<input name="reason" placeholder="지급·회수 사유" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="primary-button" type="submit" ${disabled || !catalogOptions ? "disabled" : ""}>지급</button></form><ul class="inventory-list">${entitlementRows || '<li class="empty-panel">보유 아이템이 없습니다.</li>'}</ul></article>
+      <article class="panel player-facts"><p class="eyebrow">ACCOUNT</p><h2>계정 상태</h2><dl><div><dt>최고 점수</dt><dd>${number(player.best_score)}</dd></div><div><dt>최고 레벨</dt><dd>${level(player.best_level)}</dd></div><div><dt>게임 수</dt><dd>${number(player.game_count)}</dd></div><div><dt>최근 활동</dt><dd>${escapeHtml(time(player.latest_activity_at || player.latest_played_at))}</dd></div><div><dt>최근 완료</dt><dd>${escapeHtml(time(player.latest_game_at))}</dd></div><div><dt>계정 생성</dt><dd>${escapeHtml(time(player.account_created_at))}</dd></div><div><dt>계정 유형</dt><dd>${escapeHtml(player.account_type || "unknown")}</dd></div><div><dt>국가</dt><dd>${countryMarkup(player.country)}</dd></div><div><dt>대기 우편</dt><dd>${number(data.operations?.pending_mail_count)}</dd></div><div><dt>광고 제거</dt><dd>${player.ads_removed ? "예" : "아니오"}</dd></div><div><dt>QA 상점</dt><dd>${data.operations?.qa_shop_controls_enabled ? "허용" : "미허용"}</dd></div></dl></article></div>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">SCORE RECORDS</p><h2>점수 기록 보정</h2><small>기록은 삭제하지 않으며, 최고 기록은 반영 중인 기록에서 서버가 다시 계산합니다.</small></div></div><div class="table-scroll"><table><thead><tr><th>플레이 시각</th><th>점수</th><th>레벨</th><th>랭킹</th><th>처리</th></tr></thead><tbody>${recordRows(data.records || [], disabled)}</tbody></table></div></section>
       <section class="panel danger-zone"><div class="panel-heading"><div><p class="eyebrow">DANGER ZONE</p><h2>플레이어 데이터 초기화</h2><small>재화·인벤토리·우편함·시즌패스·친구 관계를 모두 지우고 닉네임·표시코드·국가·최고기록을 초기화합니다. 게임 기록(랭킹)은 남지만 닉네임이 비어 표시됩니다. 되돌릴 수 없습니다. 다음 실행 시 자동으로 로그아웃됩니다(새 클라이언트 배포 불필요).</small></div></div>
       <form id="wipeForm"><label>초기화 사유<input name="reason" maxlength="300" required ${disabled ? "disabled" : ""}></label><button class="danger-button" type="submit" ${disabled ? "disabled" : ""}>이 플레이어 데이터 초기화</button></form></section>
       <section class="panel"><div class="panel-heading"><div><p class="eyebrow">PLAYER AUDIT</p><h2>이 플레이어의 변경 기록</h2><small>관리자 지급·조정의 처리 결과입니다. 게임 내 자동 미션 보상 시도는 포함하지 않습니다.</small></div></div><div class="audit-list">${auditHtml(data.audit || [])}</div></section>`;
     byId("copyPlayerId").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(userId);
+      try { await navigator.clipboard.writeText(userId); } catch (_error) { message("playerMessage", "복사하지 못했습니다. 위 사용자 ID를 직접 선택해 주세요.", true); return; }
       message("playerMessage", "사용자 ID를 복사했습니다.");
     });
     byId("playerNoteForm").addEventListener("submit", (event) => submitPlayerNote(event, userId));
@@ -191,6 +194,44 @@
     byId("wipeForm").addEventListener("submit", (event) => submitWipe(event, userId, player));
   }
 
+  async function submitChange(form, userId, payload, title, summary, success) {
+    if (state.mutationPending) return;
+    const finishRequest = root.ConsoleUiState.beginRequest(byId("playerDetail"));
+    if (!finishRequest) return;
+    state.mutationPending = true;
+    const viewHash = root.location.hash;
+    const detailSeq = state.detailSeq;
+    const isCurrent = () => viewHash === root.location.hash && detailSeq === state.detailSeq;
+    try {
+      if (!await root.ConsoleApp.confirmChange(title, `${userId}\n${summary}`) || !isCurrent()) return;
+      const fingerprint = JSON.stringify(payload);
+      const pending = pendingRequests.get(form);
+      const requestId = pending?.fingerprint === fingerprint ? pending.requestId : crypto.randomUUID();
+      pendingRequests.set(form, { fingerprint, requestId });
+      message("playerMessage", `${title} 처리 중...`);
+      await root.ConsoleAPI.post("admin-console", { ...payload, requestId });
+      pendingRequests.delete(form);
+      if (!isCurrent()) return;
+      if (payload.action === "players.wipe") {
+        byId("playerDetail").innerHTML = '<div class="empty-state"><strong>플레이어 데이터 초기화 완료</strong><p>목록으로 돌아가 새 계정 상태를 확인하세요.</p></div>';
+        message("playerMessage", success);
+        return;
+      }
+      const refreshed = await mountDetail(userId);
+      if (viewHash === root.location.hash && state.detailUserId === userId) {
+        message("playerMessage", refreshed ? success : `${success} 최신 상태 조회는 실패했습니다. 새로고침해 주세요.`, !refreshed);
+      }
+    } catch (error) {
+      if (Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(form);
+      if (!isCurrent()) return;
+      if (error?.message === "version_conflict") await mountDetail(userId);
+      if (viewHash === root.location.hash) message("playerMessage", errorText(error), true);
+    } finally {
+      state.mutationPending = false;
+      finishRequest();
+    }
+  }
+
   async function submitPlayerNote(event, userId) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -200,23 +241,9 @@
       message("playerMessage", "태그는 쉼표로 최대 8개, 각 24자까지 입력할 수 있습니다.", true);
       return;
     }
-    const button = form.querySelector('button[type="submit"]');
-    button.disabled = true;
-    try {
-      await root.ConsoleAPI.post("admin-console", {
-        action: "players.note.set",
-        userId,
-        tracked: form.elements.tracked.checked,
-        tags,
-        note,
-        requestId: crypto.randomUUID(),
-      });
-      await mountDetail(userId);
-      message("playerMessage", "추적 메모를 저장했습니다. 다른 화면에도 바로 표시됩니다.");
-    } catch (error) {
-      message("playerMessage", errorText(error), true);
-      button.disabled = false;
-    }
+    return submitChange(form, userId, {
+      action: "players.note.set", userId, tracked: form.elements.tracked.checked, tags, note,
+    }, "추적 메모 저장", `태그: ${tags.join(", ") || "없음"}\n${note}`, "추적 메모를 저장했습니다.");
   }
 
   async function submitWipe(event, userId, player) {
@@ -225,14 +252,7 @@
     const reason = form.elements.reason.value.trim();
     const displayName = root.ConsoleModel.playerDisplayName({ nickname: player.nickname, displayCode: player.display_code });
     if (!reason) { message("playerMessage", "초기화 사유를 입력해 주세요.", true); return; }
-    if (!await root.ConsoleApp.confirmChange("플레이어 데이터 초기화", `${displayName} (${userId})\n재화·인벤토리·우편함·시즌패스·친구 관계를 모두 지우고 프로필을 초기화합니다.\n되돌릴 수 없습니다.\n사유: ${reason}`)) return;
-    try {
-      await root.ConsoleAPI.post("admin-console", { action: "players.wipe", userId, reason, requestId: crypto.randomUUID() });
-      message("playerMessage", "플레이어 데이터를 초기화했습니다.");
-    } catch (error) {
-      message("playerMessage", errorText(error), true);
-    }
-    await mountDetail(userId);
+    return submitChange(form, userId, { action: "players.wipe", userId, reason }, "플레이어 데이터 초기화", `${displayName}\n재화·인벤토리·우편함·시즌패스·친구 관계를 모두 지우고 프로필을 초기화합니다.\n되돌릴 수 없습니다.\n사유: ${reason}`, "플레이어 데이터를 초기화했습니다.");
   }
 
   async function submitPlayerMail(event, userId) {
@@ -242,26 +262,20 @@
     const amount = Number(values.rewardValue);
     if (!form.reportValidity() || (values.kind !== "entitlement" && (!Number.isSafeInteger(amount) || amount < 1))) return;
     const expiresAt = new Date(values.expiresAt);
-    if (Number.isNaN(expiresAt.getTime())) return;
+    if (Number.isNaN(expiresAt.getTime()) || expiresAt <= new Date()) { message("playerMessage", "수령 기한은 현재 시각 이후로 설정해 주세요.", true); return; }
+    if (!values.reason.trim()) { message("playerMessage", "발송 사유를 입력해 주세요.", true); return; }
     const reward = values.kind === "entitlement" ? [{ kind: "entitlement", item_id: values.rewardValue }] : [{ kind: values.kind, amount }];
-    try {
-      await root.ConsoleAPI.post("admin-console", { action: "reward_mail.send", userId, templateKey: values.templateKey, reward, expiresAt: expiresAt.toISOString(), reason: values.reason.trim(), requestId: crypto.randomUUID() });
-      message("playerMessage", "개별 보상 우편을 발송했습니다.");
-      await mountDetail(userId);
-    } catch (error) { message("playerMessage", errorText(error), true); }
+    const rewardLabel = values.kind === "entitlement" ? form.elements.rewardValue.selectedOptions[0].textContent : `${form.elements.kind.selectedOptions[0].textContent} ${number(amount)}개`;
+    return submitChange(form, userId, { action: "reward_mail.send", userId, templateKey: values.templateKey, reward, expiresAt: expiresAt.toISOString(), reason: values.reason.trim() }, "개별 보상 우편 발송", `${rewardLabel}\n문구: ${form.elements.templateKey.selectedOptions[0].textContent}\n수령 기한: ${time(expiresAt)}\n사유: ${values.reason.trim()}`, "개별 보상 우편을 발송했습니다.");
   }
 
   async function submitInventory(event, userId, itemId = "", operation = "grant") {
-    const form = event?.currentTarget;
+    const form = event?.currentTarget || byId("inventoryForm");
     if (event) event.preventDefault();
     const selectedItem = itemId || form.elements.itemId.value;
-    const reason = itemId ? "운영자 회수" : form.elements.reason.value.trim();
-    if (!selectedItem || !reason || !await root.ConsoleApp.confirmChange(operation === "revoke" ? "아이템 회수" : "아이템 지급", `${selectedItem}\n사유: ${reason}`)) return;
-    try {
-      await root.ConsoleAPI.post("admin-console", { action: "players.inventory_mutate", userId, itemId: selectedItem, operation, reason, requestId: crypto.randomUUID() });
-      message("playerMessage", operation === "revoke" ? "아이템을 회수했습니다." : "아이템을 지급했습니다.");
-      await mountDetail(userId);
-    } catch (error) { message("playerMessage", errorText(error), true); }
+    const reason = form.elements.reason.value.trim();
+    if (!selectedItem || !reason) { message("playerMessage", "지급·회수할 아이템과 변경 사유를 확인해 주세요.", true); form.elements.reason.focus(); return; }
+    return submitChange(form, userId, { action: "players.inventory_mutate", userId, itemId: selectedItem, operation, reason }, operation === "revoke" ? "아이템 회수" : "아이템 지급", `${selectedItem}\n사유: ${reason}`, operation === "revoke" ? "아이템을 회수했습니다." : "아이템을 지급했습니다.");
   }
 
   async function submitEconomy(event, data) {
@@ -274,15 +288,8 @@
     if (!root.ConsoleModel.canSubmitMutation({ reason, changes: next, mutationsEnabled: data.operations.mutations_enabled, stateVersion: data.player.state_version })) {
       message("playerMessage", "변경할 값과 사유를 확인해 주세요.", true); return;
     }
-    const summary = Object.entries(changes).map(([key, value]) => `${key}: ${value.before} → ${value.after} (${value.after - value.before >= 0 ? "+" : ""}${value.after - value.before})`).join("\n");
-    if (!await root.ConsoleApp.confirmChange("재화 변경 확인", `${summary}\n사유: ${reason}`)) return;
-    try {
-      await root.ConsoleAPI.post("admin-console", { action: "players.mutate", userId: data.player.user_id, expectedVersion: data.player.state_version, changes: next, reason, requestId: crypto.randomUUID() });
-      message("playerMessage", "재화 변경을 저장했습니다.");
-    } catch (error) {
-      message("playerMessage", errorText(error), true);
-    }
-    await mountDetail(data.player.user_id);
+    const summary = Object.entries(changes).map(([key, value]) => `${economyLabels[key]}: ${value.before} → ${value.after} (${value.after - value.before >= 0 ? "+" : ""}${value.after - value.before})`).join("\n");
+    return submitChange(form, data.player.user_id, { action: "players.mutate", userId: data.player.user_id, expectedVersion: data.player.state_version, changes: next, reason }, "재화 변경 확인", `${summary}\n사유: ${reason}`, "재화 변경을 저장했습니다.");
   }
 
   async function submitScore(event, userId) {
@@ -291,19 +298,19 @@
     const values = Object.fromEntries(new FormData(form));
     const payload = {
       action: "scores.correct", recordId: Number(form.dataset.recordId), score: Number(values.score), level: Number(values.level),
-      excluded: form.elements.excluded.checked, reason: String(values.reason || "").trim(), requestId: crypto.randomUUID(),
+      excluded: form.elements.excluded.checked, reason: String(values.reason || "").trim(),
     };
-    if (!payload.reason || !await root.ConsoleApp.confirmChange("점수 기록 보정", `점수 ${payload.score} · 레벨 ${payload.level} · ${payload.excluded ? "랭킹 제외" : "랭킹 반영"}\n최고 기록은 서버에서 다시 계산\n사유: ${payload.reason}`)) return;
-    try {
-      await root.ConsoleAPI.post("admin-console", payload);
-      message("playerMessage", "점수 기록을 보정했습니다.");
-    } catch (error) {
-      message("playerMessage", errorText(error), true);
-    }
-    await mountDetail(userId);
+    if (!form.reportValidity() || !payload.reason) return;
+    return submitChange(form, userId, payload, "점수 기록 보정", `점수 ${payload.score} · 레벨 ${payload.level} · ${payload.excluded ? "랭킹 제외" : "랭킹 반영"}\n최고 기록은 서버에서 다시 계산\n사유: ${payload.reason}`, "점수 기록을 보정했습니다.");
   }
 
   async function mountDetail(userId) {
+    const requestSeq = ++state.detailSeq;
+    const viewHash = root.location.hash;
+    state.detailUserId = userId;
+    const panel = byId("playerDetail");
+    panel.inert = true;
+    panel.setAttribute("aria-busy", "true");
     const params = new URLSearchParams(root.location.hash.split("?")[1] || "");
     byId("playerBackLink").href = root.ConsoleModel.safeConsoleReturnHash(params.get("return"));
     message("playerMessage", "플레이어 상세를 불러오는 중...");
@@ -312,13 +319,19 @@
         root.ConsoleAPI.post("admin-console", { action: "players.get", userId }),
         root.ConsoleAPI.post("admin-console", { action: "analytics_exclusions.list" }).catch(() => []),
       ]);
+      if (requestSeq !== state.detailSeq || viewHash !== root.location.hash) return false;
       const exclusionRows = Array.isArray(exclusions) ? exclusions : Array.isArray(exclusions?.rows) ? exclusions.rows : [];
       data.analytics_exclusion = exclusionRows.find((row) => row.user_id === userId) || null;
       renderDetail(data, userId);
       message("playerMessage", "복구 코드와 인증 정보는 콘솔에 표시하지 않습니다.");
+      return true;
     } catch (error) {
+      if (requestSeq !== state.detailSeq || viewHash !== root.location.hash) return false;
       byId("playerDetail").innerHTML = '<div class="empty-state"><strong>플레이어를 찾을 수 없습니다.</strong></div>';
       message("playerMessage", errorText(error), true);
+      return false;
+    } finally {
+      if (requestSeq === state.detailSeq) { panel.inert = false; panel.setAttribute("aria-busy", "false"); }
     }
   }
 

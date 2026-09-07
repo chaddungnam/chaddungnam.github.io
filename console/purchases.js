@@ -1,7 +1,7 @@
 (function attachConsolePurchases(root) {
   const byId = (id) => document.getElementById(id);
   const model = root.ConsolePurchasesModel;
-  const state = { page: 1, pageCount: 1, loading: false };
+  const state = { page: 1, pageCount: 1, requestSeq: 0, routeQuery: null };
 
   function text(value) { return value == null || value === "" ? "—" : String(value); }
   function shortUser(value) { const id = text(value); return id === "—" || id.length <= 14 ? id : `${id.slice(0, 8)}…${id.slice(-4)}`; }
@@ -15,9 +15,13 @@
   function playerCell(row, item) {
     const td = row.insertCell();
     td.className = "purchase-player-cell";
-    td.innerHTML = item.user_id
-      ? `${root.ConsoleModel.playerIdentityMarkup(item, root.location.hash)}<small title="${text(item.user_id)}">${shortUser(item.user_id)}</small>`
-      : '<span class="player-identity-unlinked">계정 미연결</span>';
+    td.innerHTML = item.user_id ? root.ConsoleModel.playerIdentityMarkup(item, root.location.hash) : '<span class="player-identity-unlinked">계정 미연결</span>';
+    if (item.user_id) {
+      const id = document.createElement("small");
+      id.title = text(item.user_id);
+      id.textContent = shortUser(item.user_id);
+      td.append(id);
+    }
     return td;
   }
   function filters() {
@@ -56,15 +60,17 @@
     note.querySelector(".status-label").textContent = data.connected ? "자동 동기화 연결됨" : "자동 동기화 미연동";
   }
   async function load() {
-    if (state.loading) return;
-    state.loading = true;
+    const requestSeq = ++state.requestSeq;
     const panel = byId("purchasesTable").closest(".panel");
     panel?.setAttribute("aria-busy", "true");
     byId("purchasesMessage").textContent = "구매 기록을 업데이트하는 중입니다. 기존 결과는 그대로 유지합니다.";
     try {
-      render(model.normalize(await root.ConsoleAPI.post("admin-console", filters())));
+      const data = await root.ConsoleAPI.post("admin-console", filters());
+      if (requestSeq !== state.requestSeq) return;
+      render(model.normalize(data));
       byId("purchasesMessage").textContent = "";
     } catch (_error) {
+      if (requestSeq !== state.requestSeq) return;
       byId("purchasesMessage").textContent = "구매 기록을 불러오지 못했습니다. 기존 결과를 유지했습니다. 새로고침으로 다시 시도해 주세요.";
       if (!byId("purchasesTable").children.length) {
         const tr = byId("purchasesTable").insertRow();
@@ -74,11 +80,14 @@
         td.textContent = "구매 기록을 불러오지 못했습니다.";
       }
     } finally {
-      state.loading = false;
-      panel?.setAttribute("aria-busy", "false");
+      if (requestSeq === state.requestSeq) panel?.setAttribute("aria-busy", "false");
     }
   }
-  function mount() { load(); }
+  function mount() {
+    const query = new URLSearchParams(root.location.hash.split("?")[1] || "").get("query");
+    if (query !== state.routeQuery) { byId("purchaseQuery").value = (query || "").slice(0, 100); state.page = 1; state.routeQuery = query; }
+    load();
+  }
   byId("purchaseFilterForm").addEventListener("submit", (event) => { event.preventDefault(); state.page = 1; load(); });
   byId("purchasesPrevious").addEventListener("click", () => { if (state.page > 1) { state.page -= 1; load(); } });
   byId("purchasesNext").addEventListener("click", () => { if (state.page < state.pageCount) { state.page += 1; load(); } });

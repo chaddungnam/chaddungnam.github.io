@@ -4,7 +4,7 @@
   const COLUMN_IDS = { new: "New", needs_reply: "NeedsReply", waiting_customer: "WaitingCustomer", done: "Done" };
   const state = {
     labels: null, summaries: [], nextPageToken: "", pageTokens: [""], page: 0,
-    selected: null, selectedButton: null, bound: false, loading: false,
+    selected: null, selectedButton: null, bound: false, listSeq: 0, threadSeq: 0, sending: false,
     view: "kanban", calendarRange: "week", calendarDate: new Date(), dateFilter: "",
     summaryCache: new Map(),
   };
@@ -15,7 +15,7 @@
   const shortDate = (value) => new Date(value).toLocaleDateString("ko-KR", { month: "short", day: "numeric", weekday: "short" });
 
   function setMessage(value, error = false) {
-    byId("csMessage").textContent = value;
+    root.ConsoleUiState.setMessage(byId("csMessage"), value, error);
     byId("csMessage").style.color = error ? "var(--coral)" : "";
   }
 
@@ -147,7 +147,7 @@
   function shiftCalendar(direction) {
     const date = new Date(state.calendarDate);
     if (state.calendarRange === "week") date.setDate(date.getDate() + direction * 7);
-    if (state.calendarRange === "month") date.setMonth(date.getMonth() + direction);
+    if (state.calendarRange === "month") { date.setDate(1); date.setMonth(date.getMonth() + direction); }
     if (state.calendarRange === "year") date.setFullYear(date.getFullYear() + direction);
     state.calendarDate = date;
     renderCalendar();
@@ -161,9 +161,8 @@
   }
 
   async function loadList(reset = false) {
-    if (state.loading) return;
+    const requestSeq = ++state.listSeq;
     if (reset) { state.page = 0; state.pageTokens = [""]; state.dateFilter = ""; }
-    state.loading = true;
     setMessage("support@houseduck.in 문의를 불러오는 중...");
     try {
       const status = byId("csStatusFilter").value;
@@ -175,17 +174,18 @@
         newerThanDays: Number(byId("csDateFilter").value),
       });
       const summaries = await Promise.allSettled((page.threads || []).map((thread) => root.GmailAPI.getThreadSummary(thread.id)));
+      if (requestSeq !== state.listSeq) return;
       const classified = summaries.filter((result) => result.status === "fulfilled").map((result) => threadData(result.value));
       await Promise.allSettled(classified.filter((row) => !row.labelIds.includes(state.labels.status[row.status])).map((row) => root.GmailAPI.setThreadStatus(row.id, row.status, row.category, row.labelIds)));
+      if (requestSeq !== state.listSeq) return;
       state.summaries = status ? classified.filter((row) => row.status === status) : classified;
       state.nextPageToken = page.nextPageToken || "";
       renderAll(page.resultSizeEstimate || state.summaries.length);
       setMessage("문의판은 페이지당 최대 20건만 불러오고 각 칸 안에서 스크롤됩니다.");
     } catch (error) {
+      if (requestSeq !== state.listSeq) return;
       if (error?.message === "gmail_reconnect_required") setConnected(false);
       setMessage(`문의를 불러오지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
-    } finally {
-      state.loading = false;
     }
   }
 
@@ -229,6 +229,7 @@
   }
 
   async function summarizeThread(detail, latestExternal) {
+    const requestSeq = state.threadSeq;
     const text = root.GmailModel.extractMessageText(latestExternal.payload);
     const local = root.CsIntelligence.localSummary({ subject: detail.subject, text });
     renderThreadSummary(local);
@@ -241,6 +242,7 @@
     if (redacted.length < 8) { state.summaryCache.set(cacheKey, local); return; }
     try {
       const result = await root.ConsoleAPI.post("cs-summarize", { text: redacted });
+      if (requestSeq !== state.threadSeq) return;
       const summary = {
         summary: String(result.summary || "").trim().slice(0, 180),
         category: CATEGORY_LABELS[result.category] ? result.category : local.category,
@@ -251,6 +253,7 @@
       state.summaryCache.set(cacheKey, summary);
       if (state.selected?.id === detail.id) renderThreadSummary(summary);
     } catch (_error) {
+      if (requestSeq !== state.threadSeq) return;
       state.summaryCache.set(cacheKey, local);
     }
   }
@@ -261,24 +264,39 @@
     if (!displayCode) { byId("csPlayerMatches").replaceChildren(); return; }
     try {
       const result = await root.ConsoleAPI.post("admin-console", { action: "players.list", rangeDays: 0, query: displayCode, sort: "latest_played_at", direction: "desc", page: 1 });
+      if (state.selected?.id !== detail.id) return;
       byId("csPlayerMatches").innerHTML = `<div class="cs-player-match"><strong>연결 가능한 플레이어 · ${escapeHtml(displayCode)}</strong>${(result.rows || []).map((row) => root.ConsoleModel.playerIdentityMarkup(row, "#/cs")).join("") || "<small>일치 계정 없음</small>"}</div>`;
     } catch (_error) {
+      if (state.selected?.id !== detail.id) return;
       byId("csPlayerMatches").innerHTML = '<p class="empty-panel">플레이어 검색을 완료하지 못했습니다.</p>';
     }
   }
 
   async function openThread(threadId, sourceButton = null) {
+    if (state.sending) { setMessage("답변 발송이 끝난 뒤 다른 문의를 열어 주세요."); return; }
+    const form = byId("csReplyForm");
+    if (state.selected?.id !== threadId && (form.elements.body.value.trim() || form.elements.attachments.files.length)) {
+      if (!await root.ConsoleApp.confirmChange("다른 문의 열기", "작성 중인 답변과 첨부를 비우고 다른 문의를 열까요?")) return;
+      form.elements.body.value = "";
+      form.elements.attachments.value = "";
+    }
+    const requestSeq = ++state.threadSeq;
+    state.selected = null;
+    byId("csThreadPanel").inert = true;
     setMessage("문의 내용을 불러오는 중...");
     try {
       const detail = threadData(await root.GmailAPI.getThread(threadId));
+      if (requestSeq !== state.threadSeq) return;
+      if (!detail.labelIds.includes(state.labels.status[detail.status])) await root.GmailAPI.setThreadStatus(threadId, detail.status, detail.category);
+      if (requestSeq !== state.threadSeq) return;
       state.selected = detail;
       state.selectedButton = sourceButton || state.selectedButton;
-      if (!detail.labelIds.includes(state.labels.status[detail.status])) await root.GmailAPI.setThreadStatus(threadId, detail.status, detail.category);
       byId("csThreadHeader").innerHTML = `<p class="eyebrow">${escapeHtml(statusLabel(detail.status))}</p><h2>${escapeHtml(detail.subject)}</h2><small>${escapeHtml(detail.sender)} · ${escapeHtml(time(detail.latestAt))}</small>`;
       renderLabelControls(detail);
       renderMessages(detail);
       renderKanban();
       await findPlayer(detail);
+      if (requestSeq !== state.threadSeq) return;
       const latestExternal = [...detail.messages].reverse().find((message) => root.GmailModel.mailboxAddress(header(message, "From")) !== "support@houseduck.in") || detail.latest;
       summarizeThread(detail, latestExternal);
       byId("csReplyForm").elements.to.value = header(latestExternal, "Reply-To") || header(latestExternal, "From");
@@ -287,18 +305,28 @@
       if (root.matchMedia("(max-width: 760px)").matches) byId("csThreadPanel").scrollIntoView({ behavior: "smooth", block: "start" });
       setMessage("본문은 텍스트로만 표시하고, 요약에는 개인정보를 제거한 최신 문의만 사용합니다.");
     } catch (error) {
+      if (requestSeq !== state.threadSeq) return;
       setMessage(`문의를 열지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+    } finally {
+      if (requestSeq === state.threadSeq) byId("csThreadPanel").inert = false;
     }
   }
 
   async function updateLabels(status, category) {
     if (!state.selected) return;
+    const selected = state.selected;
+    const finishRequest = root.ConsoleUiState.beginRequest(byId("csLabels"));
+    if (!finishRequest) return;
     try {
-      await root.GmailAPI.setThreadStatus(state.selected.id, status, category);
-      await openThread(state.selected.id);
+      await root.GmailAPI.setThreadStatus(selected.id, status, category);
+      if (state.selected !== selected) return;
+      await openThread(selected.id);
       await loadList();
     } catch (error) {
+      if (state.selected !== selected) return;
       setMessage(`상태를 바꾸지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
+    } finally {
+      finishRequest();
     }
   }
 
@@ -320,22 +348,25 @@
 
   async function sendReply(event) {
     event.preventDefault();
-    if (!state.selected) return;
+    if (!state.selected || state.sending) return;
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
-    const files = [...form.elements.attachments.files];
-    if (files.some((file) => file.size > 10 * 1024 * 1024) || files.reduce((total, file) => total + file.size, 0) > 20 * 1024 * 1024) {
-      setMessage("첨부는 파일당 10MB, 전체 20MB까지 가능합니다.", true);
-      return;
-    }
-    const attachments = await Promise.all(files.map(async (file) => ({ filename: file.name, mimeType: file.type || "application/octet-stream", bytes: new Uint8Array(await file.arrayBuffer()) })));
-    const reply = { threadId: state.selected.id, from: form.elements.from.value, to: form.elements.to.value, subject: form.elements.subject.value, body: form.elements.body.value, attachments, category: state.selected.category };
-    const review = `보내는 주소: ${reply.from}\n받는 사람: ${reply.to}\n제목: ${reply.subject}\n첨부: ${files.map((file) => file.name).join(", ") || "없음"}\n\n${reply.body}`;
-    if (!await root.ConsoleApp.confirmChange("답변 발송 최종 확인", review)) return;
-    const button = form.querySelector('button[type="submit"]');
-    button.disabled = true;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
+    state.sending = true;
+    const selected = state.selected;
     try {
+      const files = [...form.elements.attachments.files];
+      if (files.some((file) => file.size > 10 * 1024 * 1024) || files.reduce((total, file) => total + file.size, 0) > 20 * 1024 * 1024) {
+        setMessage("첨부는 파일당 10MB, 전체 20MB까지 가능합니다.", true);
+        return;
+      }
+      const attachments = await Promise.all(files.map(async (file) => ({ filename: file.name, mimeType: file.type || "application/octet-stream", bytes: new Uint8Array(await file.arrayBuffer()) })));
+      const reply = { threadId: selected.id, from: form.elements.from.value, to: form.elements.to.value, subject: form.elements.subject.value, body: form.elements.body.value, attachments, category: selected.category };
+      const review = `보내는 주소: ${reply.from}\n받는 사람: ${reply.to}\n제목: ${reply.subject}\n첨부: ${files.map((file) => file.name).join(", ") || "없음"}\n\n${reply.body}`;
+      if (!await root.ConsoleApp.confirmChange("답변 발송 최종 확인", review) || state.selected !== selected) return;
       const outcome = await root.GmailAPI.sendReply(reply);
+      if (state.selected !== selected) return;
       form.elements.body.value = "";
       form.elements.attachments.value = "";
       state.selected.status = "waiting_customer";
@@ -343,9 +374,11 @@
       renderLabelControls(state.selected);
       setMessage(outcome.statusUpdated ? "답변을 발송하고 상태를 사용자 회신 대기로 바꿨습니다." : "답변은 발송됐습니다. 상태 라벨 변경은 실패했으므로 다시 보내지 말고 문의를 다시 열어 주세요.", !outcome.statusUpdated);
     } catch (error) {
+      if (state.selected !== selected) return;
       setMessage(error?.message === "gmail_send_rejected" ? "Gmail이 발송을 거부했습니다. 발신 별칭과 받는 주소를 확인해 주세요. 작성 내용은 유지했습니다." : `답변을 발송하지 못했습니다: ${error?.message || "알 수 없는 오류"}`, true);
     } finally {
-      button.disabled = false;
+      state.sending = false;
+      finishRequest();
     }
   }
 
@@ -365,6 +398,24 @@
   function closeThread() {
     byId("csKanban").scrollIntoView({ behavior: "smooth", block: "start" });
     state.selectedButton?.focus({ preventScroll: true });
+  }
+
+  function reset() {
+    state.listSeq += 1;
+    state.threadSeq += 1;
+    state.selected = null;
+    state.selectedButton = null;
+    state.labels = null;
+    state.summaries = [];
+    state.summaryCache.clear();
+    state.nextPageToken = "";
+    state.pageTokens = [""];
+    state.page = 0;
+    byId("csReplyForm").reset();
+    for (const id of ["csMessages", "csThreadHeader", "csThreadSummary", "csPlayerMatches", "csLabels"]) byId(id).replaceChildren();
+    byId("csThreadPanel").inert = false;
+    setConnected(false);
+    renderAll();
   }
 
   function bind() {
@@ -388,12 +439,12 @@
   function mount() {
     bind();
     const params = new URLSearchParams(root.location.hash.split("?")[1] || "");
-    if (params.get("userId") && !byId("csSearch").value) byId("csSearch").value = params.get("userId");
+    if (params.has("query") || params.has("userId")) byId("csSearch").value = (params.get("query") || params.get("userId") || "").slice(0, 200);
     setConnected(root.GmailAPI.isAuthorized());
     showView(state.view);
     if (root.GmailAPI.isAuthorized()) connect();
     else setMessage("CS를 열 때만 Gmail 권한을 요청합니다.");
   }
 
-  root.ConsoleCs = { mount };
+  root.ConsoleCs = { mount, reset };
 })(window);

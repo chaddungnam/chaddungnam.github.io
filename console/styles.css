@@ -284,6 +284,15 @@ textarea:focus-visible {
 .player-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 12px 0; }
 .player-detail-head h2 { margin-bottom: 6px; font-size: 25px; }
 .player-detail-head code { color: var(--ink-soft); font-size: 10px; word-break: break-all; }
+.player-fold { margin-block: 12px; }
+.player-fold > summary { cursor: pointer; font-weight: 800; padding-block: 4px; min-height: 32px; overflow-wrap: anywhere; }
+.player-fold[open] > summary { margin-bottom: 16px; }
+.player-fold .player-note-editor { border: 0; padding: 0; }
+.player-fold .detail-note { color: var(--ink-soft); font-size: 12px; line-height: 1.7; }
+#playerMessage { position: sticky; top: 10px; z-index: 6; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: 0 3px 12px #1620300a; }
+#playerMessage:empty { display: none; }
+#playerMessage[role="alert"] { border-color: var(--coral); }
+#playersView .table-scroll, #purchasesView .table-scroll { max-height: 65vh; overflow: auto; }
 .detail-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .detail-actions button,
 .detail-actions a,
@@ -1070,6 +1079,57 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .announcement-preview-empty { color: var(--ink-soft); font-size: 11px; }
 #announcementForm[data-editor-processing="true"] { cursor: progress; }
 #announcementForm[data-editor-processing="true"] .announcement-editor { opacity: .78; }
+
+/* 운영에 필요한 정보와 동선은 먼저, 긴 입력 화면은 필요할 때 연다. */
+.console-entry:not(:has(> :not([hidden]))) { display: none; }
+.workspace-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; }
+.workspace-jumps > span { margin-right: 4px; color: var(--ink-soft); font-size: 12px; }
+.workspace-jumps button, .workspace-jumps a { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font: inherit; font-size: 13px; font-weight: 750; text-decoration: none; cursor: pointer; }
+.workspace-jumps button:hover, .workspace-jumps a:hover { background: var(--teal-soft); border-color: var(--teal); }
+.workspace-jumps button:active, .workspace-jumps a:active { transform: translateY(1px); }
+[id$="Section"], #playDetails, #operatorDetails { scroll-margin-top: 180px; }
+.operation-task, #announcementForm { scroll-margin-top: 112px; }
+.operation-task { margin-bottom: 12px; padding: 14px 18px; }
+.operation-task > summary { min-height: 44px; align-content: center; color: var(--ink); font-size: 15px; font-weight: 800; cursor: pointer; }
+.operation-task > summary small { margin-left: 12px; color: var(--ink-soft); font-size: 12px; font-weight: 500; }
+.operation-task[open] > summary { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.operation-task > form { padding: 0; border: 0; }
+.operation-task > form > .eyebrow, .operation-task > form > h2 { display: none; }
+#operationsView > .admin-card-grid { align-items: start; }
+#noticeTask, #rewardTask { grid-column: 1 / -1; }
+#noticeTask { order: -2; }
+#rewardTask { order: -1; }
+#operationsHistory { max-height: 560px; overflow: auto; padding-right: 5px; }
+.operation-message { margin: 0 0 12px; }
+.operation-message[data-state="error"] { padding: 12px; color: #a93f34; background: var(--coral-soft); border-radius: 10px; }
+.operations-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.operations-summary span, .purchase-summary span { font-size: 12px; }
+.executive-card > span, .executive-card > small, .executive-donut figcaption span { font-size: 12px; }
+.executive-overview { padding: 20px; box-shadow: none; }
+.executive-overview::after { display: none; }
+.executive-heading { margin-bottom: 12px; }
+.executive-card { min-height: 118px; padding: 14px; box-shadow: none; }
+.executive-donut { grid-template-columns: 76px minmax(0, 1fr); padding: 10px 12px; }
+.executive-donut svg { width: 74px; height: 74px; }
+.console-main .table-scroll td { font-variant-numeric: tabular-nums; }
+.pagination span, .pagination button { font-size: 12px; }
+.pagination button { min-height: 44px; }
+.admin-form label, .admin-toolbar label, .table-toolbar label { font-size: 12px; }
+.admin-form input, .admin-form select { font-size: 14px; }
+.purchase-player-cell > small, .period-players-panel td small { font-size: 11px; }
+@media (min-width: 761px) {
+  .console-topbar h1 { font-size: 32px; }
+}
+@media (max-width: 760px) {
+  .workspace-jumps { gap: 6px; }
+  .workspace-jumps > span { width: 100%; }
+  .workspace-jumps button, .workspace-jumps a { padding: 9px 10px; }
+  .operations-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .operation-task > summary small { display: block; margin: 5px 0 0 18px; }
+  .executive-card { min-height: 118px; }
+  .admin-form input, .admin-form select { font-size: 16px; }
+  [id$="Section"], #playDetails, #operatorDetails { scroll-margin-top: 240px; }
+}
 
 @media (max-width: 760px) {
   .announcement-editor-heading { align-items: stretch; flex-direction: column; }

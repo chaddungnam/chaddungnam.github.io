@@ -119,4 +119,5 @@ rg -F -q 'format === "interstitial"' "$repo_dir/analytics/pulse-model.js"
 rg -F -q 'first_open", "첫 실행"' "$repo_dir/analytics/pulse-model.js"
 
 node "$repo_dir/scripts/test_console_audit_navigation.js"
+node "$repo_dir/scripts/test_console_request_safety.js"
 echo "House Duck console contract: PASS"

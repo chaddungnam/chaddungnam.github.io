@@ -158,6 +158,9 @@
     form.elements.endsAt.value = toLocalInput(notice.ends_at);
     form.elements.reason.value = "";
     syncAnnouncementSubmit(form);
+    const task = form.closest("details");
+    if (task) task.open = true;
+    form.scrollIntoView({ block: "start" });
     if (!announcementEditor.isRich()) form.elements.body.focus();
   }
 

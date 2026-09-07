@@ -12,11 +12,13 @@
       method: "POST",
       headers: root.ConsoleAuth.headers(),
       body: JSON.stringify(body || {}),
+      signal: AbortSignal.timeout(String(body?.action || "").startsWith("announcements.") ? 120_000 : 45_000),
     });
-    const payload = await response.json().catch(() => ({}));
+    const payload = await response.json().catch(() => null);
     if (response.status === 401) root.ConsoleAuth.logout();
-    if (response.status === 403 && payload.error === "admin_session_required") root.ConsoleAuth.requireChallenge();
-    if (!response.ok) throw Object.assign(new Error(payload.error || "console_request_failed"), { status: response.status });
+    if (response.status === 403 && payload?.error === "admin_session_required") root.ConsoleAuth.requireChallenge();
+    if (!response.ok) throw Object.assign(new Error(payload?.error || "console_request_failed"), { status: response.status });
+    if (!payload || typeof payload !== "object") throw new Error("console_invalid_response");
     return payload;
   }
 

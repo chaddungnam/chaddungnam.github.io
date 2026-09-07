@@ -105,13 +105,18 @@
     const token = oauthToken;
     clearToken();
     failedDraft = null;
+    pendingAuthorization?.reject(new Error("gmail_reconnect_required"));
+    pendingAuthorization = null;
+    root.ConsoleCs?.reset?.();
     if (token && root.google?.accounts?.oauth2?.revoke) root.google.accounts.oauth2.revoke(token, () => {});
   }
 
   async function request(segments, options) {
     if (!isAuthorized()) throw new Error("gmail_reconnect_required");
+    const requestedToken = oauthToken;
     const shape = buildGmailRequest(oauthToken, segments, options);
     const response = await fetch(shape.url, shape.options);
+    if (requestedToken !== oauthToken || !isAuthorized()) throw new Error("gmail_reconnect_required");
     if (response.status === 401) {
       clearToken();
       throw new Error("gmail_reconnect_required");
