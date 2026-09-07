@@ -875,10 +875,6 @@ button {
   transform: translateX(5px);
 }
 
-body[data-page="studio"] .post-preview-copy p {
-  font-size: 0.9rem;
-}
-
 /* Quirky Ball product page */
 .game-hero {
   padding-block: clamp(48px, 6vw, 72px);

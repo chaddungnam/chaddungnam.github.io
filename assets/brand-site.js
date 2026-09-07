@@ -1,46 +1,6 @@
 (function () {
   "use strict";
 
-  function escapeMarkup(value) {
-    return String(value || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  function safeHttpsUrl(value) {
-    try {
-      var parsed = new URL(String(value || ""));
-      return parsed.protocol === "https:" ? parsed.href : "";
-    } catch (_error) {
-      return "";
-    }
-  }
-
-  function buildPostCards(posts, locale) {
-    var localeKey = locale === "ko" ? "kr" : locale;
-    var dateLocales = { ko: "ko-KR", en: "en-US", de: "de-DE", ja: "ja-JP" };
-    return (Array.isArray(posts) ? posts : []).slice(0, 6).map(function (post, index) {
-      var localized = post.localized && (post.localized[localeKey] || post.localized.kr) || post;
-      var link = safeHttpsUrl(locale === "ko" ? post.original_url : (localized.url || post.url));
-      if (!link) return "";
-      var image = safeHttpsUrl(post.image);
-      var published = new Date(post.published_at);
-      var date = Number.isNaN(published.valueOf())
-        ? "HOUSE DUCK BLOG"
-        : new Intl.DateTimeFormat(dateLocales[locale] || "en-US", { dateStyle: "medium" }).format(published);
-      return '<article class="post-preview-card' + (index >= 3 ? ' post-preview-card-wide' : '') + '"><a class="post-preview-link" href="' + escapeMarkup(link) + '">' +
-        (image ? '<span class="post-preview-media"><img class="post-preview-image" src="' + escapeMarkup(image) + '" alt="" loading="lazy"></span>' : "") +
-        '<div class="post-preview-copy"><small>' + escapeMarkup(date) + '</small><h3 data-preview-type>' + escapeMarkup(localized.title) +
-        '</h3><p data-preview-type>' + escapeMarkup(localized.summary) + '</p></div></a></article>';
-    }).join("");
-  }
-
-  if (typeof module === "object" && module.exports) {
-    module.exports = { buildPostCards: buildPostCards };
-  }
   if (typeof document === "undefined") return;
 
   var root = document.documentElement;
@@ -119,30 +79,6 @@
       node.textContent = String(new Date().getFullYear());
     });
 
-    var postFeed = document.querySelector("[data-post-feed]");
-    var latestGrid = postFeed && postFeed.querySelector('[data-post-panel="latest"] .post-preview-grid');
-    if (latestGrid) {
-      postFeed.setAttribute("aria-busy", "true");
-      fetch("/assets/blog-feed.json", { cache: "no-cache" })
-        .then(function (response) {
-          if (!response.ok) throw new Error("Blog feed unavailable");
-          return response.json();
-        })
-        .then(function (feed) {
-          var cards = buildPostCards(feed.posts, locale);
-          if (cards) {
-            latestGrid.innerHTML = cards;
-            typePreviewText(latestGrid);
-          }
-        })
-        .catch(function () {
-          // The authored fallback remains visible while the next sync runs.
-        })
-        .finally(function () {
-          postFeed.removeAttribute("aria-busy");
-        });
-    }
-
     var nav = document.querySelector("[data-site-nav]");
     var menuButton = document.querySelector("[data-menu-button]");
 
@@ -192,47 +128,6 @@
 
     var reducedMotion = typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    function typePreviewText(scope) {
-      var nodes = Array.from((scope || document).querySelectorAll("[data-preview-type]:not([data-preview-ready])"));
-      function start(node) {
-        node.dataset.previewReady = "true";
-        var source = node.textContent;
-        if (!source || reducedMotion) {
-          node.dataset.typed = "true";
-          return;
-        }
-        node.setAttribute("aria-label", source);
-        node.textContent = "";
-        var index = 0;
-        function next() {
-          if (index >= source.length) {
-            node.dataset.typed = "true";
-            node.removeAttribute("aria-label");
-            return;
-          }
-          var character = source.charAt(index);
-          node.textContent += character;
-          index += 1;
-          window.setTimeout(next, /[,.!?。]/.test(character) ? 24 : 8);
-        }
-        next();
-      }
-      if (!("IntersectionObserver" in window)) {
-        nodes.forEach(start);
-        return;
-      }
-      var observer = new window.IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          observer.unobserve(entry.target);
-          start(entry.target);
-        });
-      }, { rootMargin: "0px 0px 8%", threshold: .05 });
-      nodes.forEach(function (node) { observer.observe(node); });
-    }
-
-    typePreviewText(document);
 
     document.querySelectorAll("[data-typewriter]").forEach(function (heading) {
       var lines = Array.from(heading.querySelectorAll("[data-type-line]"));

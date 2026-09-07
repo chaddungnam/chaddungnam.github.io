@@ -52,13 +52,6 @@ content_pages=(
   "project-k/index_ja.html"
 )
 
-redirect_pages=(
-  "story/index.html"
-  "story/index_en.html"
-  "story/index_de.html"
-  "story/index_ja.html"
-)
-
 for page in "${content_pages[@]}"; do
   test -s "$repo_dir/$page" || fail "$page does not exist"
   require_token "$page" "assets/brand-site.css"
@@ -77,32 +70,6 @@ for page in "${content_pages[@]}"; do
   reject_token "$page" "iconify"
   reject_token "$page" "tailwind"
 done
-
-for page in "${redirect_pages[@]}"; do
-  test -s "$repo_dir/$page" || fail "$page does not exist"
-  require_token "$page" 'data-page="blog-redirect"'
-done
-
-for page in index.html about/index.html quirky-ball/index.html project-k/index.html; do
-  require_token "$page" "https://blog.houseduck.in/"
-done
-require_token "index_en.html" 'blog/en/'
-require_token "about/index_en.html" 'blog/en/'
-require_token "quirky-ball/index_en.html" 'blog/en/'
-require_token "project-k/index_en.html" 'blog/en/'
-require_token "index_de.html" 'blog/de/'
-require_token "about/index_de.html" 'blog/de/'
-require_token "quirky-ball/index_de.html" 'blog/de/'
-require_token "project-k/index_de.html" 'blog/de/'
-require_token "index_ja.html" 'blog/ja/'
-require_token "about/index_ja.html" 'blog/ja/'
-require_token "quirky-ball/index_ja.html" 'blog/ja/'
-require_token "project-k/index_ja.html" 'blog/ja/'
-
-require_token "story/index.html" 'url=https://blog.houseduck.in/'
-require_token "story/index_en.html" 'url=https://houseduck.in/blog/en/'
-require_token "story/index_de.html" 'url=https://houseduck.in/blog/de/'
-require_token "story/index_ja.html" 'url=https://houseduck.in/blog/ja/'
 
 for page in about/index.html about/index_en.html about/index_de.html about/index_ja.html; do
   require_token "$page" 'data-page="about"'
@@ -133,7 +100,6 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
   require_token "$page" "assets/media/project-k-highlight.mp4"
   require_token "$page" "https://www.youtube.com/@houseduck_in"
-  require_token "$page" "https://blog.houseduck.in/"
   reject_token "$page" 'history-section'
   reject_token "$page" 'journal-section'
   reject_token "$page" '작게 만들더라도 오래 기억되는 게임'
@@ -163,8 +129,6 @@ require_token "assets/studio-home.css" "overflow: visible"
 require_token "assets/studio-home.js" "shotsPerSecond: 8"
 test -s "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2" || fail "Chilgok subset font is missing"
 test "$(wc -c < "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2")" -lt 300000 || fail "Chilgok subset font is too large"
-require_token "llms.txt" "https://houseduck.in/assets/blog-feed.json"
-require_token "llms.txt" "https://blog.houseduck.in/"
 require_token "llms.txt" "https://houseduck.in/assets/youtube-feed.json"
 require_token "llms.txt" "https://www.youtube.com/@houseduck_in"
 

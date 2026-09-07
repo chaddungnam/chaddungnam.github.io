@@ -32,7 +32,6 @@ jobs:
       - name: Test public site
         run: |
           bash scripts/check_brand_site.sh
-          node scripts/test_brand_feed.js
           node scripts/test_compact_visual_system.js
           node scripts/test_site_refinement.js
           node scripts/test_community_stats.js
@@ -40,24 +39,13 @@ jobs:
           node scripts/test_public_ui_regressions.js
           node scripts/test_site_links.js
           node scripts/test_deployment_workflows.js
-          node scripts/test_indexnow_payload.mjs
-      - name: Test blog pipeline
-        run: |
-          node scripts/test_blog_mirror.js
-          node scripts/test_blog_sync.mjs
-          npm run test:blog-security
-          python scripts/test_translate_blog.py
-          python scripts/test_blog_translation_regressions.py
+          node scripts/test_blog_retirement.js
       - name: Test legal site
         run: |
           bash scripts/check_legal_site.sh
           bash scripts/check_policy_content.sh
           node scripts/test_legal_site.js
           node scripts/test_legal_status_regressions.js
-      - name: Test Tistory skin
-        run: |
-          node scripts/test_tistory_skin.js
-          node scripts/test_tistory_skin_regressions.js
       - name: Test House Duck console
         run: |
           bash scripts/check_house_duck_console.sh

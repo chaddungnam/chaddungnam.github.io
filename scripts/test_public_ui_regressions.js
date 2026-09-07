@@ -101,7 +101,6 @@ function runBrandSite({ locale = "en", menuButton, nav } = {}) {
     documentElement: root,
     querySelector(selector) {
       if (selector === 'meta[name="theme-color"]') return metaTheme;
-      if (selector === "[data-post-feed]") return null;
       if (selector === "[data-site-nav]") return nav || null;
       if (selector === "[data-menu-button]") return menuButton || null;
       return null;
@@ -140,18 +139,16 @@ function runBrandSite({ locale = "en", menuButton, nav } = {}) {
   return { document, root, metaTheme };
 }
 
-test("product navigation stays on the localized House Duck Blog route and returns to #games", () => {
+test("product navigation keeps the remaining game and support routes", () => {
   for (const file of productPages) {
     const html = read(file);
-    const locale = file.match(/index_(en|de|ja)\.html$/)?.[1];
-    const blogHref = locale ? `../blog/${locale}/` : "https://blog.houseduck.in/";
-    assert.doesNotMatch(html, /https:\/\/houseduck\.tistory\.com\//, `${file} must not use the retired Blog host`);
-    assert.ok(html.includes(`href="${blogHref}"`), `${file} must link to its localized Blog route`);
+    assert.doesNotMatch(html, /blog\.houseduck\.in|blog\/(?:en|de|ja)?\/?|houseduck\.tistory\.com/, file + " must not expose retired blog routes");
+    assert.match(html, /href="[^"]*(?:index(?:_(?:en|de|ja))?\.html\?lang=|support\/)/, file + " must retain a first-party route");
   }
   for (const file of productPages.filter((file) => file.startsWith("project-k/"))) {
     const html = read(file);
-    assert.match(html, /#games/, `${file} must return directly to the game previews`);
-    assert.doesNotMatch(html, /#projects/, `${file} must not target the retired catalog`);
+    assert.match(html, /#games/, file + " must return directly to the game previews");
+    assert.doesNotMatch(html, /#projects/, file + " must not target the retired catalog");
   }
 });
 

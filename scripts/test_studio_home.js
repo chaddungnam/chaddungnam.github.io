@@ -104,7 +104,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.doesNotMatch(html, /history-section|journal-section|작게 만들더라도 오래 기억되는 게임/);
   assert.ok(html.includes('rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin'), `${file} must preload the hero font`);
-  assert.ok(html.includes('<script src="assets/brand-site.js" defer></script>'), `${file} must not render-block on shared JavaScript`);
+  assert.match(html, /<script src="assets\/brand-site\.js(?:\?[^\"]+)?" defer><\/script>/, `${file} must not render-block on shared JavaScript`);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
   assert.equal((html.match(/quirky-ball-gameplay\.mp4\?v=110/g) || []).length, 2, `${file} must cache-bust both released gameplay previews`);

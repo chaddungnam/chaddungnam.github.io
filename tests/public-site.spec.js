@@ -12,8 +12,6 @@ const routes = [
   "/privacy/de.html?stay=1",
   "/terms/ko.html",
   "/support/?lang=en",
-  "/blog/kr/",
-  "/blog/en/내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유/",
 ];
 
 for (const route of routes) {
@@ -78,7 +76,6 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
     "/privacy/ko.html?stay=1",
     "/terms/ko.html",
     "/support/?lang=ko",
-    "/blog/kr/",
   ]) {
     await page.goto(route);
     await expect(page.locator("html"), route).toHaveAttribute("data-theme", "light");
@@ -96,7 +93,7 @@ test("localized home pages preserve the published legal and support paths", asyn
 
   for (const [route, hrefs] of contracts) {
     await page.goto(route);
-    await expect(page.locator(".site-footer .footer-links a")).toHaveCount(6);
+    await expect(page.locator(".site-footer .footer-links a")).toHaveCount(5);
     for (const href of hrefs) await expect(page.locator(`.site-footer a[href="${href}"]`), `${route} keeps ${href}`).toHaveCount(1);
   }
 });
@@ -615,25 +612,6 @@ test("primary navigation uses a high-contrast yellow hover without motion", asyn
   }
 });
 
-test("blog index repeats the speech bubble and game previews", async ({ page }) => {
-  await page.goto("/blog/kr/");
-  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toBeVisible();
-  await expect(page.locator(".mirror-manifesto .manifesto-bubble")).toContainText("House Duck's Blog,");
-  await expect(page.locator(".mirror-manifesto .manifesto-action")).toHaveText(/메인 페이지 보러가기/);
-  await expect(page.locator(".mirror-manifesto [data-game-preview]")).toHaveCount(2);
-});
-
-test("foreign House Duck pages keep readers in their selected Blog language", async ({ page }) => {
-  for (const locale of ["en", "de", "ja"]) {
-    await page.goto(`/index_${locale}.html?lang=${locale}`);
-    await expect(page.locator(".nav-blog")).toHaveAttribute("href", `blog/${locale}/`);
-    for (const route of [`/about/index_${locale}.html`, `/quirky-ball/index_${locale}.html`, `/project-k/index_${locale}.html`]) {
-      await page.goto(route);
-      await expect(page.locator("[data-site-nav] a", { hasText: "Blog" })).toHaveAttribute("href", `../blog/${locale}/`);
-    }
-  }
-});
-
 test("Quirky Ball presents the current build as a responsive candy-neon showcase", async ({ page, isMobile }) => {
   await page.addInitScript(() => window.localStorage.setItem("house_duck_theme", "dark"));
   await page.goto("/quirky-ball/?lang=ko");
@@ -722,83 +700,6 @@ test("Quirky Ball motion reduction removes the marble intro and pauses the loop"
   await expect(page.locator(".marble-rain")).toHaveCSS("display", "none");
   await expect.poll(() => page.locator(".hero-device video").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
-
-test("the Blog keeps its editorial section number", async ({ page }) => {
-  await page.goto("/blog/kr/");
-  const blogNumber = await page.locator(".mirror-grid").evaluate((node) => getComputedStyle(node, "::before").content);
-  expect(blogNumber).toBe('"01 BLOG"');
-});
-
-test("the static Blog footer matches House Duck and exposes legal contact routes", async ({ page }) => {
-  await page.goto("/blog/kr/");
-  const footer = page.locator(".mirror-footer");
-  await expect(footer.locator(".footer-brand-images")).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Impressum" })).toHaveAttribute("href", "/impressum/ko.html");
-  const businessLink = footer.getByRole("link", { name: /business@houseduck\.in/ });
-  await expect(businessLink).toHaveAttribute("href", "mailto:business@houseduck.in");
-  await expect(businessLink).toHaveCSS("text-transform", "none");
-  await expect(footer.getByRole("link", { name: /business@houseduck\.in/ })).toHaveText(/business@houseduck\.in/);
-  await expect(footer).not.toHaveCSS("background-color", "rgb(9, 17, 31)");
-});
-
-test("journal cards gain depth on pointer focus", async ({ page, isMobile }) => {
-  test.skip(isMobile, "mouse hover is covered by the desktop project");
-
-  for (const target of [
-    { path: "/blog/kr/", card: ".mirror-grid article", image: "img", settle: 0 },
-  ]) {
-    await page.goto(target.path);
-    await page.waitForTimeout(target.settle);
-    const card = page.locator(target.card).first();
-    await card.hover();
-    await page.waitForTimeout(320);
-    const state = await card.evaluate((node, imageSelector) => {
-      const image = node.querySelector(imageSelector);
-      return {
-        border: getComputedStyle(node).borderColor,
-        shadow: getComputedStyle(node).boxShadow,
-        transform: getComputedStyle(node).transform,
-        imageTransform: image ? getComputedStyle(image).transform : "none",
-      };
-    }, target.image);
-    expect(state.shadow).not.toBe("none");
-    expect(state.transform).not.toBe("none");
-    expect(state.imageTransform).not.toBe("none");
-    const channels = state.border.match(/\d+(?:\.\d+)?/g).slice(0, 3).map(Number);
-    expect(Math.max(...channels) - Math.min(...channels)).toBeLessThan(26);
-  }
-});
-
-test("journal cards stay fully visible and type their previews quickly", async ({ page }) => {
-  await page.goto("/blog/kr/");
-  const lastMirrorCard = page.locator(".mirror-grid article").last();
-  expect(await lastMirrorCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
-  await lastMirrorCard.scrollIntoViewIfNeeded();
-  await expect(lastMirrorCard.locator("[data-preview-type][data-typed='true']")).toHaveCount(2, { timeout: 8000 });
-});
-
-test("Tistory semantic categories rename the root and keep subcategories expanded", async ({ page }) => {
-  await page.setContent(`<!doctype html><html><body id="tt-body-index">
-    <nav data-category-list><ul class="tt_category"><li><a class="link_tit" href="/category">분류 전체보기 <span class="c_cnt">(8)</span></a><ul class="category_list"><li><a class="link_item" href="/category/Mobile%20Game%20Dev.">Mobile Game Dev. <span class="c_cnt">(5)</span></a><ul class="sub_category_list"><li><a class="link_sub_item" href="/category/Mobile%20Game%20Dev./Quirky%20Ball">Quirky Ball <span class="c_cnt">(4)</span></a></li></ul></li></ul></li></ul></nav>
-    <nav data-category-list><ul class="tt_category"><li><a class="link_tit" href="/category">분류 전체보기 <span class="c_cnt">(8)</span></a><ul class="category_list"><li><a class="link_item" href="/category/Mobile%20Game%20Dev.">Mobile Game Dev. <span class="c_cnt">(5)</span></a><ul class="sub_category_list"><li><a class="link_sub_item" href="/category/Mobile%20Game%20Dev./Quirky%20Ball">Quirky Ball <span class="c_cnt">(4)</span></a></li></ul></li></ul></li></ul></nav>
-  </body></html>`);
-  await page.addScriptTag({ url: "http://127.0.0.1:4173/tistory-skin/images/script.js" });
-
-  await expect(page.locator("[data-category-list] .link_tit")).toHaveCount(2);
-  await expect(page.locator("[data-category-list] .link_tit").first()).toContainText("전체 글");
-  await expect(page.locator("[data-category-list] .link_tit").first()).not.toContainText("분류 전체보기");
-  await expect(page.locator("[data-category-list] .sub_category_list").first()).toBeVisible();
-  await expect(page.locator("[data-category-list]").first().getByRole("link", { name: /Quirky Ball/ })).toBeVisible();
-});
-
-test("YouTube Shorts keep their portrait ratio", async ({ page }) => {
-  await page.goto("/blog/kr/내가-독일까지-와서-뜬금없이-개발을-시작하게-된-이유/");
-  const frame = page.locator("iframe.video-portrait");
-  await expect(frame).toBeVisible();
-  const box = await frame.boundingBox();
-  expect(box.height / box.width).toBeCloseTo(16 / 9, 1);
-});
-
 
 test("home hero uses custom light localized Play badges without removed copy or details CTA", async ({ page }) => {
   for (const [route, lang] of [["/?lang=ko", "ko"], ["/index_en.html?lang=en", "en"], ["/index_de.html?lang=de", "de"], ["/index_ja.html?lang=ja", "ja"]]) {

@@ -31,13 +31,6 @@ const marketingPages = [
   ...projectPages
 ];
 const quirkyPages = marketingPages.filter(([file]) => file.startsWith("quirky-ball/"));
-const legacyStoryPages = [
-  ["story/index.html", "ko"],
-  ["story/index_en.html", "en"],
-  ["story/index_de.html", "de"],
-  ["story/index_ja.html", "ja"]
-];
-
 function read(file) {
   const filePath = path.join(repoDir, file);
   assert.ok(fs.existsSync(filePath), `${file} must exist`);
@@ -116,14 +109,6 @@ for (const [file] of quirkyPages) {
   assert.doesNotMatch(publicText, /첨부된|supplied|bereitgestellten|提供された/i, `${file} must read like public copy, not a work request`);
 }
 
-for (const [file, locale] of marketingPages) {
-  const html = read(file);
-  const blogUrl = locale === "ko" ? "https://blog.houseduck.in/" : `blog/${locale}/`;
-  assert.ok(html.includes(blogUrl), `${file} Blog link`);
-  assert.doesNotMatch(html, /href="[^"]*story\//, `${file} must not link to the founder story`);
-  assert.doesNotMatch(html, new RegExp(`href="[^"]*${blogUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*target="_blank"`), `${file} Blog link stays in the same tab`);
-}
-
 for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
@@ -138,24 +123,11 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two game previews`);
   assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
   assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
-  assert.match(html, locale === "ko" ? /href="https:\/\/blog\.houseduck\.in\/"/ : new RegExp(`href="blog/${locale}/"`), `${file} localized Blog link`);
-  assert.match(html, /<nav class="site-nav"[\s\S]*?>Blog<\/a>/, `${file} primary navigation uses Blog`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);
   assert.match(html, /class="app-store-badge"[^>]*aria-disabled="true"/, `${file} App Store remains a disabled placeholder`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(html, /history-section|journal-section/, `${file} keeps only the approved sections`);
-}
-
-for (const [file, locale] of legacyStoryPages) {
-  const html = read(file);
-  const blogUrl = locale === "ko" ? "https://blog.houseduck.in/" : `https://houseduck.in/blog/${locale}/`;
-  assert.match(html, new RegExp(`lang="${locale}"`), `${file} locale`);
-  assert.match(html, /data-page="blog-redirect"/, `${file} redirect marker`);
-  assert.ok(html.includes(`url=${blogUrl}`), `${file} redirect metadata`);
-  assert.ok(html.includes(`rel="canonical" href="${blogUrl}"`), `${file} canonical Blog URL`);
-  assert.ok(html.includes(`href="${blogUrl}"`), `${file} accessible continue link`);
-  assert.doesNotMatch(html, /story-timeline|story-quote|1998|industrial design|산업디자인|Industriedesign|インダストリアル/, `${file} founder profile removed`);
 }
 
 assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "sitemap must not publish founder-story URLs");

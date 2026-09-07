@@ -6,8 +6,6 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const studio = fs.readFileSync(path.join(root, "assets", "studio-home.css"), "utf8");
-const skin = fs.readFileSync(path.join(root, "tistory-skin", "style.css"), "utf8");
-const mirror = fs.readFileSync(path.join(root, "assets", "blog-mirror.css"), "utf8");
 const fonts = fs.readFileSync(path.join(root, "assets", "site-fonts.css"), "utf8");
 const brand = fs.readFileSync(path.join(root, "assets", "brand-site.css"), "utf8");
 const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8");
@@ -27,20 +25,6 @@ assert.match(studio, /\.project-phone \.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\
 assert.match(studio, /\.project-phone \.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.youtube-grid\s*\{[^}]*repeat\(3,/s);
 assert.match(studio, /\.project-k-title,[\s\S]*?font-family:\s*Gungsuh/s);
-assert.match(skin, /\.post-card:hover \.card-image,[\s\S]*?scale\(1\.04\)/);
-assert.match(mirror, /\.mirror-grid article:hover img,[\s\S]*?scale\(1\.04\)/);
-assert.doesNotMatch(mirror, /animation-timeline:\s*view\(\)/);
-
-for (const css of [skin, mirror]) {
-  assert.match(css, /color-scheme:\s*light/);
-  assert.doesNotMatch(css, /html\[data-theme="dark"\]/);
-  assert.doesNotMatch(css, /ui-serif|Georgia|Noto Serif KR/);
-}
-
-assert.match(mirror, /\.mirror-header\s*\{[^}]*min-height:\s*60px/s);
-assert.match(mirror, /\.mirror-brand img:first-child\s*\{[^}]*width:\s*32px[^}]*height:\s*32px/s);
-assert.match(mirror, /\.mirror-brand img:last-child\s*\{[^}]*width:\s*124px/s);
-
 assert.match(fonts, /font-family:\s*"Montserrat"/);
 for (const file of ["Montserrat-Variable.woff2", "DoHyeon-Regular.woff2", "Chilgok_Kaj-subset.woff2"]) {
   assert.ok(fs.statSync(path.join(root, "assets", "fonts", file)).size < 300_000, `${file} must stay web-sized`);

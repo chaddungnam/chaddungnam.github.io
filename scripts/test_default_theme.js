@@ -49,7 +49,7 @@ function themeRun(file, storedTheme, sharedCookie = "") {
   return { theme: documentElement.dataset.theme, cookieWrites, storedTheme: values.get("house_duck_theme") };
 }
 
-for (const file of ["assets/brand-site.js", "assets/blog-mirror.js", "assets/legal-site.js", "tistory-skin/images/script.js"]) {
+for (const file of ["assets/brand-site.js", "assets/legal-site.js"]) {
   assert.equal(themeRun(file, "").theme, "light", `${file} must default to light`);
   const staleDark = themeRun(file, "dark", "house_duck_theme=dark");
   assert.equal(staleDark.theme, "light", `${file} must ignore stale dark preferences`);

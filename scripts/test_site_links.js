@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const ignoredDirectories = new Set([".git", ".worktrees", "node_modules", "tistory-skin"]);
+const ignoredDirectories = new Set([".git", ".worktrees", "node_modules"]);
 
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
