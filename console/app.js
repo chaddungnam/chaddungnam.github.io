@@ -176,7 +176,7 @@ byId("mainContent").addEventListener("click", (event) => {
   }
   target.scrollIntoView({ block: "start", behavior: "auto" });
   const focus = target.matches("details") ? target.querySelector("summary") : target.querySelector("h2, h3");
-  if (focus) { focus.tabIndex = -1; focus.focus({ preventScroll: true }); }
+  if (focus) { if (!target.matches("details")) focus.tabIndex = -1; focus.focus({ preventScroll: true }); }
 });
 window.addEventListener("scroll", () => {
   byId("scrollToTop").hidden = !(Number(window.scrollY) > 640);
