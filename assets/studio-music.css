@@ -297,6 +297,9 @@
   }
 }
 
+.studio-music-panel-play span,
+.studio-music-stop span { display: none; }
+
 html[data-motion-paused="true"] .studio-music .studio-music-eq i { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
