@@ -120,6 +120,11 @@
       }
       document.body.style.setProperty("--studio-tone", closest.dataset.tone);
       document.documentElement.dataset.scrollTone = closest.dataset.tone;
+      const activeSection = closest.closest("#games") ? "games" : closest.id;
+      for (const link of document.querySelectorAll(".section-rail a")) {
+        if (link.hash === `#${activeSection}`) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      }
       if (!mascot || !quirky) return;
       mascot.style.opacity = progress > .02 && progress < .92 ? String(Math.min(.72, progress * 2)) : "0";
       mascot.style.transform = `translate3d(0, ${progress * Math.min(innerHeight * .48, 410)}px, 0) rotate(${5 - progress * 18}deg)`;

@@ -1,24 +1,103 @@
 const {test, expect} = require('@playwright/test');
-const fs = require('node:fs');
-const path = require('node:path');
 const support = require('../assets/support-site.js');
-const root = path.join(__dirname,'..');
-const stats = JSON.parse(fs.readFileSync(path.join(root,'assets/community-stats.json'),'utf8'));
 const locales = [['ko','korean','도움이 필요하신가요?'],['en','english','Need a hand?'],['de','german','Brauchst du Hilfe?'],['ja','japanese','お困りですか？']];
 
-test('aggregate snapshot contains only public totals, with explicit limited coverage', async ({page}) => {
-  expect(stats.all_time).toBe(false);
-  expect(stats.window_days).toBe(28);
-  expect(BigInt(stats.total_score)>0n).toBeTruthy();
-  expect(stats.record_count).toBeGreaterThan(0);
-  expect(Object.keys(stats).sort()).toEqual(['schema_version','total_score','record_count','as_of','coverage_start','coverage_end','window_days','source','exclusions','all_time'].sort());
-  expect(JSON.stringify(stats)).not.toMatch(/nickname|user_id|display_code|email|token|apikey/i);
+test('live community stats render public totals and evergreen copy', async ({page}) => {
+  const live = {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',window_days:28,all_time:false};
+  const requests = [];
+  await page.route('**/functions/v1/public-community-stats', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live)}));
+  page.on('request', request => {
+    if(request.url().includes('/functions/v1/public-community-stats')) requests.push(request);
+  });
   await page.goto('/?lang=ko');
-  await expect(page.locator('[data-community-total]')).toHaveText(new Intl.NumberFormat('ko-KR').format(BigInt(stats.total_score)));
-  await expect(page.locator('.community-window')).toContainText('최근 28일');
-  await expect(page.locator('.community-date')).toContainText('실시간 아님');
+  const section = page.locator('[data-community-stats]');
+  await expect(section).toHaveAttribute('data-stats-state','ready');
+  await expect(section).toHaveAttribute('data-stats-as-of',live.as_of);
+  await expect(page.locator('[data-community-total]')).toHaveAttribute('data-value',live.total_score);
+  await expect(page.locator('[data-community-count]')).toHaveAttribute('data-value',String(live.record_count));
+  await expect(page.locator('[data-community-total] .counter-accessible')).toHaveText('34,565,726');
+  await expect(page.locator('[data-community-count] .counter-accessible')).toHaveText('203');
+  await expect(page.locator('.community-date')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('2026.09.05');
   await page.locator('.community-method summary').click();
+  await expect(page.locator('.community-method p')).toContainText('최근 28일');
   await expect(page.locator('.community-method p')).toContainText('출시 이후 전체 누적 점수가 아닙니다');
+  expect(await section.innerText()).not.toMatch(/nickname|user_id|display_code|email|token|apikey/i);
+  await section.scrollIntoViewIfNeeded();
+  await expect.poll(async () => page.locator('[data-community-total] .counter-track').evaluateAll(nodes => nodes.length > 0 && nodes.every(node => node.style.transform.startsWith('translateY(-'))), {timeout:4000}).toBe(true);
+  await expect(section).not.toHaveClass(/is-counting/);
+  await expect(page.locator('[data-community-total] .counter-accessible')).toHaveText('34,565,726');
+  await expect(page.locator('[data-community-count] .counter-accessible')).toHaveText('203');
+  expect(requests).toHaveLength(1);
+});
+
+test('community stats refresh on reload with the newest public fixture', async ({page}) => {
+  let calls = 0;
+  await page.route('**/functions/v1/public-community-stats', route => {
+    calls += 1;
+    const live = calls === 1
+      ? {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',window_days:28,all_time:false}
+      : {total_score:'34565727',record_count:204,as_of:'2026-09-07T09:23:00Z',window_days:28,all_time:false};
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live)});
+  });
+  await page.goto('/?lang=ko');
+  await expect(page.locator('[data-community-total]')).toHaveAttribute('data-value','34565726');
+  await page.reload();
+  await expect(page.locator('[data-community-total]')).toHaveAttribute('data-value','34565727');
+  await expect(page.locator('[data-community-count]')).toHaveAttribute('data-value','204');
+  expect(calls).toBe(2);
+});
+
+test('community stats shows retry for errors and accepts a valid zero total', async ({page}) => {
+  let calls = 0;
+  await page.route('**/functions/v1/public-community-stats', route => {
+    calls += 1;
+    if(calls === 1) return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'unavailable'})});
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({total_score:'0',record_count:0,as_of:'2026-09-07T09:24:00Z',window_days:28,all_time:false})});
+  });
+  await page.goto('/?lang=ko');
+  const section = page.locator('[data-community-stats]');
+  await expect(section).toHaveAttribute('data-stats-state','error');
+  await expect(page.locator('[data-community-retry]')).toBeVisible();
+  await page.locator('[data-community-retry]').click();
+  await expect(section).toHaveAttribute('data-stats-state','empty');
+  await expect(page.locator('[data-community-total]')).toHaveAttribute('data-value','0');
+  await expect(page.locator('[data-community-count]')).toHaveAttribute('data-value','0');
+  await expect(page.locator('[data-community-status]')).toContainText('첫 번째 실험 기록');
+  await expect(page.locator('[data-community-retry]')).toBeHidden();
+  expect(calls).toBe(2);
+});
+
+test('BGM is manual, audio-only, stoppable and removed on mobile', async ({page,isMobile}) => {
+  const mediaRequests = [];
+  page.on('request', request => {
+    if (/\/assets\/music\/.*\.mp3|youtube.*\/embed|youtube.*iframe_api/.test(request.url())) mediaRequests.push(request.url());
+  });
+  await page.goto('/?lang=ko');
+  const music = page.locator('[data-studio-music]');
+  if (isMobile) {
+    await expect(music).toHaveCount(0);
+    expect(mediaRequests).toEqual([]);
+    return;
+  }
+  await expect(music).toBeVisible();
+  expect(mediaRequests).toEqual([]);
+  const audio = music.locator('audio');
+  await expect(audio).toHaveCount(1);
+  await expect(audio).toHaveJSProperty('paused',true);
+  await music.getByRole('button',{name:'재생',exact:true}).click();
+  await expect(music.getByRole('button',{name:'정지',exact:true})).toBeVisible();
+  await expect.poll(() => audio.evaluate(node => node.currentTime)).toBeGreaterThan(0);
+  await music.getByRole('button',{name:'정지',exact:true}).click();
+  await expect(audio).toHaveJSProperty('paused',true);
+  await expect(audio).toHaveJSProperty('currentTime',0);
+  await expect(music.getByRole('button',{name:'재생',exact:true})).toBeVisible();
+  expect(mediaRequests.some(url => url.includes('/assets/music/'))).toBe(true);
+  expect(mediaRequests.some(url => url.includes('youtube'))).toBe(false);
+  await music.getByRole('button',{name:'재생',exact:true}).click();
+  await expect(audio).toHaveJSProperty('paused',false);
+  await page.setViewportSize({width:390,height:844});
+  await expect(music).toHaveCount(0);
 });
 
 for(const [lang,hash,title] of locales){

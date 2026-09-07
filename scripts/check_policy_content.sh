@@ -60,7 +60,7 @@ for locale in "${locales[@]}"; do
     de) analytics_term='Eigene Nutzungsanalyse'; social_term='Freund' ;;
     ja) analytics_term='自社利用分析'; social_term='フレンド' ;;
   esac
-  if ! rg -q "$analytics_term" "$privacy" || ! rg -q "$social_term" "$privacy"; then
+  if ! rg -qi "$analytics_term" "$privacy" || ! rg -q "$social_term" "$privacy"; then
     printf 'Privacy page misses current analytics or social data disclosure: %s\n' "$privacy" >&2
     failed=1
   fi

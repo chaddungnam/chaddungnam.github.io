@@ -6,7 +6,6 @@ const path = require('node:path');
 const support = require('../assets/support-site.js');
 const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const stats = JSON.parse(read('assets/community-stats.json'));
 
 function element() {
   return {value: '', hidden: true, textContent: '', handlers: {}, attributes: {},
@@ -29,21 +28,24 @@ function fixture(lang, message = '') {
 }
 
 async function main() {
-  assert.equal(stats.all_time, false);
-  assert.equal(stats.window_days, 28);
-  assert.ok(BigInt(stats.total_score) > 0n);
-  assert.ok(stats.record_count > 0);
-  assert.ok(Number.isFinite(Date.parse(stats.as_of)));
-  assert.doesNotMatch(JSON.stringify(stats), /user_id|nickname|display_code|email|token|apikey/i);
-  assert.deepEqual(Object.keys(stats).sort(), ['schema_version','total_score','record_count',
-    'as_of','coverage_start','coverage_end','window_days','source','exclusions','all_time'].sort());
-
-  for (const [lang, file, locale] of [['ko','index.html','ko-KR'], ['en','index_en.html','en-GB'],
-    ['de','index_de.html','de-DE'], ['ja','index_ja.html','ja-JP']]) {
+  for (const [lang, file, loading, retry] of [['ko','index.html','기록을 불러오는 중…','다시 시도'],
+    ['en','index_en.html','Loading records…','Retry'], ['de','index_de.html','Aufzeichnungen werden geladen…','Erneut versuchen'],
+    ['ja','index_ja.html','記録を読み込み中…','再試行']]) {
     const html = read(file);
-    assert.ok(html.includes(`<strong data-community-total>${new Intl.NumberFormat(locale).format(BigInt(stats.total_score))}</strong>`));
-    assert.ok(html.includes(`data-stats-as-of="${stats.as_of}"`));
+    assert.match(html, /data-community-stats[^>]*aria-busy="true"/);
+    assert.ok(html.includes('<strong data-community-total>—</strong>'));
+    assert.ok(html.includes('<strong data-community-count>—</strong>'));
+    assert.ok(html.includes(`<p class="community-status" data-community-status role="status">${loading}</p>`));
+    assert.ok(html.includes(`<button type="button" class="community-retry" data-community-retry hidden>${retry}</button>`));
+    assert.match(html, /studio-home\.css\?v=20260907-community-music/);
+    assert.match(html, /studio-music\.css\?v=20260907/);
+    assert.match(html, /community-stats\.js\?v=20260907/);
+    assert.match(html, /studio-music\.js\?v=20260907/);
+    assert.doesNotMatch(html, /data-stats-as-of|community-date/);
     assert.match(html, /community-window[^>]*>[^<]*28/);
+    const method = html.match(/<details class="community-method">[\s\S]*?<\/details>/)?.[0];
+    assert.ok(method);
+    assert.doesNotMatch(method, /2026|202건|202 completed|202 abgeschlossenen|2026年/);
     for (const legal of [`privacy/${lang}.html`, `quirky-ball/terms/${lang}.html`,
       `quirky-ball/privacy/delete_${lang}.html`, `impressum/${lang}.html`]) {
       assert.match(read(legal), /legal-update[^]*<time datetime="2026-09-05">/);
@@ -94,6 +96,6 @@ async function main() {
   await Promise.resolve(); await Promise.resolve();
   assert.equal(denied.nodes['[data-mail-draft]'].selected, true);
   assert.match(denied.nodes['[data-mail-status]'].textContent, /kopiere/);
-  console.log('PASS: community totals, 16 document dates, legacy anchors, 4 languages, safe previews, mailto encoding, long-message and denied-clipboard fallbacks.');
+  console.log('PASS: live community markup contract, 16 document dates, legacy anchors, 4 languages, safe previews, mailto encoding, long-message and denied-clipboard fallbacks.');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
