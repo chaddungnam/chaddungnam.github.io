@@ -394,6 +394,7 @@ function runApp({ initialize, unlock, logout = () => {} }) {
     },
     querySelectorAll() { return []; },
   };
+  vm.runInNewContext(read("console/ai-usage.js"), { document, window }, { filename: "console/ai-usage.js" });
   const bootPromise = vm.runInNewContext(read("console/app.js"), { console, document, window }, { filename: "console/app.js" });
   return { bootPromise, elements, submitButton, window };
 }

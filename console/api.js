@@ -1,5 +1,5 @@
 (function attachConsoleApi(root) {
-  const allowedFunctions = new Set(["analytics-dashboard", "analytics-dashboard-v2", "admin-console", "cs-summarize"]);
+  const allowedFunctions = new Set(["analytics-dashboard", "analytics-dashboard-v2", "admin-console", "cs-summarize", "admin-ai-monitor"]);
   let functionBaseUrl = "";
 
   function initialize(options) {

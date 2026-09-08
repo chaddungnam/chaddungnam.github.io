@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>House Duck · AI 사용량</title>
+<style>
+:root { --bg:#0c1322; --card:#151f31; --line:#2a3850; --text:#edf3ff; --muted:#a3b2c9; --green:#5ee0b3; --blue:#75caff; --purple:#b2a2ff; --pink:#f7a0ca; --amber:#ffcc75; }
+* { box-sizing:border-box; }
+body { margin:0; padding:16px; background:var(--bg); color:var(--text); font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+main { max-width:960px; margin:auto; }
+header,.row,.section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+header { margin-bottom:10px; }
+h1 { font-size:20px; letter-spacing:-.7px; margin:0; }
+h2 { font-size:14px; margin:0; }
+p { margin:5px 0 0; }
+.muted,.note { color:var(--muted); font-size:11px; }
+.badge,.chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:30px; padding:5px 10px; font-size:12px; white-space:nowrap; }
+.good { color:var(--green); }
+.warn { color:var(--amber); }
+.overview,.metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.overview { margin-bottom:8px; }
+.stat { padding:9px; border:1px solid var(--line); border-radius:9px; background:#111c2c; min-width:0; }
+.stat-label { color:var(--muted); font-size:11px; }
+.stat-value { display:block; font-size:21px; font-weight:720; font-variant-numeric:tabular-nums; letter-spacing:-.6px; margin-top:3px; overflow-wrap:anywhere; }
+.section-title { margin:14px 0 7px; }
+.cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
+.card { padding:12px; background:var(--card); border:1px solid var(--line); border-radius:11px; min-width:0; }
+.cards .row { display:block; }
+.cards .row .muted { font-size:10px; }
+.free-card { border-color:#41636a; background:linear-gradient(125deg,#142d32,#151f31 65%); }
+.free-card h2 { color:var(--green); }
+.free-card .metrics { margin:9px 0; }
+.free-card .stat { background:#0d182280; }
+.chips { display:flex; flex-wrap:wrap; gap:5px; margin:8px 0; }
+.quota-value { font-size:27px; font-weight:750; font-variant-numeric:tabular-nums; letter-spacing:-1px; margin:7px 0 4px; line-height:1.2; }
+.quota-value small { font-size:11px; font-weight:500; letter-spacing:0; color:var(--muted); margin-left:5px; }
+.track { height:6px; border-radius:5px; background:#2a3850; overflow:hidden; margin:6px 0; }
+.fill { height:100%; border-radius:5px; }
+.reset { font-size:10px; color:var(--muted); }
+.alert { border:1px solid #735629; background:#332919; color:var(--amber); padding:10px 12px; margin-top:12px; border-radius:9px; font-size:13px; }
+details { border-top:1px solid var(--line); margin-top:8px; padding-top:5px; }
+summary { cursor:pointer; font-size:12px; font-weight:600; padding:5px 0; }
+summary:focus-visible,button:focus-visible { outline:2px solid var(--blue); outline-offset:4px; }
+.model-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px 16px; padding:12px 0; border-bottom:1px solid var(--line); }
+.model-row:last-child { border:0; padding-bottom:0; }
+.model-name { font-size:13px; overflow-wrap:anywhere; }
+.model-total { font-size:13px; text-align:right; font-variant-numeric:tabular-nums; }
+.model-meta { grid-column:1/-1; font-size:12px; color:var(--muted); }
+button { background:#243b5b; color:var(--text); border:1px solid #42618b; border-radius:10px; padding:10px 17px; cursor:pointer; font:inherit; font-size:13px; }
+button:disabled { opacity:.6; cursor:wait; }
+footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:12px 0; }
+.loading { color:var(--muted); padding:24px 0; }
+@media (max-width:600px) {
+ body { padding:10px; }
+ h1 { font-size:18px; }
+ header { gap:8px; margin-bottom:8px; }
+ .overview,.metrics { gap:5px; }
+ .cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+ .card { padding:10px; }
+ .cards .card { padding:8px; }
+ .quota-value { font-size:25px; margin:5px 0 3px; }
+ .section-title { margin-top:10px; }
+ footer { margin:8px 0; }
+ .stat { padding:7px 5px; }
+ .stat-value { font-size:18px; }
+ .stat-label { font-size:10px; }
+ .row { flex-wrap:wrap; }
+ .section-title .muted { text-align:right; max-width:170px; }
+}
+</style>
+</head>
+<body>
+<main>
+<header><h1>Codex AI 모니터</h1><span id="statusBadge" class="badge" role="status">조회 중</span></header>
+<div class="section-title"><h2>구독 사용률</h2><span class="muted">제공자 리셋 시각 기준</span></div>
+<section id="quotaCards" class="cards" aria-label="구독별 한도"><div class="card loading">계정 한도를 불러오는 중…</div></section>
+<section id="freeCard" class="card free-card" aria-label="FreeLLMAPI 사용량"><h2>FreeLLM Auto</h2><p class="loading">사용량을 불러오는 중…</p></section>
+<div class="section-title"><h2>오늘의 토큰 내역</h2><span class="muted">OpenCodex 요청 기록</span></div>
+<section id="overview" class="overview" aria-label="오늘의 OpenCodex 사용량"></section>
+<section id="tokenCards" class="card" aria-label="모델별 토큰 사용량"><p class="loading">토큰 기록을 불러오는 중…</p></section>
+<footer><span id="updatedAt" class="muted">15초마다 자동 갱신</span><button id="refreshButton" type="button" onclick="fetchData()">새로고침</button></footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const number = n => typeof n === 'number' && Number.isFinite(n);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => number(n) ? n.toLocaleString('ko-KR') : '—';
+function compact(n) {
+ if (!number(n)) return '—';
+ if (n >= 1e9) return (n/1e9).toFixed(2)+'B';
+ if (n >= 1e6) return (n/1e6).toFixed(2)+'M';
+ if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
+ return fmt(n);
+}
+function resetText(value) {
+ if (!number(value)) return '리셋 시각 제공 안 됨';
+ const date = new Date(value < 1e10 ? value*1000 : value);
+ const mins = Math.ceil((date-Date.now())/60000);
+ if (mins <= 0) return '리셋 시각 경과 · 최신 조회 대기';
+ const days = Math.floor(mins/1440), hours = Math.floor(mins%1440/60);
+ return (days ? days+'일 ' : '')+(hours ? hours+'시간 ' : '')+(mins%60)+'분 후 리셋';
+}
+function stat(label,value,detail) {
+ return '<div class="stat"><div class="stat-label">'+esc(label)+'</div><strong class="stat-value">'+esc(value)+'</strong>'+(detail?'<div class="note">'+esc(detail)+'</div>':'')+'</div>';
+}
+function modelRows(models, free=false) {
+ return models.map(m => '<div class="model-row"><div class="model-name">'+esc(m.model)+'</div><div class="model-total">'+fmt(m.totalTokens)+' 토큰</div><div class="model-meta">'+
+ (free?esc(m.platform)+' · ':'')+fmt(m.requests)+'회 · 입력 '+fmt(m.inputTokens)+' / 출력 '+fmt(m.outputTokens)+
+ (!free && number(m.cacheHitRate)?' · 캐시 '+(m.cacheHitRate*100).toFixed(1)+'%':'')+'</div></div>').join('');
+}
+function quotaCard(title,label,pct,reset,color,note='',extra='') {
+ const known=number(pct), value=known?Math.min(100,Math.max(0,pct)):null;
+ return '<article class="card"><div class="row"><h2 style="color:'+color+'">'+esc(title)+'</h2><span class="muted">'+esc(label)+'</span></div>'+
+ '<div class="quota-value" style="color:'+(value>=95?'var(--amber)':color)+'">'+(known?value.toFixed(1)+'%':'—')+'<small>'+(known?'사용':'조회 불가')+'</small></div>'+
+ '<div class="track"'+(known?' role="progressbar" aria-label="'+esc(title)+' 사용률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+value+'"':'')+'><div class="fill" style="width:'+(value??0)+'%;background:'+color+'"></div></div>'+
+ '<div class="reset">'+esc(resetText(reset))+'</div>'+(note?'<p class="note warn">'+esc(note)+'</p>':'')+extra+'</article>';
+}
+function render(data) {
+ const sum=data.usage?.summary, f=data.freellm || {}, t=f.today;
+ $('overview').innerHTML=stat('요청',compact(sum?.requests))+
+ stat('입력',compact(sum?.inputTokens))+
+ stat('출력',compact(sum?.outputTokens))+
+ stat('캐시',compact(sum?.cachedInputTokens));
+ const providers=f.providers||[], healthy=providers.filter(p=>p.healthy>0).length;
+ const freeOpen=$('freeModels')?.open;
+ const freeStatus=!f.ok?(f.reason==='auth'?'상태 조회 인증 만료':'상태 조회 불가'):healthy?'연결 확인':'공급자 점검 필요';
+ $('freeCard').innerHTML='<div class="row"><h2>FreeLLM Auto</h2><span class="badge '+(f.ok&&healthy?'good':'warn')+'">'+freeStatus+'</span></div>'+
+ '<div class="metrics">'+stat('오늘 토큰',t?compact(t.inputTokens+t.outputTokens):'—')+
+ stat('요청 / 성공',t?fmt(t.requests)+' / '+fmt(t.successes):'—')+
+ stat('입력 / 출력',t?compact(t.inputTokens)+' / '+compact(t.outputTokens):'—')+
+ stat('정상 공급자',f.ok?healthy+' / '+providers.length:'—')+'</div>'+
+ '<p class="note">무료 잔여 한도: 미제공 · 실제 사용량만 집계</p>'+
+ '<details id="freeModels"'+(freeOpen?' open':'')+'><summary>공급자 · 응답 모델 상세</summary>'+
+ '<div class="chips">'+providers.map(p=>'<span class="chip '+(p.healthy?'good':'warn')+'">'+esc(p.name)+' · '+(p.healthy?'정상':p.limited?'일시 제한':'확인 필요')+'</span>').join('')+'</div>'+
+ (t?modelRows(t.models,true):'<p class="note">사용 기록 조회 불가</p>')+
+ '<p class="note">공급자 상태는 최근 점검 기준입니다. Mac 현지 날짜로 집계하며, 직접 테스트가 포함되어 아래 내역과 일부 겹칩니다.</p></details>';
+ const reports=data.quota?.reports||[], oa=reports.find(r=>r.provider==='openai'), g=reports.find(r=>r.provider==='google-antigravity'), x=reports.find(r=>r.provider==='xai');
+ const q=oa?.quota||{}, qw=q.weeklyResetAt??oa?.aggregation?.weekly?.nextRecoveryAt;
+ let cards=quotaCard('OpenAI Codex','주간 한도',q.weeklyPercent,qw,'var(--green)','',
+ number(q.fiveHourPercent)?'<p class="note">5시간 '+q.fiveHourPercent.toFixed(1)+'% · '+esc(resetText(q.fiveHourResetAt))+'</p>':'');
+ for (const [key,title,color] of [['Gem','Gemini','var(--purple)'],['Cla','Claude','var(--pink)']]) {
+ const w=(g?.quota?.customWindows||[]).find(w=>w.label===key)||{};
+ cards+=quotaCard(title,'Google 연동',w.percent,w.resetAt,color,(w.mobileCached||g?.mobileCached)?'최근 확인값 · 조회 지연':'');
+ }
+ const xq=x?.quota||{}, weekly=x?.source==='xai:grok-billing-credits';
+ cards+=quotaCard('Grok 4.6',weekly?'주간 크레딧':'제공자 한도',xq.weeklyPercent,xq.weeklyResetAt,'var(--blue)',
+ weekly&&xq.weeklyPercent>=100?'주간 한도 도달':'',
+ data.xaiStatus?.overloaded?'<div class="alert">최근 요청에서 xAI 서버 과부하가 감지됐습니다.</div>':'');
+ $('quotaCards').innerHTML=cards;
+ const models=data.usage?.models||[], detailsOpen=$('allModels')?.open;
+ $('tokenCards').innerHTML=sum?'<div class="row"><h2>'+fmt(sum.totalTokens)+' 토큰 처리</h2><span class="muted">캐시 포함</span></div>'+
+ '<p class="note">캐시는 입력에 포함 · 구독 한도 차감량과는 다름</p>'+
+ (sum.unreportedRequests?'<p class="note warn">'+fmt(sum.unreportedRequests)+'개 요청은 토큰 수 미보고</p>':'')+
+ '<details id="allModels"'+(detailsOpen?' open':'')+'><summary>모델별 상세 내역 '+models.length+'개 보기</summary>'+modelRows(models)+'</details>':'<p class="warn">토큰 내역 조회 실패 · 다음 갱신에서 재시도합니다.</p>';
+ const partial=!sum||!f.ok||!t||data.quota?.error||!number(q.weeklyPercent)||!number(xq.weeklyPercent)||g?.mobileCached||
+ !['Gem','Cla'].every(label=>number((g?.quota?.customWindows||[]).find(w=>w.label===label)?.percent));
+ $('statusBadge').textContent=partial?'일부 조회 지연':'조회 완료';
+ $('statusBadge').className='badge '+(partial?'warn':'good');
+ $('updatedAt').textContent=new Date(data.generatedAt||Date.now()).toLocaleTimeString('ko-KR')+' 갱신 · 15초 간격';
+}
+let fetching=false;
+async function fetchData() {
+ if (fetching) return;
+ if (window.parent === window || !window.parent.ConsoleAuth?.isUnlocked()) {
+  $('statusBadge').textContent='콘솔 로그인 필요';
+  $('updatedAt').innerHTML='<a href="./#/ai-usage">House Duck 콘솔에서 열기</a>';
+  return;
+ }
+ if (window.parent.document.getElementById('aiUsageView')?.hidden) return;
+ fetching=true; $('refreshButton').disabled=true;
+ try {
+  const result=await window.parent.ConsoleAPI.post('admin-ai-monitor',{});
+  if (!window.parent.ConsoleAuth.isUnlocked()) return;
+  if (!result.snapshot) {
+   $('statusBadge').textContent='Mac 동기화 대기';
+   $('updatedAt').textContent='아직 사용량이 전송되지 않았습니다.';
+   return;
+  }
+  render(result.snapshot);
+  const received=Date.parse(result.receivedAt), age=Date.now()-received;
+  if (!Number.isFinite(received)||age>180000||Date.now()-result.snapshot.generatedAt>180000) {
+   $('statusBadge').textContent='Mac 갱신 지연';
+   $('statusBadge').className='badge warn';
+  }
+  $('updatedAt').textContent='마지막 수집 '+new Date(result.snapshot.generatedAt).toLocaleString('ko-KR')+' · Mac에서 1분마다 전송';
+ } catch {
+  $('statusBadge').textContent='조회 지연';
+  $('statusBadge').className='badge warn';
+  $('updatedAt').textContent='조회 실패 · 기존 값 유지 · 다음 갱신에서 재시도';
+ } finally { fetching=false; $('refreshButton').disabled=false; }
+}
+if (window.frameElement) {
+ const resize = () => {
+  const style=getComputedStyle(document.body);
+  window.frameElement.style.height=Math.ceil(document.querySelector('main').getBoundingClientRect().height+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)+4)+'px';
+ };
+ new ResizeObserver(resize).observe(document.querySelector('main'));
+}
+fetchData();
+setInterval(()=>{if(!document.hidden)fetchData();},15000);
+</script>
+</body>
+</html>

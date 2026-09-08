@@ -15,6 +15,7 @@ const pageTitles = {
   cs: "CS",
   audit: "감사 기록",
   "project-k": "Project K",
+  "ai-usage": "AI 사용량",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -26,6 +27,7 @@ const pageDescriptions = {
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
   "project-k": "아직 준비 중인 프로젝트입니다.",
+  "ai-usage": "Codex · Gemini · Grok · FreeLLM 사용량을 확인합니다. Mac에서 1분마다 동기화합니다.",
 };
 
 let currentProjectKey = "";
@@ -52,6 +54,7 @@ function showOnly(elementId) {
 }
 
 function renderAuth(authState = window.ConsoleAuth.snapshot()) {
+  if (!authState.unlocked) window.ConsoleAiUsage.clear();
   byId("userEmail").textContent = authState.email || "";
   byId("challengeEmail").textContent = authState.email || "";
   if (!authState.signedIn) {
@@ -66,6 +69,8 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
   } else if (currentProjectKey) {
     showOnly("consoleApp");
     renderRoute();
+  } else if (window.location.hash.split("?")[0] === "#/ai-usage") {
+    selectProject("ai_tools");
   } else {
     showOnly("projectPicker");
   }
@@ -74,14 +79,16 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
   const projectK = projectKey === "project_k";
-  byId("currentProject").textContent = projectK ? "Project K" : "Quirky Ball";
-  byId("consoleNav").hidden = projectK;
+  const aiTools = projectKey === "ai_tools";
+  byId("currentProject").textContent = aiTools ? "AI 사용량" : projectK ? "Project K" : "Quirky Ball";
+  byId("consoleNav").hidden = projectK || aiTools;
   showOnly("consoleApp");
-  window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
+  window.location.hash = aiTools ? "#/ai-usage" : projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|ai-usage)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
   renderRoute();
 }
 
 function returnToProjectPicker() {
+  window.ConsoleAiUsage.clear();
   currentProjectKey = "";
   showOnly("projectPicker");
 }
@@ -90,6 +97,7 @@ function renderRoute() {
   if (!currentProjectKey || !window.ConsoleAuth.isUnlocked()) return;
   const route = currentProjectKey === "project_k"
     ? { page: "project-k" }
+    : currentProjectKey === "ai_tools" ? { page: "ai-usage" }
     : window.ConsoleModel.routeFromHash(window.location.hash);
   document.querySelectorAll(".route-view").forEach((view) => {
     view.hidden = view.dataset.route !== route.page;
@@ -114,6 +122,8 @@ function renderRoute() {
   if (route.page === "purchases") window.ConsolePurchases.mount();
   if (route.page === "cs") window.ConsoleCs.mount();
   if (route.page === "audit") window.ConsoleAudit.mount();
+  if (route.page === "ai-usage") window.ConsoleAiUsage.mount();
+  else window.ConsoleAiUsage.clear();
 }
 
 function challengeErrorMessage(error) {
@@ -155,6 +165,7 @@ byId("challengeForm").addEventListener("submit", async (event) => {
 
 byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
 byId("projectK").addEventListener("click", () => selectProject("project_k"));
+byId("projectAiUsage").addEventListener("click", () => selectProject("ai_tools"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
 byId("refreshRouteButton").addEventListener("click", () => {

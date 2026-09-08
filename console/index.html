@@ -41,8 +41,8 @@
 
     <section id="projectPicker" class="project-picker" aria-labelledby="projectPickerTitle" tabindex="-1" hidden>
       <p class="eyebrow">HOUSE DUCK / PROJECTS</p>
-      <h1 id="projectPickerTitle">관리할 게임 선택</h1>
-      <p class="picker-copy">Quirky Ball은 전체 기능을 제공하고 Project K는 현재 구조만 준비합니다.</p>
+      <h1 id="projectPickerTitle">게임·도구 선택</h1>
+      <p class="picker-copy">게임 운영과 개인 AI 사용량을 확인합니다.</p>
       <div class="project-grid">
         <button id="projectQuirkyBall" class="project-card" type="button">
           <span class="project-card-mark" aria-hidden="true">Q</span>
@@ -53,6 +53,11 @@
           <span class="project-card-mark" aria-hidden="true">K</span>
           <span class="project-card-copy"><strong>Project K</strong><small>준비 중 · 껍데기만 제공</small></span>
           <span class="project-card-arrow" aria-hidden="true">→</span>
+        </button>
+        <button id="projectAiUsage" class="project-card" type="button">
+          <span class="project-card-mark" aria-hidden="true">AI</span>
+          <span class="project-card-copy"><strong>AI 사용량</strong><small>Codex · Gemini · Grok · FreeLLM</small></span>
+          <span class="project-card-arrow" aria-hidden="true">↗</span>
         </button>
       </div>
       <button id="pickerLogout" class="text-button muted" type="button">로그아웃</button>
@@ -71,6 +76,7 @@
         <a href="#/purchases" data-page="purchases"><span class="nav-index">05</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
         <a href="#/cs" data-page="cs"><span class="nav-index">06</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
         <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/ai-usage" data-page="ai-usage"><span class="nav-index">08</span><span class="nav-copy">AI 사용량<small>한도·토큰</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -359,6 +365,9 @@
         <div class="empty-state"><span class="status-label">준비 중</span><strong>Project K</strong><p>이중 작업을 피하기 위해 현재는 메뉴와 화면 구조만 제공합니다.</p></div>
       </section>
 
+      <section id="aiUsageView" class="route-view" data-route="ai-usage" hidden>
+        <iframe id="aiUsageFrame" title="개인 AI 사용량 모니터" style="display:block;width:100%;height:860px;border:0;border-radius:12px;background:#0c1322;"></iframe>
+      </section>
       <section id="playerView" class="route-view" data-route="player" hidden>
         <a id="playerBackLink" class="text-button" href="#/players">← 목록으로</a>
         <p id="playerMessage" class="dashboard-message" role="status"></p>
@@ -393,10 +402,10 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260906-2"></script>
+  <script src="model.js?v=20260908-1"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
-  <script src="api.js?v=20260907-2"></script>
+  <script src="api.js?v=20260908-1"></script>
   <script src="analytics.js?v=20260905-5"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260907-2"></script>
@@ -410,6 +419,7 @@
   <script src="cs-intelligence.js?v=20260904-1"></script>
   <script src="cs-templates.js?v=20260904-1"></script>
   <script src="cs.js?v=20260907-2"></script>
-  <script src="app.js?v=20260907-2" defer></script>
+  <script src="ai-usage.js?v=20260908-1"></script>
+  <script src="app.js?v=20260908-1" defer></script>
 </body>
 </html>
