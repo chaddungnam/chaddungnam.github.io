@@ -56,7 +56,7 @@ test("localized legal documents distinguish required Supabase operations from op
     const terms = read(`quirky-ball/terms/${locale}.html`);
     const privacyText = privacy.replace(/<[^>]+>/g, " ");
 
-    assert.match(privacy, /Supabase \(Supabase Inc\.\)/, `${locale} privacy must identify Supabase`);
+    assert.match(privacy, /Supabase Pte\. Ltd\./, `${locale} privacy must identify the published Supabase DPA entity`);
     assert.match(privacyText, copy.supabaseRole, `${locale} privacy must state the Supabase processing roles`);
     assert.match(privacy, /https:\/\/supabase\.com\/legal\/customer-resources\/data-processing-addendum/, `${locale} privacy must link the Supabase DPA`);
     assert.match(privacy, /Firebase Analytics/, `${locale} privacy must identify Firebase Analytics separately`);
