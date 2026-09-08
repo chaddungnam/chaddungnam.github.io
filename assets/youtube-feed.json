@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-09-07T08:12:49.000Z",
+  "updated": "2026-09-08T09:00:36.000Z",
   "videos": [
+    {
+      "videoId": "HR8O1flYZyE",
+      "title": "게임업계 출신이 말아보는 1인 게임 바이브코딩 개발(일지)",
+      "published": "2026-09-08T09:00:36.000Z"
+    },
     {
       "videoId": "0s8-0N1a75I",
       "title": "VIP Shop 쿼키볼 신규 BGM 플리  | 1인 개발일지",
@@ -11,11 +16,6 @@
       "videoId": "xLfQ8m6amYU",
       "title": "Mad Scientist 0 쿼키볼 신규 BGM 플리  | 1인 개발일지",
       "published": "2026-09-07T08:12:22.000Z"
-    },
-    {
-      "videoId": "vwTX66gry2s",
-      "title": "Mad Scientist 1 쿼키볼 신규 BGM 플리  | 1인 개발일지",
-      "published": "2026-09-07T08:11:55.000Z"
     }
   ]
 }
