@@ -194,8 +194,7 @@ async function fetchData() {
 }
 if (window.frameElement) {
  const resize = () => {
-  const style=getComputedStyle(document.body);
-  window.frameElement.style.height=Math.ceil(document.querySelector('main').getBoundingClientRect().height+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)+4)+'px';
+  window.frameElement.style.height=Math.ceil(document.body.getBoundingClientRect().height+4)+'px';
  };
  new ResizeObserver(resize).observe(document.querySelector('main'));
 }
