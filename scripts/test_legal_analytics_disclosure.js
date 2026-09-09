@@ -64,13 +64,36 @@ test("localized legal documents distinguish required Supabase operations from op
     assert.match(privacy, copy.firebaseId, `${locale} privacy must not omit the Firebase app-instance identifier`);
     assert.match(privacy, copy.settings, `${locale} privacy must explain settings withdrawal`);
     assert.match(privacy, /https:\/\/firebase\.google\.com\/support\/privacy/, `${locale} privacy must link to Firebase privacy information`);
-    assert.match(privacy, /1\.1\.2[^<]*(?:build\s*)?53/i, `${locale} privacy must scope the controls to app 1.1.2 build 53 or later`);
+    assert.match(privacy, /1\.1\.2[^<]*(?:build\s*)?53/i, `${locale} privacy must identify the legacy Firebase-only release`);
 
     assert.match(terms, copy.sameGame, `${locale} terms must say refusal does not restrict the game`);
     assert.match(terms, copy.separate, `${locale} terms must distinguish analytics from ad consent`);
     assert.match(terms, copy.history, `${locale} terms must record the September 5 analytics clarification`);
-    assert.match(terms, /1\.1\.2[^<]*(?:build\s*)?53/i, `${locale} terms must scope the controls to app 1.1.2 build 53 or later`);
+    assert.match(terms, /1\.1\.2[^<]*(?:build\s*)?53/i, `${locale} terms must identify the legacy Firebase-only release`);
     assert.match(privacy, copy.history, `${locale} privacy must record the September 5 analytics clarification`);
+  }
+});
+
+test("age and combined analytics controls are conditional, not retroactive public-build claims", () => {
+  const copy = {
+    ko: { scope: /연령 확인[^<]*통합 분석 안내[^<]*표시되는 앱/, noRetro: /기존[^<]*Firebase[^<]*소급[^<]*확대하지/, ttl: /24시간/, age: /14~17/ },
+    en: { scope: /app that displays[^<]*age confirmation[^<]*combined analytics notice/i, noRetro: /previous[^<]*Firebase[^<]*not[^<]*retroactively extend/i, ttl: /24 hours/i, age: /14–17/ },
+    de: { scope: /App, die[^<]*Altersbestätigung[^<]*gemeinsamen Analysehinweis anzeigt/i, noRetro: /frühere[^<]*Firebase[^<]*nicht rückwirkend erweitert/i, ttl: /24 Stunden/i, age: /14–17/ },
+    ja: { scope: /年齢確認[^<]*統合分析の案内[^<]*表示されるアプリ/, noRetro: /以前[^<]*Firebase[^<]*遡及[^<]*拡張しません/, ttl: /24時間/, age: /14～17/ },
+  };
+  for (const [locale, checks] of Object.entries(copy)) {
+    const privacy = read(`privacy/${locale}.html`);
+    const terms = read(`quirky-ball/terms/${locale}.html`);
+    for (const [name, html] of [["privacy", privacy], ["terms", terms]]) {
+      const text = html.replace(/<[^>]+>/g, " ");
+      assert.match(text, checks.scope, `${locale} ${name}: scope controls to the displayed notice`);
+      assert.match(text, checks.noRetro, `${locale} ${name}: no retroactive expansion of Firebase consent`);
+      assert.match(text, checks.age, `${locale} ${name}: explain teen use`);
+      assert.match(html, /datetime="2026-09-09"/, `${locale} ${name}: current clarification date`);
+    }
+    assert.match(privacy, checks.ttl, `${locale}: disclose app-managed pending-event expiry`);
+    assert.match(privacy, /0[^<]*14[^<]*18/, `${locale}: disclose local age-band codes`);
+    assert.match(privacy, /https:\/\/legal\.applovin\.com\/policies-publishers\//, `${locale}: link activation requirements`);
   }
 });
 

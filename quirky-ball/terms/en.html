@@ -81,6 +81,8 @@
   <p>The game offers optional one-time purchases, including Remove Ads, the Starter Package, and the yakwon Package.</p>
 
   <h2 id="section-3">3. Age Requirement</h2>
+  <p>Scope of the new controls: the new controls described below apply only to an app that displays both age confirmation and the combined analytics notice. As of September 9, 2026, this change is being prepared for release; this is not a claim that it is already available in the existing public Quirky Ball 1.1.2 (build 53). Check the notice displayed in the app, not the version number alone.</p>
+  <p>In an app displaying the new notice, users cannot enter the game before confirming they are at least 14 (unknown age: 0), or if they are under 14. Users aged 14–17 can play, but ad SDK/Google UMP requests and optional usage analytics are disabled. Users aged 18 or over can proceed to the standard advertising-consent flow after accepting the required terms; ads are not requested without the required consent. Users select their birth year and month on the age-confirmation screen; the age band is calculated only on the device. The day of birth is not requested, and the selected year/month is not saved or transmitted. Because the day is unknown, the age-14 and age-18 thresholds are conservatively treated as met only from the month after the relevant birth month. Only the calculated band is stored locally (0: unknown, 14: ages 14–17, 18: age 18 or over). This does not replace identity/age verification or any required parental authorization.</p>
   <p>The Software may only be used by persons aged 14 or older. Any higher minimum age required by local law for playing the game itself must also be met. If we learn that a user is under 14, we may delete the related account and data.</p>
   <p>A minor’s contractual capacity and any need for approval by a parent or other legal representative are governed by applicable law. Where legally required, that approval must be obtained for accepting these Terms and using the game. The age for independently consenting to personal-data processing and requirements for parental authorization vary by jurisdiction and processing purpose and are separate from the minimum gameplay age. These data-consent ages do not mean that all gameplay by persons under 16 is prohibited in Germany.</p>
 
@@ -112,10 +114,11 @@
 
   <h2 id="section-6">6. Advertising and Optional Analytics Consent</h2>
   <ul>
-    <li>The Software displays ads served by Google AdMob; watching rewarded ads is optional.</li>
-    <li>Usage analytics through Firebase Analytics is a separate, optional choice and is not preselected. If allowed, automatically collected events and app-use information such as tutorial completion may be analyzed. This control applies from Quirky Ball 1.1.2 (build 53).</li>
-    <li>Declining Firebase Analytics does not restrict the game, its features, or rewards. The analytics choice can be changed or withdrawn at any time in the app settings.</li>
-    <li>The Firebase analytics choice is separate from advertising consent through Google UMP and the iOS ATT choice.</li>
+    <li>The Software displays ads served by Google AdMob; watching rewarded ads is optional. Declining advertising consent does not prevent gameplay, but rewards conditional on completing an ad view may be unavailable.</li>
+    <li>The Firebase-only notice and setting in the existing public Quirky Ball 1.1.2 (build 53) control Firebase Analytics, not first-party analytics stored in Supabase. A previous Firebase-only ON choice does not retroactively extend to the new combined scope; a fresh explicit choice on the new notice is required.</li>
+    <li>In an app displaying the new notice, the optional usage-analytics choice jointly controls House Duck behavioral analytics stored in Supabase and Firebase Analytics (including automatically collected events and tutorial completion). Users aged 18 or over make an explicit choice that is not preselected, separate from required terms acceptance and advertising consent. Declining does not restrict the game. Essential account, currency, transaction, and security processing is separate.</li>
+    <li>Declining optional usage analytics does not restrict the game, its features, or rewards. The analytics choice can be changed or withdrawn at any time in the app settings.</li>
+    <li>The optional usage-analytics choice is separate from advertising consent through Google UMP and the iOS ATT choice.</li>
     <li>Users in regions where consent is required (such as the EEA and the UK) may be shown a Google UMP consent flow. Advertising choices can be managed through the UMP flow and device settings.</li>
     <li>Data processing related to ads and analytics is governed by the <a href="/privacy/en.html">Privacy Policy</a>.</li>
   </ul>
@@ -168,14 +171,14 @@
   <p><strong>Address:</strong> Ringstr. 23, 61476 Kronberg im Taunus, Hessen, Germany<br><a href="/impressum/en.html">Impressum</a></p>
 
   <h2 id="section-16">16. Effective Date and Revision History</h2>
-<ul><li>Effective August 24, 2026 — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products (v2.0)</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification. This does not change the original effective date of August 24, 2026.</li><li>Analytics notice update September 5, 2026 — Distinguished Supabase-backed operations and first-party analytics from optional Firebase Analytics, and documented Firebase consent, refusal, and withdrawal in settings. The original effective date remains unchanged.</li><li>Clarity update September 8, 2026 — Clarified Terms acceptance versus privacy notice and optional consent, requirements for minors’ use, purchases and data consent, and consumer rights in data loss, account termination and game-balance changes. The original effective date remains unchanged.</li></ul>
+<ul><li>Effective August 24, 2026 — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products (v2.0)</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification. This does not change the original effective date of August 24, 2026.</li><li>Analytics notice update September 5, 2026 — Distinguished Supabase-backed operations and first-party analytics from optional Firebase Analytics, and documented Firebase consent, refusal, and withdrawal in settings. The original effective date remains unchanged.</li><li>Clarity update September 8, 2026 — Clarified Terms acceptance versus privacy notice and optional consent, requirements for minors’ use, purchases and data consent, and consumer rights in data loss, account termination and game-balance changes. The original effective date remains unchanged.</li><li>Preparation notice September 9, 2026 — Clarified age bands, the combined optional analytics choice and 24-hour unsent queues in apps displaying the new notice, no retroactive expansion of Firebase-only choices, ad-reward conditions, and requirements before AppLovin MAX activation. This does not announce completed app rollout or MAX activation. The original effective date remains unchanged.</li></ul>
 
   </div>
         <!-- 문서 본문 끝 -->
 
         <footer class="legal-document-footer">
           <p>Official Quirky Ball document · Terms of Service</p>
-        <p class="legal-update">Last updated: <time datetime="2026-09-08">September 8, 2026</time> · clarity update; original effective date unchanged</p></footer>
+        <p class="legal-update">Last updated: <time datetime="2026-09-09">September 9, 2026</time> · clarity update; original effective date unchanged</p></footer>
       </article>
     </div>
   </main>
