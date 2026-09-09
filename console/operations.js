@@ -161,7 +161,7 @@
     const task = form.closest("details");
     if (task) task.open = true;
     form.scrollIntoView({ block: "start" });
-    if (!announcementEditor.isRich()) form.elements.body.focus();
+    byId("announcementDocument").focus();
   }
 
   function lockAnnouncementActions(locked) {
@@ -176,11 +176,16 @@
     announcementMutationPending = true;
     const form = byId("announcementForm");
     const controls = Array.from(form.querySelectorAll("button, input, select, textarea"));
+    const documentEditor = byId("announcementDocument");
+    documentEditor.contentEditable = "false";
+    documentEditor.setAttribute("aria-busy", "true");
     const disabled = controls.map((control) => control.disabled);
     controls.forEach((control) => { control.disabled = true; });
     lockAnnouncementActions(true);
     return () => {
       announcementMutationPending = false;
+      documentEditor.contentEditable = "true";
+      documentEditor.setAttribute("aria-busy", "false");
       controls.forEach((control, index) => { control.disabled = disabled[index]; });
       lockAnnouncementActions(announcementBusy());
     };
@@ -284,7 +289,7 @@
       onBusy: (busy) => lockAnnouncementActions(busy || announcementMutationPending),
       onMessage: (value, error) => setAnnouncementMessage(value, error),
     });
-    ["click", "input", "change"].forEach((type) => byId("announcementForm").addEventListener(type, (event) => {
+    ["click", "beforeinput", "paste", "drop", "input", "change"].forEach((type) => byId("announcementForm").addEventListener(type, (event) => {
       if (!announcementMutationPending) return;
       event.preventDefault();
       event.stopImmediatePropagation();

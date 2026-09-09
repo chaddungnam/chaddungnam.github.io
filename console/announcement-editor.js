@@ -59,318 +59,250 @@
   }
 
   function create(form, options = {}) {
-    const plainPanel = form.querySelector("#announcementPlainPanel");
-    const richPanel = form.querySelector("#announcementRichPanel");
     const body = form.elements.body;
-    const richButton = form.querySelector("#announcementRichMode");
-    const plainButton = form.querySelector("#announcementPlainMode");
-    const blockHost = form.querySelector("#announcementBlocks");
-    const preview = form.querySelector("#announcementPreview");
-    const status = form.querySelector("#announcementEditorStatus");
-    const blockCount = form.querySelector("#announcementBlockCount");
-    const textCount = form.querySelector("#announcementTextCount");
-    const sizeSelect = form.querySelector("#announcementTextSize");
-    const imageInput = form.querySelector("#announcementImageInput");
-    let rich = false;
-    let blocks = [];
-    let selected = -1;
+    const editor = form.querySelector('#announcementDocument');
+    const status = form.querySelector('#announcementEditorStatus');
+    const count = form.querySelector('#announcementTextCount');
+    const imageInput = form.querySelector('#announcementImageInput');
+    const sizeSelect = form.querySelector('#announcementTextSize');
     let processing = false;
-    let lastCaret = null;
+    let savedRange = null;
+    let previewTimer;
+    const previewKeys = new WeakMap();
+    let pendingFile = null;
+    let pendingNode = null;
+    let disabledBefore = new Map();
 
-    function message(value, error = false) {
-      status.textContent = value || "";
-      status.setAttribute("role", error ? "alert" : "status");
-      status.classList.toggle("is-error", error);
-      if (typeof options.onMessage === "function" && value) options.onMessage(value, error);
+    function message(text, error = false) {
+      status.textContent = text;
+      status.setAttribute('role', error ? 'alert' : 'status');
+      status.classList.toggle('is-error', error);
+      if (text) options.onMessage?.(text, error);
     }
-
-    function textTotal() {
-      return sourceLength(blocks);
+    function makeParagraph(block = paragraph()) {
+      const node = document.createElement('div');
+      node.dataset.paragraph = '';
+      node.dataset.size = block.size;
+      node.dataset.align = block.align;
+      for (const key of ['bold', 'italic', 'underline']) node.dataset[key] = String(block[key]);
+      node.textContent = block.text;
+      if (!block.text) node.append(document.createElement('br'));
+      styleParagraph(node);
+      return node;
     }
-
-    function imageTotal() {
-      return blocks.filter((block) => block.type === "image" || block.type === "pending-image").length;
+    function styleParagraph(node) {
+      node.style.textAlign = node.dataset.align || 'left';
+      node.style.fontWeight = node.dataset.bold === 'true' ? '800' : '400';
+      node.style.fontStyle = node.dataset.italic === 'true' ? 'italic' : 'normal';
+      node.style.textDecoration = node.dataset.underline === 'true' ? 'underline' : 'none';
     }
-
-    function derivedBody() {
-      return blocks.filter((block) => block.type === "paragraph").map((block) => block.text).join("\n\n");
+    function nodeText(node) {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+      if (node.nodeType !== Node.ELEMENT_NODE || node.matches('[data-link-preview], figure, hr')) return '';
+      if (node.tagName === 'BR') return '\n';
+      const children = Array.from(node.childNodes);
+      if (children.length === 1 && children[0].nodeName === 'BR') return '';
+      return children.map((child, index) => {
+        const text = nodeText(child);
+        return index > 0 && child.nodeType === 1 && ['DIV', 'P'].includes(child.tagName) ? '\n' + text : text;
+      }).join('');
     }
-
-    function syncBodyAndCounts() {
-      if (rich) body.value = derivedBody();
-      blockCount.textContent = `${blocks.length} / ${LIMITS.blocks} 블록 · 이미지 ${imageTotal()} / ${LIMITS.images}`;
-      textCount.textContent = `${textTotal()} / ${LIMITS.text} 소스 글자`;
-      const draftError = validateDraft(false);
-      body.setCustomValidity(draftError || "");
-    }
-
-    function validateDraft(requireText = true) {
-      if (!rich) {
-        if (codePointLength(body.value.trim()) > LIMITS.text) return `공지 소스는 총 ${LIMITS.text}자까지 입력할 수 있습니다.`;
-        return body.value.trim() || !requireText ? "" : "공지 본문을 입력해 주세요.";
-      }
-      if (blocks.length > LIMITS.blocks) return `블록은 최대 ${LIMITS.blocks}개까지 추가할 수 있습니다.`;
-      if (imageTotal() > LIMITS.images) return `이미지는 최대 ${LIMITS.images}개까지 추가할 수 있습니다.`;
-      if (blocks.some((block) => block.type === "image" && codePointLength(block.alt) > 200)) return "이미지 대체 텍스트는 200자까지 입력할 수 있습니다.";
-      if (textTotal() > LIMITS.text) return `문단 본문·문단 사이 줄바꿈·이미지 대체 텍스트를 합쳐 ${LIMITS.text}자까지 입력할 수 있습니다.`;
-      if (blocks.some((block) => block.type === "pending-image")) return "이미지 처리를 완료하거나 해당 블록을 삭제해 주세요.";
-      if (requireText && !derivedBody().trim()) return "공지에는 한 글자 이상의 문단이 필요합니다.";
-      return "";
-    }
-
-    function safeImageUrl(path) {
-      return IMAGE_PATH.test(String(path || "")) ? `${MEDIA_BASE}${path}` : "";
-    }
-
-    function renderPreview() {
-      preview.replaceChildren();
-      for (const block of blocks) {
-        if (block.type === "paragraph") {
-          const node = document.createElement(block.size === "title" ? "h3" : "p");
-          node.textContent = block.text || "빈 문단";
-          node.dataset.size = block.size;
-          node.style.textAlign = block.align;
-          node.style.fontWeight = block.bold ? "800" : "400";
-          node.style.fontStyle = block.italic ? "italic" : "normal";
-          node.style.textDecoration = block.underline ? "underline" : "none";
-          preview.append(node);
-        } else if (block.type === "divider") {
-          preview.append(document.createElement("hr"));
-        } else if (block.type === "image") {
-          const figure = document.createElement("figure");
-          figure.style.width = `${block.width}%`;
-          const url = safeImageUrl(block.path);
-          if (url) {
-            const image = document.createElement("img");
-            image.src = url;
-            image.alt = block.alt;
-            figure.append(image);
-          } else {
-            const placeholder = document.createElement("span");
-            placeholder.textContent = `이미지 · ${block.path}`;
-            figure.append(placeholder);
-          }
-          if (block.alt) {
-            const caption = document.createElement("figcaption");
-            caption.textContent = block.alt;
-            figure.append(caption);
-          }
-          preview.append(figure);
+    function blocksFromDOM() {
+      const blocks = [];
+      for (const node of editor.childNodes) {
+        if (node.nodeType === 1 && (node.matches('[data-link-preview]') || (node.dataset.editorTail && !nodeText(node)))) continue;
+        if (node.nodeType === 1 && node.matches('figure')) {
+          if (node.dataset.pending) { blocks.push({type:'pending-image'}); continue; }
+          blocks.push({type:'image', path:node.dataset.path, alt:node.querySelector('[data-image-alt]').value, width:Number(node.querySelector('[data-image-width]').value)});
+        } else if (node.nodeName === 'HR') blocks.push({type:'divider'});
+        else {
+          const text = nodeText(node);
+          if (node.nodeType === 3 && !text) continue;
+          const data = node.dataset || {};
+          blocks.push({...paragraph(text), size:SIZES.has(data.size) ? data.size : 'normal', align:ALIGNS.has(data.align) ? data.align : 'left', bold:data.bold === 'true', italic:data.italic === 'true', underline:data.underline === 'true'});
         }
       }
-      if (!blocks.length) {
-        const empty = document.createElement("p");
-        empty.className = "announcement-preview-empty";
-        empty.textContent = "블록을 추가하면 미리보기가 표시됩니다.";
-        preview.append(empty);
+      return blocks;
+    }
+    function validate(blocks, requireText = true) {
+      if (processing || blocks.some(b => b.type === 'pending-image')) return '이미지 처리를 완료하거나 실패한 이미지를 삭제해 주세요.';
+      if (blocks.length > LIMITS.blocks) return `문단·이미지·구분선은 총 ${LIMITS.blocks}개까지 넣을 수 있습니다.`;
+      if (blocks.filter(b => b.type === 'image').length > LIMITS.images) return `이미지는 최대 ${LIMITS.images}개까지 넣을 수 있습니다.`;
+      if (blocks.some(b => b.type === 'image' && codePointLength(b.alt) > 200)) return '이미지 대체 텍스트는 200자까지 입력해 주세요.';
+      if (sourceLength(blocks) > LIMITS.text) return `본문·줄바꿈·이미지 대체 텍스트를 합쳐 ${LIMITS.text}자까지 입력할 수 있습니다.`;
+      if (requireText && !blocks.some(b => b.type === 'paragraph' && b.text.trim())) return '공지 본문을 입력해 주세요.';
+      return '';
+    }
+    function ensureParagraph() {
+      if (editor.childNodes.length && Array.from(editor.childNodes).every(node => node.nodeType === 3 || node.nodeName === 'BR')) {
+        const selection = window.getSelection();
+        const anchor = selection?.anchorNode, offset = selection?.anchorOffset;
+        const node = makeParagraph(); node.replaceChildren(...editor.childNodes); editor.append(node);
+        if (anchor && editor.contains(anchor)) { const range = document.createRange(); range.setStart(anchor, Math.min(offset, anchor.textContent.length)); range.collapse(true); selection.removeAllRanges(); selection.addRange(range); }
       }
     }
-
-    function actionRow(index) {
-      const actions = document.createElement("div");
-      actions.className = "announcement-block-actions";
-      const up = button("↑", "up", `${index + 1}번 블록 위로 이동`);
-      const down = button("↓", "down", `${index + 1}번 블록 아래로 이동`);
-      const remove = button("삭제", "remove", `${index + 1}번 블록 삭제`);
-      up.disabled = processing || index === 0;
-      down.disabled = processing || index === blocks.length - 1;
-      remove.disabled = processing;
-      actions.append(up, down, remove);
-      return actions;
+    function sync() {
+      ensureParagraph();
+      const blocks = blocksFromDOM();
+      body.value = blocks.filter(b => b.type === 'paragraph').map(b => b.text).join('\n\n');
+      count.textContent = `${sourceLength(blocks)} / ${LIMITS.text}자 · 이미지 ${blocks.filter(b => /image$/.test(b.type)).length} / ${LIMITS.images}`;
+      editor.setAttribute('aria-invalid', String(Boolean(validate(blocks, false))));
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(refreshPreviews, 350);
     }
-
-    function renderBlocks(focusIndex = null) {
-      blockHost.replaceChildren();
-      blocks.forEach((block, index) => {
-        const article = document.createElement("article");
-        article.className = "announcement-block";
-        article.dataset.blockIndex = String(index);
-        article.classList.toggle("is-selected", index === selected);
-        article.setAttribute("aria-label", `${index + 1}번 ${block.type === "paragraph" ? "문단" : block.type === "divider" ? "구분선" : "이미지"} 블록`);
-        const header = document.createElement("header");
-        const label = document.createElement("strong");
-        label.textContent = `${index + 1}. ${block.type === "paragraph" ? "문단" : block.type === "divider" ? "구분선" : "이미지"}`;
-        header.append(label, actionRow(index));
-        article.append(header);
-
-        if (block.type === "paragraph") {
-          const input = document.createElement("textarea");
-          input.value = block.text;
-          input.rows = 3;
-          input.dataset.blockText = "";
-          input.setAttribute("aria-label", `${index + 1}번 문단 내용`);
-          article.append(input);
-        } else if (block.type === "divider") {
-          const line = document.createElement("hr");
-          line.setAttribute("aria-hidden", "true");
-          article.append(line);
-        } else {
-          const grid = document.createElement("div");
-          grid.className = "announcement-image-fields";
-          if (block.type === "image") {
-            const url = safeImageUrl(block.path);
-            if (url) {
-              const image = document.createElement("img");
-              image.src = url;
-              image.alt = block.alt;
-              grid.append(image);
-            }
-            const altLabel = document.createElement("label");
-            altLabel.append(document.createTextNode("대체 텍스트"));
-            const alt = document.createElement("input");
-            alt.value = block.alt;
-            alt.dataset.imageAlt = "";
-            altLabel.append(alt);
-            const widthLabel = document.createElement("label");
-            widthLabel.append(document.createTextNode("너비"));
-            const width = document.createElement("select");
-            width.dataset.imageWidth = "";
-            [50, 75, 100].forEach((value) => {
-              const option = document.createElement("option");
-              option.value = String(value);
-              option.textContent = `${value}%`;
-              option.selected = value === block.width;
-              width.append(option);
-            });
-            widthLabel.append(width);
-            grid.append(altLabel, widthLabel);
-            const compression = document.createElement("small");
-            compression.className = "announcement-compression-result";
-            compression.textContent = block.stats || `WebP · ${block.path}`;
-            grid.append(compression);
-          } else {
-            const pending = document.createElement("p");
-            pending.className = block.error ? "announcement-upload-error" : "announcement-upload-progress";
-            pending.textContent = block.error || "이미지를 WebP로 압축하고 있습니다...";
-            grid.append(pending);
-            if (block.error) {
-              const retry = button("다시 시도", "retry", `${index + 1}번 이미지 다시 처리`);
-              retry.className = "editor-retry-button";
-              retry.disabled = processing;
-              grid.append(retry);
-            }
-          }
-          article.append(grid);
-        }
-        blockHost.append(article);
-      });
-      syncBodyAndCounts();
-      renderPreview();
-      syncToolbar();
-      if (focusIndex !== null) {
-        const target = blockHost.querySelector(`[data-block-index="${focusIndex}"] textarea, [data-block-index="${focusIndex}"] input`);
-        target?.focus();
+    function rememberSelection() {
+      const selection = window.getSelection();
+      if (selection?.rangeCount && editor.contains(selection.anchorNode) && editor.contains(selection.focusNode)) savedRange = selection.getRangeAt(0).cloneRange();
+    }
+    function restoreSelection() {
+      editor.focus();
+      const selection = window.getSelection();
+      if (!savedRange || !editor.contains(savedRange.startContainer)) {
+        savedRange = document.createRange();
+        savedRange.selectNodeContents(editor.lastElementChild || editor);
+        savedRange.collapse(false);
       }
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
     }
-
+    function selectedParagraph() {
+      const selection = window.getSelection();
+      let node = selection?.anchorNode;
+      if (node?.nodeType === 3) node = node.parentElement;
+      while (node && node.parentElement !== editor) node = node.parentElement;
+      return node && !node.matches('figure, hr, [data-link-preview]') ? node : null;
+    }
     function syncToolbar() {
-      const block = blocks[selected];
-      const enabled = !processing && block?.type === "paragraph";
-      sizeSelect.disabled = !enabled;
-      if (enabled) sizeSelect.value = block.size;
-      form.querySelectorAll("[data-format]").forEach((control) => {
-        control.disabled = !enabled;
-        control.setAttribute("aria-pressed", enabled && block[control.dataset.format] ? "true" : "false");
-      });
-      form.querySelectorAll("[data-align]").forEach((control) => {
-        control.disabled = !enabled;
-        control.setAttribute("aria-pressed", enabled && block.align === control.dataset.align ? "true" : "false");
-      });
+      const node = selectedParagraph();
+      sizeSelect.value = node?.dataset.size || 'normal';
+      form.querySelectorAll('[data-format]').forEach(control => control.setAttribute('aria-pressed', String(node?.dataset[control.dataset.format] === 'true')));
+      form.querySelectorAll('[data-align]').forEach(control => control.setAttribute('aria-pressed', String((node?.dataset.align || 'left') === control.dataset.align)));
     }
-
-    function select(index) {
-      if (!Number.isInteger(index) || index < 0 || index >= blocks.length) return;
-      selected = index;
-      blockHost.querySelectorAll(".announcement-block").forEach((node, nodeIndex) => node.classList.toggle("is-selected", nodeIndex === selected));
-      syncToolbar();
-    }
-
-    function rememberCaret(target) {
-      if (!target?.matches("[data-block-text]")) return;
-      const index = Number(target.closest("[data-block-index]")?.dataset.blockIndex);
-      if (Number.isInteger(index) && Number.isInteger(target.selectionStart)) lastCaret = { index, point: target.selectionStart };
-    }
-
-    function splitPoint() {
-      const block = blocks[selected];
-      if (block?.type !== "paragraph") return null;
-      const active = document.activeElement;
-      const activeMatches = active?.matches("[data-block-text]") && active.closest("[data-block-index]")?.dataset.blockIndex === String(selected);
-      const point = activeMatches && Number.isInteger(active.selectionStart)
-        ? active.selectionStart
-        : lastCaret?.index === selected ? lastCaret.point : null;
-      if (!Number.isInteger(point)) return null;
-      const safePoint = Math.max(0, Math.min(block.text.length, point));
-      return { before: block.text.slice(0, safePoint), after: block.text.slice(safePoint) };
-    }
-
-    function insertAfterSelection(block) {
-      const previousBlocks = blocks.map((current) => ({ ...current }));
-      const previousSelected = selected;
-      const split = splitPoint();
-      const insertAt = selected >= 0 ? selected + 1 : blocks.length;
-      const extra = split?.after ? 1 : 0;
-      if (blocks.length + 1 + extra > LIMITS.blocks) {
-        message(`블록은 최대 ${LIMITS.blocks}개까지 추가할 수 있습니다.`, true);
-        return -1;
+    function refreshPreviews() {
+      if (!root.NoticeLinks) return;
+      editor.querySelectorAll(':scope > [data-link-preview]').forEach(node => { if (!node.previousElementSibling || node.previousElementSibling.matches('figure,hr,[data-link-preview]')) node.remove(); });
+      for (const node of Array.from(editor.children)) {
+        if (node.matches('figure,hr,[data-link-preview]')) continue;
+        const key = (nodeText(node).match(/https:\/\/[^\s<>]+/g) || []).join('\n');
+        if (previewKeys.get(node) === key) continue;
+        previewKeys.set(node, key);
+        if (node.nextElementSibling?.matches('[data-link-preview]')) node.nextElementSibling.remove();
+        const preview = document.createElement('div');
+        preview.dataset.linkPreview = '';
+        preview.contentEditable = 'false';
+        root.NoticeLinks.previews(nodeText(node), preview);
+        if (preview.childNodes.length) node.after(preview);
       }
-      if (split) blocks[selected].text = split.before;
-      blocks.splice(insertAt, 0, block);
-      if (split?.after) blocks.splice(insertAt + 1, 0, paragraph(split.after));
-      if (sourceLength(blocks) > LIMITS.text) {
-        blocks = previousBlocks;
-        selected = previousSelected;
-        renderBlocks(selected >= 0 ? selected : null);
-        message(`문단 분리의 줄바꿈까지 포함해 공지 소스는 ${LIMITS.text}자 이하여야 합니다.`, true);
-        return -1;
+    }
+    function makeImage(block) {
+      const figure = document.createElement('figure');
+      figure.contentEditable = 'false';
+      figure.dataset.path = block.path;
+      const img = document.createElement('img');
+      img.src = MEDIA_BASE + block.path;
+      img.alt = block.alt;
+      img.style.width = `${block.width}%`;
+      const fields = document.createElement('div');
+      fields.className = 'announcement-media-controls';
+      const altLabel = document.createElement('label');
+      altLabel.append('대체 텍스트');
+      const alt = document.createElement('input');
+      alt.dataset.imageAlt = '';
+      alt.value = block.alt;
+      altLabel.append(alt);
+      const widthLabel = document.createElement('label');
+      widthLabel.append('너비');
+      const width = document.createElement('select');
+      width.dataset.imageWidth = '';
+      for (const value of WIDTHS) width.add(new Option(`${value}%`, String(value), false, value === block.width));
+      widthLabel.append(width);
+      const remove = button('이미지 삭제', 'remove');
+      remove.addEventListener('click', () => { figure.remove(); sync(); });
+      width.addEventListener('change', () => { img.style.width = `${width.value}%`; sync(); });
+      alt.addEventListener('input', () => { img.alt = alt.value; sync(); });
+      fields.append(altLabel, widthLabel, remove);
+      figure.append(img, fields);
+      return figure;
+    }
+    // Insert at the saved caret, retaining both sides of the paragraph and selection replacement.
+    function insertMedia(node) {
+      restoreSelection();
+      const range = window.getSelection().getRangeAt(0);
+      range.deleteContents();
+      let current = selectedParagraph();
+      if (current && current.contains(range.startContainer)) {
+        const tailRange = document.createRange();
+        tailRange.selectNodeContents(current);
+        tailRange.setStart(range.startContainer, range.startOffset);
+        const tail = makeParagraph();
+        tail.replaceChildren(tailRange.extractContents());
+        if (!nodeText(tail)) { tail.dataset.editorTail = 'true'; if (!tail.childNodes.length) tail.append(document.createElement('br')); }
+        current.after(node, tail);
+        if (!nodeText(current)) current.dataset.editorTail = 'true';
+        const next = document.createRange();
+        next.selectNodeContents(tail); next.collapse(true); savedRange = next;
+      } else {
+        const tail = makeParagraph(); tail.dataset.editorTail = 'true';
+        range.insertNode(node); node.after(tail);
+        const next = document.createRange(); next.selectNodeContents(tail); next.collapse(true); savedRange = next;
       }
-      selected = insertAt;
-      renderBlocks(block.type === "paragraph" ? insertAt : split?.after ? insertAt + 1 : null);
-      return insertAt;
+      restoreSelection(); sync();
     }
-
-    function enterRichMode() {
-      if (rich || processing) return;
-      const value = body.value;
-      blocks = value ? value.split("\n\n").map((text) => paragraph(text)) : [paragraph()];
-      selected = 0;
-      rich = true;
-      plainPanel.hidden = true;
-      richPanel.hidden = false;
-      richButton.setAttribute("aria-expanded", "true");
-      richButton.textContent = "블록 편집 중";
-      renderBlocks(0);
-      message("블록 편집을 시작했습니다. 선택한 문단 뒤에 이미지나 구분선을 추가할 수 있습니다.");
-    }
-
-    function hasRichOnlyData() {
-      return blocks.some((block) => block.type !== "paragraph") || blocks.some((block) => block.type === "paragraph" && (block.size !== "normal" || block.align !== "left" || block.bold || block.italic || block.underline));
-    }
-
-    function enterPlainMode() {
-      if (!rich || processing) return;
-      if (hasRichOnlyData() && !root.confirm("이미지·구분선·문단 서식은 일반 텍스트에서 표시되지 않습니다. 일반 텍스트로 전환할까요?")) return;
-      body.value = derivedBody();
-      rich = false;
-      blocks = [];
-      selected = -1;
-      plainPanel.hidden = false;
-      richPanel.hidden = true;
-      richButton.setAttribute("aria-expanded", "false");
-      richButton.textContent = "블록 편집 사용";
-      body.setCustomValidity("");
-      body.focus();
-      message("일반 텍스트 편집으로 전환했습니다.");
-    }
-
     function setProcessing(value) {
       processing = value;
-      form.dataset.editorProcessing = value ? "true" : "false";
-      form.querySelectorAll("button, input, select, textarea").forEach((control) => {
-        if (control.type !== "hidden") control.disabled = value;
-      });
-      if (typeof options.onBusy === "function") options.onBusy(value);
-      if (rich) renderBlocks();
+      form.dataset.editorProcessing = String(value);
+      editor.contentEditable = String(!value);
+      editor.setAttribute('aria-busy', String(value));
+      if (value) {
+        disabledBefore = new Map();
+        form.querySelectorAll('button,input,select,textarea').forEach(control => { disabledBefore.set(control, control.disabled); control.disabled = true; });
+      } else {
+        disabledBefore.forEach((disabled, control) => { if (control.isConnected) control.disabled = disabled; });
+        disabledBefore.clear();
+      }
+      options.onBusy?.(value);
+    }
+    async function uploadPending() {
+      if (!pendingNode || !pendingFile || processing) return;
+      const node = pendingNode;
+      const file = pendingFile;
+      setProcessing(true);
+      node.textContent = '이미지를 압축하고 업로드하고 있습니다…';
+      message('원본은 전송하지 않고 브라우저에서 WebP로 압축합니다.');
+      try {
+        const compressed = await compress(file);
+        const result = await root.ConsoleAPI.post('admin-console', {action:'announcements.media.upload', dataBase64:toBase64(compressed.bytes)});
+        if (!IMAGE_PATH.test(String(result?.path || ''))) throw new Error('서버가 올바른 이미지 경로를 반환하지 않았습니다.');
+        node.replaceWith(makeImage({type:'image',path:result.path,alt:'',width:100}));
+        pendingNode = null; pendingFile = null;
+        message(`이미지 업로드 완료: ${byteText(file.size)} → ${byteText(compressed.blob.size)}`);
+      } catch(error) {
+        node.textContent = error?.message || '이미지 업로드 실패';
+        const retry = button('다시 시도', 'retry');
+        retry.addEventListener('click', uploadPending);
+        const remove = button('이미지 삭제', 'remove');
+        remove.addEventListener('click', () => { node.remove(); pendingNode = null; pendingFile = null; sync(); });
+        node.append(retry, remove);
+        message(`${error?.message || '이미지 업로드 실패'} 본문은 유지됩니다. 다시 시도하거나 이미지를 삭제해 주세요.`, true);
+      } finally {
+        setProcessing(false); sync(); restoreSelection();
+      }
+    }
+    async function addImages(files) {
+      if (processing) return;
+      if (pendingNode) { message('실패한 이미지를 먼저 재시도하거나 삭제해 주세요.', true); return; }
+      for (const file of files) {
+        const blocks = blocksFromDOM();
+        if (blocks.filter(b => b.type === 'image').length >= LIMITS.images || blocks.length + 2 > LIMITS.blocks) {
+          message('이미지는 최대 8개, 문단·이미지·구분선은 총 60개까지 넣을 수 있습니다.', true); break;
+        }
+        pendingNode = document.createElement('figure');
+        pendingNode.contentEditable = 'false'; pendingNode.dataset.pending = 'true';
+        pendingFile = file;
+        insertMedia(pendingNode);
+        await uploadPending();
+        if (pendingNode) break;
+      }
     }
 
     function inspectWebp(bytes) {
@@ -511,191 +443,78 @@
       return btoa(chunks.join(""));
     }
 
-    async function processImage(index) {
-      const block = blocks[index];
-      if (!block || block.type !== "pending-image" || processing) return;
-      block.error = "";
-      setProcessing(true);
-      message("원본은 전송하지 않고 브라우저에서 WebP로 압축하는 중입니다...");
-      try {
-        const compressed = await compress(block.file);
-        message(`WebP ${byteText(compressed.blob.size)}로 압축했습니다. 업로드하는 중입니다...`);
-        const result = await root.ConsoleAPI.post("admin-console", { action: "announcements.media.upload", dataBase64: toBase64(compressed.bytes) });
-        if (!result || !IMAGE_PATH.test(String(result.path || ""))) throw new Error("서버가 올바른 이미지 경로를 반환하지 않았습니다.");
-        const percent = Math.round(Math.abs(1 - compressed.blob.size / block.file.size) * 100);
-        const amount = percent === 0 ? "1% 미만" : `${percent}%`;
-        const change = compressed.blob.size === block.file.size ? "크기 동일" : compressed.blob.size < block.file.size ? `${amount} 절감` : `${amount} 증가`;
-        const uploaded = { type: "image", path: result.path, alt: block.alt || "", width: block.width || 100, stats: `${byteText(block.file.size)} → ${byteText(Number(result.bytes) || compressed.blob.size)} · ${change}` };
-        blocks[index] = uploaded;
-        selected = index;
-        message(`이미지 업로드 완료: ${uploaded.stats}`);
-      } catch (error) {
-        if (blocks[index]?.type === "pending-image") blocks[index].error = error?.message || "이미지 처리를 완료하지 못했습니다.";
-        message(`${error?.message || "이미지 처리를 완료하지 못했습니다."} 원본은 업로드되지 않았고 현재 초안은 유지됩니다.`, true);
-      } finally {
-        setProcessing(false);
-      }
-    }
 
-    function addImage(file) {
-      if (!file) return;
-      if (imageTotal() >= LIMITS.images) {
-        message(`이미지는 최대 ${LIMITS.images}개까지 추가할 수 있습니다.`, true);
-        return;
-      }
-      const index = insertAfterSelection({ type: "pending-image", file, alt: "", width: 100, error: "" });
-      if (index >= 0) processImage(index);
-    }
 
     function load(notice = {}) {
       if (processing) return false;
       const content = notice.content == null ? null : normalizedContent(notice.content);
-      if (notice.content != null && !content) {
-        message("저장된 블록 공지 형식이 올바르지 않아 편집 화면을 열지 않았습니다. 원본 데이터는 변경되지 않았습니다.", true);
-        return false;
+      if (notice.content != null && !content) { message('저장된 공지 형식이 올바르지 않아 열지 않았습니다. 원본은 유지됩니다.', true); return false; }
+      const blocks = content ? content.blocks : [paragraph(String(notice.body || ''))];
+      editor.replaceChildren();
+      for (const block of blocks) {
+        if (block.type === 'paragraph') editor.append(makeParagraph(block));
+        else if (block.type === 'image') editor.append(makeImage(block));
+        else { const hr = document.createElement('hr'); hr.contentEditable = 'false'; editor.append(hr); }
       }
-      body.value = String(notice.body || "");
-      body.setCustomValidity("");
-      if (content) {
-        blocks = cloneContent(content).blocks;
-        selected = blocks.length ? 0 : -1;
-        rich = true;
-        plainPanel.hidden = true;
-        richPanel.hidden = false;
-        richButton.setAttribute("aria-expanded", "true");
-        richButton.textContent = "블록 편집 중";
-        renderBlocks();
-        message("저장된 블록과 서식을 그대로 불러왔습니다.");
-      } else {
-        rich = false;
-        blocks = [];
-        selected = -1;
-        plainPanel.hidden = false;
-        richPanel.hidden = true;
-        richButton.setAttribute("aria-expanded", "false");
-        richButton.textContent = "블록 편집 사용";
-        message("");
-      }
+      if (!editor.children.length || editor.lastElementChild.matches('figure,hr')) { const tail = makeParagraph(); tail.dataset.editorTail = 'true'; editor.append(tail); }
+      savedRange = null; pendingNode = null; pendingFile = null;
+      message(''); sync(); refreshPreviews();
       return true;
     }
-
-    function reset() {
-      if (processing) return false;
-      load({ body: "" });
-      return true;
-    }
-
     function value() {
-      const error = validateDraft(true);
-      body.setCustomValidity(error);
-      if (error) return { error };
-      const result = { body: rich ? derivedBody() : body.value.trim() };
-      if (rich) result.content = { version: 1, blocks: blocks.map(contractBlock) };
-      return result;
+      const blocks = blocksFromDOM();
+      const error = validate(blocks);
+      if (error) { message(error, true); editor.focus(); return {error}; }
+      const content = {version:1, blocks:blocks.map(contractBlock)};
+      if (!normalizedContent(content)) return {error:'공지 형식을 확인해 주세요.'};
+      return {body:blocks.filter(b => b.type === 'paragraph').map(b => b.text).join('\n\n'), content};
     }
-
-    richButton.addEventListener("click", enterRichMode);
-    plainButton.addEventListener("click", enterPlainMode);
-    body.addEventListener("input", () => {
-      body.setCustomValidity(codePointLength(body.value.trim()) > LIMITS.text ? `공지 소스는 총 ${LIMITS.text}자까지 입력할 수 있습니다.` : "");
+    editor.addEventListener('input', () => { sync(); rememberSelection(); });
+    editor.addEventListener('keyup', () => { rememberSelection(); syncToolbar(); });
+    editor.addEventListener('mouseup', () => { rememberSelection(); syncToolbar(); });
+    editor.addEventListener('focusout', rememberSelection);
+    editor.addEventListener('paste', event => {
+      if (event.target !== editor && event.target.closest('figure')) return;
+      event.preventDefault();
+      if (processing) return;
+      rememberSelection();
+      const files = Array.from(event.clipboardData?.files || []).filter(file => file.type.startsWith('image/'));
+      if (files.length) { addImages(files); return; }
+      // Never insert clipboard HTML, remote images, scripts, or inline event handlers.
+      const text = event.clipboardData?.getData('text/plain') || '';
+      const escaped = document.createElement('span'); escaped.textContent = text;
+      document.execCommand('insertHTML', false, escaped.innerHTML.replace(/\r\n?/g, '\n').replace(/\n/g, '<br>'));
+      sync(); rememberSelection(); refreshPreviews();
     });
-    sizeSelect.addEventListener("change", () => {
-      if (blocks[selected]?.type !== "paragraph" || !SIZES.has(sizeSelect.value)) return;
-      blocks[selected].size = sizeSelect.value;
-      renderBlocks(selected);
+    editor.addEventListener('dragover', event => event.preventDefault());
+    editor.addEventListener('drop', event => {
+      event.preventDefault();
+      // Keep insertion at the last editing caret; never accept HTML dragged from websites.
+      addImages(Array.from(event.dataTransfer?.files || []).filter(file => file.type.startsWith('image/')));
     });
-    form.querySelector(".announcement-block-toolbar").addEventListener("click", (event) => {
-      const format = event.target.closest("[data-format]");
-      const align = event.target.closest("[data-align]");
-      const block = blocks[selected];
-      if (block?.type !== "paragraph") return;
-      if (format) block[format.dataset.format] = !block[format.dataset.format];
-      if (align && ALIGNS.has(align.dataset.align)) block.align = align.dataset.align;
-      if (format || align) renderBlocks(selected);
-    });
-    form.querySelector(".announcement-addbar").addEventListener("click", (event) => {
-      const add = event.target.closest("[data-add-block]")?.dataset.addBlock;
-      if (add === "paragraph") insertAfterSelection(paragraph());
-      if (add === "divider") insertAfterSelection({ type: "divider" });
-    });
-    imageInput.addEventListener("change", () => {
-      const file = imageInput.files?.[0];
-      imageInput.value = "";
-      addImage(file);
-    });
-    blockHost.addEventListener("focusin", (event) => {
-      const index = Number(event.target.closest("[data-block-index]")?.dataset.blockIndex);
-      if (Number.isInteger(index)) select(index);
-      rememberCaret(event.target);
-    });
-    blockHost.addEventListener("keyup", (event) => rememberCaret(event.target));
-    blockHost.addEventListener("click", (event) => rememberCaret(event.target));
-    blockHost.addEventListener("select", (event) => rememberCaret(event.target), true);
-    blockHost.addEventListener("pointerdown", (event) => {
-      const index = Number(event.target.closest("[data-block-index]")?.dataset.blockIndex);
-      if (Number.isInteger(index)) select(index);
-    });
-    blockHost.addEventListener("input", (event) => {
-      const index = Number(event.target.closest("[data-block-index]")?.dataset.blockIndex);
-      const block = blocks[index];
-      if (!block) return;
-      if (event.target.matches("[data-block-text]") && block.type === "paragraph") {
-        const previous = block.text;
-        block.text = event.target.value;
-        if (sourceLength(blocks) > LIMITS.text) {
-          block.text = previous;
-          event.target.value = previous;
-          message(`문단 사이 줄바꿈과 이미지 대체 텍스트를 포함해 공지 소스는 ${LIMITS.text}자 이하여야 합니다.`, true);
-          return;
-        }
-        rememberCaret(event.target);
-      }
-      if (event.target.matches("[data-image-alt]") && block.type === "image") {
-        const previous = block.alt;
-        block.alt = event.target.value;
-        const altTooLong = codePointLength(block.alt) > 200;
-        if (altTooLong || sourceLength(blocks) > LIMITS.text) {
-          block.alt = previous;
-          event.target.value = previous;
-          message(altTooLong ? "이미지 대체 텍스트는 200자까지 입력할 수 있습니다." : `문단 본문과 대체 텍스트를 합쳐 공지 소스는 ${LIMITS.text}자 이하여야 합니다.`, true);
-          return;
-        }
-      }
-      syncBodyAndCounts();
-      renderPreview();
-    });
-    blockHost.addEventListener("change", (event) => {
-      const index = Number(event.target.closest("[data-block-index]")?.dataset.blockIndex);
-      const block = blocks[index];
-      if (event.target.matches("[data-image-width]") && block?.type === "image") {
-        const width = Number(event.target.value);
-        if (WIDTHS.has(width)) block.width = width;
-        renderPreview();
-      }
-    });
-    blockHost.addEventListener("click", (event) => {
-      const control = event.target.closest("[data-block-action]");
+    // Keep toolbar actions anchored to the last document selection, not a file/select control.
+    form.querySelector('.announcement-block-toolbar').addEventListener('mousedown', event => { if (event.target.closest('button')) event.preventDefault(); });
+    form.querySelector('.announcement-block-toolbar').addEventListener('click', event => {
+      const control = event.target.closest('[data-format],[data-align]');
       if (!control || processing) return;
-      const index = Number(control.closest("[data-block-index]")?.dataset.blockIndex);
-      const action = control.dataset.blockAction;
-      if (!Number.isInteger(index) || !blocks[index]) return;
-      if (action === "remove") {
-        blocks.splice(index, 1);
-        selected = Math.min(index, blocks.length - 1);
-        renderBlocks(selected >= 0 ? selected : null);
-      } else if (action === "up" && index > 0) {
-        [blocks[index - 1], blocks[index]] = [blocks[index], blocks[index - 1]];
-        selected = index - 1;
-        renderBlocks(selected);
-      } else if (action === "down" && index < blocks.length - 1) {
-        [blocks[index + 1], blocks[index]] = [blocks[index], blocks[index + 1]];
-        selected = index + 1;
-        renderBlocks(selected);
-      } else if (action === "retry") processImage(index);
+      restoreSelection(); const node = selectedParagraph(); if (!node) return;
+      if (control.dataset.format) { const key = control.dataset.format; node.dataset[key] = String(node.dataset[key] !== 'true'); }
+      if (control.dataset.align) node.dataset.align = control.dataset.align;
+      styleParagraph(node); syncToolbar(); sync();
     });
-
-    load({ body: body.value });
-    return { value, load, reset, isBusy: () => processing, isRich: () => rich, limits: LIMITS };
+    sizeSelect.addEventListener('change', () => {
+      const size = sizeSelect.value;
+      restoreSelection(); const node = selectedParagraph(); if (!node) return;
+      node.dataset.size = size; sync(); syncToolbar();
+    });
+    imageInput.addEventListener('change', () => { const files = Array.from(imageInput.files || []); imageInput.value = ''; addImages(files); });
+    form.querySelector('[data-add-block="divider"]').addEventListener('click', () => {
+      if (processing) return;
+      const hr = document.createElement('hr'); hr.contentEditable = 'false'; insertMedia(hr);
+    });
+    body.required = false;
+    load({body:body.value});
+    return {value, load, reset:() => load(), isBusy:() => processing, isRich:() => true, limits:LIMITS};
   }
 
   root.ConsoleAnnouncementEditor = { create, normalizedContent, limits: LIMITS };

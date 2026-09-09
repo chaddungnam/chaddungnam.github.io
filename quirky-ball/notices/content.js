@@ -36,7 +36,8 @@
     container.replaceChildren();
     container.classList.remove("notice-rich-content");
     if (!valid(content)) {
-      container.textContent = String(fallback ?? "");
+      if (root.NoticeLinks) root.NoticeLinks.render(fallback, container);
+      else container.textContent = String(fallback ?? "");
       return false;
     }
     container.classList.add("notice-rich-content");
@@ -50,8 +51,9 @@
         paragraph.classList.toggle("notice-bold", block.bold);
         paragraph.classList.toggle("notice-italic", block.italic);
         paragraph.classList.toggle("notice-underline", block.underline);
-        paragraph.textContent = block.text;
         container.append(paragraph);
+        if (root.NoticeLinks) root.NoticeLinks.render(block.text, paragraph);
+        else paragraph.textContent = block.text;
       } else {
         const figure = document.createElement("figure");
         figure.className = `notice-image notice-width-${block.width}`;

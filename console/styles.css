@@ -1165,3 +1165,20 @@ body::before { opacity: .18; background-size: 22px 22px; }
 #announcementDeleteForm h2, #announcementDeleteForm p { margin: 0; }
 #announcementDeleteForm .check-label { align-items: flex-start; line-height: 1.5; }
 #announcementDeleteForm textarea { min-height: 96px; resize: vertical; }
+
+/* One continuous notice document, no plain/rich modes or block cards. */
+.announcement-document { min-height: 320px; padding: 22px; border: 1px solid var(--line); border-radius: 12px; background: white; color: var(--ink); font-size: 16px; line-height: 1.75; overflow-wrap: anywhere; white-space: pre-wrap; outline: none; }
+.announcement-document:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(33,170,155,.12); }
+.announcement-document[aria-invalid="true"] { border-color: #c54040; }
+.announcement-document > div:not([data-link-preview]), .announcement-document > p { min-height: 1.75em; margin: 0 0 12px; }
+.announcement-document [data-size="small"] { font-size: 14px; }
+.announcement-document [data-size="large"] { font-size: 21px; }
+.announcement-document [data-size="title"] { font-size: 27px; }
+.announcement-document figure { margin: 18px 0; white-space: normal; }
+.announcement-document figure > img { display: block; max-width: 100%; height: auto; border-radius: 8px; }
+.announcement-media-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; padding: 10px; background: #f6f8f9; border-radius: 8px; }
+.announcement-media-controls label:first-child { flex: 1; min-width: 120px; }
+.announcement-media-controls label:nth-child(2) { width: 86px; }
+.announcement-media-controls button { min-height: 44px; }
+.announcement-document [data-link-preview] { white-space: normal; margin-bottom: 16px; }
+@media(max-width:600px) { .announcement-document { padding: 14px; min-height: 300px; } }

@@ -1,0 +1,11 @@
+/* Shared by public notice paragraphs and the editor preview. No global selectors. */
+.notice-inline-link { overflow-wrap: anywhere; text-decoration: underline; text-underline-offset: .15em; }
+.notice-link-preview { display: block; width: 100%; max-width: 560px; box-sizing: border-box; margin: 12px 0; overflow: hidden; border: 1px solid #d7c3af; border-radius: 12px; background: #fffaf3; color: #2c211b; font: 400 14px/1.5 "Noto Sans", system-ui, sans-serif; text-align: start; text-decoration: none; white-space: normal; }
+.notice-link-poster { display: grid; position: relative; width: 100%; aspect-ratio: 16 / 9; place-items: center; overflow: hidden; background: #2c211b; color: white; }
+.notice-link-preview .notice-link-poster img { display: block; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.notice-link-preview img[hidden] { display: none; }
+.notice-link-play { z-index: 1; display: grid; place-items: center; width: 58px; height: 44px; border-radius: 12px; background: #c62828; color: white; font: 24px/1 system-ui, sans-serif; }
+.notice-link-destination { display: grid; gap: 3px; min-height: 44px; padding: 12px 14px; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.notice-link-destination span { direction: ltr; unicode-bidi: isolate; color: #705745; font-size: 12px; }
+.notice-link-poster:focus-visible, .notice-link-destination:focus-visible { outline: 3px solid #d85832; outline-offset: -3px; }
+.notice-link-player { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; background: #2c211b; }
