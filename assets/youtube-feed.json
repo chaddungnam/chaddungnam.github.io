@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-09-09T09:00:02.000Z",
+  "updated": "2026-09-11T09:00:36.000Z",
   "videos": [
+    {
+      "videoId": "d4br4NL69vU",
+      "title": "쉬었음 청년인 내가 AI로 유튜브 영상을 만드는 방법",
+      "published": "2026-09-11T09:00:36.000Z"
+    },
     {
       "videoId": "px9Jc0kJX4g",
       "title": "망겜도 살려내는 챗지피티 아스트라 ㄷㄷ",
@@ -11,11 +16,6 @@
       "videoId": "SSjPiCi9DUU",
       "title": "찐따 1인 개발 현실",
       "published": "2026-09-09T07:04:26.000Z"
-    },
-    {
-      "videoId": "HR8O1flYZyE",
-      "title": "게임업계 출신이 말아보는 1인 게임 바이브코딩 개발(일지)",
-      "published": "2026-09-08T09:00:36.000Z"
     }
   ]
 }
