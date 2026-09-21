@@ -37,7 +37,7 @@ async function main() {
     assert.ok(html.includes('<strong data-community-count>—</strong>'));
     assert.ok(html.includes(`<p class="community-status" data-community-status role="status">${loading}</p>`));
     assert.ok(html.includes(`<button type="button" class="community-retry" data-community-retry hidden>${retry}</button>`));
-    assert.match(html, /studio-home\.css\?v=20260907-community-music/);
+    assert.match(html, /studio-home\.css\?v=20260921-ios-live/);
     assert.match(html, /studio-music\.css\?v=20260907/);
     assert.match(html, /community-stats\.js\?v=20260907/);
     assert.match(html, /studio-music\.js\?v=20260907/);

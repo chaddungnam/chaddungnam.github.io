@@ -67,10 +67,10 @@ assert.match(svg, /data-part="smirk" d="M90 166Q123 180 150 150" fill="none" str
 assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky smirk needs its raised curl");
 
 const expectedCopy = {
-  "index.html": ["Coming soon", "출시 예정 미정"],
-  "index_en.html": ["Coming soon", "Release date TBD"],
-  "index_de.html": ["Coming soon", "Veröffentlichungstermin offen"],
-  "index_ja.html": ["Coming soon", "発売時期未定"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "출시 예정 미정"],
+  "index_en.html": ["https://apps.apple.com/app/id6797996754", "Release date TBD"],
+  "index_de.html": ["https://apps.apple.com/app/id6797996754", "Veröffentlichungstermin offen"],
+  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "発売時期未定"],
 };
 
 const expectedOpenGraph = {
