@@ -84,9 +84,9 @@ html[lang="ja"] .release-lede { overflow-wrap: anywhere; word-break: normal; }
 /* Custom store artwork keeps its geometry and surrounding clear space. */
 .google-play-badge { display: inline-flex; width: fit-content; align-items: center; margin-left: -14px; padding: 14px; background: #f5f4ef; text-decoration: none; }
 .google-play-badge img { display: block; width: auto; height: 54px; max-width: none; }
-.google-play-badge:focus-visible { outline: 3px solid var(--studio-blue); outline-offset: 2px; }
+.google-play-badge:focus-visible, .app-store-badge:focus-visible { outline: 3px solid var(--studio-blue); outline-offset: 2px; }
 .app-store-soon { position: relative; display: inline-flex; margin-block: 14px; }
-.app-store-badge { display: inline-flex; width: 182px; height: 54px; align-items: center; gap: 12px; padding: 7px 13px; border: 1px solid #a6a6a6; border-radius: 7px; background: #fff; color: #000; opacity: .42; cursor: not-allowed; user-select: none; }
+.app-store-badge { display: inline-flex; width: 182px; height: 54px; align-items: center; gap: 12px; padding: 7px 13px; border: 1px solid #a6a6a6; border-radius: 7px; background: #fff; color: #000; margin-block: 14px; text-decoration: none; }
 .app-store-icon { width: 30px; height: 32px; flex: none; }
 .app-store-copy { display: flex; flex-direction: column; gap: 2px; }
 .app-store-copy strong { font-size: 16px; line-height: 1.1; letter-spacing: -.03em; }

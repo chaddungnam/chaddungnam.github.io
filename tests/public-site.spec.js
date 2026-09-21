@@ -705,10 +705,10 @@ test("home hero uses custom light localized Play badges without removed copy or 
   for (const [route, lang] of [["/?lang=ko", "ko"], ["/index_en.html?lang=en", "en"], ["/index_de.html?lang=de", "de"], ["/index_ja.html?lang=ja", "ja"]]) {
     await page.goto(route);
     await expect(page.locator(".hero-hook, .studio-signature")).toHaveCount(0);
-    await expect(page.locator(".release-actions a")).toHaveCount(1);
-    await expect(page.locator(".app-store-badge")).toHaveAttribute("aria-disabled", "true");
-    await expect(page.locator(".app-store-badge")).not.toHaveAttribute("href", /.+/);
-    await expect(page.locator(".coming-soon-bubble")).toHaveText("Coming soon");
+    await expect(page.locator(".release-actions a")).toHaveCount(2);
+    await expect(page.locator(".app-store-badge")).not.toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(".app-store-badge")).toHaveAttribute("href", "https://apps.apple.com/app/id6797996754");
+    await expect(page.locator(".coming-soon-bubble")).toHaveCount(0);
     const badge = page.locator(".google-play-badge");
     await expect(badge).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
     await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + "-light.svg");

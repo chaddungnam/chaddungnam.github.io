@@ -158,7 +158,7 @@ test("home leads with store badges, YouTube, and exactly two game previews", () 
     assert.match(html, /data-studio-hero/);
     assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/);
     assert.match(html, /class="google-play-badge"/);
-    assert.match(html, /class="app-store-badge"[^>]*aria-disabled="true"/);
+    assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
     assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);

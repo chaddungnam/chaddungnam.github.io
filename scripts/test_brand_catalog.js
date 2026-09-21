@@ -125,7 +125,7 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);
-  assert.match(html, /class="app-store-badge"[^>]*aria-disabled="true"/, `${file} App Store remains a disabled placeholder`);
+  assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store links to the released iOS app`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(html, /history-section|journal-section/, `${file} keeps only the approved sections`);
 }
