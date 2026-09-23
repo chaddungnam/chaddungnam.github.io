@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-09-19T09:00:24.000Z",
+  "updated": "2026-09-23T11:53:10.000Z",
   "videos": [
+    {
+      "videoId": "-XXwKDnYJe0",
+      "title": "(무편집) 쿼키볼 2.0.0 튜토리얼 | 1인개발일지",
+      "published": "2026-09-23T11:53:10.000Z"
+    },
     {
       "videoId": "M81ETPnUhc8",
       "title": "다들 GPT 아스트라에 열광할때 탈주했습니다.",
@@ -11,11 +16,6 @@
       "videoId": "d4br4NL69vU",
       "title": "쉬었음 청년인 내가 AI로 유튜브 영상을 만드는 방법",
       "published": "2026-09-11T09:00:36.000Z"
-    },
-    {
-      "videoId": "px9Jc0kJX4g",
-      "title": "게임업계 출신이 망겜을 뜯어고친다면..?",
-      "published": "2026-09-09T09:00:02.000Z"
     }
   ]
 }
