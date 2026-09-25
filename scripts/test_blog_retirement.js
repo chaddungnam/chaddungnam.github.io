@@ -6,8 +6,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const retired = /(?:blog\.houseduck\.in|houseduck\.tistory\.com|(?:\.\.\/|\/)?blog\/(?:kr|en|de|ja)|assets\/blog-feed\.json)/i;
-const pages = ["", "about/", "quirky-ball/", "hexaworld1984/index_ko.html"]
-  .flatMap((prefix) => ["index.html", "index_en.html", "index_de.html", "index_ja.html"].map((file) => prefix + file));
+const pages = ["", "about/", "quirky-ball/"]
+  .flatMap((prefix) => ["index.html", "index_en.html", "index_de.html", "index_ja.html"].map((file) => prefix + file))
+  .concat(["index_ko.html", "index_en.html", "index_de.html", "index_ja.html"].map((file) => "hexaworld1984/" + file));
 
 for (const file of [...pages, "assets/brand-site.js", "llms.txt", "server.json"]) {
   assert.doesNotMatch(fs.readFileSync(path.join(root, file), "utf8"), retired, `${file} must not send visitors or requests to the retired blog`);
