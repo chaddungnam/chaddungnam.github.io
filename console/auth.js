@@ -60,6 +60,8 @@
   }
 
   function handleGoogleCredential(response) {
+    const previousEmail = email;
+    const hadValidTicket = hasValidAdminSession();
     googleIdToken = typeof response?.credential === "string" ? response.credential : "";
     if (!hasValidGoogleIdentity()) {
       googleIdToken = "";
@@ -67,7 +69,11 @@
       notify();
       return;
     }
-    clearTicket();
+    // A fresh credential for the SAME admin while their 72h ticket is still valid is just a
+    // silent token refresh (e.g. the HEXAWORLD project re-verifying an expiring Google ID token) —
+    // keep the ticket. Any other case (first login, switched account, expired/absent ticket)
+    // still clears it, same as before.
+    if (!hadValidTicket || email !== previousEmail) clearTicket();
     storeValue(GOOGLE_TOKEN_KEY, googleIdToken);
     notify();
   }
@@ -156,6 +162,22 @@
     notify();
   }
 
+  // Re-renders the same Google Sign-In button into another container (e.g. a HEXAWORLD
+  // "session expired" panel) so a project can recover a stale Google ID token in place, without
+  // touching the QB admin ticket. Clicking it still goes through handleGoogleCredential above.
+  function renderGoogleButton(container, options = {}) {
+    if (!root.google?.accounts?.id || !container) return false;
+    root.google.accounts.id.renderButton(container, {
+      type: "standard",
+      theme: "outline",
+      size: options.size || "medium",
+      text: options.text || "signin_with",
+      shape: "rectangular",
+      width: options.width || 280,
+    });
+    return true;
+  }
+
   function logout() {
     const revokeEmail = email;
     root.GmailAPI?.disconnect?.();
@@ -168,5 +190,5 @@
     notify();
   }
 
-  root.ConsoleAuth = { initialize, unlock, headers, isUnlocked, snapshot, requireChallenge, logout };
+  root.ConsoleAuth = { initialize, unlock, headers, isUnlocked, snapshot, requireChallenge, renderGoogleButton, logout };
 })(window);

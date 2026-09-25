@@ -3,7 +3,10 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.ConsoleModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
-  const pages = new Set(["analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "project-k"]);
+  const pages = new Set([
+    "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "project-k",
+    "hexaworld-overview", "hexaworld-notices", "hexaworld-attendance", "hexaworld-mail", "hexaworld-config", "hexaworld-audit",
+  ]);
 
   function routeFromHash(hash) {
     const path = String(hash || "").replace(/^#\/?/, "").split("?")[0];

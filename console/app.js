@@ -5,6 +5,14 @@ const CONSOLE_CONFIG = {
   functionBaseUrl: "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1",
 };
 
+// Second game, separate Supabase project — never merged into CONSOLE_CONFIG above so the
+// Quirky Ball client's requests stay byte-for-byte unchanged. See console/hexaworld.js.
+const HEXAWORLD_CONFIG = {
+  functionBaseUrl: "https://sbudnfvvavkzmmhaglkq.supabase.co/functions/v1",
+  publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNidWRuZnZ2YXZrem1taGFnbGtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNjA2NzIsImV4cCI6MjEwNTgzNjY3Mn0.GjqmzIdHYWWOCoyRzo2nX3FcIlPeUbsLEIktYPZ6UKk",
+  allowedFunctions: ["hx-admin"],
+};
+
 const pageTitles = {
   analytics: "분석",
   "analytics-exclusions": "통계 제외 계정",
@@ -15,6 +23,12 @@ const pageTitles = {
   cs: "CS",
   audit: "감사 기록",
   "project-k": "Project K",
+  "hexaworld-overview": "운영 개요",
+  "hexaworld-notices": "공지",
+  "hexaworld-attendance": "출석 보상",
+  "hexaworld-mail": "우편 발송",
+  "hexaworld-config": "앱 설정",
+  "hexaworld-audit": "감사 로그",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -26,6 +40,12 @@ const pageDescriptions = {
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
   "project-k": "아직 준비 중인 프로젝트입니다.",
+  "hexaworld-overview": "플레이어, 출석, 공지, 우편 현황을 한눈에 확인합니다.",
+  "hexaworld-notices": "게임 내 공지를 작성·수정·삭제합니다.",
+  "hexaworld-attendance": "출석 보상 사이클을 구성합니다.",
+  "hexaworld-mail": "모든 플레이어에게 보상 우편을 발송합니다.",
+  "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그를 관리합니다.",
+  "hexaworld-audit": "HEXAWORLD 관리자 변경 이력을 확인합니다.",
 };
 
 let currentProjectKey = "";
@@ -71,13 +91,20 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
   }
 }
 
+const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/;
+const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit))(?:[/?]|$)/;
+
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
-  const projectK = projectKey === "project_k";
-  byId("currentProject").textContent = projectK ? "Project K" : "Quirky Ball";
-  byId("consoleNav").hidden = projectK;
+  const isProjectK = projectKey === "project_k";
+  const isHexaworld = projectKey === "hexaworld";
+  byId("currentProject").textContent = isProjectK ? "Project K" : isHexaworld ? "HEXAWORLD 1984" : "Quirky Ball";
+  byId("consoleNav").hidden = isProjectK || isHexaworld;
+  byId("hexaworldNav").hidden = !isHexaworld;
   showOnly("consoleApp");
-  window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
+  window.location.hash = isProjectK ? "#/project-k"
+    : isHexaworld ? (HEXAWORLD_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/hexaworld-overview")
+    : (QB_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/analytics");
   renderRoute();
 }
 
@@ -94,7 +121,7 @@ function renderRoute() {
   document.querySelectorAll(".route-view").forEach((view) => {
     view.hidden = view.dataset.route !== route.page;
   });
-  document.querySelectorAll("#consoleNav a").forEach((link) => {
+  document.querySelectorAll("#consoleNav a, #hexaworldNav a").forEach((link) => {
     if (link.dataset.page === route.page || route.page === "player" && link.dataset.page === "players") link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
@@ -114,6 +141,12 @@ function renderRoute() {
   if (route.page === "purchases") window.ConsolePurchases.mount();
   if (route.page === "cs") window.ConsoleCs.mount();
   if (route.page === "audit") window.ConsoleAudit.mount();
+  if (route.page === "hexaworld-overview") window.ConsoleHexaworld.mountOverview();
+  if (route.page === "hexaworld-notices") window.ConsoleHexaworld.mountNotices();
+  if (route.page === "hexaworld-attendance") window.ConsoleHexaworld.mountAttendance();
+  if (route.page === "hexaworld-mail") window.ConsoleHexaworld.mountMail();
+  if (route.page === "hexaworld-config") window.ConsoleHexaworld.mountConfig();
+  if (route.page === "hexaworld-audit") window.ConsoleHexaworld.mountAudit();
 }
 
 function challengeErrorMessage(error) {
@@ -154,6 +187,7 @@ byId("challengeForm").addEventListener("submit", async (event) => {
 });
 
 byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
+byId("projectHexaworld").addEventListener("click", () => selectProject("hexaworld"));
 byId("projectK").addEventListener("click", () => selectProject("project_k"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
@@ -186,6 +220,7 @@ window.addEventListener("console-auth-change", (event) => renderAuth(event.detai
 
 (async () => {
   window.ConsoleAPI.initialize({ functionBaseUrl: CONSOLE_CONFIG.functionBaseUrl });
+  window.ConsoleAPI.initializeProject?.("hexaworld", HEXAWORLD_CONFIG);
   const finishLogin = window.ConsoleUiState.beginRequest(byId("loginPanel"));
   window.ConsoleUiState.setMessage(byId("loginMessage"), "Google 로그인 버튼을 불러오는 중입니다.");
   try {

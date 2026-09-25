@@ -19,13 +19,33 @@ test("legacy paragraphs keep text and punctuation with safe links and deduplicat
   await expect(content.locator(".notice-link-preview")).toHaveCount(2);
   await expect(content.locator(".notice-inline-link").last()).toHaveAttribute("href", "https://example.com/a_(b)");
   expect(await content.evaluate((el) => [...el.childNodes].filter((n) => !n.classList?.contains("notice-link-preview")).map((n) => n.textContent).join(""))).toBe(body);
+  // This body is open (embed=1 by default in open()): YouTube anchors hand off to the native
+  // WebView via target=_self, everything else keeps the normal target=_blank new-tab behavior.
   for (const link of await content.locator("a").all()) {
-    await expect(link).toHaveAttribute("target", "_blank");
-    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    const href = await link.getAttribute("href");
+    const youTube = /youtu\.?be|youtube\.com/i.test(href);
+    await expect(link).toHaveAttribute("target", youTube ? "_self" : "_blank");
+    if (!youTube) await expect(link).toHaveAttribute("rel", "noopener noreferrer");
   }
   await expect(content.locator("img")).toHaveAttribute("loading", "lazy");
   await expect(content.locator("iframe")).toHaveCount(0);
   expect(await page.locator("#notice-detail").evaluate((el) => el.scrollWidth > el.clientWidth + 1)).toBe(false);
+});
+
+test("embedded app mode hands YouTube links to the native WebView via target=_self", async ({ page }) => {
+  await open(page, `Watch https://youtu.be/${video} or https://example.com/safe`, { embed: true });
+  await expect(page.locator(".notice-link-poster")).toHaveAttribute("target", "_self");
+  await expect(page.locator(".notice-link-destination").first()).toHaveAttribute("target", "_self");
+  const inlineLinks = page.locator("#notice-body .notice-inline-link");
+  await expect(inlineLinks.filter({ hasText: `youtu.be/${video}` })).toHaveAttribute("target", "_self");
+  await expect(inlineLinks.filter({ hasText: "example.com/safe" })).toHaveAttribute("target", "_blank");
+});
+
+test("non-embedded mode keeps YouTube links target=_blank for normal browser handling", async ({ page }) => {
+  await open(page, `https://youtu.be/${video}`, { embed: false });
+  await expect(page.locator(".notice-link-poster")).toHaveAttribute("target", "_blank");
+  await expect(page.locator(".notice-link-destination")).toHaveAttribute("target", "_blank");
+  await expect(page.locator(".notice-link-destination")).toHaveAttribute("rel", "noopener noreferrer");
 });
 
 test("official watch, shorts, live and youtu.be variants resolve to one video", async ({ page }) => {

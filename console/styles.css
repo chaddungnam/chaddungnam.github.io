@@ -1182,3 +1182,19 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .announcement-media-controls button { min-height: 44px; }
 .announcement-document [data-link-preview] { white-space: normal; margin-bottom: 16px; }
 @media(max-width:600px) { .announcement-document { padding: 14px; min-height: 300px; } }
+
+/* ─────────────────────────────────────────── HEXAWORLD 1984 */
+.category-update { color: #145a8a; background: #e3f0ff; }
+.category-maintenance { color: #854000; background: #fff0d7; }
+.hx-status-badge { display: inline-block; padding: 4px 7px; color: var(--ink-soft); background: #f1ede4; border-radius: 999px; font-size: 8px; font-weight: 900; }
+.hx-status-badge[data-hx-status="live"] { color: #17665e; background: var(--teal-soft); }
+.hx-status-badge[data-hx-status="scheduled"] { color: #6e5621; background: var(--gold-soft); }
+.hx-status-badge[data-hx-status="ended"] { color: var(--ink-soft); background: #ece7dc; }
+.hx-status-badge[data-hx-status="inactive"] { color: #a93f34; background: var(--coral-soft); }
+.hexaworld-reward-rows { display: grid; gap: 9px; margin-bottom: 9px; }
+.hexaworld-reward-rows .form-pair { grid-template-columns: 1fr 1fr auto; align-items: end; gap: 9px; }
+.hexaworld-reward-rows .form-pair button { min-height: 42px; white-space: nowrap; }
+#hexaworldNoticeLinkCheck { display: flex; align-items: center; gap: 6px; }
+#hexaworldNoticeLinkCheck .text-button { padding: 4px 8px; }
+.hexaworld-auth-recovery { display: grid; gap: 10px; margin: 10px 0; }
+.hexaworld-auth-recovery p { margin: 0; }

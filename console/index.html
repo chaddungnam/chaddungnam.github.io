@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260909-1">
+  <link rel="stylesheet" href="styles.css?v=20260925-1">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -50,6 +50,11 @@
           <span class="project-card-copy"><strong>Quirky Ball</strong><small>분석 · 플레이어 · 운영</small></span>
           <span class="project-card-arrow" aria-hidden="true">↗</span>
         </button>
+        <button id="projectHexaworld" class="project-card" type="button">
+          <span class="project-card-mark" aria-hidden="true">H</span>
+          <span class="project-card-copy"><strong>HEXAWORLD 1984</strong><small>공지 · 출석 · 우편 · 설정</small></span>
+          <span class="project-card-arrow" aria-hidden="true">↗</span>
+        </button>
         <button id="projectK" class="project-card project-card-muted" type="button">
           <span class="project-card-mark" aria-hidden="true">K</span>
           <span class="project-card-copy"><strong>Project K</strong><small>준비 중 · 껍데기만 제공</small></span>
@@ -72,6 +77,14 @@
         <a href="#/purchases" data-page="purchases"><span class="nav-index">05</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
         <a href="#/cs" data-page="cs"><span class="nav-index">06</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
         <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+      </nav>
+      <nav id="hexaworldNav" hidden>
+        <a href="#/hexaworld-overview" data-page="hexaworld-overview"><span class="nav-index">01</span><span class="nav-copy">운영 개요<small>현황 요약</small></span></a>
+        <a href="#/hexaworld-notices" data-page="hexaworld-notices"><span class="nav-index">02</span><span class="nav-copy">공지<small>작성·수정·삭제</small></span></a>
+        <a href="#/hexaworld-attendance" data-page="hexaworld-attendance"><span class="nav-index">03</span><span class="nav-copy">출석 보상<small>일차별 구성</small></span></a>
+        <a href="#/hexaworld-mail" data-page="hexaworld-mail"><span class="nav-index">04</span><span class="nav-copy">우편 발송<small>전체 발송</small></span></a>
+        <a href="#/hexaworld-config" data-page="hexaworld-config"><span class="nav-index">05</span><span class="nav-copy">앱 설정<small>버전·점검·플래그</small></span></a>
+        <a href="#/hexaworld-audit" data-page="hexaworld-audit"><span class="nav-index">06</span><span class="nav-copy">감사 로그<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -360,6 +373,127 @@
         <div class="empty-state"><span class="status-label">준비 중</span><strong>Project K</strong><p>이중 작업을 피하기 위해 현재는 메뉴와 화면 구조만 제공합니다.</p></div>
       </section>
 
+      <section id="hexaworldOverviewView" class="route-view" data-route="hexaworld-overview" hidden>
+        <nav class="workspace-jumps" aria-label="HEXAWORLD 바로가기"><a href="#/hexaworld-notices">공지 작성 ↗</a><a href="#/hexaworld-mail">전체 우편 발송 ↗</a><a href="#/hexaworld-config">점검 모드 ↗</a></nav>
+        <p id="hexaworldOverviewMessage" class="dashboard-message" role="status"></p>
+        <div id="hexaworldOverviewSummary" class="operations-summary"></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">APP CONFIG</p><h2>현재 앱 설정 요약</h2></div><span id="hexaworldOverviewAuthMode" class="status-label">—</span></div><div id="hexaworldOverviewConfig" class="coverage-grid" aria-live="polite"></div></section>
+      </section>
+
+      <section id="hexaworldNoticesView" class="route-view" data-route="hexaworld-notices" hidden>
+        <nav class="workspace-jumps" aria-label="공지 바로가기"><button type="button" data-console-jump="hexaworldNoticeForm">공지 작성</button><button type="button" data-console-jump="hexaworldNoticeList">공지 목록</button></nav>
+        <p id="hexaworldNoticesMessage" class="dashboard-message" role="status"></p>
+        <form id="hexaworldNoticeForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">HEXAWORLD NOTICE</p><h2 id="hexaworldNoticeFormTitle">공지 작성</h2>
+          <p class="impact-note">활성 공지는 게시 시작일부터 종료일까지 게임 내 공지 화면에 표시됩니다. 한국어는 필수, 영어는 선택입니다.</p>
+          <input type="hidden" name="noticeId">
+          <div class="form-pair">
+            <label>분류<select name="category" required><option value="notice">[공지]</option><option value="event">[이벤트]</option><option value="update">[업데이트]</option><option value="maintenance">[점검]</option></select></label>
+            <label class="check-label"><input name="pinned" type="checkbox"> 상단 고정</label>
+          </div>
+          <div class="form-pair">
+            <label>제목 (한국어)<input name="titleKo" maxlength="80" required><small data-counter="titleKo">0 / 80자</small></label>
+            <label>제목 (영어, 선택)<input name="titleEn" maxlength="80"><small data-counter="titleEn">0 / 80자</small></label>
+          </div>
+          <div class="form-pair">
+            <label>본문 (한국어)<textarea name="bodyKo" maxlength="2000" rows="6" required></textarea><small data-counter="bodyKo">0 / 2000자</small></label>
+            <label>본문 (영어, 선택)<textarea name="bodyEn" maxlength="2000" rows="6"></textarea><small data-counter="bodyEn">0 / 2000자</small></label>
+          </div>
+          <div><p class="eyebrow">미리보기 (한국어)</p><div id="hexaworldNoticePreview" class="reward-template-preview" aria-live="polite"></div></div>
+          <div class="form-pair">
+            <label>링크 URL (선택)<input name="linkUrl" type="url" maxlength="500" placeholder="https://"></label>
+            <label>이미지 URL (선택, https만)<input name="imageUrl" type="url" maxlength="500" placeholder="https://"></label>
+          </div>
+          <p id="hexaworldNoticeLinkCheck" class="status-label" hidden></p>
+          <div class="form-pair">
+            <label>링크 버튼 라벨 (한국어)<input name="linkLabelKo" maxlength="40"></label>
+            <label>링크 버튼 라벨 (영어)<input name="linkLabelEn" maxlength="40"></label>
+          </div>
+          <div class="form-pair">
+            <label>우선순위<input name="priority" type="number" step="1" value="0"></label>
+            <label class="check-label"><input name="active" type="checkbox" checked> 활성</label>
+          </div>
+          <div class="form-pair">
+            <label>게시 시작 (KST)<input name="startsAt" type="datetime-local" required></label>
+            <label>게시 종료 (KST, 선택)<input name="endsAt" type="datetime-local"></label>
+          </div>
+          <label>작성·수정 사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 신규 이벤트 안내"></label>
+          <p id="hexaworldNoticeFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <div class="form-pair"><button class="danger-button" type="submit" data-submit-label="공지 발행" data-edit-label="공지 수정">공지 발행</button><button id="hexaworldNoticeReset" class="warning-button" type="button">새 공지</button></div>
+        </form>
+        <section id="hexaworldNoticeList" class="panel"><div class="panel-heading"><div><p class="eyebrow">NOTICES</p><h2>공지 목록</h2></div><span id="hexaworldNoticesTotal" class="panel-total">—</span></div><div id="hexaworldNoticesListing" class="audit-list"></div></section>
+      </section>
+
+      <section id="hexaworldAttendanceView" class="route-view" data-route="hexaworld-attendance" hidden>
+        <p id="hexaworldAttendanceMessage" class="dashboard-message" role="status"></p>
+        <div id="hexaworldAttendanceSummary" class="operations-summary"></div>
+        <form id="hexaworldAttendanceForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">DAILY ATTENDANCE</p><h2>출석 보상 사이클</h2>
+          <p class="impact-note">일차는 1부터 연속이어야 합니다 (최대 28일). 칸을 비워두면 그 보상은 지급하지 않습니다. 한도: 코인·부품 최대 10,000,000 · 젬 최대 100,000 · 열쇠 최대 1,000.</p>
+          <div class="table-scroll"><table><thead><tr><th>일차</th><th>코인</th><th>젬</th><th>열쇠</th><th>부품</th><th></th></tr></thead><tbody id="hexaworldAttendanceTable"></tbody></table></div>
+          <div class="form-pair"><button id="hexaworldAttendanceAddDay" type="button">마지막 날 추가</button><span id="hexaworldAttendanceDayCount" class="status-label">0일</span></div>
+          <label>변경 사유<input name="reason" maxlength="300" required></label>
+          <p id="hexaworldAttendanceFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">출석 보상 저장</button>
+        </form>
+      </section>
+
+      <section id="hexaworldMailView" class="route-view" data-route="hexaworld-mail" hidden>
+        <p id="hexaworldMailMessage" class="dashboard-message" role="status"></p>
+        <form id="hexaworldMailForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">HEXAWORLD MAIL</p><h2>전체 보상 우편</h2>
+          <p class="impact-note">모든 플레이어에게 즉시 발송됩니다. 제목·본문·보상·기한을 확인한 뒤 진행하세요.</p>
+          <div class="form-pair">
+            <label>제목 (한국어)<input name="titleKo" maxlength="60" required><small data-counter="mailTitleKo">0 / 60자</small></label>
+            <label>제목 (영어, 선택)<input name="titleEn" maxlength="60"><small data-counter="mailTitleEn">0 / 60자</small></label>
+          </div>
+          <div class="form-pair">
+            <label>본문 (한국어)<textarea name="bodyKo" maxlength="500" rows="4" required></textarea><small data-counter="mailBodyKo">0 / 500자</small></label>
+            <label>본문 (영어, 선택)<textarea name="bodyEn" maxlength="500" rows="4"></textarea><small data-counter="mailBodyEn">0 / 500자</small></label>
+          </div>
+          <div><p class="eyebrow">REWARDS</p><div id="hexaworldMailRewards" class="hexaworld-reward-rows"></div><button id="hexaworldMailAddReward" type="button">보상 추가</button></div>
+          <label>수령 기한 (일, 1~30)<input name="expiresDays" type="number" min="1" max="30" step="1" value="7" required></label>
+          <label>발송 사유<input name="reason" maxlength="300" required></label>
+          <p id="hexaworldMailFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">전체 발송</button>
+        </form>
+      </section>
+
+      <section id="hexaworldConfigView" class="route-view" data-route="hexaworld-config" hidden>
+        <p id="hexaworldConfigMessage" class="dashboard-message" role="status"></p>
+        <form id="hexaworldConfigForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">APP CONFIG</p><h2>앱 설정</h2>
+          <p class="impact-note">최소 지원 버전보다 낮은 코드의 클라이언트는 강제 업데이트 안내를 받습니다. 점검을 켜면 즉시 모든 플레이어에게 점검 화면이 표시됩니다.</p>
+          <div class="form-pair">
+            <label>최소 지원 버전 코드<input name="minVersionCode" type="number" min="0" step="1" required></label>
+            <label>최신 버전 코드<input name="latestVersionCode" type="number" min="0" step="1" required></label>
+          </div>
+          <div class="form-pair">
+            <label>Android 스토어 URL<input name="storeUrlAndroid" type="url" maxlength="500"></label>
+            <label>iOS 스토어 URL<input name="storeUrlIos" type="url" maxlength="500"></label>
+          </div>
+          <label class="check-label"><input name="maintenance" type="checkbox"> 점검 모드 사용</label>
+          <div class="form-pair">
+            <label>점검 안내 (한국어)<textarea name="maintenanceMsgKo" maxlength="300" rows="3"></textarea></label>
+            <label>점검 안내 (영어)<textarea name="maintenanceMsgEn" maxlength="300" rows="3"></textarea></label>
+          </div>
+          <label>기능 플래그 (JSON)<textarea name="featureFlags" maxlength="4000" rows="5" spellcheck="false"></textarea></label>
+          <p id="hexaworldConfigJsonMessage" class="dashboard-message" role="status"></p>
+          <label>변경 사유<input name="reason" maxlength="300" required></label>
+          <p id="hexaworldConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">앱 설정 저장</button>
+        </form>
+      </section>
+
+      <section id="hexaworldAuditView" class="route-view" data-route="hexaworld-audit" hidden>
+        <form id="hexaworldAuditFilterForm" class="panel admin-toolbar" role="search">
+          <label>표시 개수<select id="hexaworldAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
+          <button class="primary-button" type="submit">새로고침</button>
+        </form>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">HEXAWORLD AUDIT</p><h2>감사 로그</h2></div><span id="hexaworldAuditTotal" class="panel-total">—</span></div><div id="hexaworldAuditList" class="audit-list"></div></section>
+        <p id="hexaworldAuditMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="playerView" class="route-view" data-route="player" hidden>
         <a id="playerBackLink" class="text-button" href="#/players">← 목록으로</a>
         <p id="playerMessage" class="dashboard-message" role="status"></p>
@@ -394,16 +528,17 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260908-1"></script>
+  <script src="model.js?v=20260925-1"></script>
   <script src="ui-state.js?v=20260904-1"></script>
-  <script src="auth.js?v=20260829-1"></script>
-  <script src="api.js?v=20260908-1"></script>
+  <script src="auth.js?v=20260925-1"></script>
+  <script src="api.js?v=20260925-1"></script>
   <script src="analytics.js?v=20260905-5"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260907-2"></script>
-  <script src="../assets/notice-links.js?v=20260909-1"></script>
+  <script src="../assets/notice-links.js?v=20260925-1"></script>
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
+  <script src="hexaworld.js?v=20260925-1"></script>
   <script src="purchases-model.js?v=20260907-2"></script>
   <script src="purchases.js?v=20260907-2"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -412,6 +547,6 @@
   <script src="cs-intelligence.js?v=20260904-1"></script>
   <script src="cs-templates.js?v=20260904-1"></script>
   <script src="cs.js?v=20260907-2"></script>
-  <script src="app.js?v=20260908-1" defer></script>
+  <script src="app.js?v=20260925-1" defer></script>
 </body>
 </html>
