@@ -6,6 +6,8 @@ const state = {
   startDate: "",
   endDate: "",
   distributionKey: "all",
+  appFamily: "all",
+  runMode: "all",
   versionTrendVersion: "",
   playerQuery: "",
   playerSort: "latest_played_at",
@@ -30,8 +32,18 @@ function renderAnalyticsCoverage() {
   const distribution = state.payload?.accountScope?.distributionKey ?? state.distributionKey;
   const iosScope = distribution === "all" || distribution === "app_store";
   const message = coverage?.message || ("분석 이벤트 수집 범위 확인 대기. 이벤트가 없다는 것은 사용자가 없다는 뜻이 아닙니다." + (noIos && iosScope ? " iOS 텔레메트리 미수집: iOS 사용자 없음으로 해석하지 마세요." : ""));
-  setText("analyticsCoverageMessage", message + " " + accountScopeText());
+  const filters = state.payload?.filters;
+  const filterText = filters ? ` 앱 계열 ${appFamilyLabel(filters.appFamily)} · 판 종류 ${runModeLabel(filters.runMode)}.` : "";
+  setText("analyticsCoverageMessage", message + filterText + " " + accountScopeText());
 }
+
+function appFamilyLabel(value) {
+  return ({ all: "전체", "1.x": "1.x 클래식", "2.x": "2.x 실험실 빌드" })[value] || String(value || "전체");
+}
+function runModeLabel(value) {
+  return ({ all: "전체", classic: "클래식", lab: "실험실 탈출", lab_tutorial: "실험실 튜토리얼" })[value] || String(value || "전체");
+}
+function emptyPeriodText() { return "이 기간·빌드에는 데이터가 없어요"; }
 
 function setText(id, value) { byId(id).textContent = value; }
 function formatNumber(value) { return typeof value === "number" ? value.toLocaleString("ko-KR") : "—"; }
@@ -136,7 +148,7 @@ function periodReturnView() {
 }
 
 function setFiltersDisabled(disabled) {
-  document.querySelectorAll(".analytics-toolbar button, .analytics-toolbar input, .period-players-panel button, .period-players-panel input").forEach((control) => {
+  document.querySelectorAll(".analytics-toolbar button, .analytics-toolbar input, .analytics-toolbar select, .period-players-panel button, .period-players-panel input").forEach((control) => {
     control.disabled = disabled;
   });
   if (!disabled) {
@@ -184,6 +196,8 @@ async function loadDashboard() {
       root.ConsoleAPI.post("analytics-dashboard-v2", {
         projectKey: "quirky_ball",
         distributionKey: state.distributionKey,
+        appFamily: state.appFamily,
+        runMode: state.runMode,
         ...rangePayload,
         playerQuery: state.playerQuery,
         playerSort: state.playerSort,
@@ -252,6 +266,7 @@ function renderDashboard() {
   renderInsightReasons(pulseModel);
   renderPlatformSummary(state.payload?.platforms ?? []);
   renderDailyChart();
+  renderDimensions();
   renderVersionMonitor();
   renderHourlyChart();
   renderFunnel();
@@ -263,15 +278,19 @@ function renderDashboard() {
   renderPurchaseTrend();
   renderChoices();
   renderDiagnostics();
+  renderLabTutorial();
   renderInteractionInsights();
   renderPriorityInsights();
   renderAttention(pulseModel);
   renderAccountActivity();
+  renderLabAccountFacts();
   renderPeriodPlayers();
   renderUnfinishedPlays();
   renderGameRunSummary();
+  renderLabRuns();
   renderBalanceSummary();
   renderGameMetrics();
+  renderLabEconomy();
   renderDailyTable();
   renderInsight();
 }
@@ -328,7 +347,7 @@ function renderChoices() {
 }
 
 function diagnosticsWaiting(id, label, detail) {
-  renderCoverageCards(id, [{ status: "waiting", label, value: "1.1.0 데이터 수집 대기", detail }]);
+  renderCoverageCards(id, [{ status: "waiting", label, value: "데이터 수집 대기", detail }]);
 }
 
 function diagnosticsTable(id, columns, rows, emptyText) {
@@ -417,15 +436,15 @@ function renderDiagnostics() {
   const tutorial = diagnostics.tutorial ?? {};
   const stages = Array.isArray(tutorial.stages) ? tutorial.stages : [];
   const tutorialWaiting = stages.length === 0;
-  setText("tutorialStatus", tutorialWaiting ? "1.1.0 데이터 수집 대기" : `완료율 ${formatRate(tutorial.completionRate)}`);
-  diagnosticsTable("tutorialStagesTable", 5, stages.map((row) => `<tr><td><strong>${escapeHtml(tutorialStageLabel(row.stage, row.stageIndex))}</strong><small>단계 ${formatNumber(row.stageIndex)}</small></td><td>${formatNumber(row.entered)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.aborted)}</td><td>${formatNumber(row.incomplete)}</td></tr>`), "1.1.0 데이터 수집 대기");
+  setText("tutorialStatus", tutorialWaiting ? "데이터 수집 대기" : `완료율 ${formatRate(tutorial.completionRate)}`);
+  diagnosticsTable("tutorialStagesTable", 5, stages.map((row) => `<tr><td><strong>${escapeHtml(tutorialStageLabel(row.stage, row.stageIndex))}</strong><small>단계 ${formatNumber(row.stageIndex)}</small></td><td>${formatNumber(row.entered)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.aborted)}</td><td>${formatNumber(row.incomplete)}</td></tr>`), "데이터 수집 대기");
 
   const growthChoices = diagnostics.growthChoices ?? {};
   const byLevel = Array.isArray(growthChoices.byLevel) ? growthChoices.byLevel : [];
   const choiceRows = Array.isArray(growthChoices.choices) ? growthChoices.choices : [];
   const selectedCount = Math.max(Number(growthChoices.selected ?? 0), choiceRows.reduce((sum, row) => sum + Number(row.selected ?? 0), 0));
   setText("growthChoiceStatus", selectedCount > 0 || byLevel.length ? `${formatNumber(selectedCount)}회 선택` : "수집 대기");
-  diagnosticsTable("growthChoiceLevelTable", 5, byLevel.map((row) => `<tr><td><strong>Lv.${formatNumber(row.level)}</strong></td><td>${formatNumber(row.presented)}</td><td>${formatNumber(row.selected)}</td><td>${formatNumber(row.confirmed)}</td><td>${row.selectionRate === null ? "레거시 선택 기록" : formatRate(row.selectionRate)}</td></tr>`), "1.1.0 데이터 수집 대기");
+  diagnosticsTable("growthChoiceLevelTable", 5, byLevel.map((row) => `<tr><td><strong>Lv.${formatNumber(row.level)}</strong></td><td>${formatNumber(row.presented)}</td><td>${formatNumber(row.selected)}</td><td>${formatNumber(row.confirmed)}</td><td>${row.selectionRate === null ? "레거시 선택 기록" : formatRate(row.selectionRate)}</td></tr>`), "데이터 수집 대기");
 
   const mechakucha = diagnostics.mechakucha ?? {};
   const mechakuchaEvents = ["started", "completed", "aborted", "incomplete"].some((key) => Number(mechakucha[key] ?? 0) > 0);
@@ -455,10 +474,10 @@ function renderDiagnostics() {
     loopCard("돌파 사용", gameOver.breakthroughUseRate, "한 번 이상 돌파한 완료판 비율", formatRate, gameOver.breakthroughSamples),
   ]);
   setText("coreLoopStatus", completedRuns > 0 ? `총 ${formatNumber(completedRuns)}판` : "수집 대기");
-  setText("gameOverStatus", byDay.length ? `${formatNumber(Number(gameOver.total ?? 0))}회 · 중앙 ${formatNumber(gameOver.medianScore)}점` : "1.1.0 데이터 수집 대기");
+  setText("gameOverStatus", byDay.length ? `${formatNumber(Number(gameOver.total ?? 0))}회 · 중앙 ${formatNumber(gameOver.medianScore)}점` : "데이터 수집 대기");
   renderGameOverChart(byDay);
-  diagnosticsTable("gameOverDailyTable", 5, [...byDay].reverse().map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "1.1.0 데이터 수집 대기");
-  diagnosticsTable("gameOverBucketTable", 5, buckets.map((row) => `<tr><td><strong>${escapeHtml(row.bucket)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "1.1.0 데이터 수집 대기");
+  diagnosticsTable("gameOverDailyTable", 5, [...byDay].reverse().map((row) => `<tr><td><strong>${escapeHtml(row.day)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "데이터 수집 대기");
+  diagnosticsTable("gameOverBucketTable", 5, buckets.map((row) => `<tr><td><strong>${escapeHtml(row.bucket)}</strong></td><td>${formatNumber(row.games)}</td><td>${formatNumber(row.avgScore)}</td><td>${formatNumber(row.medianScore)}</td><td>${formatDecimal(row.avgLevel)}</td></tr>`), "데이터 수집 대기");
 }
 
 function renderInteractionInsights() {
@@ -489,7 +508,7 @@ function renderInteractionInsights() {
   for (const row of interactions.dropoffs ?? []) {
     if (!dropoffByScreen.has(row.screen)) dropoffByScreen.set(row.screen, row);
   }
-  const screens = [...(interactions.screens ?? [])].filter((row) => String(row.screen || "").toLowerCase() !== "home" && Number(row.exits || 0) > 0).sort((left, right) => {
+  const screens = [...(interactions.screens ?? [])].filter((row) => String(row.screen || "").toLowerCase() !== "home" && !root.ConsoleModel.isHomeScreen(row.screen) && Number(row.exits || 0) > 0).sort((left, right) => {
     const leftLegacy = root.ConsoleModel.analyticsScreenName(left.screen) === "화면 미식별";
     const rightLegacy = root.ConsoleModel.analyticsScreenName(right.screen) === "화면 미식별";
     return Number(leftLegacy) - Number(rightLegacy) || Number(right.visits || 0) - Number(left.visits || 0);
@@ -617,7 +636,7 @@ function periodPlayerActivityMarkup(row) {
   if (source === "visit_and_game") return "<strong>새 실행 + 게임</strong><small>방문과 완료 모두 확인</small>";
   if (source === "home") return "<strong>홈 접속</strong><small>클라이언트가 정확히 기록</small>";
   if (source === "home_and_game") return "<strong>홈 + 게임</strong><small>두 신호 모두 확인</small>";
-  if (source === "app_activity") return "<strong>앱 서버 접속</strong><small>기존 1.1.0도 확인</small>";
+  if (source === "app_activity") return "<strong>앱 서버 접속</strong><small>이전 빌드도 확인</small>";
   if (source === "account_sync") return "<strong>계정 동기화</strong><small>서버 상태 갱신 근거</small>";
   if (source === "signed_in") return "<strong>로그인</strong><small>홈 도달 여부 미확인</small>";
   return "<strong>게임 완료</strong><small>홈 도달 여부 미확인</small>";
@@ -1356,23 +1375,140 @@ function renderDecisionPanels() {
 
   const purchaseFunnels = state.payload?.purchaseFunnel;
   const purchaseExclusions = state.payload?.purchaseExclusions;
-  const removeAds = Array.isArray(purchaseFunnels) ? purchaseFunnels.find((item) => item?.productId === "remove_ads") : null;
+  const productLabels = { vip1: "VIP 1", vip2: "VIP 2", starter_pack: "스타터 팩", yakwon_bundle: "약원 패키지", remove_ads: "광고 제거" };
   if (!Array.isArray(purchaseFunnels) || !purchaseExclusions) {
     renderCoverageCards("removeAdsFunnel", ["구매 시작", "구매 성공", "시작 → 성공", "구매 실패"].map((label) => ({ status: "waiting", label, value: "집계 대기", detail: "운영 결제와 테스트 결제를 서버에서 분리하는 중입니다." })));
     setText("removeAdsFunnelStatus", "집계 대기");
   } else {
-    const hasIntent = Number(removeAds?.startedUsers ?? 0) > 0;
-    const status = hasIntent ? "available" : "empty";
+    const products = purchaseFunnels.filter((item) => item && typeof item === "object");
     const excludedInstalls = Number(purchaseExclusions.excludedInstalls ?? 0);
-    renderCoverageCards("removeAdsFunnel", [
-      { status, label: "구매 시작", value: `${formatNumber(Number(removeAds?.startedUsers ?? 0))}명`, detail: "테스트를 제외하고 remove_ads 구매 버튼을 누른 사람" },
-      { status, label: "구매 성공", value: `${formatNumber(Number(removeAds?.succeededUsers ?? 0))}명`, detail: "운영 purchase_succeeded가 기록된 사람" },
-      { status, label: "시작 → 성공", value: formatRate(removeAds?.startToSuccessRate), detail: "테스트 인원을 제외한 운영 전환율" },
-      { status, label: "구매 실패", value: `${formatNumber(Number(removeAds?.failedUsers ?? 0))}명 · ${formatNumber(Number(removeAds?.failedEvents ?? 0))}회`, detail: "운영 실패 사용자와 반복 시도 횟수" },
-    ]);
-    const liveStatus = hasIntent ? `운영 ${formatNumber(removeAds.startedUsers)}명 시작` : "운영 구매 시작 없음";
+    const startedUsers = products.reduce((sum, item) => sum + Number(item.startedUsers ?? 0), 0);
+    const cards = products.length ? products.flatMap((item) => {
+      const name = productLabels[item.productId] || String(item.productId || "상품");
+      const status = Number(item.startedUsers ?? 0) > 0 ? "available" : "empty";
+      return [
+        { status, label: `${name} 시작`, value: `${formatNumber(Number(item.startedUsers ?? 0))}명`, detail: "테스트를 제외하고 구매를 시작한 사람" },
+        { status, label: `${name} 성공`, value: `${formatNumber(Number(item.succeededUsers ?? 0))}명`, detail: `시작 → 성공 ${formatRate(item.startToSuccessRate)} · 실패 ${formatNumber(Number(item.failedUsers ?? 0))}명` },
+      ];
+    }) : ["구매 시작", "구매 성공", "시작 → 성공", "구매 실패"].map((label) => ({ status: "empty", label, value: "데이터 없음", detail: "이 기간의 운영 구매 시작이 없습니다." }));
+    renderCoverageCards("removeAdsFunnel", cards);
+    const liveStatus = startedUsers > 0 ? `운영 ${formatNumber(startedUsers)}명 시작 · ${formatNumber(products.length)}개 상품` : "운영 구매 시작 없음";
     setText("removeAdsFunnelStatus", excludedInstalls > 0 ? `${liveStatus} · 테스트 ${formatNumber(excludedInstalls)}명 제외` : liveStatus);
   }
+}
+
+function failCauseLabel(cause) {
+  const key = String(cause || "").trim().toLowerCase();
+  if (key === "boss_overflow") return "보스가 부풀린 구슬";
+  if (key === "beaker_danger") return "비커 위험선";
+  return key ? key.replace(/[_-]+/g, " ") : "원인 미기록";
+}
+
+function renderNeutralTable(id, columns, message) {
+  byId(id).innerHTML = `<tr><td class="empty-row" colspan="${columns}">${escapeHtml(message)}</td></tr>`;
+}
+
+function renderLabRuns() {
+  if (!Object.hasOwn(state.payload ?? {}, "labRuns") || !Array.isArray(state.payload.labRuns)) {
+    setText("labRunsStatus", "집계 대기");
+    renderNeutralTable("labRunsTable", 8, emptyPeriodText());
+    return;
+  }
+  const rows = state.payload.labRuns;
+  setText("labRunsStatus", rows.length ? `${formatNumber(rows.length)}칸` : "데이터 없음");
+  if (!rows.length) {
+    renderNeutralTable("labRunsTable", 8, emptyPeriodText());
+    return;
+  }
+  byId("labRunsTable").innerHTML = rows.map((row) => {
+    const causes = Array.isArray(row.topFailCauses) ? row.topFailCauses : [];
+    const causeText = causes.length ? causes.map((item) => `${failCauseLabel(item.cause)} ${formatNumber(item.count)}`).join(", ") : "—";
+    return `<tr><td><strong>${formatNumber(row.phase)}-${formatNumber(row.step)}</strong></td><td>${formatNumber(row.starts)}</td><td>${formatNumber(row.clears)}</td><td>${formatNumber(row.fails)}</td><td>${formatNumber(row.exits)}</td><td>${formatRate(row.clearRate)}</td><td>${formatDuration(row.avgDurationSec)}</td><td>${escapeHtml(causeText)}</td></tr>`;
+  }).join("");
+}
+
+function renderLabTutorial() {
+  const lab = state.payload?.tutorialFunnel?.lab;
+  if (!lab || typeof lab !== "object") {
+    setText("labTutorialStatus", "집계 대기");
+    renderNeutralTable("labTutorialTable", 3, emptyPeriodText());
+    return;
+  }
+  const stages = Array.isArray(lab.stages) ? [...lab.stages].sort((left, right) => Number(left.stageIndex ?? 0) - Number(right.stageIndex ?? 0)) : [];
+  const started = Number(lab.started ?? 0);
+  const rows = [{ label: "시작", count: started }, ...stages.map((stage) => ({ label: root.ConsoleModel.labTutorialStageName(stage.stage), count: Number(stage.runs ?? 0) })), { label: "완료", count: Number(lab.completed ?? 0) }];
+  setText("labTutorialStatus", started > 0 ? `완료율 ${formatRate(started ? Number(lab.completed ?? 0) / started : null)}` : "데이터 없음");
+  if (!started && !stages.length && !Number(lab.completed ?? 0)) {
+    renderNeutralTable("labTutorialTable", 3, emptyPeriodText());
+    return;
+  }
+  byId("labTutorialTable").innerHTML = rows.map((row, index) => {
+    const previous = index === 0 ? null : rows[index - 1].count;
+    const drop = previous > 0 ? Math.max(0, (previous - row.count) / previous) : null;
+    return `<tr><td><strong>${escapeHtml(row.label)}</strong></td><td>${formatNumber(row.count)}</td><td>${index === 0 ? "—" : formatRate(drop)}</td></tr>`;
+  }).join("");
+}
+
+function renderDimensions() {
+  const dimensions = state.payload?.dimensions;
+  if (!dimensions || typeof dimensions !== "object") {
+    setText("dimensionsStatus", "집계 대기");
+    renderNeutralTable("appVersionsTable", 4, emptyPeriodText());
+    renderNeutralTable("runModesTable", 4, emptyPeriodText());
+    return;
+  }
+  const versions = Array.isArray(dimensions.appVersions) ? dimensions.appVersions : [];
+  const modes = Array.isArray(dimensions.runModes) ? dimensions.runModes : [];
+  setText("dimensionsStatus", versions.length || modes.length ? `${formatNumber(versions.length)}개 버전` : "데이터 없음");
+  if (!versions.length) renderNeutralTable("appVersionsTable", 4, emptyPeriodText());
+  else byId("appVersionsTable").innerHTML = versions.map((row) => `<tr><td><strong>${escapeHtml(row.version || "미기록")}</strong></td><td>${formatNumber(row.events)}</td><td>${formatNumber(row.installs)}</td><td>${formatNumber(row.runs)}</td></tr>`).join("");
+  if (!modes.length) renderNeutralTable("runModesTable", 4, emptyPeriodText());
+  else byId("runModesTable").innerHTML = modes.map((row) => `<tr><td><strong>${escapeHtml(runModeLabel(row.mode))}</strong></td><td>${formatNumber(row.runs)}</td><td>${formatNumber(row.completed)}</td><td>${formatNumber(row.exits)}</td></tr>`).join("");
+}
+
+function economyCells(row) {
+  const grants = (countKey, amountKey) => `${formatNumber(row?.[countKey])} · ${formatNumber(row?.[amountKey])}`;
+  return [formatNumber(row?.idleClaims), formatNumber(row?.idleReagent), formatNumber(row?.idleGems), grants("escapeGrants", "escapeReagent"), grants("questGrants", "questReagent"), grants("sweepGrants", "sweepReagent"), grants("adDrones", "adDroneReagent"), formatNumber(row?.hexUpgrades), formatNumber(row?.hexCancels)];
+}
+
+function renderLabEconomy() {
+  const economy = state.payload?.labEconomy;
+  if (economy === null) {
+    setText("labEconomyStatus", "배포 전");
+    byId("labEconomyProfiles").innerHTML = '<p class="empty-panel">서버 집계 함수 배포 전이에요</p>';
+    renderNeutralTable("labEconomyTable", 10, "서버 집계 함수 배포 전이에요");
+    return;
+  }
+  if (!economy || typeof economy !== "object") {
+    setText("labEconomyStatus", "집계 대기");
+    byId("labEconomyProfiles").innerHTML = `<p class="empty-panel">${emptyPeriodText()}</p>`;
+    renderNeutralTable("labEconomyTable", 10, emptyPeriodText());
+    return;
+  }
+  const daily = Array.isArray(economy.daily) ? economy.daily : [];
+  const totals = economy.totals ?? {};
+  const profiles = economy.profiles ?? {};
+  const vip = profiles.vipTier ?? {};
+  setText("labEconomyStatus", `${formatNumber(profiles.accounts)}계정`);
+  renderCoverageCards("labEconomyProfiles", [
+    { status: "available", label: "계정 수", value: `${formatNumber(profiles.accounts)}명`, detail: "실험실 프로필이 있는 계정" },
+    { status: "available", label: "VIP 등급", value: `0 ${formatNumber(vip["0"])} · 1 ${formatNumber(vip["1"])} · 2 ${formatNumber(vip["2"])}`, detail: "등급별 계정 수" },
+    { status: "available", label: "시약 중앙값", value: formatNumber(profiles.reagentMedian), detail: `P90 ${formatNumber(profiles.reagentP90)}` },
+  ]);
+  const rows = [...daily.map((row) => `<tr><td><strong>${escapeHtml(row.day || "")}</strong></td>${economyCells(row).map((cell) => `<td>${cell}</td>`).join("")}</tr>`), `<tr><td><strong>합계</strong></td>${economyCells(totals).map((cell) => `<td>${cell}</td>`).join("")}</tr>`];
+  byId("labEconomyTable").innerHTML = daily.length ? rows.join("") : `<tr><td class="empty-row" colspan="10">${emptyPeriodText()}</td></tr>`;
+}
+
+function renderLabAccountFacts() {
+  const facts = state.payload?.labAccountFacts;
+  const line = byId("labAccountFacts");
+  if (!facts || typeof facts !== "object") {
+    line.hidden = true;
+    line.textContent = "";
+    return;
+  }
+  line.hidden = false;
+  line.textContent = `실험실 완료 판 ${formatNumber(facts.labCompletedRuns)}판 · 실험실 판이 있는 계정 ${formatNumber(facts.accountsWithLabRun)}명`;
 }
 
 function renderMarketingGate() {
@@ -1568,6 +1704,8 @@ function syncFilterHash() {
     startDate: state.startDate,
     endDate: state.endDate,
     distributionKey: state.distributionKey,
+    appFamily: state.appFamily,
+    runMode: state.runMode,
     sort: state.playerSort,
     direction: state.playerDirection,
     page: state.playerPage,
@@ -1592,6 +1730,10 @@ function readFilterHash() {
   }
   const distribution = params.get("distributionKey");
   if (["all", "google_play", "app_store", "onestore"].includes(distribution)) state.distributionKey = distribution;
+  const appFamily = params.get("appFamily");
+  state.appFamily = ["all", "1.x", "2.x"].includes(appFamily) ? appFamily : "all";
+  const runMode = params.get("runMode");
+  state.runMode = ["all", "classic", "lab", "lab_tutorial"].includes(runMode) ? runMode : "all";
   const sort = params.get("sort");
   if (["latest_played_at", "best_score", "games_played", "nickname", "country", "gems"].includes(sort)) state.playerSort = sort;
   const direction = params.get("direction");
@@ -1623,6 +1765,8 @@ function updateFilterControls() {
   picker.querySelector("summary").childNodes[0].nodeValue = state.startDate ? `${formatShortDay(state.startDate)}–${formatShortDay(state.endDate)} ` : "달력으로 선택 ";
   const customMessage = byId("customRangeMessage");
   if (!customMessage.dataset.error || customMessage.dataset.error === "false") customMessage.textContent = state.startDate ? `${state.rangeDays}일 사용자 지정 기간` : "최근 28일 안에서 원하는 기간을 선택하세요.";
+  byId("appFamilySelect").value = state.appFamily;
+  byId("runModeSelect").value = state.runMode;
   byId("periodPlayerSearch").value = state.playerQuery;
   document.querySelectorAll("[data-player-sort]").forEach((button) => {
     button.closest("th").setAttribute("aria-sort", button.dataset.playerSort === state.playerSort ? (state.playerDirection === "asc" ? "ascending" : "descending") : "none");
@@ -1685,6 +1829,16 @@ function bindControls() {
     state.playerPage = 1;
     changeFilters();
   }));
+  byId("appFamilySelect").addEventListener("change", (event) => {
+    state.appFamily = event.currentTarget.value;
+    state.playerPage = 1;
+    changeFilters();
+  });
+  byId("runModeSelect").addEventListener("change", (event) => {
+    state.runMode = event.currentTarget.value;
+    state.playerPage = 1;
+    changeFilters();
+  });
   byId("versionTrendSelect").addEventListener("change", (event) => {
     state.versionTrendVersion = event.currentTarget.value;
     renderVersionTrend(state.payload?.versionMonitor ?? {});

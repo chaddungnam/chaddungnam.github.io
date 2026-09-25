@@ -234,6 +234,8 @@
       params.set("rangeOffsetDays", String(filters.rangeOffsetDays || 0));
     }
     params.set("distributionKey", String(filters.distributionKey));
+    if (filters.appFamily && filters.appFamily !== "all") params.set("appFamily", String(filters.appFamily));
+    if (filters.runMode && filters.runMode !== "all") params.set("runMode", String(filters.runMode));
     params.set("sort", String(filters.sort));
     params.set("direction", String(filters.direction));
     params.set("page", String(filters.page));
@@ -284,6 +286,8 @@
     mechakucha_quake: "메챠쿠챠 지진", size_restore: "크기 복원", blood_game: "블러드 게임",
     all_or_nothing: "모 아니면 도", score_double: "점수 2배", roulette_reroll: "룰렛 다시하기",
     drag_drop_level: "드래그 앤 드롭",
+    lab_boss_mad: "매드 사이언티스트 연사", lab_boss_awakened: "각성 매드 사이언티스트",
+    lab_score_bonus: "즉시 점수",
     bonus: "보너스 점수", nothing: "꽝", hard_mode: "하드 모드", time_rewind: "시간 되감기",
   });
 
@@ -291,16 +295,43 @@
     home: "홈", main: "게임", loading: "첫 실행·로그인", settings: "설정", shop: "상점",
     scorerecord: "점수 기록", attendance: "미션·출석", profile: "프로필", profilecustomize: "프로필 꾸미기", mailbox: "우편함",
     origincutscene: "오프닝 이야기", ranking: "랭킹", friends: "친구", notice: "공지",
+    labhome: "실험실 홈", labshop: "실험실 상점", labranking: "실험실 랭킹", labvip: "VIP",
+    labtutorialhome: "튜토리얼 홈",
   });
+
+  function readableRawId(value) {
+    const raw = String(value || "unknown").trim();
+    return raw.replace(/[_-]+/g, " ") || "unknown";
+  }
 
   function analyticsChoiceName(value) {
     const key = String(value || "unknown").trim().toLowerCase();
-    return analyticsChoiceNames[key] || "기타·구버전 값";
+    return analyticsChoiceNames[key] || readableRawId(value);
   }
 
   function analyticsScreenName(value) {
     const key = String(value || "unknown").trim().toLowerCase();
-    return analyticsScreenNames[key] || "화면 미식별";
+    return analyticsScreenNames[key] || readableRawId(value);
+  }
+
+  const labTutorialStageNames = Object.freeze({
+    opening: "오프닝", drop: "첫 드롭", level1_free: "1레벨 자유 플레이", mad: "매드 연사",
+    bomb_ready: "폭탄 준비", bomb_roulette: "폭탄 룰렛", bomb_drop: "폭탄 드롭", bomb_practice: "폭탄 연습",
+    penalty_warning: "페널티 경고", penalty_demo: "페널티 시연", penalty_result: "페널티 결과",
+    golden_roulette: "골든 룰렛", golden: "골든 슈팅", beaker: "비커", beaker_play: "비커 플레이",
+    mason: "메이슨", choice: "성장 선택", approach: "보스 접근", boss_dodge_guide: "보스 회피 안내",
+    boss_dodge_entry: "보스 회피 진입", boss_dodge: "보스 회피", boss_return: "보스 복귀",
+    boss_attack: "보스 공격", superior_taunt: "보스 도발", boss_defeat: "보스 격파", home_handoff: "홈 인계",
+  });
+
+  function labTutorialStageName(stage) {
+    const key = String(stage || "").trim().toLowerCase();
+    return labTutorialStageNames[key] || readableRawId(stage);
+  }
+
+  function isHomeScreen(value) {
+    const key = String(value || "").trim().toLowerCase();
+    return key === "home" || key === "labhome";
   }
 
   function analyticsButtonName(buttonId, screen) {
@@ -394,6 +425,8 @@
     buildAttentionItems,
     analyticsChoiceName,
     analyticsScreenName,
+    labTutorialStageName,
+    isHomeScreen,
     analyticsButtonName,
     interactionRecommendation,
     diffPlayerChanges,

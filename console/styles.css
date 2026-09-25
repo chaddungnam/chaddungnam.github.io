@@ -706,6 +706,7 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .toolbar-live { display: flex; align-items: center; min-width: 190px; color: var(--ink-soft); font-size: 11px; font-weight: 700; }
 .toolbar-switches { gap: 13px; }
 .filter-group { display: flex; align-items: center; gap: 7px; }
+.analytics-toolbar select { min-height: 32px; padding: 6px 8px; color: #243044; background: #fff; border: 1px solid #e4e8ec; border-radius: 8px; font-size: 11px; }
 .filter-label { color: #7a8595; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
 .range-switch { gap: 2px; padding: 4px; background: #edf1f4; border: 1px solid #e4e8ec; border-radius: 11px; }
 .range-button, .distribution-button { min-height: 32px; padding: 7px 11px; color: #667386; border-radius: 8px; font-size: 10px; }

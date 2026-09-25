@@ -137,7 +137,8 @@ assert.match(analyticsSource, /renderPriorityInsights/, "the dashboard must rend
 assert.match(analyticsSource, /renderDiagnostics\(\)/, "the analytics renderer must render diagnostics from the dashboard response");
 assert.match(analyticsSource, /diagnostics\.gameOver/, "game-over rows must render from diagnostics.gameOver");
 assert.match(analyticsSource, /diagnostics\.growthChoices/, "legacy growth choices must render from diagnostics.growthChoices");
-assert.match(analyticsSource, /1\.1\.0 데이터 수집 대기/, "empty tutorial and Mechakucha panels must use the exact collection-waiting text");
+assert.match(analyticsSource, /데이터 수집 대기/, "empty tutorial and Mechakucha panels must use version-neutral collection-waiting text");
+assert.doesNotMatch(analyticsSource, /1\.1\.0 데이터 수집 대기|기존 1\.1\.0도 확인/, "empty-state copy must not name a single build");
 assert.doesNotMatch(analyticsSource, /Chart\.js|new Chart\(/, "diagnostics charts must reuse Canvas without a chart dependency");
 assert.match(analyticsSource, /function diagnosticsSignalLabel/, "diagnostics issue signals must map internal event keys to operator-facing labels");
 assert.match(analyticsSource, /튜토리얼 미완료/, "diagnostics issue labels must not expose raw event identifiers");

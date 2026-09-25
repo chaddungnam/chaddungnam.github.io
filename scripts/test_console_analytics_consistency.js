@@ -22,7 +22,8 @@ window.ConsoleModel = context.ConsoleModel;
 vm.runInContext(read("console/analytics.js").replace("root.ConsoleAnalytics = { mount, load: loadDashboard };", `root.ConsoleAnalytics = {
   render(payload) { state.payload = payload; const model = { metrics: { completion: {status:"neutral"}, duration: {status:"neutral"}, retention: {status:"neutral"} } };
     renderAnalyticsCoverage(); renderExecutiveSummary(model); renderExecutiveVisuals(model);
-    renderAccountActivity(); renderUnfinishedPlays(); renderPeriodPlayers(); renderInsight(); renderFunnel(); renderExitBreakdown();
+    renderAccountActivity(); renderLabAccountFacts(); renderUnfinishedPlays(); renderPeriodPlayers(); renderInsight(); renderFunnel(); renderExitBreakdown();
+    renderDimensions(); renderLabTutorial(); renderLabRuns(); renderLabEconomy(); renderDecisionPanels();
   },
   journey: renderJourney,
   finishLoading: () => setFiltersDisabled(false),
@@ -144,4 +145,56 @@ assert.equal(text("execReturn"), "0.0%", "known zero return rate remains valid")
 assert.match(text("execReturnDetail"), /이전 8명 중 0명/);
 assert.match(html, /<span>활동한 계정<\/span>/);
 assert.match(html, /활동 설치<\/span>.*완료 판<\/span>/);
+
+render();
+assert.match(text("insightText"), /완료한 계정 6명 · 계정 완료 기록 19판/);
+assert.match(text("execCompletedDetail"), /19판/);
+assert.doesNotMatch(text("analyticsCoverageMessage"), /앱 계열/);
+assert.equal(nodes.get("labAccountFacts").hidden, true);
+assert.match(markup("labRunsTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("labTutorialTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("appVersionsTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("labEconomyProfiles"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("removeAdsFunnel"), /집계 대기/);
+assert.doesNotMatch(markup("tutorialStagesTable") + markup("mechakuchaSummary"), /1\.1\.0/);
+
+render({
+  filters: { appFamily: "2.x", runMode: "lab" },
+  dimensions: {
+    appVersions: [{ version: "2.0.0", events: 12, installs: 3, runs: 4 }],
+    runModes: [{ mode: "lab", runs: 4, completed: 3, exits: 1 }],
+  },
+  labRuns: [{ phase: 1, step: 3, starts: 12, clears: 5, fails: 6, exits: 1, avgDurationSec: 184.2, clearRate: 0.4167, topFailCauses: [{ cause: "boss_overflow", count: 3 }, { cause: "mystery_leak", count: 1 }] }],
+  tutorialFunnel: { lab: { started: 10, completed: 6, stages: [{ stage: "drop", stageIndex: 1, runs: 8 }, { stage: "opening", stageIndex: 0, runs: 10 }] }, classic: { started: 3, completed: 2 } },
+  labEconomy: {
+    daily: [{ day: "2026-09-25", idleClaims: 3, idleReagent: 120, idleGems: 5, escapeGrants: 4, escapeReagent: 180, questGrants: 1, questReagent: 300, sweepGrants: 0, sweepReagent: 0, adDrones: 2, adDroneReagent: 120, hexUpgrades: 5, hexCancels: 0 }],
+    totals: { idleClaims: 3, idleReagent: 120, idleGems: 5, escapeGrants: 4, escapeReagent: 180, questGrants: 1, questReagent: 300, sweepGrants: 0, sweepReagent: 0, adDrones: 2, adDroneReagent: 120, hexUpgrades: 5, hexCancels: 0 },
+    profiles: { accounts: 150, vipTier: { "0": 148, "1": 2, "2": 0 }, reagentMedian: 40, reagentP90: 400 },
+  },
+  labAccountFacts: { accountsWithLabRun: 7, labCompletedRuns: 21 },
+  purchaseFunnel: [
+    { productId: "vip1", startedUsers: 2, succeededUsers: 1, failedUsers: 1, startToSuccessRate: 0.5 },
+    { productId: "remove_ads", startedUsers: 4, succeededUsers: 3, failedUsers: 0, startToSuccessRate: 0.75 },
+  ],
+  purchaseExclusions: { excludedInstalls: 2 },
+});
+assert.match(text("analyticsCoverageMessage"), /앱 계열 2\.x 실험실 빌드 · 판 종류 실험실 탈출/);
+assert.match(markup("appVersionsTable"), /2\.0\.0/);
+assert.match(markup("runModesTable"), /실험실 탈출/);
+assert.match(markup("labRunsTable"), /보스가 부풀린 구슬 3/);
+assert.match(markup("labRunsTable"), /mystery leak 1/);
+assert.match(markup("labRunsTable"), /41\.7%/);
+assert.match(markup("labTutorialTable"), /오프닝[\s\S]*첫 드롭[\s\S]*완료/);
+assert.match(markup("labTutorialTable"), /20\.0%/);
+assert.match(markup("labEconomyTable"), /2026-09-25/);
+assert.match(markup("labEconomyTable"), /합계/);
+assert.match(markup("labEconomyProfiles"), /시약 중앙값/);
+assert.match(markup("labEconomyProfiles"), /P90 400/);
+assert.equal(nodes.get("labAccountFacts").hidden, false);
+assert.match(text("labAccountFacts"), /실험실 완료 판 21판/);
+assert.match(markup("removeAdsFunnel"), /VIP 1 시작/);
+assert.match(markup("removeAdsFunnel"), /광고 제거 성공/);
+render({ labEconomy: null });
+assert.match(markup("labEconomyProfiles"), /서버 집계 함수 배포 전이에요/);
+assert.equal(nodes.get("labAccountFacts").hidden, true);
 console.log("Console analytics consistency: real-render VM mismatch, unknown/zero, coverage, identity, denominator and funnel tests passed.");
