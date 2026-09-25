@@ -75,6 +75,23 @@ assert.equal(model.actionDisplayName("future_action"), "future_action");
 assert.equal(model.analyticsChoiceName("mechakucha_quake"), "메챠쿠챠 지진");
 assert.equal(model.analyticsChoiceName("roulette_reroll"), "룰렛 다시하기");
 assert.equal(model.analyticsChoiceName("drag_drop_level"), "드래그 앤 드롭");
+assert.equal(model.analyticsChoiceName("lab_boss_mad"), "매드 사이언티스트 연사");
+assert.equal(model.analyticsChoiceName("lab_boss_awakened"), "각성 매드 사이언티스트");
+assert.equal(model.analyticsChoiceName("lab_score_bonus"), "즉시 점수");
+assert.equal(model.analyticsChoiceName("lab_unknown_perk"), "lab unknown perk");
+assert.doesNotMatch(model.analyticsChoiceName("lab_unknown_perk"), /기타/);
+assert.equal(model.analyticsScreenName("labhome"), "실험실 홈");
+assert.equal(model.analyticsScreenName("labshop"), "실험실 상점");
+assert.equal(model.analyticsScreenName("labranking"), "실험실 랭킹");
+assert.equal(model.analyticsScreenName("labvip"), "VIP");
+assert.equal(model.analyticsScreenName("labtutorialhome"), "튜토리얼 홈");
+assert.equal(model.analyticsScreenName("labreview"), "labreview");
+assert.equal(model.labTutorialStageName("opening"), "오프닝");
+assert.equal(model.labTutorialStageName("home_handoff"), "홈 인계");
+assert.equal(model.labTutorialStageName("unlisted_step"), "unlisted step");
+assert.equal(model.isHomeScreen("home"), true);
+assert.equal(model.isHomeScreen("labhome"), true);
+assert.equal(model.isHomeScreen("shop"), false);
 assert.equal(model.analyticsButtonName("main/ui/control_0/panel_1/growthchoice_space", "main"), "성장 선택 팝업 · 공간 축소");
 assert.equal(model.analyticsButtonName("main/hud/button_0", "main"), "게임 · 일시정지 메뉴 (구버전)");
 assert.equal(model.analyticsButtonName("home/start_game", "home"), "홈 · 게임 시작");
@@ -101,6 +118,14 @@ assert.equal(model.serializeAnalyticsFilters({
   direction: "desc",
   page: 1,
 }), "startDate=2026-08-21&endDate=2026-08-30&distributionKey=all&sort=latest_played_at&direction=desc&page=1");
+assert.equal(model.serializeAnalyticsFilters({
+  rangeDays: 3, distributionKey: "all", appFamily: "all", runMode: "all",
+  sort: "latest_played_at", direction: "desc", page: 1,
+}), "rangeDays=3&rangeOffsetDays=0&distributionKey=all&sort=latest_played_at&direction=desc&page=1");
+assert.match(model.serializeAnalyticsFilters({
+  rangeDays: 3, distributionKey: "all", appFamily: "2.x", runMode: "lab",
+  sort: "latest_played_at", direction: "desc", page: 1,
+}), /appFamily=2\.x&runMode=lab/);
 assert.deepEqual(model.normalizeCustomAnalyticsRange("2026-08-21", "2026-08-30", "2026-08-30"), {
   ok: true, startDate: "2026-08-21", endDate: "2026-08-30", days: 10,
 });
