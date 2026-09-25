@@ -92,4 +92,46 @@ for locale in ko en de ja; do
   done
 done
 
+# HEXAWORLD 1984 ships ko/en only — same generic legal-site contract as the
+# locales above, kept as its own block since it does not join the QB/shared
+# ko/en/de/ja loops.
+hexaworld_localized_pages=()
+for locale in ko en; do
+  hexaworld_localized_pages+=(
+    "hexaworld1984/privacy/$locale.html"
+    "hexaworld1984/terms/$locale.html"
+    "hexaworld1984/privacy/delete_$locale.html"
+  )
+done
+
+hexaworld_selector_pages=(
+  "hexaworld1984/index.html"
+  "hexaworld1984/privacy/index.html"
+  "hexaworld1984/terms/index.html"
+  "hexaworld1984/privacy/delete.html"
+)
+
+for page in "${hexaworld_localized_pages[@]}" "${hexaworld_selector_pages[@]}"; do
+  test -s "$repo_dir/$page" || fail "$page does not exist"
+  require_token "$page" "/assets/legal-site.css"
+  require_token "$page" "/assets/legal-site.js"
+  require_token "$page" 'class="skip-link"'
+  require_token "$page" "<main"
+  require_token "$page" "data-current-year"
+  reject_token "$page" "<style"
+  reject_token "$page" "fonts.googleapis.com"
+  reject_token "$page" "cdn."
+  reject_token "$page" "tailwind"
+  reject_token "$page" "iconify"
+done
+
+for page in "${hexaworld_localized_pages[@]}"; do
+  require_token "$page" "문서 본문 시작"
+  require_token "$page" "문서 본문 끝"
+  require_token "$page" "data-legal-content"
+  require_token "$page" "data-toc-list"
+done
+
+printf 'legal site contract (hexaworld1984): PASS\n'
+
 printf 'legal site contract: PASS\n'
