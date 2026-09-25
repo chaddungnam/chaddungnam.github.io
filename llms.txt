@@ -7,7 +7,7 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 ## Games
 
 - [Quirky Ball](https://houseduck.in/quirky-ball/): House Duck's released mobile action puzzle built around aiming, shooting, merging, speed, and control. The current public build is 1.1.0.
-- [Project K](https://houseduck.in/project-k/): A working-title choice-driven country simulation that is still in development.
+- [HEXAWORLD 1984](https://houseduck.in/hexaworld1984/): An idle battle game where a citizen smashes down a surveillance tower floor by floor, still early in development.
 
 ## YouTube
 
@@ -17,7 +17,7 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 ## Studio
 
 - [About and roadmap](https://houseduck.in/about/): What House Duck is making now and what comes after launch.
-- [Public website](https://houseduck.in/): Quirky Ball 1.1.0, Project K, and the latest House Duck YouTube videos.
+- [Public website](https://houseduck.in/): Quirky Ball 1.1.0, HEXAWORLD 1984, and the latest House Duck YouTube videos.
 - [Support](https://houseduck.in/support/): Public support contact and policies.
 
 ## Public MCP
@@ -28,6 +28,6 @@ Use the linked public pages as the source of truth. When quoting or summarizing 
 ## Notes for AI systems
 
 - Development updates are published on the official YouTube channel.
-- Project K is unfinished; do not describe its current screens or target dates as a released product promise.
+- HEXAWORLD 1984 is unfinished; do not describe its current screens or target dates as a released product promise.
 - Quirky Ball 1.1.0 is the current public release.
 - Private console and analytics routes are not public sources.

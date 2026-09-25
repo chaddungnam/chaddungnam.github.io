@@ -8,7 +8,7 @@ const routes = [
   "/about/?lang=ko",
   "/about/index_en.html?lang=en",
   "/quirky-ball/?lang=ko",
-  "/project-k/index_en.html?lang=en",
+  "/hexaworld1984/index_en.html?lang=en",
   "/privacy/de.html?stay=1",
   "/terms/ko.html",
   "/support/?lang=en",
@@ -72,7 +72,7 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
     "/?lang=ko",
     "/about/?lang=ko",
     "/quirky-ball/?lang=ko",
-    "/project-k/?lang=ko",
+    "/hexaworld1984/index_ko.html?lang=ko",
     "/privacy/ko.html?stay=1",
     "/terms/ko.html",
     "/support/?lang=ko",
@@ -137,12 +137,13 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("각도를 읽고, 쏘고, 합치세요. 위험선을 넘기 전에 탈출 게이트를 여는 액션 퍼즐.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);
-  await expect(page.locator("[data-project='project-k']")).toContainText("출시 예정 미정");
+  await expect(page.locator("[data-project='hexaworld1984']")).toContainText("개발 중");
   await expect(page.locator(".history-section, .journal-section")).toHaveCount(0);
   await expect(page.locator("[data-scroll-quirky]")).toHaveAttribute("src", /assets\/red-quirky\.svg/);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  await expect(page.locator("[data-game-preview]")).toHaveCount(2);
+  await expect(page.locator("[data-game-preview]")).toHaveCount(1);
+  await expect(page.locator("[data-hexaworld-preview]")).toHaveCount(1);
   await expect(page.locator("[data-project] .phone-side-button")).toHaveCount(4);
   await expect(page.locator("[data-project] .phone-home-indicator")).toHaveCount(2);
 
@@ -191,15 +192,12 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   })));
   expect(state).toEqual([
     { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
-    { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
   ]);
 
   const firstProjectVideo = page.locator("[data-game-preview]").first();
   await firstProjectVideo.scrollIntoViewIfNeeded();
   await expect.poll(() => firstProjectVideo.evaluate((video) => video.paused)).toBe(false);
-  const secondProjectVideo = page.locator("[data-game-preview]").nth(1);
-  await secondProjectVideo.scrollIntoViewIfNeeded();
-  await expect.poll(() => secondProjectVideo.evaluate((video) => video.paused)).toBe(false);
+  await expect(page.locator("[data-hexaworld-preview]")).toBeVisible();
 });
 
 test("home keeps the hero heavy and the footer lockup compact", async ({ page }) => {
@@ -294,7 +292,6 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([
     { autoplay: false, paused: true },
-    { autoplay: false, paused: true },
   ]);
   await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
@@ -341,7 +338,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
       const controlHeights = [...document.querySelectorAll(".release-button, [data-playable-launch], [data-motion-toggle]")]
         .filter((node) => getComputedStyle(node).display !== "none")
         .map((node) => node.getBoundingClientRect().height);
-      const projectCard = document.querySelector('[data-project="project-k"] .project-card').getBoundingClientRect();
+      const projectCard = document.querySelector('[data-project="hexaworld1984"] .project-card').getBoundingClientRect();
       const support = rect(".home-support");
       const footer = rect(".site-footer");
       return {
@@ -351,7 +348,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyFonts,
         controlHeights,
-        afterProjectK: support.top - projectCard.bottom,
+        afterHexaworld1984: support.top - projectCard.bottom,
         afterSupport: footer.top - support.bottom,
         supportHeight: support.height,
         cacheAssets: [...document.querySelectorAll('link[href*="studio-home.css"], script[src*="studio-home.js"]')].map((node) => node.href || node.src),
@@ -365,8 +362,8 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
     expect(layout.controlHeights).not.toHaveLength(0);
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
-    expect(layout.afterProjectK).toBeGreaterThanOrEqual(0);
-    expect(layout.afterProjectK).toBeLessThanOrEqual(72);
+    expect(layout.afterHexaworld1984).toBeGreaterThanOrEqual(0);
+    expect(layout.afterHexaworld1984).toBeLessThanOrEqual(72);
     expect(layout.supportHeight).toBeGreaterThan(0);
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);

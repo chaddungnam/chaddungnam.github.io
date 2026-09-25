@@ -6,12 +6,12 @@ const path = require("node:path");
 
 const repoDir = path.join(__dirname, "..");
 const projectPages = [
-  ["project-k/index.html", "ko"],
-  ["project-k/index_en.html", "en"],
-  ["project-k/index_de.html", "de"],
-  ["project-k/index_ja.html", "ja"]
+  ["hexaworld1984/index_ko.html", "ko"],
+  ["hexaworld1984/index_en.html", "en"],
+  ["hexaworld1984/index_de.html", "de"],
+  ["hexaworld1984/index_ja.html", "ja"]
 ];
-const projectReleaseStatus = { ko: "출시 예정 미정", en: "Release date TBD", de: "Veröffentlichungstermin offen", ja: "発売時期未定" };
+const projectReleaseStatus = { ko: "출시 일정 미정", en: "Release date TBD", de: "Veröffentlichungstermin offen", ja: "発売時期未定" };
 const aboutPages = [
   ["about/index.html", "ko"],
   ["about/index_en.html", "en"],
@@ -48,25 +48,41 @@ function pngSize(file) {
   return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
 }
 
+function webpSize(file) {
+  const data = fs.readFileSync(file);
+  assert.equal(data.subarray(0, 4).toString("ascii"), "RIFF", `${file} must be a WebP`);
+  assert.equal(data.subarray(8, 12).toString("ascii"), "WEBP", `${file} must be a WebP`);
+  const chunk = data.subarray(12, 16).toString("ascii");
+  if (chunk === "VP8 ") {
+    return { width: data.readUInt16LE(26) & 0x3fff, height: data.readUInt16LE(28) & 0x3fff };
+  }
+  if (chunk === "VP8L") {
+    const bits = data.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  }
+  throw new Error(`${file}: unsupported WebP chunk ${chunk}`);
+}
+
 for (const [file, locale] of projectPages) {
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, new RegExp(`data-locale="${locale}"`), `${file} locale`);
-  assert.match(html, /data-page="project-k"/, `${file} page marker`);
+  assert.match(html, /data-page="hexaworld1984"/, `${file} page marker`);
   assert.match(html, /class="language-picker"/, `${file} language picker`);
   assert.ok(publicText.includes(projectReleaseStatus[locale]), `${file} open release status`);
   assert.doesNotMatch(publicText, /2026[\s\S]{0,80}2027/, `${file} must not promise a release window`);
-  assert.doesNotMatch(publicText, /세로형/, `${file} public copy`);
+  assert.doesNotMatch(publicText, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);
 
-  const imageTags = (html.match(/<img\b[^>]*data-project-k-asset[^>]*>/g) || []);
-  assert.ok(imageTags.length >= 4, `${file} should show at least four real client captures`);
+  const imageTags = (html.match(/<img\b[^>]*data-hexaworld1984-asset[^>]*>/g) || []);
+  assert.ok(imageTags.length >= 1, `${file} should show at least one real development capture`);
   for (const tag of imageTags) {
     const source = attribute(tag, "src");
     const imagePath = path.resolve(path.dirname(path.join(repoDir, file)), source);
     assert.ok(fs.existsSync(imagePath), `${file}: missing ${source}`);
-    assert.deepEqual(pngSize(imagePath), { width: 720, height: 1600 }, `${source} intrinsic size`);
-    assert.equal(attribute(tag, "width"), "720", `${source} declared width`);
-    assert.equal(attribute(tag, "height"), "1600", `${source} declared height`);
+    assert.ok(fs.statSync(imagePath).size < 250_000, `${source} must stay under ~250KB`);
+    assert.deepEqual(webpSize(imagePath), { width: 450, height: 568 }, `${source} intrinsic size`);
+    assert.equal(attribute(tag, "width"), "450", `${source} declared width`);
+    assert.equal(attribute(tag, "height"), "568", `${source} declared height`);
   }
 }
 
@@ -113,16 +129,17 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
-  assert.match(html, /href="[^"]*project-k\//, `${file} Project K link`);
+  assert.match(html, /href="[^"]*hexaworld1984\//, `${file} HEXAWORLD 1984 link`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
+  assert.doesNotMatch(html, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);
   assert.match(html, /data-youtube-feed/, `${file} synchronized YouTube feed`);
   assert.match(html, /data-studio-hero/, `${file} studio hero`);
   assert.match(html, /data-quirky-mechanic/, `${file} Quirky shooting mechanic`);
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} latest videos`);
   assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} two projects only`);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two game previews`);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} one video game preview`);
   assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
-  assert.match(html, /assets\/media\/project-k-highlight\.mp4/, `${file} Project K video`);
+  assert.match(html, /assets\/hexaworld1984\/hexaworld1984-title\.webp/, `${file} HEXAWORLD 1984 development capture`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);
   assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store links to the released iOS app`);

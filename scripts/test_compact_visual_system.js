@@ -9,7 +9,7 @@ const studio = fs.readFileSync(path.join(root, "assets", "studio-home.css"), "ut
 const fonts = fs.readFileSync(path.join(root, "assets", "site-fonts.css"), "utf8");
 const brand = fs.readFileSync(path.join(root, "assets", "brand-site.css"), "utf8");
 const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8");
-const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css"), "utf8");
+const hexaworld1984 = fs.readFileSync(path.join(root, "assets", "hexaworld1984-site.css"), "utf8");
 const quirky = fs.readFileSync(path.join(root, "assets", "quirky-ball-site.css"), "utf8");
 
 assert.match(studio, /background:\s*var\(--studio-tone,\s*#f5f4ef\)/);
@@ -24,7 +24,7 @@ assert.match(studio, /\.project-card\s*\{[^}]*overflow:\s*visible/s);
 assert.match(studio, /\.project-phone \.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*20/s);
 assert.match(studio, /\.project-phone \.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.youtube-grid\s*\{[^}]*repeat\(3,/s);
-assert.match(studio, /\.project-k-title,[\s\S]*?font-family:\s*Gungsuh/s);
+assert.match(studio, /\.project-phone img\s*\{[^}]*object-fit:\s*contain/s);
 assert.match(fonts, /font-family:\s*"Montserrat"/);
 for (const file of ["Montserrat-Variable.woff2", "DoHyeon-Regular.woff2", "Chilgok_Kaj-subset.woff2"]) {
   assert.ok(fs.statSync(path.join(root, "assets", "fonts", file)).size < 300_000, `${file} must stay web-sized`);
@@ -51,11 +51,10 @@ assert.match(legal, /\.legal-duck-mark\s*\{[^}]*width:\s*34px[^}]*height:\s*34px
 assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*3\.3rem\)/s);
 assert.match(legal, /\.legal-paper\s*\{[^}]*padding:\s*clamp\(24px,\s*4vw,\s*40px\)/s);
 
-assert.match(projectK, /--k-void:\s*#f8f5ec/);
-assert.match(projectK, /\.project-k-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
-assert.match(projectK, /\.project-k-title\s*\{[^}]*font-size:\s*clamp\(2\.65rem,\s*4vw,\s*3\.45rem\)[^}]*word-break:\s*keep-all/s);
-assert.match(projectK, /\.project-k-section\s*\{[^}]*padding-block:\s*clamp\(52px,\s*7vw,\s*88px\)/s);
-assert.match(projectK, /\.project-k-loop-card\s*\{[^}]*min-height:\s*220px/s);
+assert.match(hexaworld1984, /--hex-void:\s*#e7e9f0/);
+assert.match(hexaworld1984, /\.hexaworld1984-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
+assert.match(hexaworld1984, /\.hexaworld1984-title\s*\{[^}]*font-size:\s*clamp\(2\.5rem,\s*4vw,\s*3\.3rem\)[^}]*word-break:\s*keep-all/s);
+assert.match(hexaworld1984, /\.hexaworld1984-section\s*\{[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
 assert.match(quirky, /--qb-bg:\s*#f8f9fa/);
 assert.doesNotMatch(quirky, /html\[data-theme="dark"\]/);
 assert.match(quirky, /\.hero-device\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
@@ -71,7 +70,7 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   assert.equal((html.match(/data-project="/g) || []).length, 2);
   assert.doesNotMatch(html, /history-section|journal-section/);
   assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 2);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 1);
 }
 
 for (const file of ["about/index.html", "about/index_en.html", "about/index_de.html", "about/index_ja.html"]) {

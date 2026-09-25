@@ -67,7 +67,7 @@ assert.match(svg, /data-part="smirk" d="M90 166Q123 180 150 150" fill="none" str
 assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky smirk needs its raised curl");
 
 const expectedCopy = {
-  "index.html": ["https://apps.apple.com/app/id6797996754", "출시 예정 미정"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "출시 일정 미정"],
   "index_en.html": ["https://apps.apple.com/app/id6797996754", "Release date TBD"],
   "index_de.html": ["https://apps.apple.com/app/id6797996754", "Veröffentlichungstermin offen"],
   "index_ja.html": ["https://apps.apple.com/app/id6797996754", "発売時期未定"],
@@ -118,7 +118,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(html.includes(`property="og:image:alt" content="${imageAlt}"`), `${file} needs localized social-image alt text`);
 }
 
-assert.match(read("assets/studio-home.css"), /\.project-k-display\s*\{[^}]*color:\s*transparent;[^}]*-webkit-text-stroke:/s);
+assert.match(read("assets/studio-home.css"), /\.project-phone img\s*\{[^}]*object-fit:\s*contain/s, "hexaworld1984 development capture must letterbox instead of cropping");
 assert.match(read("assets/studio-home.js"), /context\.setTransform\(1, 0, 0, 1, 0, 0\);\s*context\.clearRect\(0, 0, canvas\.width, canvas\.height\);/, "each frame must clear the full backing canvas before restoring its logical scale");
 
 console.log("studio home contract: PASS");

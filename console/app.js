@@ -14,7 +14,7 @@ const pageTitles = {
   purchases: "구매",
   cs: "CS",
   audit: "감사 기록",
-  "project-k": "Project K",
+  "project-k": "HEXAWORLD 1984",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -74,7 +74,7 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
   const projectK = projectKey === "project_k";
-  byId("currentProject").textContent = projectK ? "Project K" : "Quirky Ball";
+  byId("currentProject").textContent = projectK ? "HEXAWORLD 1984" : "Quirky Ball";
   byId("consoleNav").hidden = projectK;
   showOnly("consoleApp");
   window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";

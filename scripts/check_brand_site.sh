@@ -46,10 +46,10 @@ content_pages=(
   "quirky-ball/index_en.html"
   "quirky-ball/index_de.html"
   "quirky-ball/index_ja.html"
-  "project-k/index.html"
-  "project-k/index_en.html"
-  "project-k/index_de.html"
-  "project-k/index_ja.html"
+  "hexaworld1984/index_ko.html"
+  "hexaworld1984/index_en.html"
+  "hexaworld1984/index_de.html"
+  "hexaworld1984/index_ja.html"
 )
 
 for page in "${content_pages[@]}"; do
@@ -77,11 +77,11 @@ for page in about/index.html about/index_en.html about/index_de.html about/index
   require_token "$page" 'assets/about-site.css'
 done
 
-for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do
-  require_token "$page" 'data-page="project-k"'
+for page in hexaworld1984/index_ko.html hexaworld1984/index_en.html hexaworld1984/index_de.html hexaworld1984/index_ja.html; do
+  require_token "$page" 'data-page="hexaworld1984"'
   require_token "$page" 'class="language-picker"'
-  require_token "$page" "data-project-k-asset"
-  require_token "$page" "assets/project-k-site.css"
+  require_token "$page" "data-hexaworld1984-asset"
+  require_token "$page" "assets/hexaworld1984-site.css"
 done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
@@ -90,7 +90,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-youtube-feed'
   require_token "$page" 'data-quirky-mechanic'
   require_token "$page" 'data-project="quirky-ball"'
-  require_token "$page" 'data-project="project-k"'
+  require_token "$page" 'data-project="hexaworld1984"'
   require_token "$page" 'assets/studio-home.css'
   require_token "$page" 'assets/studio-home.js'
   require_token "$page" 'assets/house-duck-social.jpg'
@@ -98,7 +98,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
   require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
-  require_token "$page" "assets/media/project-k-highlight.mp4"
+  require_token "$page" "assets/hexaworld1984/hexaworld1984-title.webp"
   require_token "$page" "https://www.youtube.com/@houseduck_in"
   reject_token "$page" 'history-section'
   reject_token "$page" 'journal-section'

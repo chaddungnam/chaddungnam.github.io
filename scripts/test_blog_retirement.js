@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const retired = /(?:blog\.houseduck\.in|houseduck\.tistory\.com|(?:\.\.\/|\/)?blog\/(?:kr|en|de|ja)|assets\/blog-feed\.json)/i;
-const pages = ["", "about/", "quirky-ball/", "project-k/"]
+const pages = ["", "about/", "quirky-ball/", "hexaworld1984/index_ko.html"]
   .flatMap((prefix) => ["index.html", "index_en.html", "index_de.html", "index_ja.html"].map((file) => prefix + file));
 
 for (const file of [...pages, "assets/brand-site.js", "llms.txt", "server.json"]) {
