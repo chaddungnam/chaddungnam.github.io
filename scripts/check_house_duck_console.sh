@@ -121,3 +121,19 @@ rg -F -q 'first_open", "첫 실행"' "$repo_dir/analytics/pulse-model.js"
 node "$repo_dir/scripts/test_console_audit_navigation.js"
 node "$repo_dir/scripts/test_console_request_safety.js"
 echo "House Duck console contract: PASS"
+
+# Console 2.0 uses existing admin gates; new reads fail independently of 1.x panels.
+for path in lab.js liveops.js; do
+  test -f "$console_dir/$path"
+  node --check "$console_dir/$path"
+done
+for element in liveopsPanel rankingPanel labAnalyticsPanel issueReportsPanel purchaseEnvironment; do
+  rg -F -q "id=\"$element\"" "$console_dir/index.html"
+done
+rg -F -q 'action:"lab.get"' "$console_dir/lab.js"
+rg -F -q "action:'liveops.preview'" "$console_dir/liveops.js"
+rg -F -q 'ConsoleApp.confirmChange' "$console_dir/liveops.js"
+rg -F -q 'pending.set(form,{fingerprint,requestId})' "$console_dir/liveops.js"
+rg -F -q '표본 부족' "$console_dir/model.js"
+rg -F -q '@media (max-width: 600px)' "$console_dir/styles.css"
+node "$repo_dir/scripts/test_console_model.js"

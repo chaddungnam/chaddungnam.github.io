@@ -144,7 +144,7 @@
 
   function actionDisplayName(value) {
     const action = String(value || "").trim();
-    return actionNames[action] || action || "알 수 없는 작업";
+    return (action === "liveops_update" ? "라이브 이벤트 설정" : actionNames[action]) || action || "알 수 없는 작업";
   }
 
   const catalogLabels = Object.freeze({
@@ -397,6 +397,17 @@
       && stateVersion >= 0;
   }
 
+  function sampleRate(numerator, denominator) {
+    if (numerator == null || denominator == null || !Number.isFinite(Number(numerator)) || !Number.isFinite(Number(denominator))) return "기록 없음";
+    const n = Number(numerator), d = Number(denominator);
+    if (n < 0 || d < 0 || n > d) return "집계 확인 필요";
+    return d < 50 ? "표본 부족" : `${(n / d * 100).toFixed(1)}%`;
+  }
+
+  function snapshotRank(row) {
+    return !row?.captured_at ? "스냅숏 없음" : row.rank == null ? "상위 200명에 없음" : `${row.rank}위`;
+  }
+
   function tutorialStatus(tutorial) {
     if (!tutorial) return "확인 불가";
     if (tutorial.home_at) return "완료 후 홈 도착 확인";
@@ -406,6 +417,7 @@
   }
 
   return {
+    sampleRate, snapshotRank,
     tutorialStatus,
     routeFromHash,
     decodeJwtPayload,

@@ -1183,3 +1183,43 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .announcement-media-controls button { min-height: 44px; }
 .announcement-document [data-link-preview] { white-space: normal; margin-bottom: 16px; }
 @media(max-width:600px) { .announcement-document { padding: 14px; min-height: 300px; } }
+
+/* Console 2.0: reuse existing panels, keep long IDs and small screens readable. */
+.console-2x { min-width: 0; margin-bottom: 18px; overflow-wrap: anywhere; }
+.console-2x details { margin: 12px 0; }
+.console-2x summary { cursor: pointer; font-weight: 700; line-height: 1.6; }
+.console-2x fieldset { border: 0; min-width: 0; margin: 0; padding: 16px 0 0; display: grid; gap: 14px; }
+.console-2x .liveops-preview, .console-2x .report-body { white-space: pre-wrap; }
+.lab-facts { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 12px; }
+.lab-facts div { min-width: 0; padding: 12px; background: var(--surface, #f5f5f2); border-radius: 8px; }
+.lab-facts dt { font-size: 12px; color: var(--muted); }
+.lab-facts dd { margin: 4px 0 0; font-weight: 700; }
+.lab-table { width: 100%; min-width: 0; table-layout: fixed; }
+.lab-table td, .lab-table th { white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  #purchasesView .panel-heading { flex-wrap: wrap; }
+  #purchasesView .panel-total { flex: 0 0 auto; white-space: nowrap; }
+  .console-2x .form-pair, .console-2x .admin-toolbar { display: grid; grid-template-columns: minmax(0,1fr); }
+  .console-2x .panel-heading, .console-2x .detail-actions { flex-wrap: wrap; }
+  .console-2x input, .console-2x select, .console-2x button { min-width: 0; max-width: 100%; }
+  .console-2x .lab-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .console-2x .lab-table, .console-2x .lab-table tbody, .console-2x .lab-table tr, .console-2x .lab-table td { display: block; width: 100%; }
+  .console-2x .lab-table tr { margin-bottom: 12px; border-bottom: 1px solid var(--line, #ddd); }
+  .console-2x .lab-table td { display: grid; grid-template-columns: 90px minmax(0,1fr); gap: 8px; }
+  .console-2x .lab-table td::before { content: attr(data-label); font-weight: 700; }
+}
+.console-2x button:not(.primary-button) { min-height: 44px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--paper); font: inherit; font-size: 13px; font-weight: 700; }
+@media (max-width: 760px) {
+  .console-shell:has(#consoleNav:not([hidden])) .console-sidebar { padding: 7px 6px calc(7px + env(safe-area-inset-bottom)); }
+  .console-shell:has(#consoleNav:not([hidden])) #consoleNav a { padding: 7px 1px; font-size: 10px; line-height: 1.4; }
+  .console-shell:has(#consoleNav:not([hidden])) .refresh-button { flex: 0 0 40px; padding: 7px; font-size: 0; }
+}
+@media (max-width: 600px) {
+  #purchasesView .table-scroll { overflow: visible; }
+  #purchasesView table, #purchasesView tbody, #purchasesView tr, #purchasesView td { display: block; width: 100%; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  #purchasesView thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  #purchasesView tbody tr { padding-block: 8px; border-bottom: 1px solid var(--line); }
+  #purchasesView td { display: grid; grid-template-columns: 85px minmax(0,1fr); gap: 8px; }
+  #purchasesView td::before { content: attr(data-label); font-weight: 700; }
+  #purchasesView td > * { grid-column: 2; }
+}

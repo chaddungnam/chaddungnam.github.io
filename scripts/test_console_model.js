@@ -174,4 +174,16 @@ assert.match(model.mailSummaryText({ template_key: "update", recipient_count: 63
 assert.equal(require("../console/purchases-model.js").formatMoney(undefined, "KRW"), "금액 미기록");
 assert.match(require("../console/purchases-model.js").formatMoney(3900000000, "KRW"), /3,900|₩3900|₩3,900/);
 
+
+// 2.0 never turns missing/small/inconsistent samples into an actionable percentage.
+assert.equal(model.sampleRate(0, 0), '표본 부족');
+assert.equal(model.sampleRate(48, 49), '표본 부족');
+assert.equal(model.sampleRate(25, 50), '50.0%');
+assert.equal(model.sampleRate(51, 50), '집계 확인 필요');
+assert.equal(model.sampleRate(null, 100), '기록 없음');
+assert.equal(model.snapshotRank({captured_at:null,rank:null}), '스냅숏 없음');
+assert.equal(model.snapshotRank({captured_at:'2026-09-27',rank:null}), '상위 200명에 없음');
+assert.equal(model.snapshotRank({captured_at:'2026-09-27',rank:3}), '3위');
+assert.equal(require('../console/purchases-model.js').PRODUCT_LABELS.vip1, 'VIP1');
+
 console.log("console model: PASS");

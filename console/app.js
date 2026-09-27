@@ -106,13 +106,13 @@ function renderRoute() {
   byId("consoleStatus").textContent = `${byId("pageTitle").textContent} 화면`;
   byId("mainContent").focus({ preventScroll: true });
   if (routeChanged && typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "auto" });
-  if (route.page === "analytics") window.ConsoleAnalytics.mount();
+  if (route.page === "analytics") { window.ConsoleAnalytics.mount(); window.ConsoleLab?.loadAnalytics(); }
   if (route.page === "analytics-exclusions") window.ConsoleAnalyticsExclusions.mount();
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
-  if (route.page === "operations") window.ConsoleOperations.mount();
+  if (route.page === "operations") { window.ConsoleOperations.mount(); window.ConsoleLiveops?.mount(); }
   if (route.page === "purchases") window.ConsolePurchases.mount();
-  if (route.page === "cs") window.ConsoleCs.mount();
+  if (route.page === "cs") { window.ConsoleCs.mount(); window.ConsoleLab?.loadReports(); }
   if (route.page === "audit") window.ConsoleAudit.mount();
 }
 

@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260909-1">
+  <link rel="stylesheet" href="styles.css?v=20260927-2x">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -84,6 +84,13 @@
       </header>
 
       <section id="analyticsView" class="route-view" data-route="analytics">
+        <details id="labAnalyticsPanel" class="panel console-2x"><summary>2.0 퍼널 · 버전별 표본</summary>
+          <form id="labAnalyticsForm" class="admin-toolbar"><label>별도 집계 기간<select name="rangeDays"><option value="7">최근 7일</option><option value="28" selected>최근 28일</option></select></label><button type="submit">2.0 집계 조회</button></form>
+          <p>전체 스토어 · 베를린 날짜 · 아래 기존 분석 필터와 별도입니다. 분모 50 미만은 표본 부족입니다.</p>
+          <p>KO·DE는 기록된 언어만 사용합니다. 현재 앱에서 언어를 보내지 않은 기록은 ‘언어 미기록’입니다. 보스는 보관된 첫 관측 결과이며 생애 첫 도전을 보장하지 않습니다.</p>
+          <p>보너스는 판 단위 신호, 시즌 구매는 같은 설치·버전에서 탭 이후의 클라이언트 신호입니다. 실제 정산은 구매 화면에서 확인하세요. D1·D7은 해당 날짜가 끝난 설치 코호트만 포함합니다.</p>
+          <p id="labAnalyticsMessage" role="status"></p><div id="labAnalyticsRows"></div>
+        </details>
         <div class="toolbar analytics-toolbar">
           <div class="toolbar-live"><span class="live-dot"></span><span id="dataStatus">지표를 불러오는 중...</span></div>
           <div class="toolbar-switches">
@@ -295,6 +302,15 @@
 <nav class="workspace-jumps" aria-label="운영 바로가기"><a href="#/players">개별 지급 · 플레이어 찾기 ↗</a><button type="button" data-console-jump="noticeTask">공지 작성</button><button type="button" data-console-jump="rewardTask">전체 보상</button><button type="button" data-console-jump="operationsHistorySection">공지·발송 이력</button></nav>
 <p id="operationsMessage" class="dashboard-message operation-message" role="status"></p>
         <div id="operationsSummary" class="operations-summary"></div>
+        <section id="liveopsPanel" class="panel console-2x" aria-labelledby="liveopsTitle">
+          <div class="panel-heading"><div><p class="eyebrow">LIVE EVENTS</p><h2 id="liveopsTitle">라이브 이벤트</h2><small>미리보기 → 확인 → 감사 기록 · 지급은 이벤트 키당 계정별 1회</small></div><button id="liveopsRefresh" type="button">상태 새로고침</button></div>
+          <p id="liveopsMessage" role="status">이벤트 설정을 불러오는 중입니다.</p><div id="liveopsForms"></div>
+        </section>
+        <details class="panel console-2x" id="rankingPanel"><summary>파워 랭킹 스냅숏</summary>
+          <p>UTC 매일 02:15 저장 · 상위 200명까지 보관합니다. 당일 생성 전에는 스냅숏이 없습니다.</p>
+          <form id="rankingForm" class="admin-toolbar"><label>날짜 (UTC)<input name="day" type="date" required></label><label>상위 N<input name="limit" type="number" min="1" max="200" value="20" required></label><label>어제·오늘 비교 계정<input name="userId" placeholder="사용자 UUID"></label><button type="submit">랭킹 조회</button></form>
+          <p id="rankingMessage" role="status"></p><div id="rankingComparison"></div><div id="rankingRows"></div>
+        </details>
         <details class="panel operation-task"><summary>친구초대 현황 · 펼쳐 보기</summary><div class="panel-heading"><div><p class="eyebrow">REFERRAL HEALTH</p><h2>친구초대 현황</h2><small>성공 초대와 3회 만료 코드, 최근 거절 사유를 확인합니다.</small></div></div><div id="referralMetrics" class="operations-summary"><p class="empty-panel">지표를 불러오는 중입니다.</p></div></details>
         <div class="admin-card-grid">
 <details id="referralTask" class="panel operation-task"><summary><strong>친구초대 설정</strong><small>기능 켜기 · 끄기</small></summary><form id="referralConfigForm" class="admin-form impact-form"><p class="eyebrow">REFERRAL KILL SWITCH</p><h2>친구초대 기능</h2><p class="impact-note">앱 업데이트 없이 설정 화면의 친구초대 진입과 코드 사용을 함께 켜거나 끕니다.</p><label class="check-label"><input name="enabled" type="checkbox"> 친구초대 사용</label><label>변경 사유<input name="reason" maxlength="300" required></label><button class="warning-button" type="submit">친구초대 설정 저장</button></form></details>
@@ -315,8 +331,9 @@
         <form id="purchaseFilterForm" class="panel admin-toolbar" role="search">
           <label>기간<select id="purchaseRange"><option value="30">최근 30일</option><option value="90">최근 90일</option><option value="0">전체</option></select></label>
           <label>스토어<select id="purchasePlatform"><option value="">전체</option><option value="android">Google Play</option><option value="ios">App Store</option></select></label>
+          <label>환경<select id="purchaseEnvironment"><option value="">전체 환경</option><option value="Production">Production</option><option value="Sandbox">Sandbox</option><option value="Unknown">미기록</option></select></label>
           <label>상태<select id="purchaseStatus"><option value="">전체</option><option value="pending">확인 중</option><option value="purchased">결제 완료</option><option value="refunded">환불</option><option value="chargeback">결제 취소</option><option value="cancelled">취소</option><option value="revoked">권한 회수</option></select></label>
-          <label>상품<select id="purchaseProduct"><option value="">전체</option><option value="remove_ads">광고 제거</option><option value="elite_package">엘리트 패키지 (레거시)</option><option value="yakwon_bundle">약원 패키지</option></select></label>
+          <label>상품<select id="purchaseProduct"><option value="">전체</option><option value="remove_ads">광고 제거</option><option value="elite_package">엘리트 패키지 (레거시)</option><option value="yakwon_bundle">약원 패키지</option><option value="vip1">VIP1</option><option value="premium_pass_s1">시즌1 유료 패스</option><option value="premium_pass_s2">시즌2 유료 패스</option><option value="starter_pack_v2">스타터팩 v2</option></select></label>
           <label>검색<input id="purchaseQuery" type="search" maxlength="100" placeholder="사용자 ID · 주문번호 뒤 6자리"></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
@@ -330,13 +347,14 @@
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">REAL STORE RECORDS</p><h2>구매·환불 기록</h2><small>반복 환불 표시는 검토 신호일 뿐 제재 근거가 아닙니다.</small></div><span id="purchaseTotal" class="panel-total">—</span></div>
           <div class="status-legend" aria-label="구매 상태 범례"><span data-status="purchased">결제 완료</span><span data-status="refunded">환불</span><span data-status="chargeback">결제 취소</span><span data-review="true">검토 필요</span></div>
-          <div class="table-scroll"><table><thead><tr><th>처리 시각</th><th>사용자</th><th>상품</th><th>스토어</th><th>금액</th><th>상태</th><th>권한</th><th>사유</th><th>검토</th></tr></thead><tbody id="purchasesTable"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th>처리 시각</th><th>사용자</th><th>상품</th><th>스토어·환경·귀속</th><th>금액</th><th>상태</th><th>권한</th><th>사유</th><th>검토</th></tr></thead><tbody id="purchasesTable"></tbody></table></div>
           <div class="pagination"><button id="purchasesPrevious" type="button">이전</button><span id="purchasesPage">1 / 1</span><button id="purchasesNext" type="button">다음</button></div>
         </section>
         <p id="purchasesMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="csView" class="route-view" data-route="cs" hidden>
+        <details id="issueReportsPanel" class="panel console-2x"><summary>게임 내 신고 · 읽기 전용</summary><p>Gmail 연결 없이 확인합니다. 신고 내용만으로 제재하지 않습니다.</p><p id="issueReportsMessage" role="status"></p><div id="issueReportsRows"></div><div class="pagination"><button id="issueReportsPrevious" type="button">이전</button><span id="issueReportsPage"></span><button id="issueReportsNext" type="button">다음</button><button id="issueReportsRefresh" type="button">새로고침</button></div></details>
       <section id="gmailConnectPanel" class="empty-state"><span class="status-label">필요할 때만 연결</span><strong>support@houseduck.in 문의 관리</strong><p>Gmail 권한은 이 화면에서만 요청되며 토큰·메일·첨부는 서버로 보내지 않습니다. 같은 탭에서는 연결이 유지되고, 새로고침하면 다시 연결합니다.</p><button id="gmailConnectButton" class="primary-button" type="button">Gmail CS 연결</button></section>
         <div id="csWorkspace" hidden>
           <form id="csFilterForm" class="panel admin-toolbar" role="search"><label>문의 검색<input id="csSearch" type="search" maxlength="200" placeholder="제목·보낸 사람·내용"></label><label>상태<select id="csStatusFilter"><option value="">전체 상태</option><option value="new">새 문의</option><option value="needs_reply">답변 필요</option><option value="waiting_customer">사용자 회신 대기</option><option value="done">완료</option></select></label><label>분류<select id="csCategoryFilter"><option value="">전체 분류</option><option value="billing">결제</option><option value="account">계정</option><option value="bug">버그</option><option value="other">기타</option></select></label><label>기간<select id="csDateFilter"><option value="0">전체</option><option value="7">7일</option><option value="30">30일</option><option value="90">90일</option></select></label><label class="check-label"><input id="csUnreadFilter" type="checkbox"> 읽지 않음만</label><button class="primary-button" type="submit">조회</button><button id="gmailDisconnectButton" type="button">연결 해제</button></form>
@@ -401,24 +419,26 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260908-1"></script>
+  <script src="model.js?v=20260927-2x"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260908-1"></script>
   <script src="analytics.js?v=20260905-5"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
-  <script src="players.js?v=20260907-2"></script>
+  <script src="players.js?v=20260927-2x"></script>
   <script src="../assets/notice-links.js?v=20260909-1"></script>
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="purchases-model.js?v=20260907-2"></script>
-  <script src="purchases.js?v=20260907-2"></script>
+  <script src="purchases-model.js?v=20260927-2x"></script>
+  <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
   <script src="gmail-model.js?v=20260904-1"></script>
   <script src="gmail-api.js?v=20260907-2"></script>
   <script src="cs-intelligence.js?v=20260904-1"></script>
   <script src="cs-templates.js?v=20260904-1"></script>
   <script src="cs.js?v=20260907-2"></script>
-  <script src="app.js?v=20260908-1" defer></script>
+  <script src="lab.js"></script>
+  <script src="liveops.js"></script>
+  <script src="app.js?v=20260927-2x" defer></script>
 </body>
 </html>
