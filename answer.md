@@ -1,0 +1,18 @@
+# 콘솔 2.0 완료 보고 — 구현·로컬 검증, 라이브 미반영
+- 점검: [docs/console_2_0_audit.md](docs/console_2_0_audit.md), 87줄·17항목. 없음 7→신규 연결 7, 부분 9→보완 9; 13묶음 구현, 3묶음은 원본 데이터 제약이 남음.
+- 콘솔 코드 커밋: `e722688c4e3870334a4de5ad1b58ed7319c8bc13` (`claude/console-2-0`). 이 보고서는 후속 문서 커밋이다.
+- 서버 커밋: `26acb534347a6e418a09a03986b9499874c7ee46` (`claude/console-server`).
+- `console/lab.js`: 개인 연구소·무결성·친구 알림·랭킹·2.0 퍼널·신고; `liveops.js`: 미리보기·확인·재시도 ID·켜기/끄기.
+- `console/players.js`, `app.js`, `index.html`: 새 화면 연결; `model.js`: 50표본·순위·감사명; `purchases-model.js`, `purchases.js`: 2.0 상품·환경·검증 귀속; `styles.css`: 기존 스타일·360px 세로 표.
+- `scripts/check_house_duck_console.sh`, `test_console_model.js`, `test_console_request_safety.js`, `test_console_regressions.js`: 화면·회귀·중복 쓰기·오류 검사; `console_2x_fixture.cjs`, `tests/fixtures/*`: 합성 데이터 재현.
+- 서버 `admin_console_logic.ts`: 고정 RPC·입력 제한·검증된 관리자 전달; `admin_console_logic_test.ts`, `reports_test.ts`, `console_2x_test.ts`: 기존 인증·거부·새 동작 검사. 플레이어 수정 기본 false 유지.
+- 적용 ① `supabase/migrations/20260930000100_console_2x_reads.sql`: `admin_console_lab_player_v1`, `admin_console_ranking_snapshots_v1`, `admin_console_purchases_v2`. 롤백 확인 SQL: 1~11행.
+- 적용 ② `20260930000200_console_2x_liveops.sql`: `admin_console_liveops_get_v1/preview_v1/update_v1`. 롤백·중복 지급·감사 확인 SQL: 1~14행.
+- 적용 ③ `20260930000300_console_2x_analytics.sql`: `admin_console_lab_analytics_v1`. 롤백·권한·합성 표본 확인: 1~14행. ②③도 위 migrations 디렉터리다.
+- 적용 ④ `supabase/functions/admin-console/` 배포 → 콘솔 반영. SQL 의존성은 점검 문서 적용 순서 참조. 실패 시 이전 Edge 배포본과 콘솔로 되돌리고 새 RPC만 제거한다.
+- 필수 PASS: `bash scripts/check_public_repo.sh`(스테이징 전체), `bash scripts/check_legal_site.sh`, `bash scripts/check_house_duck_console.sh`, `node scripts/test_console_model.js`, `node scripts/test_gmail_model.js`.
+- 추가 PASS: 요청 안전성 8건·감사 3건, 회귀·분석 일관성·구매 모델; 서버 `deno test --allow-read --allow-env supabase/functions/admin-console/` 39/39; 양쪽 diff 공백 검사.
+- 화면: [비포·애프터 및 재현 안내](docs/console-2x-captures/README.md). Aside에서 확인/취소·필터·오류 복구·랭킹·신고 확인. 360px은 iframe이며 Android/iPhone 검증은 하지 않음.
+- 미검증: `psql` 부재로 SQL 실행·실행계획·롤백·실제 계정 연동은 설계 검토만 완료. 리드가 `begin … rollback` 확인 후 적용해야 함.
+- 데이터 한계: 상위 200명 밖 과거 순위 없음, 튜토리얼 언어 미기록은 KO/DE 추정 금지, 첫 보스는 보관된 첫 관측·시즌 전환은 클라이언트 구매 신호. 우편은 즉시 지급이며 미래 자동 예약 없음.
+- 실제 결제·실사용자 수정·라이브 DB 적용·push 없음. 기존 1.x 회귀 검사 통과, HEXAWORLD 본문·동작 변경 없음.
