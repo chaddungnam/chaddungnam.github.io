@@ -1,9 +1,9 @@
 (function (root) {
   const byId = (id) => document.getElementById(id);
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
-  const names = {exp:"런 EXP 배수",boss:"보스 변형",mail:"이벤트 시약 우편",lab_home:"연구소 홈",lab_pass:"연구소 패스",economy_v2:"경제 v2",deep_zone:"심층 존 입구",vip1_sales:"VIP1 판매",boss_p7:"P7 보스 변형",boss_p8:"P8 보스 변형"};
-  const flags = {exp:"feature_liveops_event",boss:"feature_boss_variant",lab_home:"feature_lab_home",lab_pass:"feature_lab_pass",economy_v2:"lab_economy_v2",deep_zone:"feature_deep_zone",vip1_sales:"feature_vip1_sales",boss_p7:"feature_boss_variant_p7",boss_p8:"feature_boss_variant_p8"};
-  const warnings = {vip1_sales:"스토어 상품 등록·심사 뒤에만 켜세요."};
+  const names = {exp:"런 EXP 배수",boss:"주간 보스 변형",mail:"이벤트 시약 우편",lab_home:"연구소 홈",lab_pass:"연구소 패스",economy_v2:"경제 v2",deep_zone:"심층 존 입구",vip1_sales:"VIP1 판매",phase6:"P6 열기",boss_p7:"P7 열기",boss_p8:"P8 열기"};
+  const flags = {exp:"feature_liveops_event",boss:"feature_boss_weekly_variant",phase6:"feature_boss_variant",lab_home:"feature_lab_home",lab_pass:"feature_lab_pass",economy_v2:"lab_economy_v2",deep_zone:"feature_deep_zone",vip1_sales:"feature_vip1_sales",boss_p7:"feature_boss_variant_p7",boss_p8:"feature_boss_variant_p8"};
+  const warnings = {vip1_sales:"스토어 상품 등록·심사 뒤에만 켜세요.",boss_p7:"P6이 열린 뒤에만 켜세요.",boss_p8:"P7이 열린 뒤에만 켜세요."};
   const pending = new WeakMap();
   let sequence = 0, busy = false, ready = false;
   const post = body => root.ConsoleAPI.post("admin-console",body);
