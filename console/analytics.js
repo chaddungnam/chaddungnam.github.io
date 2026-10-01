@@ -1697,97 +1697,482 @@ async function runAiBrief() {
   }
 }
 
-// ── C (2026-10-01) 한눈 요약 ─────────────────────────────────────────────
-// analytics-dashboard-v2 view=overview를 카드 6장과 자세히 보기로 그린다. 서버가 준 문자열은 모두 escapeHtml을 거친다.
-// 아래 '1.x 레거시 · 기존 상세 분석'은 열 때만 불러온다(무거운 원본 조회를 매번 하지 않기).
+// ── C2 (2026-10-01) 한눈 보드 ────────────────────────────────────────────
+// analytics-dashboard-v2 view=overview를 그래프가 먼저 보이는 한 화면 보드로 그린다(1440×900에서 스크롤 없이).
+// 화면에는 큰 숫자 4개·증감 칩·퍼널 이탈률·로딩 p50만 두고, 정확한 값·정의·표본·비교는 툴팁 하나(#overviewTip)에 둔다.
+// 툴팁 글자는 ConsoleModel.overviewTipText로 만들어 textContent로만 그린다. 서버 문자열은 모두 escapeHtml을 거친다.
+// 예전 표(자세히 보기)는 아래 '세부 표' 한 묶음에 접어 둔다. '1.x 레거시 · 기존 상세 분석'은 열 때만 불러온다.
 const overview = { payload: null, periodDays: 7, version: "all", platform: "all", sequence: 0, legacyOpen: false, legacyLoaded: false };
-const OVERVIEW_DRILLS = Object.freeze({
-  players: "overviewDrillPlayers", funnel: "overviewDrillFunnel", core: "overviewDrillCore",
-  economy: "overviewDrillEconomy", social: "overviewDrillSocial", health: "overviewDrillHealth",
-});
 const OVERVIEW_VERSION_NAMES = Object.freeze({ all: "전체 버전", "1.x": "1.x 라이브", "2.x": "2.0+" });
 const OVERVIEW_PLATFORM_NAMES = Object.freeze({ all: "전체 플랫폼", android: "Android", ios: "iOS" });
-const OVERVIEW_STATUS_ICONS = Object.freeze({ partial: "◐", no_data: "○", error: "!" });
+const OVERVIEW_WAIT_2X = "2.0 데이터 대기 중";
+const OVERVIEW_KPIS = Object.freeze([
+  { card: "players", metric: "dau", label: "DAU", definition: "분석 동의 후 실행한 서버 계정의 하루 평균", sparkValue: (value) => `${overviewCount(value)}명` },
+  { card: "players", metric: "d1", label: "D1 복귀", definition: "동의 후 첫 실행한 새 계정 중 다음 날 다시 실행한 비율", sparkValue: (value) => overviewPct(value) },
+  { card: "economy", metric: "revenue", label: "매출(검증)", definition: "스토어 검증 구매만(테스트·샌드박스·환불 제외), 통화끼리 환산하지 않음", sparkValue: (value) => `${overviewCount(value)}건` },
+  { card: "health", metric: "unclean_per_1k", label: "비정상 종료/1천 세션", definition: "앞화면에서 프로세스가 끝나 다음 실행에서 확인된 종료(크래시·강제 종료)", sparkValue: (value) => `${overviewCount(value)}건` },
+]);
 
 function overviewFinite(value) { return typeof value === "number" && Number.isFinite(value); }
 function overviewFormat(value, format, currency) { return root.ConsoleModel.formatOverviewValue(value, format, currency); }
-function overviewMetricValue(metric) { return overviewFormat(metric?.value, metric?.format, metric?.currency); }
-
-function overviewDeltaMarkup(metric) {
-  const delta = root.ConsoleModel.overviewDelta(metric, overview.payload?.filters?.periodDays ?? overview.periodDays);
-  if (!delta.text) return "";
-  const arrow = delta.arrow ? `<span aria-hidden="true">${delta.arrow}</span> ` : "";
-  const label = delta.label ? ` <small>${escapeHtml(delta.label)}</small>` : "";
-  return `<span class="overview-delta" data-tone="${delta.tone}">${arrow}${escapeHtml(delta.text)}${label}</span>`;
+function overviewTip(title, rows, note) { return escapeHtml(root.ConsoleModel.overviewTipText(title, rows, note)); }
+function overviewDays() { return overview.payload?.filters?.periodDays ?? overview.periodDays; }
+function overviewCard(data, key) { return (data.cards || []).find((card) => card.key === key) || null; }
+function overviewMetric(card, key) { return card?.headline?.key === key ? card.headline : (card?.metrics || []).find((metric) => metric.key === key) || null; }
+// 전체면 1.x와 2.0+를 겹쳐 그리고, 버전을 고르면 그 버전만 그린다.
+function overviewFamilies(data) {
+  const version = data.filters?.version ?? overview.version;
+  return version === "all" ? ["1.x", "2.x"] : [version];
 }
-
-function overviewSplitMarkup(metric) {
-  const cell = (family, name) => {
-    const value = metric?.split?.[family];
-    const body = overviewFinite(value)
-      ? `<b>${escapeHtml(overviewFormat(value, metric.format, metric.currency))}</b>`
-      : `<em>${escapeHtml(String(metric?.splitEmpty?.[family] || "기록 없음").replace(/^1\.x\s+/, ""))}</em>`;
-    return `<span class="overview-split-cell"><span class="version-key ${family === "1.x" ? "v1" : "v2"}" aria-hidden="true"></span>${name} ${body}</span>`;
-  };
-  return `<p class="overview-split" aria-label="버전별">${cell("1.x", "1.x")}${cell("2.x", "2.0+")}</p>`;
+function overviewDayTitle(day) {
+  if (!day) return "";
+  return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", weekday: "short", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
 }
-
-function overviewSparkTitle(spark, index, value) {
-  const label = spark.kind === "steps" ? spark.labels?.[index] : formatShortDay(spark.labels?.[index]);
-  const shown = !overviewFinite(value) ? "기록 없음" : spark.kind === "steps" ? `${(value * 100).toFixed(1)}%` : value.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
-  return `${label || ""} · ${shown}`;
+function overviewEmptyReason(metric, version) {
+  const reason = String(metric?.empty || "");
+  if (/실패/.test(reason)) return "집계 실패";
+  if (version === "1.x" || /1\.x 해당 없음/.test(reason)) return "1.x 해당 없음";
+  if (/2\.0|계측/.test(reason)) return OVERVIEW_WAIT_2X;
+  return "표본 없음";
 }
+function overviewWait(text, place = "center") { return `<p class="ov-wait" data-place="${place}">${escapeHtml(text)}</p>`; }
+function overviewTickText(value, percent) {
+  return percent ? `${Math.round(value * 100)}%` : value.toLocaleString("ko-KR", { maximumFractionDigits: 1 });
+}
+function overviewYTicks(max, percent = false) {
+  return `<span class="ov-ytick" style="top:0%">${escapeHtml(overviewTickText(max, percent))}</span><span class="ov-ytick" style="top:50%">${escapeHtml(overviewTickText(max / 2, percent))}</span>`;
+}
+const OVERVIEW_GRID = `<path class="ov-grid" d="M0 0 H100 M0 50 H100" vector-effect="non-scaling-stroke"></path><path class="ov-axis" d="M0 100 H100" vector-effect="non-scaling-stroke"></path>`;
 
-function overviewSparkMarkup(spark) {
+// 시간축 x는 칸(하루)의 가운데. 칸이 곧 툴팁 영역이라 선 위의 점과 툴팁 칸이 맞는다.
+function overviewLineSegments(points, domain) {
+  const count = Math.max(1, points.length);
+  const geometry = root.ConsoleModel.sparklineGeometry(points, 100, 100, 0, domain);
+  const slot = (x) => Number(((x / 100 * Math.max(0, count - 1) + 0.5) * 100 / count).toFixed(2));
+  return geometry.segments.map((segment) => segment.map(([x, y]) => [slot(x), y]));
+}
+function overviewPath(segment) { return segment.map(([x, y], index) => `${index ? "L" : "M"}${x} ${y}`).join(" "); }
+function overviewLineMarks(segments, tone, area = false) {
+  const svg = segments.filter((segment) => segment.length > 1).map((segment) => {
+    const line = overviewPath(segment);
+    const wash = area ? `<path class="ov-area ${tone}" d="${line} L${segment.at(-1)[0]} 100 L${segment[0][0]} 100 Z"></path>` : "";
+    return `${wash}<path class="ov-line ${tone}" d="${line}" vector-effect="non-scaling-stroke"></path>`;
+  }).join("");
+  const dots = segments.filter((segment) => segment.length === 1).map(([[x, y]]) => `<span class="ov-dot ${tone}" style="left:${x}%;top:${y}%"></span>`).join("");
+  return { svg, dots };
+}
+function overviewHits(tips) {
+  const width = 100 / Math.max(1, tips.length);
+  return tips.map((text, index) => `<span class="ov-hit" style="left:${(index * width).toFixed(3)}%;width:${width.toFixed(3)}%" data-tip="${text}"></span>`).join("");
+}
+function overviewColumns(points, max, tips, markup) {
+  const width = 100 / Math.max(1, points.length);
+  return points.map((value, index) => {
+    const height = overviewFinite(value) && max > 0 ? value / max * 100 : 0;
+    const bar = height > 0 ? `<span class="ov-col-bar" style="height:${Math.max(2, height).toFixed(1)}%"></span>` : "";
+    return `<span class="ov-col" style="left:${(index * width).toFixed(3)}%;width:${width.toFixed(3)}%" data-tip="${tips[index]}">${bar}${markup ? markup(index) : ""}</span>`;
+  }).join("");
+}
+function overviewXLabels(labels) {
+  return `<div class="ov-xaxis" aria-hidden="true">${labels.map(([left, text, align]) => `<span style="left:${left}%"${align ? ` data-align="${align}"` : ""}>${escapeHtml(text)}</span>`).join("")}</div>`;
+}
+function overviewDayAxis(days) {
+  if (!days.length) return overviewXLabels([]);
+  if (days.length === 1) return overviewXLabels([[50, formatShortDay(days[0])]]);
+  return overviewXLabels([[0, formatShortDay(days[0]), "start"], [100, formatShortDay(days.at(-1)), "end"]]);
+}
+const overviewKey = (tone, kind, text) => `<span class="ov-legend-item"><span class="ov-key ${tone}" data-kind="${kind}" aria-hidden="true"></span>${escapeHtml(text)}</span>`;
+
+// ── 1줄: KPI 타일(큰 숫자 하나 · 증감 칩 하나 · 작은 그래프 하나) ──
+function overviewKpiSpark(spec, spark, metric) {
   const points = Array.isArray(spark?.points) ? spark.points : [];
-  const known = points.filter(overviewFinite);
-  const caption = escapeHtml(spark?.label || "추이");
-  if (!known.length) return `<figure class="overview-spark is-empty"><div class="overview-spark-empty">아직 그릴 기록이 없습니다</div><figcaption>${caption}</figcaption></figure>`;
-  const width = 120;
-  const height = 36;
-  const slot = width / Math.max(1, points.length);
-  const hits = points.map((value, index) => `<rect class="spark-hit" x="${(index * slot).toFixed(2)}" y="0" width="${slot.toFixed(2)}" height="${height}"><title>${escapeHtml(overviewSparkTitle(spark, index, value))}</title></rect>`).join("");
-  const summary = `${spark.label || "추이"}: 최저 ${Math.min(...known).toLocaleString("ko-KR", { maximumFractionDigits: 2 })}, 최고 ${Math.max(...known).toLocaleString("ko-KR", { maximumFractionDigits: 2 })}`;
-  let marks = "";
-  let dot = "";
-  if (spark.kind === "line") {
-    const geometry = root.ConsoleModel.sparklineGeometry(points, width, height);
-    marks = geometry.segments.map((segment) => {
-      const line = segment.map(([x, y], index) => `${index ? "L" : "M"}${x} ${y}`).join(" ");
-      const area = segment.length > 1 ? `<path class="spark-area" d="${line} L${segment.at(-1)[0]} ${height} L${segment[0][0]} ${height} Z"></path>` : "";
-      return `${area}<path class="spark-line" d="${line}"></path>`;
-    }).join("");
-    if (geometry.last) dot = `<span class="spark-dot" style="left:${(geometry.last.x / width * 100).toFixed(2)}%;top:${(geometry.last.y / height * 100).toFixed(2)}%"></span>`;
-  } else {
-    const bars = spark.kind === "steps" ? root.ConsoleModel.sparkBars(points.map((value) => overviewFinite(value) ? value : null), width, height)
-      : root.ConsoleModel.sparkBars(points, width, height);
-    const lastIndex = points.reduce((last, value, index) => overviewFinite(value) ? index : last, -1);
-    marks = bars.filter((bar) => bar.height > 0).map((bar) => `<rect class="spark-bar${bar.index === lastIndex && spark.kind !== "steps" ? " is-current" : ""}${spark.kind === "steps" ? " is-step" : ""}" x="${bar.x}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="1.2"></rect>`).join("");
+  if (!points.some(overviewFinite)) return `<div class="ov-spark is-empty" aria-hidden="true"></div>`;
+  const labels = spark.labels || [];
+  const tips = points.map((value, index) => overviewTip(spark.compare ? labels[index] : overviewDayTitle(labels[index]),
+    [[spark.label || metric?.label || spec.label, overviewFinite(value) ? spec.sparkValue(value) : "기록 없음"]]));
+  if (spark.kind === "bars") {
+    const max = Math.max(0, ...points.filter(overviewFinite));
+    return `<div class="ov-spark is-bars">${overviewColumns(points, max, tips)}</div>`;
   }
-  return `<figure class="overview-spark" aria-label="${escapeHtml(summary)}"><div class="overview-spark-plot"><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">${marks}${hits}</svg>${dot}</div><figcaption>${caption}</figcaption></figure>`;
+  const segments = overviewLineSegments(points, "data");
+  const marks = overviewLineMarks(segments, "is-mark", true);
+  const last = segments.at(-1)?.at(-1);
+  const end = last ? `<span class="ov-dot is-end" style="left:${last[0]}%;top:${last[1]}%"></span>` : "";
+  return `<div class="ov-spark"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${marks.svg}</svg>${marks.dots}${end}${overviewHits(tips)}</div>`;
 }
 
-function overviewMetricRow(metric) {
-  const note = metric.value == null ? metric.empty : metric.detail;
-  return `<div class="overview-metric"><dt>${escapeHtml(metric.label)}</dt><dd><b>${escapeHtml(overviewMetricValue(metric))}</b>${overviewDeltaMarkup(metric)}</dd>${note ? `<dd class="overview-metric-note">${escapeHtml(note)}</dd>` : ""}</div>`;
-}
-
-function overviewCardMarkup(card) {
-  const status = String(card.status || "ok");
-  const chip = status === "ok" ? "" : `<span class="overview-chip" data-status="${escapeHtml(status)}"><span aria-hidden="true">${OVERVIEW_STATUS_ICONS[status] || "·"}</span>${escapeHtml(root.ConsoleModel.overviewStatusLabel(status))}</span>`;
-  const headline = card.headline || {};
-  const headlineNote = headline.value == null ? headline.empty : headline.detail;
-  const drill = OVERVIEW_DRILLS[card.key];
-  return `<article class="overview-card" data-card="${escapeHtml(card.key)}" data-status="${escapeHtml(status)}">
-    <header class="overview-card-head"><div><p class="eyebrow">${escapeHtml(card.title)}</p><h3>${escapeHtml(card.question)}</h3></div>${chip}</header>
-    <div class="overview-hero"><strong class="overview-value">${escapeHtml(overviewMetricValue(headline))}</strong>${overviewDeltaMarkup(headline)}</div>
-    <p class="overview-label">${escapeHtml(headline.label)}${headlineNote ? `<small>${escapeHtml(headlineNote)}</small>` : ""}</p>
-    ${overviewSparkMarkup(card.spark)}
-    ${overviewSplitMarkup(headline)}
-    <dl class="overview-metrics">${(card.metrics || []).map(overviewMetricRow).join("")}</dl>
-    ${card.note ? `<p class="overview-note">${escapeHtml(card.note)}</p>` : ""}
-    ${drill ? `<button class="overview-more" type="button" data-console-jump="${drill}">자세히 보기</button>` : ""}
+function overviewKpiMarkup(spec, data) {
+  const card = overviewCard(data, spec.card);
+  const metric = spec.card === "economy" ? card?.headline ?? null : overviewMetric(card, spec.metric);
+  const days = overviewDays();
+  const label = spec.card === "economy" && metric?.key === "purchases" ? "검증 구매" : spec.label;
+  const value = overviewFormat(metric?.value, metric?.format, metric?.currency);
+  let chip;
+  if (data.waiting) chip = "";
+  else if (metric?.value == null) chip = `<span class="ov-chip" data-tone="quiet">${escapeHtml(overviewEmptyReason(metric, data.filters?.version))}</span>`;
+  else {
+    const delta = root.ConsoleModel.overviewDelta(metric, days);
+    const amount = delta.arrow ? delta.text.replace(/^[+−±]/, "") : delta.text;
+    chip = `<span class="ov-chip" data-tone="${delta.arrow ? delta.tone : "quiet"}">${delta.arrow ? `<span aria-hidden="true">${delta.arrow}</span>` : ""}${escapeHtml(amount)}</span>`;
+  }
+  // D1은 날짜별 값이 없다(코호트 지표). 이전 기간 → 이번 기간 두 점으로 기울기만 보인다.
+  const spark = spec.metric === "d1"
+    ? { kind: "line", compare: true, label: "D1 복귀", points: [metric?.previous ?? null, metric?.value ?? null], labels: [`이전 ${days}일`, `이번 ${days}일`] }
+    : card?.spark;
+  const note = [spec.definition, metric?.detail, card && card.status !== "ok" ? card.note : ""].filter(Boolean).join(" · ");
+  const tip = data.waiting ? "" : ` data-tip="${overviewTip(metric?.label || label, root.ConsoleModel.overviewMetricTipRows(metric, days), note)}"`;
+  return `<article class="ov-kpi" tabindex="0" data-tip-group${tip} aria-label="${escapeHtml(`${label} ${value}`)}">
+    <h3 class="ov-kpi-label">${escapeHtml(label)}</h3>
+    <p class="ov-kpi-main"><strong class="ov-kpi-value${metric?.value == null ? " is-empty" : ""}">${escapeHtml(value)}</strong>${chip}</p>
+    ${data.waiting ? `<div class="ov-spark is-empty" aria-hidden="true"></div>` : overviewKpiSpark(spec, spark, metric)}
   </article>`;
+}
+
+// ── 2줄: 활성 사용자 · 복귀 곡선 · 2.0 첫 세션 퍼널 ──
+function overviewActiveChart(data) {
+  const daily = data.drilldowns?.players?.daily ?? [];
+  const families = overviewFamilies(data);
+  const series = (family) => daily.map((row) => overviewFinite(row.accounts?.[family]) ? row.accounts[family] : null);
+  const v1 = families.includes("1.x") ? series("1.x") : null;
+  // 2.0이 처음 기록되기 전 날들은 0이 아니라 '기록 전'이다(그 앞은 그리지 않는다).
+  const v2Start = series("2.x").findIndex((value) => value > 0);
+  const v2 = families.includes("2.x") ? series("2.x").map((value, index) => v2Start >= 0 && index < v2Start ? null : value) : null;
+  const v1Drawn = Boolean(v1?.some(overviewFinite));
+  const v2Drawn = Boolean(v2?.some((value) => value > 0));
+  const max = root.ConsoleModel.overviewNiceMax(Math.max(0, ...[...(v1Drawn ? v1 : []), ...(v2Drawn ? v2 : [])].filter(overviewFinite)));
+  const v2Marks = v2Drawn ? overviewLineMarks(overviewLineSegments(v2, [0, max]), "is-v2", true) : { svg: "", dots: "" };
+  const v1Marks = v1Drawn ? overviewLineMarks(overviewLineSegments(v1, [0, max]), "is-v1") : { svg: "", dots: "" };
+  const count = (value) => overviewFinite(value) ? `${overviewCount(value)}명` : "기록 없음";
+  const tips = daily.map((row, index) => overviewTip(overviewDayTitle(row.day), [
+    v2 ? ["2.0+", !v2Drawn ? OVERVIEW_WAIT_2X : v2[index] === null ? "기록 전" : count(row.accounts?.["2.x"])] : null,
+    v1 ? ["1.x", count(row.accounts?.["1.x"])] : null,
+    families.length > 1 ? ["전체", count(row.accounts?.all)] : null,
+  ], "활성 = 분석 동의 후 그날 실행한 서버 계정"));
+  const wait = !daily.length || (!v1Drawn && !v2Drawn) ? overviewWait(v2 && !v1 ? OVERVIEW_WAIT_2X : "이 기간 활성 기록이 없어요")
+    : v2 && !v2Drawn ? overviewWait(OVERVIEW_WAIT_2X, "top") : "";
+  return {
+    key: "active", title: "활성 사용자", label: "날짜별 활성 계정 추이",
+    legend: [v2 ? overviewKey("is-v2", "area", "2.0+") : "", v1 ? overviewKey("is-v1", "dash", "1.x") : ""].join(""),
+    plot: `${v1Drawn || v2Drawn ? overviewYTicks(max) : ""}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}${v2Marks.svg}${v1Marks.svg}</svg>${v2Marks.dots}${v1Marks.dots}${overviewHits(tips)}</div>${wait}`,
+    axis: overviewDayAxis(daily.map((row) => row.day)), yAxis: true,
+  };
+}
+
+function overviewRetentionChart(data) {
+  const families = overviewFamilies(data);
+  const rows = data.drilldowns?.players?.retention ?? [];
+  const x = (day) => Number((3 + Math.sqrt(day / 30) * 94).toFixed(2));
+  const y = (rate) => Number((4 + (1 - Math.min(1, rate)) * 96).toFixed(2));
+  const curves = families.map((family) => ({ family, tone: family === "2.x" ? "is-v2" : "is-v1", points: root.ConsoleModel.overviewRetentionCurve(rows.find((row) => row.fam === family)) }));
+  let svg = "";
+  let dots = "";
+  for (const curve of curves) {
+    const segments = [];
+    let current = [];
+    for (const point of curve.points) {
+      if (!overviewFinite(point.rate)) {
+        if (current.length) segments.push(current);
+        current = [];
+        continue;
+      }
+      current.push([x(point.day), y(point.rate)]);
+    }
+    if (current.length) segments.push(current);
+    svg += segments.filter((segment) => segment.length > 1).map((segment) => `<path class="ov-line ${curve.tone}${curve.family === "1.x" ? " is-dotted" : ""}" d="${overviewPath(segment)}" vector-effect="non-scaling-stroke"></path>`).join("");
+    dots += curve.points.filter((point) => point.day > 0 && overviewFinite(point.rate)).map((point) => `<span class="ov-dot ${curve.tone}" style="left:${x(point.day)}%;top:${y(point.rate)}%"></span>`).join("");
+  }
+  const drawn = curves.filter((curve) => curve.points.length);
+  const days = [1, 7, 30];
+  const mids = [x(0.25), (x(1) + x(7)) / 2, (x(7) + x(30)) / 2, 100];
+  const hits = days.map((day, index) => {
+    const tip = overviewTip(`D${day} 복귀`, curves.map((curve) => {
+      const name = curve.family === "2.x" ? "2.0+" : "1.x";
+      const point = curve.points.find((item) => item.day === day);
+      if (!curve.points.length) return [name, curve.family === "2.x" ? OVERVIEW_WAIT_2X : "대상 없음"];
+      return [name, point && overviewFinite(point.rate) ? root.ConsoleModel.overviewTipValue(point.rate, "percent", { numerator: point.retained, denominator: point.eligible }) : "대상 없음"];
+    }), `${day}일째가 이 기간 안에서 이미 지난 설치일 코호트. 날마다 대상이 달라 곡선은 근사예요.`);
+    return `<span class="ov-hit" style="left:${mids[index].toFixed(2)}%;width:${(mids[index + 1] - mids[index]).toFixed(2)}%" data-tip="${tip}"></span>`;
+  }).join("");
+  const v2Missing = families.includes("2.x") && !curves.find((curve) => curve.family === "2.x")?.points.length;
+  const wait = !drawn.length ? overviewWait(families.length === 1 && families[0] === "2.x" ? OVERVIEW_WAIT_2X : "복귀를 셀 코호트가 아직 없어요")
+    : v2Missing ? overviewWait(OVERVIEW_WAIT_2X, "top-right") : "";
+  return {
+    key: "retention", title: "복귀 곡선", label: "설치 후 D1·D7·D30 복귀율",
+    legend: families.map((family) => family === "2.x" ? overviewKey("is-v2", "line", "2.0+") : overviewKey("is-v1", "dotted", "1.x")).join(""),
+    plot: `${drawn.length ? overviewYTicks(1, true) : ""}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}${svg}</svg>${dots}${hits}</div>${wait}`,
+    axis: overviewXLabels(days.map((day) => [x(day), `D${day}`])), yAxis: true,
+  };
+}
+
+function overviewFunnelChart(data) {
+  const funnel = data.drilldowns?.funnel ?? {};
+  const bars = root.ConsoleModel.overviewFunnelBars(funnel.steps);
+  const previous = new Map((funnel.previousSteps ?? []).map((step) => [step.key, step]));
+  const version = data.filters?.version ?? overview.version;
+  const chart = { key: "funnel", title: "2.0 첫 세션 퍼널", label: "2.0 신규 설치의 첫 세션 단계별 도달", legend: "" };
+  if (!bars.length) return { ...chart, plot: overviewWait(version === "1.x" ? "1.x에는 이 퍼널이 없어요" : OVERVIEW_WAIT_2X) };
+  const rows = bars.map((bar, index) => {
+    const step = bar.step;
+    const before = previous.get(bar.key);
+    const tip = overviewTip(step.label, [
+      ["도달", `${overviewCount(step.reached)}명`],
+      bar.key === "next_day"
+        ? ["복귀율", root.ConsoleModel.overviewTipValue(step.stepRate, "percent", { numerator: step.reached, denominator: step.base })]
+        : ["신규 대비", root.ConsoleModel.overviewTipValue(step.fromStart, "percent", { numerator: step.reached, denominator: funnel.cohort })],
+      index ? ["앞 막대에서 빠짐", overviewPct(bar.drop)] : null,
+      overviewFinite(step.medianSec) ? ["걸린 시간(중앙)", root.ConsoleModel.formatOverviewSeconds(step.medianSec)] : null,
+      before && overviewFinite(before.stepRate) ? ["이전 기간 직전 대비", overviewPct(before.stepRate)] : null,
+    ], step.note || (index ? "" : "2.0 신규 설치(동의 후 첫 실행) 기준. 각 단계는 앞 단계를 모두 지난 사람만 셉니다."));
+    const drop = index ? `<span class="ov-fn-drop" aria-hidden="true"><span style="left:${Math.min(78, (bar.share ?? 0) * 100).toFixed(1)}%">${overviewFinite(bar.drop) ? `▾ ${Math.round(bar.drop * 100)}%` : ""}</span></span>` : "";
+    const width = overviewFinite(bar.share) ? Math.max(1.5, bar.share * 100) : 0;
+    return `${drop}<span class="ov-fn-row" data-tip="${tip}"><span class="ov-fn-label">${escapeHtml(bar.label)}</span><span class="ov-fn-track"><span class="ov-fn-bar${bar.key === "next_day" ? " is-next" : ""}" style="width:${width.toFixed(1)}%"></span>${overviewFinite(bar.share) ? "" : `<em>판정 대기</em>`}</span></span>`;
+  }).join("");
+  return { ...chart, plot: `<div class="ov-funnel">${rows}</div>`, fill: true };
+}
+
+// ── 3줄: 매출·광고 · 도달 페이즈 · 건강 ──
+function overviewMoneyChart(data) {
+  const card = overviewCard(data, "economy");
+  const spark = card?.spark || {};
+  const points = Array.isArray(spark.points) ? spark.points : [];
+  const labels = spark.labels || [];
+  const known = points.filter(overviewFinite);
+  const max = root.ConsoleModel.overviewNiceMax(Math.max(0, ...known));
+  const tips = points.map((value, index) => overviewTip(overviewDayTitle(labels[index]), [["검증 구매", overviewFinite(value) ? `${overviewCount(value)}건` : "기록 없음"]], "스토어 검증 구매만. 테스트·샌드박스 제외"));
+  const wait = !known.length ? overviewWait(card?.status === "error" ? "집계 실패" : "구매 기록 대기 중") : !known.some((value) => value > 0) ? overviewWait("이 기간 검증 구매 없음") : "";
+  const ads = overviewMetric(card, "rewarded_per_dau");
+  const days = overviewDays();
+  const placements = (data.drilldowns?.economy?.rewardedPlacements ?? []).slice().sort((left, right) => (right.views ?? 0) - (left.views ?? 0)).slice(0, 3);
+  const adTip = overviewTip("보상형 광고/DAU", [
+    ...root.ConsoleModel.overviewMetricTipRows(ads, days),
+    ...placements.map((row) => [root.ConsoleModel.overviewPlacementName(row.placement), `${overviewCount(row.views)}회`]),
+  ], "테스트 광고 제외. 날짜별 광고 수는 아직 집계하지 않아 기간 합으로 비교해요.");
+  const adMax = Math.max(0, ...[ads?.value, ads?.previous].filter(overviewFinite));
+  const adBar = (value, tone) => `<span class="ov-pair-bar ${tone}" style="width:${overviewFinite(value) && adMax > 0 ? Math.max(1.5, value / adMax * 100).toFixed(1) : 0}%"></span>`;
+  const adRow = overviewFinite(ads?.value) || overviewFinite(ads?.previous)
+    ? `<span class="ov-pair" data-tip="${adTip}"><span class="ov-pair-label">광고<small>DAU당</small></span><span class="ov-pair-bars">${adBar(ads?.value, "is-now")}${adBar(ads?.previous, "is-before")}</span></span>`
+    : `<span class="ov-pair is-empty" data-tip="${adTip}"><span class="ov-pair-label">광고<small>DAU당</small></span><em>기록 없음</em></span>`;
+  return {
+    key: "money", title: "매출·광고", label: "날짜별 검증 구매와 보상형 광고",
+    legend: `${overviewKey("is-now", "bar", "이번")}${overviewKey("is-before", "bar", "이전")}`,
+    plot: `<div class="ov-facet"><span class="ov-pair-label">구매<small>일별 건수</small></span><div><div class="ov-plot-part">${known.some((value) => value > 0) ? overviewYTicks(max) : ""}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}</svg>${overviewColumns(points, max, tips)}</div>${wait}</div>${overviewDayAxis(labels)}</div></div>${adRow}`,
+    compound: true,
+  };
+}
+
+function overviewPhaseChart(data) {
+  const core = data.drilldowns?.core ?? {};
+  const bars = root.ConsoleModel.overviewPhaseBars(core.phases, core.bosses);
+  const version = data.filters?.version ?? overview.version;
+  const chart = { key: "phases", title: "도달 페이즈", label: "2.0 설치가 도달한 최고 페이즈 분포와 보스 승률",
+    legend: `${overviewKey("is-v2", "bar", "최고 도달")}${overviewKey("is-ink", "dot", "보스 승률")}` };
+  if (!bars.length) return { ...chart, legend: "", plot: overviewWait(version === "1.x" ? "1.x에는 페이즈 기록이 없어요" : OVERVIEW_WAIT_2X), axis: overviewXLabels([]) };
+  const top = Math.min(1, root.ConsoleModel.overviewNiceMax(Math.max(...bars.map((bar) => Math.max(bar.share, bar.winRate ?? 0)))));
+  const tips = bars.map((bar) => overviewTip(`P${bar.phase}`, [
+    ["최고 도달", `${overviewCount(bar.installs)}명 (${overviewPct(bar.share)})`],
+    ["보스 승률", overviewFinite(bar.winRate) ? root.ConsoleModel.overviewTipValue(bar.winRate, "percent", { numerator: bar.clears, denominator: bar.attempts, unit: "회" }) : "보스전 기록 없음"],
+  ], bar.bosses.length ? `보스: ${bar.bosses.map((id) => root.ConsoleModel.overviewBossName(id)).join(", ")}` : "기간 중 도달한 최고 페이즈(설치 수)"));
+  const dot = (index) => overviewFinite(bars[index].winRate) ? `<span class="ov-win-dot" style="bottom:${(bars[index].winRate / top * 100).toFixed(1)}%"></span>` : "";
+  const width = 100 / bars.length;
+  return {
+    ...chart,
+    plot: `${overviewYTicks(top, true)}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}</svg><div class="ov-cols is-v2">${overviewColumns(bars.map((bar) => bar.share), top, tips, dot)}</div></div>`,
+    axis: overviewXLabels(bars.map((bar, index) => [width * index + width / 2, `P${bar.phase}`])), yAxis: true,
+  };
+}
+
+function overviewHealthChart(data) {
+  const card = overviewCard(data, "health");
+  const health = data.drilldowns?.health ?? {};
+  const days = overviewDays();
+  const version = data.filters?.version ?? overview.version;
+  const unclean = card?.headline ?? null;
+  const errors = overviewMetric(card, "errors_per_1k");
+  const load = overviewMetric(card, "load_p50");
+  const loadP95 = overviewMetric(card, "load_p95");
+  const pairs = [["오류", errors, health.clientErrors], ["비정상 종료", unclean, health.uncleanExits]];
+  const values = pairs.flatMap(([, metric]) => [metric?.value, metric?.previous]).filter(overviewFinite);
+  const chart = { key: "health", title: "건강", label: "1천 세션당 오류·비정상 종료와 시작 로딩",
+    legend: `${overviewKey("is-now", "bar", "이번")}${overviewKey("is-before", "bar", "이전")}` };
+  if (!values.length && !overviewFinite(load?.value)) {
+    return { ...chart, legend: "", plot: overviewWait(version === "1.x" ? "1.x는 건강 신호를 보내지 않아요" : OVERVIEW_WAIT_2X) };
+  }
+  const max = Math.max(0, ...values);
+  const bar = (value, tone) => `<span class="ov-pair-bar ${tone}" style="width:${overviewFinite(value) && max > 0 ? Math.max(1.5, value / max * 100).toFixed(1) : 0}%"></span>`;
+  const rows = pairs.map(([name, metric, count]) => {
+    const tip = overviewTip(metric?.label || `${name}/1천 세션`, [
+      ...root.ConsoleModel.overviewMetricTipRows(metric, days),
+      overviewFinite(count) && overviewFinite(health.sessions) ? ["건수", `${overviewCount(count)}건 / 세션 ${overviewCount(health.sessions)}`] : null,
+    ], metric?.detail || "");
+    return `<span class="ov-pair" data-tip="${tip}"><span class="ov-pair-label">${escapeHtml(name)}</span><span class="ov-pair-bars">${bar(metric?.value, "is-now")}${bar(metric?.previous, "is-before")}</span></span>`;
+  }).join("");
+  const loadTip = overviewTip(load?.label || "시작 로딩 p50", [
+    ...root.ConsoleModel.overviewMetricTipRows(load, days),
+    loadP95 ? ["p95", overviewFormat(loadP95.value, loadP95.format)] : null,
+  ], load?.detail || "");
+  return {
+    ...chart,
+    plot: `<div class="ov-health"><div class="ov-health-bars"><p class="ov-health-unit">1천 세션당</p>${rows}</div><span class="ov-health-load" data-tip="${loadTip}"><span>로딩 p50</span><strong>${escapeHtml(overviewFormat(load?.value, "milliseconds"))}</strong></span></div>`,
+    fill: true,
+  };
+}
+
+const OVERVIEW_CHARTS = Object.freeze([overviewActiveChart, overviewRetentionChart, overviewFunnelChart, overviewMoneyChart, overviewPhaseChart, overviewHealthChart]);
+
+function overviewChartMarkup(chart, data, index) {
+  const body = data.waiting ? overviewWait(data.waiting) : chart.plot;
+  const plotClass = data.waiting ? "ov-plot" : chart.compound ? "ov-plot is-compound" : chart.fill ? "ov-plot is-fill" : chart.yAxis ? "ov-plot has-y" : "ov-plot";
+  return `<article class="ov-card${index < 3 ? " is-wide" : ""}" data-chart="${chart.key}">
+    <header class="ov-card-head"><h3>${escapeHtml(chart.title)}</h3><span class="ov-legend">${data.waiting ? "" : chart.legend || ""}</span></header>
+    <figure class="ov-figure" tabindex="0" data-tip-group aria-label="${escapeHtml(`${chart.label}. 방향키로 값을 하나씩 봅니다.`)}"><div class="${plotClass}">${body}</div>${data.waiting ? "" : chart.axis || ""}</figure>
+  </article>`;
+}
+
+function overviewCoverageParts(data) {
+  const coverage = data.coverage || {};
+  return [
+    `${formatShortDay(data.range?.current?.from)}–${formatShortDay(data.range?.current?.to)} vs ${formatShortDay(data.range?.previous?.from)}–${formatShortDay(data.range?.previous?.to)}`,
+    `${OVERVIEW_VERSION_NAMES[data.filters?.version] || "전체 버전"} · ${OVERVIEW_PLATFORM_NAMES[data.filters?.platform] || "전체 플랫폼"}`,
+    coverage.events?.status === "error" ? "원본 이벤트 집계 실패"
+      : !coverage.events?.coveredFrom ? "원본 이벤트: 보관(28일) 밖"
+      : coverage.events.full ? "원본 이벤트: 기간 전체" : `원본 이벤트: ${formatShortDay(coverage.events.coveredFrom)}부터만(28일 보관)`,
+    coverage.accounts?.status === "error" ? "계정 방문 집계 실패"
+      : !coverage.accounts?.coveredFrom ? "계정 방문: 기록 없음"
+      : coverage.accounts.full ? "계정 방문: 기간 전체" : `계정 방문: ${formatShortDay(coverage.accounts.coveredFrom)}부터 기록`,
+    coverage.has2x ? `2.0 이벤트 있음${(coverage.instrumentedVersions || []).length ? ` · 새 계측 ${coverage.instrumentedVersions.join(", ")}` : " · 새 계측 빌드 대기"}` : "2.0 이벤트 아직 없음",
+  ];
+}
+
+function renderOverviewBoard(data) {
+  overviewTipHide();
+  byId("overviewKpis").innerHTML = OVERVIEW_KPIS.map((spec) => overviewKpiMarkup(spec, data)).join("");
+  byId("overviewCharts").innerHTML = OVERVIEW_CHARTS.map((chart, index) => overviewChartMarkup(chart(data), data, index)).join("");
+}
+
+// 첫 집계 전·실패 때도 같은 자리에 같은 틀을 둔다(레이아웃이 뛰지 않게). 숫자 대신 이유를 쓴다.
+function renderOverviewWaiting(message) {
+  renderOverviewBoard({ waiting: message, filters: { periodDays: overview.periodDays, version: overview.version, platform: overview.platform }, cards: [], drilldowns: {}, coverage: {} });
+  byId("overviewSummary").innerHTML = `<li>${escapeHtml(message)}</li>`;
+}
+
+// ── 툴팁 하나: 마우스는 올리면, 손가락은 누르면, 키보드는 그래프에 포커스한 뒤 방향키로 ──
+const overviewTipState = { target: null, pointer: "" };
+
+function overviewTipItems(group) { return [...group.querySelectorAll("[data-tip]")]; }
+
+function overviewTipPlace(target) {
+  const box = byId("overviewTip");
+  const rect = target.getBoundingClientRect();
+  const margin = 8;
+  const width = box.offsetWidth;
+  const height = box.offsetHeight;
+  const left = Math.max(margin, Math.min(rect.left + rect.width / 2 - width / 2, root.innerWidth - width - margin));
+  let top = rect.top - height - 8;
+  if (top < margin) top = Math.min(rect.bottom + 8, root.innerHeight - height - margin);
+  box.style.left = `${Math.round(left)}px`;
+  box.style.top = `${Math.round(Math.max(margin, top))}px`;
+}
+
+function overviewTipShow(target) {
+  const text = target?.getAttribute("data-tip");
+  if (!text) {
+    overviewTipHide();
+    return;
+  }
+  if (overviewTipState.target && overviewTipState.target !== target) overviewTipState.target.classList.remove("is-active");
+  overviewTipState.target = target;
+  target.classList.add("is-active");
+  const box = byId("overviewTip");
+  const parsed = root.ConsoleModel.parseOverviewTip(text);
+  const title = document.createElement("strong");
+  title.className = "ov-tip-title";
+  title.textContent = parsed.title;
+  const lines = parsed.rows.map((row) => {
+    if (row.note !== undefined) {
+      const note = document.createElement("p");
+      note.className = "ov-tip-note";
+      note.textContent = row.note;
+      return note;
+    }
+    const line = document.createElement("p");
+    line.className = "ov-tip-row";
+    if (row.label === "2.0+" || row.label === "1.x") line.dataset.series = row.label === "2.0+" ? "v2" : "v1";
+    const label = document.createElement("span");
+    label.textContent = row.label;
+    const value = document.createElement("b");
+    value.textContent = row.value;
+    line.append(label, value);
+    return line;
+  });
+  box.replaceChildren(title, ...lines);
+  box.hidden = false;
+  target.closest("[data-tip-group]")?.setAttribute("aria-describedby", "overviewTip");
+  overviewTipPlace(target);
+}
+
+function overviewTipHide() {
+  const box = byId("overviewTip");
+  if (box) box.hidden = true;
+  const target = overviewTipState.target;
+  overviewTipState.target = null;
+  if (!target) return;
+  target.classList.remove("is-active");
+  target.closest("[data-tip-group]")?.removeAttribute("aria-describedby");
+}
+
+function bindOverviewTooltip() {
+  const section = byId("overviewSection");
+  const tipTarget = (node) => {
+    const target = node?.closest?.("[data-tip]");
+    return target && section.contains(target) ? target : null;
+  };
+  section.addEventListener("pointerdown", (event) => { overviewTipState.pointer = event.pointerType; });
+  section.addEventListener("pointerover", (event) => {
+    if (event.pointerType === "touch") return;
+    const target = tipTarget(event.target);
+    if (target) overviewTipShow(target);
+    else overviewTipHide();
+  });
+  section.addEventListener("pointerleave", (event) => { if (event.pointerType !== "touch") overviewTipHide(); });
+  // 손가락: 누른 곳을 보이고, 같은 곳을 다시 누르거나 바깥을 누르면 닫는다. 마우스 클릭은 이미 hover로 보인다.
+  section.addEventListener("click", (event) => {
+    const pointer = overviewTipState.pointer;
+    overviewTipState.pointer = "";
+    if (pointer === "mouse") return;
+    const target = tipTarget(event.target);
+    if (!target) return;
+    if (overviewTipState.target === target && pointer) overviewTipHide();
+    else overviewTipShow(target);
+  });
+  document.addEventListener("pointerdown", (event) => { if (!tipTarget(event.target)) overviewTipHide(); }, { passive: true });
+  section.addEventListener("focusin", (event) => {
+    const group = event.target.closest?.("[data-tip-group]");
+    if (!group || overviewTipState.pointer) return;
+    overviewTipShow(group.hasAttribute("data-tip") ? group : overviewTipItems(group)[0]);
+  });
+  section.addEventListener("focusout", (event) => {
+    if (!event.relatedTarget?.closest?.("[data-tip-group]")) overviewTipHide();
+  });
+  section.addEventListener("keydown", (event) => {
+    const group = event.target.closest?.("[data-tip-group]");
+    if (!group) return;
+    if (event.key === "Escape") {
+      overviewTipHide();
+      return;
+    }
+    const steps = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!(event.key in steps) && event.key !== "Home" && event.key !== "End") return;
+    const items = overviewTipItems(group);
+    if (!items.length) return;
+    event.preventDefault();
+    const current = items.indexOf(overviewTipState.target);
+    const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+      : current < 0 ? (steps[event.key] > 0 ? 0 : items.length - 1)
+      : Math.max(0, Math.min(items.length - 1, current + steps[event.key]));
+    overviewTipShow(items[next]);
+  });
+  root.addEventListener("scroll", overviewTipHide, { passive: true });
+  root.addEventListener("resize", overviewTipHide);
 }
 
 function overviewTable(columns, rows, emptyText) {
@@ -1927,20 +2312,17 @@ function renderOverviewDrillHealth(data) {
 function renderOverview() {
   const data = overview.payload;
   if (!data) return;
-  byId("overviewCards").innerHTML = (data.cards || []).map(overviewCardMarkup).join("");
-  const coverage = data.coverage || {};
-  const parts = [
-    `${formatShortDay(data.range?.current?.from)}–${formatShortDay(data.range?.current?.to)} vs ${formatShortDay(data.range?.previous?.from)}–${formatShortDay(data.range?.previous?.to)}`,
-    `${OVERVIEW_VERSION_NAMES[data.filters?.version] || "전체 버전"} · ${OVERVIEW_PLATFORM_NAMES[data.filters?.platform] || "전체 플랫폼"}`,
-    coverage.events?.status === "error" ? "원본 이벤트 집계 실패"
-      : !coverage.events?.coveredFrom ? "원본 이벤트: 보관(28일) 밖"
-      : coverage.events.full ? "원본 이벤트: 기간 전체" : `원본 이벤트: ${formatShortDay(coverage.events.coveredFrom)}부터만(28일 보관)`,
-    coverage.accounts?.status === "error" ? "계정 방문 집계 실패"
-      : !coverage.accounts?.coveredFrom ? "계정 방문: 기록 없음"
-      : coverage.accounts.full ? "계정 방문: 기간 전체" : `계정 방문: ${formatShortDay(coverage.accounts.coveredFrom)}부터 기록`,
-    coverage.has2x ? `2.0 이벤트 있음${(coverage.instrumentedVersions || []).length ? ` · 새 계측 ${coverage.instrumentedVersions.join(", ")}` : " · 새 계측 빌드 대기"}` : "2.0 이벤트 아직 없음",
-  ];
+  renderOverviewBoard(data);
+  const version = data.filters?.version ?? overview.version;
+  const sentences = root.ConsoleModel.overviewSummarySentences(data.cards, overviewDays(), { has2x: version === "1.x" ? undefined : data.coverage?.has2x });
+  byId("overviewSummary").innerHTML = sentences.map((sentence) => `<li data-direction="${sentence.direction || "none"}">${escapeHtml(sentence.text)}</li>`).join("");
+  const parts = overviewCoverageParts(data);
   byId("overviewCoverage").textContent = parts.join(" · ");
+  const generated = data.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
+  byId("overviewInfo").setAttribute("data-tip", root.ConsoleModel.overviewTipText("집계 범위", [
+    ["이번 vs 이전", parts[0]], ["보기", parts[1]], ["원본 이벤트", parts[2].replace(/^원본 이벤트:?\s*/, "")], ["계정 방문", parts[3].replace(/^계정 방문:?\s*/, "")], ["2.0", parts[4]],
+    ["집계", `${generated}${data.cache?.hit ? ` · ${Math.max(1, Math.round((data.cache.ageSec || 0) / 60))}분 전 결과 재사용` : ""}`],
+  ], "날짜는 독일 시간. 증감은 바로 앞 같은 길이 기간과 비교. 값이 없으면 0이 아니라 이유를 씁니다. 표와 기준은 아래 '세부 표'."));
   byId("overviewNotes").innerHTML = (data.notes || []).map((note) => `<li>${escapeHtml(note)}</li>`).join("");
   const drilldowns = data.drilldowns || {};
   renderOverviewDrillPlayers(drilldowns);
@@ -1967,25 +2349,29 @@ async function loadOverview(refresh = false) {
   const sequence = ++overview.sequence;
   const section = byId("overviewSection");
   section.setAttribute("aria-busy", "true");
-  byId("overviewStatus").textContent = overview.payload ? "새 조건으로 다시 집계하는 중입니다. 지금 보이는 숫자는 이전 조회입니다." : "요약을 집계하는 중입니다.";
+  byId("overviewStatus").textContent = overview.payload ? "다시 집계하는 중" : "불러오는 중";
+  if (!overview.payload) renderOverviewWaiting("요약을 집계하는 중이에요");
   try {
     const data = await root.ConsoleAPI.post("analytics-dashboard-v2", {
       view: "overview", periodDays: overview.periodDays, version: overview.version, platform: overview.platform,
       ...(refresh ? { refresh: true } : {}),
     });
     if (sequence !== overview.sequence) return;
-    // 배포 전 analytics-dashboard-v2는 view를 모르고 기존 대시보드를 돌려준다. 빈 카드로 속이지 않는다.
+    // 배포 전 analytics-dashboard-v2는 view를 모르고 기존 대시보드를 돌려준다. 빈 그래프로 속이지 않는다.
     if (data?.view !== "overview" || !Array.isArray(data?.cards)) throw new Error("overview_not_deployed");
     overview.payload = data;
     renderOverview();
-    const at = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
-    byId("overviewStatus").textContent = `${at} 집계 · 독일 시간${data?.cache?.hit ? ` · ${Math.max(1, Math.round((data.cache.ageSec || 0) / 60))}분 전 결과 재사용` : ""}`;
+    const at = data?.generatedAt ? new Date(data.generatedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }) : "방금";
+    byId("overviewStatus").textContent = `${at} 업데이트${data?.cache?.hit ? " · 캐시" : ""}`;
+    byId("overviewStatus").title = "";
   } catch (error) {
     if (sequence !== overview.sequence) return;
     const message = error?.message === "overview_not_deployed"
       ? "한눈 요약 집계가 아직 서버에 배포되지 않았습니다. 아래 기존 상세 분석은 그대로 쓸 수 있습니다."
       : readFunctionError(error);
-    byId("overviewStatus").textContent = `${message}${overview.payload ? " 이전 결과를 그대로 둡니다." : ""}`;
+    byId("overviewStatus").textContent = overview.payload ? "새 집계 실패 · 이전 결과" : "집계 실패";
+    byId("overviewStatus").title = message;
+    if (!overview.payload) renderOverviewWaiting(message);
   } finally {
     if (sequence === overview.sequence) section.setAttribute("aria-busy", "false");
   }
@@ -2009,6 +2395,7 @@ function bindOverviewControls() {
   document.querySelectorAll("[data-overview-version]").forEach((button) => button.addEventListener("click", () => changeOverview({ version: button.dataset.overviewVersion })));
   document.querySelectorAll("[data-overview-platform]").forEach((button) => button.addEventListener("click", () => changeOverview({ platform: button.dataset.overviewPlatform })));
   byId("overviewRefresh").addEventListener("click", () => loadOverview(true));
+  bindOverviewTooltip();
   byId("legacyAnalytics").addEventListener("toggle", (event) => {
     overview.legacyOpen = event.currentTarget.open;
     syncFilterHash();

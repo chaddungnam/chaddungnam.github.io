@@ -233,4 +233,67 @@ assert.equal(model.overviewBossName("scientist"), "P1 과학자");
 assert.equal(model.overviewPlacementName("shop_gems"), "상점 젬");
 assert.equal(model.labTutorialStageName("home_growth"), "홈 성장");
 
+// C2 (2026-10-01) 한눈 보드: 툴팁 값 글자. 없으면 0이 아니라 이유, 비율은 표본을 붙인다.
+assert.equal(model.overviewTipValue(null, "percent"), "기록 없음");
+assert.equal(model.overviewTipValue(undefined, "count", { empty: "2.0 이벤트 아직 없음" }), "2.0 이벤트 아직 없음");
+assert.equal(model.overviewTipValue(0, "count"), "0", "a real zero stays a zero");
+assert.equal(model.overviewTipValue(0.3235, "percent", { numerator: 11, denominator: 34 }), "32.4% (11/34명)");
+assert.equal(model.overviewTipValue(1234, "count", { numerator: 1234, denominator: 5000, unit: "판" }), "1,234 (1,234/5,000판)");
+assert.equal(model.overviewTipValue(2600, "milliseconds", { sample: 194, unit: "회" }), "2.6초 · 표본 194회");
+assert.match(model.overviewTipValue(39.96, "money", { currency: "EUR" }), /39[.,]96/);
+const tipText = model.overviewTipText("D1\t복귀\n", [["이번 7일", "32.4% (11/34명)"], null, ["1.x", "기간\n내 표본 없음"]], "정의: 설치 다음 날 다시 실행");
+assert.equal(tipText, "D1 복귀\n이번 7일\t32.4% (11/34명)\n1.x\t기간 내 표본 없음\n정의: 설치 다음 날 다시 실행", "tabs and newlines inside values never break the row format");
+assert.deepEqual(model.parseOverviewTip(tipText), { title: "D1 복귀", rows: [{ label: "이번 7일", value: "32.4% (11/34명)" }, { label: "1.x", value: "기간 내 표본 없음" }, { note: "정의: 설치 다음 날 다시 실행" }] });
+const d1Metric = { key: "d1", label: "D1 복귀", format: "percent", value: 0.324, previous: 0.383, delta: -0.059, compare: "points", better: "up",
+  split: { "1.x": 0.3, "2.x": null }, splitEmpty: { "1.x": null, "2.x": "2.0 이벤트 아직 없음" } };
+assert.deepEqual(model.overviewMetricTipRows(d1Metric, 7), [["이번 7일", "32.4%"], ["이전 7일", "38.3% (−5.9%p)"], ["1.x", "30.0%"], ["2.0+", "2.0 이벤트 아직 없음"]]);
+assert.deepEqual(model.overviewMetricTipRows({ ...d1Metric, previous: null, delta: null, split: null }, 30), [["이번 30일", "32.4%"], ["이전 30일", "비교 기간 기록 없음"]]);
+assert.deepEqual(model.overviewMetricTipRows({ key: "vip", format: "count", value: 6, compare: "none" }, 7), [["지금", "6"]]);
+
+// '이번 기간 요약' 문장 규칙: 크게 변한 순서로 3개, %p 지표는 이전 값 대비로 크기를 맞추고, 작은 변화·비교 불가는 빼고, 빈자리는 이유로 채운다.
+const metricOf = (key, extra) => ({ key, format: "decimal", value: 1, previous: 1, delta: 0, compare: "relative", better: "up", ...extra });
+const summaryCards = [
+  { headline: metricOf("dau", { delta: 0.3 }), metrics: [metricOf("d1", { compare: "points", value: 0.324, previous: 0.383, delta: -0.059 }), metricOf("d7", { compare: "points", value: 0.34, previous: 0.336, delta: 0.004 }), metricOf("session_length", { delta: 0.9 })] },
+  { headline: metricOf("revenue", { delta: 1.67 }), metrics: [metricOf("buyers", { delta: 0.5 })] },
+  { headline: metricOf("unclean_per_1k", { delta: 0.12, better: "down" }), metrics: [metricOf("load_p50", { delta: -0.02 })] },
+];
+assert.deepEqual(model.overviewSummarySentences(summaryCards, 7).map((sentence) => sentence.text), [
+  "검증 매출이 이전 7일보다 167% 늘었어요",
+  "DAU가 이전 7일보다 30% 늘었어요",
+  "D1 복귀가 이전 7일보다 5.9%p 내려갔어요",
+], "biggest change first; 5.9%p of 38.3% (≈15%) outranks +12%, unlisted metrics (session length, buyers) never speak");
+assert.equal(model.overviewSummarySentences(summaryCards, 7)[2].direction, "down");
+assert.deepEqual(model.overviewSummarySentences([{ headline: metricOf("dau", { delta: -0.08 }), metrics: [metricOf("d7", { compare: "points", delta: 0.004 })] }], 30, { has2x: false }).map((sentence) => sentence.text), [
+  "DAU가 이전 30일보다 8.0% 줄었어요",
+  "나머지 지표는 이전 30일과 비슷해요",
+  "2.0 데이터는 아직 기다리는 중이에요",
+]);
+assert.deepEqual(model.overviewSummarySentences([{ headline: metricOf("dau", { delta: null, previous: null }), metrics: [metricOf("d1", { value: null, delta: null })] }], 7).map((sentence) => sentence.text), ["이전 7일과 비교할 기록이 아직 없어요"]);
+assert.deepEqual(model.overviewSummarySentences([], 7), [{ key: "no_compare", direction: null, text: "이전 7일과 비교할 기록이 아직 없어요" }]);
+assert.equal(model.overviewSummarySentences([{ headline: metricOf("vip", { compare: "none", delta: 1 }), metrics: [] }], 7)[0].key, "no_compare", "snapshot metrics have no change to report");
+
+// 퍼널 막대·페이즈 분포·복귀 곡선: 빈 2.0은 0 막대가 아니라 빈 배열(화면은 '2.0 데이터 대기 중').
+const funnel = model.overviewFunnelBars([
+  { key: "app_open", reached: null }, { key: "first_open", reached: 36, fromStart: 1 }, { key: "tutorial_start", reached: 33, fromStart: 0.917 },
+  { key: "tutorial_done", reached: 28, fromStart: 0.778 }, { key: "first_run", reached: 28, fromStart: 0.778 }, { key: "p1_boss", reached: 21, fromStart: 0.583 },
+  { key: "next_day", reached: 10, stepRate: 0.5, fromStart: null },
+]);
+assert.deepEqual(funnel.map((bar) => bar.label), ["동의", "튜토리얼", "첫 런", "P1 보스", "다음 날"], "missing first_3d (old build) is skipped, not drawn as zero");
+assert.equal(funnel[0].drop, null);
+assert.equal(funnel[1].drop.toFixed(3), "0.222");
+assert.equal(funnel[2].drop, 0);
+assert.equal(funnel[4].share.toFixed(4), "0.2915", "next day uses its own base times the bar before it");
+assert.equal(funnel[4].drop, 0.5);
+assert.deepEqual(model.overviewFunnelBars([{ key: "first_open", reached: 0, fromStart: null }]), []);
+assert.deepEqual(model.overviewFunnelBars(undefined), []);
+const phaseBars = model.overviewPhaseBars([{ phase: 1, installs: 3 }, { phase: 3, installs: 1 }], [{ bossId: "scientist", phase: 1, attempts: 4, clears: 3 }, { bossId: "p1b", phase: 1, attempts: 1, clears: 0 }]);
+assert.equal(phaseBars.length, 8);
+assert.deepEqual(phaseBars.slice(0, 3).map((bar) => [bar.phase, bar.installs, bar.share, bar.winRate]), [[1, 3, 0.75, 0.6], [2, 0, 0, null], [3, 1, 0.25, null]]);
+assert.deepEqual(model.overviewPhaseBars([], []), []);
+assert.deepEqual(model.overviewRetentionCurve({ d1: { eligible: 34, retained: 11, rate: 11 / 34 }, d7: { eligible: 0, retained: 0, rate: null }, d30: { eligible: 9, retained: 1, rate: 1 / 9 } }).map((point) => [point.day, point.rate === null ? null : Number(point.rate.toFixed(3))]),
+  [[0, 1], [1, 0.324], [7, null], [30, 0.111]]);
+assert.deepEqual(model.overviewRetentionCurve({ d1: { eligible: 0 }, d7: { eligible: 0 }, d30: { eligible: 0 } }), []);
+assert.deepEqual([0, 0.4, 7, 38, 51, 240].map(model.overviewNiceMax), [1, 0.5, 10, 50, 100, 250]);
+assert.deepEqual(model.sparklineGeometry([0, 5], 100, 20, 0, [0, 10]).segments[0], [[0, 20], [100, 10]], "two series share one axis");
+
 console.log("console model: PASS");

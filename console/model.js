@@ -493,13 +493,14 @@
   }
 
   // 작은 선 그래프: null은 끊고(보관 밖·기록 전), 0은 그린다. 선은 추세를 보이려고 값의 범위(domain="data")로,
-  // 막대처럼 0부터 읽어야 하면 domain="zero"로 그린다. 값이 모두 같으면 가운데 줄이다.
+  // 막대처럼 0부터 읽어야 하면 domain="zero"로, 두 선이 한 축을 나눠 쓰면 [min, max]로 그린다. 값이 모두 같으면 가운데 줄이다.
   function sparklineGeometry(points, width = 120, height = 36, pad = 3, domain = "data") {
     const list = Array.isArray(points) ? points : [];
     const values = list.filter(finite);
     if (!values.length) return { segments: [], last: null, min: null, max: null };
-    const min = domain === "zero" ? Math.min(0, ...values) : Math.min(...values);
-    const max = domain === "zero" ? Math.max(...values, 0) : Math.max(...values);
+    const fixed = Array.isArray(domain) && finite(domain[0]) && finite(domain[1]);
+    const min = fixed ? domain[0] : domain === "zero" ? Math.min(0, ...values) : Math.min(...values);
+    const max = fixed ? domain[1] : domain === "zero" ? Math.max(...values, 0) : Math.max(...values);
     const span = max - min;
     const x = (index) => list.length > 1 ? pad + index * (width - pad * 2) / (list.length - 1) : width / 2;
     const y = (value) => span === 0 ? height / 2 : height - pad - (value - min) / span * (height - pad * 2);
@@ -579,6 +580,160 @@
     return overviewSocialNames[String(kind || "")] || readableRawId(kind);
   }
 
+  // ── C2 (2026-10-01) 한눈 보드: 그래프가 먼저, 정확한 숫자·정의·표본은 툴팁으로 ─────────
+  // 툴팁 값: 없으면 0이 아니라 '기록 없음'. 분자/분모가 있으면 표본을, 표본 수만 있으면 '표본 N'을 붙인다.
+  function overviewTipValue(value, format, options = {}) {
+    if (!finite(value)) return options.empty || "기록 없음";
+    const shown = formatOverviewValue(value, format, options.currency);
+    const unit = options.unit ?? "명";
+    const count = (number) => Math.round(number).toLocaleString("ko-KR");
+    if (finite(options.numerator) && finite(options.denominator)) return `${shown} (${count(options.numerator)}/${count(options.denominator)}${unit})`;
+    if (finite(options.sample)) return `${shown} · 표본 ${count(options.sample)}${unit}`;
+    return shown;
+  }
+
+  // 툴팁 한 개 = 첫 줄 제목, 다음 줄부터 "라벨\t값" 또는 메모 한 줄. 화면은 이 글자를 textContent로만 그린다.
+  function overviewTipText(title, rows = [], note = "") {
+    const clean = (value) => String(value ?? "").replace(/[\t\r\n]+/g, " ").trim();
+    const lines = [clean(title)];
+    for (const row of rows) {
+      if (!row) continue;
+      lines.push(Array.isArray(row) ? `${clean(row[0])}\t${clean(row[1])}` : clean(row));
+    }
+    if (note) lines.push(clean(note));
+    return lines.join("\n");
+  }
+
+  function parseOverviewTip(text) {
+    const [title = "", ...lines] = String(text ?? "").split("\n");
+    return {
+      title,
+      rows: lines.filter(Boolean).map((line) => {
+        const tab = line.indexOf("\t");
+        return tab < 0 ? { note: line } : { label: line.slice(0, tab), value: line.slice(tab + 1) };
+      }),
+    };
+  }
+
+  // 지표 하나의 툴팁 줄: 이번 값, 이전 값과 증감, 버전별 값(없으면 이유). 숫자는 화면 대신 여기에만 둔다.
+  function overviewMetricTipRows(metric, periodDays) {
+    if (!metric) return [];
+    const days = periodDays || 7;
+    const value = (number) => overviewTipValue(number, metric.format, { currency: metric.currency, empty: metric.empty || "기록 없음" });
+    const rows = [[metric.compare === "none" ? "지금" : `이번 ${days}일`, value(metric.value)]];
+    if (metric.compare && metric.compare !== "none" && metric.value != null) {
+      const delta = overviewDelta(metric, days);
+      rows.push([`이전 ${days}일`, finite(metric.previous)
+        ? `${formatOverviewValue(metric.previous, metric.format, metric.currency)}${finite(metric.delta) ? ` (${delta.text})` : ""}`
+        : "비교 기간 기록 없음"]);
+    }
+    if (metric.split) {
+      for (const [family, name] of [["1.x", "1.x"], ["2.x", "2.0+"]]) {
+        const split = metric.split[family];
+        rows.push([name, finite(split) ? formatOverviewValue(split, metric.format, metric.currency) : String(metric.splitEmpty?.[family] || "기록 없음").replace(/^1\.x\s+/, "")]);
+      }
+    }
+    return rows;
+  }
+
+  // '이번 기간 요약' 문장: 증감이 있는 핵심 지표만, 크게 변한 순서로 3개. AI 없이 규칙으로 만든다.
+  // 크기 비교: 상대 지표는 증감률 그대로, %p 지표는 이전 값 대비 비율로 맞춘다(38.3%에서 5.9%p ↓ ≈ 15%).
+  const overviewSummarySubjects = Object.freeze({
+    dau: "DAU가", new_accounts: "신규 유입이", d1: "D1 복귀가", d7: "D7 복귀가",
+    revenue: "검증 매출이", purchases: "검증 구매가", p1_boss: "신규의 P1 보스 클리어가", runs_per_dau: "DAU당 판 수가",
+    boss_win: "보스 승률이", clear_rate: "런 클리어율이", unclean_per_1k: "비정상 종료가", errors_per_1k: "오류 위치가", load_p50: "시작 로딩 시간이",
+  });
+
+  function overviewSummarySentences(cards, periodDays, options = {}) {
+    const days = periodDays || 7;
+    const metrics = (Array.isArray(cards) ? cards : []).flatMap((card) => [card?.headline, ...(card?.metrics || [])]).filter(Boolean);
+    const seen = new Set();
+    const changes = [];
+    let flat = 0;
+    metrics.forEach((metric, order) => {
+      const subject = overviewSummarySubjects[metric.key];
+      if (!subject || seen.has(metric.key)) return;
+      seen.add(metric.key);
+      if (!finite(metric.value) || !finite(metric.delta) || !metric.compare || metric.compare === "none") return;
+      const points = metric.compare === "points";
+      const magnitude = Math.abs(metric.delta);
+      if (points ? magnitude < 0.01 : magnitude < 0.05) {
+        flat += 1;
+        return;
+      }
+      const size = points && finite(metric.previous) && metric.previous > 0 ? magnitude / metric.previous : magnitude;
+      const percent = magnitude * 100;
+      const amount = points ? `${percent.toFixed(1)}%p` : `${percent >= 10 ? percent.toFixed(0) : percent.toFixed(1)}%`;
+      const up = metric.delta > 0;
+      const verb = points ? (up ? "올라갔어요" : "내려갔어요") : (up ? "늘었어요" : "줄었어요");
+      changes.push({ key: metric.key, direction: up ? "up" : "down", size, order, text: `${subject} 이전 ${days}일보다 ${amount} ${verb}` });
+    });
+    changes.sort((left, right) => right.size - left.size || left.order - right.order);
+    const sentences = changes.slice(0, 3).map(({ key, direction, text }) => ({ key, direction, text }));
+    if (sentences.length < 3 && flat > 0) sentences.push({ key: "flat", direction: null, text: `나머지 지표는 이전 ${days}일과 비슷해요` });
+    if (!changes.length && !flat) sentences.push({ key: "no_compare", direction: null, text: `이전 ${days}일과 비교할 기록이 아직 없어요` });
+    if (sentences.length < 3 && options.has2x === false) sentences.push({ key: "no_2x", direction: null, text: "2.0 데이터는 아직 기다리는 중이에요" });
+    return sentences.slice(0, 3);
+  }
+
+  // 2.0 첫 세션 퍼널 막대: 동의→튜토리얼→첫 런→첫 3D→P1 보스→다음 날. 막대 길이는 신규 대비, 사이 숫자는 앞 막대에서 빠진 비율.
+  // '다음 날'은 분모가 다르다(P1 보스까지 간 어제 이전 설치). 그 단계 비율을 앞 막대 길이에 곱한다.
+  const overviewFunnelPick = Object.freeze([["first_open", "동의"], ["tutorial_done", "튜토리얼"], ["first_run", "첫 런"], ["first_3d", "첫 3D"], ["p1_boss", "P1 보스"], ["next_day", "다음 날"]]);
+  function overviewFunnelBars(steps) {
+    const byKey = new Map((Array.isArray(steps) ? steps : []).map((step) => [step?.key, step]));
+    const start = byKey.get("first_open");
+    if (!start || !finite(start.reached) || start.reached <= 0) return [];
+    const bars = [];
+    for (const [key, label] of overviewFunnelPick) {
+      const step = byKey.get(key);
+      if (!step || !finite(step.reached)) continue;
+      const previous = bars.at(-1);
+      const share = key === "next_day"
+        ? (previous && finite(previous.share) && finite(step.stepRate) ? previous.share * step.stepRate : null)
+        : (finite(step.fromStart) ? step.fromStart : null);
+      const drop = previous && finite(previous.share) && previous.share > 0 && finite(share) ? Math.max(0, 1 - share / previous.share) : null;
+      bars.push({ key, label, step, share, drop });
+    }
+    return bars;
+  }
+
+  // 도달 페이즈 분포(설치 비율)와 그 페이즈 보스 승률. 둘 다 0~100%라 한 축을 나눠 쓴다.
+  function overviewPhaseBars(phases, bosses, minPhases = 8) {
+    const list = (Array.isArray(phases) ? phases : []).filter((row) => finite(row?.phase));
+    const total = list.reduce((sum, row) => sum + (finite(row.installs) ? row.installs : 0), 0);
+    if (total <= 0) return [];
+    const fights = Array.isArray(bosses) ? bosses : [];
+    const last = Math.max(minPhases, ...list.map((row) => row.phase));
+    return Array.from({ length: last }, (_, index) => {
+      const phase = index + 1;
+      const installs = list.filter((row) => row.phase === phase).reduce((sum, row) => sum + (finite(row.installs) ? row.installs : 0), 0);
+      const here = fights.filter((row) => row?.phase === phase);
+      const attempts = here.reduce((sum, row) => sum + (finite(row.attempts) ? row.attempts : 0), 0);
+      const clears = here.reduce((sum, row) => sum + (finite(row.clears) ? row.clears : 0), 0);
+      return { phase, installs, share: installs / total, attempts, clears, winRate: attempts > 0 ? clears / attempts : null, bosses: here.map((row) => row.bossId) };
+    });
+  }
+
+  // 복귀 곡선: D0은 정의상 100%. 대상(분모)이 없는 날은 0이 아니라 빈칸이다. 그릴 점이 하나도 없으면 빈 배열.
+  function overviewRetentionCurve(row) {
+    if (!row) return [];
+    const points = [1, 7, 30].map((day) => {
+      const cell = row[`d${day}`] || {};
+      const eligible = finite(cell.eligible) ? cell.eligible : 0;
+      return { day, rate: eligible > 0 && finite(cell.rate) ? cell.rate : null, retained: finite(cell.retained) ? cell.retained : 0, eligible };
+    });
+    if (!points.some((point) => finite(point.rate))) return [];
+    return [{ day: 0, rate: 1, retained: null, eligible: null }, ...points];
+  }
+
+  // 축 눈금용 깔끔한 최댓값(1·2·2.5·5·10 단위).
+  function overviewNiceMax(value) {
+    if (!finite(value) || value <= 0) return 1;
+    const power = 10 ** Math.floor(Math.log10(value));
+    const step = [1, 2, 2.5, 5, 10].find((unit) => unit * power >= value - 1e-9);
+    return step * power;
+  }
+
   return {
     normalizeOverviewFilters,
     formatOverviewValue,
@@ -591,6 +746,15 @@
     overviewPlacementName,
     overviewErrorKindName,
     overviewBossName,
+    overviewTipValue,
+    overviewTipText,
+    parseOverviewTip,
+    overviewMetricTipRows,
+    overviewSummarySentences,
+    overviewFunnelBars,
+    overviewPhaseBars,
+    overviewRetentionCurve,
+    overviewNiceMax,
     sampleRate, snapshotRank,
     tutorialStatus,
     routeFromHash,

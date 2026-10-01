@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20261001-pulse">
+  <link rel="stylesheet" href="styles.css?v=20261001-pulse2">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -85,28 +85,36 @@
 
       <section id="analyticsView" class="route-view" data-route="analytics">
         <section id="overviewSection" class="overview" aria-labelledby="overviewTitle" aria-busy="false">
-          <header class="overview-head">
-            <div><p class="eyebrow">AT A GLANCE · 1.x / 2.0+</p><h2 id="overviewTitle">한눈 요약</h2><p class="overview-sub">버전·플랫폼을 나눠 보고, 바로 앞 같은 길이 기간과 비교합니다.</p></div>
-            <p id="overviewStatus" class="overview-status" role="status">요약을 불러오는 중입니다.</p>
-          </header>
-          <div class="overview-filters" role="group" aria-label="한눈 요약 필터">
-            <div class="filter-group"><span id="overviewPeriodLabel" class="filter-label">기간</span><div class="overview-segment" role="group" aria-labelledby="overviewPeriodLabel"><button class="overview-switch" type="button" data-overview-period="7" aria-pressed="true">7일</button><button class="overview-switch" type="button" data-overview-period="30" aria-pressed="false">30일</button><button class="overview-switch" type="button" data-overview-period="90" aria-pressed="false">90일</button></div></div>
-            <div class="filter-group"><span id="overviewVersionLabel" class="filter-label">버전</span><div class="overview-segment" role="group" aria-labelledby="overviewVersionLabel"><button class="overview-switch" type="button" data-overview-version="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-version="1.x" aria-pressed="false">1.x 라이브</button><button class="overview-switch" type="button" data-overview-version="2.x" aria-pressed="false">2.0+</button></div></div>
-            <div class="filter-group"><span id="overviewPlatformLabel" class="filter-label">플랫폼</span><div class="overview-segment" role="group" aria-labelledby="overviewPlatformLabel"><button class="overview-switch" type="button" data-overview-platform="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-overview-platform="ios" aria-pressed="false">iOS</button></div></div>
-            <button id="overviewRefresh" class="overview-refresh" type="button">새로 집계</button>
+          <h2 id="overviewTitle" class="sr-only">한눈 요약</h2>
+          <div class="ov-bar" role="group" aria-label="한눈 요약 필터">
+            <div class="overview-segment" role="group" aria-label="기간"><button class="overview-switch" type="button" data-overview-period="7" aria-pressed="true">7일</button><button class="overview-switch" type="button" data-overview-period="30" aria-pressed="false">30일</button><button class="overview-switch" type="button" data-overview-period="90" aria-pressed="false">90일</button></div>
+            <div class="overview-segment" role="group" aria-label="버전"><button class="overview-switch" type="button" data-overview-version="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-version="1.x" aria-pressed="false">1.x</button><button class="overview-switch" type="button" data-overview-version="2.x" aria-pressed="false">2.0+</button></div>
+            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-overview-platform="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-overview-platform="ios" aria-pressed="false">iOS</button></div>
+            <div class="ov-bar-end">
+              <p id="overviewStatus" class="ov-status" role="status">불러오는 중</p>
+              <button id="overviewInfo" class="ov-info" type="button" aria-label="집계 범위와 기준" data-tip-group data-tip="집계 범위&#10;요약을 불러오면 채워집니다.">i</button>
+              <button id="overviewRefresh" class="overview-refresh" type="button">새로 집계</button>
+            </div>
           </div>
-          <p id="overviewCoverage" class="overview-coverage">기록 범위를 확인하는 중입니다.</p>
-          <div id="overviewCards" class="overview-grid" aria-live="polite"></div>
-          <p class="overview-legend"><span><span class="version-key v1" aria-hidden="true"></span>1.x(라이브 1.1.3)</span><span><span class="version-key v2" aria-hidden="true"></span>2.0+</span><span>▲▼ 증감 = 바로 앞 같은 길이 기간 대비</span><span>'—' = 0이 아니라 아직 셀 수 없음</span></p>
-          <div class="overview-drilldowns">
-            <details id="overviewDrillPlayers" class="panel overview-drill"><summary><span class="eyebrow">PLAYERS</span><strong>플레이어 자세히</strong><small>일별 활성 · 설치일 코호트 D1/D7/D30</small></summary><div id="overviewDrillPlayersBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-            <details id="overviewDrillFunnel" class="panel overview-drill"><summary><span class="eyebrow">FIRST SESSION</span><strong>2.0 첫 세션 퍼널 자세히</strong><small>단계별 도달·이탈·걸린 시간 · 튜토리얼 단계</small></summary><div id="overviewDrillFunnelBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-            <details id="overviewDrillCore" class="panel overview-drill"><summary><span class="eyebrow">CORE LOOP</span><strong>핵심 루프 자세히</strong><small>최고 페이즈 분포 · 보스별 승률 · 실패 원인</small></summary><div id="overviewDrillCoreBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-            <details id="overviewDrillEconomy" class="panel overview-drill"><summary><span class="eyebrow">ECONOMY</span><strong>경제·수익 자세히</strong><small>통화별 매출 · 시약·젬 획득과 소비 · 광고 위치 · VIP</small></summary><div id="overviewDrillEconomyBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-            <details id="overviewDrillSocial" class="panel overview-drill"><summary><span class="eyebrow">SOCIAL & LAB</span><strong>소셜·실험실 자세히</strong><small>친구·초대·공유·출석·우편 · 실험실 레벨</small></summary><div id="overviewDrillSocialBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-            <details id="overviewDrillHealth" class="panel overview-drill"><summary><span class="eyebrow">HEALTH</span><strong>건강 자세히</strong><small>비정상 종료 · 오류 종류 · 시작 로딩 · 끝 기록 없는 판</small></summary><div id="overviewDrillHealthBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
-          </div>
-          <details class="overview-notes"><summary>집계 기준 보기</summary><ul id="overviewNotes"></ul></details>
+          <section class="ov-summary" aria-labelledby="overviewSummaryTitle"><h3 id="overviewSummaryTitle">이번 기간 요약</h3><ol id="overviewSummary" class="ov-summary-list"><li>요약을 불러오는 중이에요</li></ol></section>
+          <div id="overviewKpis" class="ov-kpis" aria-live="polite"></div>
+          <div id="overviewCharts" class="ov-charts"></div>
+          <details id="overviewDetails" class="ov-details">
+            <summary><strong>세부 표</strong><small>단계별 표·통화별 매출·오류 종류·집계 기준. 한눈에 볼 때는 열지 않아도 됩니다.</small></summary>
+            <div class="ov-details-body">
+              <p id="overviewCoverage" class="overview-coverage">기록 범위를 확인하는 중입니다.</p>
+              <div class="overview-drilldowns">
+                <details id="overviewDrillPlayers" class="panel overview-drill"><summary><span class="eyebrow">PLAYERS</span><strong>플레이어 자세히</strong><small>일별 활성 · 설치일 코호트 D1/D7/D30</small></summary><div id="overviewDrillPlayersBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+                <details id="overviewDrillFunnel" class="panel overview-drill"><summary><span class="eyebrow">FIRST SESSION</span><strong>2.0 첫 세션 퍼널 자세히</strong><small>단계별 도달·이탈·걸린 시간 · 튜토리얼 단계</small></summary><div id="overviewDrillFunnelBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+                <details id="overviewDrillCore" class="panel overview-drill"><summary><span class="eyebrow">CORE LOOP</span><strong>핵심 루프 자세히</strong><small>최고 페이즈 분포 · 보스별 승률 · 실패 원인</small></summary><div id="overviewDrillCoreBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+                <details id="overviewDrillEconomy" class="panel overview-drill"><summary><span class="eyebrow">ECONOMY</span><strong>경제·수익 자세히</strong><small>통화별 매출 · 시약·젬 획득과 소비 · 광고 위치 · VIP</small></summary><div id="overviewDrillEconomyBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+                <details id="overviewDrillSocial" class="panel overview-drill"><summary><span class="eyebrow">SOCIAL & LAB</span><strong>소셜·실험실 자세히</strong><small>친구·초대·공유·출석·우편 · 실험실 레벨</small></summary><div id="overviewDrillSocialBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+                <details id="overviewDrillHealth" class="panel overview-drill"><summary><span class="eyebrow">HEALTH</span><strong>건강 자세히</strong><small>비정상 종료 · 오류 종류 · 시작 로딩 · 끝 기록 없는 판</small></summary><div id="overviewDrillHealthBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+              </div>
+              <section class="overview-notes"><h4>집계 기준</h4><ul id="overviewNotes"></ul></section>
+            </div>
+          </details>
+          <div id="overviewTip" class="ov-tip" role="tooltip" hidden></div>
         </section>
         <details id="labAnalyticsPanel" class="panel console-2x"><summary>2.0 언어별 표본 · 튜토리얼·보너스·보스·시즌·대사 (기존 집계, 최근 28일)</summary>
           <form id="labAnalyticsForm" class="admin-toolbar"><label>별도 집계 기간<select name="rangeDays"><option value="7">최근 7일</option><option value="28" selected>최근 28일</option></select></label><button type="submit">2.0 집계 조회</button></form>
@@ -448,11 +456,11 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261001-pulse"></script>
+  <script src="model.js?v=20261001-pulse2"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260908-1"></script>
-  <script src="analytics.js?v=20261001-pulse"></script>
+  <script src="analytics.js?v=20261001-pulse2"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260927-2x"></script>
   <script src="../assets/notice-links.js?v=20260909-1"></script>
