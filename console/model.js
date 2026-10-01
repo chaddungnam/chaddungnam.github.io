@@ -240,6 +240,11 @@
     params.set("direction", String(filters.direction));
     params.set("page", String(filters.page));
     if (String(filters.query || "").trim()) params.set("query", String(filters.query).trim());
+    // C(2026-10-01) 한눈 요약 필터. 기본값이면 생략해 기존 주소와 같다.
+    if (filters.overviewPeriod && Number(filters.overviewPeriod) !== 7) params.set("period", String(filters.overviewPeriod));
+    if (filters.overviewVersion && filters.overviewVersion !== "all") params.set("version", String(filters.overviewVersion));
+    if (filters.overviewPlatform && filters.overviewPlatform !== "all") params.set("platform", String(filters.overviewPlatform));
+    if (filters.legacyOpen) params.set("legacy", "1");
     return params.toString();
   }
 
@@ -322,6 +327,8 @@
     mason: "메이슨", choice: "성장 선택", approach: "보스 접근", boss_dodge_guide: "보스 회피 안내",
     boss_dodge_entry: "보스 회피 진입", boss_dodge: "보스 회피", boss_return: "보스 복귀",
     boss_attack: "보스 공격", superior_taunt: "보스 도발", boss_defeat: "보스 격파", home_handoff: "홈 인계",
+    boss_escape: "보스 탈출", boss_flight: "보스 비행", boss_repair: "보스 수리",
+    home_story: "홈 이야기", home_growth: "홈 성장", home_free: "홈 자유",
   });
 
   function labTutorialStageName(stage) {
@@ -416,7 +423,174 @@
     return "기록 없음";
   }
 
+  // ── C (2026-10-01) 한눈 요약: 필터·숫자·증감·작은 그래프 ─────────────────
+  const overviewPeriods = Object.freeze([7, 30, 90]);
+  const overviewVersions = Object.freeze(["all", "1.x", "2.x"]);
+  const overviewPlatforms = Object.freeze(["all", "android", "ios"]);
+
+  function normalizeOverviewFilters(params) {
+    const get = (key) => (typeof params?.get === "function" ? params.get(key) : params?.[key]) ?? "";
+    const period = Number(get("period"));
+    const version = String(get("version"));
+    const platform = String(get("platform"));
+    return {
+      periodDays: overviewPeriods.includes(period) ? period : 7,
+      version: overviewVersions.includes(version) ? version : "all",
+      platform: overviewPlatforms.includes(platform) ? platform : "all",
+    };
+  }
+
+  const finite = (value) => typeof value === "number" && Number.isFinite(value);
+
+  function formatOverviewSeconds(value) {
+    const seconds = Math.max(0, Math.round(value));
+    if (seconds < 60) return `${seconds}초`;
+    if (seconds < 3600) {
+      const rest = seconds % 60;
+      return rest ? `${Math.floor(seconds / 60)}분 ${rest}초` : `${seconds / 60}분`;
+    }
+    const minutes = Math.round((seconds % 3600) / 60);
+    return minutes ? `${Math.floor(seconds / 3600)}시간 ${minutes}분` : `${Math.floor(seconds / 3600)}시간`;
+  }
+
+  function formatOverviewValue(value, format, currency) {
+    if (!finite(value)) return "—";
+    if (format === "percent") return `${(value * 100).toFixed(1)}%`;
+    if (format === "seconds") return formatOverviewSeconds(value);
+    if (format === "milliseconds") return value < 1000 ? `${Math.round(value)}ms` : `${(value / 1000).toFixed(1)}초`;
+    if (format === "money") {
+      if (/^[A-Z]{3}$/.test(String(currency || "")) && currency !== "XXX") {
+        try {
+          return new Intl.NumberFormat("ko-KR", { style: "currency", currency, maximumFractionDigits: 2 }).format(value);
+        } catch (_error) {
+          // 알 수 없는 통화 코드는 숫자와 코드로 둔다.
+        }
+      }
+      return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 2 })} ${currency || ""}`.trim();
+    }
+    if (format === "decimal" || format === "per1k") {
+      const digits = Math.abs(value) >= 100 ? 0 : Math.abs(value) >= 10 ? 1 : 2;
+      return value.toLocaleString("ko-KR", { minimumFractionDigits: 0, maximumFractionDigits: digits });
+    }
+    return Math.round(value).toLocaleString("ko-KR");
+  }
+
+  // 증감: 비교할 수 없으면 비워 두고(이유 문구), 좋아짐·나빠짐은 화살표와 글자로도 보인다(색만으로 구분하지 않음).
+  function overviewDelta(metric, periodDays) {
+    const compare = metric?.compare || "none";
+    const label = `이전 ${periodDays || 7}일`;
+    if (metric?.value == null) return { text: "", tone: "neutral", arrow: "", label: "" };
+    if (compare === "none") return { text: "현재 상태", tone: "neutral", arrow: "", label: "" };
+    if (!finite(metric.delta)) return { text: "비교 없음", tone: "neutral", arrow: "", label: metric.previous == null ? "비교 기간 기록 없음" : "0에서 늘어남" };
+    const magnitude = Math.abs(metric.delta) * 100;
+    const flat = magnitude < 0.05;
+    const sign = flat ? "±" : metric.delta > 0 ? "+" : "−";
+    const amount = compare === "points" ? `${magnitude.toFixed(1)}%p` : `${magnitude >= 10 ? magnitude.toFixed(0) : magnitude.toFixed(1)}%`;
+    const better = metric.better || "none";
+    const good = better === "up" ? metric.delta > 0 : metric.delta < 0;
+    const tone = flat || better === "none" ? "neutral" : good ? "good" : "bad";
+    return { text: `${sign}${amount}`, tone, arrow: flat ? "→" : metric.delta > 0 ? "▲" : "▼", label };
+  }
+
+  // 작은 선 그래프: null은 끊고(보관 밖·기록 전), 0은 그린다. 선은 추세를 보이려고 값의 범위(domain="data")로,
+  // 막대처럼 0부터 읽어야 하면 domain="zero"로 그린다. 값이 모두 같으면 가운데 줄이다.
+  function sparklineGeometry(points, width = 120, height = 36, pad = 3, domain = "data") {
+    const list = Array.isArray(points) ? points : [];
+    const values = list.filter(finite);
+    if (!values.length) return { segments: [], last: null, min: null, max: null };
+    const min = domain === "zero" ? Math.min(0, ...values) : Math.min(...values);
+    const max = domain === "zero" ? Math.max(...values, 0) : Math.max(...values);
+    const span = max - min;
+    const x = (index) => list.length > 1 ? pad + index * (width - pad * 2) / (list.length - 1) : width / 2;
+    const y = (value) => span === 0 ? height / 2 : height - pad - (value - min) / span * (height - pad * 2);
+    const segments = [];
+    let current = [];
+    list.forEach((value, index) => {
+      if (!finite(value)) {
+        if (current.length) segments.push(current);
+        current = [];
+        return;
+      }
+      current.push([Number(x(index).toFixed(2)), Number(y(value).toFixed(2))]);
+    });
+    if (current.length) segments.push(current);
+    let lastIndex = -1;
+    list.forEach((value, index) => { if (finite(value)) lastIndex = index; });
+    return { segments, last: { index: lastIndex, value: list[lastIndex], x: Number(x(lastIndex).toFixed(2)), y: Number(y(list[lastIndex]).toFixed(2)) }, min, max };
+  }
+
+  function sparkBars(points, width = 120, height = 36, pad = 2) {
+    const list = Array.isArray(points) ? points : [];
+    const values = list.filter(finite);
+    const max = Math.max(0, ...values);
+    const slot = list.length ? (width - pad * 2) / list.length : 0;
+    const barWidth = Math.max(1, Math.min(12, slot * 0.62));
+    return list.map((value, index) => {
+      if (!finite(value)) return { index, value: null, x: 0, y: 0, width: 0, height: 0 };
+      const barHeight = max > 0 ? Math.max(value > 0 ? 1.5 : 0, value / max * (height - pad * 2)) : 0;
+      return {
+        index, value,
+        x: Number((pad + index * slot + (slot - barWidth) / 2).toFixed(2)),
+        y: Number((height - pad - barHeight).toFixed(2)),
+        width: Number(barWidth.toFixed(2)),
+        height: Number(barHeight.toFixed(2)),
+      };
+    });
+  }
+
+  const overviewStatusLabels = Object.freeze({ ok: "정상", partial: "일부 기간", no_data: "아직 데이터 없음", error: "집계 실패" });
+  function overviewStatusLabel(status) {
+    return overviewStatusLabels[status] || "확인 필요";
+  }
+
+  const overviewFlowNames = Object.freeze({
+    claim_idle: "방치 보상", "grant_reagent:escape": "탈출 보상", "grant_reagent:quest": "연구 퀘스트",
+    "grant_reagent:sweep": "소탕", grant_reagent: "시약 지급", ad_drone: "광고 드론", claim_daily_goal: "하루 목표",
+    claim_weekly_chest: "주간 상자", claim_deep_milestone: "심층 이정표", grant_deep_zone: "심층 구역",
+    claim_result_bonus: "결과 보너스", complete_run: "런 완료", report_play: "플레이 보고", upgrade_hex: "육각 강화",
+    cancel_upgrade: "강화 취소", tune_core: "코어 조율", shop_free: "상점 무료 젬", shop_ad: "상점 광고 젬",
+    mailbox: "우편 수령", cosmetic: "꾸미기 구매", stamina: "스태미나", stamina_bundle: "스태미나 묶음",
+    breakthrough_ticket: "돌파 티켓", emergency_breakthrough_ticket: "긴급 돌파 티켓", speed_boost_ticket: "가속 티켓",
+    nickname_ticket: "닉네임 변경권", country_ticket: "국가 변경권",
+  });
+  function overviewFlowName(flow) {
+    const key = String(flow || "").trim();
+    return overviewFlowNames[key] || overviewFlowNames[key.split(":")[0]] || readableRawId(key);
+  }
+
+  const overviewPlacementNames = Object.freeze({
+    home_stamina_refill: "홈 스태미나 충전", shop_stamina_refill: "상점 스태미나 충전", shop_gems: "상점 젬",
+    ingame_pop_chance: "인게임 팝 찬스", gameover_restart_refill: "게임오버 재시작", gameover_stamina_refill: "게임오버 스태미나",
+    midgame_exit: "중간 종료", gameover_to_home: "게임오버→홈", gameover_to_ranking: "게임오버→랭킹",
+  });
+  function overviewPlacementName(placement) {
+    const key = String(placement || "").trim();
+    return overviewPlacementNames[key] || readableRawId(key);
+  }
+
+  // LabPhaseProgress.BOSS_IDS (P1–P8 순서).
+  const overviewBossNames = Object.freeze({ scientist: "P1 과학자", airship: "P2 비행선", ufo: "P3 UFO", drone: "P4 드론", agent: "P5 요원", p6: "P6 보스", p7: "P7 보스", p8: "P8 보스" });
+  function overviewBossName(bossId) {
+    return overviewBossNames[String(bossId || "")] || readableRawId(bossId);
+  }
+
+  const overviewSocialNames = Object.freeze({ engine: "엔진 오류", script: "스크립트 오류", shader: "셰이더 오류" });
+  function overviewErrorKindName(kind) {
+    return overviewSocialNames[String(kind || "")] || readableRawId(kind);
+  }
+
   return {
+    normalizeOverviewFilters,
+    formatOverviewValue,
+    formatOverviewSeconds,
+    overviewDelta,
+    sparklineGeometry,
+    sparkBars,
+    overviewStatusLabel,
+    overviewFlowName,
+    overviewPlacementName,
+    overviewErrorKindName,
+    overviewBossName,
     sampleRate, snapshotRank,
     tutorialStatus,
     routeFromHash,

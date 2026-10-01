@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20260927-2x">
+  <link rel="stylesheet" href="styles.css?v=20261001-pulse">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -84,191 +84,220 @@
       </header>
 
       <section id="analyticsView" class="route-view" data-route="analytics">
-        <details id="labAnalyticsPanel" class="panel console-2x"><summary>2.0 퍼널 · 버전별 표본</summary>
+        <section id="overviewSection" class="overview" aria-labelledby="overviewTitle" aria-busy="false">
+          <header class="overview-head">
+            <div><p class="eyebrow">AT A GLANCE · 1.x / 2.0+</p><h2 id="overviewTitle">한눈 요약</h2><p class="overview-sub">버전·플랫폼을 나눠 보고, 바로 앞 같은 길이 기간과 비교합니다.</p></div>
+            <p id="overviewStatus" class="overview-status" role="status">요약을 불러오는 중입니다.</p>
+          </header>
+          <div class="overview-filters" role="group" aria-label="한눈 요약 필터">
+            <div class="filter-group"><span id="overviewPeriodLabel" class="filter-label">기간</span><div class="overview-segment" role="group" aria-labelledby="overviewPeriodLabel"><button class="overview-switch" type="button" data-overview-period="7" aria-pressed="true">7일</button><button class="overview-switch" type="button" data-overview-period="30" aria-pressed="false">30일</button><button class="overview-switch" type="button" data-overview-period="90" aria-pressed="false">90일</button></div></div>
+            <div class="filter-group"><span id="overviewVersionLabel" class="filter-label">버전</span><div class="overview-segment" role="group" aria-labelledby="overviewVersionLabel"><button class="overview-switch" type="button" data-overview-version="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-version="1.x" aria-pressed="false">1.x 라이브</button><button class="overview-switch" type="button" data-overview-version="2.x" aria-pressed="false">2.0+</button></div></div>
+            <div class="filter-group"><span id="overviewPlatformLabel" class="filter-label">플랫폼</span><div class="overview-segment" role="group" aria-labelledby="overviewPlatformLabel"><button class="overview-switch" type="button" data-overview-platform="all" aria-pressed="true">전체</button><button class="overview-switch" type="button" data-overview-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-overview-platform="ios" aria-pressed="false">iOS</button></div></div>
+            <button id="overviewRefresh" class="overview-refresh" type="button">새로 집계</button>
+          </div>
+          <p id="overviewCoverage" class="overview-coverage">기록 범위를 확인하는 중입니다.</p>
+          <div id="overviewCards" class="overview-grid" aria-live="polite"></div>
+          <p class="overview-legend"><span><span class="version-key v1" aria-hidden="true"></span>1.x(라이브 1.1.3)</span><span><span class="version-key v2" aria-hidden="true"></span>2.0+</span><span>▲▼ 증감 = 바로 앞 같은 길이 기간 대비</span><span>'—' = 0이 아니라 아직 셀 수 없음</span></p>
+          <div class="overview-drilldowns">
+            <details id="overviewDrillPlayers" class="panel overview-drill"><summary><span class="eyebrow">PLAYERS</span><strong>플레이어 자세히</strong><small>일별 활성 · 설치일 코호트 D1/D7/D30</small></summary><div id="overviewDrillPlayersBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+            <details id="overviewDrillFunnel" class="panel overview-drill"><summary><span class="eyebrow">FIRST SESSION</span><strong>2.0 첫 세션 퍼널 자세히</strong><small>단계별 도달·이탈·걸린 시간 · 튜토리얼 단계</small></summary><div id="overviewDrillFunnelBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+            <details id="overviewDrillCore" class="panel overview-drill"><summary><span class="eyebrow">CORE LOOP</span><strong>핵심 루프 자세히</strong><small>최고 페이즈 분포 · 보스별 승률 · 실패 원인</small></summary><div id="overviewDrillCoreBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+            <details id="overviewDrillEconomy" class="panel overview-drill"><summary><span class="eyebrow">ECONOMY</span><strong>경제·수익 자세히</strong><small>통화별 매출 · 시약·젬 획득과 소비 · 광고 위치 · VIP</small></summary><div id="overviewDrillEconomyBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+            <details id="overviewDrillSocial" class="panel overview-drill"><summary><span class="eyebrow">SOCIAL & LAB</span><strong>소셜·실험실 자세히</strong><small>친구·초대·공유·출석·우편 · 실험실 레벨</small></summary><div id="overviewDrillSocialBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+            <details id="overviewDrillHealth" class="panel overview-drill"><summary><span class="eyebrow">HEALTH</span><strong>건강 자세히</strong><small>비정상 종료 · 오류 종류 · 시작 로딩 · 끝 기록 없는 판</small></summary><div id="overviewDrillHealthBody" class="overview-drill-body"><p class="empty-panel">요약을 불러오면 채워집니다.</p></div></details>
+          </div>
+          <details class="overview-notes"><summary>집계 기준 보기</summary><ul id="overviewNotes"></ul></details>
+        </section>
+        <details id="labAnalyticsPanel" class="panel console-2x"><summary>2.0 언어별 표본 · 튜토리얼·보너스·보스·시즌·대사 (기존 집계, 최근 28일)</summary>
           <form id="labAnalyticsForm" class="admin-toolbar"><label>별도 집계 기간<select name="rangeDays"><option value="7">최근 7일</option><option value="28" selected>최근 28일</option></select></label><button type="submit">2.0 집계 조회</button></form>
           <p>전체 스토어 · 베를린 날짜 · 아래 기존 분석 필터와 별도입니다. 분모 50 미만은 표본 부족입니다.</p>
           <p>KO·DE는 기록된 언어만 사용합니다. 현재 앱에서 언어를 보내지 않은 기록은 ‘언어 미기록’입니다. 보스는 보관된 첫 관측 결과이며 생애 첫 도전을 보장하지 않습니다.</p>
           <p>보너스는 판 단위 신호, 시즌 구매는 같은 설치·버전에서 탭 이후의 클라이언트 신호입니다. 실제 정산은 구매 화면에서 확인하세요. D1·D7은 해당 날짜가 끝난 설치 코호트만 포함합니다.</p>
           <p id="labAnalyticsMessage" role="status"></p><div id="labAnalyticsRows"></div>
         </details>
-        <div class="toolbar analytics-toolbar">
-          <div class="toolbar-live"><span class="live-dot"></span><span id="dataStatus">지표를 불러오는 중...</span></div>
-          <div class="toolbar-switches">
-            <div class="filter-group"><span class="filter-label">기간</span><div class="range-switch" aria-label="조회 기간">
-              <button class="range-button" data-range="1" data-range-offset="0" type="button">오늘</button>
-              <button class="range-button" data-range="1" data-range-offset="1" type="button">어제</button>
-              <button class="range-button active" data-range="3" data-range-offset="0" type="button">최근 3일</button>
-              <button class="range-button" data-range="5" data-range-offset="0" type="button">최근 5일</button>
-              <button class="range-button" data-range="7" data-range-offset="0" type="button">최근 7일</button>
-              <button class="range-button" data-range="28" data-range-offset="0" type="button">최근 28일</button>
-            </div><details id="customRangePicker" class="custom-range-picker"><summary>달력으로 선택</summary><form id="customRangeForm" class="custom-range-form"><label for="customRangeStart">시작일<input id="customRangeStart" name="startDate" type="date" required></label><span aria-hidden="true">→</span><label for="customRangeEnd">종료일<input id="customRangeEnd" name="endDate" type="date" required></label><button class="primary-button" type="submit">기간 적용</button><button id="customRangeClear" type="button">최근 3일</button><small id="customRangeMessage" role="status">최근 28일 안에서 원하는 기간을 선택하세요.</small></form></details></div>
-            <div class="filter-group"><span class="filter-label">스토어</span><div class="range-switch" aria-label="배포 스토어">
-              <button class="distribution-button active" data-distribution="all" type="button">전체</button>
-              <button class="distribution-button" data-distribution="google_play" type="button">Google Play</button>
-              <button class="distribution-button" data-distribution="app_store" type="button">iOS</button>
-            </div></div>
-            <label class="filter-group" for="appFamilySelect"><span class="filter-label">앱 계열</span><select id="appFamilySelect"><option value="all">전체</option><option value="1.x">1.x 클래식</option><option value="2.x">2.x 실험실 빌드</option></select></label>
-            <label class="filter-group" for="runModeSelect"><span class="filter-label">판 종류</span><select id="runModeSelect"><option value="all">전체</option><option value="classic">클래식</option><option value="lab">실험실 탈출</option><option value="lab_tutorial">실험실 튜토리얼</option></select></label>
+        <details id="legacyAnalytics" class="legacy-analytics">
+          <summary><span class="legacy-summary"><span class="eyebrow">1.x 레거시 · 기존 상세 분석</span><strong>계정 검색·미완료 판·밸런스·광고·스토어 상세</strong><small>열 때 불러옵니다. 기간(오늘~28일)·스토어·앱 계열 필터는 이 안에서 따로 고릅니다. 1.x 전용 패널(클래식 튜토리얼·성장 선택·Mechakucha·주간 랭킹)이 함께 있습니다.</small></span></summary>
+          <div class="legacy-body">
+          <div class="toolbar analytics-toolbar">
+            <div class="toolbar-live"><span class="live-dot"></span><span id="dataStatus">지표를 불러오는 중...</span></div>
+            <div class="toolbar-switches">
+              <div class="filter-group"><span class="filter-label">기간</span><div class="range-switch" aria-label="조회 기간">
+                <button class="range-button" data-range="1" data-range-offset="0" type="button">오늘</button>
+                <button class="range-button" data-range="1" data-range-offset="1" type="button">어제</button>
+                <button class="range-button active" data-range="3" data-range-offset="0" type="button">최근 3일</button>
+                <button class="range-button" data-range="5" data-range-offset="0" type="button">최근 5일</button>
+                <button class="range-button" data-range="7" data-range-offset="0" type="button">최근 7일</button>
+                <button class="range-button" data-range="28" data-range-offset="0" type="button">최근 28일</button>
+              </div><details id="customRangePicker" class="custom-range-picker"><summary>달력으로 선택</summary><form id="customRangeForm" class="custom-range-form"><label for="customRangeStart">시작일<input id="customRangeStart" name="startDate" type="date" required></label><span aria-hidden="true">→</span><label for="customRangeEnd">종료일<input id="customRangeEnd" name="endDate" type="date" required></label><button class="primary-button" type="submit">기간 적용</button><button id="customRangeClear" type="button">최근 3일</button><small id="customRangeMessage" role="status">최근 28일 안에서 원하는 기간을 선택하세요.</small></form></details></div>
+              <div class="filter-group"><span class="filter-label">스토어</span><div class="range-switch" aria-label="배포 스토어">
+                <button class="distribution-button active" data-distribution="all" type="button">전체</button>
+                <button class="distribution-button" data-distribution="google_play" type="button">Google Play</button>
+                <button class="distribution-button" data-distribution="app_store" type="button">iOS</button>
+              </div></div>
+              <label class="filter-group" for="appFamilySelect"><span class="filter-label">앱 계열</span><select id="appFamilySelect"><option value="all">전체</option><option value="1.x">1.x 클래식</option><option value="2.x">2.x 실험실 빌드</option></select></label>
+              <label class="filter-group" for="runModeSelect"><span class="filter-label">판 종류</span><select id="runModeSelect"><option value="all">전체</option><option value="classic">클래식</option><option value="lab">실험실 탈출</option><option value="lab_tutorial">실험실 튜토리얼</option></select></label>
+            </div>
           </div>
-        </div>
 
-<nav class="workspace-jumps" aria-label="분석 바로가기"><span>바로 보기</span><button type="button" data-console-jump="periodPlayersSection">기간 플레이어</button><button type="button" data-console-jump="playDetails">미완료 판·선택</button><button type="button" data-console-jump="economySection">경제·랭킹</button><button type="button" data-console-jump="operatorDetails">광고·스토어</button></nav>
-        <div id="attentionPanel" class="attention-panel" hidden>
-          <div><p class="eyebrow">ACTION REQUIRED</p><h2>지금 확인할 신호</h2></div>
-          <div id="attentionList" class="attention-list"><p>지표를 확인하는 중입니다.</p></div>
-        </div>
-
-        <section class="executive-overview" aria-labelledby="executiveTitle">
-          <header class="executive-heading"><div><p class="eyebrow">EXECUTIVE SNAPSHOT</p><h2 id="executiveTitle">지금 알아야 할 5가지</h2></div><span id="executivePeriod">최근 3일 · 전체 스토어</span></header>
-          <div class="executive-summary">
-            <article id="execPlayersCard" class="executive-card" data-status="neutral"><span>활동한 계정</span><strong id="execPlayers">—</strong><small id="execPlayersDetail">선택 기간의 인증 계정</small></article>
-            <article id="execCompletedCard" class="executive-card" data-status="insufficient"><span>완료한 계정</span><strong id="execCompleted">—</strong><small id="execCompletedDetail">한 판 이상 완료</small></article>
-            <article id="execPlayTimeCard" class="executive-card" data-status="insufficient"><span>평균 플레이</span><strong id="execPlayTime">—</strong><small id="execPlayTimeDetail">텔레메트리 결과 확인 표본 기준</small></article>
-            <article id="execExitCard" class="executive-card" data-status="insufficient"><span>중간 종료율</span><strong id="execExit">—</strong><small id="execExitDetail">명시적 종료만 집계</small></article>
-            <article id="execReturnCard" class="executive-card" data-status="insufficient"><span>계정 재방문</span><strong id="execReturn">—</strong><small id="execReturnDetail">이전 같은 기간과 비교</small></article>
+  <nav class="workspace-jumps" aria-label="분석 바로가기"><span>바로 보기</span><button type="button" data-console-jump="periodPlayersSection">기간 플레이어</button><button type="button" data-console-jump="playDetails">미완료 판·선택</button><button type="button" data-console-jump="economySection">경제·랭킹</button><button type="button" data-console-jump="operatorDetails">광고·스토어</button></nav>
+          <div id="attentionPanel" class="attention-panel" hidden>
+            <div><p class="eyebrow">ACTION REQUIRED</p><h2>지금 확인할 신호</h2></div>
+            <div id="attentionList" class="attention-list"><p>지표를 확인하는 중입니다.</p></div>
           </div>
-          <div id="executiveVisuals" class="executive-visuals" aria-label="핵심 비율 원형 그래프">
-            <figure id="execCompletionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execCompletionDonutTitle"><title id="execCompletionDonutTitle">완료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execCompletionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execCompletionPercent" x="60" y="65">—</text></svg><figcaption><strong>확인된 판 완료율</strong><span id="execCompletionCaption">결과가 확인된 판 기준</span></figcaption></figure>
-            <figure id="execRetentionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execRetentionDonutTitle"><title id="execRetentionDonutTitle">재방문율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execRetentionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execRetentionPercent" x="60" y="65">—</text></svg><figcaption><strong>이전 기간 대비 재방문</strong><span id="execRetentionCaption">같은 길이의 직전 기간과 비교</span></figcaption></figure>
-            <figure id="execExitDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execExitDonutTitle"><title id="execExitDonutTitle">중간 종료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execExitRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execExitPercent" x="60" y="65">—</text></svg><figcaption><strong>명시적 중간 종료율</strong><span id="execExitCaption">낮을수록 좋음</span></figcaption></figure>
+
+          <section class="executive-overview" aria-labelledby="executiveTitle">
+            <header class="executive-heading"><div><p class="eyebrow">EXECUTIVE SNAPSHOT</p><h2 id="executiveTitle">지금 알아야 할 5가지</h2></div><span id="executivePeriod">최근 3일 · 전체 스토어</span></header>
+            <div class="executive-summary">
+              <article id="execPlayersCard" class="executive-card" data-status="neutral"><span>활동한 계정</span><strong id="execPlayers">—</strong><small id="execPlayersDetail">선택 기간의 인증 계정</small></article>
+              <article id="execCompletedCard" class="executive-card" data-status="insufficient"><span>완료한 계정</span><strong id="execCompleted">—</strong><small id="execCompletedDetail">한 판 이상 완료</small></article>
+              <article id="execPlayTimeCard" class="executive-card" data-status="insufficient"><span>평균 플레이</span><strong id="execPlayTime">—</strong><small id="execPlayTimeDetail">텔레메트리 결과 확인 표본 기준</small></article>
+              <article id="execExitCard" class="executive-card" data-status="insufficient"><span>중간 종료율</span><strong id="execExit">—</strong><small id="execExitDetail">명시적 종료만 집계</small></article>
+              <article id="execReturnCard" class="executive-card" data-status="insufficient"><span>계정 재방문</span><strong id="execReturn">—</strong><small id="execReturnDetail">이전 같은 기간과 비교</small></article>
+            </div>
+            <div id="executiveVisuals" class="executive-visuals" aria-label="핵심 비율 원형 그래프">
+              <figure id="execCompletionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execCompletionDonutTitle"><title id="execCompletionDonutTitle">완료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execCompletionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execCompletionPercent" x="60" y="65">—</text></svg><figcaption><strong>확인된 판 완료율</strong><span id="execCompletionCaption">결과가 확인된 판 기준</span></figcaption></figure>
+              <figure id="execRetentionDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execRetentionDonutTitle"><title id="execRetentionDonutTitle">재방문율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execRetentionRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execRetentionPercent" x="60" y="65">—</text></svg><figcaption><strong>이전 기간 대비 재방문</strong><span id="execRetentionCaption">같은 길이의 직전 기간과 비교</span></figcaption></figure>
+              <figure id="execExitDonut" class="executive-donut" data-status="insufficient"><svg viewBox="0 0 120 120" role="img" aria-labelledby="execExitDonutTitle"><title id="execExitDonutTitle">중간 종료율</title><circle class="donut-track" cx="60" cy="60" r="48" pathLength="100"></circle><circle id="execExitRing" class="donut-value" cx="60" cy="60" r="48" pathLength="100"></circle><text id="execExitPercent" x="60" y="65">—</text></svg><figcaption><strong>명시적 중간 종료율</strong><span id="execExitCaption">낮을수록 좋음</span></figcaption></figure>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="analyticsCoverageTitle"><h2 id="analyticsCoverageTitle">계정 집계와 텔레메트리 수집 범위</h2><p id="analyticsCoverageMessage" role="status">수집 범위 확인 대기. 이벤트 미수집은 사용자 없음이 아닙니다.</p></section>
+
+          <section id="healthCard" class="pulse-hero" aria-live="polite" data-status="insufficient">
+            <div class="duck-guide" aria-hidden="true"><div class="duck-head"><i class="duck-eye"></i><i class="duck-beak"></i></div><span>HOUSE DUCK</span></div>
+            <div class="mascot-speech">
+              <p class="eyebrow">오리가 쉽게 알려드려요</p>
+              <div class="verdict-line"><span>지금 상태는</span><strong id="healthLabel">판단 대기</strong><b id="healthScore">수집 중</b></div>
+              <p id="mascotMessage">플레이어가 조금 더 쌓이면 게임 상태를 판단할 수 있어요.</p>
+              <div class="insight-line"><p id="insightText" class="mascot-extra">데이터가 쌓이면 가장 중요한 변화부터 요약해 드립니다.</p><button id="insightWhyButton" class="insight-why" type="button">왜?</button></div>
+            </div>
+            <div id="signalLights" class="signal-lights" aria-label="게임 상태 신호등">
+              <span data-signal="good"><i></i><b>좋아요</b></span><span data-signal="watch"><i></i><b>지켜봐요</b></span><span data-signal="risk"><i></i><b>고쳐야 해요</b></span><span data-signal="insufficient"><i></i><b>판단 대기</b></span>
+            </div>
+            <aside class="today-action"><span>오늘 할 일 1개</span><strong id="todayAction">플레이 데이터를 조금 더 모아요.</strong></aside>
+            <div class="pulse-facts"><span><span id="kpiActiveLabel">최근 3일 활동 계정</span> <strong id="kpiActive">—</strong><span id="kpiActiveUnit">명</span></span><span id="kpiPeopleMix">별도 텔레메트리 —설치 · 헤비 —설치(2인분)</span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
+          </section>
+
+          <section id="priorityInsightPanel" class="priority-insight-panel" data-status="clear" aria-labelledby="priorityInsightTitle" hidden>
+            <div id="priorityInsightIcon" class="priority-insight-icon" aria-hidden="true">✓</div>
+            <div><p class="eyebrow">PRIORITY INSIGHT</p><h2 id="priorityInsightTitle">광고 뒤 실제 선택 흐름 확인</h2><p id="priorityInsightDetail">같은 선택 제안의 실제 선택 여부를 세션이 바뀌어도 연결해 확인합니다.</p></div>
+            <strong id="priorityInsightValue">—</strong>
+          </section>
+
+          <section class="question-grid" aria-label="게임 상태를 설명하는 네 가지 질문">
+            <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>텔레메트리 결과 확인 판의 평균 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="duration" type="button">왜?</button></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
+            <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>텔레메트리 결과 확인 표본의 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10판 중 7판쯤이면 좋아요</small></article>
+            <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>기간 계정 재방문</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>선택 기간과 바로 이전 같은 기간 비교</small></article>
+            <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활동 인원당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
+          </section>
+
+          <section id="versionUpdatePanel" class="panel version-monitor-panel" aria-labelledby="versionUpdateTitle">
+            <div class="panel-heading"><div><p class="eyebrow">VERSION ADOPTION · FORCE UPDATE HISTORY</p><h2 id="versionUpdateTitle">강제 업데이트 이후 버전 추이</h2><small id="versionUpdateDescription">운영 감사 기록의 최소 지원 버전 변경일을 기준선으로 삼아 최근 28일의 실제 실행 버전을 비교합니다.</small></div><div class="version-monitor-controls"><label for="versionTrendSelect">표시 버전</label><select id="versionTrendSelect" aria-label="추이를 볼 앱 버전"><option value="">불러오는 중</option></select><span id="versionCurrentGate" class="status-label">현재 기준 확인 중</span></div></div>
+            <section class="panel panel-wide" aria-labelledby="dimensionsTitle"><div class="panel-heading"><div><p class="eyebrow">BUILD MIX</p><h2 id="dimensionsTitle">버전·판 종류</h2><small>이 기간에 관측된 앱 버전과 판 종류입니다.</small></div><span id="dimensionsStatus" class="panel-total">—</span></div><div class="content-grid"><div class="table-scroll"><table><thead><tr><th>앱 버전</th><th>이벤트</th><th>설치</th><th>판</th></tr></thead><tbody id="appVersionsTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>판 종류</th><th>시작</th><th>완료</th><th>중단</th></tr></thead><tbody id="runModesTable"></tbody></table></div></div></section>
+            <div class="version-monitor-grid">
+              <article class="version-adoption-card"><div><h3>최근 활동 버전 구성</h3><small id="versionAdoptionDay">최근 활동일 기준</small></div><div id="versionAdoptionBar" class="version-adoption-bar" aria-label="버전별 활동 인원 비율"></div><div id="versionAdoptionLegend" class="version-adoption-legend"></div></article>
+              <article class="version-trend-card"><div class="version-trend-head"><div><h3 id="versionTrendTitle">버전 추이</h3><small id="versionTrendSummary">버전을 선택하면 업데이트 이후 추이를 표시합니다.</small></div><div class="legend"><span><i class="legend-teal"></i>활동 인원</span><span><i class="legend-gold"></i>완료 인원</span></div></div><div class="chart-wrap"><canvas id="versionTrendChart" height="176" aria-label="선택 버전의 일별 활동 인원과 완료 인원 추이"></canvas></div></article>
+            </div>
+            <div><div class="version-history-heading"><h3>강제 업데이트 기록</h3><small>표시 버전과 공통 호환 코드를 함께 표시합니다.</small></div><ol id="versionUpdateHistory" class="version-update-history"><li>기록을 불러오는 중입니다.</li></ol></div>
+          </section>
+
+          <section class="content-grid decision-grid" aria-label="신규 유입, 광고 형식, 광고 제거 구매 분석">
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 사람을 고유 설치 ID로 구분해 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">AD FORMAT MIX</p><h2>어떤 광고를 보고 있나</h2><small>전체 합계 대신 강제 전면·자발적 보상·배너·네이티브를 나눕니다.</small></div><span id="adFormatStatus" class="panel-total">—</span></div><div id="adFormatSummary" class="coverage-grid" aria-live="polite"></div></article>
+            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PURCHASE FUNNEL</p><h2>구매로 이어지나</h2><small>QA 기능·TestFlight·Google Play 테스트 결제를 제외한 운영 구매만 확인합니다. 응답에 있는 상품을 모두 표시합니다.</small></div><span id="removeAdsFunnelStatus" class="panel-total">—</span></div><div id="removeAdsFunnel" class="coverage-grid" aria-live="polite"></div></article>
+            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">MARKETING REVIEW</p><h2 id="marketingGateTitle">유료 마케팅 검토 조건</h2><small>이해하기 쉬운 플레이 인원·결과 기준입니다. 모두 충족해도 광고비를 자동 집행하지 않고 검토만 시작합니다.</small></div><span id="marketingGateStatus" class="panel-total">대기</span></div><div id="marketingGateSummary" class="coverage-grid" aria-live="polite"></div></article>
+          </section>
+
+          <section id="economySection" class="operations-pulse" aria-labelledby="operationsPulseTitle">
+            <div class="panel-heading compact-heading"><div><p class="eyebrow">LOW-COST OPERATIONS</p><h2 id="operationsPulseTitle">경제·패스·랭킹 현황</h2><small id="operationsFreshAt">서버 상태를 요약하는 중입니다.</small></div></div>
+            <section class="panel panel-wide" aria-labelledby="labEconomyTitle"><div class="panel-heading"><div><p class="eyebrow">LAB ECONOMY</p><h2 id="labEconomyTitle">실험실 경제</h2><small>방치 수령, 탈출·퀘스트·소탕 지급, 광고 드론, 헥스 강화입니다.</small></div><span id="labEconomyStatus" class="panel-total">—</span></div><div id="labEconomyProfiles" class="coverage-grid" aria-live="polite"></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>방치 수령</th><th>방치 시약</th><th>방치 젬</th><th>탈출</th><th>퀘스트</th><th>소탕</th><th>광고 드론</th><th>헥스 강화</th><th>헥스 취소</th></tr></thead><tbody id="labEconomyTable"></tbody></table></div></section>
+            <div class="question-grid operations-grid">
+              <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">◆</span><div><h2>젬 경제</h2><p>서버 동기화 계정 기준</p></div></div><strong id="opsGemMedian" class="question-value">—</strong><div class="question-gauge"><i id="opsGemCoverage"></i></div><small id="opsGemDetail">오늘부터 일별 추적</small></article>
+              <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">⚡</span><div><h2>스태미나 사용</h2><p>게임 시작 기준 추정</p></div></div><strong id="opsStaminaUse" class="question-value">—</strong><div class="question-gauge"><i id="opsStaminaGauge"></i></div><small id="opsStaminaDetail">별도 로그를 쌓지 않습니다.</small></article>
+              <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">▰</span><div><h2>시즌패스</h2><p>현재 시즌 완주율</p></div></div><strong id="opsPassRate" class="question-value">—</strong><div class="question-gauge"><i id="opsPassGauge"></i></div><small id="opsPassDetail">참여 정보 없음</small></article>
+              <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">♛</span><div><h2>주간랭킹</h2><p>현재 시즌 참가자</p></div></div><strong id="opsRankingPlayers" class="question-value">—</strong><div class="question-gauge"><i id="opsRankingGauge"></i></div><small id="opsRankingDetail">기록 정보 없음</small></article>
+            </div>
+          </section>
+
+          <section class="panel ai-brief-panel" aria-labelledby="aiBriefTitle">
+            <div class="panel-heading"><div><p class="eyebrow">AI OPERATING BRIEF</p><h2 id="aiBriefTitle">다음 결정을 같이 판단해요</h2><small>월 수익·스토어별 출시·차기작 방향을 현재 집계 지표로 분석합니다.</small></div><span id="aiBriefSource" class="status-label">준비됨</span></div>
+            <div class="ai-brief-actions"><button id="aiBriefRun" class="primary-button" type="button">AI 운영 브리핑 만들기</button><button id="aiBriefOriginal" type="button" hidden>원문 보기</button></div>
+            <div id="aiBriefResult" class="ai-brief-result"><p>버튼을 누르면 이 기기에서 분석합니다. Chrome AI를 사용할 수 없으면 비용 없는 지표 기반 조언으로 안내합니다.</p></div>
+            <pre id="aiBriefOriginalText" class="ai-brief-original" hidden></pre>
+            <p id="aiBriefMessage" class="dashboard-message" role="status"></p>
+          </section>
+
+          <section class="panel account-activity-panel" aria-labelledby="accountActivityTitle">
+            <div class="panel-heading"><div><p class="eyebrow">ACCOUNT VISITS</p><h2 id="accountActivityTitle">계정 방문과 재방문</h2><small>로그인, 홈·랭킹 확인, 앱 서버 활동, 계정 동기화, 완료 게임 중 하나가 기간에 남은 인증 계정을 셉니다. 백그라운드 복귀 같은 session_start만으로는 세지 않습니다.</small></div><span id="accountActivityCoverage" class="panel-total">정확 계측 지원 빌드 대기</span></div>
+            <div id="accountActivitySummary" class="coverage-grid account-activity-grid" aria-live="polite"></div>
+            <p id="labAccountFacts" class="dashboard-message" hidden>실험실 완료 판 집계 대기</p>
+          </section>
+
+          <section id="periodPlayersSection" class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
+            <div class="panel-heading period-heading"><div><p class="eyebrow">ACCOUNT ACTIVITY EVIDENCE</p><h2 id="periodPlayersTitle">기간 내 계정 활동 신호</h2><small>정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료를 섞지 않고 표시합니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
+            <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
+              <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
+              <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
+            </form>
+            <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어·국가·기기</button></th><th>활동 근거</th><th><button data-player-sort="visit_count" type="button">새 실행</button></th><th><button data-player-sort="games_played" type="button">완료</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
+            <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
+          </section>
+
+          <details id="playDetails" class="operator-details analytics-more">
+            <summary><span><p class="eyebrow">PLAY DETAILS</p><strong>판·선택 상세</strong><small>미완료 판, 밸런스, 여정은 필요할 때 펼칩니다.</small></span><b>펼치기 / 접기</b></summary>
+          <section class="panel unfinished-plays-panel" aria-labelledby="unfinishedPlaysTitle">
+            <div class="panel-heading"><div><p class="eyebrow">UNFINISHED PLAY DETAILS</p><h2 id="unfinishedPlaysTitle">완료되지 않은 판</h2><small>플레이어가 아니라 개별 게임 판 기준입니다. 같은 계정에 이후 완료한 판이 있어도 이 판은 별도로 표시합니다. 백그라운드는 앱 종료로 단정하지 않습니다.</small></div><span id="unfinishedPlaysStatus" class="panel-total">—</span></div>
+            <div class="table-scroll"><table><thead><tr><th>플레이어·설치</th><th>상태</th><th>마지막 확인 위치</th><th>도달치</th><th>마지막 신호</th><th>계정·판 맥락</th></tr></thead><tbody id="unfinishedPlaysTable"></tbody></table></div>
+          </section>
+
+          <section class="panel panel-wide game-run-status-panel" aria-labelledby="gameRunStatusTitle">
+            <div class="panel-heading"><div><p class="eyebrow">GAME RUN STATUS</p><h2 id="gameRunStatusTitle">판 상태 요약</h2><small>game_id를 우선으로 한 판 연결 결과입니다. 게임·런타임 식별자는 화면에 표시하지 않고, 정상 완료·장면 종료·앱 종료·미확인 상태만 집계합니다.</small></div><span id="gameRunStatusTotal" class="panel-total">—</span></div>
+            <p id="gameRunLatestCheckpoint" class="dashboard-message">마지막 체크포인트 없음</p>
+            <div class="table-scroll"><table><thead><tr><th>상태</th><th>판 수</th><th>일시중지·복귀</th><th>체크포인트</th><th>마지막 확인치</th><th>마지막 신호</th></tr></thead><tbody id="gameRunStatusTable"></tbody></table></div>
+          </section>
+
+          <section class="panel panel-wide balance-telemetry-panel" aria-labelledby="balanceTelemetryTitle">
+            <div class="panel-heading"><div><p class="eyebrow">BALANCE SIGNALS</p><h2 id="balanceTelemetryTitle">밸런스 신호</h2><small>판 종료·성장 선택·30초 체크포인트에서만 요약합니다. 식별자와 샷 단위 기록은 표시하지 않으며, 선택별 비교는 인과관계로 단정하지 않습니다.</small></div><span id="balanceTelemetryStatus" class="panel-total">수집 대기</span></div>
+            <section class="panel panel-wide" aria-labelledby="labRunsTitle"><div class="panel-heading"><div><p class="eyebrow">LAB ESCAPE</p><h2 id="labRunsTitle">실험실 탈출 결과</h2><small>페이즈·스텝별 시작, 클리어, 실패, 중단입니다.</small></div><span id="labRunsStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>페이즈·스텝</th><th>시작</th><th>클리어</th><th>실패</th><th>중단</th><th>클리어율</th><th>평균 시간</th><th>주요 실패 원인</th></tr></thead><tbody id="labRunsTable"></tbody></table></div></section>
+            <div class="table-scroll"><table><thead><tr><th>판 상태</th><th>판 수</th><th>중앙 도달 레벨</th><th>중앙 점수</th><th>중앙 플레이 시간</th></tr></thead><tbody id="balanceTerminalTable"></tbody></table></div>
+            <p id="balancePressureSummary" class="dashboard-message">보드 압력 체크포인트 수집 대기</p>
+            <div class="table-scroll"><table><thead><tr><th>성장 선택</th><th>선택 판</th><th>정상 완료율</th><th>완료 중앙 레벨</th><th>완료 중앙 점수</th><th>종료 분포</th></tr></thead><tbody id="balanceChoiceTable"></tbody></table></div>
+          </section>
+
+          <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
+            <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">PLAYER JOURNEY</p><h2>사람들이 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 사람 수예요. 고유 설치 ID로 구분합니다.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
+            <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>활동 설치</span><span><i class="legend-coral"></i>완료 판</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="텔레메트리 일별 활동 설치 수와 게임 완료 판 수 차트"></canvas></div></article>
+          </section>
+
+          <section class="content-grid insight-card-grid" aria-label="게임 내 선택과 행동 분석">
+            <article class="panel panel-wide visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">CORE LOOP QUALITY</p><h2>한 판의 재미 밀도</h2><small>완료한 일반 판의 성장·연쇄·돌파를 함께 봅니다.</small></div><span id="coreLoopStatus" class="panel-total">—</span></div><div id="coreLoopSummary" class="coverage-grid core-loop-grid" aria-live="polite"></div></article>
+            <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>선택 횟수와 비율을 막대 길이로 바로 비교합니다.</small></div><span id="growthDistributionStatus" class="panel-total">—</span></div><div id="growthChoicesTable" class="distribution-list" aria-live="polite"></div></article>
+            <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>결과별 비중과 실제 횟수를 한 줄에 붙여 표시합니다.</small></div><span id="rouletteDistributionStatus" class="panel-total">—</span></div><div id="rouletteResultsTable" class="distribution-list" aria-live="polite"></div></article>
+            <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>성장 선택은 제외하고, 같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시합니다.</small></div></div><div id="buttonInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
+            <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">VERIFIED APP EXIT</p><h2>실제 종료가 확인된 화면</h2><small id="screenDropoffDefinition">명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.</small></div></div><div id="screenInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
+          </section>
+          </details>
+
+          <details id="operatorDetails" class="operator-details">
+            <summary><span><p class="eyebrow">FOR OPERATORS</p><strong>운영자 상세보기</strong><small>시간대, 종료 이유, 광고 오류와 스토어별 수치를 확인해요.</small></span><b>필요할 때 열기</b></summary>
+            <div class="content-grid detail-grid">
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLAY FLOW DIAGNOSTICS</p><h2>플레이 흐름 진단</h2><small>클래식 튜토리얼과 특수 흐름에서 멈춘 신호를 서버 요약으로 확인합니다.</small></div><span id="tutorialStatus" class="panel-total">—</span></div><div id="diagnosticsIssueSignals" class="coverage-grid" aria-live="polite"></div><div class="table-scroll"><table><thead><tr><th>튜토리얼 단계</th><th>진입</th><th>완료</th><th>중단</th><th>미완료</th></tr></thead><tbody id="tutorialStagesTable"></tbody></table></div></article>
+              <article class="panel panel-wide" aria-labelledby="labTutorialTitle"><div class="panel-heading"><div><p class="eyebrow">LAB TUTORIAL</p><h2 id="labTutorialTitle">실험실 튜토리얼 퍼널</h2><small>시작에서 단계, 완료까지 단계 사이 이탈입니다.</small></div><span id="labTutorialStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>단계</th><th>도달</th><th>이전 단계 대비</th></tr></thead><tbody id="labTutorialTable"></tbody></table></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">CHOICES &amp; SPECIAL EFFECTS</p><h2>선택과 특수 효과</h2><small>레벨별 성장 선택과 메차쿠차 완료 흐름을 분리해 확인합니다.</small></div><span id="growthChoiceStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>레벨</th><th>제시</th><th>선택</th><th>확정</th><th>선택률</th></tr></thead><tbody id="growthChoiceLevelTable"></tbody></table></div><div id="mechakuchaSummary" class="coverage-grid" aria-live="polite"></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">GAME OVER TREND</p><h2>게임 종료 추이</h2><small>정상 완료된 게임의 날짜별 중앙 점수와 평균 레벨입니다.</small></div><span id="gameOverStatus" class="panel-total">—</span></div><div class="legend"><span><i class="legend-teal"></i>중앙 점수</span><span><i class="legend-coral"></i>평균 레벨</span></div><div class="chart-wrap"><canvas id="gameOverChart" height="154" aria-label="날짜별 게임 종료 중앙 점수와 평균 레벨 차트"></canvas></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverDailyTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>레벨 구간</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverBucketTable"></tbody></table></div></article>
+              <article class="panel"><div class="panel-heading"><div><p class="eyebrow">ARRIVAL TIME</p><h2>주로 몇 시에 오나</h2></div></div><div id="hourlyChart" class="hourly-chart"></div></article>
+              <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RAW EVENT VIEW</p><h2>이벤트별 고유 설치 수</h2></div></div><p>각 이벤트별 고유 설치를 독립 집계합니다. 같은 사람의 단계별 전환이나 동일 코호트가 아닙니다.</p><div id="funnelChart" class="funnel-chart"></div></article>
+              <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GAME EXIT</p><h2>플레이 후 어떻게 나가나</h2></div></div><div id="exitBreakdown" class="metric-list"></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">AD HEALTH</p><h2>광고 시청 흐름</h2><small>선택한 기간의 서버 집계 · 위치별 시작과 노출 실패</small></div><span id="adTotal" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>형식</th><th>위치</th><th>시작</th><th>노출</th><th>테스트</th><th>보상</th><th>닫힘</th><th>실패</th><th>실패 사유</th><th>일별 실패(최근순)</th></tr></thead><tbody id="adsTable"></tbody></table></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">APP STATUS</p><h2>앱 핵심 상태</h2><small>선택한 기간의 analytics_events 서버 집계만 표시합니다.</small></div><span id="appStatusTotal" class="panel-total">—</span></div><div id="appStatusGrid" class="coverage-grid" aria-live="polite"></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PURCHASE TREND</p><h2>구매 상태 · 최근 30일</h2><small>전체 스토어의 실제 서버 기록만 표시하며, 현재 집계에 없는 항목은 계측 대기로 남깁니다.</small></div><span id="purchaseTrendStatus" class="panel-total">불러오는 중</span></div><div id="purchaseTrend" class="coverage-grid" aria-live="polite"></div></article>
+              <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLATFORM VIEW</p><h2>스토어별로 비교</h2></div><span id="revenueNote" class="panel-note">—</span></div><div id="platformSummary" class="platform-summary"></div></article>
+              <article class="panel panel-wide collapsible-panel"><details id="dailyDetails" class="collapsible-content"><summary><span><p class="eyebrow">DAY BY DAY</p><strong>출시 후 변화를 표로 보기</strong></span><span class="collapsible-hint">클릭해서 열기</span></summary><div class="table-scroll"><table><thead><tr><th>날짜</th><th>활동 인원</th><th>앱 세션</th><th>게임 시작</th><th>완료</th><th>명시적 중간 종료</th><th>결과 미확인</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div></details></article>
+            </div>
+          </details>
+          <p id="dashboardMessage" class="dashboard-message" role="status"></p>
           </div>
-        </section>
-
-        <section class="panel" aria-labelledby="analyticsCoverageTitle"><h2 id="analyticsCoverageTitle">계정 집계와 텔레메트리 수집 범위</h2><p id="analyticsCoverageMessage" role="status">수집 범위 확인 대기. 이벤트 미수집은 사용자 없음이 아닙니다.</p></section>
-
-        <section id="healthCard" class="pulse-hero" aria-live="polite" data-status="insufficient">
-          <div class="duck-guide" aria-hidden="true"><div class="duck-head"><i class="duck-eye"></i><i class="duck-beak"></i></div><span>HOUSE DUCK</span></div>
-          <div class="mascot-speech">
-            <p class="eyebrow">오리가 쉽게 알려드려요</p>
-            <div class="verdict-line"><span>지금 상태는</span><strong id="healthLabel">판단 대기</strong><b id="healthScore">수집 중</b></div>
-            <p id="mascotMessage">플레이어가 조금 더 쌓이면 게임 상태를 판단할 수 있어요.</p>
-            <div class="insight-line"><p id="insightText" class="mascot-extra">데이터가 쌓이면 가장 중요한 변화부터 요약해 드립니다.</p><button id="insightWhyButton" class="insight-why" type="button">왜?</button></div>
-          </div>
-          <div id="signalLights" class="signal-lights" aria-label="게임 상태 신호등">
-            <span data-signal="good"><i></i><b>좋아요</b></span><span data-signal="watch"><i></i><b>지켜봐요</b></span><span data-signal="risk"><i></i><b>고쳐야 해요</b></span><span data-signal="insufficient"><i></i><b>판단 대기</b></span>
-          </div>
-          <aside class="today-action"><span>오늘 할 일 1개</span><strong id="todayAction">플레이 데이터를 조금 더 모아요.</strong></aside>
-          <div class="pulse-facts"><span><span id="kpiActiveLabel">최근 3일 활동 계정</span> <strong id="kpiActive">—</strong><span id="kpiActiveUnit">명</span></span><span id="kpiPeopleMix">별도 텔레메트리 —설치 · 헤비 —설치(2인분)</span><span>기간 평균 세션 <strong id="kpiSession">—</strong></span><span>예상 수익 <strong id="kpiRevenue">—</strong></span></div>
-        </section>
-
-        <section id="priorityInsightPanel" class="priority-insight-panel" data-status="clear" aria-labelledby="priorityInsightTitle" hidden>
-          <div id="priorityInsightIcon" class="priority-insight-icon" aria-hidden="true">✓</div>
-          <div><p class="eyebrow">PRIORITY INSIGHT</p><h2 id="priorityInsightTitle">광고 뒤 실제 선택 흐름 확인</h2><p id="priorityInsightDetail">같은 선택 제안의 실제 선택 여부를 세션이 바뀌어도 연결해 확인합니다.</p></div>
-          <strong id="priorityInsightValue">—</strong>
-        </section>
-
-        <section class="question-grid" aria-label="게임 상태를 설명하는 네 가지 질문">
-          <article id="metricDurationCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">◷</span><div><h2>오래 하나?</h2><p>텔레메트리 결과 확인 판의 평균 시간</p></div><b id="metricDurationStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="duration" type="button">왜?</button></div><strong id="metricDuration" class="question-value">—</strong><div class="question-gauge"><i id="metricDurationBar"></i></div><small>3분 이상이면 좋아요</small></article>
-          <article id="metricCompletionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">✓</span><div><h2>끝까지 하나?</h2><p>텔레메트리 결과 확인 표본의 완료 비율</p></div><b id="metricCompletionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="completion" type="button">왜?</button></div><strong id="metricCompletion" class="question-value">—</strong><div class="question-gauge"><i id="metricCompletionBar"></i></div><small>10판 중 7판쯤이면 좋아요</small></article>
-          <article id="metricRetentionCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon" aria-hidden="true">↻</span><div><h2>다시 오나?</h2><p>기간 계정 재방문</p></div><b id="metricRetentionStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="retention" type="button">왜?</button></div><strong id="metricRetention" class="question-value">—</strong><div class="question-gauge"><i id="metricRetentionBar"></i></div><small>선택 기간과 바로 이전 같은 기간 비교</small></article>
-          <article id="metricAdsCard" class="question-card" data-status="insufficient"><div class="question-top"><span class="question-icon ad-icon" aria-hidden="true">AD</span><div><h2>강제 광고는 적당한가?</h2><p>활동 인원당 전면광고</p></div><b id="metricAdsStatus" class="status-chip">판단 대기</b><button class="metric-why" data-metric-why="ads" type="button">왜?</button></div><strong id="metricAds" class="question-value">—</strong><div class="question-gauge"><i id="metricAdsBar"></i></div><small>보상형·배너·네이티브 제외 · 테스트 제외</small></article>
-        </section>
-
-        <section id="versionUpdatePanel" class="panel version-monitor-panel" aria-labelledby="versionUpdateTitle">
-          <div class="panel-heading"><div><p class="eyebrow">VERSION ADOPTION · FORCE UPDATE HISTORY</p><h2 id="versionUpdateTitle">강제 업데이트 이후 버전 추이</h2><small id="versionUpdateDescription">운영 감사 기록의 최소 지원 버전 변경일을 기준선으로 삼아 최근 28일의 실제 실행 버전을 비교합니다.</small></div><div class="version-monitor-controls"><label for="versionTrendSelect">표시 버전</label><select id="versionTrendSelect" aria-label="추이를 볼 앱 버전"><option value="">불러오는 중</option></select><span id="versionCurrentGate" class="status-label">현재 기준 확인 중</span></div></div>
-          <section class="panel panel-wide" aria-labelledby="dimensionsTitle"><div class="panel-heading"><div><p class="eyebrow">BUILD MIX</p><h2 id="dimensionsTitle">버전·판 종류</h2><small>이 기간에 관측된 앱 버전과 판 종류입니다.</small></div><span id="dimensionsStatus" class="panel-total">—</span></div><div class="content-grid"><div class="table-scroll"><table><thead><tr><th>앱 버전</th><th>이벤트</th><th>설치</th><th>판</th></tr></thead><tbody id="appVersionsTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>판 종류</th><th>시작</th><th>완료</th><th>중단</th></tr></thead><tbody id="runModesTable"></tbody></table></div></div></section>
-          <div class="version-monitor-grid">
-            <article class="version-adoption-card"><div><h3>최근 활동 버전 구성</h3><small id="versionAdoptionDay">최근 활동일 기준</small></div><div id="versionAdoptionBar" class="version-adoption-bar" aria-label="버전별 활동 인원 비율"></div><div id="versionAdoptionLegend" class="version-adoption-legend"></div></article>
-            <article class="version-trend-card"><div class="version-trend-head"><div><h3 id="versionTrendTitle">버전 추이</h3><small id="versionTrendSummary">버전을 선택하면 업데이트 이후 추이를 표시합니다.</small></div><div class="legend"><span><i class="legend-teal"></i>활동 인원</span><span><i class="legend-gold"></i>완료 인원</span></div></div><div class="chart-wrap"><canvas id="versionTrendChart" height="176" aria-label="선택 버전의 일별 활동 인원과 완료 인원 추이"></canvas></div></article>
-          </div>
-          <div><div class="version-history-heading"><h3>강제 업데이트 기록</h3><small>표시 버전과 공통 호환 코드를 함께 표시합니다.</small></div><ol id="versionUpdateHistory" class="version-update-history"><li>기록을 불러오는 중입니다.</li></ol></div>
-        </section>
-
-        <section class="content-grid decision-grid" aria-label="신규 유입, 광고 형식, 광고 제거 구매 분석">
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW PLAYER QUALITY</p><h2>신규 유입이 실제 플레이로 이어지나</h2><small>선택 기간에 처음 실행한 사람을 고유 설치 ID로 구분해 시작과 완료를 확인합니다.</small></div><span id="acquisitionQualityStatus" class="panel-total">—</span></div><div id="acquisitionQuality" class="coverage-grid" aria-live="polite"></div></article>
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">AD FORMAT MIX</p><h2>어떤 광고를 보고 있나</h2><small>전체 합계 대신 강제 전면·자발적 보상·배너·네이티브를 나눕니다.</small></div><span id="adFormatStatus" class="panel-total">—</span></div><div id="adFormatSummary" class="coverage-grid" aria-live="polite"></div></article>
-          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PURCHASE FUNNEL</p><h2>구매로 이어지나</h2><small>QA 기능·TestFlight·Google Play 테스트 결제를 제외한 운영 구매만 확인합니다. 응답에 있는 상품을 모두 표시합니다.</small></div><span id="removeAdsFunnelStatus" class="panel-total">—</span></div><div id="removeAdsFunnel" class="coverage-grid" aria-live="polite"></div></article>
-          <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">MARKETING REVIEW</p><h2 id="marketingGateTitle">유료 마케팅 검토 조건</h2><small>이해하기 쉬운 플레이 인원·결과 기준입니다. 모두 충족해도 광고비를 자동 집행하지 않고 검토만 시작합니다.</small></div><span id="marketingGateStatus" class="panel-total">대기</span></div><div id="marketingGateSummary" class="coverage-grid" aria-live="polite"></div></article>
-        </section>
-
-        <section id="economySection" class="operations-pulse" aria-labelledby="operationsPulseTitle">
-          <div class="panel-heading compact-heading"><div><p class="eyebrow">LOW-COST OPERATIONS</p><h2 id="operationsPulseTitle">경제·패스·랭킹 현황</h2><small id="operationsFreshAt">서버 상태를 요약하는 중입니다.</small></div></div>
-          <section class="panel panel-wide" aria-labelledby="labEconomyTitle"><div class="panel-heading"><div><p class="eyebrow">LAB ECONOMY</p><h2 id="labEconomyTitle">실험실 경제</h2><small>방치 수령, 탈출·퀘스트·소탕 지급, 광고 드론, 헥스 강화입니다.</small></div><span id="labEconomyStatus" class="panel-total">—</span></div><div id="labEconomyProfiles" class="coverage-grid" aria-live="polite"></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>방치 수령</th><th>방치 시약</th><th>방치 젬</th><th>탈출</th><th>퀘스트</th><th>소탕</th><th>광고 드론</th><th>헥스 강화</th><th>헥스 취소</th></tr></thead><tbody id="labEconomyTable"></tbody></table></div></section>
-          <div class="question-grid operations-grid">
-            <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">◆</span><div><h2>젬 경제</h2><p>서버 동기화 계정 기준</p></div></div><strong id="opsGemMedian" class="question-value">—</strong><div class="question-gauge"><i id="opsGemCoverage"></i></div><small id="opsGemDetail">오늘부터 일별 추적</small></article>
-            <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">⚡</span><div><h2>스태미나 사용</h2><p>게임 시작 기준 추정</p></div></div><strong id="opsStaminaUse" class="question-value">—</strong><div class="question-gauge"><i id="opsStaminaGauge"></i></div><small id="opsStaminaDetail">별도 로그를 쌓지 않습니다.</small></article>
-            <article class="question-card" data-status="good"><div class="question-top"><span class="question-icon" aria-hidden="true">▰</span><div><h2>시즌패스</h2><p>현재 시즌 완주율</p></div></div><strong id="opsPassRate" class="question-value">—</strong><div class="question-gauge"><i id="opsPassGauge"></i></div><small id="opsPassDetail">참여 정보 없음</small></article>
-            <article class="question-card" data-status="watch"><div class="question-top"><span class="question-icon" aria-hidden="true">♛</span><div><h2>주간랭킹</h2><p>현재 시즌 참가자</p></div></div><strong id="opsRankingPlayers" class="question-value">—</strong><div class="question-gauge"><i id="opsRankingGauge"></i></div><small id="opsRankingDetail">기록 정보 없음</small></article>
-          </div>
-        </section>
-
-        <section class="panel ai-brief-panel" aria-labelledby="aiBriefTitle">
-          <div class="panel-heading"><div><p class="eyebrow">AI OPERATING BRIEF</p><h2 id="aiBriefTitle">다음 결정을 같이 판단해요</h2><small>월 수익·스토어별 출시·차기작 방향을 현재 집계 지표로 분석합니다.</small></div><span id="aiBriefSource" class="status-label">준비됨</span></div>
-          <div class="ai-brief-actions"><button id="aiBriefRun" class="primary-button" type="button">AI 운영 브리핑 만들기</button><button id="aiBriefOriginal" type="button" hidden>원문 보기</button></div>
-          <div id="aiBriefResult" class="ai-brief-result"><p>버튼을 누르면 이 기기에서 분석합니다. Chrome AI를 사용할 수 없으면 비용 없는 지표 기반 조언으로 안내합니다.</p></div>
-          <pre id="aiBriefOriginalText" class="ai-brief-original" hidden></pre>
-          <p id="aiBriefMessage" class="dashboard-message" role="status"></p>
-        </section>
-
-        <section class="panel account-activity-panel" aria-labelledby="accountActivityTitle">
-          <div class="panel-heading"><div><p class="eyebrow">ACCOUNT VISITS</p><h2 id="accountActivityTitle">계정 방문과 재방문</h2><small>로그인, 홈·랭킹 확인, 앱 서버 활동, 계정 동기화, 완료 게임 중 하나가 기간에 남은 인증 계정을 셉니다. 백그라운드 복귀 같은 session_start만으로는 세지 않습니다.</small></div><span id="accountActivityCoverage" class="panel-total">정확 계측 지원 빌드 대기</span></div>
-          <div id="accountActivitySummary" class="coverage-grid account-activity-grid" aria-live="polite"></div>
-          <p id="labAccountFacts" class="dashboard-message" hidden>실험실 완료 판 집계 대기</p>
-        </section>
-
-        <section id="periodPlayersSection" class="panel period-players-panel" aria-labelledby="periodPlayersTitle">
-          <div class="panel-heading period-heading"><div><p class="eyebrow">ACCOUNT ACTIVITY EVIDENCE</p><h2 id="periodPlayersTitle">기간 내 계정 활동 신호</h2><small>정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료를 섞지 않고 표시합니다.</small></div><span id="periodPlayerTotal" class="panel-total">—</span></div>
-          <form id="periodPlayerSearchForm" class="table-toolbar" role="search">
-            <label for="periodPlayerSearch">닉네임·표시코드·국가·태그·메모·사용자 ID 검색</label>
-            <div><input id="periodPlayerSearch" type="search" maxlength="100" autocomplete="off" placeholder="예: 구독자, Duck 또는 UUID"><button class="primary-button" type="submit">검색</button><button id="periodPlayerReset" type="button">초기화</button></div>
-          </form>
-          <div class="table-scroll"><table><thead><tr><th><button data-player-sort="nickname" type="button">플레이어·국가·기기</button></th><th>활동 근거</th><th><button data-player-sort="visit_count" type="button">새 실행</button></th><th><button data-player-sort="games_played" type="button">완료</button></th><th><button data-player-sort="best_score" type="button">기간 최고</button></th><th><button data-player-sort="latest_played_at" type="button">최근 활동</button></th><th>처리</th></tr></thead><tbody id="periodPlayersTable"></tbody></table></div>
-          <div class="pagination"><button id="periodPrevious" type="button" disabled>이전</button><span id="periodPage">1 / 1</span><button id="periodNext" type="button" disabled>다음</button></div>
-        </section>
-
-        <details id="playDetails" class="operator-details analytics-more">
-          <summary><span><p class="eyebrow">PLAY DETAILS</p><strong>판·선택 상세</strong><small>미완료 판, 밸런스, 여정은 필요할 때 펼칩니다.</small></span><b>펼치기 / 접기</b></summary>
-        <section class="panel unfinished-plays-panel" aria-labelledby="unfinishedPlaysTitle">
-          <div class="panel-heading"><div><p class="eyebrow">UNFINISHED PLAY DETAILS</p><h2 id="unfinishedPlaysTitle">완료되지 않은 판</h2><small>플레이어가 아니라 개별 게임 판 기준입니다. 같은 계정에 이후 완료한 판이 있어도 이 판은 별도로 표시합니다. 백그라운드는 앱 종료로 단정하지 않습니다.</small></div><span id="unfinishedPlaysStatus" class="panel-total">—</span></div>
-          <div class="table-scroll"><table><thead><tr><th>플레이어·설치</th><th>상태</th><th>마지막 확인 위치</th><th>도달치</th><th>마지막 신호</th><th>계정·판 맥락</th></tr></thead><tbody id="unfinishedPlaysTable"></tbody></table></div>
-        </section>
-
-        <section class="panel panel-wide game-run-status-panel" aria-labelledby="gameRunStatusTitle">
-          <div class="panel-heading"><div><p class="eyebrow">GAME RUN STATUS</p><h2 id="gameRunStatusTitle">판 상태 요약</h2><small>game_id를 우선으로 한 판 연결 결과입니다. 게임·런타임 식별자는 화면에 표시하지 않고, 정상 완료·장면 종료·앱 종료·미확인 상태만 집계합니다.</small></div><span id="gameRunStatusTotal" class="panel-total">—</span></div>
-          <p id="gameRunLatestCheckpoint" class="dashboard-message">마지막 체크포인트 없음</p>
-          <div class="table-scroll"><table><thead><tr><th>상태</th><th>판 수</th><th>일시중지·복귀</th><th>체크포인트</th><th>마지막 확인치</th><th>마지막 신호</th></tr></thead><tbody id="gameRunStatusTable"></tbody></table></div>
-        </section>
-
-        <section class="panel panel-wide balance-telemetry-panel" aria-labelledby="balanceTelemetryTitle">
-          <div class="panel-heading"><div><p class="eyebrow">BALANCE SIGNALS</p><h2 id="balanceTelemetryTitle">밸런스 신호</h2><small>판 종료·성장 선택·30초 체크포인트에서만 요약합니다. 식별자와 샷 단위 기록은 표시하지 않으며, 선택별 비교는 인과관계로 단정하지 않습니다.</small></div><span id="balanceTelemetryStatus" class="panel-total">수집 대기</span></div>
-          <section class="panel panel-wide" aria-labelledby="labRunsTitle"><div class="panel-heading"><div><p class="eyebrow">LAB ESCAPE</p><h2 id="labRunsTitle">실험실 탈출 결과</h2><small>페이즈·스텝별 시작, 클리어, 실패, 중단입니다.</small></div><span id="labRunsStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>페이즈·스텝</th><th>시작</th><th>클리어</th><th>실패</th><th>중단</th><th>클리어율</th><th>평균 시간</th><th>주요 실패 원인</th></tr></thead><tbody id="labRunsTable"></tbody></table></div></section>
-          <div class="table-scroll"><table><thead><tr><th>판 상태</th><th>판 수</th><th>중앙 도달 레벨</th><th>중앙 점수</th><th>중앙 플레이 시간</th></tr></thead><tbody id="balanceTerminalTable"></tbody></table></div>
-          <p id="balancePressureSummary" class="dashboard-message">보드 압력 체크포인트 수집 대기</p>
-          <div class="table-scroll"><table><thead><tr><th>성장 선택</th><th>선택 판</th><th>정상 완료율</th><th>완료 중앙 레벨</th><th>완료 중앙 점수</th><th>종료 분포</th></tr></thead><tbody id="balanceChoiceTable"></tbody></table></div>
-        </section>
-
-        <section class="visual-overview" aria-label="플레이 흐름과 최근 변화">
-          <article class="journey-panel"><div class="panel-heading compact-heading"><div><p class="eyebrow">PLAYER JOURNEY</p><h2>사람들이 어디까지 갔을까?</h2><small>기간 중 각 행동을 한 사람 수예요. 고유 설치 ID로 구분합니다.</small></div></div><div id="journeyGraph" class="journey-graph"></div></article>
-          <article class="trend-panel"><div class="panel-heading compact-heading"><div><p id="dailyTrendEyebrow" class="eyebrow">3 DAY CHANGE · BERLIN</p><h2>좋아지고 있나?</h2></div><div class="legend"><span><i class="legend-teal"></i>활동 설치</span><span><i class="legend-coral"></i>완료 판</span></div></div><div class="chart-wrap"><canvas id="dailyChart" height="154" aria-label="텔레메트리 일별 활동 설치 수와 게임 완료 판 수 차트"></canvas></div></article>
-        </section>
-
-        <section class="content-grid insight-card-grid" aria-label="게임 내 선택과 행동 분석">
-          <article class="panel panel-wide visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">CORE LOOP QUALITY</p><h2>한 판의 재미 밀도</h2><small>완료한 일반 판의 성장·연쇄·돌파를 함께 봅니다.</small></div><span id="coreLoopStatus" class="panel-total">—</span></div><div id="coreLoopSummary" class="coverage-grid core-loop-grid" aria-live="polite"></div></article>
-          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">GROWTH CHOICES</p><h2>성장 선택</h2><small>선택 횟수와 비율을 막대 길이로 바로 비교합니다.</small></div><span id="growthDistributionStatus" class="panel-total">—</span></div><div id="growthChoicesTable" class="distribution-list" aria-live="polite"></div></article>
-          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">LEVEL ROULETTE</p><h2>레벨업 룰렛 결과</h2><small>결과별 비중과 실제 횟수를 한 줄에 붙여 표시합니다.</small></div><span id="rouletteDistributionStatus" class="panel-total">—</span></div><div id="rouletteResultsTable" class="distribution-list" aria-live="polite"></div></article>
-          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">BUTTON FLOW</p><h2>어디서 망설이나</h2><small>성장 선택은 제외하고, 같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시합니다.</small></div></div><div id="buttonInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
-          <article class="panel visual-data-panel"><div class="panel-heading"><div><p class="eyebrow">VERIFIED APP EXIT</p><h2>실제 종료가 확인된 화면</h2><small id="screenDropoffDefinition">명시적 app_quit만 집계합니다. 광고·외부 링크·일시 중단의 background는 종료로 세지 않습니다.</small></div></div><div id="screenInsightsTable" class="behavior-card-list" aria-live="polite"></div></article>
-        </section>
         </details>
-
-        <details id="operatorDetails" class="operator-details">
-          <summary><span><p class="eyebrow">FOR OPERATORS</p><strong>운영자 상세보기</strong><small>시간대, 종료 이유, 광고 오류와 스토어별 수치를 확인해요.</small></span><b>필요할 때 열기</b></summary>
-          <div class="content-grid detail-grid">
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLAY FLOW DIAGNOSTICS</p><h2>플레이 흐름 진단</h2><small>클래식 튜토리얼과 특수 흐름에서 멈춘 신호를 서버 요약으로 확인합니다.</small></div><span id="tutorialStatus" class="panel-total">—</span></div><div id="diagnosticsIssueSignals" class="coverage-grid" aria-live="polite"></div><div class="table-scroll"><table><thead><tr><th>튜토리얼 단계</th><th>진입</th><th>완료</th><th>중단</th><th>미완료</th></tr></thead><tbody id="tutorialStagesTable"></tbody></table></div></article>
-            <article class="panel panel-wide" aria-labelledby="labTutorialTitle"><div class="panel-heading"><div><p class="eyebrow">LAB TUTORIAL</p><h2 id="labTutorialTitle">실험실 튜토리얼 퍼널</h2><small>시작에서 단계, 완료까지 단계 사이 이탈입니다.</small></div><span id="labTutorialStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>단계</th><th>도달</th><th>이전 단계 대비</th></tr></thead><tbody id="labTutorialTable"></tbody></table></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">CHOICES &amp; SPECIAL EFFECTS</p><h2>선택과 특수 효과</h2><small>레벨별 성장 선택과 메차쿠차 완료 흐름을 분리해 확인합니다.</small></div><span id="growthChoiceStatus" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>레벨</th><th>제시</th><th>선택</th><th>확정</th><th>선택률</th></tr></thead><tbody id="growthChoiceLevelTable"></tbody></table></div><div id="mechakuchaSummary" class="coverage-grid" aria-live="polite"></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">GAME OVER TREND</p><h2>게임 종료 추이</h2><small>정상 완료된 게임의 날짜별 중앙 점수와 평균 레벨입니다.</small></div><span id="gameOverStatus" class="panel-total">—</span></div><div class="legend"><span><i class="legend-teal"></i>중앙 점수</span><span><i class="legend-coral"></i>평균 레벨</span></div><div class="chart-wrap"><canvas id="gameOverChart" height="154" aria-label="날짜별 게임 종료 중앙 점수와 평균 레벨 차트"></canvas></div><div class="table-scroll"><table><thead><tr><th>날짜</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverDailyTable"></tbody></table></div><div class="table-scroll"><table><thead><tr><th>레벨 구간</th><th>완료</th><th>평균 점수</th><th>중앙 점수</th><th>평균 레벨</th></tr></thead><tbody id="gameOverBucketTable"></tbody></table></div></article>
-            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">ARRIVAL TIME</p><h2>주로 몇 시에 오나</h2></div></div><div id="hourlyChart" class="hourly-chart"></div></article>
-            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RAW EVENT VIEW</p><h2>이벤트별 고유 설치 수</h2></div></div><p>각 이벤트별 고유 설치를 독립 집계합니다. 같은 사람의 단계별 전환이나 동일 코호트가 아닙니다.</p><div id="funnelChart" class="funnel-chart"></div></article>
-            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">GAME EXIT</p><h2>플레이 후 어떻게 나가나</h2></div></div><div id="exitBreakdown" class="metric-list"></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">AD HEALTH</p><h2>광고 시청 흐름</h2><small>선택한 기간의 서버 집계 · 위치별 시작과 노출 실패</small></div><span id="adTotal" class="panel-total">—</span></div><div class="table-scroll"><table><thead><tr><th>형식</th><th>위치</th><th>시작</th><th>노출</th><th>테스트</th><th>보상</th><th>닫힘</th><th>실패</th><th>실패 사유</th><th>일별 실패(최근순)</th></tr></thead><tbody id="adsTable"></tbody></table></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">APP STATUS</p><h2>앱 핵심 상태</h2><small>선택한 기간의 analytics_events 서버 집계만 표시합니다.</small></div><span id="appStatusTotal" class="panel-total">—</span></div><div id="appStatusGrid" class="coverage-grid" aria-live="polite"></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PURCHASE TREND</p><h2>구매 상태 · 최근 30일</h2><small>전체 스토어의 실제 서버 기록만 표시하며, 현재 집계에 없는 항목은 계측 대기로 남깁니다.</small></div><span id="purchaseTrendStatus" class="panel-total">불러오는 중</span></div><div id="purchaseTrend" class="coverage-grid" aria-live="polite"></div></article>
-            <article class="panel panel-wide"><div class="panel-heading"><div><p class="eyebrow">PLATFORM VIEW</p><h2>스토어별로 비교</h2></div><span id="revenueNote" class="panel-note">—</span></div><div id="platformSummary" class="platform-summary"></div></article>
-            <article class="panel panel-wide collapsible-panel"><details id="dailyDetails" class="collapsible-content"><summary><span><p class="eyebrow">DAY BY DAY</p><strong>출시 후 변화를 표로 보기</strong></span><span class="collapsible-hint">클릭해서 열기</span></summary><div class="table-scroll"><table><thead><tr><th>날짜</th><th>활동 인원</th><th>앱 세션</th><th>게임 시작</th><th>완료</th><th>명시적 중간 종료</th><th>결과 미확인</th><th>광고 노출</th></tr></thead><tbody id="dailyTable"></tbody></table></div></details></article>
-          </div>
-        </details>
-        <p id="dashboardMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="analyticsExclusionsView" class="route-view" data-route="analytics-exclusions" hidden>
@@ -419,11 +448,11 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260927-2x"></script>
+  <script src="model.js?v=20261001-pulse"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260908-1"></script>
-  <script src="analytics.js?v=20260905-5"></script>
+  <script src="analytics.js?v=20261001-pulse"></script>
   <script src="analytics-exclusions.js?v=20260829-1"></script>
   <script src="players.js?v=20260927-2x"></script>
   <script src="../assets/notice-links.js?v=20260909-1"></script>

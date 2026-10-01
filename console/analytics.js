@@ -1697,6 +1697,325 @@ async function runAiBrief() {
   }
 }
 
+// ── C (2026-10-01) 한눈 요약 ─────────────────────────────────────────────
+// analytics-dashboard-v2 view=overview를 카드 6장과 자세히 보기로 그린다. 서버가 준 문자열은 모두 escapeHtml을 거친다.
+// 아래 '1.x 레거시 · 기존 상세 분석'은 열 때만 불러온다(무거운 원본 조회를 매번 하지 않기).
+const overview = { payload: null, periodDays: 7, version: "all", platform: "all", sequence: 0, legacyOpen: false, legacyLoaded: false };
+const OVERVIEW_DRILLS = Object.freeze({
+  players: "overviewDrillPlayers", funnel: "overviewDrillFunnel", core: "overviewDrillCore",
+  economy: "overviewDrillEconomy", social: "overviewDrillSocial", health: "overviewDrillHealth",
+});
+const OVERVIEW_VERSION_NAMES = Object.freeze({ all: "전체 버전", "1.x": "1.x 라이브", "2.x": "2.0+" });
+const OVERVIEW_PLATFORM_NAMES = Object.freeze({ all: "전체 플랫폼", android: "Android", ios: "iOS" });
+const OVERVIEW_STATUS_ICONS = Object.freeze({ partial: "◐", no_data: "○", error: "!" });
+
+function overviewFinite(value) { return typeof value === "number" && Number.isFinite(value); }
+function overviewFormat(value, format, currency) { return root.ConsoleModel.formatOverviewValue(value, format, currency); }
+function overviewMetricValue(metric) { return overviewFormat(metric?.value, metric?.format, metric?.currency); }
+
+function overviewDeltaMarkup(metric) {
+  const delta = root.ConsoleModel.overviewDelta(metric, overview.payload?.filters?.periodDays ?? overview.periodDays);
+  if (!delta.text) return "";
+  const arrow = delta.arrow ? `<span aria-hidden="true">${delta.arrow}</span> ` : "";
+  const label = delta.label ? ` <small>${escapeHtml(delta.label)}</small>` : "";
+  return `<span class="overview-delta" data-tone="${delta.tone}">${arrow}${escapeHtml(delta.text)}${label}</span>`;
+}
+
+function overviewSplitMarkup(metric) {
+  const cell = (family, name) => {
+    const value = metric?.split?.[family];
+    const body = overviewFinite(value)
+      ? `<b>${escapeHtml(overviewFormat(value, metric.format, metric.currency))}</b>`
+      : `<em>${escapeHtml(String(metric?.splitEmpty?.[family] || "기록 없음").replace(/^1\.x\s+/, ""))}</em>`;
+    return `<span class="overview-split-cell"><span class="version-key ${family === "1.x" ? "v1" : "v2"}" aria-hidden="true"></span>${name} ${body}</span>`;
+  };
+  return `<p class="overview-split" aria-label="버전별">${cell("1.x", "1.x")}${cell("2.x", "2.0+")}</p>`;
+}
+
+function overviewSparkTitle(spark, index, value) {
+  const label = spark.kind === "steps" ? spark.labels?.[index] : formatShortDay(spark.labels?.[index]);
+  const shown = !overviewFinite(value) ? "기록 없음" : spark.kind === "steps" ? `${(value * 100).toFixed(1)}%` : value.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
+  return `${label || ""} · ${shown}`;
+}
+
+function overviewSparkMarkup(spark) {
+  const points = Array.isArray(spark?.points) ? spark.points : [];
+  const known = points.filter(overviewFinite);
+  const caption = escapeHtml(spark?.label || "추이");
+  if (!known.length) return `<figure class="overview-spark is-empty"><div class="overview-spark-empty">아직 그릴 기록이 없습니다</div><figcaption>${caption}</figcaption></figure>`;
+  const width = 120;
+  const height = 36;
+  const slot = width / Math.max(1, points.length);
+  const hits = points.map((value, index) => `<rect class="spark-hit" x="${(index * slot).toFixed(2)}" y="0" width="${slot.toFixed(2)}" height="${height}"><title>${escapeHtml(overviewSparkTitle(spark, index, value))}</title></rect>`).join("");
+  const summary = `${spark.label || "추이"}: 최저 ${Math.min(...known).toLocaleString("ko-KR", { maximumFractionDigits: 2 })}, 최고 ${Math.max(...known).toLocaleString("ko-KR", { maximumFractionDigits: 2 })}`;
+  let marks = "";
+  let dot = "";
+  if (spark.kind === "line") {
+    const geometry = root.ConsoleModel.sparklineGeometry(points, width, height);
+    marks = geometry.segments.map((segment) => {
+      const line = segment.map(([x, y], index) => `${index ? "L" : "M"}${x} ${y}`).join(" ");
+      const area = segment.length > 1 ? `<path class="spark-area" d="${line} L${segment.at(-1)[0]} ${height} L${segment[0][0]} ${height} Z"></path>` : "";
+      return `${area}<path class="spark-line" d="${line}"></path>`;
+    }).join("");
+    if (geometry.last) dot = `<span class="spark-dot" style="left:${(geometry.last.x / width * 100).toFixed(2)}%;top:${(geometry.last.y / height * 100).toFixed(2)}%"></span>`;
+  } else {
+    const bars = spark.kind === "steps" ? root.ConsoleModel.sparkBars(points.map((value) => overviewFinite(value) ? value : null), width, height)
+      : root.ConsoleModel.sparkBars(points, width, height);
+    const lastIndex = points.reduce((last, value, index) => overviewFinite(value) ? index : last, -1);
+    marks = bars.filter((bar) => bar.height > 0).map((bar) => `<rect class="spark-bar${bar.index === lastIndex && spark.kind !== "steps" ? " is-current" : ""}${spark.kind === "steps" ? " is-step" : ""}" x="${bar.x}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="1.2"></rect>`).join("");
+  }
+  return `<figure class="overview-spark" aria-label="${escapeHtml(summary)}"><div class="overview-spark-plot"><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">${marks}${hits}</svg>${dot}</div><figcaption>${caption}</figcaption></figure>`;
+}
+
+function overviewMetricRow(metric) {
+  const note = metric.value == null ? metric.empty : metric.detail;
+  return `<div class="overview-metric"><dt>${escapeHtml(metric.label)}</dt><dd><b>${escapeHtml(overviewMetricValue(metric))}</b>${overviewDeltaMarkup(metric)}</dd>${note ? `<dd class="overview-metric-note">${escapeHtml(note)}</dd>` : ""}</div>`;
+}
+
+function overviewCardMarkup(card) {
+  const status = String(card.status || "ok");
+  const chip = status === "ok" ? "" : `<span class="overview-chip" data-status="${escapeHtml(status)}"><span aria-hidden="true">${OVERVIEW_STATUS_ICONS[status] || "·"}</span>${escapeHtml(root.ConsoleModel.overviewStatusLabel(status))}</span>`;
+  const headline = card.headline || {};
+  const headlineNote = headline.value == null ? headline.empty : headline.detail;
+  const drill = OVERVIEW_DRILLS[card.key];
+  return `<article class="overview-card" data-card="${escapeHtml(card.key)}" data-status="${escapeHtml(status)}">
+    <header class="overview-card-head"><div><p class="eyebrow">${escapeHtml(card.title)}</p><h3>${escapeHtml(card.question)}</h3></div>${chip}</header>
+    <div class="overview-hero"><strong class="overview-value">${escapeHtml(overviewMetricValue(headline))}</strong>${overviewDeltaMarkup(headline)}</div>
+    <p class="overview-label">${escapeHtml(headline.label)}${headlineNote ? `<small>${escapeHtml(headlineNote)}</small>` : ""}</p>
+    ${overviewSparkMarkup(card.spark)}
+    ${overviewSplitMarkup(headline)}
+    <dl class="overview-metrics">${(card.metrics || []).map(overviewMetricRow).join("")}</dl>
+    ${card.note ? `<p class="overview-note">${escapeHtml(card.note)}</p>` : ""}
+    ${drill ? `<button class="overview-more" type="button" data-console-jump="${drill}">자세히 보기</button>` : ""}
+  </article>`;
+}
+
+function overviewTable(columns, rows, emptyText) {
+  if (!rows.length) return `<p class="empty-panel">${escapeHtml(emptyText)}</p>`;
+  const head = columns.map((column) => `<th scope="col">${escapeHtml(column)}</th>`).join("");
+  const body = rows.map((row) => `<tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join("")}</tr>`).join("");
+  return `<div class="table-scroll"><table class="overview-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+function overviewBars(rows, valueText, tone = "neutral") {
+  const values = rows.map((row) => Number(row.value) || 0);
+  const max = Math.max(0, ...values);
+  if (!rows.length) return "";
+  return `<ul class="overview-bars" data-tone="${tone}">${rows.map((row) => {
+    const width = max > 0 ? Math.max(row.value > 0 ? 2 : 0, row.value / max * 100) : 0;
+    return `<li><span class="bar-label">${escapeHtml(row.label)}</span><span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:${width.toFixed(1)}%"></span></span><span class="bar-value">${escapeHtml(valueText(row))}</span></li>`;
+  }).join("")}</ul>`;
+}
+
+const overviewPct = (value) => overviewFinite(value) ? `${(value * 100).toFixed(1)}%` : "—";
+const overviewCount = (value) => overviewFinite(value) ? Math.round(value).toLocaleString("ko-KR") : "—";
+
+function renderOverviewDrillPlayers(data) {
+  const daily = data.players?.daily ?? [];
+  const familyCells = (cell) => [cell?.all, cell?.["1.x"], cell?.["2.x"]].map((value) => escapeHtml(overviewCount(value)));
+  const dailyRows = daily.slice().reverse().map((row) => [escapeHtml(formatShortDay(row.day)), ...familyCells(row.accounts), escapeHtml(overviewCount(row.installs?.all)), escapeHtml(overviewCount(row.sessions?.all))]);
+  const retentionCell = (cell) => cell?.eligible ? `${escapeHtml(overviewPct(cell.rate))}<small>${escapeHtml(`${cell.retained}/${cell.eligible}명`)}</small>` : `—<small>대상 없음</small>`;
+  const retentionRows = (data.players?.retention ?? []).map((row) => [escapeHtml(OVERVIEW_VERSION_NAMES[row.fam] || row.fam), escapeHtml(overviewCount(row.newAccounts)), retentionCell(row.d1), retentionCell(row.d7), retentionCell(row.d30)]);
+  byId("overviewDrillPlayersBody").innerHTML = `
+    <h4>설치일 코호트 복귀율</h4><p class="overview-drill-note">동의 후 첫 실행한 새 계정이 1·7·30일 뒤 다시 실행했는지. 그날이 끝난 코호트만 셉니다.</p>
+    ${overviewTable(["버전", "신규", "D1", "D7", "D30"], retentionRows, "이 기간에 새 계정이 없습니다.")}
+    <h4>일별 활성</h4><p class="overview-drill-note">계정은 서버 실행 기록, 설치·세션은 원본 이벤트(최근 28일)입니다. '—'는 기록 범위 밖입니다.</p>
+    ${overviewTable(["날짜", "계정 전체", "1.x", "2.0+", "설치(이벤트)", "세션"], dailyRows, "표시할 날짜가 없습니다.")}`;
+}
+
+function renderOverviewDrillFunnel(data) {
+  const funnel = data.funnel ?? {};
+  const steps = funnel.steps ?? [];
+  const previous = new Map((funnel.previousSteps ?? []).map((step) => [step.key, step]));
+  const funnelBars = steps.filter((step) => step.reached !== null && step.key !== "next_day")
+    .map((step) => ({ label: step.label, value: step.fromStart ?? 0, reached: step.reached }));
+  const stepRows = steps.map((step) => {
+    const before = previous.get(step.key);
+    return [
+      escapeHtml(step.label),
+      step.reached === null ? `—<small>${escapeHtml(step.note || "")}</small>` : escapeHtml(overviewCount(step.reached)),
+      escapeHtml(overviewPct(step.stepRate)) + (step.note && step.reached !== null ? `<small>${escapeHtml(step.note)}</small>` : ""),
+      escapeHtml(overviewPct(step.dropOff)),
+      escapeHtml(overviewFinite(step.medianSec) ? root.ConsoleModel.formatOverviewSeconds(step.medianSec) : "—"),
+      escapeHtml(before ? overviewPct(before.stepRate) : "—"),
+    ];
+  });
+  const stages = (funnel.tutorialStages ?? []).map((stage) => [
+    escapeHtml(root.ConsoleModel.labTutorialStageName(stage.stage)),
+    escapeHtml(overviewCount(stage.reached)),
+    escapeHtml(overviewPct(stage.fromStart)),
+    escapeHtml(overviewPct(stage.stepRate)),
+    escapeHtml(overviewFinite(stage.medianSecFromOpen) ? root.ConsoleModel.formatOverviewSeconds(stage.medianSecFromOpen) : "—"),
+  ]);
+  byId("overviewDrillFunnelBody").innerHTML = `
+    <p class="overview-drill-note">2.0+ 신규 설치(동의 후 first_open) ${escapeHtml(overviewCount(funnel.cohort))}명 기준. 각 단계는 앞 단계를 모두 지난 사람만 셉니다. 시간은 앞 단계에서 걸린 중앙값입니다.</p>
+    ${overviewBars(funnelBars, (row) => `${overviewPct(row.value)} · ${overviewCount(row.reached)}명`, "v2")}
+    ${overviewTable(["단계", "도달", "직전 대비", "이탈", "걸린 시간(중앙)", "이전 기간 직전 대비"], stepRows, "2.0 이벤트가 아직 없습니다.")}
+    <h4>튜토리얼 단계</h4><p class="overview-drill-note">첫 실행부터 그 단계에 들어오기까지 걸린 시간(중앙값)입니다.</p>
+    ${overviewTable(["단계", "도달", "신규 대비", "직전 단계 대비", "첫 실행부터"], stages, "튜토리얼 단계 기록이 아직 없습니다.")}`;
+}
+
+function renderOverviewDrillCore(data) {
+  const core = data.core ?? {};
+  const phases = (core.phases ?? []).map((row) => ({ label: `P${row.phase}`, value: row.installs, share: row.share }));
+  const bosses = (core.bosses ?? []).map((row) => [escapeHtml(root.ConsoleModel.overviewBossName(row.bossId)), escapeHtml(row.phase == null ? "—" : `P${row.phase}`), escapeHtml(overviewCount(row.attempts)), escapeHtml(overviewCount(row.clears)), escapeHtml(overviewPct(row.winRate))]);
+  const fails = (core.failCauses ?? []).map((row) => ({ label: row.label, value: row.count, share: row.share }));
+  byId("overviewDrillCoreBody").innerHTML = `
+    <h4>기간 중 도달한 최고 페이즈(설치 수)</h4>
+    ${overviewBars(phases, (row) => `${overviewCount(row.value)} · ${overviewPct(row.share)}`, "v2") || '<p class="empty-panel">2.0 런 기록이 아직 없습니다.</p>'}
+    <h4>보스별 승률</h4>
+    ${overviewTable(["보스", "페이즈", "도전", "클리어", "승률"], bosses, "보스 교전 기록이 아직 없습니다.")}
+    <h4>실패 원인</h4>
+    ${overviewBars(fails, (row) => `${overviewCount(row.value)} · ${overviewPct(row.share)}`) || '<p class="empty-panel">실패한 런이 없습니다.</p>'}
+    <p class="overview-drill-note">레벨업 ${escapeHtml(overviewCount(core.levelUps?.total))}회 중 3D 비커 ${escapeHtml(overviewCount(core.levelUps?.flask3d))}회 · 판 수 전체 ${escapeHtml(overviewCount(core.runs?.all))} (1.x ${escapeHtml(overviewCount(core.runs?.["1.x"]))} · 2.0+ ${escapeHtml(overviewCount(core.runs?.["2.x"]))})</p>`;
+}
+
+function renderOverviewDrillEconomy(data) {
+  const economy = data.economy ?? {};
+  const money = (value, currency) => overviewFormat(value, "money", currency);
+  const revenue = (economy.revenue ?? []).map((row) => [escapeHtml(row.currency), escapeHtml(money(row.current, row.currency)), escapeHtml(money(row.previous, row.currency)), escapeHtml(overviewCount(row.purchases)), escapeHtml(overviewCount(row.refunds))]);
+  const products = (economy.products ?? []).map((row) => [escapeHtml(row.productId), escapeHtml(row.currency), escapeHtml(overviewCount(row.purchases)), escapeHtml(money(row.revenue, row.currency))]);
+  const flowRows = (rows) => rows.map((row) => ({ label: `${root.ConsoleModel.overviewFlowName(row.flow)}${row.source === "events" ? " (앱 신호)" : ""}`, value: row.amount, previous: row.previous }));
+  const amount = (row) => `${overviewCount(row.value)} (이전 ${overviewCount(row.previous)})`;
+  const placements = (economy.rewardedPlacements ?? []).map((row) => [escapeHtml(root.ConsoleModel.overviewPlacementName(row.placement)), escapeHtml(overviewCount(row.views)), escapeHtml(overviewFormat(row.perDau, "decimal"))]);
+  const vip = (economy.vip ?? []).map((row) => [escapeHtml(`VIP ${row.tier}`), escapeHtml(overviewCount(row.accounts))]);
+  byId("overviewDrillEconomyBody").innerHTML = `
+    <h4>통화별 검증 매출</h4><p class="overview-drill-note">스토어 검증 구매만, 테스트·샌드박스 제외. 통화끼리 환산하지 않습니다.</p>
+    ${overviewTable(["통화", "이번 기간", "이전 기간", "구매", "환불"], revenue, "검증 구매가 없습니다.")}
+    ${overviewTable(["상품", "통화", "구매", "매출"], products, "이번 기간 구매 상품이 없습니다.")}
+    <div class="overview-two"><section><h4>시약 획득</h4>${overviewBars(flowRows(economy.reagent?.sources ?? []), amount, "v2") || '<p class="empty-panel">기록 없음</p>'}</section>
+    <section><h4>시약 소비</h4>${overviewBars(flowRows(economy.reagent?.sinks ?? []), amount, "v2") || '<p class="empty-panel">기록 없음</p>'}</section></div>
+    <div class="overview-two"><section><h4>젬 획득(서버 지급)</h4>${overviewBars(flowRows(economy.gems?.sources ?? []), amount) || '<p class="empty-panel">기록 없음</p>'}</section>
+    <section><h4>젬 소비</h4>${overviewBars(flowRows(economy.gems?.sinks ?? []), amount) || '<p class="empty-panel">기록 없음</p>'}</section></div>
+    <p class="overview-drill-note">젬 획득은 서버가 지급한 경로(상점 무료·광고, 방치 보상, 우편)만 셉니다. 출석·구매·초대 보상 젬은 아직 원장이 없습니다. '앱 신호'는 새 계측 빌드의 gems_spent(원본 28일)입니다.</p>
+    <h4>보상형 광고 위치</h4>${overviewTable(["위치", "시청", "DAU당"], placements, "보상형 광고 시청 기록이 없습니다(테스트 광고 제외).")}
+    <h4>VIP 등급(현재)</h4>${overviewTable(["등급", "계정"], vip, "연구소 계정 기록이 없습니다.")}`;
+}
+
+function renderOverviewDrillSocial(data) {
+  const social = data.social ?? {};
+  const rows = (social.rows ?? []).map((row) => [
+    escapeHtml(row.label), escapeHtml(overviewCount(row.current)), escapeHtml(overviewCount(row.previous)),
+    escapeHtml(overviewCount(row.split?.["1.x"])), escapeHtml(overviewCount(row.split?.["2.x"])), escapeHtml(row.source === "server" ? "서버" : "앱 이벤트"),
+  ]);
+  const levels = (social.labLevels ?? []).map((row) => ({ label: row.label, value: row.accounts }));
+  const phases = (social.labPhases ?? []).map((row) => [escapeHtml(row.phase == null ? "기록 없음" : `P${row.phase}${row.completed ? " 완료" : ""}`), escapeHtml(overviewCount(row.accounts))]);
+  byId("overviewDrillSocialBody").innerHTML = `
+    ${overviewTable(["지표", "이번 기간", "이전 기간", "1.x", "2.0+", "출처"], rows, "기록이 없습니다.")}
+    <div class="overview-two"><section><h4>실험실 레벨(현재)</h4>${levels.some((row) => row.value > 0) ? overviewBars(levels, (row) => overviewCount(row.value), "v2") : '<p class="empty-panel">연구소 스냅샷이 없습니다.</p>'}</section>
+    <section><h4>저장된 진행 페이즈(현재)</h4>${overviewTable(["페이즈", "계정"], phases, "연구소 스냅샷이 없습니다.")}</section></div>
+    <p class="overview-drill-note">친구·초대·우편은 서버 기록, 공유·초대 창·출석은 앱 이벤트(최근 28일)입니다. 초대 완료는 서버 판정(계정 연동 + 2페이즈)만 셉니다.</p>`;
+}
+
+function renderOverviewDrillHealth(data) {
+  const health = data.health ?? {};
+  const per1k = (value) => overviewFinite(value) && overviewFinite(health.sessions) && health.sessions > 0 ? (value / health.sessions * 1000).toFixed(1) : "—";
+  const rows = [
+    ["새 계측 빌드 세션", overviewCount(health.sessions)],
+    ["비정상 종료", `${overviewCount(health.uncleanExits)} (1천 세션당 ${per1k(health.uncleanExits)})`],
+    ["오류 위치", `${overviewCount(health.clientErrors)} (1천 세션당 ${per1k(health.clientErrors)})`],
+    ["시작 로딩 p50 / p95", `${overviewFormat(health.load?.p50, "milliseconds")} / ${overviewFormat(health.load?.p95, "milliseconds")} · 표본 ${overviewCount(health.load?.count)}`],
+    ["끝 기록 없는 판", `${overviewCount(health.games?.unfinished)} / ${overviewCount(health.games?.settled)}판`],
+  ].map(([label, value]) => [escapeHtml(label), escapeHtml(value)]);
+  const kinds = (health.errorKinds ?? []).map((row) => [escapeHtml(root.ConsoleModel.overviewErrorKindName(row.kind)), escapeHtml(overviewCount(row.count))]);
+  byId("overviewDrillHealthBody").innerHTML = `
+    ${overviewTable(["항목", "값"], rows, "기록이 없습니다.")}
+    <h4>오류 종류</h4>${overviewTable(["종류", "위치 수"], kinds, "오류 기록이 없습니다(새 계측 빌드부터 셉니다).")}
+    <p class="overview-drill-note">오류는 세션마다 같은 위치를 한 번만, 메시지 없이 파일:줄만 받습니다. 비정상 종료는 앞화면에서 프로세스가 끝난 뒤 다음 실행에서 셉니다.</p>`;
+}
+
+function renderOverview() {
+  const data = overview.payload;
+  if (!data) return;
+  byId("overviewCards").innerHTML = (data.cards || []).map(overviewCardMarkup).join("");
+  const coverage = data.coverage || {};
+  const parts = [
+    `${formatShortDay(data.range?.current?.from)}–${formatShortDay(data.range?.current?.to)} vs ${formatShortDay(data.range?.previous?.from)}–${formatShortDay(data.range?.previous?.to)}`,
+    `${OVERVIEW_VERSION_NAMES[data.filters?.version] || "전체 버전"} · ${OVERVIEW_PLATFORM_NAMES[data.filters?.platform] || "전체 플랫폼"}`,
+    coverage.events?.status === "error" ? "원본 이벤트 집계 실패"
+      : !coverage.events?.coveredFrom ? "원본 이벤트: 보관(28일) 밖"
+      : coverage.events.full ? "원본 이벤트: 기간 전체" : `원본 이벤트: ${formatShortDay(coverage.events.coveredFrom)}부터만(28일 보관)`,
+    coverage.accounts?.status === "error" ? "계정 방문 집계 실패"
+      : !coverage.accounts?.coveredFrom ? "계정 방문: 기록 없음"
+      : coverage.accounts.full ? "계정 방문: 기간 전체" : `계정 방문: ${formatShortDay(coverage.accounts.coveredFrom)}부터 기록`,
+    coverage.has2x ? `2.0 이벤트 있음${(coverage.instrumentedVersions || []).length ? ` · 새 계측 ${coverage.instrumentedVersions.join(", ")}` : " · 새 계측 빌드 대기"}` : "2.0 이벤트 아직 없음",
+  ];
+  byId("overviewCoverage").textContent = parts.join(" · ");
+  byId("overviewNotes").innerHTML = (data.notes || []).map((note) => `<li>${escapeHtml(note)}</li>`).join("");
+  const drilldowns = data.drilldowns || {};
+  renderOverviewDrillPlayers(drilldowns);
+  renderOverviewDrillFunnel(drilldowns);
+  renderOverviewDrillCore(drilldowns);
+  renderOverviewDrillEconomy(drilldowns);
+  renderOverviewDrillSocial(drilldowns);
+  renderOverviewDrillHealth(drilldowns);
+}
+
+function updateOverviewControls() {
+  const groups = [["overviewPeriod", "periodDays", Number], ["overviewVersion", "version", String], ["overviewPlatform", "platform", String]];
+  for (const [attribute, key, cast] of groups) {
+    document.querySelectorAll(`[data-${attribute.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}]`).forEach((button) => {
+      const active = cast(button.dataset[attribute]) === overview[key];
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+  }
+}
+
+async function loadOverview(refresh = false) {
+  if (!root.ConsoleAuth.isUnlocked()) return;
+  const sequence = ++overview.sequence;
+  const section = byId("overviewSection");
+  section.setAttribute("aria-busy", "true");
+  byId("overviewStatus").textContent = overview.payload ? "새 조건으로 다시 집계하는 중입니다. 지금 보이는 숫자는 이전 조회입니다." : "요약을 집계하는 중입니다.";
+  try {
+    const data = await root.ConsoleAPI.post("analytics-dashboard-v2", {
+      view: "overview", periodDays: overview.periodDays, version: overview.version, platform: overview.platform,
+      ...(refresh ? { refresh: true } : {}),
+    });
+    if (sequence !== overview.sequence) return;
+    // 배포 전 analytics-dashboard-v2는 view를 모르고 기존 대시보드를 돌려준다. 빈 카드로 속이지 않는다.
+    if (data?.view !== "overview" || !Array.isArray(data?.cards)) throw new Error("overview_not_deployed");
+    overview.payload = data;
+    renderOverview();
+    const at = data?.generatedAt ? new Date(data.generatedAt).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "방금";
+    byId("overviewStatus").textContent = `${at} 집계 · 독일 시간${data?.cache?.hit ? ` · ${Math.max(1, Math.round((data.cache.ageSec || 0) / 60))}분 전 결과 재사용` : ""}`;
+  } catch (error) {
+    if (sequence !== overview.sequence) return;
+    const message = error?.message === "overview_not_deployed"
+      ? "한눈 요약 집계가 아직 서버에 배포되지 않았습니다. 아래 기존 상세 분석은 그대로 쓸 수 있습니다."
+      : readFunctionError(error);
+    byId("overviewStatus").textContent = `${message}${overview.payload ? " 이전 결과를 그대로 둡니다." : ""}`;
+  } finally {
+    if (sequence === overview.sequence) section.setAttribute("aria-busy", "false");
+  }
+}
+
+function changeOverview(changes) {
+  Object.assign(overview, changes);
+  updateOverviewControls();
+  syncFilterHash();
+  loadOverview();
+}
+
+function loadLegacyIfOpen() {
+  if (!overview.legacyOpen) return;
+  overview.legacyLoaded = true;
+  loadDashboard();
+}
+
+function bindOverviewControls() {
+  document.querySelectorAll("[data-overview-period]").forEach((button) => button.addEventListener("click", () => changeOverview({ periodDays: Number(button.dataset.overviewPeriod) })));
+  document.querySelectorAll("[data-overview-version]").forEach((button) => button.addEventListener("click", () => changeOverview({ version: button.dataset.overviewVersion })));
+  document.querySelectorAll("[data-overview-platform]").forEach((button) => button.addEventListener("click", () => changeOverview({ platform: button.dataset.overviewPlatform })));
+  byId("overviewRefresh").addEventListener("click", () => loadOverview(true));
+  byId("legacyAnalytics").addEventListener("toggle", (event) => {
+    overview.legacyOpen = event.currentTarget.open;
+    syncFilterHash();
+    if (overview.legacyOpen && !overview.legacyLoaded) loadLegacyIfOpen();
+  });
+}
+
 function syncFilterHash() {
   const query = root.ConsoleModel.serializeAnalyticsFilters({
     rangeDays: state.rangeDays,
@@ -1710,6 +2029,10 @@ function syncFilterHash() {
     direction: state.playerDirection,
     page: state.playerPage,
     query: state.playerQuery,
+    overviewPeriod: overview.periodDays,
+    overviewVersion: overview.version,
+    overviewPlatform: overview.platform,
+    legacyOpen: overview.legacyOpen,
   });
   root.history.replaceState(null, "", `#/analytics?${query}`);
 }
@@ -1741,6 +2064,8 @@ function readFilterHash() {
   const page = Number(params.get("page"));
   if (Number.isInteger(page) && page > 0) state.playerPage = page;
   state.playerQuery = (params.get("query") || "").slice(0, 100);
+  Object.assign(overview, root.ConsoleModel.normalizeOverviewFilters(params));
+  overview.legacyOpen = params.get("legacy") === "1";
 }
 
 function updateFilterControls() {
@@ -1891,10 +2216,16 @@ function mount() {
   if (!state.mounted) {
     readFilterHash();
     bindControls();
+    bindOverviewControls();
     state.mounted = true;
   }
   updateFilterControls();
-  loadDashboard();
+  updateOverviewControls();
+  byId("legacyAnalytics").open = overview.legacyOpen;
+  loadOverview();
+  // 레거시 상세는 열려 있을 때만 다시 읽는다. 닫혀 있으면 다음에 열 때 새로 읽는다.
+  overview.legacyLoaded = false;
+  loadLegacyIfOpen();
 }
 
 root.ConsoleAnalytics = { mount, load: loadDashboard };

@@ -27,6 +27,7 @@ vm.runInContext(read("console/analytics.js").replace("root.ConsoleAnalytics = { 
   },
   journey: renderJourney,
   finishLoading: () => setFiltersDisabled(false),
+  overview(payload) { overview.payload = payload; renderOverview(); },
 };`), context);
 const text = (id) => nodes.get(id).textContent;
 const markup = (id) => nodes.get(id).innerHTML;
@@ -197,4 +198,36 @@ assert.match(markup("removeAdsFunnel"), /광고 제거 성공/);
 render({ labEconomy: null });
 assert.match(markup("labEconomyProfiles"), /서버 집계 함수 배포 전이에요/);
 assert.equal(nodes.get("labAccountFacts").hidden, true);
+// C (2026-10-01) 한눈 요약: 서버 문자열은 이스케이프되고, 값이 없으면 0이 아니라 '—'와 이유가 보인다.
+const emptyMetric = { key: "d7", label: "D7 복귀", format: "percent", value: null, previous: null, delta: null, deltaKind: null, compare: "points", better: "up",
+  split: { "1.x": null, "2.x": null }, splitEmpty: { "1.x": "기간 내 표본 없음", "2.x": "2.0 이벤트 아직 없음" }, empty: "기간 내 표본 없음", source: "accounts" };
+window.ConsoleAnalytics.overview({
+  filters: { periodDays: 7, version: "all", platform: "all" },
+  range: { current: { from: "2026-09-25", to: "2026-10-01" }, previous: { from: "2026-09-18", to: "2026-09-24" } },
+  coverage: { events: { coveredFrom: "2026-09-25", full: true, status: "ok" }, accounts: { coveredFrom: "2026-09-25", full: true, status: "ok" }, server: { status: "ok" }, instrumentedVersions: [], has2x: false },
+  cards: [{
+    key: "players", title: "<img src=x onerror=alert(1)>", question: "몇 명?", status: "partial", note: "메모",
+    headline: { ...emptyMetric, key: "dau", label: "DAU", format: "decimal", value: 2.5, previous: 2, delta: 0.25, deltaKind: "relative", compare: "relative",
+      split: { "1.x": 2.5, "2.x": null }, splitEmpty: { "1.x": null, "2.x": "2.0 이벤트 아직 없음" }, empty: null },
+    metrics: [emptyMetric],
+    spark: { kind: "line", label: "일별 활성 계정", labels: ["2026-09-30", "2026-10-01"], points: [null, 3] },
+  }],
+  drilldowns: { players: { daily: [{ day: "2026-10-01", accounts: { all: 3, "1.x": 3, "2.x": 0 }, installs: { all: null }, sessions: { all: null } }], retention: [] },
+    funnel: { steps: [], tutorialStages: [], cohort: 0 }, core: {}, economy: {}, social: {}, health: {} },
+  notes: ["<b>기준</b>"],
+});
+assert.match(markup("overviewCards"), /&lt;img src=x onerror=alert\(1\)&gt;/);
+assert.doesNotMatch(markup("overviewCards"), /<img src=x/);
+assert.match(markup("overviewCards"), /\+25%/);
+assert.match(markup("overviewCards"), /이전 7일/);
+assert.match(markup("overviewCards"), /2\.0 이벤트 아직 없음/);
+assert.match(markup("overviewCards"), /<b>—<\/b>/, "a missing value is a dash, never a fabricated zero");
+assert.match(markup("overviewCards"), /기간 내 표본 없음/);
+assert.match(markup("overviewCards"), /data-console-jump="overviewDrillPlayers"/);
+assert.match(text("overviewCoverage"), /원본 이벤트: 기간 전체/);
+assert.match(text("overviewCoverage"), /2\.0 이벤트 아직 없음/);
+assert.match(markup("overviewNotes"), /&lt;b&gt;기준/);
+assert.match(markup("overviewDrillPlayersBody"), /이 기간에 새 계정이 없습니다/);
+assert.match(markup("overviewDrillFunnelBody"), /2\.0 이벤트가 아직 없습니다/);
+
 console.log("Console analytics consistency: real-render VM mismatch, unknown/zero, coverage, identity, denominator and funnel tests passed.");
