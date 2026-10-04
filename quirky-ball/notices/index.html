@@ -9,6 +9,17 @@
   <link href="content.css?v=20260906-1" rel="stylesheet">
   <link href="/assets/notice-links.css?v=20260909-1" rel="stylesheet">
   <title>Quirky Ball Updates — House Duck</title>
+  <script>
+    // Mark the embed mode on <html> before first paint: the body script runs only after the
+    // external scripts load, so the full cream page chrome must never flash inside an app popup.
+    (() => {
+      const params = new URLSearchParams(location.search);
+      if (!params.has("embed")) return;
+      document.documentElement.classList.add("embedded");
+      // Quirky Ball 2.0 draws the notice inside a dark popup: page surface must stay transparent.
+      if (params.get("theme") === "dark") document.documentElement.classList.add("embed-dark");
+    })();
+  </script>
   <style>
     :root { color-scheme: light; font-family: "Noto Sans", system-ui, sans-serif; color: #2c211b; background: #f8f4ec; }
     * { box-sizing: border-box; }
@@ -52,6 +63,29 @@
     body.embedded .notice-meta { font-size: .74rem; }
     body.embedded .notice-card p { display: -webkit-box; margin: 4px 0 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: .94rem; line-height: 1.35; }
     body.embedded #notice-detail { padding: 4px 4px 12px; }
+    [hidden] { display: none !important; }
+    .notice-empty { min-height: 180px; display: grid; place-content: center; margin: 0; padding: 24px 12px; color: #8b6e5d; font-weight: 800; line-height: 1.5; text-align: center; white-space: pre-line; }
+    html.embedded header, html.embedded footer, html.embedded .kicker, html.embedded h1 { display: none; }
+    html.embed-dark { color-scheme: dark; height: 100%; color: #fcfdfe; background: transparent; }
+    html.embed-dark body, html.embed-dark body.embedded { height: 100%; color: #fcfdfe; background: transparent; }
+    html.embed-dark body main { width: 100%; height: 100%; padding: 0; overflow: hidden; }
+    html.embed-dark body .notice-shell { height: 100%; border: 0; border-radius: 0; box-shadow: none; background: transparent; padding: 0; overflow: hidden; animation: none; }
+    html.embed-dark body #notice-list { padding: 0; gap: 12px; }
+    html.embed-dark body .notice-card { border: 2px solid #00bfae; border-radius: 8px; background: #1a2130; color: #fcfdfe; padding: 12px 14px; box-shadow: none; }
+    html.embed-dark body .notice-card:hover, html.embed-dark body .notice-card:focus-visible { border-color: #ffd21f; background: #262d3b; box-shadow: none; transform: none; }
+    html.embed-dark body .notice-card:active { border-color: #007e75; background: #141c2a; }
+    html.embed-dark body .notice-meta, html.embed-dark body #notice-detail time, html.embed-dark body .error { color: rgba(252, 253, 254, .64); }
+    html.embed-dark body .notice-kind { border-color: rgba(70, 222, 208, .55); background: rgba(70, 222, 208, .12); color: #46ded0; }
+    html.embed-dark body .notice-kind[data-category="event"] { border-color: rgba(201, 167, 255, .55); background: rgba(201, 167, 255, .12); color: #c9a7ff; }
+    html.embed-dark body .notice-kind[data-category="preview"] { border-color: rgba(255, 210, 31, .55); background: rgba(255, 210, 31, .12); color: #ffd21f; }
+    html.embed-dark body #notice-detail { padding: 4px 0 12px; }
+    html.embed-dark body .back { border-radius: 8px; background: #00bfae; color: #101827; }
+    html.embed-dark body .notice-empty { color: rgba(252, 253, 254, .72); }
+    html.embed-dark body .notice-spinner { border-color: rgba(252, 253, 254, .18); border-top-color: #00bfae; }
+    html.embed-dark body .notice-loading { color: rgba(252, 253, 254, .72); }
+    html.embed-dark body .notice-link-preview { border-color: rgba(70, 222, 208, .45); background: #1a2130; color: #fcfdfe; }
+    html.embed-dark body .notice-link-destination span, html.embed-dark body .notice-rich-content .notice-image-unavailable { color: rgba(252, 253, 254, .64); }
+    html.embed-dark body .notice-rich-content hr, html.embed-dark body .notice-rich-content .notice-image-unavailable { border-color: rgba(252, 253, 254, .24); }
     @media (prefers-reduced-motion: no-preference) { .notice-shell { animation: enter .45s ease-out both; } @keyframes enter { from { opacity: 0; transform: translateY(10px); } } }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -84,18 +118,18 @@
   <script>
     const languageNames = { ko: "한국어", en: "English", de: "Deutsch", ja: "日本語", fr: "Français", es: "Español", it: "Italiano", zh_CN: "简体中文", zh_TW: "繁體中文", ar: "العربية", id: "Bahasa Indonesia", ur: "اردو" };
     const noticeLabels = {
-      ko: { notice: "공지", back: "← 공지 목록", title: "공지사항", language: "언어" },
-      en: { notice: "Notice", back: "← Notice list", title: "Notices", language: "Language" },
-      de: { notice: "Hinweis", back: "← Zurück zur Liste", title: "Hinweise", language: "Sprache" },
-      ja: { notice: "お知らせ", back: "← お知らせ一覧", title: "お知らせ", language: "言語" },
-      fr: { notice: "Avis", back: "← Liste des avis", title: "Avis", language: "Langue" },
-      es: { notice: "Aviso", back: "← Lista de avisos", title: "Avisos", language: "Idioma" },
-      it: { notice: "Avviso", back: "← Elenco avvisi", title: "Avvisi", language: "Lingua" },
-      zh_CN: { notice: "公告", back: "← 公告列表", title: "公告", language: "语言" },
-      zh_TW: { notice: "公告", back: "← 公告列表", title: "公告", language: "語言" },
-      ar: { notice: "إشعار", back: "← قائمة الإشعارات", title: "الإشعارات", language: "اللغة" },
-      id: { notice: "Pengumuman", back: "← Daftar pengumuman", title: "Pengumuman", language: "Bahasa" },
-      ur: { notice: "اعلان", back: "← اعلانات کی فہرست", title: "اعلانات", language: "زبان" },
+      ko: { notice: "공지", back: "← 공지 목록", title: "공지사항", language: "언어", empty: "아직 등록된 공지사항이 없어요.", failed: "공지사항을 불러오지 못했어요." },
+      en: { notice: "Notice", back: "← Notice list", title: "Notices", language: "Language", empty: "No announcements yet.", failed: "Could not load announcements." },
+      de: { notice: "Hinweis", back: "← Zurück zur Liste", title: "Hinweise", language: "Sprache", empty: "Noch keine Ankündigungen.", failed: "Die Ankündigungen konnten nicht geladen werden." },
+      ja: { notice: "お知らせ", back: "← お知らせ一覧", title: "お知らせ", language: "言語", empty: "お知らせはまだありません。", failed: "お知らせを読み込めませんでした。" },
+      fr: { notice: "Avis", back: "← Liste des avis", title: "Avis", language: "Langue", empty: "Aucune annonce pour le moment.", failed: "Impossible de charger les annonces." },
+      es: { notice: "Aviso", back: "← Lista de avisos", title: "Avisos", language: "Idioma", empty: "Aún no hay anuncios.", failed: "No se pudieron cargar los anuncios." },
+      it: { notice: "Avviso", back: "← Elenco avvisi", title: "Avvisi", language: "Lingua", empty: "Nessun annuncio per ora.", failed: "Impossibile caricare gli avvisi." },
+      zh_CN: { notice: "公告", back: "← 公告列表", title: "公告", language: "语言", empty: "暂无公告。", failed: "无法加载公告。" },
+      zh_TW: { notice: "公告", back: "← 公告列表", title: "公告", language: "語言", empty: "暫無公告。", failed: "無法載入公告。" },
+      ar: { notice: "إشعار", back: "← قائمة الإشعارات", title: "الإشعارات", language: "اللغة", empty: "لا توجد إعلانات بعد.", failed: "تعذر تحميل الإعلانات." },
+      id: { notice: "Pengumuman", back: "← Daftar pengumuman", title: "Pengumuman", language: "Bahasa", empty: "Belum ada pengumuman.", failed: "Pengumuman tidak dapat dimuat." },
+      ur: { notice: "اعلان", back: "← اعلانات کی فہرست", title: "اعلانات", language: "زبان", empty: "ابھی تک کوئی اعلانات نہیں ہیں۔", failed: "اعلانات لوڈ نہیں ہو سکیں۔" },
     };
     const categoryLabels = {
       ko: { event: "이벤트", preview: "예고" }, en: { event: "Event", preview: "Preview" },
@@ -117,6 +151,7 @@
     const requested = requestedParam && requestedParam.trim() ? requestedParam : normalizeLanguage(navigator.language || "en");
     const selectedNoticeId = search.get("notice");
     if (search.has("embed")) document.body.classList.add("embedded");
+    if (search.has("embed") && search.get("theme") === "dark") document.querySelector('meta[name="theme-color"]').content = "#101827";
     const endpoint = "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1/public-notice";
     const language = languageNames[requested] ? requested : "en";
 
@@ -159,6 +194,15 @@
       document.querySelector("#back-to-list").textContent = labels.back;
       document.title = `${labels.title} — House Duck`;
     };
+    const renderListMessage = (text, isError) => {
+      const message = document.createElement("p");
+      message.className = isError ? "notice-empty error" : "notice-empty";
+      message.textContent = text;
+      list.replaceChildren(message);
+      loading.hidden = true;
+      detail.hidden = true;
+      list.hidden = false;
+    };
     const renderDetail = (notice) => {
       document.querySelector("#back-to-list").hidden = false;
       date.hidden = false;
@@ -192,7 +236,12 @@
           ? data.notices.filter((notice) => notice?.body && notice?.created_at)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           : []);
-        if (!notices.length) throw new Error("notice_unavailable");
+        if (!notices.length) {
+          // An empty console table is a normal state: show the list's empty state, not an error detail.
+          stopLoadingAnimation();
+          renderListMessage((noticeLabels[nextLanguage] ?? noticeLabels.en).empty, false);
+          return;
+        }
         list.replaceChildren(...notices.map((notice) => {
             const card = document.createElement("button");
             card.type = "button";
@@ -219,14 +268,8 @@
         if (selected) renderDetail(selected);
       } catch (_error) {
         stopLoadingAnimation();
-        loading.hidden = true;
-        list.hidden = true;
-        detail.hidden = false;
-        date.hidden = true;
-        document.querySelector("#notice-category").hidden = true;
-        document.querySelector("#back-to-list").hidden = true;
-        body.textContent = language === "ko" ? "현재 이 공지를 불러올 수 없어요." : "Unable to load this notice.";
-        body.className = "error";
+        // Failure stays on the list page (no detail view, no back button to an empty list).
+        renderListMessage((noticeLabels[nextLanguage] ?? noticeLabels.en).failed, true);
       } finally {
         window.HouseDuckNoticeReady = true;
       }
