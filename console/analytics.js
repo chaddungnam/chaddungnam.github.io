@@ -1996,7 +1996,7 @@ function overviewMoneyChart(data) {
   return {
     key: "money", title: "매출·광고", label: "날짜별 검증 구매와 보상형 광고",
     legend: `${overviewKey("is-now", "bar", "이번")}${overviewKey("is-before", "bar", "이전")}`,
-    plot: `<div class="ov-facet"><span class="ov-pair-label">구매<small>일별 건수</small></span><div><div class="ov-plot-part">${known.some((value) => value > 0) ? overviewYTicks(max) : ""}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}</svg>${overviewColumns(points, max, tips)}</div>${wait}</div>${overviewDayAxis(labels)}</div></div>${adRow}`,
+    plot: `<div class="ov-facet"><span class="ov-pair-label">구매<small>${data.buckets ? (data.buckets.hours === 1 ? "시간별" : `${data.buckets.hours}시간별`) : "일별"} 건수</small></span><div><div class="ov-plot-part">${known.some((value) => value > 0) ? overviewYTicks(max) : ""}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${OVERVIEW_GRID}</svg>${overviewColumns(points, max, tips)}</div>${wait}</div>${overviewDayAxis(labels)}</div></div>${adRow}`,
     compound: true,
   };
 }
