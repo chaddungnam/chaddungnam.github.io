@@ -22,7 +22,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
-assert.match(consoleHtml, /analytics\.js\?v=20261001-pulse/, "cache must refresh corrected account metrics");
+assert.match(consoleHtml, /analytics\.js\?v=20261005-r23/, "cache must refresh corrected account metrics");
 assert.match(consoleHtml, /id="analyticsCoverageMessage"/, "telemetry coverage must be prominent");
 assert.doesNotMatch(analyticsSource, /10초 미만 즉시 이탈 제외|종료 \(10초 이상\)/, "all explicit exits belong in the lifecycle sample");
 const modelSource = read("console/model.js");
@@ -56,7 +56,7 @@ assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose pr
 assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
 assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
 assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
-assert.match(consoleHtml, /analytics\.js\?v=20261001-pulse/, "the Console must cache-bust the balance signal update");
+assert.match(consoleHtml, /analytics\.js\?v=20261005-r23/, "the Console must cache-bust the balance signal update");
 assert.match(consoleHtml, /id="balanceTerminalTable"/, "the Console must expose privacy-safe balance terminal outcomes");
 assert.match(consoleHtml, /id="balancePressureSummary"/, "the Console must expose checkpoint board pressure");
 assert.match(consoleHtml, /id="balanceChoiceTable"/, "the Console must expose growth-choice outcomes");
@@ -124,7 +124,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20261001-pulse/, "the Console must cache-bust the unified notice editor layout");
+assert.match(consoleHtml, /styles\.css\?v=20261005-r23/, "the Console must cache-bust the unified notice editor layout");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");

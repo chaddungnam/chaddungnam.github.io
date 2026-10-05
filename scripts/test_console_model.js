@@ -297,3 +297,19 @@ assert.deepEqual([0, 0.4, 7, 38, 51, 240].map(model.overviewNiceMax), [1, 0.5, 1
 assert.deepEqual(model.sparklineGeometry([0, 5], 100, 20, 0, [0, 10]).segments[0], [[0, 20], [100, 10]], "two series share one axis");
 
 console.log("console model: PASS");
+
+// r23 (10-05): 1일·3일 기간과 시간 칸 이름
+{
+  const assert = require("node:assert/strict");
+  const model = require("../console/model.js");
+  assert.equal(model.normalizeOverviewFilters({ period: "1" }).periodDays, 1);
+  assert.equal(model.normalizeOverviewFilters({ period: "3" }).periodDays, 3);
+  assert.equal(model.overviewPrevLabel(1), "어제");
+  assert.equal(model.overviewNowLabel(1), "오늘");
+  assert.equal(model.overviewPrevLabel(3), "이전 3일");
+  assert.equal(model.overviewSlotTitle("2026-10-05T06:00", 6), "10월 5일 06:00–12:00");
+  assert.equal(model.overviewSlotParts("2026-10-05"), null);
+  const sentences = model.overviewSummarySentences([], 1);
+  assert.match(sentences[0].text, /^어제와 /);
+  console.log("console model r23: PASS");
+}

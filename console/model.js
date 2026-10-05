@@ -424,7 +424,21 @@
   }
 
   // ── C (2026-10-01) 한눈 요약: 필터·숫자·증감·작은 그래프 ─────────────────
-  const overviewPeriods = Object.freeze([7, 30, 90]);
+  const overviewPeriods = Object.freeze([1, 3, 7, 30, 90]);
+  // 기간 이름: 1일 = 오늘(독일 시간 0시부터)과 어제, 그 밖은 '이번/이전 N일'.
+  function overviewNowLabel(periodDays) { return Number(periodDays) === 1 ? "오늘" : `이번 ${periodDays || 7}일`; }
+  function overviewPrevLabel(periodDays) { return Number(periodDays) === 1 ? "어제" : `이전 ${periodDays || 7}일`; }
+  // 시간 칸 이름 "YYYY-MM-DDTHH:00" → 툴팁 제목·축 글자.
+  function overviewSlotParts(label) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):00$/.exec(String(label || ""));
+    return match ? { day: `${match[1]}-${match[2]}-${match[3]}`, month: Number(match[2]), date: Number(match[3]), hour: Number(match[4]) } : null;
+  }
+  function overviewSlotTitle(label, hours) {
+    const slot = overviewSlotParts(label);
+    if (!slot) return "";
+    const end = slot.hour + (hours || 1);
+    return `${slot.month}월 ${slot.date}일 ${String(slot.hour).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00`;
+  }
   const overviewVersions = Object.freeze(["all", "1.x", "2.x"]);
   const overviewPlatforms = Object.freeze(["all", "android", "ios"]);
 
@@ -478,7 +492,7 @@
   // 증감: 비교할 수 없으면 비워 두고(이유 문구), 좋아짐·나빠짐은 화살표와 글자로도 보인다(색만으로 구분하지 않음).
   function overviewDelta(metric, periodDays) {
     const compare = metric?.compare || "none";
-    const label = `이전 ${periodDays || 7}일`;
+    const label = overviewPrevLabel(periodDays);
     if (metric?.value == null) return { text: "", tone: "neutral", arrow: "", label: "" };
     if (compare === "none") return { text: "현재 상태", tone: "neutral", arrow: "", label: "" };
     if (!finite(metric.delta)) return { text: "비교 없음", tone: "neutral", arrow: "", label: metric.previous == null ? "비교 기간 기록 없음" : "0에서 늘어남" };
@@ -620,10 +634,10 @@
     if (!metric) return [];
     const days = periodDays || 7;
     const value = (number) => overviewTipValue(number, metric.format, { currency: metric.currency, empty: metric.empty || "기록 없음" });
-    const rows = [[metric.compare === "none" ? "지금" : `이번 ${days}일`, value(metric.value)]];
+    const rows = [[metric.compare === "none" ? "지금" : overviewNowLabel(days), value(metric.value)]];
     if (metric.compare && metric.compare !== "none" && metric.value != null) {
       const delta = overviewDelta(metric, days);
-      rows.push([`이전 ${days}일`, finite(metric.previous)
+      rows.push([overviewPrevLabel(days), finite(metric.previous)
         ? `${formatOverviewValue(metric.previous, metric.format, metric.currency)}${finite(metric.delta) ? ` (${delta.text})` : ""}`
         : "비교 기간 기록 없음"]);
     }
@@ -641,7 +655,7 @@
   const overviewSummarySubjects = Object.freeze({
     dau: "DAU가", new_accounts: "신규 유입이", d1: "D1 복귀가", d7: "D7 복귀가",
     revenue: "검증 매출이", purchases: "검증 구매가", p1_boss: "신규의 P1 보스 클리어가", runs_per_dau: "DAU당 판 수가",
-    boss_win: "보스 승률이", clear_rate: "런 클리어율이", unclean_per_1k: "비정상 종료가", errors_per_1k: "오류 위치가", load_p50: "시작 로딩 시간이",
+    boss_win: "보스 승률이", clear_rate: "런 클리어율이", unclean_per_1k: "사용 중 꺼짐이", errors_per_1k: "오류 위치가", load_p50: "시작 로딩 시간이",
   });
 
   function overviewSummarySentences(cards, periodDays, options = {}) {
@@ -666,12 +680,12 @@
       const amount = points ? `${percent.toFixed(1)}%p` : `${percent >= 10 ? percent.toFixed(0) : percent.toFixed(1)}%`;
       const up = metric.delta > 0;
       const verb = points ? (up ? "올라갔어요" : "내려갔어요") : (up ? "늘었어요" : "줄었어요");
-      changes.push({ key: metric.key, direction: up ? "up" : "down", size, order, text: `${subject} 이전 ${days}일보다 ${amount} ${verb}` });
+      changes.push({ key: metric.key, direction: up ? "up" : "down", size, order, text: `${subject} ${overviewPrevLabel(days)}보다 ${amount} ${verb}` });
     });
     changes.sort((left, right) => right.size - left.size || left.order - right.order);
     const sentences = changes.slice(0, 3).map(({ key, direction, text }) => ({ key, direction, text }));
-    if (sentences.length < 3 && flat > 0) sentences.push({ key: "flat", direction: null, text: `나머지 지표는 이전 ${days}일과 비슷해요` });
-    if (!changes.length && !flat) sentences.push({ key: "no_compare", direction: null, text: `이전 ${days}일과 비교할 기록이 아직 없어요` });
+    if (sentences.length < 3 && flat > 0) sentences.push({ key: "flat", direction: null, text: `나머지 지표는 ${overviewPrevLabel(days)}${Number(days) === 1 ? "와" : "과"} 비슷해요` });
+    if (!changes.length && !flat) sentences.push({ key: "no_compare", direction: null, text: `${overviewPrevLabel(days)}${Number(days) === 1 ? "와" : "과"} 비교할 기록이 아직 없어요` });
     if (sentences.length < 3 && options.has2x === false) sentences.push({ key: "no_2x", direction: null, text: "2.0 데이터는 아직 기다리는 중이에요" });
     return sentences.slice(0, 3);
   }
@@ -737,6 +751,10 @@
   return {
     normalizeOverviewFilters,
     formatOverviewValue,
+    overviewNowLabel,
+    overviewPrevLabel,
+    overviewSlotParts,
+    overviewSlotTitle,
     formatOverviewSeconds,
     overviewDelta,
     sparklineGeometry,

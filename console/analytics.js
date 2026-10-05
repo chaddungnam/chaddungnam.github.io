@@ -1706,11 +1706,21 @@ const overview = { payload: null, periodDays: 7, version: "all", platform: "all"
 const OVERVIEW_VERSION_NAMES = Object.freeze({ all: "전체 버전", "1.x": "1.x 라이브", "2.x": "2.0+" });
 const OVERVIEW_PLATFORM_NAMES = Object.freeze({ all: "전체 플랫폼", android: "Android", ios: "iOS" });
 const OVERVIEW_WAIT_2X = "2.0 데이터 대기 중";
-const OVERVIEW_KPIS = Object.freeze([
-  { card: "players", metric: "dau", label: "DAU", definition: "분석 동의 후 실행한 서버 계정의 하루 평균", sparkValue: (value) => `${overviewCount(value)}명` },
-  { card: "players", metric: "d1", label: "D1 복귀", definition: "동의 후 첫 실행한 새 계정 중 다음 날 다시 실행한 비율", sparkValue: (value) => overviewPct(value) },
-  { card: "economy", metric: "revenue", label: "매출(검증)", definition: "스토어 검증 구매만(테스트·샌드박스·환불 제외), 통화끼리 환산하지 않음", sparkValue: (value) => `${overviewCount(value)}건` },
-  { card: "health", metric: "unclean_per_1k", label: "비정상 종료/1천 세션", definition: "앞화면에서 프로세스가 끝나 다음 실행에서 확인된 종료(크래시·강제 종료)", sparkValue: (value) => `${overviewCount(value)}건` },
+// 1줄: 묶음 6장. 큰 숫자 하나·증감 칩·작은 추이 + 그 묶음의 나머지 핵심 숫자 몇 줄(클릭 없이 한눈에).
+// rows의 지표는 analytics-dashboard-v2 카드의 metrics 키. 정의·비교는 각 줄의 툴팁.
+const OVERVIEW_TILES = Object.freeze([
+  { card: "players", label: "DAU(하루 평균)", definition: "분석 동의 후 실행한 서버 계정의 하루 평균", sparkUnit: "명", bucketUnit: "대",
+    rows: [["wau", "WAU"], ["new_accounts", "신규 유입"], ["d1", "D1 복귀"], ["session_length", "평균 세션"]] },
+  { card: "funnel", label: "신규 중 P1 보스 클리어", definition: "2.0 신규 설치(동의 후 첫 실행) 중 P1 보스까지 깬 비율",
+    rows: [["cohort", "2.0 신규 설치"], ["tutorial_done", "튜토리얼 완료"], ["first_run", "첫 런 시작"], ["next_day", "다음 날 복귀"]] },
+  { card: "core", label: "DAU당 판 수", definition: "판 = 2.0 실험실 런 + 1.x 클래식", sparkUnit: "", bucketUnit: "판",
+    rows: [["run_length", "판 길이"], ["clear_rate", "런 클리어"], ["boss_win", "보스 승률"], ["shooting_usage", "슈팅 쓴 런"]] },
+  { card: "economy", label: "매출(검증)", definition: "스토어 검증 구매만(테스트·샌드박스·환불 제외), 통화끼리 환산하지 않음", sparkUnit: "건", bucketUnit: "건",
+    rows: [["buyers", "구매자"], ["arpdau", "ARPDAU"], ["rewarded_per_dau", "광고/DAU"], ["vip", "VIP 계정"]] },
+  { card: "social", label: "친구로 이어짐", definition: "친구 수락 + 초대 완료", sparkUnit: "건", bucketUnit: "건",
+    rows: [["share_taps", "공유 카드 탭"], ["attendance", "출석 수령"], ["mailbox", "우편 수령"], ["lab_level", "실험실 Lv 중앙"]] },
+  { card: "health", label: "사용 중 꺼짐/1천 세션", definition: "앱을 화면에 띄워 쓰는 중에 꺼진 것(크래시·멈춰서 강제 종료). 홈·앱 전환기로 내린 뒤 닫은 것은 세지 않음(판정 고친 빌드부터 셈)", sparkUnit: "건", bucketUnit: "건",
+    rows: [["errors_per_1k", "오류/1천 세션"], ["load_p50", "시작 로딩 p50"], ["unfinished", "끝 기록 없는 판"]] },
 ]);
 
 function overviewFinite(value) { return typeof value === "number" && Number.isFinite(value); }
@@ -1724,8 +1734,10 @@ function overviewFamilies(data) {
   const version = data.filters?.version ?? overview.version;
   return version === "all" ? ["1.x", "2.x"] : [version];
 }
+function overviewBucketHours() { return overview.payload?.buckets?.hours ?? null; }
 function overviewDayTitle(day) {
   if (!day) return "";
+  if (root.ConsoleModel.overviewSlotParts(day)) return root.ConsoleModel.overviewSlotTitle(day, overviewBucketHours() || 1);
   return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", weekday: "short", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
 }
 function overviewEmptyReason(metric, version) {
@@ -1778,6 +1790,15 @@ function overviewXLabels(labels) {
 }
 function overviewDayAxis(days) {
   if (!days.length) return overviewXLabels([]);
+  // 시간 칸: 1일은 0·6·12·18시, 3일은 날짜 첫 칸마다. 칸 가운데에 글자를 둔다.
+  if (root.ConsoleModel.overviewSlotParts(days[0])) {
+    const width = 100 / days.length;
+    const many = days.length > 12;
+    const marks = days.map((label, index) => [index, root.ConsoleModel.overviewSlotParts(label)])
+      .filter(([, slot]) => many ? slot.hour % 6 === 0 : slot.hour === 0)
+      .map(([index, slot]) => [index * width + width / 2, many ? `${slot.hour}시` : `${slot.month}. ${slot.date}.`]);
+    return overviewXLabels(marks);
+  }
   if (days.length === 1) return overviewXLabels([[50, formatShortDay(days[0])]]);
   return overviewXLabels([[0, formatShortDay(days[0]), "start"], [100, formatShortDay(days.at(-1)), "end"]]);
 }
@@ -1788,9 +1809,10 @@ function overviewKpiSpark(spec, spark, metric) {
   const points = Array.isArray(spark?.points) ? spark.points : [];
   if (!points.some(overviewFinite)) return `<div class="ov-spark is-empty" aria-hidden="true"></div>`;
   const labels = spark.labels || [];
-  const tips = points.map((value, index) => overviewTip(spark.compare ? labels[index] : overviewDayTitle(labels[index]),
-    [[spark.label || metric?.label || spec.label, overviewFinite(value) ? spec.sparkValue(value) : "기록 없음"]]));
-  if (spark.kind === "bars") {
+  const steps = spark.kind === "steps";
+  const tips = points.map((value, index) => overviewTip(spark.compare || steps ? labels[index] : overviewDayTitle(labels[index]),
+    [[spark.label || metric?.label || spec.label, overviewFinite(value) ? (steps ? overviewPct(value) : spec.sparkValue(value)) : "기록 없음"]]));
+  if (spark.kind === "bars" || steps) {
     const max = Math.max(0, ...points.filter(overviewFinite));
     return `<div class="ov-spark is-bars">${overviewColumns(points, max, tips)}</div>`;
   }
@@ -1801,9 +1823,15 @@ function overviewKpiSpark(spec, spark, metric) {
   return `<div class="ov-spark"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${marks.svg}</svg>${marks.dots}${end}${overviewHits(tips)}</div>`;
 }
 
+function overviewDeltaMark(metric, days, waiting) {
+  if (waiting || metric?.value == null) return "";
+  const delta = root.ConsoleModel.overviewDelta(metric, days);
+  return delta.arrow ? `<span class="ov-row-delta" data-tone="${delta.tone}" aria-label="${escapeHtml(`${delta.label} 대비 ${delta.text}`)}">${delta.arrow}</span>` : "";
+}
+
 function overviewKpiMarkup(spec, data) {
   const card = overviewCard(data, spec.card);
-  const metric = spec.card === "economy" ? card?.headline ?? null : overviewMetric(card, spec.metric);
+  const metric = card?.headline ?? null;
   const days = overviewDays();
   const label = spec.card === "economy" && metric?.key === "purchases" ? "검증 구매" : spec.label;
   const value = overviewFormat(metric?.value, metric?.format, metric?.currency);
@@ -1815,22 +1843,35 @@ function overviewKpiMarkup(spec, data) {
     const amount = delta.arrow ? delta.text.replace(/^[+−±]/, "") : delta.text;
     chip = `<span class="ov-chip" data-tone="${delta.arrow ? delta.tone : "quiet"}">${delta.arrow ? `<span aria-hidden="true">${delta.arrow}</span>` : ""}${escapeHtml(amount)}</span>`;
   }
-  // D1은 날짜별 값이 없다(코호트 지표). 이전 기간 → 이번 기간 두 점으로 기울기만 보인다.
-  const spark = spec.metric === "d1"
-    ? { kind: "line", compare: true, label: "D1 복귀", points: [metric?.previous ?? null, metric?.value ?? null], labels: [`이전 ${days}일`, `이번 ${days}일`] }
-    : card?.spark;
+  const bucket = Boolean(data.buckets);
+  const unit = bucket ? spec.bucketUnit ?? "" : spec.sparkUnit ?? "";
+  const sparkSpec = { ...spec, sparkValue: (number) => `${overviewFormat(number, "decimal")}${unit}` };
   const note = [spec.definition, metric?.detail, card && card.status !== "ok" ? card.note : ""].filter(Boolean).join(" · ");
   const tip = data.waiting ? "" : ` data-tip="${overviewTip(metric?.label || label, root.ConsoleModel.overviewMetricTipRows(metric, days), note)}"`;
-  return `<article class="ov-kpi" tabindex="0" data-tip-group${tip} aria-label="${escapeHtml(`${label} ${value}`)}">
-    <h3 class="ov-kpi-label">${escapeHtml(label)}</h3>
-    <p class="ov-kpi-main"><strong class="ov-kpi-value${metric?.value == null ? " is-empty" : ""}">${escapeHtml(value)}</strong>${chip}</p>
-    ${data.waiting ? `<div class="ov-spark is-empty" aria-hidden="true"></div>` : overviewKpiSpark(spec, spark, metric)}
+  const rows = spec.rows.map(([key, name]) => {
+    const row = overviewMetric(card, key);
+    const empty = row?.value == null;
+    const text = data.waiting ? "…" : empty ? "—" : overviewFormat(row.value, row.format, row.currency);
+    const rowTip = data.waiting || !row ? "" : ` data-tip="${overviewTip(row.label || name, root.ConsoleModel.overviewMetricTipRows(row, days), [row.detail, empty ? overviewEmptyReason(row, data.filters?.version) : ""].filter(Boolean).join(" · "))}"`;
+    return `<span class="ov-row"${rowTip}><span class="ov-row-name">${escapeHtml(name)}</span><b class="ov-row-value${empty ? " is-empty" : ""}">${escapeHtml(text)}${overviewDeltaMark(row, days, data.waiting)}</b></span>`;
+  }).join("");
+  return `<article class="ov-kpi" data-card="${spec.card}" tabindex="0" data-tip-group aria-label="${escapeHtml(`${label} ${value}`)}">
+    <div class="ov-kpi-top"${tip}>
+      <h3 class="ov-kpi-label">${escapeHtml(label)}</h3>
+      <p class="ov-kpi-main"><strong class="ov-kpi-value${metric?.value == null ? " is-empty" : ""}">${escapeHtml(value)}</strong>${chip}</p>
+    </div>
+    ${data.waiting ? `<div class="ov-spark is-empty" aria-hidden="true"></div>` : overviewKpiSpark(sparkSpec, card?.spark, metric)}
+    <div class="ov-kpi-rows">${rows}</div>
   </article>`;
 }
 
 // ── 2줄: 활성 사용자 · 복귀 곡선 · 2.0 첫 세션 퍼널 ──
 function overviewActiveChart(data) {
-  const daily = data.drilldowns?.players?.daily ?? [];
+  // 1일·3일은 시간 칸(그 칸에 기록을 보낸 기기), 7일 이상은 날짜별 활성 계정.
+  const bucketed = Boolean(data.buckets);
+  const daily = bucketed
+    ? (data.buckets.rows ?? []).map((row) => ({ day: row.bucket, accounts: row.installs }))
+    : data.drilldowns?.players?.daily ?? [];
   const families = overviewFamilies(data);
   const series = (family) => daily.map((row) => overviewFinite(row.accounts?.[family]) ? row.accounts[family] : null);
   const v1 = families.includes("1.x") ? series("1.x") : null;
@@ -1847,7 +1888,7 @@ function overviewActiveChart(data) {
     v2 ? ["2.0+", !v2Drawn ? OVERVIEW_WAIT_2X : v2[index] === null ? "기록 전" : count(row.accounts?.["2.x"])] : null,
     v1 ? ["1.x", count(row.accounts?.["1.x"])] : null,
     families.length > 1 ? ["전체", count(row.accounts?.all)] : null,
-  ], "활성 = 분석 동의 후 그날 실행한 서버 계정"));
+  ], bucketed ? "활성 = 그 시간에 기록을 보낸 기기(분석 동의). 아직 오지 않은 시간은 비움" : "활성 = 분석 동의 후 그날 실행한 서버 계정"));
   const wait = !daily.length || (!v1Drawn && !v2Drawn) ? overviewWait(v2 && !v1 ? OVERVIEW_WAIT_2X : "이 기간 활성 기록이 없어요")
     : v2 && !v2Drawn ? overviewWait(OVERVIEW_WAIT_2X, "top") : "";
   return {
@@ -1990,9 +2031,9 @@ function overviewHealthChart(data) {
   const errors = overviewMetric(card, "errors_per_1k");
   const load = overviewMetric(card, "load_p50");
   const loadP95 = overviewMetric(card, "load_p95");
-  const pairs = [["오류", errors, health.clientErrors], ["비정상 종료", unclean, health.uncleanExits]];
+  const pairs = [["오류", errors, health.clientErrors], ["사용 중 꺼짐", unclean, health.uncleanExits]];
   const values = pairs.flatMap(([, metric]) => [metric?.value, metric?.previous]).filter(overviewFinite);
-  const chart = { key: "health", title: "건강", label: "1천 세션당 오류·비정상 종료와 시작 로딩",
+  const chart = { key: "health", title: "건강", label: "1천 세션당 오류·사용 중 꺼짐과 시작 로딩",
     legend: `${overviewKey("is-now", "bar", "이번")}${overviewKey("is-before", "bar", "이전")}` };
   if (!values.length && !overviewFinite(load?.value)) {
     return { ...chart, legend: "", plot: overviewWait(version === "1.x" ? "1.x는 건강 신호를 보내지 않아요" : OVERVIEW_WAIT_2X) };
@@ -2045,7 +2086,7 @@ function overviewCoverageParts(data) {
 
 function renderOverviewBoard(data) {
   overviewTipHide();
-  byId("overviewKpis").innerHTML = OVERVIEW_KPIS.map((spec) => overviewKpiMarkup(spec, data)).join("");
+  byId("overviewKpis").innerHTML = OVERVIEW_TILES.map((spec) => overviewKpiMarkup(spec, data)).join("");
   byId("overviewCharts").innerHTML = OVERVIEW_CHARTS.map((chart, index) => overviewChartMarkup(chart(data), data, index)).join("");
 }
 
@@ -2297,7 +2338,7 @@ function renderOverviewDrillHealth(data) {
   const per1k = (value) => overviewFinite(value) && overviewFinite(health.sessions) && health.sessions > 0 ? (value / health.sessions * 1000).toFixed(1) : "—";
   const rows = [
     ["새 계측 빌드 세션", overviewCount(health.sessions)],
-    ["비정상 종료", `${overviewCount(health.uncleanExits)} (1천 세션당 ${per1k(health.uncleanExits)})`],
+    ["사용 중 꺼짐", `${overviewCount(health.uncleanExits)} (1천 세션당 ${per1k(health.uncleanExits)})`],
     ["오류 위치", `${overviewCount(health.clientErrors)} (1천 세션당 ${per1k(health.clientErrors)})`],
     ["시작 로딩 p50 / p95", `${overviewFormat(health.load?.p50, "milliseconds")} / ${overviewFormat(health.load?.p95, "milliseconds")} · 표본 ${overviewCount(health.load?.count)}`],
     ["끝 기록 없는 판", `${overviewCount(health.games?.unfinished)} / ${overviewCount(health.games?.settled)}판`],
@@ -2306,7 +2347,7 @@ function renderOverviewDrillHealth(data) {
   byId("overviewDrillHealthBody").innerHTML = `
     ${overviewTable(["항목", "값"], rows, "기록이 없습니다.")}
     <h4>오류 종류</h4>${overviewTable(["종류", "위치 수"], kinds, "오류 기록이 없습니다(새 계측 빌드부터 셉니다).")}
-    <p class="overview-drill-note">오류는 세션마다 같은 위치를 한 번만, 메시지 없이 파일:줄만 받습니다. 비정상 종료는 앞화면에서 프로세스가 끝난 뒤 다음 실행에서 셉니다.</p>`;
+    <p class="overview-drill-note">오류는 세션마다 같은 위치를 한 번만, 메시지 없이 파일:줄만 받습니다. 사용 중 꺼짐은 앱을 화면에 띄워 쓰는 중에 꺼진 것(크래시·멈춰서 강제 종료)을 다음 실행에서 셉니다. 홈·앱 전환기로 내린 뒤 쓸어 닫거나 OS가 정리한 것은 세지 않습니다(판정을 고친 빌드부터, 그 전 기록은 제외).</p>`;
 }
 
 function renderOverview() {

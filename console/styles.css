@@ -1416,6 +1416,34 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .legacy-summary small { color: var(--ov-muted, #5f687b); font-size: 11px; line-height: 1.5; }
 .legacy-analytics[open] > summary { border-bottom: 1px solid var(--line); }
 .legacy-body { padding: 16px; }
+/* r23 (10-05) 한눈: 묶음 6장에 핵심 숫자 줄을 바로 보이게. 1440×900에서 그래프까지 스크롤 없이. */
+.ov-kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.ov-kpi { grid-template-rows: auto auto 1fr; gap: 2px; padding: 10px 12px 8px; }
+.ov-kpi-top { border-radius: 8px; }
+.ov-kpi-top.is-active { background: var(--ov-hover); }
+.ov-kpi-label { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-kpi-value { font-size: 24px; }
+.ov-kpi .ov-chip { padding: 2px 6px; font-size: 10px; }
+.ov-kpi .ov-spark { height: 22px; margin-top: 2px; }
+.ov-kpi-rows { display: grid; gap: 1px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--ov-grid); }
+.ov-row { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-height: 17px; padding: 0 3px; border-radius: 5px; font-size: 11px; line-height: 17px; }
+.ov-row.is-active { background: var(--ov-hover); }
+.ov-row-name { overflow: hidden; color: var(--ov-muted); font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.ov-row-value { display: inline-flex; align-items: baseline; gap: 3px; color: var(--ink); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ov-row-value.is-empty { color: #aab2bf; font-weight: 700; }
+.ov-row-delta { font-size: 8px; color: var(--ov-muted); }
+.ov-row-delta[data-tone="good"] { color: var(--ov-good); }
+.ov-row-delta[data-tone="bad"] { color: var(--ov-bad); }
+.ov-charts { gap: 8px; margin-top: 8px; }
+.ov-card { padding: 10px 12px 8px; }
+.ov-card-head { margin-bottom: 6px; }
+.ov-plot { --ov-plot-h: 128px; }
+.ov-card:not(.is-wide) .ov-plot { --ov-plot-h: 96px; }
+.ov-plot-part { height: 58px; }
+.ov-summary { margin-top: 8px; padding: 8px 14px; }
+@media (max-width: 1240px) {
+  .ov-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 1100px) {
   .ov-kpis, .ov-charts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ov-summary { grid-template-columns: 1fr; }
@@ -1429,7 +1457,8 @@ body::before { opacity: .18; background-size: 22px 22px; }
   .ov-bar-end .overview-refresh { margin-left: auto; }
   .ov-kpis, .ov-charts, .overview-two { grid-template-columns: 1fr; }
   .ov-kpi { grid-template-columns: minmax(0, 1fr) 44%; grid-template-rows: auto auto; column-gap: 12px; }
-  .ov-kpi .ov-spark { grid-row: 1 / 3; grid-column: 2; align-self: center; height: 36px; margin: 0; }
+  .ov-kpi .ov-spark { grid-row: 1; grid-column: 2; align-self: center; height: 36px; margin: 0; }
+  .ov-kpi-rows { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; }
   .ov-plot, .ov-card:not(.is-wide) .ov-plot { --ov-plot-h: 132px; }
   .overview-drill > summary, .overview-drill-body { padding-right: 14px; padding-left: 14px; }
   .legacy-body { padding: 8px; }
