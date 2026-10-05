@@ -1,21 +1,21 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-09-29T08:35:30.000Z",
+  "updated": "2026-10-05T11:32:34.000Z",
   "videos": [
+    {
+      "videoId": "rnksH-UdAAc",
+      "title": "Quirky Ball 2.0.0 Mobile Game | 쿼키볼 모바일 게임 티저영상",
+      "published": "2026-10-05T11:32:34.000Z"
+    },
+    {
+      "videoId": "sGZ5lLg5UUM",
+      "title": "[C&tBNW] 'Citizen-1' 동무와 멋진 신세계 BGM",
+      "published": "2026-10-05T05:00:07.000Z"
+    },
     {
       "videoId": "-vev9SaVDe0",
       "title": "당분간 클로드 Opus 5.5만 써야겠네요",
       "published": "2026-09-29T08:35:30.000Z"
-    },
-    {
-      "videoId": "-XXwKDnYJe0",
-      "title": "(무편집) 쿼키볼 2.0.0 튜토리얼 | 1인개발일지",
-      "published": "2026-09-23T11:53:10.000Z"
-    },
-    {
-      "videoId": "M81ETPnUhc8",
-      "title": "다들 GPT 아스트라에 열광할때 탈주했습니다.",
-      "published": "2026-09-19T09:00:24.000Z"
     }
   ]
 }
