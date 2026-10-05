@@ -74,26 +74,27 @@ test("localized legal documents distinguish required Supabase operations from op
   }
 });
 
-test("age and combined analytics controls are conditional, not retroactive public-build claims", () => {
+test("age and combined analytics controls match the 2.0.0 client", () => {
   const copy = {
-    ko: { scope: /연령 확인[^<]*통합 분석 안내[^<]*표시되는 앱/, noRetro: /기존[^<]*Firebase[^<]*소급[^<]*확대하지/, ttl: /24시간/, age: /14~17/ },
-    en: { scope: /app that displays[^<]*age confirmation[^<]*combined analytics notice/i, noRetro: /previous[^<]*Firebase[^<]*not[^<]*retroactively extend/i, ttl: /24 hours/i, age: /14–17/ },
-    de: { scope: /App, die[^<]*Altersbestätigung[^<]*gemeinsamen Analysehinweis anzeigt/i, noRetro: /frühere[^<]*Firebase[^<]*nicht rückwirkend erweitert/i, ttl: /24 Stunden/i, age: /14–17/ },
-    ja: { scope: /年齢確認[^<]*統合分析の案内[^<]*表示されるアプリ/, noRetro: /以前[^<]*Firebase[^<]*遡及[^<]*拡張しません/, ttl: /24時間/, age: /14～17/ },
+    ko: { noRetro: /기존[^<]*Firebase[^<]*소급[^<]*확대하지/, ttl: /24시간/, age: /14~17/ },
+    en: { noRetro: /previous[^<]*Firebase[^<]*not[^<]*retroactively extend/i, ttl: /24 hours/i, age: /14–17/ },
+    de: { noRetro: /frühere[^<]*Firebase[^<]*nicht rückwirkend[^<]*erweitert/i, ttl: /24 Stunden/i, age: /14–17/ },
+    ja: { noRetro: /以前[^<]*Firebase[^<]*遡及[^<]*拡張しません/, ttl: /24時間/, age: /14～17/ },
   };
   for (const [locale, checks] of Object.entries(copy)) {
     const privacy = read(`privacy/${locale}.html`);
     const terms = read(`quirky-ball/terms/${locale}.html`);
     for (const [name, html] of [["privacy", privacy], ["terms", terms]]) {
       const text = html.replace(/<[^>]+>/g, " ");
-      assert.match(text, checks.scope, `${locale} ${name}: scope controls to the displayed notice`);
       assert.match(text, checks.noRetro, `${locale} ${name}: no retroactive expansion of Firebase consent`);
       assert.match(text, checks.age, `${locale} ${name}: explain teen use`);
-      assert.match(html, /datetime="2026-09-09"/, `${locale} ${name}: current clarification date`);
+      assert.match(html, /datetime="2026-10-05"/, `${locale} ${name}: current update date`);
     }
     assert.match(privacy, checks.ttl, `${locale}: disclose app-managed pending-event expiry`);
     assert.match(privacy, /0[^<]*14[^<]*18/, `${locale}: disclose local age-band codes`);
-    assert.match(privacy, /https:\/\/legal\.applovin\.com\/policies-publishers\//, `${locale}: link activation requirements`);
+    assert.match(privacy, /tutorial|튜토리얼|Tutorial|チュートリアル/, `${locale}: disclose tutorial-completion event`);
+    assert.match(privacy, /Google Ads/, `${locale}: disclose Google Ads conversion measurement`);
+    assert.match(privacy, /Gemini/, `${locale}: disclose redacted support summaries`);
   }
 });
 
