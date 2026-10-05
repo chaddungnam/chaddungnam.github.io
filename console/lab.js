@@ -70,12 +70,12 @@
   }
   async function loadReports() {
     const seq = ++sequences.reports;
-    byId("issueReportsPanel").setAttribute("aria-busy","true"); byId("issueReportsMessage").textContent = "게임 내 신고를 불러오는 중입니다.";
+    byId("issueReportsPanel").setAttribute("aria-busy","true"); byId("issueReportsMessage").textContent = "게임 안 문의·제보를 불러오는 중입니다.";
     try {
       const d = await post({action:"reports.list",page:reportPage});
       if (seq !== sequences.reports) return;
       reportPages = Math.max(1,Number(d.pageCount || 1));
-      byId("issueReportsRows").innerHTML = (d.reports || []).map(r => `<article class="audit-item"><strong>${esc(time(r.submitted_at))}</strong><a href="#/players/${encodeURIComponent(r.user_id)}">${esc(r.user_id)}</a><p class="report-body">${esc(r.body)}</p><small>${esc([r.metadata?.app_version,r.metadata?.platform,r.metadata?.locale].filter(Boolean).join(" · "))}</small></article>`).join("") || '<p class="empty-panel">접수된 게임 내 신고가 없습니다.</p>';
+      byId("issueReportsRows").innerHTML = (d.reports || []).map(r => `<article class="audit-item"><strong>${esc(time(r.submitted_at))}</strong><a href="#/players/${encodeURIComponent(r.user_id)}">${esc(r.nickname || "닉네임 없음")} · ${esc(r.user_id)}</a><p class="report-body">${esc(r.body)}</p><small>${esc([r.metadata?.app_version && `앱 ${r.metadata.app_version}${r.metadata?.build ? ` (빌드 ${r.metadata.build})` : ""}`,r.metadata?.platform,r.metadata?.locale && `언어 ${r.metadata.locale}`].filter(Boolean).join(" · "))}</small></article>`).join("") || '<p class="empty-panel">게임 안에서 보낸 문의·제보가 아직 없습니다.</p>';
       byId("issueReportsMessage").textContent = `${d.total || 0}건 · 읽기 전용`;
       byId("issueReportsPage").textContent = `${reportPage} / ${reportPages}`;
       byId("issueReportsPrevious").disabled = reportPage <= 1; byId("issueReportsNext").disabled = reportPage >= reportPages;
