@@ -161,8 +161,8 @@ test("home leads with store badges, YouTube, and exactly two game previews", () 
     assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
-    assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} video game preview`);
-    assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 1, `${file} HEXAWORLD development preview`);
+    assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} video game previews (Quirky Ball + C&tBNW)`);
+    assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 1, `${file} C&tBNW looping preview`);
     assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }
 

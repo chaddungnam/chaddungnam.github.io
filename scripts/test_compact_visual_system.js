@@ -70,7 +70,7 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   assert.equal((html.match(/data-project="/g) || []).length, 2);
   assert.doesNotMatch(html, /history-section|journal-section/);
   assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 1);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 2);
 }
 
 for (const file of ["about/index.html", "about/index_en.html", "about/index_de.html", "about/index_ja.html"]) {

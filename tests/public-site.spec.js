@@ -142,7 +142,7 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   await expect(page.locator("[data-scroll-quirky]")).toHaveAttribute("src", /assets\/red-quirky\.svg/);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  await expect(page.locator("[data-game-preview]")).toHaveCount(1);
+  await expect(page.locator("[data-game-preview]")).toHaveCount(2);
   await expect(page.locator("[data-hexaworld-preview]")).toHaveCount(1);
   await expect(page.locator("[data-project] .phone-side-button")).toHaveCount(4);
   await expect(page.locator("[data-project] .phone-home-indicator")).toHaveCount(2);
