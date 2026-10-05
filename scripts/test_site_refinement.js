@@ -46,9 +46,9 @@ async function main() {
     const method = html.match(/<details class="community-method">[\s\S]*?<\/details>/)?.[0];
     assert.ok(method);
     assert.doesNotMatch(method, /2026|202건|202 completed|202 abgeschlossenen|2026年/);
-    for (const legal of [`privacy/${lang}.html`, `quirky-ball/terms/${lang}.html`,
-      `quirky-ball/privacy/delete_${lang}.html`, `impressum/${lang}.html`]) {
-      assert.match(read(legal), /legal-update[^]*<time datetime="2026-09-05">/);
+    for (const [legal, date] of [[`privacy/${lang}.html`, '2026-10-05'], [`quirky-ball/terms/${lang}.html`, '2026-10-05'],
+      [`quirky-ball/privacy/delete_${lang}.html`, '2026-09-08'], [`impressum/${lang}.html`, '2026-09-05']]) {
+      assert.match(read(legal), new RegExp(`legal-update[^]*<time datetime="${date}">`), legal);
     }
   }
   assert.doesNotMatch(read('index_en.html'), /And counting/);

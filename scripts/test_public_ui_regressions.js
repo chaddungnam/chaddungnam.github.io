@@ -257,10 +257,10 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
 
 test("terms show the effective date and avoid unconfirmed business status", () => {
   const expectations = [
-    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 8월 24일/, /영업하는 개인사업자/],
-    ["quirky-ball/terms/en.html", /Effective date:\s*August 24, 2026/i, /sole proprietor/i],
-    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*24\. August 2026/i, /Einzelunternehmer/i],
-    ["quirky-ball/terms/ja.html", /施行日:\s*2026年8月24日/, /個人事業主/],
+    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 10월 5일/, /영업하는 개인사업자/],
+    ["quirky-ball/terms/en.html", /Effective date:\s*October 5, 2026/i, /sole proprietor/i],
+    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*5\. Oktober 2026/i, /Einzelunternehmer/i],
+    ["quirky-ball/terms/ja.html", /施行日:\s*2026年10月5日/, /個人事業主/],
   ];
   for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);
