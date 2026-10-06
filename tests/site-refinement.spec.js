@@ -3,7 +3,7 @@ const support = require('../assets/support-site.js');
 const locales = [['ko','korean','도움이 필요하신가요?'],['en','english','Need a hand?'],['de','german','Brauchst du Hilfe?'],['ja','japanese','お困りですか？']];
 
 test('live community stats render public totals and evergreen copy', async ({page}) => {
-  const live = {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',window_days:28,all_time:false};
+  const live = {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',all_time:true};
   const requests = [];
   await page.route('**/functions/v1/public-community-stats', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live)}));
   page.on('request', request => {
@@ -20,8 +20,8 @@ test('live community stats render public totals and evergreen copy', async ({pag
   await expect(page.locator('.community-date')).toHaveCount(0);
   await expect(page.locator('body')).not.toContainText('2026.09.05');
   await page.locator('.community-method summary').click();
-  await expect(page.locator('.community-method p')).toContainText('최근 28일');
-  await expect(page.locator('.community-method p')).toContainText('출시 이후 전체 누적 점수가 아닙니다');
+  await expect(page.locator('.community-method p')).toContainText('쿼키력');
+  await expect(page.locator('.community-method p')).not.toContainText('28일');
   expect(await section.innerText()).not.toMatch(/nickname|user_id|display_code|email|token|apikey/i);
   await section.scrollIntoViewIfNeeded();
   await expect.poll(async () => page.locator('[data-community-total] .counter-track').evaluateAll(nodes => nodes.length > 0 && nodes.every(node => node.style.transform.startsWith('translateY(-'))), {timeout:4000}).toBe(true);
@@ -36,8 +36,8 @@ test('community stats refresh on reload with the newest public fixture', async (
   await page.route('**/functions/v1/public-community-stats', route => {
     calls += 1;
     const live = calls === 1
-      ? {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',window_days:28,all_time:false}
-      : {total_score:'34565727',record_count:204,as_of:'2026-09-07T09:23:00Z',window_days:28,all_time:false};
+      ? {total_score:'34565726',record_count:203,as_of:'2026-09-07T09:22:00Z',all_time:true}
+      : {total_score:'34565727',record_count:204,as_of:'2026-09-07T09:23:00Z',all_time:true};
     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live)});
   });
   await page.goto('/?lang=ko');
@@ -53,7 +53,7 @@ test('community stats shows retry for errors and accepts a valid zero total', as
   await page.route('**/functions/v1/public-community-stats', route => {
     calls += 1;
     if(calls === 1) return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'unavailable'})});
-    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({total_score:'0',record_count:0,as_of:'2026-09-07T09:24:00Z',window_days:28,all_time:false})});
+    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({total_score:'0',record_count:0,as_of:'2026-09-07T09:24:00Z',all_time:true})});
   });
   await page.goto('/?lang=ko');
   const section = page.locator('[data-community-stats]');

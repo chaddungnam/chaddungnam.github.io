@@ -39,10 +39,10 @@ async function main() {
     assert.ok(html.includes(`<button type="button" class="community-retry" data-community-retry hidden>${retry}</button>`));
     assert.match(html, /studio-home\.css\?v=20260921-ios-live/);
     assert.match(html, /studio-music\.css\?v=20260907/);
-    assert.match(html, /community-stats\.js\?v=20260907/);
+    assert.match(html, /community-stats\.js\?v=20261006/);
     assert.match(html, /studio-music\.js\?v=20260907/);
     assert.doesNotMatch(html, /data-stats-as-of|community-date/);
-    assert.match(html, /community-window[^>]*>[^<]*28/);
+    assert.doesNotMatch(html, /community-window[^>]*>[^<]*28/);
     const method = html.match(/<details class="community-method">[\s\S]*?<\/details>/)?.[0];
     assert.ok(method);
     assert.doesNotMatch(method, /2026|202건|202 completed|202 abgeschlossenen|2026年/);

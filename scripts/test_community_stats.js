@@ -8,8 +8,7 @@ function valid(overrides = {}) {
     total_score: "9007199254740993",
     record_count: 12,
     as_of: "2026-09-07T09:15:55.410Z",
-    window_days: 28,
-    all_time: false,
+    all_time: true,
     ...overrides,
   };
 }
@@ -94,8 +93,8 @@ assert.deepEqual(community.validateStats(valid()), {
 });
 assert.deepEqual(community.validateStats(valid({ total_score: "0", record_count: 0 })).record_count, 0);
 for (const data of [
-  valid({ window_days: 7 }),
-  valid({ all_time: true }),
+  valid({ all_time: false }),
+  valid({ all_time: undefined, window_days: 28 }),
   valid({ total_score: "01" }),
   valid({ total_score: "9".repeat(31) }),
   valid({ record_count: Number.MAX_SAFE_INTEGER + 1 }),

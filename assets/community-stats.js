@@ -14,7 +14,7 @@
   };
 
   function validateStats(data) {
-    if (!data || data.window_days !== 28 || data.all_time !== false
+    if (!data || data.all_time !== true
       || typeof data.total_score !== "string" || !/^(0|[1-9]\d{0,29})$/.test(data.total_score)
       || !Number.isSafeInteger(data.record_count) || data.record_count < 0
       || typeof data.as_of !== "string" || !Number.isFinite(Date.parse(data.as_of))) {
