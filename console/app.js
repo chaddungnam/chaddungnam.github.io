@@ -14,6 +14,7 @@ const pageTitles = {
   purchases: "구매",
   cs: "CS",
   audit: "감사 기록",
+  notes: "메모",
   "project-k": "Comrade & the Brave New World",
 };
 const pageDescriptions = {
@@ -25,6 +26,7 @@ const pageDescriptions = {
   purchases: "실제 스토어 구매·환불 기록과 검토가 필요한 결제를 확인합니다.",
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
+  notes: "정한 것과 그 이유를 남겨 두고 나중에 같은 판단을 다시 찾습니다.",
   "project-k": "아직 준비 중인 프로젝트입니다.",
 };
 
@@ -77,7 +79,7 @@ function selectProject(projectKey) {
   byId("currentProject").textContent = projectK ? "Comrade & the Brave New World" : "Quirky Ball";
   byId("consoleNav").hidden = projectK;
   showOnly("consoleApp");
-  window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
+  window.location.hash = projectK ? "#/project-k" : /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/.test(window.location.hash) ? window.location.hash : "#/analytics";
   renderRoute();
 }
 
@@ -114,6 +116,7 @@ function renderRoute() {
   if (route.page === "purchases") window.ConsolePurchases.mount();
   if (route.page === "cs") { window.ConsoleCs.mount(); window.ConsoleLab?.loadReports(); }
   if (route.page === "audit") window.ConsoleAudit.mount();
+  if (route.page === "notes") window.ConsoleNotes.mount();
 }
 
 function challengeErrorMessage(error) {

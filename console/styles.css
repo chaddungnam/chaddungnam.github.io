@@ -238,6 +238,16 @@ textarea:focus-visible {
 #purchaseFilterForm { grid-template-columns: repeat(4, minmax(105px, .3fr)) minmax(190px, 1fr) auto; }
 #csFilterForm { grid-template-columns: minmax(200px, 1fr) repeat(3, minmax(105px, .38fr)) minmax(112px, .35fr) auto auto; }
 #auditFilterForm { grid-template-columns: minmax(260px, 1fr) auto; }
+#notesFilterForm { grid-template-columns: minmax(220px, 1fr) minmax(140px, .35fr) auto; }
+#noteEditor { scroll-margin-top: 190px; }
+#noteEditor textarea { min-height: 260px; font-size: 13px; font-weight: 500; line-height: 1.65; }
+.note-editor-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#noteCancel { min-height: 44px; padding: 10px 16px; color: var(--ink); background: var(--teal-soft); border: 0; border-radius: 12px; font-weight: 800; }
+#noteEditorState[data-dirty="true"] { color: #a93f34; font-weight: 800; }
+.note-item[data-pinned="true"] { border-left-color: var(--gold); }
+.note-item > div:first-child strong { font-size: 13px; }
+.note-item .note-body { color: var(--ink); font-size: 12px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note-item .detail-actions { justify-content: flex-end; }
 .admin-toolbar label,
 .admin-form label,
 .revert-form label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 10px; font-weight: 800; }

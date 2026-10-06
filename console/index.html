@@ -72,6 +72,7 @@
         <a href="#/purchases" data-page="purchases"><span class="nav-index">05</span><span class="nav-copy">구매<small>결제·환불</small></span></a>
         <a href="#/cs" data-page="cs"><span class="nav-index">06</span><span class="nav-copy">CS<small>문의·답변</small></span></a>
         <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/notes" data-page="notes"><span class="nav-index">08</span><span class="nav-copy">메모<small>판단·기록</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -418,6 +419,13 @@
         <p id="auditMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="notesView" class="route-view" data-route="notes" hidden>
+        <form id="notesFilterForm" class="panel admin-toolbar" role="search"><label>검색<input id="notesQuery" type="search" maxlength="100" placeholder="제목·내용·태그"></label><label>태그<select id="notesTag"><option value="">전체 태그</option></select></label><button id="notesNewButton" class="primary-button" type="button">새 메모</button></form>
+        <form id="noteEditor" class="panel admin-form player-note-editor" hidden><div class="panel-heading"><div><p class="eyebrow">NOTE</p><h2 id="noteEditorTitle">새 메모</h2><small id="noteEditorMeta"></small></div><label class="check-label player-track-toggle"><input name="pinned" type="checkbox"> 맨 위에 고정</label></div><label>제목<input maxlength="120" name="title" required placeholder="예: 쿼키볼 2.0 판정 계획"></label><label>태그<input name="tags" maxlength="200" placeholder="예: 판정, 마케팅, 튜토리얼"></label><label>내용<textarea name="body" maxlength="20000" rows="12" placeholder="정한 것, 이유, 다시 볼 날짜를 남겨두세요."></textarea></label><div class="note-editor-footer"><small id="noteEditorState"></small><div class="note-editor-actions"><button id="noteCancel" type="button">닫기</button><button id="noteDelete" class="danger-button" type="button">삭제</button><button class="primary-button" type="submit">저장</button></div></div></form>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">DECISION LOG</p><h2>메모</h2><small>고정한 메모가 먼저, 그다음 최신순입니다.</small></div><span id="notesTotal" class="panel-total">—</span></div><div id="notesList" class="audit-list"></div></section>
+        <p id="notesMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="projectKView" class="route-view" data-route="project-k" hidden>
         <div class="empty-state"><span class="status-label">준비 중</span><strong>Comrade & the Brave New World</strong><p>이중 작업을 피하기 위해 현재는 메뉴와 화면 구조만 제공합니다.</p></div>
       </section>
@@ -456,7 +464,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261005-r23"></script>
+  <script src="model.js?v=20261006-r25"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260829-1"></script>
   <script src="api.js?v=20260908-1"></script>
@@ -469,6 +477,7 @@
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
+  <script src="notes.js?v=20261006-r25"></script>
   <script src="gmail-model.js?v=20260904-1"></script>
   <script src="gmail-api.js?v=20260907-2"></script>
   <script src="cs-intelligence.js?v=20260904-1"></script>
@@ -476,6 +485,6 @@
   <script src="cs.js?v=20260907-2"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20260927-2x" defer></script>
+  <script src="app.js?v=20261006-r25" defer></script>
 </body>
 </html>

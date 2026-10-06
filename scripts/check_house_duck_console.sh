@@ -137,3 +137,13 @@ rg -F -q 'pending.set(form,{fingerprint,requestId})' "$console_dir/liveops.js"
 rg -F -q '표본 부족' "$console_dir/model.js"
 rg -F -q '@media (max-width: 600px)' "$console_dir/styles.css"
 node "$repo_dir/scripts/test_console_model.js"
+
+# 메모(판단 기록) 페이지: 명시 저장 + 저장 안 한 변경 경고 + 삭제 확인
+test -f "$console_dir/notes.js"
+rg -q 'data-route="notes"' "$console_dir/index.html"
+rg -q 'href="#/notes" data-page="notes"' "$console_dir/index.html"
+rg -F -q 'window.ConsoleNotes.mount()' "$console_dir/app.js"
+rg -F -q 'action: "notes.save"' "$console_dir/notes.js"
+rg -F -q 'action: "notes.delete"' "$console_dir/notes.js"
+rg -F -q 'beforeunload' "$console_dir/notes.js"
+rg -F -q 'root.ConsoleApp.confirmChange("메모 삭제"' "$console_dir/notes.js"
