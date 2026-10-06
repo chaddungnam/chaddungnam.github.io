@@ -55,12 +55,11 @@ assert.match(hexaworld1984, /--hex-void:\s*#e7e9f0/);
 assert.match(hexaworld1984, /\.hexaworld1984-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
 assert.match(hexaworld1984, /\.hexaworld1984-title\s*\{[^}]*font-size:\s*clamp\(2\.5rem,\s*4vw,\s*3\.3rem\)[^}]*word-break:\s*keep-all/s);
 assert.match(hexaworld1984, /\.hexaworld1984-section\s*\{[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
-assert.match(quirky, /--qb-bg:\s*#f8f9fa/);
+// Quirky Ball 2.0 reuses the home visual system: no own palette, no dark theme, no extra animation.
 assert.doesNotMatch(quirky, /html\[data-theme="dark"\]/);
-assert.match(quirky, /\.hero-device\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
-assert.match(quirky, /\.marble-rain\s*\{[^}]*pointer-events:\s*none/s);
-assert.match(quirky, /\.shot:nth-child\(2\)[\s\S]*rotateY/s);
-assert.match(quirky, /@media \(prefers-reduced-motion:\s*reduce\)[\s\S]*\.marble-rain[\s\S]*display:\s*none/s);
+assert.doesNotMatch(quirky, /#[0-9a-fA-F]{3,8}\b/, "Quirky Ball page colors come from the studio tokens");
+assert.doesNotMatch(quirky, /@keyframes|animation:/, "Quirky Ball page adds no motion beyond the home page");
+assert.match(studio, /body:is\(\[data-page="studio"\], \[data-page="quirky-ball"\]\)\s*\{/, "home chrome applies to the Quirky Ball page");
 for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /data-studio-hero/);

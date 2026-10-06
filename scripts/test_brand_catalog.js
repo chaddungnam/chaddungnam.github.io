@@ -115,12 +115,20 @@ for (const [file] of quirkyPages) {
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /assets\/quirky-ball-site\.css/, `${file} product stylesheet`);
-  assert.match(html, /assets\/media\/quirky-ball-showcase\.mp4/, `${file} current-build hero loop`);
-  assert.match(html, /class="marble-rain"/, `${file} marble-drop intro`);
-  assert.equal((html.match(/class="falling-marble"/g) || []).length, 12, `${file} restrained marble intro count`);
-  assert.equal((html.match(/data-quirky-capture/g) || []).length, 4, `${file} current-build capture count`);
-  assert.match(html, /class="hero-device"/, `${file} tilted hero device`);
+  assert.match(html, /<video data-qb-loop autoplay muted loop playsinline[^>]*poster="v2\/loop-poster\.webp"[\s\S]*?src="v2\/loop\.mp4"/, `${file} vertical 2.0 gameplay loop in the phone mockup`);
+  assert.doesNotMatch(html, /quirky-ball-showcase\.mp4|class="marble-rain"|latest\/0\d-/, `${file} legacy 1.x showcase stays retired`);
+  assert.equal((html.match(/data-quirky-capture/g) || []).length, 10, `${file} 2.0 store screen count`);
+  assert.match(html, /class="release-visual hero-device"/, `${file} hero phone mockup`);
+  assert.match(html, /assets\/studio-home\.css/, `${file} reuses the House Duck home components`);
+  assert.match(html, /class="iphone-shell"/, `${file} home phone shell`);
   assert.match(html, /data-video-toggle/, `${file} hero loop pause control`);
+  assert.equal((html.match(/class="qb-screen"/g) || []).length, 8, `${file} screen gallery`);
+  assert.match(html, /href="https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.quirkyball\.app"/, `${file} Google Play link`);
+  assert.match(html, /class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store link`);
+  assert.match(html, /data-qb-youtube="rnksH-UdAAc"/, `${file} click-to-play trailer facade`);
+  assert.doesNotMatch(html, /<iframe/, `${file} loads nothing from YouTube before a click`);
+  assert.match(html, /href="https:\/\/youtube\.com\/shorts\/byPZJB99nIk"/, `${file} Shorts link`);
+  assert.equal(fs.existsSync(path.join(repoDir, "quirky-ball/v2/loop.mp4")) && fs.statSync(path.join(repoDir, "quirky-ball/v2/loop.mp4")).size < 4_000_000, true, "phone loop stays under 4 MB");
   assert.doesNotMatch(publicText, /조커|Joker/i, `${file} retired mascot terminology`);
   assert.doesNotMatch(publicText, /첨부된|supplied|bereitgestellten|提供された/i, `${file} must read like public copy, not a work request`);
 }

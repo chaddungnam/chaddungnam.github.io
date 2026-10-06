@@ -112,10 +112,15 @@ for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_d
   require_token "$page" 'data-section="game-features"'
   require_token "$page" 'data-section="gallery"'
   require_token "$page" "assets/quirky-ball-site.css"
-  require_token "$page" "assets/media/quirky-ball-showcase.mp4"
-  require_token "$page" 'class="marble-rain"'
-  require_token "$page" "latest/01-core.png"
-  require_token "$page" "latest/04-roulette.png"
+  require_token "$page" 'data-section="hero"'
+  require_token "$page" "assets/quirky-ball-site.js"
+  require_token "$page" "assets/studio-home.css"
+  require_token "$page" 'class="section-rail"' 
+  require_token "$page" "v2/loop.mp4"
+  require_token "$page" "v2/shot-01-600.webp"
+  require_token "$page" "v2/shot-10-600.webp"
+  require_token "$page" "https://play.google.com/store/apps/details?id=com.quirkyball.app"
+  require_token "$page" "https://apps.apple.com/app/id6797996754"
 done
 
 if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then
