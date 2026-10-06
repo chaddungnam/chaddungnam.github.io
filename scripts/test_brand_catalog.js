@@ -146,7 +146,7 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} latest videos`);
   assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} two projects only`);
   assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two video game previews`);
-  assert.match(html, /assets\/media\/quirky-ball-gameplay\.mp4/, `${file} gameplay video`);
+  assert.match(html, /quirky-ball\/v2\/loop\.mp4/, `${file} gameplay video`);
   assert.match(html, /assets\/media\/comrade-gameplay\.mp4/, `${file} C&tBNW looping gameplay preview`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);

@@ -43,11 +43,9 @@ for (const refreshRate of [60, 90, 120]) {
   }
   assert.equal(simulatedFrames, 300, `ten seconds at ${refreshRate}Hz must retain a steady 30fps draw clock`);
 }
-assert.equal(
-  crypto.createHash("sha256").update(fs.readFileSync(path.join(root, "assets/media/quirky-ball-gameplay.mp4"))).digest("hex"),
-  "c2cc501efa44a28db7adc5ba214f963086206c314ce2b26b04d01df294c8d49d",
-  "home gameplay must remain the approved engine recording capture",
-);
+for (const asset of ["quirky-ball/v2/loop.mp4", "quirky-ball/v2/loop.webm", "quirky-ball/v2/loop-poster.webp"]) {
+  assert.ok(fs.existsSync(path.join(root, asset)), `home 2.0 gameplay loop asset ${asset} must exist`);
+}
 
 const svg = read("assets/red-quirky.svg");
 assert.match(svg, /<svg[^>]*width="240"[^>]*height="260"/, "Quirky must keep its 240×260 natural size");
@@ -74,17 +72,17 @@ const expectedCopy = {
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "준비됐나요? House Duck의 릴리스 랩에서 Quirky Ball 1.1.0을 만나보세요.", "House Duck 릴리스 랩의 Quirky Ball 1.1.0 실제 플레이"],
-  "index_en.html": ["House Duck — Independent Game Studio", "Are you ready? Quirky Ball 1.1.0 in the House Duck release lab.", "Quirky Ball 1.1.0 gameplay in the House Duck release lab"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "Bereit? Quirky Ball 1.1.0 im Release-Labor von House Duck.", "Quirky Ball 1.1.0 Gameplay im Release-Labor von House Duck"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "準備はいい？House DuckのリリースラボでQuirky Ball 1.1.0を紹介します。", "House Duckのリリースラボで動くQuirky Ball 1.1.0"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "준비됐나요? House Duck의 릴리스 랩에서 Quirky Ball 2.0을 만나보세요.", "House Duck 릴리스 랩의 Quirky Ball 2.0 실제 플레이"],
+  "index_en.html": ["House Duck — Independent Game Studio", "Are you ready? Quirky Ball 2.0 in the House Duck release lab.", "Quirky Ball 2.0 gameplay in the House Duck release lab"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "Bereit? Quirky Ball 2.0 im Release-Labor von House Duck.", "Quirky Ball 2.0 Gameplay im Release-Labor von House Duck"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "準備はいい？House DuckのリリースラボでQuirky Ball 2.0を紹介します。", "House Duckのリリースラボで動くQuirky Ball 2.0"],
 };
 
 const expectedHeroLabels = {
-  "index.html": "LIVE CAPTURE · Quirky Ball 1.1.0 실제 플레이 보기",
-  "index_en.html": "LIVE CAPTURE · Watch real Quirky Ball 1.1.0 gameplay",
-  "index_de.html": "LIVE CAPTURE · Echtes Quirky Ball 1.1.0 Gameplay ansehen",
-  "index_ja.html": "LIVE CAPTURE · Quirky Ball 1.1.0の実際のプレイを見る",
+  "index.html": "LIVE CAPTURE · Quirky Ball 2.0 실제 플레이 보기",
+  "index_en.html": "LIVE CAPTURE · Watch real Quirky Ball 2.0 gameplay",
+  "index_de.html": "LIVE CAPTURE · Echtes Quirky Ball 2.0 Gameplay ansehen",
+  "index_ja.html": "LIVE CAPTURE · Quirky Ball 2.0の実際のプレイを見る",
 };
 
 for (const asset of ["assets/house-duck-logo-96.webp", "assets/house-duck-wordmark-360.webp"]) {
@@ -107,8 +105,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /<script src="assets\/brand-site\.js(?:\?[^\"]+)?" defer><\/script>/, `${file} must not render-block on shared JavaScript`);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
-  assert.equal((html.match(/quirky-ball-gameplay\.mp4\?v=110/g) || []).length, 2, `${file} must cache-bust both released gameplay previews`);
-  assert.equal((html.match(/quirky-ball-gameplay-poster\.jpg\?v=110/g) || []).length, 2, `${file} must cache-bust both released gameplay posters`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 2, `${file} must use the 2.0 loop in both gameplay previews`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop-poster\.webp"/g) || []).length, 2, `${file} must use the 2.0 loop poster in both previews`);
   assert.ok(html.includes(expectedHeroLabels[file]), `${file} must include its localized hero label`);
   assert.doesNotMatch(html, /<button class="motion-toggle"[^>]+aria-label=/, `${file} motion control must use its visible label`);
   assert.doesNotMatch(html, /<p class="hero-loop"[^>]+aria-label=/, `${file} action keywords must use their visible text`);

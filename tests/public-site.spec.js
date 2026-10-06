@@ -109,15 +109,15 @@ test("all localized home pages fit a 320px viewport", async ({ page }) => {
 });
 
 test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
-  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.1.0" } }));
+  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "2.0.0" } }));
   await page.goto("/?lang=ko");
   const chamber = page.locator("[data-release-chamber]");
   const video = page.locator("[data-hero-gameplay]");
 
   await expect(chamber).toBeVisible();
   await expect(chamber).toContainText("Quirky Ball");
-  await expect(chamber).toContainText("1.1.0");
-  await expect(chamber).toContainText(/AIM.*SHOOT.*MERGE/);
+  await expect(chamber).toContainText("2.0.0");
+  await expect(chamber).toContainText(/2D MERGE.*3D BEAKER.*BOSS FIGHT/);
   await expect(video).toBeVisible();
   expect(await video.evaluate((node) => ({
     autoplay: node.autoplay,
@@ -134,7 +134,7 @@ test("home opens on the released Quirky Ball specimen and real gameplay", async 
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-studio-hero] h1")).toHaveText("Quirky Ball");
-  await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("각도를 읽고, 쏘고, 합치세요. 위험선을 넘기 전에 탈출 게이트를 여는 액션 퍼즐.");
+  await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("육각형 외계 생명체 쿼키의 실험실 탈출기. 구슬을 합치고, 3D 비커를 채우고, 보스를 쏘아 맞혀 빠져나가세요.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);
   await expect(page.locator("[data-project='hexaworld1984']")).toContainText("개발 중");
@@ -192,6 +192,7 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   })));
   expect(state).toEqual([
     { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
+    { autoplay: true, muted: true, loop: true, playsInline: true, preload: "metadata" },
   ]);
 
   const firstProjectVideo = page.locator("[data-game-preview]").first();
@@ -292,6 +293,7 @@ test("home reduced motion holds the canvas and pauses phone video", async ({ pag
   await expect(page.locator("[data-quirky-canvas]")).toHaveAttribute("data-frame", "1");
   await expect.poll(() => page.locator("[data-game-preview]").evaluateAll((videos) => videos.map((video) => ({ autoplay: video.autoplay, paused: video.paused })))).toEqual([
     { autoplay: false, paused: true },
+    { autoplay: false, paused: true },
   ]);
   await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
 });
@@ -311,7 +313,7 @@ async function stubPlayable(page, { ready = true } = {}) {
   return requests;
 }
 
-test("home shows the console min_version and keeps 1.1.0 when the lookup fails", async ({ page }) => {
+test("home shows the console min_version and keeps 2.0.0 when the lookup fails", async ({ page }) => {
   await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.2.3" } }));
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-live-version]").first()).toHaveText("1.2.3");
@@ -319,7 +321,7 @@ test("home shows the console min_version and keeps 1.1.0 when the lookup fails",
 
   await page.route("**/functions/v1/public-version", (route) => route.abort());
   await page.reload();
-  await expect(page.locator("[data-live-version]").first()).toHaveText("1.1.0");
+  await expect(page.locator("[data-live-version]").first()).toHaveText("2.0.0");
 });
 
 test("localized homes place a stable playable phone before supporting copy at 390px", async ({ page }) => {

@@ -97,7 +97,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'assets/red-quirky.svg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
-  require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
+  require_token "$page" "quirky-ball/v2/loop.mp4"
   require_token "$page" "assets/media/comrade-gameplay.mp4"
   require_token "$page" "https://www.youtube.com/@houseduck_in"
   reject_token "$page" 'history-section'
