@@ -1,21 +1,21 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-10-05T11:32:34.000Z",
+  "updated": "2026-10-06T05:00:15.000Z",
   "videos": [
     {
+      "videoId": "mqZZNvWXhqw",
+      "title": "[C&tBNW] 'Citizen-2' 동무와 멋진 신세계 BGM",
+      "published": "2026-10-06T05:00:15.000Z"
+    },
+    {
       "videoId": "rnksH-UdAAc",
-      "title": "Quirky Ball 2.0.0 Mobile Game | 쿼키볼 모바일 게임 티저영상",
+      "title": "Quirky Ball 2.0.0 Mobile Game",
       "published": "2026-10-05T11:32:34.000Z"
     },
     {
       "videoId": "sGZ5lLg5UUM",
       "title": "[C&tBNW] 'Citizen-1' 동무와 멋진 신세계 BGM",
       "published": "2026-10-05T05:00:07.000Z"
-    },
-    {
-      "videoId": "-vev9SaVDe0",
-      "title": "당분간 클로드 Opus 5.5만 써야겠네요",
-      "published": "2026-09-29T08:35:30.000Z"
     }
   ]
 }
