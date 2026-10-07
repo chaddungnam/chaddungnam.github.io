@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-10-06T05:00:15.000Z",
+  "updated": "2026-10-07T05:00:26.000Z",
   "videos": [
+    {
+      "videoId": "BlSWw3Fec3s",
+      "title": "[C&tBNW] 'Comrade!!!' 동무와 멋진 신세계 BGM",
+      "published": "2026-10-07T05:00:26.000Z"
+    },
     {
       "videoId": "mqZZNvWXhqw",
       "title": "[C&tBNW] 'Citizen-2' 동무와 멋진 신세계 BGM",
@@ -11,11 +16,6 @@
       "videoId": "rnksH-UdAAc",
       "title": "Quirky Ball 2.0.0 Mobile Game",
       "published": "2026-10-05T11:32:34.000Z"
-    },
-    {
-      "videoId": "sGZ5lLg5UUM",
-      "title": "[C&tBNW] 'Citizen-1' 동무와 멋진 신세계 BGM",
-      "published": "2026-10-05T05:00:07.000Z"
     }
   ]
 }
