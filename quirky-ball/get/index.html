@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Quirky Ball 다운로드</title>
+<script>
+(function () {
+  var PLAY = "https://play.google.com/store/apps/details?id=com.quirkyball.app";
+  var APPLE = "https://apps.apple.com/app/id6797996754";
+  var ua = navigator.userAgent || "";
+  var ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var store = ios ? APPLE : (/Android/i.test(ua) ? PLAY : "");
+  if (store) {
+    // 광고 추적값(utm 등)은 플레이스토어 referrer로 넘긴다.
+    var q = location.search.slice(1);
+    if (store === PLAY && q) store += "&referrer=" + encodeURIComponent(q);
+    location.replace(store);
+  }
+})();
+</script>
+<style>
+:root{color-scheme:light dark}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:system-ui,-apple-system,sans-serif;background:#111;color:#fff;padding:16px;box-sizing:border-box;text-align:center}
+a.btn{display:block;width:260px;max-width:100%;padding:14px;border-radius:12px;background:#fff;color:#111;text-decoration:none;font-weight:700}
+a.site{color:#aaa}
+</style>
+</head>
+<body>
+<h1 style="font-size:22px;margin:0">Quirky Ball</h1>
+<a class="btn" href="https://play.google.com/store/apps/details?id=com.quirkyball.app">Google Play</a>
+<a class="btn" href="https://apps.apple.com/app/id6797996754">App Store</a>
+<a class="site" href="/quirky-ball/">houseduck.in/quirky-ball</a>
+</body>
+</html>
