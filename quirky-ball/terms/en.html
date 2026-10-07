@@ -30,7 +30,7 @@
       <div>
         <p class="legal-kicker">HOUSE DUCK · QUIRKY BALL</p>
         <h1 id="legal-title">Terms of Service</h1>
-        <p class="legal-date">Quirky Ball · Effective date: August 24, 2026</p>
+        <p class="legal-date">Quirky Ball · Effective date: October 5, 2026</p>
       </div>
       <nav class="legal-language-links" aria-label="Document language">
           <a href="ko.html">한국어</a>
@@ -66,92 +66,94 @@
         <!-- 문서 본문 시작: 정책 문구는 이 안에서만 수정 -->
         <div data-legal-content>
 <h2 id="section-1">1. Overview and Acceptance</h2>
-  <p>These Terms govern Quirky Ball, provided by <strong>Junhee Choi</strong> under the name <strong>House Duck</strong> in Germany.</p>
-  <p>Use of the game requires acceptance of these Terms. The <a href="/privacy/en.html">shared Privacy Policy</a> is a notice explaining personal-data processing; acknowledging it is not blanket consent to that processing. A required checkbox acknowledging acceptance of the Terms and receipt of the Privacy Policy does not replace separate optional consent required for advertising, analytics, or other processing.</p>
+  <p>These Terms govern Quirky Ball (version 2.0.0 and later, and earlier versions where still in use), provided by <strong>Junhee Choi</strong> under the name <strong>House Duck</strong> in Germany.</p>
+  <p>Use of the game requires acceptance of these Terms. The <a href="/privacy/en.html">shared House Duck Privacy Policy</a> is a notice explaining personal-data processing; acknowledging it is not blanket consent to that processing. A required checkbox acknowledging acceptance of the Terms and receipt of the Privacy Policy does not replace separate optional consent required for advertising, analytics, or other processing.</p>
 
   <h2 id="section-2">2. The Service</h2>
-  <p>Quirky Ball is an advertising-supported mobile puzzle game for Android and iOS. It includes:</p>
+  <p>Quirky Ball is a free-to-play, advertising-supported mobile puzzle game for Android and iOS. It includes:</p>
   <ul>
-    <li>Ad-based monetization — rewarded, interstitial, banner, and native ads (Google AdMob)</li>
-    <li>Optional account linking through Google Sign-In on Android or Sign in with Apple on iOS</li>
-    <li>Supabase-backed guest accounts/authentication, game-state synchronization, online rankings/social features, purchase entitlements/reward state, and first-party operational analytics</li>
-    <li>Friends and gifts, mailbox, and profile/marble customization</li>
-    <li>Gameplay using virtual currency such as stamina and gems</li>
+    <li>Merge-puzzle runs, the lab with its abilities, upgrades and reagent collection, and related events</li>
+    <li>Ads — rewarded, interstitial, banner, and native ads (Google AdMob)</li>
+    <li>Guest play without sign-up, and optional account linking with Google Sign-In (Android and iOS) or Sign in with Apple (iOS)</li>
+    <li>Supabase-backed accounts, game-state synchronization, rankings, friends and gifts, invitations, mailbox, profile customization, purchase entitlements and reward state</li>
+    <li>Virtual currencies and items such as gems, reagent and tickets</li>
+    <li>An in-app Quick Report for sending problem reports to House Duck</li>
   </ul>
-  <p>The game offers optional one-time purchases, including Remove Ads, the Starter Package, and the yakwon Package.</p>
+  <p>The game offers optional one-time (non-consumable) purchases: Remove Ads, the Starter Package, the Yakwon Package (yakwon), and VIP 1. There are no recurring payments.</p>
 
   <h2 id="section-3">3. Age Requirement</h2>
-  <p>Scope of the new controls: the new controls described below apply only to an app that displays both age confirmation and the combined analytics notice. As of September 9, 2026, this change is being prepared for release; this is not a claim that it is already available in the existing public Quirky Ball 1.1.2 (build 53). Check the notice displayed in the app, not the version number alone.</p>
-  <p>In an app displaying the new notice, users cannot enter the game before confirming they are at least 14 (unknown age: 0), or if they are under 14. Users aged 14–17 can play, but ad SDK/Google UMP requests and optional usage analytics are disabled. Users aged 18 or over can proceed to the standard advertising-consent flow after accepting the required terms; ads are not requested without the required consent. Users select their birth year and month on the age-confirmation screen; the age band is calculated only on the device. The day of birth is not requested, and the selected year/month is not saved or transmitted. Because the day is unknown, the age-14 and age-18 thresholds are conservatively treated as met only from the month after the relevant birth month. Only the calculated band is stored locally (0: unknown, 14: ages 14–17, 18: age 18 or over). This does not replace identity/age verification or any required parental authorization.</p>
-  <p>The Software may only be used by persons aged 14 or older. Any higher minimum age required by local law for playing the game itself must also be met. If we learn that a user is under 14, we may delete the related account and data.</p>
+  <p>The game may only be used by persons aged 14 or older. Any higher minimum age required by local law for playing the game itself must also be met. If we learn that a user is under 14, we may delete the related account and data.</p>
+  <p>Before entering the game, you select your birth year and month; the app calculates only an age band on the device and does not save or transmit the year/month. Users under 14 cannot enter the game. Users aged 14–17 can play, but ads and optional usage analytics are turned off for them. Users aged 18 or over can proceed to the standard advertising-consent flow after accepting the required terms. This does not replace identity/age verification or any required parental authorization; details are in section 10 of the Privacy Policy.</p>
   <p>A minor’s contractual capacity and any need for approval by a parent or other legal representative are governed by applicable law. Where legally required, that approval must be obtained for accepting these Terms and using the game. The age for independently consenting to personal-data processing and requirements for parental authorization vary by jurisdiction and processing purpose and are separate from the minimum gameplay age. These data-consent ages do not mean that all gameplay by persons under 16 is prohibited in Germany.</p>
 
   <h2 id="section-4">4. Accounts</h2>
   <ul>
-    <li>You can play as a guest without any sign-up; in that case a guest identifier (UID) is generated on your device and the server.</li>
-    <li>On Android, Google Sign-In can be used for optional account linking and progress synchronization; on iOS, Sign in with Apple provides the corresponding account-linking option.</li>
-    <li>Guest account data cannot be recovered once the app is deleted. You are responsible for managing your account and progress data. This explanation of data loss does not limit purchase-restoration or refund rights under law or store policy, or the Operator’s legal obligations.</li>
+    <li>You can play as a guest without any sign-up; a guest identifier (UID) is then created on your device and the server.</li>
+    <li>You can optionally link your game account to Google (Android and iOS) or Apple (iOS). A linked account can be loaded on another device by signing in with the same Google or Apple account. Some features, such as friends and invitations, require a linked account.</li>
+    <li>If you sign in with a Google or Apple account that is already linked to another game account, the app asks you first; if you continue, that account’s saved progress is loaded and the current guest progress on the device is replaced and cannot be recovered.</li>
+    <li><strong>Guest risk:</strong> guest progress is tied to the app installation. If you delete the app, reset the device, log out, or lose the device without linking an account, guest progress and items may be permanently lost. Please link an account to keep your progress. This explanation does not limit purchase-restoration or refund rights under law or store policy, or the Operator’s legal obligations.</li>
   </ul>
 
   <h2 id="section-5">5. Purchases and Virtual Items</h2>
   <ul>
-    <li><strong>Remove Ads:</strong> a restorable one-time product that removes ads and permanently unlocks speed play.</li>
-    <li><strong>Starter Package:</strong> a one-per-account package containing one profile icon, one profile frame, three nickname changes, and three country/faction changes. Its exact contents are shown in the app or store before purchase.</li>
-    <li><strong>yakwon Package:</strong> a one-per-account, restorable profile icon and marble skin entitlement.</li>
-    <li>Starter Package contents are granted once per account; used components are not replenished by restoring a purchase.</li>
-    <li>Payments are processed through Google Play Billing on Android and App Store/StoreKit on iOS. The store displays price, tax, and payment terms.</li>
+    <li><strong>Remove Ads:</strong> a permanent, restorable product that removes ads, permanently unlocks speed play, and grants the ad-free benefits shown in the store.</li>
+    <li><strong>Starter Package:</strong> a permanent, restorable package containing a profile icon and a nameplate, plus 20 Speed Tickets granted once per purchase. If the account already owns Remove Ads when the tickets would be granted, 2,000 gems are sent to the mailbox instead of the tickets, because speed play is already unlocked.</li>
+    <li><strong>Yakwon Package:</strong> a permanent, restorable package of yakwon cosmetic items (such as a profile icon and marble skin).</li>
+    <li><strong>VIP 1:</strong> a permanent, restorable benefit that lets reagent keep collecting for longer (up to 8 hours) while the app is closed.</li>
+    <li>The exact contents and price of each product are shown in the app or store before purchase. Products from earlier versions that are no longer sold remain owned and can still be restored where the app supports it.</li>
+    <li>Payments are processed only by Google Play Billing on Android and the App Store/StoreKit on iOS. The store displays price, tax, and payment terms. House Duck does not receive card details; the server verifies each purchase with Apple or Google before granting it.</li>
+    <li><strong>Account-bound purchases:</strong> a purchase is granted to the game account that was signed in when it was made. Each product can be owned once per store account.</li>
+    <li><strong>Restoring purchases:</strong> use <strong>Settings → Restore Purchases</strong> while signed in to the same store account (Apple ID or Google account). Restoration checks your store purchase history and copies the permanent entitlements to the game account currently signed in. One-time bonuses, such as the Starter Package’s Speed Tickets or the gems replacing them, are granted only once per purchase and are not granted again by restoring, including to another game account.</li>
     <li>Minors must obtain approval from a parent or other legal representative for paid purchases where required by applicable law. This clause does not impose additional liability on the representative or waive a minor’s statutory rights.</li>
-    <li>Restorable entitlements require the same store account. Android uses Google Play purchase status; iOS provides an App Store restore-purchases option.</li>
     <li>Refunds and withdrawal rights follow store rules and mandatory consumer law; statutory rights are not limited.</li>
-    <li>When a refund, cancellation, or chargeback is confirmed, the Operator may revoke entitlements such as ad removal or cosmetics and reasonably adjust remaining tickets or change rights granted by that purchase. If granted items have already been consumed, further delivery or restoration may be restricted.</li>
+    <li>When a refund, cancellation, or chargeback is confirmed, the Operator may revoke the related entitlements and reasonably adjust remaining tickets, gems or other items granted by that purchase. If granted items have already been consumed, further delivery or restoration may be restricted.</li>
     <li>If objective evidence shows repeated purchase-use-refund cycles, duplicate compensation claims for the same transaction, false unauthorized-payment reports, or similar abuse, the Operator may investigate and proportionately restrict purchasing or social features, temporarily suspend the account, or terminate it in serious cases. The user may contact support about the decision and its basis and request a review.</li>
     <li>A <strong>legitimate refund request</strong>, a genuine unauthorized or minor purchase report, or the exercise of mandatory consumer rights is not by itself grounds for a sanction.</li>
-    <li>Stamina and gems are virtual currencies granted free of charge in the game or earned by actions such as watching rewarded ads.</li>
-    <li>Virtual currency has no cash or real-world value and may not be transferred or exchanged outside the store. This does not limit refunds or restoration rights required by mandatory law or store policy.</li>
-    <li>Virtual currency and some progress may be stored and synchronized on the device and in server account state. They are lost when the account is deleted or the service ends and cannot be restored. This explanation does not exclude purchase-restoration or refund rights under law or store policy.</li>
-    <li>The Operator may adjust how virtual currency is earned or spent to keep the game balanced, subject to applicable law and Section 12. Statutory consumer rights and purchase-restoration or refund rights under law or store policy remain unaffected.</li>
+    <li><strong>Virtual currencies and items</strong> (such as gems, reagent and tickets) are earned in the game, through rewarded ads, events, invitations or mailbox rewards, or as part of a purchased package. They cannot be bought individually for money and are not sold as separate products.</li>
+    <li>Virtual currencies and items have no cash or real-world value and may not be sold, transferred, or exchanged outside the game. This does not limit refunds or restoration rights required by mandatory law or store policy.</li>
+    <li>Virtual currencies, items and progress are stored on the device and in the server account. They are lost when the account is deleted, when unlinked guest progress is lost (section 4), or when the service ends, and cannot be restored. This explanation does not exclude purchase-restoration or refund rights under law or store policy.</li>
+    <li>Mailbox rewards may have an expiry date shown in the mailbox; unclaimed rewards expire after that date.</li>
+    <li>The Operator may adjust how virtual currencies and items are earned or spent to keep the game balanced, subject to applicable law and Section 12. Statutory consumer rights and purchase-restoration or refund rights under law or store policy remain unaffected.</li>
   </ul>
 
   <h2 id="section-6">6. Advertising and Optional Analytics Consent</h2>
   <ul>
-    <li>The Software displays ads served by Google AdMob; watching rewarded ads is optional. Declining advertising consent does not prevent gameplay, but rewards conditional on completing an ad view may be unavailable.</li>
-    <li>The Firebase-only notice and setting in the existing public Quirky Ball 1.1.2 (build 53) control Firebase Analytics, not first-party analytics stored in Supabase. A previous Firebase-only ON choice does not retroactively extend to the new combined scope; a fresh explicit choice on the new notice is required.</li>
-    <li>In an app displaying the new notice, the optional usage-analytics choice jointly controls House Duck behavioral analytics stored in Supabase and Firebase Analytics (including automatically collected events and tutorial completion). Users aged 18 or over make an explicit choice that is not preselected, separate from required terms acceptance and advertising consent. Declining does not restrict the game. Essential account, currency, transaction, and security processing is separate.</li>
+    <li>The game displays ads served by Google AdMob; watching rewarded ads is optional. Declining advertising consent does not prevent gameplay, but rewards conditional on completing an ad view may be unavailable.</li>
+    <li>The optional usage-analytics choice jointly controls House Duck usage analytics stored in Supabase (including basic stability diagnostics) and Firebase Analytics (including tutorial completion, which may also be used to measure our Google Ads campaigns). Users aged 18 or over make an explicit choice that is not preselected, separate from required terms acceptance and advertising consent. Essential account, currency, transaction, and security processing is separate.</li>
     <li>Declining optional usage analytics does not restrict the game, its features, or rewards. The analytics choice can be changed or withdrawn at any time in the app settings.</li>
     <li>The optional usage-analytics choice is separate from advertising consent through Google UMP and the iOS ATT choice.</li>
-    <li>Users in regions where consent is required (such as the EEA and the UK) may be shown a Google UMP consent flow. Advertising choices can be managed through the UMP flow and device settings.</li>
+    <li>The Firebase-only notice and setting in older versions such as Quirky Ball 1.1.2 (build 53) control Firebase Analytics only. A previous Firebase-only ON choice does not retroactively extend to the combined scope; a fresh explicit choice on the new notice is required.</li>
+    <li>Users in regions where consent is required (such as the EEA and the UK) may be shown a Google UMP consent flow. Advertising choices can be managed through Ad Privacy Settings in the app and device settings.</li>
     <li>Data processing related to ads and analytics is governed by the <a href="/privacy/en.html">Privacy Policy</a>.</li>
   </ul>
 
-  <h2 id="section-7">7. Leaderboards and Social Features</h2>
+  <h2 id="section-7">7. Rankings and Social Features</h2>
   <ul>
-    <li>Leaderboards publicly show your nickname/display code, best score, and country to other users.</li>
-    <li>Leaderboard data is stored in Supabase. The normal retention threshold is 28 days; record-specific timestamps and the next daily cleanup follow section 6 of the Privacy Policy.</li>
-    <li>Inappropriate nicknames or abnormal scores may be removed from leaderboards on verifiable facts and proportionately, with review through support where possible.</li>
-    <li>Social features may show your chosen nickname, country, best score, tier, and profile customization to other users. Friend requests, relationships, and gift status are stored on the server to provide those features.</li>
+    <li>Rankings show your nickname/display code, country, profile customization and ranking values (such as best score or lab power) to other users.</li>
+    <li>Detailed play, weekly and season records are normally kept for 28 days; record-specific timestamps and the next daily cleanup follow section 6 of the Privacy Policy. Best records and current ranking values are kept while the account exists.</li>
+    <li>Friends can see each other’s nickname, country, ranking values, tier, profile customization and ranking changes. Friend requests, relationships, gifts and invitation status are stored on the server to provide those features.</li>
+    <li>Invitation rewards are granted only when the conditions shown in the app are met; self-invitations, mutual invitations and similar abuse are not rewarded.</li>
   </ul>
-  <p>Leaderboard removal, nickname measures, or social-feature restrictions are based on verifiable facts and applied proportionately to the violation. Where possible, we give reasons and an opportunity to request review through support. A legitimate refund or rights request is not abuse by itself.</p>
+  <p>Inappropriate nicknames or abnormal scores may be removed from rankings. Ranking removal, nickname measures, or social-feature restrictions are based on verifiable facts and applied proportionately to the violation. Where possible, we give reasons and an opportunity to request review through support. A legitimate refund or rights request is not abuse by itself.</p>
 
-
-
-  <h2 id="section-8">8. Prohibited Conduct</h2>
-
+  <h2 id="section-8">8. Quick Report and Prohibited Conduct</h2>
+  <p>You can send a problem report with <strong>Settings → Quick Report</strong>. The report text and basic app information (app version, build, platform and language) are linked to your account so we can investigate. Do not include passwords, payment details or other people’s personal data. A Quick Report does not guarantee an individual reply; if you need a reply or want to exercise legal rights, email <a href="mailto:support@houseduck.in">support@houseduck.in</a>.</p>
   <p>You must not:</p>
   <ul>
-    <li>Manipulate the game using cheats, automation tools, or modified clients</li>
+    <li>Manipulate the game using cheats, automation tools, or modified clients, or exploit bugs to obtain currencies, items or rankings</li>
     <li>Reverse engineer, copy, or redistribute the Software (except as permitted by applicable law)</li>
-    <li>Attack or overload the servers or leaderboard systems</li>
-    <li>Use nicknames that defame or offend others</li>
+    <li>Attack or overload the servers or ranking systems</li>
+    <li>Use nicknames or reports that defame or offend others, or send spam or abusive reports</li>
     <li>Violate applicable laws</li>
-  </ul><p>Where a violation is established, the Operator may restrict use or particular features, or remove leaderboard entries, based on the facts and proportionately. Account deletion is used only where necessary; where possible, reasons and an opportunity for support review are provided. Exercising legal rights is not grounds for a sanction.</p>
+  </ul><p>Where a violation is established, the Operator may restrict use or particular features, withhold or reverse improperly obtained rewards, or remove ranking entries, based on the facts and proportionately. Account deletion is used only where necessary; where possible, reasons and an opportunity for support review are provided. Exercising legal rights is not grounds for a sanction.</p>
 
   <h2 id="section-9">9. Intellectual Property</h2>
   <p>Intellectual-property rights in the Software belong to the Operator or relevant third-party licensors. The Operator grants only a non-transferable, non-exclusive license for personal, non-commercial use. Exceptions permitted by applicable law remain unaffected.</p>
 
   <h2 id="section-10">10. Statutory Conformity and Rights</h2>
   <p>Statutory requirements for conformity of digital products and the remedies arising from them, as well as other mandatory rights, remain unaffected. These protections take precedence also in cases of account or data loss, entitlement adjustments, restrictions or account termination, service discontinuation, and game-balance changes. Recovery or restoration limitations elsewhere in these Terms do not exclude purchase-restoration or refund rights under law or store policy.</p>
-
   <p>Where applicable, you may request remedies for defective digital products, including correction, a price reduction or termination, and necessary security updates. Store refund procedures are not the only route for exercising statutory rights; requests concerning the Operator’s responsibilities may be sent to support@houseduck.in. Statutory withdrawal rights do not automatically expire merely through downloading, use, or these Terms.</p>
+
   <h2 id="section-11">11. Limitation of Liability</h2>
   <p>Liability is unrestricted for intent, gross negligence, injury to life, body, or health, and any liability that cannot be limited by law. For ordinary negligence, liability for breach of essential contractual duties may be limited, to the extent permitted by law, to foreseeable damage typical for the contract. Otherwise liability is limited to the extent permitted by law.</p>
 
@@ -159,7 +161,7 @@
   <p>Changes or discontinuation for updates, maintenance, or technical reasons are subject to applicable law, including the requirements of German Civil Code Section 327r where applicable. Where required, this includes valid reasons, no additional cost, clear notice, information on a durable medium, and statutory termination or refund rights for impairment.</p>
 
   <h2 id="section-13">13. Account Deletion and Data</h2>
-<ul><li>You can delete your account at any time via <strong>Settings → Delete Account</strong> in the app.</li><li>In-app deletion removes the account profile, current synchronized state, and social connections and cannot be undone. Some raw play and archived records may remain under the 28-day calculation and daily cleanup in section 6 of the Privacy Policy. Device-only settings can be deleted separately.</li><li>Transaction records controlled by Apple or Google and minimal records needed for legal obligations, payment/refund handling, fraud prevention, or legal claims may remain until those purposes end.</li><li>If you cannot access the app, you may request deletion by email. Nicknames and display codes may be visible to other users and are not authentication. Do not send passwords or full payment details. If needed, we will explain the minimum additional information required to process the request. See the <a href="../privacy/delete_en.html">Account Deletion page</a> and <a href="/privacy/en.html">Privacy Policy</a>.</li></ul>
+<ul><li>You can delete your account at any time via <strong>Settings → Delete Account</strong> in the app.</li><li>In-app deletion removes the account profile, progress, currencies and items, synchronized state, social connections, mailbox and in-app reports and cannot be undone; a Google or Apple link is removed. Some detailed play records may remain under the 28-day calculation and daily cleanup in section 6 of the Privacy Policy. Device-only settings can be deleted separately.</li><li>Store transactions are not deleted with the game account. Permanent purchases can later be restored to another game account under section 5; one-time bonuses are not granted again.</li><li>Transaction records controlled by Apple or Google and minimal records needed for legal obligations, payment/refund handling, fraud prevention, or legal claims may remain until those purposes end.</li><li>If you cannot access the app, you may request deletion by email. Nicknames and display codes may be visible to other users and are not authentication. Do not send passwords or full payment details. If needed, we will explain the minimum additional information required to process the request. See the <a href="../privacy/delete_en.html">Account Deletion page</a> and <a href="/privacy/en.html">Privacy Policy</a>.</li></ul>
 
   <h2 id="section-14">14. Changes to These Terms</h2>
 <p>These Terms may be updated to reflect legal changes or service improvements. Material changes will be announced in advance through an in-app notice or this page. Continued use alone is not automatic agreement to all changes or optional personal-data processing. Changes requiring separate consent by law require that consent; rights under applicable law and mandatory consumer protections are not waived.</p>
@@ -171,14 +173,14 @@
   <p><strong>Address:</strong> Ringstr. 23, 61476 Kronberg im Taunus, Hessen, Germany<br><a href="/impressum/en.html">Impressum</a></p>
 
   <h2 id="section-16">16. Effective Date and Revision History</h2>
-<ul><li>Effective August 24, 2026 — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products (v2.0)</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification. This does not change the original effective date of August 24, 2026.</li><li>Analytics notice update September 5, 2026 — Distinguished Supabase-backed operations and first-party analytics from optional Firebase Analytics, and documented Firebase consent, refusal, and withdrawal in settings. The original effective date remains unchanged.</li><li>Clarity update September 8, 2026 — Clarified Terms acceptance versus privacy notice and optional consent, requirements for minors’ use, purchases and data consent, and consumer rights in data loss, account termination and game-balance changes. The original effective date remains unchanged.</li><li>Preparation notice September 9, 2026 — Clarified age bands, the combined optional analytics choice and 24-hour unsent queues in apps displaying the new notice, no retroactive expansion of Firebase-only choices, ad-reward conditions, and requirements before AppLovin MAX activation. This does not announce completed app rollout or MAX activation. The original effective date remains unchanged.</li></ul>
+<ul><li>Effective October 5, 2026 (v3.0) — Updated for Quirky Ball 2.0.0: lab currencies (gems, reagent, tickets), the current one-time products (Remove Ads, Starter Package, Yakwon Package, VIP 1), account-bound purchases and restoration rules, account loading and guest data-loss risk, Quick Report, rankings and invitations; removed the AppLovin MAX preparation notice (AppLovin will not be used).</li><li>Notice update September 9, 2026 — Clarified age bands, the combined optional analytics choice, no retroactive expansion of Firebase-only choices, and ad-reward conditions.</li><li>Clarity update September 8, 2026 — Clarified Terms acceptance versus privacy notice and optional consent, requirements for minors’ use, purchases and data consent, and consumer rights in data loss, account termination and game-balance changes.</li><li>Analytics notice update September 5, 2026 — Distinguished Supabase-backed operations and first-party analytics from optional Firebase Analytics, and documented Firebase consent, refusal, and withdrawal in settings.</li><li>Clarity update September 5, 2026 — Clarified purchase/restoration/refund treatment, review of use restrictions, and deletion-request verification.</li><li>Effective August 24, 2026 (v2.0) — Added Android/Google Play and iOS support, Sign in with Apple, and one-time in-app products.</li></ul>
 
   </div>
         <!-- 문서 본문 끝 -->
 
         <footer class="legal-document-footer">
           <p>Official Quirky Ball document · Terms of Service</p>
-        <p class="legal-update">Last updated: <time datetime="2026-09-09">September 9, 2026</time> · clarity update; original effective date unchanged</p></footer>
+        <p class="legal-update">Last updated: <time datetime="2026-10-05">October 5, 2026</time> · updated for Quirky Ball 2.0.0</p></footer>
       </article>
     </div>
   </main>

@@ -1,0 +1,301 @@
+:root {
+  color-scheme: light;
+  --hex-void: #e7e9f0;
+  --hex-ink: #fbfbfd;
+  --hex-panel: #fff;
+  --hex-navy: #1a2238;
+  --hex-navy-deep: #0d1226;
+  --hex-crimson: #b7262a;
+  --hex-crimson-deep: #7a1518;
+  --hex-paper: #171a22;
+  --hex-muted: #5b6070;
+  --hex-gold: #e3b23c;
+  --hex-line: rgba(23, 25, 34, .16);
+}
+
+.hexaworld1984-page {
+  color: var(--hex-paper);
+  background:
+    linear-gradient(rgba(23, 34, 56, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 34, 56, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 80% 4%, rgba(183, 38, 42, 0.08), transparent 32rem),
+    var(--hex-void);
+  background-size: 26px 26px, 26px 26px, auto, auto;
+}
+
+.hexaworld1984-page :focus-visible {
+  outline-color: var(--hex-gold);
+}
+
+.hexaworld1984-header {
+  border-color: var(--hex-line);
+  background: color-mix(in srgb, var(--hex-void) 92%, transparent);
+}
+
+.hexaworld1984-header .brand-lockup,
+.hexaworld1984-header .site-nav a,
+.hexaworld1984-header .language-picker {
+  color: var(--hex-paper);
+}
+
+.hexaworld1984-page .footer-duck-image { width: 34px; height: 34px; object-fit: contain; }
+.hexaworld1984-page .footer-wordmark-image { width: 132px; height: auto; object-fit: contain; filter: brightness(0) invert(1); }
+
+.hexaworld1984-header .site-nav a::after {
+  background: var(--hex-crimson);
+}
+
+.hexaworld1984-header .language-picker summary,
+.hexaworld1984-header .language-menu {
+  border-color: var(--hex-line);
+  color: var(--hex-paper);
+  background: var(--hex-panel);
+}
+
+.hexaworld1984-header .language-picker summary::after,
+.hexaworld1984-header .language-menu a:hover,
+.hexaworld1984-header .language-menu a[aria-current="page"] {
+  color: var(--hex-gold);
+}
+
+.hexaworld1984-header .language-menu a:hover,
+.hexaworld1984-header .language-menu a[aria-current="page"] {
+  background: rgba(227, 178, 60, 0.12);
+}
+
+.hexaworld1984-header .menu-button {
+  border-color: var(--hex-line);
+  background: var(--hex-panel);
+}
+
+.hexaworld1984-header .menu-button-lines,
+.hexaworld1984-header .menu-button-lines::before,
+.hexaworld1984-header .menu-button-lines::after {
+  background: var(--hex-paper);
+}
+
+.hexaworld1984-hero {
+  display: grid;
+  min-height: auto;
+  align-items: center;
+  padding-block: clamp(48px, 6vw, 72px);
+}
+
+.hexaworld1984-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.98fr) minmax(300px, 0.85fr);
+  align-items: center;
+  gap: clamp(40px, 5vw, 56px);
+}
+
+.hexaworld1984-eyebrow,
+.hexaworld1984-kicker {
+  margin: 0;
+  color: var(--hex-crimson);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hexaworld1984-badge {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 10px;
+  border: 1px solid var(--hex-navy);
+  color: var(--hex-navy);
+  background: rgba(227, 178, 60, 0.18);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hexaworld1984-title {
+  margin: 16px 0 20px;
+  color: var(--hex-paper);
+  font-size: clamp(2.5rem, 4vw, 3.3rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.96;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.hexaworld1984-title span {
+  color: var(--hex-crimson);
+}
+
+.hexaworld1984-lead {
+  max-width: 600px;
+  margin: 0;
+  color: var(--hex-muted);
+  font-size: clamp(1rem, 1.4vw, 1.1rem);
+  line-height: 1.7;
+}
+
+.hexaworld1984-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0 0;
+}
+
+.hexaworld1984-meta div {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid var(--hex-line);
+  background: rgba(255, 255, 255, .88);
+}
+
+.hexaworld1984-meta dt {
+  color: var(--hex-muted);
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hexaworld1984-meta dd {
+  margin: 8px 0 0;
+  color: var(--hex-paper);
+  font-size: 0.87rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.hexaworld1984-page .button-primary {
+  background: var(--hex-crimson);
+  box-shadow: 0 6px 0 var(--hex-crimson-deep);
+}
+
+.hexaworld1984-page .button-primary:hover {
+  box-shadow: 0 8px 0 var(--hex-crimson-deep);
+}
+
+.hexaworld1984-frame {
+  position: relative;
+  width: min(100%, 360px);
+  aspect-ratio: 450 / 568;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 2px solid var(--hex-gold);
+  background: var(--hex-navy-deep);
+  box-shadow: 11px 13px 0 rgba(0, 0, 0, 0.4);
+}
+
+.hexaworld1984-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.hexaworld1984-stamp {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  z-index: 3;
+  display: grid;
+  width: 84px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 4px double var(--hex-crimson);
+  color: var(--hex-crimson);
+  background: var(--hex-ink);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(8deg);
+}
+
+.hexaworld1984-section {
+  padding-block: clamp(48px, 6vw, 72px);
+  border-top: 1px solid var(--hex-line);
+}
+
+.hexaworld1984-release-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(30px, 5vw, 48px);
+  border: 2px solid var(--hex-crimson);
+  background: var(--hex-panel);
+  box-shadow: 7px 8px 0 var(--hex-crimson-deep);
+}
+
+.hexaworld1984-release-card::after {
+  position: absolute;
+  right: 6%;
+  bottom: -55px;
+  content: "84";
+  color: rgba(183, 38, 42, 0.12);
+  font-size: 9rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hexaworld1984-release-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hexaworld1984-release-card h2 {
+  max-width: 760px;
+  margin: 10px 0 12px;
+  color: var(--hex-paper);
+  font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.hexaworld1984-release-card p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--hex-muted);
+}
+
+.hexaworld1984-page .site-footer {
+  border-color: var(--hex-line);
+  color: var(--hex-muted);
+  background: var(--hex-navy-deep);
+}
+
+.hexaworld1984-page .footer-links a {
+  color: #f2f3f7;
+}
+
+@media (max-width: 1000px) {
+  .hexaworld1984-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hexaworld1984-frame {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .hexaworld1984-header .site-nav {
+    border-color: var(--hex-line);
+    background: var(--hex-panel);
+  }
+
+  .hexaworld1984-hero {
+    min-height: auto;
+  }
+
+  .hexaworld1984-title {
+    font-size: clamp(2rem, 9vw, 2.6rem);
+  }
+
+  .hexaworld1984-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .hexaworld1984-meta div {
+    min-height: 0;
+  }
+}

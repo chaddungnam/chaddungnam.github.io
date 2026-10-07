@@ -8,7 +8,7 @@ const routes = [
   "/about/?lang=ko",
   "/about/index_en.html?lang=en",
   "/quirky-ball/?lang=ko",
-  "/project-k/index_en.html?lang=en",
+  "/hexaworld1984/index_en.html?lang=en",
   "/privacy/de.html?stay=1",
   "/terms/ko.html",
   "/support/?lang=en",
@@ -72,7 +72,7 @@ test("every public surface ignores a stale dark preference", async ({ page }) =>
     "/?lang=ko",
     "/about/?lang=ko",
     "/quirky-ball/?lang=ko",
-    "/project-k/?lang=ko",
+    "/hexaworld1984/index_ko.html?lang=ko",
     "/privacy/ko.html?stay=1",
     "/terms/ko.html",
     "/support/?lang=ko",
@@ -109,15 +109,15 @@ test("all localized home pages fit a 320px viewport", async ({ page }) => {
 });
 
 test("home opens on the released Quirky Ball specimen and real gameplay", async ({ page, isMobile }) => {
-  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.1.0" } }));
+  await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "2.0.0" } }));
   await page.goto("/?lang=ko");
   const chamber = page.locator("[data-release-chamber]");
   const video = page.locator("[data-hero-gameplay]");
 
   await expect(chamber).toBeVisible();
   await expect(chamber).toContainText("Quirky Ball");
-  await expect(chamber).toContainText("1.1.0");
-  await expect(chamber).toContainText(/AIM.*SHOOT.*MERGE/);
+  await expect(chamber).toContainText("2.0.0");
+  await expect(chamber).toContainText(/2D MERGE.*3D BEAKER.*BOSS FIGHT/);
   await expect(video).toBeVisible();
   expect(await video.evaluate((node) => ({
     autoplay: node.autoplay,
@@ -134,15 +134,16 @@ test("home opens on the released Quirky Ball specimen and real gameplay", async 
 test("home reads as a game studio and keeps mascot and phone tops complete", async ({ page }) => {
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-studio-hero] h1")).toHaveText("Quirky Ball");
-  await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("각도를 읽고, 쏘고, 합치세요. 위험선을 넘기 전에 탈출 게이트를 여는 액션 퍼즐.");
+  await expect(page.locator("[data-studio-hero] .release-lede")).toHaveText("육각형 외계 생명체 쿼키의 실험실 탈출기. 구슬을 합치고, 3D 비커를 채우고, 보스를 쏘아 맞혀 빠져나가세요.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(2);
-  await expect(page.locator("[data-project='project-k']")).toContainText("출시 예정 미정");
+  await expect(page.locator("[data-project='hexaworld1984']")).toContainText("개발 중");
   await expect(page.locator(".history-section, .journal-section")).toHaveCount(0);
   await expect(page.locator("[data-scroll-quirky]")).toHaveAttribute("src", /assets\/red-quirky\.svg/);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
   await expect(page.locator("[data-game-preview]")).toHaveCount(2);
+  await expect(page.locator("[data-hexaworld-preview]")).toHaveCount(1);
   await expect(page.locator("[data-project] .phone-side-button")).toHaveCount(4);
   await expect(page.locator("[data-project] .phone-home-indicator")).toHaveCount(2);
 
@@ -191,15 +192,13 @@ test("home reads as a game studio and keeps mascot and phone tops complete", asy
   })));
   expect(state).toEqual([
     { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
-    { autoplay: false, muted: true, loop: true, playsInline: true, preload: "none" },
+    { autoplay: true, muted: true, loop: true, playsInline: true, preload: "metadata" },
   ]);
 
   const firstProjectVideo = page.locator("[data-game-preview]").first();
   await firstProjectVideo.scrollIntoViewIfNeeded();
   await expect.poll(() => firstProjectVideo.evaluate((video) => video.paused)).toBe(false);
-  const secondProjectVideo = page.locator("[data-game-preview]").nth(1);
-  await secondProjectVideo.scrollIntoViewIfNeeded();
-  await expect.poll(() => secondProjectVideo.evaluate((video) => video.paused)).toBe(false);
+  await expect(page.locator("[data-hexaworld-preview]")).toBeVisible();
 });
 
 test("home keeps the hero heavy and the footer lockup compact", async ({ page }) => {
@@ -314,7 +313,7 @@ async function stubPlayable(page, { ready = true } = {}) {
   return requests;
 }
 
-test("home shows the console min_version and keeps 1.1.0 when the lookup fails", async ({ page }) => {
+test("home shows the console min_version and keeps 2.0.0 when the lookup fails", async ({ page }) => {
   await page.route("**/functions/v1/public-version", (route) => route.fulfill({ json: { min_version: "1.2.3" } }));
   await page.goto("/?lang=ko");
   await expect(page.locator("[data-live-version]").first()).toHaveText("1.2.3");
@@ -322,7 +321,7 @@ test("home shows the console min_version and keeps 1.1.0 when the lookup fails",
 
   await page.route("**/functions/v1/public-version", (route) => route.abort());
   await page.reload();
-  await expect(page.locator("[data-live-version]").first()).toHaveText("1.1.0");
+  await expect(page.locator("[data-live-version]").first()).toHaveText("2.0.0");
 });
 
 test("localized homes place a stable playable phone before supporting copy at 390px", async ({ page }) => {
@@ -341,7 +340,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
       const controlHeights = [...document.querySelectorAll(".release-button, [data-playable-launch], [data-motion-toggle]")]
         .filter((node) => getComputedStyle(node).display !== "none")
         .map((node) => node.getBoundingClientRect().height);
-      const projectCard = document.querySelector('[data-project="project-k"] .project-card').getBoundingClientRect();
+      const projectCard = document.querySelector('[data-project="hexaworld1984"] .project-card').getBoundingClientRect();
       const support = rect(".home-support");
       const footer = rect(".site-footer");
       return {
@@ -351,7 +350,7 @@ test("localized homes place a stable playable phone before supporting copy at 39
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyFonts,
         controlHeights,
-        afterProjectK: support.top - projectCard.bottom,
+        afterHexaworld1984: support.top - projectCard.bottom,
         afterSupport: footer.top - support.bottom,
         supportHeight: support.height,
         cacheAssets: [...document.querySelectorAll('link[href*="studio-home.css"], script[src*="studio-home.js"]')].map((node) => node.href || node.src),
@@ -365,8 +364,8 @@ test("localized homes place a stable playable phone before supporting copy at 39
     expect(Math.min(...layout.bodyFonts)).toBeGreaterThanOrEqual(16);
     expect(layout.controlHeights).not.toHaveLength(0);
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
-    expect(layout.afterProjectK).toBeGreaterThanOrEqual(0);
-    expect(layout.afterProjectK).toBeLessThanOrEqual(72);
+    expect(layout.afterHexaworld1984).toBeGreaterThanOrEqual(0);
+    expect(layout.afterHexaworld1984).toBeLessThanOrEqual(72);
     expect(layout.supportHeight).toBeGreaterThan(0);
     expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
     expect(layout.afterSupport).toBeLessThanOrEqual(72);
@@ -612,67 +611,50 @@ test("primary navigation uses a high-contrast yellow hover without motion", asyn
   }
 });
 
-test("Quirky Ball presents the current build as a responsive candy-neon showcase", async ({ page, isMobile }) => {
+test("Quirky Ball 2.0 uses the home components with the vertical gameplay loop, store links and real screens", async ({ page, isMobile }) => {
   await page.addInitScript(() => window.localStorage.setItem("house_duck_theme", "dark"));
   await page.goto("/quirky-ball/?lang=ko");
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  if (isMobile) await page.locator("[data-menu-button]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.locator("[data-theme-toggle]")).toHaveCount(0);
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#f8f9fa");
-  await expect(page.locator(".marble-rain .falling-marble")).toHaveCount(12);
   await expect(page.locator(".hero-device video")).toHaveCount(1);
-  await expect(page.locator("[data-quirky-capture]")).toHaveCount(4);
+  await expect(page.locator("[data-quirky-capture]")).toHaveCount(10);
+  await expect(page.locator(".qb-screen .iphone-shell")).toHaveCount(8);
   await expect(page.locator("main")).toContainText("쿼키");
   await expect(page.locator("main")).not.toContainText("조커");
+  await expect(page.locator(".studio-hero .google-play-badge")).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
+  await expect(page.locator(".studio-hero .app-store-badge")).toHaveAttribute("href", "https://apps.apple.com/app/id6797996754");
+  // Same header colors as the House Duck home.
+  expect(await page.locator(".site-header").evaluate((node) => getComputedStyle(node).backgroundColor)).toBe("rgba(17, 20, 25, 0.97)");
 
-  const playback = await page.locator(".hero-device video").evaluate((video) => ({
-    autoplay: video.autoplay,
-    muted: video.muted,
-    loop: video.loop,
-    playsInline: video.playsInline,
-  }));
+  const video = page.locator(".hero-device video");
+  const playback = await video.evaluate((node) => ({ autoplay: node.autoplay, muted: node.muted, loop: node.loop, playsInline: node.playsInline }));
   expect(playback).toEqual({ autoplay: true, muted: true, loop: true, playsInline: true });
+  await expect.poll(() => video.evaluate((node) => !node.paused && node.currentTime > 0)).toBe(true);
 
   const videoToggle = page.locator("[data-video-toggle]");
   await expect(videoToggle).toHaveAccessibleName(/영상 일시정지/);
   await videoToggle.click();
-  await expect.poll(() => page.locator(".hero-device video").evaluate((video) => video.paused)).toBe(true);
+  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(true);
   await expect(videoToggle).toHaveAccessibleName(/영상 재생/);
   await page.locator("#gallery").scrollIntoViewIfNeeded();
-  await page.locator(".game-hero").scrollIntoViewIfNeeded();
+  await page.locator(".studio-hero").scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
-  expect(await page.locator(".hero-device video").evaluate((video) => video.paused)).toBe(true);
-
-  const chrome = await page.locator(".hero-device").evaluate((device) => ({
-    overflow: getComputedStyle(device).overflow,
-    quirkyWidth: parseFloat(getComputedStyle(document.querySelector(".hero-quirky")).width),
-  }));
-  expect(chrome.overflow).toBe("visible");
-  expect(chrome.quirkyWidth).toBeLessThanOrEqual(116);
-
-  const lightContrast = await page.evaluate(() => {
-    const style = getComputedStyle(document.body);
-    const parse = (value) => {
-      const hex = value.trim().replace("#", "");
-      return [0, 2, 4].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
-    };
-    const luminance = (rgb) => rgb.map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
-      .reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
-    const background = luminance(parse(style.getPropertyValue("--qb-bg")));
-    return ["--qb-cyan-text", "--qb-yellow-text", "--qb-pink-text", "--qb-lime-text"].map((token) => {
-      const foreground = luminance(parse(style.getPropertyValue(token)));
-      return (Math.max(background, foreground) + .05) / (Math.min(background, foreground) + .05);
-    });
-  });
-  expect(Math.min(...lightContrast)).toBeGreaterThanOrEqual(4.5);
+  expect(await video.evaluate((node) => node.paused)).toBe(true);
+  expect(await page.locator(".hero-device").evaluate((device) => getComputedStyle(device).overflow)).toBe("visible");
 
   if (!isMobile) {
-    const device = await page.locator(".hero-device").boundingBox();
-    expect(device.width).toBeGreaterThan(260);
-    await expect.poll(() => page.locator(".shot").evaluateAll((nodes) => new Set(nodes.map((node) => getComputedStyle(node).transform)).size)).toBeGreaterThan(2);
+    const phone = await page.locator(".hero-device .iphone-shell").boundingBox();
+    expect(phone.width).toBeGreaterThan(260);
   }
+
+  // Nothing loads from YouTube until the trailer card is pressed.
+  await expect(page.locator("#trailer iframe")).toHaveCount(0);
+  await page.route("https://www.youtube-nocookie.com/**", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><title>stub</title>" }));
+  await page.locator("[data-qb-youtube]").click();
+  await expect(page.locator("#trailer iframe")).toHaveAttribute("src", /youtube-nocookie\.com\/embed\/rnksH-UdAAc/);
 
   await page.goto("/?lang=ko");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -684,7 +666,7 @@ test("all Quirky Ball locales fit a narrow mobile viewport", async ({ page, isMo
   await page.setViewportSize({ width: 360, height: 800 });
   for (const route of ["/quirky-ball/?lang=ko", "/quirky-ball/index_en.html?lang=en", "/quirky-ball/index_de.html?lang=de", "/quirky-ball/index_ja.html?lang=ja"]) {
     await page.goto(route);
-    const overflowing = await page.locator(".game-hero-copy").evaluate((copy) => [...copy.querySelectorAll("h1, p, span, a")]
+    const overflowing = await page.locator(".release-copy").evaluate((copy) => [...copy.querySelectorAll("h1, p, span, a")]
       .filter((node) => {
         const rect = node.getBoundingClientRect();
         return node.scrollWidth > node.clientWidth + 1 || rect.left < -1 || rect.right > window.innerWidth + 1;
@@ -694,11 +676,12 @@ test("all Quirky Ball locales fit a narrow mobile viewport", async ({ page, isMo
   }
 });
 
-test("Quirky Ball motion reduction removes the marble intro and pauses the loop", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/quirky-ball/?lang=ko");
-  await expect(page.locator(".marble-rain")).toHaveCSS("display", "none");
-  await expect.poll(() => page.locator(".hero-device video").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
+test("all Quirky Ball locales keep a 320px viewport free of horizontal scroll", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const route of ["/quirky-ball/?lang=ko", "/quirky-ball/index_en.html?lang=en", "/quirky-ball/index_de.html?lang=de", "/quirky-ball/index_ja.html?lang=ja"]) {
+    await page.goto(route);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), route).toBeLessThanOrEqual(320);
+  }
 });
 
 test("home hero uses custom light localized Play badges without removed copy or details CTA", async ({ page }) => {

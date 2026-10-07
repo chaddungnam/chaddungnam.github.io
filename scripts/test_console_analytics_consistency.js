@@ -22,10 +22,12 @@ window.ConsoleModel = context.ConsoleModel;
 vm.runInContext(read("console/analytics.js").replace("root.ConsoleAnalytics = { mount, load: loadDashboard };", `root.ConsoleAnalytics = {
   render(payload) { state.payload = payload; const model = { metrics: { completion: {status:"neutral"}, duration: {status:"neutral"}, retention: {status:"neutral"} } };
     renderAnalyticsCoverage(); renderExecutiveSummary(model); renderExecutiveVisuals(model);
-    renderAccountActivity(); renderUnfinishedPlays(); renderPeriodPlayers(); renderInsight(); renderFunnel(); renderExitBreakdown();
+    renderAccountActivity(); renderLabAccountFacts(); renderUnfinishedPlays(); renderPeriodPlayers(); renderInsight(); renderFunnel(); renderExitBreakdown();
+    renderDimensions(); renderLabTutorial(); renderLabRuns(); renderLabEconomy(); renderDecisionPanels();
   },
   journey: renderJourney,
   finishLoading: () => setFiltersDisabled(false),
+  overview(payload) { overview.payload = payload; renderOverview(); },
 };`), context);
 const text = (id) => nodes.get(id).textContent;
 const markup = (id) => nodes.get(id).innerHTML;
@@ -144,4 +146,92 @@ assert.equal(text("execReturn"), "0.0%", "known zero return rate remains valid")
 assert.match(text("execReturnDetail"), /이전 8명 중 0명/);
 assert.match(html, /<span>활동한 계정<\/span>/);
 assert.match(html, /활동 설치<\/span>.*완료 판<\/span>/);
+
+render();
+assert.match(text("insightText"), /완료한 계정 6명 · 계정 완료 기록 19판/);
+assert.match(text("execCompletedDetail"), /19판/);
+assert.doesNotMatch(text("analyticsCoverageMessage"), /앱 계열/);
+assert.equal(nodes.get("labAccountFacts").hidden, true);
+assert.match(markup("labRunsTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("labTutorialTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("appVersionsTable"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("labEconomyProfiles"), /이 기간·빌드에는 데이터가 없어요/);
+assert.match(markup("removeAdsFunnel"), /집계 대기/);
+assert.doesNotMatch(markup("tutorialStagesTable") + markup("mechakuchaSummary"), /1\.1\.0/);
+
+render({
+  filters: { appFamily: "2.x", runMode: "lab" },
+  dimensions: {
+    appVersions: [{ version: "2.0.0", events: 12, installs: 3, runs: 4 }],
+    runModes: [{ mode: "lab", runs: 4, completed: 3, exits: 1 }],
+  },
+  labRuns: [{ phase: 1, step: 3, starts: 12, clears: 5, fails: 6, exits: 1, avgDurationSec: 184.2, clearRate: 0.4167, topFailCauses: [{ cause: "boss_overflow", count: 3 }, { cause: "mystery_leak", count: 1 }] }],
+  tutorialFunnel: { lab: { started: 10, completed: 6, stages: [{ stage: "drop", stageIndex: 1, runs: 8 }, { stage: "opening", stageIndex: 0, runs: 10 }] }, classic: { started: 3, completed: 2 } },
+  labEconomy: {
+    daily: [{ day: "2026-09-25", idleClaims: 3, idleReagent: 120, idleGems: 5, escapeGrants: 4, escapeReagent: 180, questGrants: 1, questReagent: 300, sweepGrants: 0, sweepReagent: 0, adDrones: 2, adDroneReagent: 120, hexUpgrades: 5, hexCancels: 0 }],
+    totals: { idleClaims: 3, idleReagent: 120, idleGems: 5, escapeGrants: 4, escapeReagent: 180, questGrants: 1, questReagent: 300, sweepGrants: 0, sweepReagent: 0, adDrones: 2, adDroneReagent: 120, hexUpgrades: 5, hexCancels: 0 },
+    profiles: { accounts: 150, vipTier: { "0": 148, "1": 2, "2": 0 }, reagentMedian: 40, reagentP90: 400 },
+  },
+  labAccountFacts: { accountsWithLabRun: 7, labCompletedRuns: 21 },
+  purchaseFunnel: [
+    { productId: "vip1", startedUsers: 2, succeededUsers: 1, failedUsers: 1, startToSuccessRate: 0.5 },
+    { productId: "remove_ads", startedUsers: 4, succeededUsers: 3, failedUsers: 0, startToSuccessRate: 0.75 },
+  ],
+  purchaseExclusions: { excludedInstalls: 2 },
+});
+assert.match(text("analyticsCoverageMessage"), /앱 계열 2\.x 실험실 빌드 · 판 종류 실험실 탈출/);
+assert.match(markup("appVersionsTable"), /2\.0\.0/);
+assert.match(markup("runModesTable"), /실험실 탈출/);
+assert.match(markup("labRunsTable"), /보스가 부풀린 구슬 3/);
+assert.match(markup("labRunsTable"), /mystery leak 1/);
+assert.match(markup("labRunsTable"), /41\.7%/);
+assert.match(markup("labTutorialTable"), /오프닝[\s\S]*첫 드롭[\s\S]*완료/);
+assert.match(markup("labTutorialTable"), /20\.0%/);
+assert.match(markup("labEconomyTable"), /2026-09-25/);
+assert.match(markup("labEconomyTable"), /합계/);
+assert.match(markup("labEconomyProfiles"), /시약 중앙값/);
+assert.match(markup("labEconomyProfiles"), /P90 400/);
+assert.equal(nodes.get("labAccountFacts").hidden, false);
+assert.match(text("labAccountFacts"), /실험실 완료 판 21판/);
+assert.match(markup("removeAdsFunnel"), /VIP 1 시작/);
+assert.match(markup("removeAdsFunnel"), /광고 제거 성공/);
+render({ labEconomy: null });
+assert.match(markup("labEconomyProfiles"), /서버 집계 함수 배포 전이에요/);
+assert.equal(nodes.get("labAccountFacts").hidden, true);
+// C2 (2026-10-01) 한눈 보드: 서버 문자열은 이스케이프되고(툴팁 속성 포함), 값이 없으면 0이 아니라 '—'와 이유가 보인다.
+// 화면에는 큰 숫자·증감 칩·그래프만, 정확한 값·비교·표본은 툴팁에. '자세히 보기' 버튼은 없고 표는 '세부 표'에 접힌다.
+const emptyMetric = { key: "d1", label: "D1 복귀", format: "percent", value: null, previous: null, delta: null, deltaKind: null, compare: "points", better: "up",
+  split: { "1.x": null, "2.x": null }, splitEmpty: { "1.x": "기간 내 표본 없음", "2.x": "2.0 이벤트 아직 없음" }, empty: "기간 내 표본 없음", source: "accounts" };
+window.ConsoleAnalytics.overview({
+  filters: { periodDays: 7, version: "all", platform: "all" },
+  range: { current: { from: "2026-09-25", to: "2026-10-01" }, previous: { from: "2026-09-18", to: "2026-09-24" } },
+  coverage: { events: { coveredFrom: "2026-09-25", full: true, status: "ok" }, accounts: { coveredFrom: "2026-09-25", full: true, status: "ok" }, server: { status: "ok" }, instrumentedVersions: [], has2x: false },
+  cards: [{
+    key: "players", title: "플레이어", question: "몇 명?", status: "partial", note: "메모",
+    headline: { ...emptyMetric, key: "dau", label: "<img src=x onerror=alert(1)>", format: "decimal", value: 2.5, previous: 2, delta: 0.25, deltaKind: "relative", compare: "relative",
+      split: { "1.x": 2.5, "2.x": null }, splitEmpty: { "1.x": null, "2.x": "2.0 이벤트 아직 없음" }, empty: null },
+    metrics: [emptyMetric],
+    spark: { kind: "line", label: "일별 활성 계정", labels: ["2026-09-30", "2026-10-01"], points: [null, 3] },
+  }],
+  drilldowns: { players: { daily: [{ day: "2026-10-01", accounts: { all: 3, "1.x": 3, "2.x": 0 }, installs: { all: null }, sessions: { all: null } }], retention: [] },
+    funnel: { steps: [], tutorialStages: [], cohort: 0 }, core: {}, economy: {}, social: {}, health: {} },
+  notes: ["<b>기준</b>"],
+});
+const board = markup("overviewKpis") + markup("overviewCharts");
+assert.match(markup("overviewKpis"), /&lt;img src=x onerror=alert\(1\)&gt;/);
+assert.doesNotMatch(board, /<img src=x/);
+assert.match(markup("overviewKpis"), /data-tone="good"><span aria-hidden="true">▲<\/span>25%<\/span>/, "one delta chip, colored only by direction × better");
+assert.match(markup("overviewKpis"), /이전 7일\t2 \(\+25%\)/, "the exact comparison lives in the tooltip");
+assert.match(markup("overviewKpis"), /2\.0\+\t2\.0 이벤트 아직 없음/);
+assert.match(markup("overviewKpis"), /ov-kpi-value is-empty">—<\/strong><span class="ov-chip" data-tone="quiet">표본 없음/, "a missing value is a dash with a reason, never a fabricated zero");
+assert.match(markup("overviewKpis"), /기간 내 표본 없음/);
+assert.match(markup("overviewCharts"), /2\.0 데이터 대기 중/, "empty 2.0 data is a calm placeholder inside the chart");
+assert.doesNotMatch(board, /자세히 보기|data-console-jump|overview-metrics/, "no per-card numeric rows or drill buttons on the board");
+assert.match(markup("overviewSummary"), /DAU가 이전 7일보다 25% 늘었어요/);
+assert.match(text("overviewCoverage"), /원본 이벤트: 기간 전체/);
+assert.match(text("overviewCoverage"), /2\.0 이벤트 아직 없음/);
+assert.match(markup("overviewNotes"), /&lt;b&gt;기준/);
+assert.match(markup("overviewDrillPlayersBody"), /이 기간에 새 계정이 없습니다/);
+assert.match(markup("overviewDrillFunnelBody"), /2\.0 이벤트가 아직 없습니다/);
+
 console.log("Console analytics consistency: real-render VM mismatch, unknown/zero, coverage, identity, denominator and funnel tests passed.");

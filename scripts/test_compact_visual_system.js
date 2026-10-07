@@ -9,7 +9,7 @@ const studio = fs.readFileSync(path.join(root, "assets", "studio-home.css"), "ut
 const fonts = fs.readFileSync(path.join(root, "assets", "site-fonts.css"), "utf8");
 const brand = fs.readFileSync(path.join(root, "assets", "brand-site.css"), "utf8");
 const legal = fs.readFileSync(path.join(root, "assets", "legal-site.css"), "utf8");
-const projectK = fs.readFileSync(path.join(root, "assets", "project-k-site.css"), "utf8");
+const hexaworld1984 = fs.readFileSync(path.join(root, "assets", "hexaworld1984-site.css"), "utf8");
 const quirky = fs.readFileSync(path.join(root, "assets", "quirky-ball-site.css"), "utf8");
 
 assert.match(studio, /background:\s*var\(--studio-tone,\s*#f5f4ef\)/);
@@ -24,7 +24,7 @@ assert.match(studio, /\.project-card\s*\{[^}]*overflow:\s*visible/s);
 assert.match(studio, /\.project-phone \.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*20/s);
 assert.match(studio, /\.project-phone \.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.youtube-grid\s*\{[^}]*repeat\(3,/s);
-assert.match(studio, /\.project-k-title,[\s\S]*?font-family:\s*Gungsuh/s);
+assert.match(studio, /\.project-phone img\s*\{[^}]*object-fit:\s*contain/s);
 assert.match(fonts, /font-family:\s*"Montserrat"/);
 for (const file of ["Montserrat-Variable.woff2", "DoHyeon-Regular.woff2", "Chilgok_Kaj-subset.woff2"]) {
   assert.ok(fs.statSync(path.join(root, "assets", "fonts", file)).size < 300_000, `${file} must stay web-sized`);
@@ -51,17 +51,15 @@ assert.match(legal, /\.legal-duck-mark\s*\{[^}]*width:\s*34px[^}]*height:\s*34px
 assert.match(legal, /\.legal-hero h1,[\s\S]*?font-size:\s*clamp\(2rem,\s*4vw,\s*3\.3rem\)/s);
 assert.match(legal, /\.legal-paper\s*\{[^}]*padding:\s*clamp\(24px,\s*4vw,\s*40px\)/s);
 
-assert.match(projectK, /--k-void:\s*#f8f5ec/);
-assert.match(projectK, /\.project-k-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
-assert.match(projectK, /\.project-k-title\s*\{[^}]*font-size:\s*clamp\(2\.65rem,\s*4vw,\s*3\.45rem\)[^}]*word-break:\s*keep-all/s);
-assert.match(projectK, /\.project-k-section\s*\{[^}]*padding-block:\s*clamp\(52px,\s*7vw,\s*88px\)/s);
-assert.match(projectK, /\.project-k-loop-card\s*\{[^}]*min-height:\s*220px/s);
-assert.match(quirky, /--qb-bg:\s*#f8f9fa/);
+assert.match(hexaworld1984, /--hex-void:\s*#e7e9f0/);
+assert.match(hexaworld1984, /\.hexaworld1984-hero\s*\{[^}]*min-height:\s*auto[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
+assert.match(hexaworld1984, /\.hexaworld1984-title\s*\{[^}]*font-size:\s*clamp\(2\.5rem,\s*4vw,\s*3\.3rem\)[^}]*word-break:\s*keep-all/s);
+assert.match(hexaworld1984, /\.hexaworld1984-section\s*\{[^}]*padding-block:\s*clamp\(48px,\s*6vw,\s*72px\)/s);
+// Quirky Ball 2.0 reuses the home visual system: no own palette, no dark theme, no extra animation.
 assert.doesNotMatch(quirky, /html\[data-theme="dark"\]/);
-assert.match(quirky, /\.hero-device\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*19\.5/s);
-assert.match(quirky, /\.marble-rain\s*\{[^}]*pointer-events:\s*none/s);
-assert.match(quirky, /\.shot:nth-child\(2\)[\s\S]*rotateY/s);
-assert.match(quirky, /@media \(prefers-reduced-motion:\s*reduce\)[\s\S]*\.marble-rain[\s\S]*display:\s*none/s);
+assert.doesNotMatch(quirky, /#[0-9a-fA-F]{3,8}\b/, "Quirky Ball page colors come from the studio tokens");
+assert.doesNotMatch(quirky, /@keyframes|animation:/, "Quirky Ball page adds no motion beyond the home page");
+assert.match(studio, /body:is\(\[data-page="studio"\], \[data-page="quirky-ball"\]\)\s*\{/, "home chrome applies to the Quirky Ball page");
 for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /data-studio-hero/);

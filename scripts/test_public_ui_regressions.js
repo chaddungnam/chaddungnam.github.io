@@ -14,10 +14,10 @@ const productPages = [
   "quirky-ball/index_en.html",
   "quirky-ball/index_de.html",
   "quirky-ball/index_ja.html",
-  "project-k/index.html",
-  "project-k/index_en.html",
-  "project-k/index_de.html",
-  "project-k/index_ja.html",
+  "hexaworld1984/index_ko.html",
+  "hexaworld1984/index_en.html",
+  "hexaworld1984/index_de.html",
+  "hexaworld1984/index_ja.html",
 ];
 const englishSupportPages = [
   "index_en.html",
@@ -28,15 +28,15 @@ const englishSupportPages = [
   "quirky-ball/index_ja.html",
   "quirky-ball/terms/en.html",
   "quirky-ball/terms/ja.html",
-  "project-k/index_en.html",
-  "project-k/index_ja.html",
+  "hexaworld1984/index_en.html",
+  "hexaworld1984/index_ja.html",
 ];
 const germanSupportPages = [
   "index_de.html",
   "about/index_de.html",
   "quirky-ball/index_de.html",
   "quirky-ball/terms/de.html",
-  "project-k/index_de.html",
+  "hexaworld1984/index_de.html",
 ];
 
 function read(file) {
@@ -145,7 +145,7 @@ test("product navigation keeps the remaining game and support routes", () => {
     assert.doesNotMatch(html, /blog\.houseduck\.in|blog\/(?:en|de|ja)?\/?|houseduck\.tistory\.com/, file + " must not expose retired blog routes");
     assert.match(html, /href="[^"]*(?:index(?:_(?:en|de|ja))?\.html\?lang=|support\/)/, file + " must retain a first-party route");
   }
-  for (const file of productPages.filter((file) => file.startsWith("project-k/"))) {
+  for (const file of productPages.filter((file) => file.startsWith("hexaworld1984/"))) {
     const html = read(file);
     assert.match(html, /#games/, file + " must return directly to the game previews");
     assert.doesNotMatch(html, /#projects/, file + " must not target the retired catalog");
@@ -161,7 +161,8 @@ test("home leads with store badges, YouTube, and exactly two game previews", () 
     assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
-    assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} game previews`);
+    assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} video game previews (Quirky Ball + C&tBNW)`);
+    assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 1, `${file} C&tBNW looping preview`);
     assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }
 
@@ -256,10 +257,10 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
 
 test("terms show the effective date and avoid unconfirmed business status", () => {
   const expectations = [
-    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 8월 24일/, /영업하는 개인사업자/],
-    ["quirky-ball/terms/en.html", /Effective date:\s*August 24, 2026/i, /sole proprietor/i],
-    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*24\. August 2026/i, /Einzelunternehmer/i],
-    ["quirky-ball/terms/ja.html", /施行日:\s*2026年8月24日/, /個人事業主/],
+    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 10월 5일/, /영업하는 개인사업자/],
+    ["quirky-ball/terms/en.html", /Effective date:\s*October 5, 2026/i, /sole proprietor/i],
+    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*5\. Oktober 2026/i, /Einzelunternehmer/i],
+    ["quirky-ball/terms/ja.html", /施行日:\s*2026年10月5日/, /個人事業主/],
   ];
   for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);

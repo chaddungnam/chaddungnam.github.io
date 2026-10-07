@@ -1,0 +1,25 @@
+const fixtureId='11111111-1111-4111-8111-111111111111';
+const fixturePlayer={user_id:fixtureId,nickname:'목업 오리',display_code:'pMOCKDUCK01',country:'KR',state_version:2,gems:40,stamina:4,stamina_max:4,best_score:12000,best_level:7};
+window.__mockCalls=[];
+window.__mockConfig={feature_lab_home:'true',feature_liveops_event:'false',feature_boss_variant:'false',feature_lab_pass:'false',liveops_config:JSON.stringify({event_id:'launch_2',starts_at:'2026-10-01T00:00:00Z',ends_at:'2026-10-07T00:00:00Z',exp_multiplier:1.5})};
+window.__mockFailures={};
+window.ConsoleAPI={initialize:()=>{},post:async(name,b)=>{
+ window.__mockCalls.push({...b});if(window.__mockFailures[b.action])throw new Error('mock_failure');
+ if(name.startsWith('analytics-dashboard'))return {summary:{},daily:[],players:[],retention:[]};
+ if(b.action==='players.get')return {player:fixturePlayer,operations:{mutations_enabled:false},catalog:[],records:[],audit:[],entitlements:[]};
+ if(b.action==='players.list')return {rows:[fixturePlayer],total:1,mutations_enabled:false};
+ if(b.action==='operations.get')return {config:{min_version:'1.1.3',min_version_code:'113',admin_player_mutations_enabled:'false'},catalog:[],notices:[],reward_mail_broadcasts:[]};
+ if(b.action==='liveops.get')return {config:window.__mockConfig};
+ if(b.action==='liveops.preview')return {targets:120,already_received:3,reagent_per_account:String(b.config.reagent||0),total_reagent:String(120*(b.config.reagent||0))};
+ if(b.action==='liveops.update'){
+  if(b.kind==='mail')window.__mockConfig.console_event_mail=JSON.stringify({...b.config,enabled:b.enabled});
+  else window.__mockConfig[{boss:'feature_boss_variant',exp:'feature_liveops_event',lab_home:'feature_lab_home',lab_pass:'feature_lab_pass'}[b.kind]]=String(b.enabled);
+  return {ok:true,grant:{inserted:120}};
+ }
+ if(b.action==='lab.get')return {profile:{reagent:'2400',hex_stats:{intelligence:3,speed:2,endurance:1,luck:1,psychic:0,reserved:0},vip_tier:1,idle_claimed_at:'2026-09-27T08:00:00Z'},snapshot:{progress:{phase:3,step:2},updated_at:'2026-09-27T08:00:00Z'},facts:{labCompletedRuns:12},core:{steps_bought:2,play_seconds_balance:'960'},held:false,friends:{requests:true,gifts:false},guard_modes:{integrity_lab_guard:'observe'},integrity:[{kind:'elapsed_time',severity:1,action:'observed',occurrences:1,last_seen_at:'2026-09-27T08:00:00Z'}],ledger:[{result_id:'mock-result-1',active_sec:150,created_at:'2026-09-27T08:00:00Z'}],events:[{event_type:'lab_claim_result_bonus_v1',granted_reagent:'60',created_at:'2026-09-27T08:00:00Z'}],tickets:[{phase:3,step:2,state:'completed',verdict:'ok',verdict_reasons:[],granted_reagent:'60',issued_at:'2026-09-27T07:55:00Z'}]};
+ if(b.action==='ranking.snapshots')return {day:b.day,captured_at:b.day+'T02:15:00Z',total_players:240,rows:[{rank:1,nickname:'목업 오리',user_id:fixtureId,quirky_power:2400}],comparison:[{day:'2026-09-26',captured_at:'2026-09-26T02:15:00Z',rank:2},{day:'2026-09-27',captured_at:'2026-09-27T02:15:00Z',rank:1}]};
+ if(b.action==='purchases.list'){const rows=[{...fixturePlayer,product_id:'vip1',platform:'ios',environment:'Sandbox',verified_binding:true,status:'purchased',entitlement_status:'active',purchased_at:'2026-09-27T08:00:00Z'},{...fixturePlayer,product_id:'premium_pass_s1',platform:'ios',environment:'Production',verified_binding:true,status:'refunded',entitlement_status:'revoked',purchased_at:'2026-09-26T08:00:00Z'}].filter(r=>(!b.environment||r.environment===b.environment)&&(!b.platform||r.platform===b.platform)&&(!b.productId||r.product_id===b.productId));return {summary:{total:rows.length,purchased:rows.filter(r=>r.status==='purchased').length,refunded:rows.filter(r=>r.status==='refunded').length,refundRate:rows.length?rows.filter(r=>r.status==='refunded').length/rows.length:0},total:rows.length,purchases:rows,page:1,pageCount:1};}
+ if(b.action==='lab.analytics')return {range_days:b.rangeDays,events:150,unknown_locale_events:20,metrics:[{section:'tutorial',app_version:'2.0.0',locale:'KO',label:'home_free',numerator:36,denominator:60},{section:'tutorial',app_version:'2.0.0',locale:'DE',label:'home_free',numerator:20,denominator:30},{section:'bonus',app_version:'2.0.0',locale:'all',label:'제안 → 요청',numerator:30,denominator:60},{section:'bonus',app_version:'2.0.0',locale:'all',label:'요청 → 지급',numerator:28,denominator:30},{section:'boss',app_version:'2.0.0',locale:'all',label:'mock_boss · 첫 관측 승률',numerator:40,denominator:60},{section:'season',app_version:'2.0.0',locale:'all',label:'유료 탭 → 시즌1 구매 신호',numerator:5,denominator:60},{section:'dialogue',app_version:'2.0.0',locale:'all',label:'mock_intro · 완독',numerator:45,denominator:60},{section:'retention',app_version:'2.0.0',locale:'all',label:'D1',numerator:20,denominator:60},{section:'retention',app_version:'2.0.0',locale:'all',label:'D7',numerator:8,denominator:49}]};
+ if(b.action==='reports.list')return {reports:[{user_id:fixtureId,body:'로컬 목업 신고입니다. 실제 사용자 문의가 아닙니다.',metadata:{app_version:'2.0.0',locale:'ko',platform:'ios'},submitted_at:'2026-09-27T08:00:00Z'}],total:1,page:1,pageCount:1};
+ return {summary:{},total:0,rows:[],purchases:[]};
+}};

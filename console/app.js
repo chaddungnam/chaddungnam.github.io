@@ -22,7 +22,8 @@ const pageTitles = {
   purchases: "구매",
   cs: "CS",
   audit: "감사 기록",
-  "project-k": "Project K",
+  notes: "메모",
+  "project-k": "Comrade & the Brave New World",
   "hexaworld-overview": "운영 개요",
   "hexaworld-notices": "공지",
   "hexaworld-attendance": "출석 보상",
@@ -40,6 +41,7 @@ const pageDescriptions = {
   purchases: "실제 스토어 구매·환불 기록과 검토가 필요한 결제를 확인합니다.",
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
+  notes: "정한 것과 그 이유를 남겨 두고 나중에 같은 판단을 다시 찾습니다.",
   "project-k": "아직 준비 중인 프로젝트입니다.",
   "hexaworld-overview": "플레이어, 출석, 공지, 우편 현황을 한눈에 확인합니다.",
   "hexaworld-notices": "게임 내 공지를 작성·수정·삭제합니다.",
@@ -93,14 +95,14 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
   }
 }
 
-const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/;
+const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
 const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit|players))(?:[/?]|$)/;
 
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
   const isProjectK = projectKey === "project_k";
   const isHexaworld = projectKey === "hexaworld";
-  byId("currentProject").textContent = isProjectK ? "Project K" : isHexaworld ? "HEXAWORLD 1984" : "Quirky Ball";
+  byId("currentProject").textContent = isProjectK ? "Comrade & the Brave New World" : isHexaworld ? "HEXAWORLD 1984" : "Quirky Ball";
   byId("consoleNav").hidden = isProjectK || isHexaworld;
   byId("hexaworldNav").hidden = !isHexaworld;
   showOnly("consoleApp");
@@ -135,14 +137,15 @@ function renderRoute() {
   byId("consoleStatus").textContent = `${byId("pageTitle").textContent} 화면`;
   byId("mainContent").focus({ preventScroll: true });
   if (routeChanged && typeof window.scrollTo === "function") window.scrollTo({ top: 0, behavior: "auto" });
-  if (route.page === "analytics") window.ConsoleAnalytics.mount();
+  if (route.page === "analytics") { window.ConsoleAnalytics.mount(); window.ConsoleLab?.loadAnalytics(); }
   if (route.page === "analytics-exclusions") window.ConsoleAnalyticsExclusions.mount();
   if (route.page === "players") window.ConsolePlayers.mountList();
   if (route.page === "player") window.ConsolePlayers.mountDetail(route.userId);
-  if (route.page === "operations") window.ConsoleOperations.mount();
+  if (route.page === "operations") { window.ConsoleOperations.mount(); window.ConsoleLiveops?.mount(); }
   if (route.page === "purchases") window.ConsolePurchases.mount();
-  if (route.page === "cs") window.ConsoleCs.mount();
+  if (route.page === "cs") { window.ConsoleCs.mount(); window.ConsoleLab?.loadReports(); }
   if (route.page === "audit") window.ConsoleAudit.mount();
+  if (route.page === "notes") window.ConsoleNotes.mount();
   if (route.page === "hexaworld-overview") window.ConsoleHexaworld.mountOverview();
   if (route.page === "hexaworld-notices") window.ConsoleHexaworld.mountNotices();
   if (route.page === "hexaworld-attendance") window.ConsoleHexaworld.mountAttendance();

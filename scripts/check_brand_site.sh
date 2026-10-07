@@ -46,10 +46,10 @@ content_pages=(
   "quirky-ball/index_en.html"
   "quirky-ball/index_de.html"
   "quirky-ball/index_ja.html"
-  "project-k/index.html"
-  "project-k/index_en.html"
-  "project-k/index_de.html"
-  "project-k/index_ja.html"
+  "hexaworld1984/index_ko.html"
+  "hexaworld1984/index_en.html"
+  "hexaworld1984/index_de.html"
+  "hexaworld1984/index_ja.html"
 )
 
 for page in "${content_pages[@]}"; do
@@ -77,11 +77,11 @@ for page in about/index.html about/index_en.html about/index_de.html about/index
   require_token "$page" 'assets/about-site.css'
 done
 
-for page in project-k/index.html project-k/index_en.html project-k/index_de.html project-k/index_ja.html; do
-  require_token "$page" 'data-page="project-k"'
+for page in hexaworld1984/index_ko.html hexaworld1984/index_en.html hexaworld1984/index_de.html hexaworld1984/index_ja.html; do
+  require_token "$page" 'data-page="hexaworld1984"'
   require_token "$page" 'class="language-picker"'
-  require_token "$page" "data-project-k-asset"
-  require_token "$page" "assets/project-k-site.css"
+  require_token "$page" "data-hexaworld1984-asset"
+  require_token "$page" "assets/hexaworld1984-site.css"
 done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
@@ -90,15 +90,15 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-youtube-feed'
   require_token "$page" 'data-quirky-mechanic'
   require_token "$page" 'data-project="quirky-ball"'
-  require_token "$page" 'data-project="project-k"'
+  require_token "$page" 'data-project="hexaworld1984"'
   require_token "$page" 'assets/studio-home.css'
   require_token "$page" 'assets/studio-home.js'
   require_token "$page" 'assets/house-duck-social.jpg'
   require_token "$page" 'assets/red-quirky.svg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
-  require_token "$page" "assets/media/quirky-ball-gameplay.mp4"
-  require_token "$page" "assets/media/project-k-highlight.mp4"
+  require_token "$page" "quirky-ball/v2/loop.mp4"
+  require_token "$page" "assets/media/comrade-gameplay.mp4"
   require_token "$page" "https://www.youtube.com/@houseduck_in"
   reject_token "$page" 'history-section'
   reject_token "$page" 'journal-section'
@@ -112,10 +112,15 @@ for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_d
   require_token "$page" 'data-section="game-features"'
   require_token "$page" 'data-section="gallery"'
   require_token "$page" "assets/quirky-ball-site.css"
-  require_token "$page" "assets/media/quirky-ball-showcase.mp4"
-  require_token "$page" 'class="marble-rain"'
-  require_token "$page" "latest/01-core.png"
-  require_token "$page" "latest/04-roulette.png"
+  require_token "$page" 'data-section="hero"'
+  require_token "$page" "assets/quirky-ball-site.js"
+  require_token "$page" "assets/studio-home.css"
+  require_token "$page" 'class="section-rail"' 
+  require_token "$page" "v2/loop.mp4"
+  require_token "$page" "v2/shot-01-600.webp"
+  require_token "$page" "v2/shot-10-600.webp"
+  require_token "$page" "https://play.google.com/store/apps/details?id=com.quirkyball.app"
+  require_token "$page" "https://apps.apple.com/app/id6797996754"
 done
 
 if grep -Fq 'https://houseduck.in/story/' "$repo_dir/sitemap.xml"; then

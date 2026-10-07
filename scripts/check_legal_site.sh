@@ -101,6 +101,7 @@ for locale in ko en; do
     "hexaworld1984/privacy/$locale.html"
     "hexaworld1984/terms/$locale.html"
     "hexaworld1984/privacy/delete_$locale.html"
+    "hexaworld1984/odds/$locale.html"
   )
 done
 
@@ -109,6 +110,7 @@ hexaworld_selector_pages=(
   "hexaworld1984/privacy/index.html"
   "hexaworld1984/terms/index.html"
   "hexaworld1984/privacy/delete.html"
+  "hexaworld1984/odds/index.html"
 )
 
 for page in "${hexaworld_localized_pages[@]}" "${hexaworld_selector_pages[@]}"; do

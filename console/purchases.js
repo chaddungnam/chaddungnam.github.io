@@ -27,7 +27,7 @@
   function filters() {
     return {
       action: "purchases.list", rangeDays: Number(byId("purchaseRange").value), platform: byId("purchasePlatform").value,
-      status: byId("purchaseStatus").value, productId: byId("purchaseProduct").value,
+      environment: byId("purchaseEnvironment").value, status: byId("purchaseStatus").value, productId: byId("purchaseProduct").value,
       query: byId("purchaseQuery").value.trim(), page: state.page, limit: 50,
     };
   }
@@ -39,11 +39,12 @@
       tr.dataset.status = item.status || "unknown";
       tr.dataset.review = String(Boolean(item.repeat_refund_review));
       cell(tr, dateTime(item)); playerCell(tr, item); cell(tr, model.PRODUCT_LABELS[item.product_id] || item.product_id);
-      cell(tr, item.platform === "ios" ? "App Store" : "Google Play"); cell(tr, model.formatMoney(item.amount_micros, item.currency));
+      cell(tr, `${item.platform === "ios" ? "App Store" : "Google Play"} · ${item.environment === "Unknown" || !item.environment ? "환경 미기록" : item.environment}${item.verified_binding ? " · 검증 귀속" : ""}`); cell(tr, model.formatMoney(item.amount_micros, item.currency));
       cell(tr, model.STATUS_LABELS[item.status] || item.status, `purchase-status purchase-status-${item.status}`);
       cell(tr, model.ENTITLEMENT_LABELS[item.entitlement_status] || item.entitlement_status);
       cell(tr, model.REASON_LABELS[item.refund_reason_category] || item.refund_reason_category);
       cell(tr, item.repeat_refund_review ? "반복 확인 필요" : "—", item.repeat_refund_review ? "purchase-review-flag" : "");
+      Array.from(tr.cells || []).forEach((td, i) => { td.dataset.label = ["처리 시각", "사용자", "상품", "스토어·환경", "금액", "상태", "권한", "사유", "검토"][i]; });
     });
   }
   function render(data) {

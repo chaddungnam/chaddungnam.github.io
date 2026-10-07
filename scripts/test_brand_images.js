@@ -14,10 +14,10 @@ const css = cssFiles
   .join("\n");
 const quirkyCss = fs.readFileSync(path.join(repoDir, "assets/quirky-ball-site.css"), "utf8");
 const pages = [
-  { file: "quirky-ball/index.html", expected: 4, prefix: "latest/" },
-  { file: "quirky-ball/index_en.html", expected: 4, prefix: "latest/" },
-  { file: "quirky-ball/index_de.html", expected: 4, prefix: "latest/" },
-  { file: "quirky-ball/index_ja.html", expected: 4, prefix: "latest/" },
+  { file: "quirky-ball/index.html", expected: 10, prefix: "v2/shot-" },
+  { file: "quirky-ball/index_en.html", expected: 10, prefix: "v2/shot-" },
+  { file: "quirky-ball/index_de.html", expected: 10, prefix: "v2/shot-" },
+  { file: "quirky-ball/index_ja.html", expected: 10, prefix: "v2/shot-" },
 ];
 
 function fail(message) {
@@ -30,6 +30,15 @@ function pngSize(filePath) {
     fail(`${path.relative(repoDir, filePath)} is not a readable PNG`);
   }
   return { width: header.readUInt32BE(16), height: header.readUInt32BE(20) };
+}
+
+function webpSize(filePath) {
+  const data = fs.readFileSync(filePath);
+  if (data.toString("ascii", 0, 4) !== "RIFF" || data.toString("ascii", 8, 12) !== "WEBP") fail(`${path.relative(repoDir, filePath)} is not a WebP`);
+  const chunk = data.toString("ascii", 12, 16);
+  if (chunk === "VP8 ") return { width: data.readUInt16LE(26) & 0x3fff, height: data.readUInt16LE(28) & 0x3fff };
+  if (chunk === "VP8L") { const bits = data.readUInt32LE(21); return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 }; }
+  fail(`${path.relative(repoDir, filePath)}: unsupported WebP chunk ${chunk}`);
 }
 
 function attribute(tag, name) {
@@ -65,7 +74,8 @@ for (const page of pages) {
     const imagePath = path.resolve(path.dirname(pagePath), src);
     if (!fs.existsSync(imagePath)) fail(`${page.file} references missing image: ${src}`);
 
-    const natural = pngSize(imagePath);
+    const natural = path.extname(imagePath) === ".webp" ? webpSize(imagePath) : pngSize(imagePath);
+    if (path.extname(imagePath) === ".webp" && fs.statSync(imagePath).size > 120_000) fail(`${src} must stay a compressed display-size WebP`);
     if (width !== natural.width || height !== natural.height) {
       fail(`${page.file} declares ${width}x${height} for ${src}, expected ${natural.width}x${natural.height}`);
     }
@@ -87,9 +97,8 @@ for (const selector of [".game-logo"]) {
   }
 }
 
-const shotRule = quirkyCss.match(/\.shot img\s*\{([^}]*)\}/);
-if (!shotRule || !/height:\s*100%\s*;/.test(shotRule[1]) || !/object-fit:\s*cover\s*;/.test(shotRule[1])) {
-  fail(".shot img must fill the iPhone display with object-fit:cover");
+if (!/\.qb-screen \.project-phone \.iphone-shell\s*\{[^}]*width:\s*100%/.test(quirkyCss)) {
+  fail("Quirky Ball screens must reuse the home iPhone shell at full gallery width");
 }
 
 console.log("brand image contract: PASS");

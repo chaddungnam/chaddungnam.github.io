@@ -30,7 +30,7 @@
     "notices.upsert": "공지 저장", "notices.delete": "공지 삭제",
     "attendance.set": "출석 보상 설정", "mail.broadcast": "전체 우편 발송", "config.set": "앱 설정 변경",
     "config.restore": "설정 복구", "events.create": "이벤트 등록", "events.halt": "이벤트 중단",
-    "players.patch": "시험 계정 변경", "push.test": "시험 알림", "mail.send": "시험 우편", "players.wipe": "계정 기록 삭제",
+    "players.patch": "시험 계정 변경", "push.test": "시험 알림", "mail.send": "시험 우편", "players.wipe": "계정 기록 지우기",
   };
   const HX_ERROR_MESSAGES = {
     notice_under_48h: "이벤트는 시작 48시간 전까지 등록해야 합니다.",

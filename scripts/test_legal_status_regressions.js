@@ -4,10 +4,10 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const expected = {
-  "privacy/ko.html": ["시행일: 2026년 8월 24일", "2026년 8월 24일 시행"],
-  "privacy/en.html": ["Effective date: August 24, 2026", "Effective August 24, 2026"],
-  "privacy/de.html": ["Inkrafttreten: 24. August 2026", "Am 24. August 2026 in Kraft getreten"],
-  "privacy/ja.html": ["発効日：2026年8月24日", "2026年8月24日発効"],
+  "privacy/ko.html": ["시행일: 2026년 10월 5일", "2026년 10월 5일 시행"],
+  "privacy/en.html": ["Effective date: October 5, 2026", "Effective October 5, 2026"],
+  "privacy/de.html": ["Inkrafttreten: 5. Oktober 2026", "Wirksam ab 5. Oktober 2026"],
+  "privacy/ja.html": ["発効日：2026年10月5日", "2026年10月5日発効"],
 };
 
 for (const [file, phrases] of Object.entries(expected)) {

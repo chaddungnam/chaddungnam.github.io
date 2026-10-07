@@ -48,6 +48,7 @@ jobs:
           node scripts/test_legal_status_regressions.js
           node scripts/test_legal_analytics_disclosure.js
           node scripts/test_legal_crossborder_disclosure.js
+          node scripts/test_legal_ad_networks.js
       - name: Test House Duck console
         run: |
           bash scripts/check_house_duck_console.sh

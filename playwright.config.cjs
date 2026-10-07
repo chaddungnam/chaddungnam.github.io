@@ -16,7 +16,7 @@ module.exports = defineConfig({
     { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: "python3 -m http.server 4173 --bind 127.0.0.1",
+    command: "python3 -c \"from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler; ThreadingHTTPServer(('127.0.0.1', 4173), SimpleHTTPRequestHandler).serve_forever()\"",
     url: "http://127.0.0.1:4173/",
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",

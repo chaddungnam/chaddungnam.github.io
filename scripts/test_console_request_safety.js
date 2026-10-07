@@ -15,12 +15,12 @@ function fixture(script, post) {
   const elements = new Map();
   function node(id) {
     if (elements.has(id)) return elements.get(id);
-    const value = { id, innerHTML: "", textContent: "", value: "", style: {}, dataset: {}, events: {}, children: [], attrs: {}, disabled: false,
+    const value = { id, isConnected: true, innerHTML: "", textContent: "", value: "", style: {}, dataset: {}, events: {}, children: [], attrs: {}, disabled: false,
       elements: { kind: { addEventListener() {} } },
       addEventListener(type, callback) { this.events[type] = callback; },
       setAttribute(key, value) { this.attrs[key] = value; }, getAttribute(key) { return this.attrs[key] ?? null; },
       removeAttribute(key) { delete this.attrs[key]; }, closest() { return null; },
-      querySelectorAll(selector) { return selector === "[data-thread-id]" ? [...this.innerHTML.matchAll(/data-thread-id="([^"]+)"/g)].map((match) => { const button = node(`thread-${match[1]}`); button.dataset.threadId = match[1]; return button; }) : []; }, querySelector(selector) { return node(`${id}:${selector}`); },
+      querySelectorAll(selector) { if (id === "liveopsForms" && selector === "form") return [node("mockLiveopsForm")]; if (id === "liveopsForms" && selector === "fieldset") return [node("mockLiveopsFieldset")]; return selector === "[data-thread-id]" ? [...this.innerHTML.matchAll(/data-thread-id="([^"]+)"/g)].map((match) => { const button = node(`thread-${match[1]}`); button.dataset.threadId = match[1]; return button; }) : []; }, querySelector(selector) { return node(`${id}:${selector}`); },
       replaceChildren() { this.children = []; }, append(child) { this.children.push(child); },
       insertRow() { const row = node(`${id}:row:${this.children.length}`); this.children.push(row); return row; },
       insertCell() { const cell = node(`${id}:cell:${this.children.length}`); this.children.push(cell); return cell; },
@@ -34,6 +34,7 @@ function fixture(script, post) {
     FormData: class { constructor(form) { this.form = form; } *[Symbol.iterator]() { for (const [key, field] of Object.entries(this.form.elements)) yield [key, field.value]; } },
   };
   vm.runInNewContext(source("ui-state.js"), context);
+  if (script === "lab.js") { node("rankingForm").elements.day = {}; node("labAnalyticsForm").elements.rangeDays = { value: "28" }; }
   vm.runInNewContext(source(script), context);
   return { window, node, context };
 }
@@ -119,4 +120,52 @@ test("invalid JSON is never reported as a successful write; API requests have a 
   window.ConsoleAPI.initialize({ functionBaseUrl: "https://example.test" });
   await assert.rejects(window.ConsoleAPI.post("admin-console", { action: "players.mutate" }), /console_invalid_response/);
   assert.ok(options.signal instanceof AbortSignal);
+});
+
+
+test("liveops confirms preview, cancels without writing and retries an uncertain write with the same ID", async () => {
+  const calls = []; let failWrite = true, allow = false;
+  const { window, node } = fixture("liveops.js", async (_, p) => {
+    calls.push(p);
+    if (p.action === "liveops.get") return {config:{}};
+    if (p.action === "liveops.preview") return {targets:12,already_received:2,reagent_per_account:"200",total_reagent:"2400"};
+    if (failWrite) throw new Error("timeout");
+    return {ok:true,grant:{inserted:12}};
+  });
+  const form=node("mockLiveopsForm");form.dataset.kind="mail";
+  form.elements={reason:{value:"mock check"},eventKey:{value:"mock_event"},reagent:{value:"200"},expiresInDays:{value:"7"}};
+  let confirmations=0;
+  window.ConsoleApp.confirmChange=async (_,text)=>{confirmations++;assert.match(text,/2400시약/);return allow;};
+  await window.ConsoleLiveops.mount();
+  const submit=()=>form.events.submit({preventDefault(){}});
+  submit();await tick();assert.equal(calls.filter(p=>p.action==="liveops.update").length,0);
+  allow=true;submit();submit();await tick();
+  assert.equal(calls.filter(p=>p.action==="liveops.update").length,1);
+  failWrite=false;submit();await tick();
+  const writes=calls.filter(p=>p.action==="liveops.update");assert.equal(writes.length,2);assert.equal(writes[0].requestId,writes[1].requestId);
+  assert.equal(confirmations,3);assert.match(node("liveopsMessage").textContent,/실제 발송 12건/);
+  assert.equal(node("mockLiveopsFieldset").disabled,false);
+});
+
+test("liveops read failure locks writes and turning off does not need a preview or valid event dates", async () => {
+  const calls=[];let fails=true;
+  const {window,node}=fixture("liveops.js",async(_,p)=>{calls.push(p);if(fails)throw new Error("unavailable");return p.action==="liveops.get" ? {config:{}} : {ok:true};});
+  const form=node("mockLiveopsForm");form.dataset.kind="exp";form.elements={reason:{value:"stop mock"}};
+  form.reportValidity=()=>false;
+  await window.ConsoleLiveops.mount();assert.equal(node("mockLiveopsFieldset").disabled,true);
+  fails=false;await window.ConsoleLiveops.mount();
+  node("mockLiveopsForm:[data-disable]").events.click();await tick();
+  assert.equal(calls.filter(p=>p.action==="liveops.preview").length,0);
+  const write=calls.find(p=>p.action==="liveops.update");assert.equal(write.enabled,false);assert.equal(Object.keys(write.config).length,0);
+});
+
+test("lab reads discard stale responses, preserve zero and escape server text", async () => {
+  const reads=[];
+  const {window,node}=fixture("lab.js",(_,p)=>{const read=deferred();reads.push(read);return read.promise;});
+  const a=window.ConsoleLab.loadPlayer("a"),b=window.ConsoleLab.loadPlayer("b");
+  reads[1].resolve({profile:{reagent:"0",vip_tier:0,hex_stats:{}},facts:{labCompletedRuns:0},events:[{event_type:"<img src=x onerror=alert(1)>"}]});await b;
+  const html=node("labPlayer").innerHTML;assert.match(html,/>0</);assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img/);
+  reads[0].resolve({profile:{reagent:"999"}});await a;assert.equal(node("labPlayer").innerHTML,html);
+  const c=window.ConsoleLab.loadPlayer("c");reads[2].reject(new Error("missing RPC"));await c;
+  assert.match(node("labPlayer").innerHTML,/서버 적용 상태/);assert.doesNotMatch(node("labPlayer").innerHTML,/프로필이 없습니다/);
 });
