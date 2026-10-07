@@ -6,6 +6,7 @@
   const pages = new Set([
     "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "project-k",
     "hexaworld-overview", "hexaworld-notices", "hexaworld-attendance", "hexaworld-mail", "hexaworld-config", "hexaworld-audit",
+    "hexaworld-players",
   ]);
 
   function routeFromHash(hash) {

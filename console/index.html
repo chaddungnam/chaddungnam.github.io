@@ -85,6 +85,7 @@
         <a href="#/hexaworld-mail" data-page="hexaworld-mail"><span class="nav-index">04</span><span class="nav-copy">우편 발송<small>전체 발송</small></span></a>
         <a href="#/hexaworld-config" data-page="hexaworld-config"><span class="nav-index">05</span><span class="nav-copy">앱 설정<small>버전·점검·플래그</small></span></a>
         <a href="#/hexaworld-audit" data-page="hexaworld-audit"><span class="nav-index">06</span><span class="nav-copy">감사 로그<small>변경 이력</small></span></a>
+        <a href="#/hexaworld-players" data-page="hexaworld-players"><span class="nav-index">07</span><span class="nav-copy">시험 계정<small>재화·스테이지·알림</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -478,11 +479,91 @@
             <label>점검 안내 (영어)<textarea name="maintenanceMsgEn" maxlength="300" rows="3"></textarea></label>
           </div>
           <label>기능 플래그 (JSON)<textarea name="featureFlags" maxlength="4000" rows="5" spellcheck="false"></textarea></label>
+          <label>보상 배율 (JSON, 0.5~3)<textarea name="balance" maxlength="2000" rows="5" spellcheck="false" placeholder='{"econ_mult":{"idle":1}}'></textarea><small>idle, chest_normal, directive_daily, directive_weekly, leaflet, crate, ad_double. 비우면 배율은 바꾸지 않습니다.</small></label>
           <p id="hexaworldConfigJsonMessage" class="dashboard-message" role="status"></p>
           <label>변경 사유<input name="reason" maxlength="300" required></label>
           <p id="hexaworldConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
           <button class="danger-button" type="submit">앱 설정 저장</button>
         </form>
+        <section class="panel" aria-labelledby="hexaworldConfigHistoryTitle">
+          <p class="eyebrow">CONFIG HISTORY</p><h2 id="hexaworldConfigHistoryTitle">이전 설정 복구</h2>
+          <p id="hexaworldConfigHistoryMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <ul id="hexaworldConfigHistory" class="admin-list"></ul>
+        </section>
+        <section class="panel" aria-labelledby="hexaworldEventsTitle">
+          <p class="eyebrow">LIVE EVENTS</p><h2 id="hexaworldEventsTitle">라이브 이벤트</h2>
+          <p class="impact-note">시작 48시간 전까지 등록해야 하며, 시작 뒤에는 보상표를 바꿀 수 없습니다. 중단은 5분 안에 모든 클라이언트에 반영됩니다.</p>
+          <p id="hexaworldEventsMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <ul id="hexaworldEventsList" class="admin-list"></ul>
+        </section>
+        <form id="hexaworldEventForm" class="panel admin-form impact-form">
+          <p class="eyebrow">NEW EVENT</p><h2>이벤트 등록</h2>
+          <div class="form-pair">
+            <label>이벤트 키 (영소문자·숫자·_)<input name="eventKey" pattern="[a-z0-9_]{3,40}" maxlength="40" required></label>
+            <label>종류<select name="kind" required><option value="reward">보상</option><option value="incident">사건</option><option value="pattern">패턴 변형</option></select></label>
+          </div>
+          <div class="form-pair">
+            <label>제목 (한국어)<input name="titleKo" maxlength="80" required></label>
+            <label>제목 (영어)<input name="titleEn" maxlength="80" required></label>
+          </div>
+          <div class="form-pair">
+            <label>시작 (KST)<input name="startsAt" type="datetime-local" required></label>
+            <label>종료 (KST)<input name="endsAt" type="datetime-local" required></label>
+          </div>
+          <label>보상표 (JSON 배열)<textarea name="rewardTable" maxlength="4000" rows="4" spellcheck="false"></textarea></label>
+          <p id="hexaworldEventFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">이벤트 등록</button>
+        </form>
+      </section>
+
+      <section id="hexaworldPlayersView" class="route-view" data-route="hexaworld-players" hidden>
+        <form id="hexaworldPlayerSearch" class="panel admin-toolbar" role="search">
+          <label>닉네임, 계정 번호 또는 친구 코드<input id="hexaworldPlayerQuery" name="query" maxlength="100" required></label>
+          <button class="primary-button" type="submit">찾기</button>
+        </form>
+        <p id="hexaworldPlayerSearchMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+        <ul id="hexaworldPlayerResults" class="admin-list"></ul>
+        <section id="hexaworldPlayerDetail" class="panel" hidden>
+          <p class="eyebrow">TEST ACCOUNT</p>
+          <h2 id="hexaworldPlayerTitle">시험 계정</h2>
+          <p id="hexaworldPlayerMeta"></p>
+          <p class="impact-note">재화·스테이지·포탑·룬·해금·튜토리얼·VIP·시험 구매는 그 계정이 다음에 접속할 때 그 기기에 반영됩니다. 출석 기록 삭제는 서버에서 바로 지워집니다. 시험 구매는 스토어 영수증을 만들지 않습니다.</p>
+          <form id="hexaworldPlayerPatch" class="admin-form">
+            <div class="form-pair">
+              <label>배급표 증감<input name="coupons" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
+              <label>보석 증감<input name="gems" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
+            </div>
+            <div class="form-pair">
+              <label>열쇠 증감<input name="keys" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
+              <label>부품 증감<input name="parts" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
+            </div>
+            <div class="form-pair">
+              <label>지금 스테이지 (1~10000)<input name="stage" type="number" min="1" max="10000" step="1"></label>
+              <label>최고 스테이지 (1~10000)<input name="bestStage" type="number" min="1" max="10000" step="1"></label>
+            </div>
+            <div id="hexaworldTurretFields" class="form-pair"></div>
+            <div id="hexaworldRuneFields" class="form-pair"></div>
+            <label class="check-label"><input name="unlockAll" type="checkbox"> 포탑 칸을 모두 열기</label>
+            <label class="check-label"><input name="resetTutorial" type="checkbox"> 튜토리얼을 처음부터</label>
+            <label class="check-label"><input name="resetAttendance" type="checkbox"> 출석 기록을 지우기</label>
+            <div class="form-pair">
+              <label>VIP 시험<select name="vip"><option value="">그대로</option><option value="on">등급 1로 켜기 (결제 금액은 그대로)</option><option value="off">시험 표시 끄기</option></select></label>
+              <label>시험 구매<select name="testPurchase"><option value="">그대로</option><option value="on">상점 버튼을 시험 지급으로</option><option value="off">시험 지급 끄기</option></select></label>
+            </div>
+            <label>사유<input name="reason" maxlength="300" required></label>
+            <p id="hexaworldPlayerPatchMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+            <button class="danger-button" type="submit">다음 접속에 적용</button>
+          </form>
+          <div class="form-pair">
+            <button id="hexaworldTestMail" type="button">시험 우편 보내기</button>
+            <button id="hexaworldTestPush" type="button">시험 알림 보내기</button>
+          </div>
+          <form id="hexaworldPlayerWipe" class="admin-form">
+            <label>지울 계정의 닉네임<input name="confirmNick" maxlength="80" autocomplete="off"></label>
+            <p id="hexaworldPlayerActionMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+            <button class="danger-button" type="submit">계정 기록 지우기</button>
+          </form>
+        </section>
       </section>
 
       <section id="hexaworldAuditView" class="route-view" data-route="hexaworld-audit" hidden>
@@ -528,7 +609,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20260925-1"></script>
+  <script src="model.js?v=20261007-1"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20260925-1"></script>
   <script src="api.js?v=20260925-1"></script>
@@ -538,7 +619,7 @@
   <script src="../assets/notice-links.js?v=20260925-1"></script>
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="hexaworld.js?v=20260925-1"></script>
+  <script src="hexaworld.js?v=20261007-1"></script>
   <script src="purchases-model.js?v=20260907-2"></script>
   <script src="purchases.js?v=20260907-2"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -547,6 +628,6 @@
   <script src="cs-intelligence.js?v=20260904-1"></script>
   <script src="cs-templates.js?v=20260904-1"></script>
   <script src="cs.js?v=20260907-2"></script>
-  <script src="app.js?v=20260925-1" defer></script>
+  <script src="app.js?v=20261007-1" defer></script>
 </body>
 </html>

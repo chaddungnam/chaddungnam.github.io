@@ -29,6 +29,7 @@ const pageTitles = {
   "hexaworld-mail": "우편 발송",
   "hexaworld-config": "앱 설정",
   "hexaworld-audit": "감사 로그",
+  "hexaworld-players": "시험 계정",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -44,8 +45,9 @@ const pageDescriptions = {
   "hexaworld-notices": "게임 내 공지를 작성·수정·삭제합니다.",
   "hexaworld-attendance": "출석 보상 사이클을 구성합니다.",
   "hexaworld-mail": "모든 플레이어에게 보상 우편을 발송합니다.",
-  "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그를 관리합니다.",
+  "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그, 보상 배율을 관리합니다.",
   "hexaworld-audit": "HEXAWORLD 관리자 변경 이력을 확인합니다.",
+  "hexaworld-players": "한 계정의 재화, 스테이지, 포탑, 룬, 우편, 알림을 시험용으로 바꿉니다.",
 };
 
 let currentProjectKey = "";
@@ -92,7 +94,7 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 }
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit)(?:[/?]|$)/;
-const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit))(?:[/?]|$)/;
+const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit|players))(?:[/?]|$)/;
 
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
@@ -147,6 +149,7 @@ function renderRoute() {
   if (route.page === "hexaworld-mail") window.ConsoleHexaworld.mountMail();
   if (route.page === "hexaworld-config") window.ConsoleHexaworld.mountConfig();
   if (route.page === "hexaworld-audit") window.ConsoleHexaworld.mountAudit();
+  if (route.page === "hexaworld-players") window.ConsoleHexaworld.mountPlayers();
 }
 
 function challengeErrorMessage(error) {

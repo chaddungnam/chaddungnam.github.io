@@ -29,8 +29,16 @@
   const HX_ACTION_LABELS = {
     "notices.upsert": "공지 저장", "notices.delete": "공지 삭제",
     "attendance.set": "출석 보상 설정", "mail.broadcast": "전체 우편 발송", "config.set": "앱 설정 변경",
+    "config.restore": "설정 복구", "events.create": "이벤트 등록", "events.halt": "이벤트 중단",
+    "players.patch": "시험 계정 변경", "push.test": "시험 알림", "mail.send": "시험 우편", "players.wipe": "계정 기록 삭제",
   };
   const HX_ERROR_MESSAGES = {
+    notice_under_48h: "이벤트는 시작 48시간 전까지 등록해야 합니다.",
+    reward_table_locked: "진행 중인 이벤트의 보상표는 바꿀 수 없습니다.",
+    reward_event_overlap: "같은 기간에 다른 보상 이벤트가 있습니다.",
+    invalid_reward_table: "보상표 형식을 확인해 주세요.",
+    history_not_found: "복구할 이전 설정을 찾지 못했습니다.",
+    event_not_found: "중단할 이벤트를 찾지 못했습니다(이미 중단됨).",
     admin_session_required: "HEXAWORLD 세션이 만료되었습니다.",
     admin_required: "이 계정은 HEXAWORLD 관리자 목록에 없습니다.",
     origin_not_allowed: "허용되지 않은 주소에서 접속했습니다. houseduck.in에서 다시 열어 주세요.",
@@ -57,6 +65,11 @@
     invalid_maintenance_msg: "점검 안내문(한국어)을 입력해 주세요 (300자 이하). 사용하지 않으려면 두 언어 모두 비워두세요.",
     invalid_feature_flags: "기능 플래그는 JSON 객체 형식이어야 합니다.",
     min_version_above_latest: "최소 지원 버전 코드는 최신 버전 코드보다 클 수 없습니다.",
+    invalid_patch: "바꾼 값의 형식이나 범위를 확인해 주세요.",
+    invalid_balance: "보상 배율은 0.5~3 사이 숫자만 가능합니다.",
+    player_not_found: "그 계정을 찾지 못했습니다.",
+    no_push_device: "알림을 받을 기기가 없습니다. 게임에서 알림을 켠 뒤 다시 보내 주세요.",
+    reason_required: "사유를 입력해 주세요.",
   };
 
   function hxErrorText(error) {
@@ -69,7 +82,8 @@
   function hxActionLabel(action) { return HX_ACTION_LABELS[action] || action || "알 수 없는 작업"; }
 
   const state = {
-    bound: { overview: false, notices: false, attendance: false, mail: false, config: false, audit: false },
+    bound: { overview: false, notices: false, attendance: false, mail: false, config: false, audit: false, players: false },
+    player: null,
     notices: new Map(),
     attendanceCycle: [],
     config: null,
@@ -644,6 +658,7 @@
     form.elements.maintenanceMsgKo.value = config.maintenance_msg?.ko || "";
     form.elements.maintenanceMsgEn.value = config.maintenance_msg?.en || "";
     form.elements.featureFlags.value = JSON.stringify(config.feature_flags || {}, null, 2);
+    form.elements.balance.value = JSON.stringify(config.balance || { econ_mult: {} }, null, 2);
     setMessage("hexaworldConfigJsonMessage", "");
   }
 
@@ -697,11 +712,28 @@
         setMessage("hexaworldConfigJsonMessage", '기능 플래그 JSON 형식을 확인해 주세요 (예: {"key": true}).', true);
         return;
       }
+      let balance;
+      const balanceText = values.balance.trim();
+      if (balanceText) {
+        try {
+          balance = JSON.parse(balanceText);
+          const keys = ["idle", "chest_normal", "directive_daily", "directive_weekly", "leaflet", "crate", "ad_double"];
+          const mult = balance?.econ_mult ?? {};
+          const bad = !balance || typeof balance !== "object" || Array.isArray(balance)
+            || Object.keys(balance).some((key) => key !== "econ_mult")
+            || Object.entries(mult).some(([key, value]) => !keys.includes(key) || typeof value !== "number" || value < 0.5 || value > 3);
+          if (bad) throw new Error("invalid_balance");
+        } catch (_error) {
+          setMessage("hexaworldConfigJsonMessage", hxErrorText({ message: "invalid_balance" }), true);
+          return;
+        }
+      }
       const config = {
         min_version_code: minCode, latest_version_code: latestCode,
         store_url_android: values.storeUrlAndroid.trim(), store_url_ios: values.storeUrlIos.trim(),
         maintenance, feature_flags: featureFlags,
       };
+      if (balance) config.balance = balance;
       if (msgKo) config.maintenance_msg = { ko: msgKo, en: msgEn };
       const reason = values.reason.trim();
       const turningMaintenanceOn = maintenance && !state.config?.maintenance;
@@ -729,8 +761,113 @@
     if (state.bound.config) return;
     state.bound.config = true;
     byId("hexaworldConfigForm").addEventListener("submit", submitConfig);
+    byId("hexaworldConfigHistory").addEventListener("click", onHistoryClick);
+    byId("hexaworldEventsList").addEventListener("click", onEventsClick);
+    byId("hexaworldEventForm").addEventListener("submit", submitEvent);
   }
-  function mountConfig() { bindConfig(); loadConfig(); }
+  function mountConfig() { bindConfig(); loadConfig(); loadConfigHistory(); loadEvents(); }
+
+  // ─────────────────────────────────────────── config history · live events (LV-05)
+  async function loadConfigHistory() {
+    try {
+      const rows = (await callHx("config.history", { limit: 20 })).data || [];
+      byId("hexaworldConfigHistory").innerHTML = rows.length ? rows.map((h) => `<li>
+        <span>${escapeHtml(time(h.replaced_at))} · 최소 ${escapeHtml(h.config?.min_version_code ?? "-")} / 최신 ${escapeHtml(h.config?.latest_version_code ?? "-")} · 점검 ${h.config?.maintenance ? "켜짐" : "꺼짐"}</span>
+        <button type="button" class="danger-button" data-restore-id="${Number(h.id)}">이 값으로 복구</button></li>`).join("") : "<li>이전 설정이 없습니다.</li>";
+      setMessage("hexaworldConfigHistoryMessage", "");
+    } catch (error) {
+      reportError("hexaworldConfigHistoryMessage", error);
+    }
+  }
+
+  async function onHistoryClick(event) {
+    const btn = event.target.closest("[data-restore-id]");
+    if (!btn) return;
+    if (!await root.ConsoleApp.confirmChange("이전 설정 복구", `기록 #${btn.dataset.restoreId}의 값으로 즉시 되돌립니다(현재 값은 기록에 남습니다).`)) return;
+    try {
+      await callHxWrite("config.restore", { id: Number(btn.dataset.restoreId) }, btn);
+      setMessage("hexaworldConfigHistoryMessage", "이전 설정으로 복구했습니다. 클라이언트는 5분 안에 반영합니다.");
+      loadConfig(); loadConfigHistory();
+    } catch (error) {
+      reportError("hexaworldConfigHistoryMessage", error);
+    }
+  }
+
+  function eventStatus(e, now) {
+    if (e.halted_at) return "중단";
+    const start = Date.parse(e.starts_at), end = Date.parse(e.ends_at);
+    return now < start ? "예고" : now < end ? "진행" : "종료";
+  }
+
+  async function loadEvents() {
+    try {
+      const rows = (await callHx("events.list", {})).data || [];
+      const now = Date.now();
+      byId("hexaworldEventsList").innerHTML = rows.length ? rows.map((e) => {
+        const status = eventStatus(e, now);
+        const halt = status === "예고" || status === "진행"
+          ? `<button type="button" class="danger-button" data-halt-id="${Number(e.id)}">중단</button>` : "";
+        return `<li><span>[${status}] ${escapeHtml(e.event_key)} v${Number(e.version)} · ${escapeHtml(e.kind)} · ${escapeHtml(e.title?.ko || "")} · ${escapeHtml(time(e.starts_at))} ~ ${escapeHtml(time(e.ends_at))}</span>${halt}</li>`;
+      }).join("") : "<li>등록된 이벤트가 없습니다.</li>";
+      setMessage("hexaworldEventsMessage", "");
+    } catch (error) {
+      reportError("hexaworldEventsMessage", error);
+    }
+  }
+
+  async function onEventsClick(event) {
+    const btn = event.target.closest("[data-halt-id]");
+    if (!btn) return;
+    if (!await root.ConsoleApp.confirmChange("이벤트 중단", "즉시 중단합니다. 클라이언트는 5분 안에 이벤트를 내립니다.")) return;
+    try {
+      await callHxWrite("events.halt", { id: Number(btn.dataset.haltId) }, btn);
+      setMessage("hexaworldEventsMessage", "이벤트를 중단했습니다.");
+      loadEvents();
+    } catch (error) {
+      reportError("hexaworldEventsMessage", error);
+    }
+  }
+
+  async function submitEvent(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
+    try {
+      if (!form.reportValidity()) return;
+      const v = Object.fromEntries(new FormData(form));
+      const startsAt = kstInputToIso(v.startsAt), endsAt = kstInputToIso(v.endsAt);
+      const start = Date.parse(startsAt), end = Date.parse(endsAt);
+      if (!(start >= Date.now() + 48 * 3600 * 1000)) {
+        setMessage("hexaworldEventFormMessage", HX_ERROR_MESSAGES.notice_under_48h, true);
+        return;
+      }
+      if (!(end > start && end - start <= 14 * 86400 * 1000)) {
+        setMessage("hexaworldEventFormMessage", "종료는 시작 뒤 14일 이내여야 합니다.", true);
+        return;
+      }
+      let rewardTable;
+      try {
+        rewardTable = v.rewardTable.trim() ? JSON.parse(v.rewardTable) : [];
+        if (!Array.isArray(rewardTable)) throw new Error("not_array");
+      } catch (_error) {
+        setMessage("hexaworldEventFormMessage", '보상표 JSON 배열을 확인해 주세요 (예: [{"step":1,"reward":{"coins":100}}]).', true);
+        return;
+      }
+      const ev = { event_key: v.eventKey.trim(), kind: v.kind, title: { ko: v.titleKo.trim(), en: v.titleEn.trim() },
+        starts_at: startsAt, ends_at: endsAt, reward_table: rewardTable };
+      const summary = `${ev.event_key} · ${ev.kind} · ${ev.title.ko}\n${time(startsAt)} ~ ${time(endsAt)}\n보상 ${rewardTable.length}행 (등록 후 시작되면 보상표 고정)`;
+      if (!await root.ConsoleApp.confirmChange("이벤트 등록", summary)) return;
+      await callHxWrite("events.create", { event: ev }, form);
+      setMessage("hexaworldEventFormMessage", "이벤트를 등록했습니다(예고 즉시 노출).");
+      form.reset();
+      loadEvents();
+    } catch (error) {
+      reportError("hexaworldEventFormMessage", error);
+    } finally {
+      finishRequest();
+    }
+  }
 
   // ─────────────────────────────────────────── audit
   function auditRowMarkup(row) {
@@ -762,5 +899,210 @@
   }
   function mountAudit() { bindAudit(); loadAudit(); }
 
-  root.ConsoleHexaworld = { mountOverview, mountNotices, mountAttendance, mountMail, mountConfig, mountAudit };
+  // ─────────────────────────────────────────── one-player test controls
+  const TURRETS = [["machinegun", "기관총"], ["mortar", "박격포"], ["tesla", "전기포"], ["flame", "화염포"], ["sniper", "저격포"]];
+  const RUNES = [["rn_hammer", "망치 휘장"], ["rn_shift", "철야 교대표"], ["rn_ledger", "배급 장부"], ["rn_brick", "벽돌 보강재"],
+    ["rn_scope", "망원 조준경"], ["rn_drum", "행진 북"], ["rn_rivet", "강철 리벳"], ["rn_conveyor", "련속 콘베아"],
+    ["rn_merit", "모범 로동자 표창"], ["rn_bulwark", "인민 방벽"], ["rn_vanguard", "선봉대 기폭"], ["rn_radio", "확성 방송탑"],
+    ["rn_quota", "계획 초과 훈장"], ["rn_lens", "감시탑 렌즈"], ["rn_medal", "강철 동무 훈장"]];
+
+  function optionalInt(raw) {
+    const text = String(raw ?? "").trim();
+    if (!text) return null;
+    const n = Number(text);
+    if (!Number.isSafeInteger(n)) return undefined;
+    return n;
+  }
+
+  function buildLevelFields(host, rows, max, prefix) {
+    if (host.childElementCount) return;
+    host.innerHTML = rows.map(([id, label]) => `<label>${escapeHtml(label)} 레벨 (0~${max})<input name="${prefix}${escapeHtml(id)}" type="number" min="0" max="${max}" step="1"></label>`).join("");
+  }
+
+  function renderPlayerHits(rows) {
+    const list = byId("hexaworldPlayerResults");
+    list.innerHTML = rows.length ? rows.map((row) => `<li>
+      <span><strong>${escapeHtml(row.nickname || "(닉네임 없음)")}</strong> · 최고 스테이지 ${escapeHtml(row.best_stage ?? "—")} · ${escapeHtml(row.friend_code || "코드 없음")}</span>
+      <button type="button" data-user-id="${escapeHtml(row.user_id)}" data-nickname="${escapeHtml(row.nickname || "")}">이 계정 다루기</button></li>`).join("")
+      : "<li>해당하는 계정이 없습니다.</li>";
+  }
+
+  async function submitPlayerSearch(event) {
+    event.preventDefault();
+    const query = byId("hexaworldPlayerQuery").value.trim();
+    setMessage("hexaworldPlayerSearchMessage", "찾는 중입니다...");
+    try {
+      const result = await callHx("players.list", { query, page: 1 });
+      const rows = result.data?.rows || [];
+      renderPlayerHits(rows);
+      setMessage("hexaworldPlayerSearchMessage", rows.length ? `${rows.length}명을 찾았습니다.` : "해당하는 계정이 없습니다.");
+    } catch (error) {
+      reportError("hexaworldPlayerSearchMessage", error);
+    }
+  }
+
+  async function openPlayer(userId, nickname) {
+    setMessage("hexaworldPlayerSearchMessage", "계정을 불러오는 중입니다...");
+    try {
+      const result = await callHx("players.get", { user_id: userId });
+      const data = result.data || {};
+      if (data.ok === false) throw Object.assign(new Error(data.error || "player_not_found"), {});
+      const player = data.player || {};
+      state.player = {
+        userId,
+        nickname: player.nickname || nickname || "",
+      };
+      byId("hexaworldPlayerTitle").textContent = state.player.nickname || "닉네임 없는 계정";
+      byId("hexaworldPlayerMeta").textContent = `계정 ${userId} · 최고 스테이지 ${data.records?.best_stage ?? "—"}`;
+      byId("hexaworldPlayerDetail").hidden = false;
+      setMessage("hexaworldPlayerSearchMessage", "");
+      setMessage("hexaworldPlayerPatchMessage", "");
+      setMessage("hexaworldPlayerActionMessage", "");
+    } catch (error) {
+      reportError("hexaworldPlayerSearchMessage", error);
+    }
+  }
+
+  function collectPatch(form) {
+    const values = Object.fromEntries(new FormData(form));
+    const patch = {};
+    const currencies = {};
+    for (const key of ["coupons", "gems", "keys", "parts"]) {
+      const n = optionalInt(values[key]);
+      if (n === undefined) return { error: "증감은 정수로 입력해 주세요." };
+      if (n !== null) {
+        if (n < -1_000_000_000 || n > 1_000_000_000) return { error: "증감은 -10억~10억 사이여야 합니다." };
+        currencies[key] = n;
+      }
+    }
+    if (Object.keys(currencies).length) patch.currencies = currencies;
+    for (const [formKey, patchKey, max] of [["stage", "stage", 10000], ["bestStage", "best_stage", 10000]]) {
+      const n = optionalInt(values[formKey]);
+      if (n === undefined) return { error: "스테이지는 정수로 입력해 주세요." };
+      if (n !== null) {
+        if (n < 1 || n > max) return { error: "스테이지는 1~10000입니다." };
+        patch[patchKey] = n;
+      }
+    }
+    const turrets = {};
+    for (const [id] of TURRETS) {
+      const n = optionalInt(values[`turret_${id}`]);
+      if (n === undefined || (n !== null && (n < 0 || n > 999))) return { error: "포탑 레벨은 0~999입니다." };
+      if (n !== null) turrets[id] = n;
+    }
+    if (Object.keys(turrets).length) patch.turrets = turrets;
+    const runes = {};
+    for (const [id] of RUNES) {
+      const n = optionalInt(values[`rune_${id}`]);
+      if (n === undefined || (n !== null && (n < 0 || n > 99))) return { error: "룬 레벨은 0~99입니다." };
+      if (n !== null) runes[id] = n;
+    }
+    if (Object.keys(runes).length) patch.runes = runes;
+    if (form.elements.unlockAll.checked) patch.unlock_all = true;
+    if (form.elements.resetTutorial.checked) patch.reset_tutorial = true;
+    if (form.elements.resetAttendance.checked) patch.reset_attendance = true;
+    if (values.vip === "on") patch.vip = true;
+    if (values.vip === "off") patch.vip = false;
+    if (values.testPurchase === "on") patch.test_purchase = true;
+    if (values.testPurchase === "off") patch.test_purchase = false;
+    if (!Object.keys(patch).length) return { error: "바꿀 항목을 하나 입력해 주세요." };
+    return { patch };
+  }
+
+  async function submitPlayerPatch(event) {
+    event.preventDefault();
+    if (!state.player) return;
+    const form = event.currentTarget;
+    const finishRequest = root.ConsoleUiState.beginRequest(form);
+    if (!finishRequest) return;
+    try {
+      if (!form.reportValidity()) return;
+      const built = collectPatch(form);
+      if (built.error) {
+        setMessage("hexaworldPlayerPatchMessage", built.error, true);
+        return;
+      }
+      const reason = new FormData(form).get("reason").trim();
+      const who = state.player.nickname || state.player.userId;
+      if (!await root.ConsoleApp.confirmChange("시험 값 적용", `${who}\n다음 접속 때 반영됩니다.\n사유: ${reason}`)) return;
+      setMessage("hexaworldPlayerPatchMessage", "저장하는 중입니다...");
+      await callHxWrite("players.patch", { user_id: state.player.userId, reason, patch: built.patch }, form);
+      setMessage("hexaworldPlayerPatchMessage", "저장했습니다. 그 계정이 다음에 접속하면 반영됩니다.");
+    } catch (error) {
+      reportError("hexaworldPlayerPatchMessage", error);
+    } finally {
+      finishRequest();
+    }
+  }
+
+  async function sendPlayerExtra(kind) {
+    if (!state.player) return;
+    const reason = byId("hexaworldPlayerPatch").elements.reason.value.trim();
+    if (!reason) {
+      setMessage("hexaworldPlayerActionMessage", "사유를 먼저 입력해 주세요.", true);
+      return;
+    }
+    const mail = kind === "mail";
+    const title = mail ? "시험 우편 보내기" : "시험 알림 보내기";
+    if (!await root.ConsoleApp.confirmChange(title, `${state.player.nickname || state.player.userId}\n사유: ${reason}`)) return;
+    const button = byId(mail ? "hexaworldTestMail" : "hexaworldTestPush");
+    try {
+      if (mail) {
+        await callHxWrite("mail.send", {
+          user_id: state.player.userId,
+          reason,
+          mail: {
+            title: { ko: "시험 우편", en: "Test mail", de: "Testpost" },
+            body: { ko: "콘솔에서 보낸 시험 우편입니다.", en: "A test mail from the console.", de: "Eine Testpost aus der Konsole." },
+            rewards: { gems: 1 },
+            expires_days: 7,
+          },
+        }, button);
+      } else {
+        await callHxWrite("push.test", { user_id: state.player.userId, reason }, button);
+      }
+      setMessage("hexaworldPlayerActionMessage", mail ? "시험 우편을 보냈습니다." : "시험 알림을 보냈습니다. 알림 동의가 켜진 기기로 갑니다.");
+    } catch (error) {
+      reportError("hexaworldPlayerActionMessage", error);
+    }
+  }
+
+  async function submitPlayerWipe(event) {
+    event.preventDefault();
+    if (!state.player) return;
+    const form = event.currentTarget;
+    const typed = String(new FormData(form).get("confirmNick") || "").trim();
+    const expect = state.player.nickname || state.player.userId;
+    if (typed !== expect) {
+      setMessage("hexaworldPlayerActionMessage", "닉네임이 계정의 닉네임과 같아야 지울 수 있습니다.", true);
+      return;
+    }
+    const reason = byId("hexaworldPlayerPatch").elements.reason.value.trim() || "console wipe";
+    if (!await root.ConsoleApp.confirmChange("계정 기록 지우기", `${expect}\n이 계정의 서버 기록을 지웁니다. 다음 접속은 처음처럼 약관부터 봅니다.`)) return;
+    try {
+      await callHxWrite("players.wipe", { user_id: state.player.userId, reason }, form);
+      setMessage("hexaworldPlayerActionMessage", "계정 기록을 지웠습니다. 그 기기는 다음 접속 때 타이틀과 약관부터 봅니다.");
+    } catch (error) {
+      reportError("hexaworldPlayerActionMessage", error);
+    }
+  }
+
+  function bindPlayers() {
+    if (state.bound.players) return;
+    state.bound.players = true;
+    buildLevelFields(byId("hexaworldTurretFields"), TURRETS, 999, "turret_");
+    buildLevelFields(byId("hexaworldRuneFields"), RUNES, 99, "rune_");
+    byId("hexaworldPlayerSearch").addEventListener("submit", submitPlayerSearch);
+    byId("hexaworldPlayerResults").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-user-id]");
+      if (button) openPlayer(button.dataset.userId, button.dataset.nickname || "");
+    });
+    byId("hexaworldPlayerPatch").addEventListener("submit", submitPlayerPatch);
+    byId("hexaworldTestMail").addEventListener("click", () => sendPlayerExtra("mail"));
+    byId("hexaworldTestPush").addEventListener("click", () => sendPlayerExtra("push"));
+    byId("hexaworldPlayerWipe").addEventListener("submit", submitPlayerWipe);
+  }
+  function mountPlayers() { bindPlayers(); }
+
+  root.ConsoleHexaworld = { mountOverview, mountNotices, mountAttendance, mountMail, mountConfig, mountAudit, mountPlayers };
 })(window);
