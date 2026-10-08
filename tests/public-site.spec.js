@@ -93,8 +93,10 @@ test("localized home pages preserve the published legal and support paths", asyn
 
   for (const [route, hrefs] of contracts) {
     await page.goto(route);
-    await expect(page.locator(".site-footer .footer-links a")).toHaveCount(5);
+    await expect(page.locator(".site-footer .footer-links a")).toHaveCount(6);
     for (const href of hrefs) await expect(page.locator(`.site-footer a[href="${href}"]`), `${route} keeps ${href}`).toHaveCount(1);
+    await expect(page.locator(".site-footer a[href^=\"about/\"]"), `${route} footer links About`).toHaveCount(1);
+    await expect(page.locator(".site-nav a[href^=\"about/\"]"), `${route} header links About`).toHaveCount(1);
   }
 });
 
