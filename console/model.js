@@ -130,6 +130,7 @@
     if (key === "google_play" || key === "android") return { key, label: "AOS", known: true };
     if (key === "app_store" || key === "ios") return { key, label: "iOS", known: true };
     if (key === "onestore") return { key, label: "AOS · 원스토어", known: true };
+    if (key === "crazygames" || key === "web_crazygames" || key === "web") return { key, label: "웹(크레이지게임즈)", known: true };
     return { key, label: "기기 미확인", known: false };
   }
 
@@ -444,7 +445,7 @@
     return `${slot.month}월 ${slot.date}일 ${String(slot.hour).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00`;
   }
   const overviewVersions = Object.freeze(["all", "1.x", "2.x"]);
-  const overviewPlatforms = Object.freeze(["all", "android", "ios"]);
+  const overviewPlatforms = Object.freeze(["all", "android", "ios", "web"]);
 
   function normalizeOverviewFilters(params) {
     const get = (key) => (typeof params?.get === "function" ? params.get(key) : params?.[key]) ?? "";

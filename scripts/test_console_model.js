@@ -68,6 +68,7 @@ assert.deepEqual(model.platformDisplay("google_play"), { key: "google_play", lab
 assert.deepEqual(model.platformDisplay("app_store"), { key: "app_store", label: "iOS", known: true });
 assert.deepEqual(model.platformDisplay("ios"), { key: "ios", label: "iOS", known: true });
 assert.deepEqual(model.platformDisplay(""), { key: "", label: "기기 미확인", known: false });
+assert.deepEqual(model.platformDisplay("crazygames"), { key: "crazygames", label: "웹(크레이지게임즈)", known: true });
 assert.equal(model.actionDisplayName("player_mutation"), "플레이어 재화 변경");
 assert.equal(model.actionDisplayName("player_note_update"), "플레이어 메모 업데이트");
 assert.equal(model.actionDisplayName("reward_mail_broadcast"), "전체 보상 우편");
@@ -188,7 +189,9 @@ assert.equal(require('../console/purchases-model.js').PRODUCT_LABELS.vip1, 'VIP1
 
 // C (2026-10-01) 한눈 요약: 필터 정규화·숫자·증감·작은 그래프. 비교 못 하는 값은 비우고, 좋아짐·나빠짐은 화살표와 글자로도 보인다.
 assert.deepEqual(model.normalizeOverviewFilters(new URLSearchParams("period=90&version=2.x&platform=ios")), { periodDays: 90, version: "2.x", platform: "ios" });
-assert.deepEqual(model.normalizeOverviewFilters(new URLSearchParams("period=28&version=3.x&platform=web")), { periodDays: 7, version: "all", platform: "all" });
+assert.deepEqual(model.normalizeOverviewFilters(new URLSearchParams("period=28&version=3.x&platform=desktop")), { periodDays: 7, version: "all", platform: "all" });
+// 웹판(크레이지게임즈, 10-09)은 플랫폼 web으로 따로 볼 수 있다.
+assert.deepEqual(model.normalizeOverviewFilters(new URLSearchParams("platform=web")), { periodDays: 7, version: "all", platform: "web" });
 assert.deepEqual(model.normalizeOverviewFilters({}), { periodDays: 7, version: "all", platform: "all" });
 const legacyFilters = { rangeDays: 3, rangeOffsetDays: 0, distributionKey: "all", sort: "latest_played_at", direction: "desc", page: 1 };
 assert.equal(model.serializeAnalyticsFilters({ ...legacyFilters, overviewPeriod: 7, overviewVersion: "all", overviewPlatform: "all", legacyOpen: false }), model.serializeAnalyticsFilters(legacyFilters), "default overview filters keep the old URL");

@@ -862,7 +862,7 @@ function renderBalanceSummary() {
 }
 
 function distributionLabel(value) {
-  return ({ all: "전체 스토어", google_play: "Google Play", app_store: "iOS", onestore: "원스토어", unknown: "스토어 미지정" })[value] ?? value ?? "전체 스토어";
+  return ({ all: "전체(앱+웹)", google_play: "Google Play", app_store: "iOS", onestore: "원스토어", crazygames: "웹(크레이지게임즈)", unknown: "스토어 미지정" })[value] ?? value ?? "전체(앱+웹)";
 }
 
 function metricProgress(value, target) {
@@ -1704,7 +1704,7 @@ async function runAiBrief() {
 // 예전 표(자세히 보기)는 아래 '세부 표' 한 묶음에 접어 둔다. '1.x 레거시 · 기존 상세 분석'은 열 때만 불러온다.
 const overview = { payload: null, periodDays: 7, version: "all", platform: "all", sequence: 0, legacyOpen: false, legacyLoaded: false };
 const OVERVIEW_VERSION_NAMES = Object.freeze({ all: "전체 버전", "1.x": "1.x 라이브", "2.x": "2.0+" });
-const OVERVIEW_PLATFORM_NAMES = Object.freeze({ all: "전체 플랫폼", android: "Android", ios: "iOS" });
+const OVERVIEW_PLATFORM_NAMES = Object.freeze({ all: "전체(앱+웹)", android: "Android", ios: "iOS", web: "웹(크레이지게임즈)" });
 const OVERVIEW_WAIT_2X = "2.0 데이터 대기 중";
 // 1줄: 묶음 6장. 큰 숫자 하나·증감 칩·작은 추이 + 그 묶음의 나머지 핵심 숫자 몇 줄(클릭 없이 한눈에).
 // rows의 지표는 analytics-dashboard-v2 카드의 metrics 키. 정의·비교는 각 줄의 툴팁.
@@ -2480,7 +2480,7 @@ function readFilterHash() {
     state.rangeOffsetDays = range === 1 && rangeOffset === 1 ? 1 : 0;
   }
   const distribution = params.get("distributionKey");
-  if (["all", "google_play", "app_store", "onestore"].includes(distribution)) state.distributionKey = distribution;
+  if (["all", "google_play", "app_store", "onestore", "crazygames"].includes(distribution)) state.distributionKey = distribution;
   const appFamily = params.get("appFamily");
   state.appFamily = ["all", "1.x", "2.x"].includes(appFamily) ? appFamily : "all";
   const runMode = params.get("runMode");
