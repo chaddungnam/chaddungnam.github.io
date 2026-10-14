@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-10-08T05:00:31.000Z",
+  "updated": "2026-10-14T09:00:07.000Z",
   "videos": [
+    {
+      "videoId": "xOoLVxA6AM0",
+      "title": "AI로 게임만들고 실패했지만, 포기하지 않는 이유",
+      "published": "2026-10-14T09:00:07.000Z"
+    },
     {
       "videoId": "6zm2Ah72x8o",
       "title": "[C&tBNW] '렬병식' 동무와 멋진 신세계 BGM",
@@ -11,11 +16,6 @@
       "videoId": "BlSWw3Fec3s",
       "title": "[C&tBNW] 'Comrade!!!' 동무와 멋진 신세계 BGM",
       "published": "2026-10-07T05:00:26.000Z"
-    },
-    {
-      "videoId": "mqZZNvWXhqw",
-      "title": "[C&tBNW] 'Citizen-2' 동무와 멋진 신세계 BGM",
-      "published": "2026-10-06T05:00:15.000Z"
     }
   ]
 }
