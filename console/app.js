@@ -8,8 +8,8 @@ const CONSOLE_CONFIG = {
 // Second game, separate Supabase project — never merged into CONSOLE_CONFIG above so the
 // Quirky Ball client's requests stay byte-for-byte unchanged. See console/hexaworld.js.
 const HEXAWORLD_CONFIG = {
-  functionBaseUrl: "https://sbudnfvvavkzmmhaglkq.supabase.co/functions/v1",
-  publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNidWRuZnZ2YXZrem1taGFnbGtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNjA2NzIsImV4cCI6MjEwNTgzNjY3Mn0.GjqmzIdHYWWOCoyRzo2nX3FcIlPeUbsLEIktYPZ6UKk",
+  functionBaseUrl: "https://frepunpqswciugwoyvxo.supabase.co/functions/v1",
+  publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyZXB1bnBxc3djaXVnd295dnhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDA3ODQsImV4cCI6MjEwNzgxNjc4NH0.BTfi0LS35wVbsgLkdKpvRQN8e0pw2F7-vcJ2UEnWTv4",
   allowedFunctions: ["hx-admin"],
 };
 
