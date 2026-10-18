@@ -136,4 +136,40 @@ done
 
 printf 'legal site contract (hexaworld1984): PASS\n'
 
+# 10KEY ships a ko/en privacy notice only (no terms or deletion pages yet) —
+# same generic legal-site contract as the hexaworld1984 block above.
+tenkey_localized_pages=(
+  "10key/privacy/ko.html"
+  "10key/privacy/en.html"
+)
+
+tenkey_selector_pages=(
+  "10key/index.html"
+  "10key/privacy/index.html"
+)
+
+for page in "${tenkey_localized_pages[@]}" "${tenkey_selector_pages[@]}"; do
+  test -s "$repo_dir/$page" || fail "$page does not exist"
+  require_token "$page" "/assets/legal-site.css"
+  require_token "$page" "/assets/legal-site.js"
+  require_token "$page" 'class="skip-link"'
+  require_token "$page" "<main"
+  require_token "$page" "data-current-year"
+  reject_token "$page" "<style"
+  reject_token "$page" "fonts.googleapis.com"
+  reject_token "$page" "cdn."
+  reject_token "$page" "tailwind"
+  reject_token "$page" "iconify"
+done
+
+for page in "${tenkey_localized_pages[@]}"; do
+  require_token "$page" "문서 본문 시작"
+  require_token "$page" "문서 본문 끝"
+  require_token "$page" "data-legal-content"
+  require_token "$page" "data-toc-list"
+  require_token "$page" "support@houseduck.in"
+done
+
+printf 'legal site contract (10key): PASS\n'
+
 printf 'legal site contract: PASS\n'

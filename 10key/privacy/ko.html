@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/assets/site-fonts.css" rel="stylesheet">
+  <link href="/assets/legal-site.css" rel="stylesheet">
+  <script defer src="/assets/legal-site.js"></script>
+  <title>개인정보처리방침 — 10KEY | House Duck</title>
+</head>
+<body class="legal-page" data-document="privacy">
+  <a class="skip-link" href="#legal-content">문서 본문으로 건너뛰기</a>
+
+  <header class="legal-site-header">
+    <div class="legal-header-inner">
+      <a class="legal-brand" href="../../" aria-label="House Duck 홈">
+        <span class="legal-duck-mark" aria-hidden="true"></span>
+        <span>HOUSE DUCK</span>
+      </a>
+      <nav class="legal-header-links" aria-label="관련 문서">
+        <a href="../">10KEY</a>
+        <a href="/support/">고객지원</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="legal-main" id="legal-content">
+    <!-- 문서 메타데이터 시작: 제목, 시행일, 언어 링크만 수정 -->
+    <section class="legal-hero" aria-labelledby="legal-title">
+      <div>
+        <p class="legal-kicker">HOUSE DUCK · 10KEY</p>
+        <h1 id="legal-title">개인정보처리방침</h1>
+        <p class="legal-date">10KEY · 시행일: 2026년 10월 18일 (v1)</p>
+      </div>
+      <nav class="legal-language-links" aria-label="문서 언어">
+          <a class="current" aria-current="page" href="ko.html">한국어</a>
+          <a href="en.html">English</a>
+      </nav>
+    </section>
+    <!-- 문서 메타데이터 끝 -->
+
+    <div class="legal-layout">
+      <aside class="legal-aside" aria-label="관련 문서">
+        <a class="legal-back-link" href="../../">← House Duck 홈</a>
+        <div class="legal-related-block">
+          <p class="legal-aside-label">관련 문서</p>
+          <nav class="legal-related-links">
+            <a aria-current="page" href="ko.html">개인정보처리방침</a>
+            <a href="/support/">고객지원</a>
+          </nav>
+        </div>
+        <nav class="legal-desktop-toc" data-toc-container aria-label="이 문서의 내용">
+          <p class="legal-aside-label">이 문서의 내용</p>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </nav>
+        <details class="legal-mobile-toc" data-toc-container>
+          <summary>목차 열기</summary>
+          <ol class="legal-toc-list" data-toc-list></ol>
+        </details>
+      </aside>
+
+      <article class="legal-paper">
+        <!-- 문서 본문 시작: 정책 문구는 이 안에서만 수정 -->
+        <div data-legal-content>
+<h2 id="section-1" class="first">1. 개요</h2>
+<p>House Duck(이하 "운영자")은 <strong>10KEY</strong>(이하 "본 게임") 이용자의 개인정보를 소중히 다루며, 대한민국 「개인정보 보호법」, EU 일반개인정보보호규칙(GDPR) 등 관련 법령을 준수하기 위해 노력합니다. 이 문서는 어떤 개인정보를 어떤 목적으로 처리하고, 어디에 보관하며, 누구와 공유하고, 얼마 동안 보유하며, 어떻게 삭제하는지 설명합니다.</p>
+<p>10KEY는 CrazyGames에서 먼저 공개하는 웹 게임입니다(이후 Android와 iOS로도 제공할 계획입니다). House Duck 계정 없이 플레이할 수 있습니다. 이 문서는 CrazyGames에서 제공하는 웹 버전에 적용됩니다. 다른 로그인 방식이나 다른 정보를 사용하는 버전을 출시하기 전에 이 문서를 먼저 개정합니다.</p>
+<ul>
+<li><strong>CrazyGames에 로그인하지 않은 경우</strong> 이용자에 관한 정보는 운영자 서버로 전송되지 않습니다. 진행 상황은 이용자의 기기(브라우저 저장소)에만 저장됩니다.</li>
+<li><strong>CrazyGames에 로그인한 경우</strong> 그 주의 최고 기록을 넘긴 플레이 한 판의 결과를 순위 집계를 위해 운영자 서버로 전송합니다(자세한 내용은 2항).</li>
+</ul>
+
+<h2 id="section-2">2. 수집하는 정보</h2>
+<p>운영자는 CrazyGames에 로그인한 이용자에 한해, 게임이 플레이 결과를 순위에 제출할 때에만 개인정보를 수집합니다.</p>
+<div class="table-scroll" role="region" aria-label="수집하는 정보" tabindex="0"><table>
+<tr><th>항목</th><th>수집 시점·목적</th><th>보관 위치</th></tr>
+<tr><td>CrazyGames 사용자 ID</td><td>운영자 서버가 검증하는 CrazyGames 로그인 토큰에서 읽어 옵니다. 순위 기록의 주인을 구분하는 데 사용합니다. 이메일 주소 같은 다른 계정 정보는 받지 않습니다.</td><td>Supabase</td></tr>
+<tr><td>CrazyGames 사용자 이름, 프로필 사진 주소(URL)</td><td>CrazyGames에서 바뀔 수 있으므로 결과를 제출할 때마다 같은 로그인 토큰에서 가져옵니다. 순위표에 표시됩니다. 사진 자체가 아니라 사진의 링크만 저장합니다.</td><td>Supabase</td></tr>
+<tr><td>플레이 결과: 점수, 레벨, 플레이 시간, 깊이, 부품(scrap), 콤보, 스킬 수, 끝난 사유(예: 배터리 방전, 마우스 포획, 텐키 파손), 게임 빌드, 플랫폼</td><td>그 주의 최고 점수를 넘긴 플레이일 때 전송합니다(새로운 주의 첫 제출, 새 기기의 첫 제출도 포함). 순위 집계, 부정행위 확인, 제출 횟수 제한에 사용합니다.</td><td>Supabase</td></tr>
+<tr><td>순위 기록: 주간·전체 최고 점수와 그때의 레벨, 플레이 시간, 달성 시각</td><td>플레이 결과로부터 만들어집니다. 주간·전체 순위표를 만들고 게임 안의 "지금 N위!" 표시에 사용합니다.</td><td>Supabase</td></tr>
+<tr><td>기술 기록: 마지막 접속 시각, 마지막 제출 시각, 최근 제출 횟수 카운터, 플레이마다의 확인 결과(통과 또는 사유와 함께 표시), 부정행위로 순위에서 제외된 이용자 표시</td><td>부정행위 확인과 짧은 시간 안에 받는 제출 횟수 제한(레이트 리밋)을 위해 보관합니다.</td><td>Supabase</td></tr>
+<tr><td>순위 조회(개인정보 전송 없음)</td><td>게임이 이번 플레이가 지금 몇 위쯤인지 보여 주기 위해 운영자 서버에서 현재 순위 목록을 가져옵니다. 이 요청에는 이용자에 관한 정보가 담기지 않습니다.</td><td>&mdash;</td></tr>
+</table></div>
+<p>10KEY는 House Duck 계정을 만들지 않으며 이메일 주소, 비밀번호, 닉네임을 요구하지 않습니다. CrazyGames 사용자 이름을 사용합니다. 게임 진행 상황과 설정은 이용자의 기기(브라우저 저장소)에 남으며 운영자 서버로 전송되지 않습니다.</p>
+<p>다만 다른 온라인 서비스와 마찬가지로, 게임이 운영자 서버에 접속할 때(위의 순위 조회 포함) 호스팅 사업자는 IP 주소와 요청 시각 같은 통상적인 접속 정보를 기술적으로 받게 됩니다. 운영자는 이를 이용자를 식별하거나 추적하는 데 사용하지 않으며, 순위 데이터에 포함하지 않습니다.</p>
+
+<h2 id="section-3">3. 이용 목적</h2>
+<ul>
+<li>주간·전체 순위 표시와 게임 안의 내 순위("지금 N위!") 표시</li>
+<li>제출된 결과가 정상 범위인지 확인(부정행위 방지)</li>
+<li>결과 제출 횟수 제한(레이트 리밋)</li>
+</ul>
+
+<h2 id="section-4">4. 외부 제공 및 처리위탁</h2>
+<p>House Duck은 이용자의 개인정보를 판매하지 않습니다. 법령상 필요한 경우를 제외하고 개인정보를 다른 제3자에게 제공하지 않습니다. 게임 제공에는 다음 사업자가 관여합니다.</p>
+<div class="table-scroll" role="region" aria-label="관여 사업자 및 국외 이전" tabindex="0"><table>
+<tr><th>사업자</th><th>역할</th><th>보관 위치</th></tr>
+<tr><td>Supabase</td><td>수탁자: 순위를 저장하고 제공하는 데이터베이스와 서버 함수</td><td>아일랜드(AWS eu-west-1, EU). 계약 법인: Supabase Pte. Ltd.(싱가포르), 지원 하위처리자 위치는 별도(privacy@supabase.io)</td></tr>
+<tr><td>CrazyGames</td><td>게임을 공개하고 CrazyGames 로그인과 SDK를 제공합니다. CrazyGames 플랫폼에는 CrazyGames의 개인정보처리방침이 적용됩니다(<a href="https://www.crazygames.com/privacy-policy" rel="noopener noreferrer">crazygames.com/privacy-policy</a>)</td><td>CrazyGames 시스템</td></tr>
+</table></div>
+<p>다른 이용자: 순위표에는 이용자의 CrazyGames 사용자 이름, 프로필 사진, 점수, 레벨이 게임의 다른 이용자에게 표시됩니다.</p>
+<p>10KEY는 CrazyGames 자체 리더보드로 결과를 보내지 않습니다. CrazyGames가 게임을 해당 기능에 초대하고 운영자가 이를 켜는 경우, 두 순위표가 일치하도록 인정된 주간 최고 점수를 CrazyGames 사용자 ID와 함께 CrazyGames로 보낼 수 있으며, 그 전에 이 문서를 먼저 개정합니다.</p>
+
+<h2 id="section-5">5. 보유 및 이용 기간</h2>
+<ul>
+<li>CrazyGames에 로그인하지 않은 이용자: 운영자 서버에는 아무것도 저장되지 않습니다.</li>
+<li>플레이어 기록과 순위 기록: 삭제를 요청할 때까지 보관합니다. 6개월 동안 접속 기록이 없는 이용자는 저장된 모든 정보와 함께 삭제됩니다.</li>
+<li>주간 순위표: 12주가 지난 주간 기록은 삭제됩니다.</li>
+<li>플레이 기록: 일반 플레이 기록은 35일 뒤, 확인 과정에서 표시된 플레이 기록은 90일 뒤 삭제됩니다.</li>
+<li>이용자의 기기에 있는 진행 상황과 설정: 이용자가 브라우저 저장소를 지울 때까지 남습니다.</li>
+</ul>
+
+<h2 id="section-6">6. 이용자의 권리와 삭제</h2>
+<p>적용 법률에 따라 열람, 정정, 삭제, 처리 제한, 데이터 이동을 요구하거나 처리에 반대할 수 있습니다. 요청은 <a href="mailto:support@houseduck.in">support@houseduck.in</a>으로 보내 주세요. 통상 30일 이내에 답변합니다.</p>
+<ul>
+<li>열람 또는 삭제를 요청하실 때는 이메일에 <strong>CrazyGames 사용자 이름</strong>을 적어 주세요. 운영자는 10KEY 서버에 있는 이용자의 순위 데이터(플레이어 기록, 순위 기록, 플레이 기록)를 삭제합니다.</li>
+<li>삭제 후 CrazyGames에 로그인한 채로 다시 플레이하면, 결과가 제출될 때 새 순위 기록이 만들어집니다.</li>
+<li>CrazyGames에 로그인하지 않았다면 운영자 서버에는 삭제할 정보가 없습니다. 기기에 저장된 진행 상황은 브라우저 저장소를 지워 삭제할 수 있습니다.</li>
+<li>CrazyGames 계정과 CrazyGames가 보유한 정보는 CrazyGames의 개인정보처리방침에 따라 CrazyGames에 문의해 주세요.</li>
+</ul>
+
+<h2 id="section-7">7. CrazyGames, 광고와 추적</h2>
+<ul>
+<li>10KEY는 CrazyGames에서 플레이하며, 로그인이나 게임 플레이 시작·중지 알림 등을 위해 CrazyGames SDK를 사용합니다.</li>
+<li>CrazyGames SDK는 광고를 표시하거나 정보를 수집할 수 있습니다. 이는 CrazyGames가 자사 개인정보처리방침에 따라 하는 것이며, 운영자가 통제하지 않습니다.</li>
+<li>운영자는 맞춤형 광고를 하지 않고, 정보를 판매하지 않으며, 게임 안에서 그 밖의 분석·광고 추적을 하지 않습니다.</li>
+</ul>
+
+<h2 id="section-8">8. 아동의 개인정보</h2>
+<p>본 게임은 만 14세 미만 아동을 대상으로 하지 않으며, 아동의 개인정보를 알면서 수집하지 않습니다. 연령과 동의 절차는 CrazyGames가 자사 플랫폼에서 처리하며, CrazyGames에 로그인하지 않은 이용자는 운영자에게 아무 정보도 보내지 않습니다. 아동의 정보가 수집된 사실을 알게 된 경우 즉시 삭제하며, 법정대리인은 아래 문의처로 삭제를 요청할 수 있습니다.</p>
+
+<h2 id="section-9">9. 안전성 확보 조치</h2>
+<ul>
+<li>모든 데이터베이스 테이블에 행 수준 보안(RLS)을 적용하며, 게임은 테이블에 직접 접근할 수 없습니다. 순위 목록은 제한된 서버 함수로 조회하고, 결과는 CrazyGames 로그인 토큰을 먼저 검증하는 서버 함수만 받습니다.</li>
+<li>통신은 HTTPS로 암호화합니다.</li>
+<li>접근 권한은 최소한으로 부여하고, 서버 비밀값은 게임에 포함하지 않습니다.</li>
+</ul>
+
+<h2 id="section-10">10. 문의</h2>
+<p>개인정보 관련 문의·요청: <strong><a href="mailto:support@houseduck.in">support@houseduck.in</a></strong></p>
+
+<h2 id="section-11">11. 시행일 및 개정 이력</h2>
+<ul>
+<li>2026년 10월 18일 — 제정 (v1)</li>
+</ul>
+
+</div>
+        <!-- 문서 본문 끝 -->
+        <footer class="legal-document-footer">
+          <p>공식 10KEY 문서 · 개인정보처리방침</p>
+          <p class="legal-update">최종 업데이트: <time datetime="2026-10-18">2026년 10월 18일</time> · 최초 게시 버전</p>
+        </footer>
+      </article>
+    </div>
+  </main>
+
+  <footer class="legal-site-footer">
+    <div class="legal-site-footer-inner">
+      <p>© <span data-current-year>2026</span> House Duck.</p>
+      <p>Small games. Big personality.</p>
+    </div>
+  </footer>
+</body>
+</html>
