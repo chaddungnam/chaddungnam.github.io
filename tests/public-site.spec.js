@@ -9,7 +9,7 @@ const routes = [
   "/about/index_en.html?lang=en",
   "/quirky-ball/?lang=ko",
   "/hexaworld1984/index_en.html?lang=en",
-  "/privacy/de.html?stay=1",
+  "/privacy/?stay=1",
   "/terms/ko.html",
   "/support/?lang=en",
 ];

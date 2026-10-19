@@ -190,16 +190,19 @@ test('support remains readable and contactable with JavaScript disabled',async({
 });
 
 for(const [lang] of locales){
+ // Legal documents are English + Korean only (owner 2026-10-19); de/ja legal URLs redirect to the English page.
+ const legalLang=['ko','en'].includes(lang);
  test(`legal ${lang}: unchanged public routes, usable contents, bottom update date`,async({page})=>{
-  for(const route of [`/privacy/${lang}.html`,`/quirky-ball/terms/${lang}.html`,`/quirky-ball/privacy/delete_${lang}.html`,`/impressum/${lang}.html`]){
-   const response=await page.goto(route);expect(response.status()).toBe(200);
-   await expect(page.locator('.legal-document-footer time')).toHaveAttribute('datetime','2026-09-05');
+  for(const [route,date] of [[`/privacy/${lang}.html`,'2026-10-19'],[`/quirky-ball/terms/${lang}.html`,'2026-10-05'],[`/quirky-ball/privacy/delete_${lang}.html`,'2026-09-08'],[`/impressum/${lang}.html`,'2026-09-05']]){
+   const response=await page.goto(route);expect(response.ok()).toBeTruthy();
+   if(!legalLang&&!route.startsWith('/impressum/')){await expect(page).toHaveURL(/\/(?:privacy\/en|quirky-ball\/terms\/en|quirky-ball\/privacy\/delete_en)\.html$/);continue;}
+   await expect(page.locator('.legal-document-footer time')).toHaveAttribute('datetime',date);
    await expect(page.locator('.legal-tools button')).toBeVisible();
    expect(await page.locator('[data-toc-list] a').count()).toBeGreaterThan(0);
    await page.setViewportSize({width:320,height:844});
    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   }
   const redirect=await page.goto(`/quirky-ball/privacy/${lang}.html`);expect(redirect.ok()).toBeTruthy();
-  await expect(page).toHaveURL(new RegExp(`/privacy/${lang}\\.html$`));
+  await expect(page).toHaveURL(new RegExp(`/privacy/${legalLang?lang:'en'}\\.html$`));
  });
 }

@@ -1,1 +1,28 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/privacy/"><link rel="canonical" href="https://houseduck.in/privacy/"><title>House Duck Privacy Policy</title></head><body><p>Redirecting to the House Duck Privacy Policy. <a href="/privacy/">Continue if you are not redirected.</a></p></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// 언어 자동 이동: 브라우저/기기 언어 목록에서 한국어(ko)가 영어(en)보다 먼저 나오면 한국어 문서,
+// 그 밖에는 기본 문서인 영어로 보낸다. JavaScript가 꺼져 있으면 noscript가 영어 문서로 보낸다.
+(function () {
+  try {
+    var langs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || ""];
+    for (var i = 0; i < langs.length; i++) {
+      var code = String(langs[i]).toLowerCase();
+      if (/^ko(?:[-_]|$)/.test(code)) { location.replace("/privacy/ko.html"); return; }
+      if (/^en(?:[-_]|$)/.test(code)) break;
+    }
+    location.replace("/privacy/en.html");
+  } catch (e) { /* 아래 링크로 폴백 */ }
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0;url=/privacy/en.html"></noscript>
+  <link rel="canonical" href="https://houseduck.in/privacy/">
+  <title>House Duck Privacy Policy</title>
+</head>
+<body>
+  <p>Redirecting to the House Duck Privacy Policy. <a href="/privacy/en.html">English</a> · <a href="/privacy/ko.html" lang="ko">한국어</a></p>
+</body>
+</html>

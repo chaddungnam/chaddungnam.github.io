@@ -30,24 +30,6 @@ const locales = {
     supabaseRole: /House Duck[^<]*controller[^<]*Supabase[^<]*processor/i,
     firebaseId: /app instance ID/i,
   },
-  de: {
-    optional: /optional[^<]*Firebase|Firebase[^<]*optional/i,
-    settings: /Einstellungen[^<]*(?:widerruf|änder)|(?:widerruf|änder)[^<]*Einstellungen/i,
-    sameGame: /Ablehn[^<]*(?:beschränkt|schränkt)[^<]*Spiel|Spiel[^<]*(?:gleich|einschränk)[^<]*Ablehn/i,
-    separate: /Werbe[^<]*(?:getrennt|separat)|(?:getrennt|separat)[^<]*Werbe/i,
-    history: /5\. September 2026[^<]*(?:Supabase|Firebase)/i,
-    supabaseRole: /House Duck[^<]*Verantwortlicher[^<]*Supabase[^<]*Auftragsverarbeiter/i,
-    firebaseId: /App-Instanz-ID/i,
-  },
-  ja: {
-    optional: /任意[^<]*Firebase|Firebase[^<]*任意/,
-    settings: /設定[^<]*(?:撤回|変更)|(?:撤回|変更)[^<]*設定/,
-    sameGame: /拒否[^<]*ゲーム[^<]*(?:同じ|制限)|ゲーム[^<]*(?:同じ|制限)[^<]*拒否/,
-    separate: /広告[^<]*(?:別|分離)|(?:別|分離)[^<]*広告/,
-    history: /2026年9月5日[^<]*(?:Supabase|Firebase)/,
-    supabaseRole: /House Duck[^<]*(?:管理者[^<]*Supabase|Supabase[^<]*管理者)[^<]*処理者/,
-    firebaseId: /アプリインスタンスID/,
-  },
 };
 
 test("localized legal documents distinguish required Supabase operations from optional Firebase Analytics", () => {
@@ -78,8 +60,6 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
   const copy = {
     ko: { noRetro: /기존[^<]*Firebase[^<]*소급[^<]*확대하지/, ttl: /24시간/, age: /14~17/ },
     en: { noRetro: /previous[^<]*Firebase[^<]*not[^<]*retroactively extend/i, ttl: /24 hours/i, age: /14–17/ },
-    de: { noRetro: /frühere[^<]*Firebase[^<]*nicht rückwirkend[^<]*erweitert/i, ttl: /24 Stunden/i, age: /14–17/ },
-    ja: { noRetro: /以前[^<]*Firebase[^<]*遡及[^<]*拡張しません/, ttl: /24時間/, age: /14～17/ },
   };
   for (const [locale, checks] of Object.entries(copy)) {
     const privacy = read(`privacy/${locale}.html`);
@@ -88,7 +68,8 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
       const text = html.replace(/<[^>]+>/g, " ");
       assert.match(text, checks.noRetro, `${locale} ${name}: no retroactive expansion of Firebase consent`);
       assert.match(text, checks.age, `${locale} ${name}: explain teen use`);
-      assert.match(html, /datetime="2026-10-05"/, `${locale} ${name}: current update date`);
+      // The shared policy was last updated on 2026-10-19 (10KEY added); the Quirky Ball terms on 2026-10-05.
+      assert.match(html, name === "privacy" ? /datetime="2026-10-19"/ : /datetime="2026-10-05"/, `${locale} ${name}: current update date`);
     }
     assert.match(privacy, checks.ttl, `${locale}: disclose app-managed pending-event expiry`);
     assert.match(privacy, /0[^<]*14[^<]*18/, `${locale}: disclose local age-band codes`);
@@ -99,6 +80,13 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
 });
 
 test("legacy Quirky Ball privacy URLs keep routing each language to the shared policy", () => {
+  // de/ja documents were dropped (owner 2026-10-19); their legacy URLs now go to the English shared policy.
+  for (const locale of ["de", "ja"]) {
+    const legacy = read(`quirky-ball/privacy/${locale}.html`);
+    assert.match(legacy, /http-equiv="refresh" content="0;url=\/privacy\/en\.html"/i, `${locale} legacy page must go to the English policy`);
+    assert.ok(legacy.includes('href="/privacy/en.html"'), `${locale} legacy page needs an accessible continue link`);
+    assert.ok(legacy.includes('href="https://houseduck.in/privacy/en.html"'), `${locale} legacy page needs the English canonical URL`);
+  }
   for (const locale of Object.keys(locales)) {
     const legacy = read(`quirky-ball/privacy/${locale}.html`);
     assert.match(legacy, new RegExp(`http-equiv="refresh" content="0;url=/privacy/${locale}\\.html"`, "i"));

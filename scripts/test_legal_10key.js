@@ -1,0 +1,129 @@
+#!/usr/bin/env node
+// 10KEY legal contract (2026-10-19): the shared House Duck Privacy Policy covers 10KEY in section 13, 10KEY has its
+// own Terms like Quirky Ball, /10key/privacy/ redirects to that section, and both documents read correctly on every
+// platform (CrazyGames first; Google Play, the Apple App Store and Steam later). English + Korean only.
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const repoDir = path.join(__dirname, "..");
+const read = (file) => fs.readFileSync(path.join(repoDir, file), "utf8");
+const exists = (file) => fs.existsSync(path.join(repoDir, file));
+const text = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+const locales = ["en", "ko"];
+const platforms = ["CrazyGames", "Google Play", "App Store", "Steam"];
+// Quirky-Ball-only features that must not leak into the 10KEY documents.
+const quirkyOnly = /AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|\bgems?\b|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|age band|연령대|birth year|출생 연도/i;
+
+function section13(locale) {
+  const html = read(`privacy/${locale}.html`);
+  const start = html.indexOf('<h2 id="section-13">13. 10KEY</h2>');
+  const end = html.indexOf('<h2 id="section-14">');
+  assert.ok(start > 0 && end > start, `${locale}: 10KEY is section 13, Changes is section 14`);
+  return html.slice(start, end);
+}
+
+test("the shared privacy policy describes 10KEY in section 13 with the confirmed facts", () => {
+  const facts = {
+    en: [/offline/, /only on your device or in your browser’s storage/, /does not receive this save/, /weekly board and an all-time board/,
+      /separate part \(schema\)/, /without sending an account or player identifier/, /IP address and HTTP request metadata/,
+      /today: a CrazyGames account/, /no device identifier is created/, /CrazyGames userId/, /token itself is not stored/,
+      /display name \(username\)/, /avatar image/, /depth, scrap, combo, number of skills, how the run ended, game build, platform name and an anti-cheat flag/,
+      /Art\. 6\(1\)\(b\)/, /Art\. 6\(1\)\(f\)/, /eu-west-1/, /independent controller/, /loading and gameplay events, sign-in state, the user token and celebration events/,
+      /12 weeks/, /35 days/, /90 days/, /6 months \(183 days\)/, /platform username/, /no analytics SDK and no advertising SDK of its own/,
+      /no advertising identifiers/, /no payment card data/, /not directed to children under 14/, /permission of a parent or guardian/, /human review/],
+    ko: [/오프라인/, /기기 또는 브라우저 저장소에만 저장/, /저장 데이터를 받지 않습니다/, /주간 순위표와 전체 기간 순위표/,
+      /별도 영역\(스키마\)/, /계정이나 플레이어 식별자를 보내지 않습니다/, /IP 주소와 HTTP 요청 메타데이터/,
+      /현재는 CrazyGames 계정/, /기기 식별자도 만들어지지 않습니다/, /CrazyGames userId/, /토큰 자체는 저장하지 않습니다/,
+      /표시 이름\(사용자 이름\)/, /아바타 이미지/, /깊이, 스크랩, 콤보, 스킬 수, 플레이가 끝난 원인, 게임 빌드, 플랫폼 이름, 부정행위 방지 표시/,
+      /제6조 제1항 b호/, /제6조 제1항 f호/, /eu-west-1/, /독립된 개인정보처리자/, /로딩 및 게임플레이 이벤트, 로그인 상태, 사용자 토큰, 축하 이벤트/,
+      /12주/, /35일/, /90일/, /6개월\(183일\)/, /플랫폼 사용자 이름/, /분석 SDK도 광고 SDK도 포함되어 있지 않으며/,
+      /광고 식별자를 받지 않습니다/, /결제 카드 정보를 받지 않습니다/, /만 14세 미만/, /부모 또는 보호자의 허락/, /사람의 검토/],
+  };
+  for (const locale of locales) {
+    const section = section13(locale);
+    const plain = text(section);
+    for (const fact of facts[locale]) assert.match(plain, fact, `${locale} section 13: ${fact}`);
+    for (const platform of platforms) assert.ok(plain.includes(platform), `${locale} section 13 names ${platform} as an example platform`);
+    assert.doesNotMatch(plain, quirkyOnly, `${locale} section 13: no Quirky-Ball-only feature`);
+    assert.ok(section.includes(`href="/10key/terms/${locale}.html"`), `${locale} section 13 links the 10KEY terms`);
+    assert.ok(section.includes("support@houseduck.in"), `${locale} section 13 names the deletion contact`);
+  }
+});
+
+test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website", () => {
+  const scope = {
+    en: ["The titles currently covered are the mobile game <strong>Quirky Ball</strong> (Android, iOS) and the arcade game <strong>10KEY</strong>.",
+      "Sections 2 to 12 describe Quirky Ball 2.0.0 and later and the website, unless stated otherwise.",
+      "A guest account is created when Quirky Ball is first used.", "are required to provide Quirky Ball."],
+    ko: ["현재 본 방침이 적용되는 타이틀은 모바일 게임 <strong>Quirky Ball</strong>(Android, iOS)과 아케이드 게임 <strong>10KEY</strong>입니다.",
+      "제2항부터 제12항까지는 별도의 언급이 없는 한 Quirky Ball 2.0.0 이후 버전과 웹사이트를 기준으로 설명합니다.",
+      "Quirky Ball을 처음 이용할 때 게스트 계정이 생성됩니다.", "Quirky Ball을 제공하기 위해서는 게스트 UID,"],
+  };
+  for (const locale of locales) {
+    const html = read(`privacy/${locale}.html`);
+    for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
+    assert.match(html, /datetime="2026-10-19"/, `${locale}: last updated 2026-10-19`);
+    assert.equal((html.match(/id="section-14"/g) || []).length, 1, `${locale}: Changes is section 14`);
+  }
+});
+
+test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
+  const titles = {
+    en: ["Overview and Acceptance", "The Service", "Accounts and Platforms", "Minors", "Purchases and Refunds", "Ads", "Online Rankings",
+      "Fair Play and Prohibited Conduct", "Intellectual Property and Licence", "Statutory Conformity and Rights",
+      "Availability and Changes to the Service", "Limitation of Liability", "Termination and Your Data", "Changes to These Terms",
+      "Governing Law, Severability and Contact", "Effective Date and Revision History"],
+    ko: ["개요 및 동의", "서비스", "계정 및 플랫폼", "미성년자", "구매 및 환불", "광고", "온라인 랭킹", "공정한 플레이 및 금지 행위",
+      "지식재산권 및 이용 허락", "법정 적합성 및 권리", "서비스 제공 및 변경", "책임의 제한", "이용 종료 및 데이터", "본 약관의 변경",
+      "준거법, 분리 가능성 및 연락처", "시행일 및 개정 이력"],
+  };
+  const required = {
+    en: [/no House Duck account/, /no cash or real-world value and cannot be sold or exchanged for money/, /legitimate refund request/,
+      /may show ads \(today on CrazyGames\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
+      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /Offline play is not affected/],
+    ko: [/House Duck 계정은 없습니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
+      /광고를 표시할 수 있습니다\(현재 CrazyGames\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
+      /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /오프라인 플레이에 영향을 주지 않습니다/],
+  };
+  for (const locale of locales) {
+    const file = `10key/terms/${locale}.html`;
+    const html = read(file);
+    const plain = text(html);
+    titles[locale].forEach((title, index) => {
+      assert.ok(html.includes(`<h2 id="section-${index + 1}">${index + 1}. ${title}</h2>`), `${file}: section ${index + 1} ${title}`);
+    });
+    assert.equal((html.match(/<h2 id="section-/g) || []).length, 16, `${file}: 16 sections`);
+    for (const marker of ["<!-- 문서 메타데이터 시작", "<!-- 문서 메타데이터 끝 -->", "<!-- 문서 본문 시작", "<!-- 문서 본문 끝 -->", "data-legal-content", "data-toc-list"]) {
+      assert.ok(html.includes(marker), `${file}: ${marker}`);
+    }
+    assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
+    assert.match(html, /datetime="2026-10-19"/, `${file}: last updated 2026-10-19`);
+    for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
+    for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
+    assert.doesNotMatch(plain, quirkyOnly, `${file}: no Quirky-Ball-only feature`);
+    assert.ok(html.includes(`href="/privacy/${locale}.html#section-13"`), `${file}: links its privacy section`);
+    assert.ok(html.includes('href="mailto:support@houseduck.in"'), `${file}: contact`);
+    assert.ok(html.includes("Ringstr. 23, 61476 Kronberg im Taunus"), `${file}: operator address`);
+  }
+});
+
+test("10KEY privacy URLs redirect to the shared policy and the terms selector offers 10KEY", () => {
+  for (const locale of locales) {
+    const redirect = read(`10key/privacy/${locale}.html`);
+    assert.ok(redirect.includes(`http-equiv="refresh" content="0;url=/privacy/${locale}.html#section-13"`), `${locale}: redirect to section 13`);
+    assert.ok(redirect.includes(`rel="canonical" href="https://houseduck.in/privacy/${locale}.html"`), `${locale}: shared canonical`);
+    assert.ok(redirect.includes(`href="/privacy/${locale}.html#section-13"`), `${locale}: continue link`);
+    assert.doesNotMatch(redirect, /data-legal-content/, `${locale}: the old standalone notice is gone`);
+    assert.ok(read(`terms/${locale}.html`).includes(`href="../10key/terms/${locale}.html"`), `${locale}: terms selector card`);
+  }
+  for (const locale of ["de", "ja"]) {
+    assert.ok(!exists(`10key/terms/${locale}.html`) && !exists(`10key/privacy/${locale}.html`), `10KEY has no ${locale} legal page`);
+  }
+  const home = read("10key/index.html");
+  assert.match(home, /href="terms\/"/);
+  assert.match(home, /href="privacy\/"/);
+  const sitemap = read("sitemap.xml");
+  assert.ok(!sitemap.includes("https://houseduck.in/10key/privacy/"), "10KEY privacy redirects stay out of the sitemap");
+});

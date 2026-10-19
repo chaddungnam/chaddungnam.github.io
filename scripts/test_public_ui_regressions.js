@@ -27,7 +27,6 @@ const englishSupportPages = [
   "quirky-ball/index_en.html",
   "quirky-ball/index_ja.html",
   "quirky-ball/terms/en.html",
-  "quirky-ball/terms/ja.html",
   "hexaworld1984/index_en.html",
   "hexaworld1984/index_ja.html",
 ];
@@ -35,7 +34,6 @@ const germanSupportPages = [
   "index_de.html",
   "about/index_de.html",
   "quirky-ball/index_de.html",
-  "quirky-ball/terms/de.html",
   "hexaworld1984/index_de.html",
 ];
 
@@ -228,14 +226,17 @@ test("the common Terms route asks readers to choose a project", () => {
   const localized = [
     ["terms/ko.html", /프로젝트를 선택하세요/, /href="\.\.\/quirky-ball\/terms\/ko\.html"/],
     ["terms/en.html", /Choose a project/, /href="\.\.\/quirky-ball\/terms\/en\.html"/],
-    ["terms/de.html", /Projekt auswählen/, /href="\.\.\/quirky-ball\/terms\/de\.html"/],
-    ["terms/ja.html", /プロジェクトを選択/, /href="\.\.\/quirky-ball\/terms\/ja\.html"/],
   ];
   for (const [file, heading, projectLink] of localized) {
     const html = read(file);
     assert.match(html, heading, `${file} needs a localized project choice`);
     assert.match(html, projectLink, `${file} needs the Quirky Ball terms choice`);
+    assert.ok(html.includes(`href="../10key/terms/${file.slice(6, 8)}.html"`), `${file} needs the 10KEY terms choice`);
     assert.doesNotMatch(html, /http-equiv="refresh"/i, `${file} must not skip project choice`);
+  }
+  // Legal documents are English + Korean only (owner 2026-10-19): the de/ja selector URLs redirect to English.
+  for (const file of ["terms/de.html", "terms/ja.html"]) {
+    assert.match(read(file), /http-equiv="refresh" content="0;url=\/terms\/en\.html"/, `${file} must redirect to the English selector`);
   }
   assert.match(read("index.html"), /href="terms\/ko\.html"[^>]*>이용약관<\/a>/, "House Duck footer must use the project selector");
   assert.doesNotMatch(read("index.html"), />Quirky Ball 이용약관</, "House Duck footer must not expose one game's terms");
@@ -259,8 +260,8 @@ test("terms show the effective date and avoid unconfirmed business status", () =
   const expectations = [
     ["quirky-ball/terms/ko.html", /시행일:\s*2026년 10월 5일/, /영업하는 개인사업자/],
     ["quirky-ball/terms/en.html", /Effective date:\s*October 5, 2026/i, /sole proprietor/i],
-    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*5\. Oktober 2026/i, /Einzelunternehmer/i],
-    ["quirky-ball/terms/ja.html", /施行日:\s*2026年10月5日/, /個人事業主/],
+    ["10key/terms/ko.html", /시행일:\s*2026년 10월 19일/, /영업하는 개인사업자/],
+    ["10key/terms/en.html", /Effective date:\s*October 19, 2026/i, /sole proprietor/i],
   ];
   for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);

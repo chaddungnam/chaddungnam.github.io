@@ -28,20 +28,31 @@ require_token "assets/legal-site.css" 'color-scheme: light'
 reject_token "assets/legal-site.css" 'html[data-theme="dark"]'
 require_token "assets/legal-site.css" '/assets/house-duck-logo.png'
 
+# Legal documents are English (main version) + Korean only (owner 2026-10-19). The de/ja legal URLs stay
+# alive as redirect stubs to the matching English page (the live Quirky Ball app opens them). The Impressum is
+# not part of that change and keeps all four languages.
+legal_locales=(en ko)
+dropped_locales=(de ja)
+
 localized_pages=()
-for locale in ko en de ja; do
+for locale in "${legal_locales[@]}"; do
   localized_pages+=(
     "privacy/$locale.html"
     "quirky-ball/terms/$locale.html"
     "quirky-ball/privacy/delete_$locale.html"
-    "impressum/$locale.html"
+    "10key/terms/$locale.html"
   )
+done
+for locale in ko en de ja; do
+  localized_pages+=("impressum/$locale.html")
 done
 
 selector_pages=(
   "privacy/index.html"
   "quirky-ball/privacy/delete.html"
   "quirky-ball/terms/index.html"
+  "10key/terms/index.html"
+  "10key/index.html"
 )
 
 for page in "${localized_pages[@]}" "${selector_pages[@]}" "support/index.html"; do
@@ -58,13 +69,84 @@ for page in "${localized_pages[@]}" "${selector_pages[@]}" "support/index.html";
   reject_token "$page" "iconify"
 done
 
-for locale in ko en de ja; do
-  redirect="quirky-ball/privacy/$locale.html"
-  test -s "$repo_dir/$redirect" || fail "$redirect does not exist"
-  require_token "$redirect" "/privacy/$locale.html"
+for locale in "${legal_locales[@]}"; do
+  for redirect in "quirky-ball/privacy/$locale.html" "10key/privacy/$locale.html"; do
+    test -s "$repo_dir/$redirect" || fail "$redirect does not exist"
+    require_token "$redirect" 'http-equiv="refresh"'
+    require_token "$redirect" "/privacy/$locale.html"
+    require_token "$redirect" "https://houseduck.in/privacy/$locale.html"
+    reject_token "$redirect" "data-legal-content"
+  done
+  require_token "10key/privacy/$locale.html" "/privacy/$locale.html#section-13"
 done
 
 require_token "quirky-ball/privacy/index.html" "/privacy/"
+require_token "10key/privacy/index.html" "/privacy/"
+
+# de/ja legal URLs: redirect stubs to the English document only, never a document of their own.
+require_redirect_stub() {
+  local page="$1"
+  local target="$2"
+  test -s "$repo_dir/$page" || fail "$page does not exist (the live app may open it)"
+  require_token "$page" "http-equiv=\"refresh\" content=\"0;url=$target\""
+  require_token "$page" "rel=\"canonical\" href=\"https://houseduck.in$target\""
+  require_token "$page" "href=\"$target\""
+  reject_token "$page" "data-legal-content"
+  reject_token "$page" "문서 본문 시작"
+}
+
+for locale in "${dropped_locales[@]}"; do
+  require_redirect_stub "privacy/$locale.html" "/privacy/en.html"
+  require_redirect_stub "terms/$locale.html" "/terms/en.html"
+  require_redirect_stub "quirky-ball/privacy/$locale.html" "/privacy/en.html"
+  require_redirect_stub "quirky-ball/terms/$locale.html" "/quirky-ball/terms/en.html"
+  require_redirect_stub "quirky-ball/privacy/delete_$locale.html" "/quirky-ball/privacy/delete_en.html"
+  require_redirect_stub "quirky-ball/web/privacy/$locale.html" "/quirky-ball/web/privacy/en.html"
+  require_redirect_stub "quirky-ball/web/terms/$locale.html" "/quirky-ball/web/terms/en.html"
+  if [[ -e "$repo_dir/10key/terms/$locale.html" || -e "$repo_dir/10key/privacy/$locale.html" ]]; then
+    fail "10KEY has no $locale legal pages"
+  fi
+done
+
+# en/ko legal pages offer only the en/ko switch.
+for page in "${localized_pages[@]}" "terms/en.html" "terms/ko.html" \
+  "quirky-ball/web/privacy/en.html" "quirky-ball/web/privacy/ko.html" \
+  "quirky-ball/web/terms/en.html" "quirky-ball/web/terms/ko.html"; do
+  case "$page" in impressum/*) continue ;; esac
+  for dropped in "${dropped_locales[@]}"; do
+    reject_token "$page" "href=\"$dropped.html\""
+    reject_token "$page" "href=\"delete_$dropped.html\""
+  done
+done
+
+# Language choice: Korean browsers go to ko, everyone else to the English main version; no-JS falls back to en.
+require_language_choice() {
+  local page="$1"
+  local ko_target="$2"
+  local en_target="$3"
+  test -s "$repo_dir/$page" || fail "$page does not exist"
+  require_token "$page" '/^ko(?:[-_]|$)/'
+  require_token "$page" "location.replace(\"$ko_target\")"
+  require_token "$page" "location.replace(\"$en_target\")"
+  require_token "$page" "<noscript><meta http-equiv=\"refresh\" content=\"0;url=$en_target\"></noscript>"
+  require_token "$page" "href=\"$en_target\""
+  local dropped
+  for dropped in "${dropped_locales[@]}"; do
+    reject_token "$page" "\"$dropped\""
+    reject_token "$page" "href=\"$dropped.html\""
+    reject_token "$page" "href=\"delete_$dropped.html\""
+  done
+}
+
+require_language_choice "privacy/index.html" "ko.html" "en.html"
+require_language_choice "terms/index.html" "ko.html" "en.html"
+require_language_choice "quirky-ball/terms/index.html" "ko.html" "en.html"
+require_language_choice "quirky-ball/privacy/index.html" "/privacy/ko.html" "/privacy/en.html"
+require_language_choice "quirky-ball/privacy/delete.html" "delete_ko.html" "delete_en.html"
+require_language_choice "quirky-ball/web/privacy/index.html" "ko.html" "en.html"
+require_language_choice "quirky-ball/web/terms/index.html" "ko.html" "en.html"
+require_language_choice "10key/terms/index.html" "ko.html" "en.html"
+require_language_choice "10key/privacy/index.html" "/privacy/ko.html#section-13" "/privacy/en.html#section-13"
 
 for locale in ko en de ja; do
   require_token "impressum/$locale.html" "Junhee Choi"
@@ -136,39 +218,17 @@ done
 
 printf 'legal site contract (hexaworld1984): PASS\n'
 
-# 10KEY ships a ko/en privacy notice only (no terms or deletion pages yet) —
-# same generic legal-site contract as the hexaworld1984 block above.
-tenkey_localized_pages=(
-  "10key/privacy/ko.html"
-  "10key/privacy/en.html"
-)
-
-tenkey_selector_pages=(
-  "10key/index.html"
-  "10key/privacy/index.html"
-)
-
-for page in "${tenkey_localized_pages[@]}" "${tenkey_selector_pages[@]}"; do
-  test -s "$repo_dir/$page" || fail "$page does not exist"
-  require_token "$page" "/assets/legal-site.css"
-  require_token "$page" "/assets/legal-site.js"
-  require_token "$page" 'class="skip-link"'
-  require_token "$page" "<main"
-  require_token "$page" "data-current-year"
-  reject_token "$page" "<style"
-  reject_token "$page" "fonts.googleapis.com"
-  reject_token "$page" "cdn."
-  reject_token "$page" "tailwind"
-  reject_token "$page" "iconify"
+# 10KEY follows the Quirky Ball pattern: its own Terms (en/ko, checked with the localized pages above), the shared
+# House Duck Privacy Policy (section 13), and /10key/privacy/ redirects to that section.
+for locale in "${legal_locales[@]}"; do
+  require_token "10key/terms/$locale.html" "support@houseduck.in"
+  require_token "10key/terms/$locale.html" "/privacy/$locale.html#section-13"
+  require_token "privacy/$locale.html" 'id="section-13">13. 10KEY</h2>'
+  require_token "privacy/$locale.html" "/10key/terms/$locale.html"
+  require_token "terms/$locale.html" "../10key/terms/$locale.html"
 done
-
-for page in "${tenkey_localized_pages[@]}"; do
-  require_token "$page" "문서 본문 시작"
-  require_token "$page" "문서 본문 끝"
-  require_token "$page" "data-legal-content"
-  require_token "$page" "data-toc-list"
-  require_token "$page" "support@houseduck.in"
-done
+require_token "10key/index.html" 'href="terms/"'
+require_token "10key/index.html" 'href="privacy/"'
 
 printf 'legal site contract (10key): PASS\n'
 

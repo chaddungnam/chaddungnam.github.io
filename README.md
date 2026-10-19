@@ -40,7 +40,8 @@ node scripts/test_gmail_model.js
 
 ## 법적 문서 문구 수정 방법
 
-- 실제 문구는 `quirky-ball/privacy/`, `quirky-ball/terms/`의 각 언어 HTML에 있습니다.
+- 법적 문서는 영어(기본)와 한국어만 유지합니다(소유자 2026-10-19). `de.html`/`ja.html` 법적 주소는 앱이 열 수 있으므로 지우지 않고, 같은 문서의 영어판으로 보내는 작은 리디렉트로 둡니다. 언어 선택 `index.html`은 브라우저 언어가 한국어면 `ko.html`, 그 밖에는 `en.html`로 보냅니다.
+- 개인정보처리방침은 House Duck 공용 `privacy/<언어>.html` 하나이고(10KEY는 제13항), 이용약관은 게임마다 `quirky-ball/terms/`, `10key/terms/`에 있습니다. `quirky-ball/privacy/<언어>.html`, `10key/privacy/<언어>.html`은 공용 방침으로 가는 리디렉트입니다.
 - 제목·시행일은 `문서 메타데이터 시작/끝`, 본문은 `문서 본문 시작/끝` 주석 안에서만 수정합니다.
 - 섹션 제목의 `id="section-..."`는 자동 목차가 사용하므로 지우지 않습니다.
 - 색상·간격·모바일·인쇄 모양은 `assets/legal-site.css`, 목차·연도는 `assets/legal-site.js`가 공통 관리합니다.
