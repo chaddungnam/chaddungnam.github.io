@@ -40,8 +40,9 @@ node scripts/test_gmail_model.js
 
 ## 법적 문서 문구 수정 방법
 
-- 법적 문서는 영어(기본), 한국어, 독일어로 유지합니다(소유자 2026-10-20: 독일어 복원, GDPR). `ja.html` 법적 주소는 앱이 열 수 있으므로 지우지 않고, 같은 문서의 영어판으로 보내는 작은 리디렉트로 둡니다. 언어 선택 `index.html`은 브라우저 언어 목록에서 영어보다 한국어가 먼저면 `ko.html`, 독일어가 먼저면 `de.html`, 그 밖에는(일본어 포함) `en.html`로 보냅니다. 10KEY 이용약관은 영어·한국어만 있고, 독일어 페이지는 영어 약관을 연결합니다.
-- 개인정보처리방침은 House Duck 공용 `privacy/<언어>.html` 하나이고(10KEY는 제13항, 고객지원 메일·직원 전용 운영 콘솔·Gmail 접근은 모든 게임 공통인 제14항, 변경 이력은 제15항), 이용약관은 게임마다 `quirky-ball/terms/`, `10key/terms/`에 있습니다. 동무(`hexaworld1984/`)는 출시 전까지 자체 방침을 유지합니다. `quirky-ball/privacy/<언어>.html`, `10key/privacy/<언어>.html`은 공용 방침으로 가는 리디렉트입니다.
+- 법적 문서는 영어(기본), 한국어, 독일어로 유지합니다(소유자 2026-10-20: 독일어 복원, GDPR). `ja.html` 법적 주소는 앱이 열 수 있으므로 지우지 않고, 같은 문서의 영어판으로 보내는 작은 리디렉트로 둡니다. 언어 선택 `index.html`은 브라우저 언어 목록에서 영어보다 한국어가 먼저면 `ko.html`, 독일어가 먼저면 `de.html`, 그 밖에는(일본어 포함) `en.html`로 보냅니다. 딸깍 서바이벌(10key Survival) 이용약관은 영어·한국어만 있고, 독일어 페이지는 영어 약관을 연결합니다.
+- 개인정보처리방침은 House Duck 공용 `privacy/<언어>.html` 하나이고(딸깍 서바이벌은 제13항, 고객지원 메일·직원 전용 운영 콘솔·Gmail 접근은 모든 게임 공통인 제14항, 변경 이력은 제15항), 이용약관은 게임마다 `quirky-ball/terms/`, `10key/terms/`에 있습니다. 동무(`hexaworld1984/`)는 출시 전까지 자체 방침을 유지합니다. `quirky-ball/privacy/<언어>.html`, `10key/privacy/<언어>.html`은 공용 방침으로 가는 리디렉트입니다.
+- 게임 이름(소유자 2026-10-20, 출시 전 변경): 영어·독일어 문서는 `10key Survival`, 한국어 문서는 `딸깍 서바이벌`(문서에서 처음 나올 때 한 번 `(10key Survival)`을 붙임). `10KEY`는 프로젝트 이름일 뿐이며, 설치된 앱과 스토어가 링크하는 주소·파일·앵커(`/10key/`, `#10key`, `#section-13`, `10key/config.json`)는 바꾸지 않습니다. 변경 이력의 이름 변경 줄에만 옛 이름 `10KEY`가 남습니다.
 - 스토어·앱·Google이 링크하는 입구 주소(`/privacy/`, `/quirky-ball/privacy/`, `/10key/privacy/`, `/quirky-ball/terms/`, `/10key/terms/`, `/hexaworld1984/privacy/`, `/hexaworld1984/terms/`)는 언어 선택이나 리디렉트가 아니라 영어 문서 전문을 바로 보여 줍니다(2026-10-20, Google OAuth 브랜드 검토에서 언어 선택 화면이 "내용 부족"으로 거절됨). 이 `index.html`은 `python3 scripts/build_legal_entry_pages.py`가 영어 원문에서 만들므로 직접 고치지 않습니다. 영어 원문을 고친 뒤 이 스크립트를 실행하고, `scripts/check_legal_site.sh`는 사본이 원문과 다르면 실패합니다. 브라우저 언어 목록에서 한국어(또는 독일어 문서가 있으면 독일어)가 영어보다 먼저인 사람만 그 언어 문서로 옮기고, `/10key/privacy/`는 제13항에서 열립니다.
 - 홈페이지 바닥글의 `House Duck Console (staff only)`는 콘솔의 Google 로그인 용도를 설명하는 제14항으로 연결됩니다.
 - 제목·시행일은 `문서 메타데이터 시작/끝`, 본문은 `문서 본문 시작/끝` 주석 안에서만 수정합니다.

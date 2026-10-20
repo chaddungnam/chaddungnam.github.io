@@ -115,7 +115,7 @@ for locale in "${dropped_locales[@]}"; do
 done
 for locale in de ja; do
   if [[ -e "$repo_dir/10key/terms/$locale.html" || -e "$repo_dir/10key/privacy/$locale.html" ]]; then
-    fail "10KEY has no $locale legal pages"
+    fail "10key Survival has no $locale legal pages"
   fi
 done
 
@@ -304,16 +304,17 @@ done
 
 printf 'legal site contract (hexaworld1984): PASS\n'
 
-# 10KEY follows the Quirky Ball pattern: its own Terms (en/ko, checked with the localized pages above), the shared
+# 10key Survival (딸깍 서바이벌; project name 10KEY, renamed 2026-10-20) follows the Quirky Ball pattern: its own Terms (en/ko, checked with the localized pages above), the shared
 # House Duck Privacy Policy (section 13, also in German), and /10key/privacy/ shows that policy opened at section 13.
 for locale in "${tenkey_locales[@]}"; do
   require_token "10key/terms/$locale.html" "support@houseduck.in"
   require_token "10key/terms/$locale.html" "/privacy/$locale.html#section-13"
-  require_token "privacy/$locale.html" 'id="section-13">13. 10KEY</h2>'
+  if [[ "$locale" == ko ]]; then require_token "privacy/$locale.html" 'id="section-13">13. 딸깍 서바이벌 (10key Survival)</h2>'
+  else require_token "privacy/$locale.html" 'id="section-13">13. 10key Survival</h2>'; fi
   require_token "privacy/$locale.html" "/10key/terms/$locale.html"
   require_token "terms/$locale.html" "../10key/terms/$locale.html"
 done
-require_token "privacy/de.html" 'id="section-13">13. 10KEY</h2>'
+require_token "privacy/de.html" 'id="section-13">13. 10key Survival</h2>'
 require_token "privacy/de.html" "/10key/terms/en.html"
 require_token "terms/de.html" "../10key/terms/en.html"
 require_token "10key/index.html" 'href="terms/"'

@@ -238,7 +238,7 @@ test("the common Terms route asks readers to choose a project", () => {
     assert.ok(html.includes(`href="../10key/terms/${tenkeyLang}.html"`), `${file} needs the 10KEY terms choice`);
     assert.doesNotMatch(html, /http-equiv="refresh"/i, `${file} must not skip project choice`);
   }
-  assert.match(read("terms/de.html"), /10KEY<small>[^<]*auf Englisch/, "German selector says the 10KEY terms are in English");
+  assert.match(read("terms/de.html"), /10key Survival<small>[^<]*auf Englisch/, "German selector says the 10key Survival terms are in English");
   // Japanese legal URLs redirect to English (owner 2026-10-19; German is back since 2026-10-20).
   for (const file of ["terms/ja.html"]) {
     assert.match(read(file), /http-equiv="refresh" content="0;url=\/terms\/en\.html"/, `${file} must redirect to the English selector`);

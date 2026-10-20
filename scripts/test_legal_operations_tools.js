@@ -28,7 +28,8 @@ for (const locale of ["en", "ko", "de"]) {
   ids[locale] = (html.match(/id="section-\d+"/g) || []).join(",");
   assert.ok(html.includes(`<h2 id="section-14">${TITLES[locale][0]}</h2>`), `${locale}: section 14 title`);
   assert.ok(html.includes(`<h2 id="section-15">${TITLES[locale][1]}</h2>`), `${locale}: Changes is section 15`);
-  assert.ok(html.includes('<h2 id="section-13">13. 10KEY</h2>'), `${locale}: 10KEY stays section 13`);
+  const heading13 = locale === "ko" ? "13. 딸깍 서바이벌 (10key Survival)" : "13. 10key Survival";
+  assert.ok(html.includes(`<h2 id="section-13">${heading13}</h2>`), `${locale}: 10key Survival stays section 13`);
   const section = html.slice(html.indexOf('<h2 id="section-14">'), html.indexOf('<h2 id="section-15">'));
   if (locale === "en") assert.ok(section.includes(LIMITED_USE.en), "en: Limited Use sentence verbatim");
   else assert.match(section, LIMITED_USE[locale], `${locale}: Limited Use sentence`);
@@ -42,7 +43,9 @@ for (const locale of ["en", "ko", "de"]) {
   assert.ok(section.includes({ en: "mail text is not sent to any AI service", ko: "메일 본문은 어떤 AI 서비스로도 전송되지 않습니다", de: "E-Mail-Texte werden an keinen KI-Dienst gesendet" }[locale]), `${locale}: no mail text to AI`);
   assert.ok(!section.includes("Gemini"), `${locale}: section 14 does not send mail to Gemini`);
   const changes = html.slice(html.indexOf('<h2 id="section-15">'));
-  assert.match(changes, /^<h2 id="section-15">[^<]+<\/h2>\n<ul><li>[^<]*\(v4\.2\)/, `${locale}: v4.2 is the newest change entry`);
+  assert.match(changes, /^<h2 id="section-15">[^<]+<\/h2>\n<ul><li>/, `${locale}: section 15 is the change list`);
+  // The unversioned name update of October 20, 2026 (10key Survival / 딸깍 서바이벌) sits above it; v4.2 stays the newest version.
+  assert.equal((changes.match(/\(v\d+\.\d+\)/) || [])[0], "(v4.2)", `${locale}: v4.2 is the newest versioned change entry`);
   assert.match(html, /legal-update[^]*<time datetime="2026-10-20">/, `${locale}: last updated 2026-10-20`);
   assert.ok(/Google Workspace ?\(Gmail\)[^<]*Google Identity Services/.test(html.slice(html.indexOf('id="section-4"'), html.indexOf('id="section-5"'))),
     `${locale}: section 4 lists Google Workspace and Google Identity Services`);

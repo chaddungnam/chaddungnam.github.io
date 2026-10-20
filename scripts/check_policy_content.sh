@@ -97,44 +97,47 @@ for locale in "${locales[@]}"; do
   tenkey_locale="$locale"
   [[ "$locale" == de ]] && tenkey_locale=en
   tenkey_terms="$repo_dir/10key/terms/$tenkey_locale.html"
+  # Store names since 2026-10-20: 10key Survival (en, de) / 딸깍 서바이벌 (ko); URLs and anchors keep "10key".
+  tenkey_heading='13\. 10key Survival</h2>'
+  [[ "$locale" == ko ]] && tenkey_heading='13\. 딸깍 서바이벌 \(10key Survival\)</h2>'
   tenkey_redirect="$repo_dir/10key/privacy/$locale.html"
   [[ "$locale" == de ]] && tenkey_redirect="$repo_dir/10key/privacy/index.html"
   if [[ ! -s "$tenkey_terms" ]]; then
-    printf 'Missing 10KEY terms page: %s\n' "$tenkey_terms" >&2
+    printf 'Missing 10key Survival terms page: %s\n' "$tenkey_terms" >&2
     failed=1
   else
-    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-19"'; do
+    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-20"'; do
       if ! rg -q "$token" "$tenkey_terms"; then
-        printf '10KEY terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
+        printf '10key Survival terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
         failed=1
       fi
     done
     if rg -n -i 'AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|\bgems?\b|젬|season pass|시즌패스|subscription|구독' "$tenkey_terms"; then
-      printf '10KEY terms page contains Quirky-Ball-only or removed wording: %s\n' "$tenkey_terms" >&2
+      printf '10key Survival terms page contains Quirky-Ball-only or removed wording: %s\n' "$tenkey_terms" >&2
       failed=1
     fi
   fi
-  if ! rg -q 'id="section-13">13\. 10KEY</h2>' "$privacy" || ! rg -q "/10key/terms/$tenkey_locale\.html" "$privacy"; then
-    printf 'Privacy page misses the 10KEY section or its terms link: %s\n' "$privacy" >&2
+  if ! rg -q "id=\"section-13\">$tenkey_heading" "$privacy" || ! rg -q "/10key/terms/$tenkey_locale\.html" "$privacy"; then
+    printf 'Privacy page misses the 10key Survival section or its terms link: %s\n' "$privacy" >&2
     failed=1
   fi
-  tenkey_section="$(sed -n '/id="section-13">13\. 10KEY/,/id="section-14"/p' "$privacy")"
+  tenkey_section="$(sed -n '/id="section-13">13\. /,/id="section-14"/p' "$privacy")"
   for token in 'eu-west-1' 'CrazyGames' 'Google Play' 'Steam' '12' '35' '90' '183' 'support@houseduck\.in'; do
     if ! printf '%s' "$tenkey_section" | grep -Eq "$token"; then
-      printf 'Privacy 10KEY section misses %s: %s\n' "$token" "$privacy" >&2
+      printf 'Privacy 10key Survival section misses %s: %s\n' "$token" "$privacy" >&2
       failed=1
     fi
   done
   if printf '%s' "$tenkey_section" | grep -Eiq 'AdMob|Firebase|AppLovin|Sign in with Apple|Apple로 로그인'; then
-    printf 'Privacy 10KEY section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
+    printf 'Privacy 10key Survival section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
   fi
   if ! rg -q "(url=|replace\(\")/privacy/$locale\.html(#section-13|\" \+ \(location\.hash \|\| \"#section-13\"\))" "$tenkey_redirect"; then
-    printf '10KEY privacy route is not linked to the shared policy: %s\n' "$tenkey_redirect" >&2
+    printf '10key Survival privacy route is not linked to the shared policy: %s\n' "$tenkey_redirect" >&2
     failed=1
   fi
   if ! rg -q "\.\./10key/terms/$tenkey_locale\.html" "$terms_redirect"; then
-    printf 'Terms selector does not offer 10KEY: %s\n' "$terms_redirect" >&2
+    printf 'Terms selector does not offer 10key Survival: %s\n' "$terms_redirect" >&2
     failed=1
   fi
 done
@@ -181,4 +184,4 @@ if [[ "$failed" -ne 0 ]]; then
   exit 1
 fi
 
-printf 'Quirky Ball and 10KEY policy content check passed (en + ko + de; ja redirects to en).\n'
+printf 'Quirky Ball and 10key Survival policy content check passed (en + ko + de; ja redirects to en).\n'

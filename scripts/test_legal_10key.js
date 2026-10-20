@@ -17,9 +17,13 @@ const platforms = ["CrazyGames", "Google Play", "App Store", "Steam"];
 // Quirky-Ball-only features that must not leak into the 10KEY documents.
 const quirkyOnly = /AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|\bgems?\b|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|age band|연령대|birth year|출생 연도/i;
 
+// Store names (owner 2026-10-20, before release): 10key Survival in English and German, 딸깍 서바이벌 in Korean.
+// 10KEY was only the project name; URLs, file names and anchors (/10key/, #10key, #section-13) stay as they are.
+const HEADING13 = { en: "13. 10key Survival", de: "13. 10key Survival", ko: "13. 딸깍 서바이벌 (10key Survival)" };
+
 function section13(locale) {
   const html = read(`privacy/${locale}.html`);
-  const start = html.indexOf('<h2 id="section-13">13. 10KEY</h2>');
+  const start = html.indexOf(`<h2 id="section-13">${HEADING13[locale]}</h2>`);
   const end = html.indexOf('<h2 id="section-14">');
   assert.ok(start > 0 && end > start, `${locale}: 10KEY is section 13, followed by section 14`);
   return html.slice(start, end);
@@ -55,10 +59,10 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
 
 test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website", () => {
   const scope = {
-    en: ["The titles currently covered are the mobile game <strong>Quirky Ball</strong> (Android, iOS) and the arcade game <strong>10KEY</strong>.",
+    en: ["The titles currently covered are the mobile game <strong>Quirky Ball</strong> (Android, iOS) and the arcade game <strong>10key Survival</strong>.",
       "Sections 2 to 12 describe Quirky Ball 2.0.0 and later and the website, unless stated otherwise.",
       "A guest account is created when Quirky Ball is first used.", "are required to provide Quirky Ball."],
-    ko: ["현재 본 방침이 적용되는 타이틀은 모바일 게임 <strong>Quirky Ball</strong>(Android, iOS)과 아케이드 게임 <strong>10KEY</strong>입니다.",
+    ko: ["현재 본 방침이 적용되는 타이틀은 모바일 게임 <strong>Quirky Ball</strong>(Android, iOS)과 아케이드 게임 <strong>딸깍 서바이벌</strong>(10key Survival)입니다.",
       "제2항부터 제12항까지는 별도의 언급이 없는 한 Quirky Ball 2.0.0 이후 버전과 웹사이트를 기준으로 설명합니다.",
       "Quirky Ball을 처음 이용할 때 게스트 계정이 생성됩니다.", "Quirky Ball을 제공하기 위해서는 게스트 UID,"],
   };
@@ -88,7 +92,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
   assert.ok(section.includes('href="/10key/terms/en.html"') && /auf Englisch/.test(plain), "de section 13 links the English 10KEY terms and says so");
   assert.ok(section.includes("support@houseduck.in"), "de section 13 names the deletion contact");
   const html = read("privacy/de.html");
-  for (const phrase of ["Die derzeit erfassten Titel sind das Mobile-Spiel <strong>Quirky Ball</strong> (Android, iOS) und das Arcade-Spiel <strong>10KEY</strong>.",
+  for (const phrase of ["Die derzeit erfassten Titel sind das Mobile-Spiel <strong>Quirky Ball</strong> (Android, iOS) und das Arcade-Spiel <strong>10key Survival</strong>.",
     "Die Abschnitte 2 bis 12 beschreiben Quirky Ball 2.0.0 und später sowie die Website, sofern nicht anders angegeben.",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
@@ -129,7 +133,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-10-19"/, `${file}: last updated 2026-10-19`);
+    assert.match(html, /datetime="2026-10-20"/, `${file}: last updated 2026-10-20 (name update; terms effective October 19, 2026)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
     assert.doesNotMatch(plain, quirkyOnly, `${file}: no Quirky-Ball-only feature`);
@@ -156,4 +160,27 @@ test("10KEY privacy URLs redirect to the shared policy and the terms selector of
   assert.match(home, /href="privacy\/"/);
   const sitemap = read("sitemap.xml");
   assert.ok(!sitemap.includes("https://houseduck.in/10key/privacy/"), "10KEY privacy redirects stay out of the sitemap");
+});
+
+test("public pages use the store names; the old name 10KEY appears only in the dated rename log line", () => {
+  const pages = ["privacy/en.html", "privacy/ko.html", "privacy/de.html", "privacy/index.html", "quirky-ball/privacy/index.html",
+    "10key/privacy/index.html", "10key/privacy/en.html", "10key/privacy/ko.html", "10key/terms/en.html", "10key/terms/ko.html",
+    "10key/terms/index.html", "terms/en.html", "terms/ko.html", "terms/de.html", "10key/index.html"];
+  const renameLine = /^(Name update October 20, 2026|Namensänderung 20\. Oktober 2026|2026년 10월 20일 명칭 변경) — /;
+  for (const file of pages) {
+    const html = read(file);
+    const korean = /<html lang="ko"/.test(html) && !file.startsWith("10key/index");
+    assert.ok(html.includes(korean ? "딸깍 서바이벌" : "10key Survival"), `${file}: names the game by its store name`);
+    if (korean) assert.match(text(html), /딸깍 서바이벌 ?\(10key Survival\)/, `${file}: ties the Korean name to 10key Survival`);
+    const items = html.split(/<li>/).filter((part) => part.includes("10KEY"));
+    assert.ok((html.match(/10KEY/g) || []).length === items.length && items.length <= 1, `${file}: 10KEY at most once, in a list item`);
+    for (const item of items) {
+      assert.match(text(item), renameLine, `${file}: 10KEY only in the October 20, 2026 rename entry`);
+      assert.match(item, /10key Survival/, `${file}: rename entry names the new name`);
+    }
+  }
+  const privacyLogs = { en: "privacy/en.html", ko: "privacy/ko.html", de: "privacy/de.html" };
+  for (const file of Object.values(privacyLogs)) assert.equal((read(file).match(/10KEY/g) || []).length, 1, `${file}: one rename entry`);
+  const home = read("10key/index.html");
+  assert.match(home, /<h1 id="game-title">.*10key Survival.*딸깍 서바이벌.*<\/h1>/, "/10key/ shows both store names");
 });
