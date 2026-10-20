@@ -228,6 +228,11 @@
     container.innerHTML = `<span>${summary.source === "ai" ? "AI" : "로컬"}</span><strong>${escapeHtml(CATEGORY_LABELS[summary.category] || "기타")} · ${summary.urgency === "high" ? "우선 확인" : "일반"}</strong><p>${escapeHtml(summary.summary)}</p>`;
   }
 
+  // Off (2026-10-20): the only Gemini key (AI Studio project "House Duck") is on the free tier, where Google may use the
+  // content to improve its products. Gmail data must not go there (Google API Services User Data Policy, Limited Use),
+  // and privacy policy section 14 says mail text goes to no AI service. Turn on only with a paid Gemini key AND a policy update.
+  const AI_SUMMARY = false;
+
   async function summarizeThread(detail, latestExternal) {
     const requestSeq = state.threadSeq;
     const text = root.GmailModel.extractMessageText(latestExternal.payload);
@@ -238,6 +243,7 @@
       renderThreadSummary(state.summaryCache.get(cacheKey));
       return;
     }
+    if (!AI_SUMMARY) { state.summaryCache.set(cacheKey, local); return; }
     const redacted = root.CsIntelligence.redactForSummary(text);
     if (redacted.length < 8) { state.summaryCache.set(cacheKey, local); return; }
     try {

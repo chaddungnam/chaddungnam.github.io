@@ -34,9 +34,13 @@ for (const locale of ["en", "ko", "de"]) {
   else assert.match(section, LIMITED_USE[locale], `${locale}: Limited Use sentence`);
   assert.ok(section.includes(`href="${POLICY_URL}"`), `${locale}: links the Google API Services User Data Policy`);
   for (const fact of ["<code>https://www.googleapis.com/auth/gmail.modify</code>", "support@houseduck.in", "business@houseduck.in",
-    "<code>houseduck.in/console/</code>", "Google Workspace", "Gmail", "72", "Supabase", "Google Gemini API", "4,000".replace(",", locale === "de" ? "." : ",")]) {
+    "<code>houseduck.in/console/</code>", "Google Workspace", "Gmail", "72", "Supabase"]) {
     assert.ok(section.includes(fact), `${locale}: section 14 names ${fact}`);
   }
+  // The console's AI summary is off (the only Gemini key is on the free tier, which may use content to improve Google's
+  // products): section 14 must say mail text goes to no AI service, and never name Gemini as a mail recipient.
+  assert.ok(section.includes({ en: "mail text is not sent to any AI service", ko: "메일 본문은 어떤 AI 서비스로도 전송되지 않습니다", de: "E-Mail-Texte werden an keinen KI-Dienst gesendet" }[locale]), `${locale}: no mail text to AI`);
+  assert.ok(!section.includes("Gemini"), `${locale}: section 14 does not send mail to Gemini`);
   const changes = html.slice(html.indexOf('<h2 id="section-15">'));
   assert.match(changes, /^<h2 id="section-15">[^<]+<\/h2>\n<ul><li>[^<]*\(v4\.2\)/, `${locale}: v4.2 is the newest change entry`);
   assert.match(html, /legal-update[^]*<time datetime="2026-10-20">/, `${locale}: last updated 2026-10-20`);
@@ -54,4 +58,7 @@ for (const file of ["privacy/index.html", "quirky-ball/privacy/index.html", "10k
 for (const file of ["index.html", "index_en.html"]) {
   assert.match(read(file), /<a href="privacy\/en\.html#section-14"[^>]*>House Duck Console \(staff only\)<\/a>/, `${file}: footer explains the console`);
 }
+const cs = read("console/cs.js");
+assert.match(cs, /const AI_SUMMARY = false;/, "console: the AI summary stays off");
+assert.match(cs, /if \(!AI_SUMMARY\) \{ state\.summaryCache\.set\(cacheKey, local\); return; \}/, "console: no cs-summarize call while it is off");
 console.log("privacy section 14 (support and operations tools, Gmail Limited Use): PASS");
