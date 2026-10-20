@@ -44,8 +44,10 @@ for (const locale of ["en", "ko", "de"]) {
   assert.ok(!section.includes("Gemini"), `${locale}: section 14 does not send mail to Gemini`);
   const changes = html.slice(html.indexOf('<h2 id="section-15">'));
   assert.match(changes, /^<h2 id="section-15">[^<]+<\/h2>\n<ul><li>/, `${locale}: section 15 is the change list`);
-  // The unversioned name update of October 20, 2026 (10key Survival / 딸깍 서바이벌) sits above it; v4.2 stays the newest version.
-  assert.equal((changes.match(/\(v\d+\.\d+\)/) || [])[0], "(v4.2)", `${locale}: v4.2 is the newest versioned change entry`);
+  // Newest first: v4.3 (10key Survival guest accounts and in-app purchases, October 20, 2026) above the unversioned name
+  // update and v4.2 (this section 14) of the same day.
+  assert.equal((changes.match(/\(v\d+\.\d+\)/) || [])[0], "(v4.3)", `${locale}: v4.3 is the newest versioned change entry`);
+  assert.ok(changes.includes("(v4.2)"), `${locale}: the v4.2 entry for section 14 stays`);
   assert.match(html, /legal-update[^]*<time datetime="2026-10-20">/, `${locale}: last updated 2026-10-20`);
   assert.ok(/Google Workspace ?\(Gmail\)[^<]*Google Identity Services/.test(html.slice(html.indexOf('id="section-4"'), html.indexOf('id="section-5"'))),
     `${locale}: section 4 lists Google Workspace and Google Identity Services`);

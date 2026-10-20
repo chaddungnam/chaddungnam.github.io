@@ -112,7 +112,8 @@ for locale in "${locales[@]}"; do
         failed=1
       fi
     done
-    if rg -n -i 'AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|\bgems?\b|젬|season pass|시즌패스|subscription|구독' "$tenkey_terms"; then
+    # Gems (gem keycaps / 보석 키캡) are a 10key Survival mobile feature since 2026-10-20, so only Quirky Ball's 젬 stays banned.
+    if rg -n -i 'AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|젬|season pass|시즌패스|subscription|구독' "$tenkey_terms"; then
       printf '10key Survival terms page contains Quirky-Ball-only or removed wording: %s\n' "$tenkey_terms" >&2
       failed=1
     fi

@@ -3,6 +3,8 @@
 // own Terms like Quirky Ball, /10key/privacy/ redirects to that section, and both documents read correctly on every
 // platform (CrazyGames first; Google Play, the Apple App Store and Steam later). Terms: English + Korean only; the shared
 // privacy policy also has German (owner 2026-10-20), whose section 13 links the English 10KEY Terms.
+// Owner decision (22), 2026-10-20: the Android / iOS apps have a House Duck guest account (age question, nickname,
+// anonymous Supabase Auth login) and in-app purchases (gem keycaps, Revive Pass); privacy v4.3 and terms v1.1 say so.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -14,8 +16,9 @@ const exists = (file) => fs.existsSync(path.join(repoDir, file));
 const text = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const locales = ["en", "ko"];
 const platforms = ["CrazyGames", "Google Play", "App Store", "Steam"];
-// Quirky-Ball-only features that must not leak into the 10KEY documents.
-const quirkyOnly = /AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|\bgems?\b|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|age band|연령대|birth year|출생 연도/i;
+// Quirky-Ball-only features that must not leak into the 10KEY documents. Gems (gem keycaps / 보석 키캡), the age
+// question and the age band became 10KEY features on 2026-10-20 (mobile guest account and shop), so they left this list.
+const quirkyOnly = /AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|연령대|출생 연도/i;
 
 // Store names (owner 2026-10-20, before release): 10key Survival in English and German, 딸깍 서바이벌 in Korean.
 // 10KEY was only the project name; URLs, file names and anchors (/10key/, #10key, #section-13) stay as they are.
@@ -37,14 +40,25 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
       /display name \(username\)/, /avatar image/, /depth, scrap, combo, number of skills, how the run ended, game build, platform name and an anti-cheat flag/,
       /Art\. 6\(1\)\(b\)/, /Art\. 6\(1\)\(f\)/, /eu-west-1/, /independent controller/, /loading and gameplay events, sign-in state, the user token and celebration events/,
       /12 weeks/, /35 days/, /90 days/, /6 months \(183 days\)/, /platform username/, /no analytics SDK and no advertising SDK of its own/,
-      /no advertising identifiers/, /no payment card data/, /not directed to children under 14/, /permission of a parent or guardian/, /human review/],
+      /no advertising identifiers/, /no payment card data/, /not directed to children under 14/, /permission of a parent or guardian/, /human review/,
+      // Android / iOS guest account and in-app purchases (2026-10-20)
+      /signs in anonymously at Supabase Auth \(no email address, no password, no phone number\)/, /year and month themselves are not saved and not sent/,
+      /Under 14: the app creates no account/, /stored only in the app’s save on your device/, /one-way hash \(SHA-256\) of your login ID/,
+      /passes no account identifier to Apple/, /Art\. 6\(1\)\(c\)/, /Google and Apple process in-app purchases/, /Hold to delete account/,
+      /unless another House Duck game uses the same login/, /kept without the link to your account/, /Logging out does not delete/,
+      /The Android and iOS apps show no ads/, /There is no House Duck account on CrazyGames/],
     ko: [/오프라인/, /기기 또는 브라우저 저장소에만 저장/, /저장 데이터를 받지 않습니다/, /주간 순위표와 전체 기간 순위표/,
       /별도 영역\(스키마\)/, /계정이나 플레이어 식별자를 보내지 않습니다/, /IP 주소와 HTTP 요청 메타데이터/,
       /현재는 CrazyGames 계정/, /기기 식별자도 만들어지지 않습니다/, /CrazyGames userId/, /토큰 자체는 저장하지 않습니다/,
       /표시 이름\(사용자 이름\)/, /아바타 이미지/, /깊이, 스크랩, 콤보, 스킬 수, 플레이가 끝난 원인, 게임 빌드, 플랫폼 이름, 부정행위 방지 표시/,
       /제6조 제1항 b호/, /제6조 제1항 f호/, /eu-west-1/, /독립된 개인정보처리자/, /로딩 및 게임플레이 이벤트, 로그인 상태, 사용자 토큰, 축하 이벤트/,
       /12주/, /35일/, /90일/, /6개월\(183일\)/, /플랫폼 사용자 이름/, /분석 SDK도 광고 SDK도 포함되어 있지 않으며/,
-      /광고 식별자를 받지 않습니다/, /결제 카드 정보를 받지 않습니다/, /만 14세 미만/, /부모 또는 보호자의 허락/, /사람의 검토/],
+      /광고 식별자를 받지 않습니다/, /결제 카드 정보를 받지 않습니다/, /만 14세 미만/, /부모 또는 보호자의 허락/, /사람의 검토/,
+      /Supabase Auth에 익명으로 로그인하고\(이메일 주소, 비밀번호, 전화번호 없음\)/, /해와 달 자체는 저장하지도, 전송하지도 않습니다/,
+      /만 14세 미만: 앱은 계정을 만들지 않습니다/, /기기의 앱 저장 데이터에만 보관/, /로그인 ID의 단방향 해시\(SHA-256\)/,
+      /Apple에 계정 식별자를 전달하지 않습니다/, /제6조 제1항 c호/, /Google과 Apple ?은 Android 및 iOS 앱의 인앱 구매/, /길게 눌러 계정 삭제/,
+      /다른 House Duck 게임이 같은 로그인을 쓰지 않으면/, /계정과의 연결 없이 보관/, /로그아웃해도 당사 서버의 계정 데이터는 삭제되지 않습니다/,
+      /Android 및 iOS 앱에는 광고가 없습니다/, /CrazyGames에는 House Duck 계정이 없습니다/],
   };
   for (const locale of locales) {
     const section = section13(locale);
@@ -85,7 +99,14 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     /Art\. 6 Abs\. 1 Buchst\. b/, /Art\. 6 Abs\. 1 Buchst\. f/, /eu-west-1/, /eigenständig Verantwortliche/,
     /Lade- und Spielereignisse, den Anmeldestatus, das Nutzer-Token und Feier-Ereignisse/, /12 Wochen/, /35 Tagen/, /90 Tagen/,
     /6 Monate \(183 Tage\)/, /Benutzernamen auf der Plattform/, /kein Analyse-SDK und kein eigenes Werbe-SDK/, /keine Werbekennungen/,
-    /keine Zahlungskartendaten/, /nicht an Kinder unter 14 Jahren/, /Erlaubnis eines Elternteils/, /menschliche Überprüfung/];
+    /keine Zahlungskartendaten/, /nicht an Kinder unter 14 Jahren/, /Erlaubnis eines Elternteils/, /menschliche Überprüfung/,
+    /meldet sich dann anonym bei Supabase Auth an \(keine E-Mail-Adresse, kein Passwort, keine Telefonnummer\)/,
+    /Jahr und Monat selbst werden weder gespeichert noch gesendet/, /Unter 14: Die App legt kein Konto an/,
+    /nur im Spielstand der App auf Ihrem Gerät gespeichert/, /Einweg-Hash \(SHA-256\) Ihrer Login-ID/, /übergibt die App Apple keine Kontokennung/,
+    /Art\. 6 Abs\. 1 Buchst\. c/, /Google und Apple verarbeiten In-App-Käufe/, /Hold to delete account/,
+    /sofern kein anderes House-Duck-Spiel dieselbe Anmeldung verwendet/, /ohne Verbindung zu Ihrem Konto aufbewahrt/,
+    /Das Abmelden löscht die Kontodaten auf unserem Server nicht/, /Die Android- und iOS-Apps zeigen keine Werbung/,
+    /Auf CrazyGames gibt es kein House-Duck-Konto/];
   for (const fact of facts) assert.match(plain, fact, `de section 13: ${fact}`);
   for (const platform of platforms) assert.ok(plain.includes(platform), `de section 13 names ${platform} as an example platform`);
   assert.doesNotMatch(plain, quirkyOnly, "de section 13: no Quirky-Ball-only feature");
@@ -116,10 +137,18 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
   const required = {
     en: [/no House Duck account/, /no cash or real-world value and cannot be sold or exchanged for money/, /legitimate refund request/,
       /may show ads \(today on CrazyGames\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
-      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /Offline play is not affected/],
+      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /Offline play is not affected/,
+      /creates a House Duck guest account for you, without an email address or password/, /Players under 14 play without an account/,
+      /Google Play Billing on Android and the App Store on iOS/, /Restore purchases/, /Gems are consumable/,
+      /cannot be transferred to another account or player/, /Gems already spent are not taken back/, /The Android and iOS apps show no ads/,
+      /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/],
     ko: [/House Duck 계정은 없습니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
       /광고를 표시할 수 있습니다\(현재 CrazyGames\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
-      /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /오프라인 플레이에 영향을 주지 않습니다/],
+      /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /오프라인 플레이에 영향을 주지 않습니다/,
+      /이메일 주소나 비밀번호 없이 House Duck 게스트 계정을 만듭니다/, /만 14세 미만은 계정 없이 플레이합니다/,
+      /Android에서는 Google Play 결제, iOS에서는 App Store/, /구매 복원/, /보석은 소모성 상품/,
+      /다른 계정이나 다른 플레이어에게 넘길 수 없고/, /이미 사용한 보석은 회수하지 않습니다/, /Android 및 iOS 앱에는 광고가 없습니다/,
+      /길게 눌러 계정 삭제/, /2026년 10월 20일 시행\(v1\.1\)/],
   };
   for (const locale of locales) {
     const file = `10key/terms/${locale}.html`;
@@ -133,7 +162,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-10-20"/, `${file}: last updated 2026-10-20 (name update; terms effective October 19, 2026)`);
+    assert.match(html, /datetime="2026-10-20"/, `${file}: last updated 2026-10-20 (v1.1: guest accounts and in-app purchases)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
     assert.doesNotMatch(plain, quirkyOnly, `${file}: no Quirky-Ball-only feature`);
