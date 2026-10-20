@@ -77,7 +77,8 @@ for locale in "${locales[@]}"; do
     failed=1
   fi
 
-  # 10KEY: section 13 of the shared policy, its own Terms, and the /10key/privacy/ redirect.
+  # 10KEY: section 13 of the shared policy, its own Terms, and the /10key/privacy/ route (index.html is the full English
+  # policy opened at section 13 that moves ko / de browsers to that section of their language).
   tenkey_locale="$locale"
   [[ "$locale" == de ]] && tenkey_locale=en
   tenkey_terms="$repo_dir/10key/terms/$tenkey_locale.html"
@@ -113,7 +114,7 @@ for locale in "${locales[@]}"; do
     printf 'Privacy 10KEY section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
   fi
-  if ! rg -q "(url=|replace\(\")/privacy/$locale\.html#section-13" "$tenkey_redirect"; then
+  if ! rg -q "(url=|replace\(\")/privacy/$locale\.html(#section-13|\" \+ \(location\.hash \|\| \"#section-13\"\))" "$tenkey_redirect"; then
     printf '10KEY privacy route is not linked to the shared policy: %s\n' "$tenkey_redirect" >&2
     failed=1
   fi

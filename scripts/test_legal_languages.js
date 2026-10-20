@@ -27,15 +27,22 @@ const tenkeyDocuments = ["10key/terms/en.html", "10key/terms/ko.html"];
 
 // [page, Korean target, English target, German target or null]
 const choosers = [
-  ["privacy/index.html", "ko.html", "en.html", "de.html"],
   ["terms/index.html", "ko.html", "en.html", "de.html"],
-  ["quirky-ball/terms/index.html", "ko.html", "en.html", "de.html"],
-  ["quirky-ball/privacy/index.html", "/privacy/ko.html", "/privacy/en.html", "/privacy/de.html"],
   ["quirky-ball/privacy/delete.html", "delete_ko.html", "delete_en.html", "delete_de.html"],
   ["quirky-ball/web/privacy/index.html", "ko.html", "en.html", "de.html"],
   ["quirky-ball/web/terms/index.html", "ko.html", "en.html", "de.html"],
-  ["10key/terms/index.html", "ko.html", "en.html", null],
-  ["10key/privacy/index.html", "/privacy/ko.html#section-13", "/privacy/en.html#section-13", "/privacy/de.html#section-13"],
+];
+
+// Entry URLs that stores, apps and Google link to show the full English document (lead 2026-10-20, after Google's
+// OAuth brand review judged the /privacy/ chooser "not sufficient content"). [page, English source, ko, de, section]
+const entries = [
+  ["privacy/index.html", "privacy/en.html", "/privacy/ko.html", "/privacy/de.html", ""],
+  ["quirky-ball/privacy/index.html", "privacy/en.html", "/privacy/ko.html", "/privacy/de.html", ""],
+  ["10key/privacy/index.html", "privacy/en.html", "/privacy/ko.html", "/privacy/de.html", "#section-13"],
+  ["quirky-ball/terms/index.html", "quirky-ball/terms/en.html", "/quirky-ball/terms/ko.html", "/quirky-ball/terms/de.html", ""],
+  ["10key/terms/index.html", "10key/terms/en.html", "/10key/terms/ko.html", null, ""],
+  ["hexaworld1984/privacy/index.html", "hexaworld1984/privacy/en.html", "/hexaworld1984/privacy/ko.html", null, ""],
+  ["hexaworld1984/terms/index.html", "hexaworld1984/terms/en.html", "/hexaworld1984/terms/ko.html", null, ""],
 ];
 
 test("ja legal URLs are only redirect stubs to the English page", () => {
@@ -80,14 +87,15 @@ test("legal documents switch between Korean, English and German, never Japanese"
   }
 });
 
-function runChooser(file, languages, search = "") {
+function runChooser(file, languages, search = "", hash = "") {
   const html = read(file);
   const script = html.match(/<script>\n(\/\/ 언어 자동 이동[\s\S]*?)<\/script>/);
   assert.ok(script, `${file}: language chooser script`);
   let target = null;
   const sandbox = {
     navigator: { languages, language: languages[0] },
-    location: { search, replace(url) { target = url; } },
+    location: { search, hash, replace(url) { target = url; } },
+    document: { addEventListener() {} },
   };
   vm.runInNewContext(script[1], sandbox);
   return target;
@@ -114,8 +122,28 @@ test("legal index pages send ko and de browsers to their language and everyone e
     assert.equal(runChooser(file, ["dev"]), en, `${file}: dev is not German`);
     assert.equal(runChooser(file, []), en, `${file}: unknown language gets English`);
   }
-  for (const file of ["privacy/index.html", "quirky-ball/terms/index.html", "quirky-ball/privacy/delete.html", "10key/terms/index.html"]) {
-    assert.equal(runChooser(file, ["de-DE"], "?stay=1"), null, `${file}: ?stay=1 keeps the list`);
+  assert.equal(runChooser("quirky-ball/privacy/delete.html", ["de-DE"], "?stay=1"), null, "delete.html: ?stay=1 keeps the list");
+});
+
+test("legal entry pages show the full English document and move only ko / de browsers", () => {
+  for (const [file, source, ko, de, section] of entries) {
+    const html = read(file);
+    assert.ok(html.includes("data-legal-content") && html.includes("<!-- 문서 본문 시작"), `${file}: full document text`);
+    assert.ok(html.includes(`<link rel="canonical" href="https://houseduck.in/${source}">`), `${file}: canonical to ${source}`);
+    assert.doesNotMatch(html, /http-equiv="refresh"|class="language-page"|class="language-all"/, `${file}: no chooser or redirect`);
+    const body = (page) => read(page).split("<!-- 문서 본문 시작")[1].split("<!-- 문서 본문 끝 -->")[0];
+    assert.equal(body(file), body(source).replace(/href="(?![/#]|https?:|mailto:|tel:)([^"]+)"/g, (_m, href) =>
+      `href="${new URL(href, `https://houseduck.in/${source}`).pathname}${new URL(href, `https://houseduck.in/${source}`).hash}"`),
+      `${file}: same text as ${source}`);
+    if (section) assert.ok(html.includes(`getElementById("${section.slice(1)}")`), `${file}: opens at ${section}`);
+    assert.equal(runChooser(file, ["ko-KR", "en-US"]), ko + section, `${file}: Korean browser`);
+    assert.equal(runChooser(file, ["ko"], "", "#section-9"), `${ko}#section-9`, `${file}: Korean browser keeps the link's section`);
+    assert.equal(runChooser(file, ["de-DE", "ko-KR"]), de ? de + section : ko + section, `${file}: German first`);
+    assert.equal(runChooser(file, ["de-DE"]), de ? de + section : null, `${file}: German browser`);
+    for (const languages of [["en-US", "ko-KR"], ["ja-JP"], ["kok-IN"], ["dev"], []]) {
+      assert.equal(runChooser(file, languages), null, `${file}: ${languages.join(",") || "unknown"} stays on English`);
+    }
+    assert.equal(runChooser(file, ["ko-KR"], "?stay=1"), null, `${file}: ?stay=1 stays`);
   }
 });
 
