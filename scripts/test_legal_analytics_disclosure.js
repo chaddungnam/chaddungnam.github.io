@@ -78,8 +78,8 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
       const text = html.replace(/<[^>]+>/g, " ");
       assert.match(text, checks.noRetro, `${locale} ${name}: no retroactive expansion of Firebase consent`);
       assert.match(text, checks.age, `${locale} ${name}: explain teen use`);
-      // The shared policy was last updated on 2026-10-19 (10KEY added); the Quirky Ball terms on 2026-10-05.
-      assert.match(html, name === "privacy" ? /datetime="2026-10-19"/ : /datetime="2026-10-05"/, `${locale} ${name}: current update date`);
+      // The shared policy was last updated on 2026-10-20 (section 14, support and operations tools); the Quirky Ball terms on 2026-10-05.
+      assert.match(html, name === "privacy" ? /datetime="2026-10-20"/ : /datetime="2026-10-05"/, `${locale} ${name}: current update date`);
     }
     assert.match(privacy, checks.ttl, `${locale}: disclose app-managed pending-event expiry`);
     assert.match(privacy, /0[^<]*14[^<]*18/, `${locale}: disclose local age-band codes`);
