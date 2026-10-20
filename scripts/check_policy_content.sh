@@ -24,6 +24,21 @@ for locale in "${locales[@]}"; do
     fi
   done
 
+  # Section 14 (2026-10-20, after Google's OAuth brand review): support email, the staff-only console and its Gmail
+  # access with the Limited Use statement; Changes is section 15.
+  ops_section="$(sed -n '/id="section-14"/,/id="section-15"/p' "$privacy")"
+  for token in 'Google Workspace' 'houseduck\.in/console/' 'https://www\.googleapis\.com/auth/gmail\.modify' \
+    'https://developers\.google\.com/terms/api-services-user-data-policy' 'Limited Use' '72' 'business@houseduck\.in'; do
+    if ! printf '%s' "$ops_section" | grep -Eq "$token"; then
+      printf 'Privacy section 14 (support and operations tools) misses %s: %s\n' "$token" "$privacy" >&2
+      failed=1
+    fi
+  done
+  if ! rg -q 'id="section-15">15\. ' "$privacy" || rg -q 'id="section-16"' "$privacy"; then
+    printf 'Privacy Changes must be the last section, 15: %s\n' "$privacy" >&2
+    failed=1
+  fi
+
   if ! rg -q '28' "$privacy" || ! rg -q 'support@houseduck\.in' "$privacy"; then
     printf 'Privacy page misses retention or contact: %s\n' "$privacy" >&2
     failed=1

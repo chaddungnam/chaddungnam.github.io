@@ -25,7 +25,7 @@ node scripts/test_gmail_model.js
 - 재화·점수·운영 변경은 브라우저가 데이터베이스를 직접 쓰지 않고 관리자 Edge Function과 감사 RPC만 사용합니다. 플레이어 수정 플래그의 기본값은 `false`입니다.
 - 플레이어 상세의 `감사 기록에서 보기`로 해당 계정의 전체 관리자 변경 이력을 조회합니다. 상세에도 성공·실패와 오류 코드가 표시됩니다. 이 기록은 관리자 지급·조정 이력이며 게임 내 자동 미션 보상의 시도 로그가 아닙니다. 계정 전환·필터 해제·응답 역전은 `node scripts/test_console_audit_navigation.js`로 검증하며 공용 콘솔 검사에도 포함됩니다.
 - `/analytics/`는 호환 주소이며 통합 콘솔의 분석 화면으로 이동합니다.
-- Gmail CS는 `gmail.modify` 토큰을 CS 화면에서만 요청하고 브라우저 메모리에만 둡니다. 메일·첨부·토큰은 Supabase와 저장소에 복사하지 않습니다.
+- Gmail CS는 `gmail.modify` 토큰을 CS 화면에서만 요청하고 브라우저 메모리에만 둡니다. 메일·첨부·토큰은 Supabase와 저장소에 복사하지 않습니다. 이 내용은 공용 개인정보처리방침 제14항에 공개되어 있으므로, Gmail·로그인·요약 동작을 바꾸면 제14항(영·한·독)도 함께 고칩니다.
 - 동무와 멋진신세계는 준비 중입니다. 구매 화면은 서버에 기록된 구매·환불만 표시하며, 가격이 없으면 `금액 미기록`으로 표시합니다.
 
 ### HEXAWORLD 1984
@@ -41,11 +41,13 @@ node scripts/test_gmail_model.js
 ## 법적 문서 문구 수정 방법
 
 - 법적 문서는 영어(기본), 한국어, 독일어로 유지합니다(소유자 2026-10-20: 독일어 복원, GDPR). `ja.html` 법적 주소는 앱이 열 수 있으므로 지우지 않고, 같은 문서의 영어판으로 보내는 작은 리디렉트로 둡니다. 언어 선택 `index.html`은 브라우저 언어 목록에서 영어보다 한국어가 먼저면 `ko.html`, 독일어가 먼저면 `de.html`, 그 밖에는(일본어 포함) `en.html`로 보냅니다. 10KEY 이용약관은 영어·한국어만 있고, 독일어 페이지는 영어 약관을 연결합니다.
-- 개인정보처리방침은 House Duck 공용 `privacy/<언어>.html` 하나이고(10KEY는 제13항), 이용약관은 게임마다 `quirky-ball/terms/`, `10key/terms/`에 있습니다. `quirky-ball/privacy/<언어>.html`, `10key/privacy/<언어>.html`은 공용 방침으로 가는 리디렉트입니다.
+- 개인정보처리방침은 House Duck 공용 `privacy/<언어>.html` 하나이고(10KEY는 제13항, 고객지원 메일·직원 전용 운영 콘솔·Gmail 접근은 모든 게임 공통인 제14항, 변경 이력은 제15항), 이용약관은 게임마다 `quirky-ball/terms/`, `10key/terms/`에 있습니다. 동무(`hexaworld1984/`)는 출시 전까지 자체 방침을 유지합니다. `quirky-ball/privacy/<언어>.html`, `10key/privacy/<언어>.html`은 공용 방침으로 가는 리디렉트입니다.
+- 스토어·앱·Google이 링크하는 입구 주소(`/privacy/`, `/quirky-ball/privacy/`, `/10key/privacy/`, `/quirky-ball/terms/`, `/10key/terms/`, `/hexaworld1984/privacy/`, `/hexaworld1984/terms/`)는 언어 선택이나 리디렉트가 아니라 영어 문서 전문을 바로 보여 줍니다(2026-10-20, Google OAuth 브랜드 검토에서 언어 선택 화면이 "내용 부족"으로 거절됨). 이 `index.html`은 `python3 scripts/build_legal_entry_pages.py`가 영어 원문에서 만들므로 직접 고치지 않습니다. 영어 원문을 고친 뒤 이 스크립트를 실행하고, `scripts/check_legal_site.sh`는 사본이 원문과 다르면 실패합니다. 브라우저 언어 목록에서 한국어(또는 독일어 문서가 있으면 독일어)가 영어보다 먼저인 사람만 그 언어 문서로 옮기고, `/10key/privacy/`는 제13항에서 열립니다.
+- 홈페이지 바닥글의 `House Duck Console (staff only)`는 콘솔의 Google 로그인 용도를 설명하는 제14항으로 연결됩니다.
 - 제목·시행일은 `문서 메타데이터 시작/끝`, 본문은 `문서 본문 시작/끝` 주석 안에서만 수정합니다.
 - 섹션 제목의 `id="section-..."`는 자동 목차가 사용하므로 지우지 않습니다.
 - 색상·간격·모바일·인쇄 모양은 `assets/legal-site.css`, 목차·연도는 `assets/legal-site.js`가 공통 관리합니다.
-- 문구 수정 후 `scripts/check_legal_site.sh`와 `scripts/check_policy_content.sh`를 실행합니다.
+- 문구 수정 후 `python3 scripts/build_legal_entry_pages.py`, `scripts/check_legal_site.sh`, `scripts/check_policy_content.sh`, `node scripts/test_legal_operations_tools.js`를 실행합니다.
 
 ### 공지 블록 편집
 
