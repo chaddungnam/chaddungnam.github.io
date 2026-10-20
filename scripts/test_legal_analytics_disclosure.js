@@ -30,6 +30,15 @@ const locales = {
     supabaseRole: /House Duck[^<]*controller[^<]*Supabase[^<]*processor/i,
     firebaseId: /app instance ID/i,
   },
+  de: {
+    optional: /optional[^<]*Firebase|Firebase[^<]*optional/i,
+    settings: /Einstellungen[^<]*(?:widerruf|änder)|(?:widerruf|änder)[^<]*Einstellungen/i,
+    sameGame: /Ablehn[^<]*(?:beschränkt|schränkt)[^<]*Spiel|Spiel[^<]*(?:gleich|einschränk)[^<]*Ablehn/i,
+    separate: /Werbe[^<]*(?:getrennt|separat)|(?:getrennt|separat)[^<]*Werbe/i,
+    history: /5\. September 2026[^<]*(?:Supabase|Firebase)/i,
+    supabaseRole: /House Duck[^<]*Verantwortlicher[^<]*Supabase[^<]*Auftragsverarbeiter/i,
+    firebaseId: /App-Instanz-ID/i,
+  },
 };
 
 test("localized legal documents distinguish required Supabase operations from optional Firebase Analytics", () => {
@@ -60,6 +69,7 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
   const copy = {
     ko: { noRetro: /기존[^<]*Firebase[^<]*소급[^<]*확대하지/, ttl: /24시간/, age: /14~17/ },
     en: { noRetro: /previous[^<]*Firebase[^<]*not[^<]*retroactively extend/i, ttl: /24 hours/i, age: /14–17/ },
+    de: { noRetro: /frühere[^<]*Firebase[^<]*nicht rückwirkend[^<]*erweitert/i, ttl: /24 Stunden/i, age: /14–17/ },
   };
   for (const [locale, checks] of Object.entries(copy)) {
     const privacy = read(`privacy/${locale}.html`);
@@ -80,8 +90,8 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
 });
 
 test("legacy Quirky Ball privacy URLs keep routing each language to the shared policy", () => {
-  // de/ja documents were dropped (owner 2026-10-19); their legacy URLs now go to the English shared policy.
-  for (const locale of ["de", "ja"]) {
+  // The ja document was dropped (owner 2026-10-19); its legacy URL goes to the English shared policy. German is back (2026-10-20).
+  for (const locale of ["ja"]) {
     const legacy = read(`quirky-ball/privacy/${locale}.html`);
     assert.match(legacy, /http-equiv="refresh" content="0;url=\/privacy\/en\.html"/i, `${locale} legacy page must go to the English policy`);
     assert.ok(legacy.includes('href="/privacy/en.html"'), `${locale} legacy page needs an accessible continue link`);

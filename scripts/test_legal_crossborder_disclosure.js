@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-// Legal documents are English + Korean only (owner 2026-10-19); de/ja are redirect stubs checked elsewhere.
-for (const locale of ['ko', 'en']) {
+// Legal documents are English + Korean + German (owner 2026-10-20); ja URLs are redirect stubs checked elsewhere.
+for (const locale of ['ko', 'en', 'de']) {
   const privacy = fs.readFileSync(path.join(root, `privacy/${locale}.html`), 'utf8');
   const terms = fs.readFileSync(path.join(root, `quirky-ball/terms/${locale}.html`), 'utf8');
   const deletion = fs.readFileSync(path.join(root, `quirky-ball/privacy/delete_${locale}.html`), 'utf8');

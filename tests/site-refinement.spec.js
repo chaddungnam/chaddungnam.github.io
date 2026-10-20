@@ -190,8 +190,8 @@ test('support remains readable and contactable with JavaScript disabled',async({
 });
 
 for(const [lang] of locales){
- // Legal documents are English + Korean only (owner 2026-10-19); de/ja legal URLs redirect to the English page.
- const legalLang=['ko','en'].includes(lang);
+ // Legal documents are English + Korean + German (owner 2026-10-20); ja legal URLs redirect to the English page.
+ const legalLang=['ko','en','de'].includes(lang);
  test(`legal ${lang}: unchanged public routes, usable contents, bottom update date`,async({page})=>{
   for(const [route,date] of [[`/privacy/${lang}.html`,'2026-10-19'],[`/quirky-ball/terms/${lang}.html`,'2026-10-05'],[`/quirky-ball/privacy/delete_${lang}.html`,'2026-09-08'],[`/impressum/${lang}.html`,'2026-09-05']]){
    const response=await page.goto(route);expect(response.ok()).toBeTruthy();

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 10KEY legal contract (2026-10-19): the shared House Duck Privacy Policy covers 10KEY in section 13, 10KEY has its
 // own Terms like Quirky Ball, /10key/privacy/ redirects to that section, and both documents read correctly on every
-// platform (CrazyGames first; Google Play, the Apple App Store and Steam later). English + Korean only.
+// platform (CrazyGames first; Google Play, the Apple App Store and Steam later). Terms: English + Korean only; the shared
+// privacy policy also has German (owner 2026-10-20), whose section 13 links the English 10KEY Terms.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -67,6 +68,35 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
     assert.match(html, /datetime="2026-10-19"/, `${locale}: last updated 2026-10-19`);
     assert.equal((html.match(/id="section-14"/g) || []).length, 1, `${locale}: Changes is section 14`);
   }
+});
+
+test("the German shared policy has the same section 13 and Quirky Ball scoping", () => {
+  const section = section13("de");
+  const plain = text(section);
+  const facts = [/offline/, /nur auf Ihrem Gerät oder im Speicher Ihres Browsers/, /erhält diesen Spielstand nicht/,
+    /Wochenrangliste und eine Rangliste aller Zeiten/, /getrennten Teil \(Schema\)/, /ohne eine Konto- oder Spielerkennung zu senden/,
+    /IP-Adresse und HTTP-Anfrage-Metadaten/, /derzeit: ein CrazyGames-Konto/, /keine Gerätekennung/, /CrazyGames-userId/,
+    /Token selbst wird nicht gespeichert/, /Anzeigename auf der Plattform \(Benutzername\)/, /Profilbild/,
+    /Tiefe, Scrap, Combo, Anzahl der Fähigkeiten, wie der Run endete, Spielversion \(Build\), Name der Plattform und ein Anti-Cheat-Kennzeichen/,
+    /Art\. 6 Abs\. 1 Buchst\. b/, /Art\. 6 Abs\. 1 Buchst\. f/, /eu-west-1/, /eigenständig Verantwortliche/,
+    /Lade- und Spielereignisse, den Anmeldestatus, das Nutzer-Token und Feier-Ereignisse/, /12 Wochen/, /35 Tagen/, /90 Tagen/,
+    /6 Monate \(183 Tage\)/, /Benutzernamen auf der Plattform/, /kein Analyse-SDK und kein eigenes Werbe-SDK/, /keine Werbekennungen/,
+    /keine Zahlungskartendaten/, /nicht an Kinder unter 14 Jahren/, /Erlaubnis eines Elternteils/, /menschliche Überprüfung/];
+  for (const fact of facts) assert.match(plain, fact, `de section 13: ${fact}`);
+  for (const platform of platforms) assert.ok(plain.includes(platform), `de section 13 names ${platform} as an example platform`);
+  assert.doesNotMatch(plain, quirkyOnly, "de section 13: no Quirky-Ball-only feature");
+  assert.ok(section.includes('href="/10key/terms/en.html"') && /auf Englisch/.test(plain), "de section 13 links the English 10KEY terms and says so");
+  assert.ok(section.includes("support@houseduck.in"), "de section 13 names the deletion contact");
+  const html = read("privacy/de.html");
+  for (const phrase of ["Die derzeit erfassten Titel sind das Mobile-Spiel <strong>Quirky Ball</strong> (Android, iOS) und das Arcade-Spiel <strong>10KEY</strong>.",
+    "Die Abschnitte 2 bis 12 beschreiben Quirky Ball 2.0.0 und später sowie die Website, sofern nicht anders angegeben.",
+    "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
+    assert.ok(html.includes(phrase), `de: ${phrase}`);
+  }
+  assert.match(html, /datetime="2026-10-19"/, "de: last updated 2026-10-19");
+  const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
+  assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
+  assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
 });
 
 test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {

@@ -3,9 +3,10 @@ set -euo pipefail
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 failed=0
-# Legal documents are English (main) + Korean only (owner 2026-10-19); de/ja URLs redirect to English.
-locales=(ko en)
-dropped_locales=(de ja)
+# Legal documents are English (main) + Korean + German (owner 2026-10-20: German back, GDPR); ja URLs redirect
+# to English. 10KEY has no German terms: German pages link its English terms.
+locales=(ko en de)
+dropped_locales=(ja)
 
 if ! command -v rg >/dev/null 2>&1; then
   rg() { grep -ER "$@"; }
@@ -43,6 +44,7 @@ for locale in "${locales[@]}"; do
   case "$locale" in
     ko) product_term='스타터 패키지'; rights_term='정당한 환불 요청' ;;
     en) product_term='Starter Package'; rights_term='legitimate refund request' ;;
+    de) product_term='Starter-Paket'; rights_term='berechtigter Erstattungsantrag' ;;
   esac
   if ! rg -q "$product_term" "$terms" || ! rg -qi 'yakwon' "$terms" || ! rg -q "$rights_term" "$terms"; then
     printf 'Terms page misses current product or lawful-refund protection: %s\n' "$terms" >&2
@@ -57,6 +59,7 @@ for locale in "${locales[@]}"; do
   case "$locale" in
     ko) analytics_term='자체 이용 분석'; social_term='친구' ;;
     en) analytics_term='First-party usage analytics'; social_term='Friend' ;;
+    de) analytics_term='Eigene Nutzungsanalyse'; social_term='Freund' ;;
   esac
   if ! rg -qi "$analytics_term" "$privacy" || ! rg -q "$social_term" "$privacy"; then
     printf 'Privacy page misses current analytics or social data disclosure: %s\n' "$privacy" >&2
@@ -75,13 +78,16 @@ for locale in "${locales[@]}"; do
   fi
 
   # 10KEY: section 13 of the shared policy, its own Terms, and the /10key/privacy/ redirect.
-  tenkey_terms="$repo_dir/10key/terms/$locale.html"
+  tenkey_locale="$locale"
+  [[ "$locale" == de ]] && tenkey_locale=en
+  tenkey_terms="$repo_dir/10key/terms/$tenkey_locale.html"
   tenkey_redirect="$repo_dir/10key/privacy/$locale.html"
+  [[ "$locale" == de ]] && tenkey_redirect="$repo_dir/10key/privacy/index.html"
   if [[ ! -s "$tenkey_terms" ]]; then
     printf 'Missing 10KEY terms page: %s\n' "$tenkey_terms" >&2
     failed=1
   else
-    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$locale\.html#section-13" 'datetime="2026-10-19"'; do
+    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-19"'; do
       if ! rg -q "$token" "$tenkey_terms"; then
         printf '10KEY terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
         failed=1
@@ -92,7 +98,7 @@ for locale in "${locales[@]}"; do
       failed=1
     fi
   fi
-  if ! rg -q 'id="section-13">13\. 10KEY</h2>' "$privacy" || ! rg -q "/10key/terms/$locale\.html" "$privacy"; then
+  if ! rg -q 'id="section-13">13\. 10KEY</h2>' "$privacy" || ! rg -q "/10key/terms/$tenkey_locale\.html" "$privacy"; then
     printf 'Privacy page misses the 10KEY section or its terms link: %s\n' "$privacy" >&2
     failed=1
   fi
@@ -107,11 +113,11 @@ for locale in "${locales[@]}"; do
     printf 'Privacy 10KEY section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
   fi
-  if ! rg -q "url=/privacy/$locale\.html#section-13" "$tenkey_redirect"; then
+  if ! rg -q "(url=|replace\(\")/privacy/$locale\.html#section-13" "$tenkey_redirect"; then
     printf '10KEY privacy route is not linked to the shared policy: %s\n' "$tenkey_redirect" >&2
     failed=1
   fi
-  if ! rg -q "\.\./10key/terms/$locale\.html" "$terms_redirect"; then
+  if ! rg -q "\.\./10key/terms/$tenkey_locale\.html" "$terms_redirect"; then
     printf 'Terms selector does not offer 10KEY: %s\n' "$terms_redirect" >&2
     failed=1
   fi
@@ -159,4 +165,4 @@ if [[ "$failed" -ne 0 ]]; then
   exit 1
 fi
 
-printf 'Quirky Ball and 10KEY policy content check passed (en + ko; de/ja redirect to en).\n'
+printf 'Quirky Ball and 10KEY policy content check passed (en + ko + de; ja redirects to en).\n'

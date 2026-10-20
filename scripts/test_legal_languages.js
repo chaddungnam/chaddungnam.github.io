@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Owner 2026-10-19: legal documents are English (main version) + Korean only. German and Japanese legal URLs
-// stay alive as redirect stubs to the matching English page, because the live Quirky Ball app opens them.
+// Owner 2026-10-19: legal documents became English (main version) + Korean. Owner 2026-10-20: German is back on every
+// legal page that had it (GDPR: German players get the German text). Japanese legal URLs stay alive as redirect stubs to
+// the matching English page, because the live Quirky Ball app opens them. 10KEY Terms exist in English and Korean only.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -11,45 +12,33 @@ const repoDir = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(repoDir, file), "utf8");
 
 const dropped = {
-  "privacy/de.html": "/privacy/en.html",
   "privacy/ja.html": "/privacy/en.html",
-  "terms/de.html": "/terms/en.html",
   "terms/ja.html": "/terms/en.html",
-  "quirky-ball/privacy/de.html": "/privacy/en.html",
   "quirky-ball/privacy/ja.html": "/privacy/en.html",
-  "quirky-ball/terms/de.html": "/quirky-ball/terms/en.html",
   "quirky-ball/terms/ja.html": "/quirky-ball/terms/en.html",
-  "quirky-ball/privacy/delete_de.html": "/quirky-ball/privacy/delete_en.html",
   "quirky-ball/privacy/delete_ja.html": "/quirky-ball/privacy/delete_en.html",
-  "quirky-ball/web/privacy/de.html": "/quirky-ball/web/privacy/en.html",
   "quirky-ball/web/privacy/ja.html": "/quirky-ball/web/privacy/en.html",
-  "quirky-ball/web/terms/de.html": "/quirky-ball/web/terms/en.html",
   "quirky-ball/web/terms/ja.html": "/quirky-ball/web/terms/en.html",
 };
 
-const documents = [
-  "privacy/en.html", "privacy/ko.html", "terms/en.html", "terms/ko.html",
-  "quirky-ball/terms/en.html", "quirky-ball/terms/ko.html",
-  "quirky-ball/privacy/delete_en.html", "quirky-ball/privacy/delete_ko.html",
-  "quirky-ball/web/privacy/en.html", "quirky-ball/web/privacy/ko.html",
-  "quirky-ball/web/terms/en.html", "quirky-ball/web/terms/ko.html",
-  "10key/terms/en.html", "10key/terms/ko.html",
-];
+// Document families with a German version: [folder/prefix] -> ko, en, de pages.
+const families = ["privacy/", "terms/", "quirky-ball/terms/", "quirky-ball/privacy/delete_", "quirky-ball/web/privacy/", "quirky-ball/web/terms/"];
+const tenkeyDocuments = ["10key/terms/en.html", "10key/terms/ko.html"];
 
-// [page, Korean target, English target]
+// [page, Korean target, English target, German target or null]
 const choosers = [
-  ["privacy/index.html", "ko.html", "en.html"],
-  ["terms/index.html", "ko.html", "en.html"],
-  ["quirky-ball/terms/index.html", "ko.html", "en.html"],
-  ["quirky-ball/privacy/index.html", "/privacy/ko.html", "/privacy/en.html"],
-  ["quirky-ball/privacy/delete.html", "delete_ko.html", "delete_en.html"],
-  ["quirky-ball/web/privacy/index.html", "ko.html", "en.html"],
-  ["quirky-ball/web/terms/index.html", "ko.html", "en.html"],
-  ["10key/terms/index.html", "ko.html", "en.html"],
-  ["10key/privacy/index.html", "/privacy/ko.html#section-13", "/privacy/en.html#section-13"],
+  ["privacy/index.html", "ko.html", "en.html", "de.html"],
+  ["terms/index.html", "ko.html", "en.html", "de.html"],
+  ["quirky-ball/terms/index.html", "ko.html", "en.html", "de.html"],
+  ["quirky-ball/privacy/index.html", "/privacy/ko.html", "/privacy/en.html", "/privacy/de.html"],
+  ["quirky-ball/privacy/delete.html", "delete_ko.html", "delete_en.html", "delete_de.html"],
+  ["quirky-ball/web/privacy/index.html", "ko.html", "en.html", "de.html"],
+  ["quirky-ball/web/terms/index.html", "ko.html", "en.html", "de.html"],
+  ["10key/terms/index.html", "ko.html", "en.html", null],
+  ["10key/privacy/index.html", "/privacy/ko.html#section-13", "/privacy/en.html#section-13", "/privacy/de.html#section-13"],
 ];
 
-test("de/ja legal URLs are only redirect stubs to the English page", () => {
+test("ja legal URLs are only redirect stubs to the English page", () => {
   for (const [file, target] of Object.entries(dropped)) {
     const html = read(file);
     assert.ok(html.includes(`http-equiv="refresh" content="0;url=${target}"`), `${file}: meta refresh to ${target}`);
@@ -61,13 +50,33 @@ test("de/ja legal URLs are only redirect stubs to the English page", () => {
   }
 });
 
-test("en/ko legal documents only switch between English and Korean", () => {
-  for (const file of documents) {
+test("German legal documents are full documents again", () => {
+  for (const family of families) {
+    const html = read(`${family}de.html`);
+    assert.match(html, /<html lang="de"/, `${family}de.html: German page`);
+    assert.doesNotMatch(html, /http-equiv="refresh"/, `${family}de.html: not a redirect`);
+    if (family !== "terms/") assert.ok(html.includes("data-legal-content"), `${family}de.html: document body`);
+  }
+  assert.ok(read("quirky-ball/privacy/de.html").includes('content="0;url=/privacy/de.html"'), "legacy Quirky Ball de privacy URL opens the German shared policy");
+});
+
+test("legal documents switch between Korean, English and German, never Japanese", () => {
+  for (const family of families) {
+    const base = family.endsWith("/") ? "" : path.basename(family);
+    for (const locale of ["ko", "en", "de"]) {
+      const file = `${family}${locale}.html`;
+      const html = read(file);
+      for (const other of ["ko", "en", "de"]) assert.ok(html.includes(`href="${base}${other}.html"`), `${file}: links ${other}`);
+      assert.doesNotMatch(html, /href="(?:delete_)?ja\.html"/, `${file}: no ja language link`);
+      assert.doesNotMatch(html, />(?:JA|日本語)</, `${file}: no ja switch label`);
+    }
+  }
+  for (const file of tenkeyDocuments) {
     const html = read(file);
-    assert.doesNotMatch(html, /href="(?:delete_)?(?:de|ja)\.html"/, `${file}: no de/ja language link`);
+    assert.doesNotMatch(html, /href="(?:de|ja)\.html"/, `${file}: no de/ja language link`);
     assert.doesNotMatch(html, />(?:DE|JA|Deutsch|日本語)</, `${file}: no de/ja switch label`);
-    const other = /(?:^|\/)(?:delete_)?ko\.html$/.test(file) ? file.replace(/ko\.html$/, "en.html") : file.replace(/en\.html$/, "ko.html");
-    assert.ok(html.includes(`href="${path.basename(other)}"`), `${file}: keeps the en/ko switch`);
+    const other = file.endsWith("ko.html") ? "en.html" : "ko.html";
+    assert.ok(html.includes(`href="${other}"`), `${file}: keeps the en/ko switch`);
   }
 });
 
@@ -84,32 +93,39 @@ function runChooser(file, languages, search = "") {
   return target;
 }
 
-test("legal index pages send Korean browsers to ko and everyone else to English", () => {
-  for (const [file, ko, en] of choosers) {
+test("legal index pages send ko and de browsers to their language and everyone else to English", () => {
+  for (const [file, ko, en, de] of choosers) {
     const html = read(file);
+    const german = de || en;
     assert.ok(html.includes(`<noscript><meta http-equiv="refresh" content="0;url=${en}"></noscript>`), `${file}: no-JS falls back to English`);
     assert.ok(html.includes(`href="${en}"`), `${file}: plain English link`);
-    assert.doesNotMatch(html, /href="(?:delete_)?(?:de|ja)\.html"|"de"|"ja"/, `${file}: no de/ja choice`);
+    if (de) assert.ok(html.includes(`href="${de}"`), `${file}: plain German link`);
+    else assert.doesNotMatch(html, /href="de\.html"|"de"/, `${file}: no German choice`);
+    assert.doesNotMatch(html, /href="(?:delete_)?ja\.html"|"ja"/, `${file}: no ja choice`);
     assert.equal(runChooser(file, ["ko-KR", "ko", "en-US"]), ko, `${file}: Korean browser`);
     assert.equal(runChooser(file, ["ko"]), ko, `${file}: plain ko`);
-    assert.equal(runChooser(file, ["de-DE", "ko-KR", "en"]), ko, `${file}: Korean before English`);
-    assert.equal(runChooser(file, ["en-US", "ko-KR"]), en, `${file}: English first`);
-    assert.equal(runChooser(file, ["de-DE"]), en, `${file}: German browser gets English`);
+    assert.equal(runChooser(file, ["de-DE", "ko-KR", "en"]), de || ko, `${file}: German first`);
+    assert.equal(runChooser(file, ["de-DE"]), german, `${file}: German browser`);
+    assert.equal(runChooser(file, ["de_AT", "en"]), german, `${file}: Austrian German`);
+    assert.equal(runChooser(file, ["en-US", "de-DE", "ko-KR"]), en, `${file}: English first`);
     assert.equal(runChooser(file, ["ja-JP"]), en, `${file}: Japanese browser gets English`);
+    assert.equal(runChooser(file, ["ja-JP", "de-DE"]), german, `${file}: Japanese then German`);
     assert.equal(runChooser(file, ["kok-IN"]), en, `${file}: Konkani is not Korean`);
+    assert.equal(runChooser(file, ["dev"]), en, `${file}: dev is not German`);
     assert.equal(runChooser(file, []), en, `${file}: unknown language gets English`);
   }
-  for (const file of ["privacy/index.html", "quirky-ball/terms/index.html", "10key/terms/index.html"]) {
-    assert.equal(runChooser(file, ["ko-KR"], "?stay=1"), null, `${file}: ?stay=1 keeps the list`);
+  for (const file of ["privacy/index.html", "quirky-ball/terms/index.html", "quirky-ball/privacy/delete.html", "10key/terms/index.html"]) {
+    assert.equal(runChooser(file, ["de-DE"], "?stay=1"), null, `${file}: ?stay=1 keeps the list`);
   }
 });
 
-test("sitemap lists no de/ja legal URL and no redirect", () => {
+test("sitemap lists the German legal documents and no ja redirect", () => {
   const sitemap = read("sitemap.xml");
   for (const file of Object.keys(dropped)) {
     assert.ok(!sitemap.includes(`https://houseduck.in/${file}<`), `sitemap must not list ${file}`);
   }
-  for (const file of ["privacy/en.html", "privacy/ko.html", "quirky-ball/terms/en.html", "quirky-ball/terms/ko.html", "10key/terms/en.html", "10key/terms/ko.html"]) {
+  for (const file of ["privacy/en.html", "privacy/ko.html", "privacy/de.html", "quirky-ball/terms/en.html", "quirky-ball/terms/ko.html",
+    "quirky-ball/terms/de.html", "quirky-ball/web/terms/de.html", "quirky-ball/web/privacy/de.html", "10key/terms/en.html", "10key/terms/ko.html"]) {
     assert.ok(sitemap.includes(`<loc>https://houseduck.in/${file}</loc>`), `sitemap must list ${file}`);
   }
 });

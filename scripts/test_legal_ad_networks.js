@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Owner 2026-10-05: AppLovin/MAX was rejected; Google AdMob is the only ad network in the shipped build.
-// Owner 2026-10-19: legal documents are English + Korean only (de/ja URLs redirect to English).
+// Owner 2026-10-20: legal documents are English + Korean + German (ja URLs redirect to English).
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -10,7 +10,7 @@ const repoDir = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(repoDir, file), "utf8");
 
 test("legal pages name Google AdMob and no rejected or absent ad network", () => {
-  for (const locale of ["ko", "en"]) {
+  for (const locale of ["ko", "en", "de"]) {
     for (const file of [`privacy/${locale}.html`, `quirky-ball/terms/${locale}.html`]) {
       const html = read(file);
       const withoutHistory = html.slice(0, html.lastIndexOf('id="section-'));

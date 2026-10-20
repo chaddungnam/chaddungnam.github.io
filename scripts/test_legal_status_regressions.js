@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, "..");
 const expected = {
   "privacy/ko.html": ["시행일: 2026년 10월 5일", "2026년 10월 5일 시행"],
   "privacy/en.html": ["Effective date: October 5, 2026", "Effective October 5, 2026", "10KEY additions: October 19, 2026", "Effective October 19, 2026 (v4.1)"],
+  "privacy/de.html": ["Inkrafttreten: 5. Oktober 2026", "Wirksam ab 5. Oktober 2026", "Ergänzungen zu 10KEY: 19. Oktober 2026", "Wirksam ab 19. Oktober 2026 (v4.1)"],
   "10key/terms/en.html": ["Effective date: October 19, 2026", "Effective October 19, 2026 (v1.0)"],
   "10key/terms/ko.html": ["시행일: 2026년 10월 19일", "2026년 10월 19일 시행(v1.0)"],
 };
