@@ -4,7 +4,7 @@
   root.ConsoleModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
   const pages = new Set([
-    "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes", "project-k",
+    "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
     "hexaworld-overview", "hexaworld-notices", "hexaworld-attendance", "hexaworld-mail", "hexaworld-config", "hexaworld-audit",
     "hexaworld-players",
   ]);

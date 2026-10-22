@@ -39,8 +39,8 @@
     invalid_reward_table: "보상표 형식을 확인해 주세요.",
     history_not_found: "복구할 이전 설정을 찾지 못했습니다.",
     event_not_found: "중단할 이벤트를 찾지 못했습니다(이미 중단됨).",
-    admin_session_required: "HEXAWORLD 세션이 만료되었습니다.",
-    admin_required: "이 계정은 HEXAWORLD 관리자 목록에 없습니다.",
+    admin_session_required: "Comrade 세션이 만료되었습니다.",
+    admin_required: "이 계정은 Comrade 관리자 목록에 없습니다.",
     origin_not_allowed: "허용되지 않은 주소에서 접속했습니다. houseduck.in에서 다시 열어 주세요.",
     admin_check_failed: "관리자 확인 서버에 일시적으로 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.",
     unknown_action: "지원하지 않는 요청입니다.",
@@ -110,8 +110,8 @@
     panel.className = "read-only-banner hexaworld-auth-recovery";
     const text = document.createElement("p");
     text.textContent = error.message === "admin_session_required"
-      ? "Google 로그인이 만료되어 HEXAWORLD 서버가 요청을 거부했습니다. 아래 버튼으로 Google에 다시 로그인해 주세요."
-      : "이 Google 계정은 HEXAWORLD 관리자 목록에 없습니다. 다른 관리자 계정으로 전환해 주세요.";
+      ? "Google 로그인이 만료되어 Comrade 서버가 요청을 거부했습니다. 아래 버튼으로 Google에 다시 로그인해 주세요."
+      : "이 Google 계정은 Comrade 관리자 목록에 없습니다. 다른 관리자 계정으로 전환해 주세요.";
     const buttonHost = document.createElement("div");
     panel.append(text, buttonHost);
     messageEl.insertAdjacentElement("afterend", panel);
@@ -175,8 +175,8 @@
     ].map(([label, value]) => `<article data-tone="neutral"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join("");
     byId("hexaworldOverviewAuthMode").textContent = authMode === "console_ticket" ? "세션 티켓 인증" : authMode === "google_id" ? "Google 로그인 인증" : "—";
     byId("hexaworldOverviewConfig").innerHTML = [
-      ["최소 지원 버전 코드", number(config.min_version_code)],
-      ["최신 버전 코드", number(config.latest_version_code)],
+      ["Android 최소 / 최신", `${number(config.min_version_code)} / ${number(config.latest_version_code)}`],
+      ["iOS 최소 / 최신 빌드", `${number(config.min_build_ios ?? 1)} / ${number(config.latest_build_ios ?? 1)}`],
       ["점검 모드", config.maintenance ? "사용 중" : "꺼짐"],
       ["Android 스토어", config.store_url_android || "미설정"],
       ["iOS 스토어", config.store_url_ios || "미설정"],
@@ -652,6 +652,8 @@
     const form = byId("hexaworldConfigForm");
     form.elements.minVersionCode.value = config.min_version_code ?? "";
     form.elements.latestVersionCode.value = config.latest_version_code ?? "";
+    form.elements.minBuildIos.value = config.min_build_ios ?? 1;
+    form.elements.latestBuildIos.value = config.latest_build_ios ?? 1;
     form.elements.storeUrlAndroid.value = config.store_url_android || "";
     form.elements.storeUrlIos.value = config.store_url_ios || "";
     form.elements.maintenance.checked = Boolean(config.maintenance);
@@ -692,6 +694,12 @@
         setMessage("hexaworldConfigFormMessage", hxErrorText({ message: "rpc_failed", detail: "min_version_above_latest" }), true);
         return;
       }
+      const minIos = Number(values.minBuildIos);
+      const latestIos = Number(values.latestBuildIos);
+      if (!Number.isInteger(minIos) || minIos < 1 || !Number.isInteger(latestIos) || latestIos < 1 || minIos > latestIos) {
+        setMessage("hexaworldConfigFormMessage", "iOS 빌드 번호를 확인해 주세요 (최소는 최신보다 클 수 없습니다).", true);
+        return;
+      }
       const maintenance = form.elements.maintenance.checked;
       const msgKo = values.maintenanceMsgKo.trim();
       const msgEn = values.maintenanceMsgEn.trim();
@@ -730,6 +738,7 @@
       }
       const config = {
         min_version_code: minCode, latest_version_code: latestCode,
+        min_build_ios: minIos, latest_build_ios: latestIos,
         store_url_android: values.storeUrlAndroid.trim(), store_url_ios: values.storeUrlIos.trim(),
         maintenance, feature_flags: featureFlags,
       };
@@ -738,7 +747,8 @@
       const reason = values.reason.trim();
       const turningMaintenanceOn = maintenance && !state.config?.maintenance;
       const summary = [
-        `최소 버전 코드: ${minCode} · 최신 버전 코드: ${latestCode}`,
+        `Android 최소 ${minCode} · 최신 ${latestCode}`,
+        `iOS 최소 빌드 ${minIos} · 최신 ${latestIos}`,
         `점검 모드: ${maintenance ? "켜짐" : "꺼짐"}${maintenance && msgKo ? ` (${msgKo})` : ""}`,
         `기능 플래그: ${Object.keys(featureFlags).length}개`,
         `사유: ${reason || "(없음)"}`,
@@ -772,7 +782,7 @@
     try {
       const rows = (await callHx("config.history", { limit: 20 })).data || [];
       byId("hexaworldConfigHistory").innerHTML = rows.length ? rows.map((h) => `<li>
-        <span>${escapeHtml(time(h.replaced_at))} · 최소 ${escapeHtml(h.config?.min_version_code ?? "-")} / 최신 ${escapeHtml(h.config?.latest_version_code ?? "-")} · 점검 ${h.config?.maintenance ? "켜짐" : "꺼짐"}</span>
+        <span>${escapeHtml(time(h.replaced_at))} · Android ${escapeHtml(h.config?.min_version_code ?? "-")}/${escapeHtml(h.config?.latest_version_code ?? "-")} · iOS ${escapeHtml(h.config?.min_build_ios ?? "-")}/${escapeHtml(h.config?.latest_build_ios ?? "-")} · 점검 ${h.config?.maintenance ? "켜짐" : "꺼짐"}</span>
         <button type="button" class="danger-button" data-restore-id="${Number(h.id)}">이 값으로 복구</button></li>`).join("") : "<li>이전 설정이 없습니다.</li>";
       setMessage("hexaworldConfigHistoryMessage", "");
     } catch (error) {

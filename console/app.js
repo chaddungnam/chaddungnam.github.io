@@ -23,7 +23,6 @@ const pageTitles = {
   cs: "CS",
   audit: "감사 기록",
   notes: "메모",
-  "project-k": "Comrade & the Brave New World",
   "hexaworld-overview": "운영 개요",
   "hexaworld-notices": "공지",
   "hexaworld-attendance": "출석 보상",
@@ -42,13 +41,12 @@ const pageDescriptions = {
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
   notes: "정한 것과 그 이유를 남겨 두고 나중에 같은 판단을 다시 찾습니다.",
-  "project-k": "아직 준비 중인 프로젝트입니다.",
   "hexaworld-overview": "플레이어, 출석, 공지, 우편 현황을 한눈에 확인합니다.",
   "hexaworld-notices": "게임 내 공지를 작성·수정·삭제합니다.",
   "hexaworld-attendance": "출석 보상 사이클을 구성합니다.",
   "hexaworld-mail": "모든 플레이어에게 보상 우편을 발송합니다.",
   "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그, 보상 배율을 관리합니다.",
-  "hexaworld-audit": "HEXAWORLD 관리자 변경 이력을 확인합니다.",
+  "hexaworld-audit": "Comrade 관리자 변경 이력을 확인합니다.",
   "hexaworld-players": "한 계정의 재화, 스테이지, 포탑, 룬, 우편, 알림을 시험용으로 바꿉니다.",
 };
 
@@ -100,14 +98,12 @@ const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|m
 
 function selectProject(projectKey) {
   currentProjectKey = projectKey;
-  const isProjectK = projectKey === "project_k";
-  const isHexaworld = projectKey === "hexaworld";
-  byId("currentProject").textContent = isProjectK ? "Comrade & the Brave New World" : isHexaworld ? "HEXAWORLD 1984" : "Quirky Ball";
-  byId("consoleNav").hidden = isProjectK || isHexaworld;
+  const isHexaworld = projectKey === "hexaworld";   // route keys keep the old "hexaworld" name; the game is Comrade
+  byId("currentProject").textContent = isHexaworld ? "Comrade & the Brave New World" : "Quirky Ball";
+  byId("consoleNav").hidden = isHexaworld;
   byId("hexaworldNav").hidden = !isHexaworld;
   showOnly("consoleApp");
-  window.location.hash = isProjectK ? "#/project-k"
-    : isHexaworld ? (HEXAWORLD_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/hexaworld-overview")
+  window.location.hash = isHexaworld ? (HEXAWORLD_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/hexaworld-overview")
     : (QB_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/analytics");
   renderRoute();
 }
@@ -119,9 +115,7 @@ function returnToProjectPicker() {
 
 function renderRoute() {
   if (!currentProjectKey || !window.ConsoleAuth.isUnlocked()) return;
-  const route = currentProjectKey === "project_k"
-    ? { page: "project-k" }
-    : window.ConsoleModel.routeFromHash(window.location.hash);
+  const route = window.ConsoleModel.routeFromHash(window.location.hash);
   document.querySelectorAll(".route-view").forEach((view) => {
     view.hidden = view.dataset.route !== route.page;
   });
@@ -194,7 +188,6 @@ byId("challengeForm").addEventListener("submit", async (event) => {
 
 byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
 byId("projectHexaworld").addEventListener("click", () => selectProject("hexaworld"));
-byId("projectK").addEventListener("click", () => selectProject("project_k"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
 byId("refreshRouteButton").addEventListener("click", () => {
