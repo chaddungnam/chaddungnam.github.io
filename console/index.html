@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20261007-hx">
+  <link rel="stylesheet" href="styles.css?v=20261022-tk">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -55,6 +55,11 @@
           <span class="project-card-copy"><strong>Comrade & the Brave New World</strong><small>동무와 멋진신세계 · 공지 · 출석 · 우편 · 설정</small></span>
           <span class="project-card-arrow" aria-hidden="true">↗</span>
         </button>
+        <button id="projectTenkey" class="project-card" type="button">
+          <span class="project-card-mark" aria-hidden="true">10</span>
+          <span class="project-card-copy"><strong>10key Survival</strong><small>10KEY · 딸깍 서바이벌</small></span>
+          <span class="project-card-arrow" aria-hidden="true">↗</span>
+        </button>
       </div>
       <button id="pickerLogout" class="text-button muted" type="button">로그아웃</button>
     </section>
@@ -82,6 +87,9 @@
         <a href="#/hexaworld-config" data-page="hexaworld-config"><span class="nav-index">05</span><span class="nav-copy">앱 설정<small>버전·점검·플래그</small></span></a>
         <a href="#/hexaworld-audit" data-page="hexaworld-audit"><span class="nav-index">06</span><span class="nav-copy">감사 로그<small>변경 이력</small></span></a>
         <a href="#/hexaworld-players" data-page="hexaworld-players"><span class="nav-index">07</span><span class="nav-copy">시험 계정<small>재화·스테이지·알림</small></span></a>
+      </nav>
+      <nav id="tenkeyNav" hidden>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">01</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -642,6 +650,34 @@
         <p id="hexaworldAuditMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="tenkeyConfigView" class="route-view" data-route="tenkey-config" hidden>
+        <p id="tenkeyConfigMessage" class="dashboard-message" role="status"></p>
+        <form id="tenkeyConfigForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">10KEY APP CONFIG</p><h2>앱 설정 / 강제 업데이트</h2>
+          <p class="impact-note">Android는 versionCode, iOS는 빌드 번호를 따로 비교합니다 (버전 표시 "1  1.0.0  1" = Android versionCode 1 · 버전 1.0.0 · iOS 빌드 1). 0은 꺼짐입니다.</p>
+          <p class="impact-note">최소보다 낮은 앱은 스토어 버튼이 있는 "업데이트가 필요합니다" 창에 막히고, 최신보다 낮은 앱은 새 번호마다 한 번 "새 버전이 있습니다"(건너뛰기 가능)가 뜹니다. 웹(CrazyGames)·데스크톱에는 뜨지 않습니다. 최소는 그 스토어에 새 빌드가 배포된 뒤에 올리세요.</p>
+          <fieldset class="tenkey-group">
+            <legend>Android (versionCode)</legend>
+            <div class="form-pair">
+              <label>최소 versionCode<input name="minVersionCode" type="number" min="0" step="1" required><small>이보다 낮으면 업데이트 필수 · 0 = 끔</small></label>
+              <label>최신 versionCode<input name="latestVersionCode" type="number" min="0" step="1" required><small>이보다 낮으면 새 버전 안내 · 0 = 끔</small></label>
+            </div>
+            <label>Google Play 링크<input name="storeUrlAndroid" type="url" maxlength="500" placeholder="https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival"></label>
+          </fieldset>
+          <fieldset class="tenkey-group">
+            <legend>iOS (build)</legend>
+            <div class="form-pair">
+              <label>최소 빌드 번호<input name="minBuildIos" type="number" min="0" step="1" required><small>이보다 낮으면 업데이트 필수 · 0 = 끔</small></label>
+              <label>최신 빌드 번호<input name="latestBuildIos" type="number" min="0" step="1" required><small>이보다 낮으면 새 버전 안내 · 0 = 끔</small></label>
+            </div>
+            <label>App Store 링크<input name="storeUrlIos" type="url" maxlength="500" placeholder="https://apps.apple.com/..."><small>iOS 번호를 0보다 크게 하려면 꼭 필요합니다. 링크는 https://로 시작해야 합니다.</small></label>
+          </fieldset>
+          <label>변경 이유<input name="reason" maxlength="300" required></label>
+          <p id="tenkeyConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">앱 설정 저장</button>
+        </form>
+      </section>
+
       <section id="playerView" class="route-view" data-route="player" hidden>
         <a id="playerBackLink" class="text-button" href="#/players">← 목록으로</a>
         <p id="playerMessage" class="dashboard-message" role="status"></p>
@@ -676,7 +712,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261009-web"></script>
+  <script src="model.js?v=20261022-tk"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261007-hx"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -687,6 +723,7 @@
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
   <script src="hexaworld.js?v=20261007-hx"></script>
+  <script src="tenkey.js?v=20261022-tk"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -698,6 +735,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261007-hx" defer></script>
+  <script src="app.js?v=20261022-tk" defer></script>
 </body>
 </html>

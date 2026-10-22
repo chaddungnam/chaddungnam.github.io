@@ -30,6 +30,7 @@ const pageTitles = {
   "hexaworld-config": "앱 설정",
   "hexaworld-audit": "감사 로그",
   "hexaworld-players": "시험 계정",
+  "tenkey-config": "앱 설정 / 강제 업데이트",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -48,6 +49,7 @@ const pageDescriptions = {
   "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그, 보상 배율을 관리합니다.",
   "hexaworld-audit": "Comrade 관리자 변경 이력을 확인합니다.",
   "hexaworld-players": "한 계정의 재화, 스테이지, 포탑, 룬, 우편, 알림을 시험용으로 바꿉니다.",
+  "tenkey-config": "10KEY 강제 업데이트 기준(Android versionCode, iOS 빌드 번호)과 스토어 링크를 관리합니다.",
 };
 
 let currentProjectKey = "";
@@ -95,16 +97,24 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
 const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit|players))(?:[/?]|$)/;
+const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:config))(?:[/?]|$)/;
+
+// One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
+// Route keys keep the old "hexaworld" name; the game is Comrade.
+const PROJECTS = {
+  quirky_ball: { title: "Quirky Ball", nav: "consoleNav", routePattern: QB_ROUTE_PATTERN, home: "#/analytics" },
+  hexaworld: { title: "Comrade & the Brave New World", nav: "hexaworldNav", routePattern: HEXAWORLD_ROUTE_PATTERN, home: "#/hexaworld-overview" },
+  tenkey: { title: "10key Survival", nav: "tenkeyNav", routePattern: TENKEY_ROUTE_PATTERN, home: "#/tenkey-config" },
+};
 
 function selectProject(projectKey) {
+  const project = PROJECTS[projectKey];
+  if (!project) return;
   currentProjectKey = projectKey;
-  const isHexaworld = projectKey === "hexaworld";   // route keys keep the old "hexaworld" name; the game is Comrade
-  byId("currentProject").textContent = isHexaworld ? "Comrade & the Brave New World" : "Quirky Ball";
-  byId("consoleNav").hidden = isHexaworld;
-  byId("hexaworldNav").hidden = !isHexaworld;
+  byId("currentProject").textContent = project.title;
+  Object.values(PROJECTS).forEach((entry) => { byId(entry.nav).hidden = entry !== project; });
   showOnly("consoleApp");
-  window.location.hash = isHexaworld ? (HEXAWORLD_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/hexaworld-overview")
-    : (QB_ROUTE_PATTERN.test(window.location.hash) ? window.location.hash : "#/analytics");
+  window.location.hash = project.routePattern.test(window.location.hash) ? window.location.hash : project.home;
   renderRoute();
 }
 
@@ -119,7 +129,7 @@ function renderRoute() {
   document.querySelectorAll(".route-view").forEach((view) => {
     view.hidden = view.dataset.route !== route.page;
   });
-  document.querySelectorAll("#consoleNav a, #hexaworldNav a").forEach((link) => {
+  document.querySelectorAll(Object.values(PROJECTS).map((entry) => `#${entry.nav} a`).join(", ")).forEach((link) => {
     if (link.dataset.page === route.page || route.page === "player" && link.dataset.page === "players") link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
@@ -147,6 +157,7 @@ function renderRoute() {
   if (route.page === "hexaworld-config") window.ConsoleHexaworld.mountConfig();
   if (route.page === "hexaworld-audit") window.ConsoleHexaworld.mountAudit();
   if (route.page === "hexaworld-players") window.ConsoleHexaworld.mountPlayers();
+  if (route.page === "tenkey-config") window.ConsoleTenkey.mountConfig();
 }
 
 function challengeErrorMessage(error) {
@@ -188,6 +199,7 @@ byId("challengeForm").addEventListener("submit", async (event) => {
 
 byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
 byId("projectHexaworld").addEventListener("click", () => selectProject("hexaworld"));
+byId("projectTenkey").addEventListener("click", () => selectProject("tenkey"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
 byId("refreshRouteButton").addEventListener("click", () => {

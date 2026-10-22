@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js tenkey.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -39,7 +39,7 @@ rg -F -q 'rangeDays: Number(byId("purchaseRange").value)' "$console_dir/purchase
 rg -q 'data-route="cs"' "$console_dir/index.html"
 rg -q 'data-route="audit"' "$console_dir/index.html"
 rg -q 'Comrade & the Brave New World' "$console_dir/index.html"
-rg -q '준비 중' "$console_dir/index.html"
+rg -q 'id="projectTenkey"' "$console_dir/index.html"
 rg -q '자동 동기화 미연동' "$console_dir/index.html"
 rg -q 'sessionStorage' "$console_dir/auth.js"
 rg -q 'X-Admin-Session' "$console_dir/auth.js"
@@ -64,7 +64,13 @@ rg -q 'name="templateKey"' "$console_dir/index.html"
 rg -q 'overflow-y: auto' "$console_dir/styles.css"
 rg -F -q 'max-height: min(62vh, 680px)' "$console_dir/styles.css"
 rg -q 'action: "audit.revert"' "$console_dir/audit.js"
-rg -F -q '준비 중 · 껍데기만 제공' "$console_dir/index.html"
+# 10KEY (10key Survival) force-update page: third project card, its own menu, form and hx-admin actions.
+rg -q 'id="tenkeyNav"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-config"' "$console_dir/index.html"
+rg -q 'id="tenkeyConfigForm"' "$console_dir/index.html"
+rg -F -q 'window.ConsoleTenkey.mountConfig()' "$console_dir/app.js"
+rg -F -q '"tenkey.config.get"' "$console_dir/tenkey.js"
+rg -F -q '"tenkey.config.set"' "$console_dir/tenkey.js"
 for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done
@@ -120,6 +126,7 @@ rg -F -q 'first_open", "첫 실행"' "$repo_dir/analytics/pulse-model.js"
 
 node "$repo_dir/scripts/test_console_audit_navigation.js"
 node "$repo_dir/scripts/test_console_request_safety.js"
+node "$repo_dir/scripts/test_tenkey_console.js"
 echo "House Duck console contract: PASS"
 
 # Console 2.0 uses existing admin gates; new reads fail independently of 1.x panels.

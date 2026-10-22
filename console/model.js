@@ -7,6 +7,7 @@
     "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
     "hexaworld-overview", "hexaworld-notices", "hexaworld-attendance", "hexaworld-mail", "hexaworld-config", "hexaworld-audit",
     "hexaworld-players",
+    "tenkey-config",
   ]);
 
   function routeFromHash(hash) {
