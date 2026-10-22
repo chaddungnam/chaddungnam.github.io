@@ -120,7 +120,7 @@
   async function loadConfig() {
     setMessage(PAGE_MESSAGE, "10KEY 설정을 불러오는 중입니다...");
     try {
-      state.config = (await call("tenkey.config.get", {})).data || {};
+      state.config = (await call("tenkey.config_get", {})).data || {};
       fillForm(state.config);
       const saved = state.config.updated_at ? new Date(state.config.updated_at) : null;
       const savedText = saved && !Number.isNaN(saved.getTime()) ? ` 마지막 저장: ${saved.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" })}` : "";
@@ -145,7 +145,7 @@
       const { config, reason } = checked;
       if (!await root.ConsoleApp.confirmChange("10KEY 앱 설정 변경", summary(config, reason))) return;
       setMessage(FORM_MESSAGE, "저장하는 중입니다...");
-      const result = await call("tenkey.config.set", { config, reason }, form);
+      const result = await call("tenkey.config_set", { config, reason }, form);
       state.config = result.data?.config || config;
       fillForm(state.config);
       form.elements.reason.value = "";

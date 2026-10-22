@@ -69,8 +69,8 @@ rg -q 'id="tenkeyNav"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-config"' "$console_dir/index.html"
 rg -q 'id="tenkeyConfigForm"' "$console_dir/index.html"
 rg -F -q 'window.ConsoleTenkey.mountConfig()' "$console_dir/app.js"
-rg -F -q '"tenkey.config.get"' "$console_dir/tenkey.js"
-rg -F -q '"tenkey.config.set"' "$console_dir/tenkey.js"
+rg -F -q '"tenkey.config_get"' "$console_dir/tenkey.js"
+rg -F -q '"tenkey.config_set"' "$console_dir/tenkey.js"
 for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done

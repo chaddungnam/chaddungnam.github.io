@@ -84,10 +84,10 @@ test("validation: integers >= 0, min <= latest per platform, https links, iOS li
   assert.equal(check({ reason: "   " }).error, "reason_required");
 });
 
-test("opening the page reads tenkey.config.get through the Comrade project client and fills the form", async () => {
+test("opening the page reads tenkey.config_get through the Comrade project client and fills the form", async () => {
   const { window, byId, form, calls } = pageFixture(async () => ({ ok: true, data: SERVER_CONFIG }));
   window.ConsoleTenkey.mountConfig(); await tick();
-  assert.deepEqual(plain(calls[0]), ["hexaworld", "hx-admin", { action: "tenkey.config.get", params: {} }]);
+  assert.deepEqual(plain(calls[0]), ["hexaworld", "hx-admin", { action: "tenkey.config_get", params: {} }]);
   assert.equal(form.elements.latestVersionCode.value, 1);
   assert.equal(form.elements.minBuildIos.value, 0);
   assert.equal(form.elements.storeUrlAndroid.value, SERVER_CONFIG.store_url_android);
@@ -100,9 +100,9 @@ test("a server without the 10KEY actions shows the Korean not-deployed message",
   assert.equal(byId("tenkeyConfigMessage").textContent, "서버에 10KEY 설정이 아직 배포되지 않았습니다.");
 });
 
-test("saving confirms the numbers and links, then sends tenkey.config.set with a request_id", async () => {
+test("saving confirms the numbers and links, then sends tenkey.config_set with a request_id", async () => {
   const { window, byId, form, calls, confirmations, fill, submit } = pageFixture(async (_, __, body) =>
-    body.action === "tenkey.config.get" ? { ok: true, data: SERVER_CONFIG } : { ok: true, data: { ok: true, config: body.params.config } });
+    body.action === "tenkey.config_get" ? { ok: true, data: SERVER_CONFIG } : { ok: true, data: { ok: true, config: body.params.config } });
   window.ConsoleTenkey.mountConfig(); await tick();
   fill(GOOD); await submit();
   assert.equal(confirmations.length, 1);
@@ -112,7 +112,7 @@ test("saving confirms the numbers and links, then sends tenkey.config.set with a
     `Google Play 링크: ${GOOD.storeUrlAndroid}`, `App Store 링크: ${GOOD.storeUrlIos}`, "변경 이유: 첫 강제 업데이트",
   ].join("\n"));
   const [project, fn, body] = calls.at(-1);
-  assert.deepEqual([project, fn, body.action], ["hexaworld", "hx-admin", "tenkey.config.set"]);
+  assert.deepEqual([project, fn, body.action], ["hexaworld", "hx-admin", "tenkey.config_set"]);
   assert.match(body.request_id, /^[0-9a-f-]{36}$/);
   assert.deepEqual(plain(body.params), { config: plain(window.ConsoleTenkey.validate(GOOD).config), reason: "첫 강제 업데이트" });
   assert.equal(form.elements.reason.value, "", "the reason is cleared so the next change needs its own");
@@ -134,13 +134,13 @@ test("cancelling the confirmation and invalid input send nothing", async () => {
 test("server error codes map to Korean text; a retry of the same payload reuses its request_id", async () => {
   const outcomes = [new Error("network down"), { ok: true, data: { ok: false, error: "ios_store_url_required" } }, { ok: true, data: { ok: true } }, { ok: true, data: { ok: true } }];
   const { window, byId, calls, fill, submit } = pageFixture(async (_, __, body) => {
-    if (body.action === "tenkey.config.get") return { ok: true, data: SERVER_CONFIG };
+    if (body.action === "tenkey.config_get") return { ok: true, data: SERVER_CONFIG };
     const next = outcomes.shift();
     if (next instanceof Error) throw next;
     return next;
   });
   window.ConsoleTenkey.mountConfig(); await tick();
-  const writes = () => calls.filter(([, , body]) => body.action === "tenkey.config.set").map(([, , body]) => body.request_id);
+  const writes = () => calls.filter(([, , body]) => body.action === "tenkey.config_set").map(([, , body]) => body.request_id);
   fill(GOOD); await submit();
   assert.match(byId("tenkeyConfigFormMessage").textContent, /network down/);
   fill(GOOD); await submit();
