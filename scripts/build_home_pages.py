@@ -37,23 +37,11 @@ TEXT = {
     "키를 눌러 보세요": ("Press a key", "Drück eine Taste", "キーを押してみて"),
     "출시작": ("Out now", "Erschienen", "配信中"),
     "버전": ("Version", "Version", "バージョン"),
-    "타이틀": ("Title", "Titel", "タイトル"),
-    "과열": ("Overheat", "Überhitzung", "オーバーヒート"),
-    "3D 비커 머지": ("3D beaker merge", "3D-Becher-Merge", "3Dビーカーマージ"),
-    "교수님과 첫 만남": ("Meeting the professor", "Treffen mit dem Professor", "教授との出会い"),
-    "시한폭탄": ("Time bomb", "Zeitbombe", "時限爆弾"),
-    "실험실 탈출": ("Lab escape", "Laborflucht", "実験室脱出"),
-    "비행선 보스": ("Airship boss", "Luftschiff-Boss", "飛行船ボス"),
-    "쿼키력 랭킹": ("Quirky Power ranking", "Quirky-Kraft-Rangliste", "Quirky力ランキング"),
-    "스킬 카드": ("Skill cards", "Skill-Karten", "スキルカード"),
-    "보스전": ("Boss fight", "Bosskampf", "ボス戦"),
-    "Quirky Ball 화면 10장": ("Ten Quirky Ball screens", "Zehn Quirky-Ball-Screens", "Quirky Ballの画面10枚"),
     "2D 머지에서 3D 비커, 보스전까지. 쿼키와 함께 실험실을 탈출하세요.": (
         "From 2D merge to 3D beakers and boss fights. Escape the lab with Quirky.",
         "Vom 2D-Merge über den 3D-Becher bis zum Bosskampf. Brich mit Quirky aus dem Labor aus.",
         "2Dマージから3Dビーカー、ボス戦まで。Quirkyと一緒に研究所を脱出しよう。"),
     "무료 다운로드, 광고 및 앱 내 구매 포함": ("Free download, ads and in-app purchases", "Kostenlos, mit Werbung und In-App-Käufen", "無料ダウンロード（広告・アプリ内購入あり）"),
-    "게임 자세히 보기 ↗": ("View game ↗", "Spiel ansehen ↗", "ゲームを見る ↗"),
     "플레이어들이 함께 연구한 점수": ("Researched by players together", "Gemeinsam von Spielern erforscht", "プレイヤーのみんなで研究したスコア"),
     "점": ("points", "Punkte", "点"),
     "최근 플레이 횟수": ("Recent plays", "Letzte Runden", "最近のプレイ回数"),
@@ -81,13 +69,16 @@ TEXT = {
     "계정·진행 데이터": ("Account &amp; progress", "Konto &amp; Fortschritt", "アカウント・進行"),
     "계정 삭제": ("Delete account", "Konto löschen", "アカウント削除"),
     "개인정보·데이터 권리 ↗": ("Privacy &amp; your data ↗", "Datenschutz &amp; deine Rechte ↗", "プライバシー・データの権利 ↗"),
-    "동무와 멋진신세계 작별 인사": ("Farewell from Comrade and the Brave New World", "Abschied von Genosse und die schöne neue Welt",
-                          "Comrade and the Brave New Worldからのお別れ"),
+    "Quirky Ball 실제 플레이 영상": ("Quirky Ball gameplay video", "Quirky Ball Gameplay-Video", "Quirky Ballのプレイ映像"),
+    "Quirky Ball 2.0 실제 플레이": ("Quirky Ball 2.0 gameplay", "Quirky Ball 2.0 Gameplay", "Quirky Ball 2.0のプレイ"),
+    "동무와 멋진신세계 실제 플레이 영상": ("Comrade and the Brave New World gameplay video", "Genosse und die schöne neue Welt – Gameplay-Video",
+        "Comrade and the Brave New Worldのプレイ映像"),
+    "동무와 멋진신세계 실제 플레이": ("Comrade and the Brave New World gameplay", "Genosse und die schöne neue Welt – Gameplay",
+        "Comrade and the Brave New Worldのプレイ"),
     "동무와 멋진신세계": ("Comrade and the Brave New World", "Genosse und die schöne neue Welt", "Comrade and the Brave New World"),
     "다른 장르의 게임에서 만나요": ("See you in a game of another genre", "Wir sehen uns in einem Spiel eines anderen Genres",
                          "別のジャンルのゲームでまた会いましょう"),
 }
-SHOT = {"en": "Quirky Ball screen {n}, {c}", "de": "Quirky-Ball-Screen {n}, {c}", "ja": "Quirky Ball 画面{n}、{c}"}
 SUPPORT = {"en": "english", "de": "german", "ja": "japanese"}
 YOUTUBE_TITLES = re.compile(r'(<a class="youtube-card"[^>]*>.*?</a>)', re.S)  # video titles stay as published
 HANGUL = re.compile(r"[가-힣]")
@@ -97,14 +88,9 @@ def tr(text, i):
     core = text.strip()
     if not core:
         return text
-    m = re.fullmatch(r"Quirky Ball 화면 (\d+), (.+)", core)
-    if m and m.group(2) in TEXT:
-        out = SHOT[LANGS[i]].format(n=m.group(1), c=TEXT[m.group(2)][i])
-    elif core in TEXT:
-        out = TEXT[core][i]
-    else:
+    if core not in TEXT:
         return text
-    return text.replace(core, out)
+    return text.replace(core, TEXT[core][i])
 
 
 def translate_main(main, lang, badges):
@@ -119,6 +105,7 @@ def translate_main(main, lang, badges):
     main = re.sub(r'\b(aria-label|alt|title|data-[a-z-]+)="([^"]*)"', lambda m: f'{m.group(1)}="{tr(m.group(2), i)}"', main)
     main = re.sub(r'<span class="hd-title-alt"[^>]*>[^<]*</span>', "", main)  # the Latin name is already the title
     main = main.replace('href="quirky-ball/?lang=ko"', f'href="quirky-ball/?lang={lang}"')
+    main = main.replace('href="10key/"', 'href="10key/index_en.html"')  # the 10key Survival page exists in Korean and English only
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')
     main = main.replace('href="privacy/ko.html"', f'href="privacy/{lang}.html"')
     main = re.sub(r'href="support/#ko-', f'href="support/#{lang}-', main)
@@ -133,7 +120,7 @@ def translate_main(main, lang, badges):
 
 
 def badge_block(html):
-    m = re.search(r'<div class="release-actions"><a class="google-play-badge"[\s\S]*?</a><a class="app-store-badge"[\s\S]*?</a></div>', html)
+    m = re.search(r'<div class="release-actions"><a class="store-button google-play-badge"[\s\S]*?</a><a class="store-button app-store-badge"[\s\S]*?</a></div>', html)
     return m.group(0) if m else None
 
 

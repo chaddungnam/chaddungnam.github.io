@@ -151,24 +151,31 @@ test("product navigation keeps the remaining game and support routes", () => {
   }
 });
 
-test("home leads with 10key Survival, then Quirky Ball with its store badges, and YouTube", () => {
+test("home leads with 10key Survival, then Quirky Ball with its store buttons, the Comrade farewell, and YouTube", () => {
   for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
     const hero = html.match(/<section class="hd-hero"[\s\S]*?<\/section>/)[0];
     const tenkey = html.match(/<section class="hd-tenkey"[\s\S]*?<\/section>/)[0];
     const quirky = html.match(/<section class="hd-quirky"[\s\S]*?<\/section>/)[0];
+    const farewell = html.match(/<section class="hd-farewell home-farewell"[\s\S]*?<\/section>/)[0];
     assert.match(hero, /data-desk /, `${file} hero is the pixel desk`);
     assert.doesNotMatch(html, /data-studio-hero|class="section-rail"|class="(?:hero-hook|studio-signature)"/);
     assert.match(hero, /id="studio-title"/, `${file} hero title`);
     assert.doesNotMatch(hero, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} hero is the desk scene only, without Quirky Ball text or store badges`);
     assert.doesNotMatch(tenkey, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} 10key Survival section has no Quirky Ball and no store badges before its release`);
-    assert.match(quirky, /class="google-play-badge"/, `${file} Quirky Ball section keeps the Google Play badge`);
-    assert.match(quirky, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} Quirky Ball section keeps the App Store badge`);
+    assert.match(quirky, /<a class="store-button google-play-badge" href="https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.quirkyball\.app"/, `${file} Quirky Ball section keeps the Google Play button`);
+    assert.match(quirky, /<a class="store-button app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} Quirky Ball section keeps the App Store button`);
+    assert.doesNotMatch(quirky, /<img[^>]*store-badges|google-play-[a-z]{2}-light/, `${file} the Google Play button is HTML, not the official bitmap artwork`);
+    assert.match(quirky, /class="hd-keycap-cta" href="quirky-ball\/\?lang=(?:ko|en|de|ja)" data-pressable/, `${file} Quirky Ball links its page with the yellow keycap`);
+    assert.doesNotMatch(quirky, /hd-shot|data-stack/, `${file} Quirky Ball no longer shows the screenshot stack`);
+    assert.equal((quirky.match(/class="hd-qb-piece"/g) || []).length, 13, `${file} Quirky Ball title is its logo cut into thirteen pieces`);
     assert.ok(html.indexOf('class="hd-tenkey"') < html.indexOf('class="hd-quirky"'), `${file} 10key Survival comes first`);
+    assert.ok(html.indexOf(quirky) + quirky.length < html.indexOf(farewell) && html.indexOf(farewell) < html.indexOf('id="lab-notes"'), `${file} the Comrade farewell follows Quirky Ball, before the lab notes`);
+    assert.doesNotMatch(farewell, /<a\b|google-play|apps\.apple/, `${file} the Comrade farewell has no link or store button`);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
     assert.equal((html.match(/data-project="/g) || []).length, 1, `${file} one project zone (Quirky Ball); 10key Survival is the data-tenkey section`);
     assert.equal((html.match(/data-game-preview/g) || []).length, 0, `${file} no project video preview (the Quirky Ball loop plays on the desk CRT)`);
-    assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} gameplay loop (10key Survival)`);
+    assert.equal((html.match(/data-hero-gameplay/g) || []).length, 3, `${file} gameplay loops (10key Survival, Quirky Ball, Comrade farewell)`);
     assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 0, `${file} must not preview the dropped Comrade project`);
     assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }

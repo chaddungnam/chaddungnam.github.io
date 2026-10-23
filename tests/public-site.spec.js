@@ -105,10 +105,26 @@ const homeRoutes = ["/?lang=ko", "/index_en.html?lang=en", "/index_de.html?lang=
 
 // Jumps without the page's smooth-scroll easing so a test can read the settled state.
 const jumpTo = (page, top) => page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top);
+// Puts a section's top edge just under the fixed bar, so the bar's tone probe reads that section.
+const jumpToSection = (page, selector) => page.evaluate((sel) => window.scrollTo({ top: document.querySelector(sel).getBoundingClientRect().top + scrollY + 8, behavior: "instant" }), selector);
 const heroTrack = (page) => page.evaluate(() => {
   const hero = document.querySelector(".hd-hero");
   return { height: hero.offsetHeight, viewport: window.innerHeight };
 });
+// Where the hero hand-off lands: the 10key card sits just under the bar (setupHeroGlide uses the same formula).
+const glideLanding = (page) => page.evaluate(() => Math.max(0, Math.round(document.querySelector(".hd-tenkey-grid").getBoundingClientRect().top + scrollY - (innerWidth > 720 ? 96 : 76))));
+// The hero hand-off animates the scroll (about 1.1 to 2.4 s), so a test waits for scrollY to settle instead of expecting an instant jump.
+const scrollSettlesAt = async (page, target, tolerance = 4) => {
+  await expect.poll(() => page.evaluate((to) => Math.abs(Math.round(scrollY) - to), target), { timeout: 8000, intervals: [100, 200, 300] }).toBeLessThanOrEqual(tolerance);
+  // After a glide the page ignores further wheel / key / swipe input for about 450 ms (trackpad inertia); wait that out before the next gesture.
+  await page.waitForTimeout(600);
+};
+const homeCopy = {
+  "/?lang=ko": { tenkeyHref: "10key/", more: "자세히 보기", comrade: ["동무와 멋진신세계", "다른 장르의 게임에서 만나요"], quirkyHref: "quirky-ball/?lang=ko" },
+  "/index_en.html?lang=en": { tenkeyHref: "10key/index_en.html", more: "Learn more", comrade: ["Comrade and the Brave New World", "See you in a game of another genre"], quirkyHref: "quirky-ball/?lang=en" },
+  "/index_de.html?lang=de": { tenkeyHref: "10key/index_en.html", more: "Mehr erfahren", comrade: ["Genosse und die schöne neue Welt", "Wir sehen uns in einem Spiel eines anderen Genres"], quirkyHref: "quirky-ball/?lang=de" },
+  "/index_ja.html?lang=ja": { tenkeyHref: "10key/index_en.html", more: "詳しく見る", comrade: ["Comrade and the Brave New World", "別のジャンルのゲームでまた会いましょう"], quirkyHref: "quirky-ball/?lang=ja" },
+};
 
 test("all localized home pages fit a 320px viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
@@ -134,7 +150,7 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await page.goto("/?lang=ko");
   const hero = page.locator("#studio");
   const tenkey = page.locator("#games");
-  const video = page.locator("[data-hero-gameplay]");
+  const video = tenkey.locator("[data-hero-gameplay]");
 
   // The hero is the scene only: one canvas, no overlay copy; the h1 is there for search and screen readers.
   await expect(hero).toBeVisible();
@@ -147,6 +163,9 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await expect(hero.locator("a")).toHaveAttribute("href", "#games");
   await expect(hero.locator("a")).toHaveAccessibleName("딸깍 서바이벌 보러 가기");
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
+  // Over the duck scene the bar is clear so the art stays uncovered.
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+  await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   // The pixel room really is drawn (it needs the layered desk PNGs to load): a blank canvas would show only one or two colours.
   await expect.poll(() => hero.locator("canvas.hd-desk-canvas").evaluate((canvas) => {
     const { data } = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
@@ -201,103 +220,161 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   await expect(page.locator(".section-rail, [data-motion-toggle], [data-game-preview], [data-release-chamber], [data-studio-hero], .project-zone, .community-section")).toHaveCount(0);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  await expect(page.locator(".hd-phone-button")).toHaveCount(3);
-  await expect(page.locator(".hd-phone-island")).toHaveCount(1);
-  await expect(page.locator(".hd-phone-home")).toHaveCount(1);
-  await expect(page.locator("[data-hero-gameplay]")).toHaveCount(1);
+  // Three phones on the page: 10key Survival, Quirky Ball and the Comrade farewell, each with one loop.
+  await expect(page.locator(".hd-phone")).toHaveCount(3);
+  await expect(page.locator(".hd-phone-button")).toHaveCount(9);
+  await expect(page.locator(".hd-phone-island")).toHaveCount(3);
+  await expect(page.locator(".hd-phone-home")).toHaveCount(3);
+  await expect(page.locator("[data-hero-gameplay]")).toHaveCount(3);
+  await expect(page.locator("#games [data-hero-gameplay]")).toHaveCount(1);
+  await expect(page.locator("#quirky [data-hero-gameplay]")).toHaveCount(1);
+  await expect(page.locator("#comrade [data-hero-gameplay]")).toHaveCount(1);
+  await expect(page.locator("[data-shot], [data-stack], .hd-ghost")).toHaveCount(0);
+  // Section order: hero, 10key Survival, Quirky Ball, the Comrade farewell, lab notes, support.
+  const tops = await page.evaluate(() => ["#studio", "#games", "#quirky", "#comrade", "#lab-notes", "#player-support"].map((selector) => document.querySelector(selector).getBoundingClientRect().top + scrollY));
+  expect([...tops].sort((a, b) => a - b)).toEqual(tops);
+  expect(await page.locator("#comrade").evaluate((node) => node.previousElementSibling.id)).toBe("quirky");
+  expect(await page.locator("#player-support").evaluate((node) => node.nextElementSibling)).toBeNull();
 
   // Desktop shows the three video cards in one row of equal height; on a phone they stack as rows.
   const cardHeights = await page.locator("[data-youtube-card]").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
   if (!isMobile) expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThan(2);
 
-  // The phone is never cut: it sits whole inside every ancestor that clips (the 10key section clips its decorative keys).
-  await page.locator(".hd-phone").scrollIntoViewIfNeeded();
-  const clippedBy = await page.locator(".hd-phone").evaluate((phone) => {
-    const rect = phone.getBoundingClientRect();
-    const clipped = [];
-    for (let node = phone.parentElement; node && node !== document.documentElement; node = node.parentElement) {
-      const style = getComputedStyle(node);
-      if (!["hidden", "clip"].includes(style.overflowY) && !["hidden", "clip"].includes(style.overflowX)) continue;
-      const box = node.getBoundingClientRect();
-      if (rect.top < box.top - 0.5 || rect.bottom > box.bottom + 0.5 || rect.left < box.left - 0.5 || rect.right > box.right + 0.5) clipped.push(node.className || node.tagName);
-    }
-    return clipped;
-  });
-  expect(clippedBy).toEqual([]);
+  // Every phone is never cut: it sits whole inside every ancestor that clips (the 10key section clips its decorative keys,
+  // the Quirky Ball and farewell sections clip their glows).
+  for (const index of [0, 1, 2]) {
+    const phone = page.locator(".hd-phone").nth(index);
+    await phone.scrollIntoViewIfNeeded();
+    const clippedBy = await phone.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      const clipped = [];
+      for (let ancestor = node.parentElement; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
+        const style = getComputedStyle(ancestor);
+        if (!["hidden", "clip"].includes(style.overflowY) && !["hidden", "clip"].includes(style.overflowX)) continue;
+        const box = ancestor.getBoundingClientRect();
+        if (rect.top < box.top - 0.5 || rect.bottom > box.bottom + 0.5 || rect.left < box.left - 0.5 || rect.right > box.right + 0.5) clipped.push(ancestor.className || ancestor.tagName);
+      }
+      return clipped;
+    });
+    expect(clippedBy, `phone ${index + 1} is clipped`).toEqual([]);
+  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 
-  // The header pill follows the tone behind it: night over the desk, paper once the zoom has handed over to the 10key page.
+  // The header tracks what is under it. data-hd-theme names the section tone (night over the desk, paper once the zoom has handed over
+  // to the 10key page); data-hd-over-hero is on only while the bar sits over the desk before its zoom ends, and the bar is the dark House Duck bar elsewhere.
   await jumpTo(page, 0);
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
   const track = await heroTrack(page);
   await jumpTo(page, track.height - track.viewport);
   await expect(page.locator("#studio")).toHaveClass(/is-entered/);
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
-  await page.locator("#lab-notes").scrollIntoViewIfNeeded();
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+  await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(17, 20, 25, 0.97)");
+  await jumpToSection(page, "#lab-notes");
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+  // Over the night Comrade farewell the tone follows the section, and the bar stays the dark bar.
+  await jumpToSection(page, "#comrade");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+  await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(17, 20, 25, 0.97)");
 });
 
-test("Quirky Ball screens stack follows the scroll and names every screen", async ({ page }) => {
+test("Quirky Ball title is the game's own logo, cut into letters that land one by one when it scrolls into view", async ({ page }) => {
   await page.goto("/?lang=ko");
-  const track = page.locator("[data-stack]");
-  const captions = await page.locator("[data-shot]").evaluateAll((nodes) => nodes.map((node) => node.dataset.caption));
-  expect(captions).toHaveLength(10);
-  await page.locator("#quirky").scrollIntoViewIfNeeded();
-  // Positions the page so the sticky stage has travelled `fraction` (0..1) of its track.
-  const travelTo = (fraction) => page.evaluate((f) => {
-    const col = document.querySelector("[data-stack-col]");
-    const stage = document.querySelector("[data-stack-stage]");
-    const travel = col.offsetHeight - stage.offsetHeight;
-    window.scrollTo({ top: col.getBoundingClientRect().top + window.scrollY + travel * f, behavior: "instant" });
-  }, fraction);
-  for (const index of [0, 5, 9, 3]) {
-    await travelTo(index / 9);
-    await expect(track).toHaveAttribute("data-stack-active", String(index));
-    const label = `${String(index + 1).padStart(2, "0")} / 10`;
-    await expect(page.locator("[data-stack-index]").first()).toHaveText(label);
-    await expect(page.locator("[data-stack-caption]").first()).toHaveText(captions[index]);
-    await expect(page.locator("[data-shot]").nth(index)).toHaveClass(/is-active/);
-    await expect(page.locator("[data-shot].is-active")).toHaveCount(1);
+  const title = page.locator("#quirky-title");
+  const logo = title.locator("[data-qb-logo]");
+  const pieces = logo.locator("img.hd-qb-piece");
+  // The heading still says "Quirky Ball" to search and screen readers; the logo itself is decoration.
+  await expect(title).toHaveText("Quirky Ball");
+  await expect(title.locator(".hd-visually-hidden")).toHaveText("Quirky Ball");
+  await expect(logo).toHaveAttribute("aria-hidden", "true");
+  expect(await pieces.evaluateAll((nodes) => nodes.map((node) => node.dataset.piece))).toEqual(["q", "u", "i", "r", "k", "y", "b", "a", "l1", "l2", "dot", "hex", "ball"]);
+  expect(await pieces.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("src")))).toEqual(
+    ["q", "u", "i", "r", "k", "y", "b", "a", "l1", "l2", "dot", "hex", "ball"].map((piece) => `assets/media/home/qb-logo/${piece}.webp`),
+  );
+
+  // Before it is in view the letters wait, invisible; the shot of Quirky Ball is not a stack of screenshots any more.
+  await expect(logo).not.toHaveClass(/is-in/);
+  expect(await pieces.evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity))).toEqual(Array(13).fill("0"));
+
+  // Scrolled into view, they drop in one after another in --i order, and every piece image really loads.
+  await logo.scrollIntoViewIfNeeded();
+  await expect(logo).toHaveClass(/is-in/);
+  const timing = await pieces.evaluateAll((nodes) => nodes.map((node) => {
+    const style = getComputedStyle(node);
+    return { piece: node.dataset.piece, order: Number(node.style.getPropertyValue("--i")), animation: style.animationName.split(",")[0].trim(), delay: parseFloat(style.animationDelay) };
+  }));
+  for (const letter of timing.filter((entry) => !["dot", "hex", "ball"].includes(entry.piece))) {
+    expect(letter.animation, `${letter.piece} drops in`).toBe("hd-qb-drop");
+    expect(letter.delay, `${letter.piece} waits for its turn`).toBeCloseTo(letter.order * 0.065, 3);
   }
+  expect(timing.find((entry) => entry.piece === "dot").animation).toBe("hd-qb-pop");
+  expect(timing.find((entry) => entry.piece === "hex").animation).toBe("hd-qb-hex-in");
+  expect(timing.find((entry) => entry.piece === "ball").animation).toBe("hd-qb-ball-in");
+  await expect.poll(() => pieces.evaluateAll((nodes) => nodes.every((node) => node.complete && node.naturalWidth > 0)), { message: "logo pieces load" }).toBe(true);
+  await expect.poll(() => pieces.evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity)), { timeout: 8000, message: "letters have landed" }).toEqual(Array(13).fill("1"));
+
+  // Landed, the letters read as the logo: both rows run left to right inside the logo box, the dot over the i.
+  const boxes = await logo.evaluate((node) => {
+    const frame = node.getBoundingClientRect();
+    const out = { frame: { width: frame.width, height: frame.height }, pieces: {} };
+    for (const piece of node.querySelectorAll(".hd-qb-piece")) {
+      const rect = piece.getBoundingClientRect();
+      out.pieces[piece.dataset.piece] = { left: rect.left - frame.left, top: rect.top - frame.top, right: rect.right - frame.left, bottom: rect.bottom - frame.top, midX: (rect.left + rect.right) / 2 - frame.left };
+    }
+    return out;
+  });
+  expect(boxes.frame.width / boxes.frame.height).toBeCloseTo(861 / 551, 1);
+  for (const [piece, box] of Object.entries(boxes.pieces)) {
+    expect(box.left, `${piece} stays inside the logo box (left)`).toBeGreaterThanOrEqual(-boxes.frame.width * 0.03);
+    expect(box.right, `${piece} stays inside the logo box (right)`).toBeLessThanOrEqual(boxes.frame.width * 1.03);
+    expect(box.top, `${piece} stays inside the logo box (top)`).toBeGreaterThanOrEqual(-boxes.frame.height * 0.08);
+    expect(box.bottom, `${piece} stays inside the logo box (bottom)`).toBeLessThanOrEqual(boxes.frame.height * 1.03);
+  }
+  const lefts = (names) => names.map((name) => boxes.pieces[name].left);
+  expect(lefts(["q", "u", "i", "r", "k", "y"]), "QUIRKY reads left to right").toEqual([...lefts(["q", "u", "i", "r", "k", "y"])].sort((a, b) => a - b));
+  expect(lefts(["b", "a", "l1", "l2"]), "BALL reads left to right").toEqual([...lefts(["b", "a", "l1", "l2"])].sort((a, b) => a - b));
+  expect(boxes.pieces.b.top, "the second word sits below the first").toBeGreaterThan(boxes.pieces.q.top + boxes.frame.height * 0.2);
+  expect(boxes.pieces.dot.bottom, "the dot rides above the i").toBeLessThanOrEqual(boxes.pieces.i.top + 2);
+  expect(Math.abs(boxes.pieces.dot.midX - boxes.pieces.i.midX)).toBeLessThan(boxes.frame.width * 0.03);
 });
 
-test("10key Survival shows its real gameplay in the phone and the quiet Comrade farewell closes the page", async ({ page }) => {
-  const farewell = [
-    ["/?lang=ko", "동무와 멋진신세계", "다른 장르의 게임에서 만나요"],
-    ["/index_en.html?lang=en", "Comrade and the Brave New World", "See you in a game of another genre"],
-    ["/index_de.html?lang=de", "Genosse und die schöne neue Welt", "Wir sehen uns in einem Spiel eines anderen Genres"],
-    ["/index_ja.html?lang=ja", "Comrade and the Brave New World", "別のジャンルのゲームでまた会いましょう"],
-  ];
-  for (const [route, name, line] of farewell) {
+test("10key Survival shows its real gameplay in the phone and the quiet Comrade farewell sits right under Quirky Ball", async ({ page }) => {
+  for (const [route, copy] of Object.entries(homeCopy)) {
+    const [name, line] = copy.comrade;
     await page.goto(route);
     const zone = page.locator("#games");
     await zone.scrollIntoViewIfNeeded();
     const video = zone.locator(".hd-phone video");
     await expect(video).toBeVisible();
     await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
-    await expect(zone.locator("a[href='10key/']")).toHaveCount(1);
+    await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
+    await expect(zone.locator("a")).toHaveCount(1);
     await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(20, 22, 43)");
     expect(await zone.locator("a[href*='play.google.com'], a[href*='apps.apple.com']").count(), `${route} no store links before release`).toBe(0);
 
-    const block = page.locator(".home-farewell");
+    // The dropped game: night section right after Quirky Ball, its old play loop in a phone, one line, no link, no status.
+    const block = page.locator("#comrade");
+    await expect(block).toHaveClass(/home-farewell/);
+    await expect(block).toHaveAttribute("data-theme", "night");
+    await expect(block).toHaveAttribute("aria-labelledby", "comrade-title");
     await block.scrollIntoViewIfNeeded();
     await expect(block.locator(".farewell-name")).toHaveText(name);
-    await expect(block.locator(".farewell-line")).toHaveText(line);
+    await expect(block.locator("h2.farewell-line#comrade-title")).toHaveText(line);
     await expect(block.locator("a")).toHaveCount(0);
     await expect(block).not.toContainText(/개발 중|In development|In Entwicklung|開発中/);
-    // The poster is redrawn as a dim ASCII ghost; if that ever fails the plain image takes over.
-    const ghost = block.locator("[data-ghost]");
-    await expect.poll(() => ghost.evaluate((node) => node.dataset.ghostReady === "true" || node.classList.contains("is-fallback")), { message: `${route} ghost` }).toBe(true);
-    if (await ghost.getAttribute("data-ghost-ready") === "true") {
-      expect(await ghost.locator("canvas").evaluate((canvas) => {
-        const { data } = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-        let inked = 0;
-        for (let i = 3; i < data.length; i += 4) if (data[i] > 0) inked += 1;
-        return inked;
-      }), `${route} ghost canvas has glyphs`).toBeGreaterThan(200);
-    } else {
-      await expect(ghost.locator("img")).toBeVisible();
-    }
+    await expect(block).toHaveCSS("background-color", "rgb(11, 15, 42)");
+    await expect(block.locator(".hd-ghost, [data-ghost], canvas")).toHaveCount(0);
+    const farewellVideo = block.locator("video[data-hero-gameplay]");
+    await expect(farewellVideo).toHaveCount(1);
+    await expect(farewellVideo).toBeVisible();
+    expect(await farewellVideo.evaluate((node) => ({ poster: node.getAttribute("poster"), sources: [...node.querySelectorAll("source")].map((source) => source.getAttribute("src")), autoplay: node.autoplay, muted: node.muted, loop: node.loop, playsInline: node.playsInline, preload: node.preload }))).toEqual({
+      poster: "assets/media/comrade-gameplay-poster.jpg", sources: ["assets/media/comrade-gameplay.mp4"], autoplay: true, muted: true, loop: true, playsInline: true, preload: "none",
+    });
+    await expect.poll(() => farewellVideo.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} farewell loop loads` }).toBe(true);
+    await expect.poll(() => farewellVideo.evaluate((node) => node.paused), { message: `${route} farewell loop plays while on screen` }).toBe(false);
     // Comrade only ever appears as the farewell (the synced YouTube titles are the channel's own words, so they are left out).
     const elsewhere = await page.locator("main").evaluate((main) => {
       const copy = main.cloneNode(true);
@@ -306,20 +383,26 @@ test("10key Survival shows its real gameplay in the phone and the quiet Comrade 
       return copy.textContent;
     });
     expect(elsewhere, `${route} mentions Comrade outside the farewell`).not.toMatch(/comrade|동무|genosse/i);
+    // The farewell is no longer the last block: Quirky Ball, farewell, lab notes, support, footer.
     const order = await page.evaluate(() => {
       const top = (selector) => document.querySelector(selector).getBoundingClientRect().top + scrollY;
-      return [top("#player-support"), top(".home-farewell"), top(".site-footer")];
+      return [top("#quirky"), top("#comrade"), top("#lab-notes"), top("#player-support"), top(".site-footer")];
     });
-    expect(order[0]).toBeLessThan(order[1]);
-    expect(order[1]).toBeLessThan(order[2]);
+    expect([...order].sort((a, b) => a - b), `${route} section order`).toEqual(order);
+    expect(new Set(order).size).toBe(order.length);
+    expect(await page.evaluate(() => document.querySelector("#comrade").previousElementSibling.id)).toBe("quirky");
+    expect(await page.evaluate(() => document.querySelector("#comrade").nextElementSibling.id)).toBe("lab-notes");
   }
 });
 
 test("home keeps its titles heavy and the footer lockup compact", async ({ page }) => {
   await page.goto("/?lang=ko");
-  for (const title of ["#tenkey-title", "#quirky-title", "#lab-title", "#help-title"]) {
+  // Quirky Ball's title is its logo (no font weight); the farewell line is a calmer bold on the night section.
+  for (const title of ["#tenkey-title", "#lab-title", "#help-title"]) {
     expect(Number(await page.locator(title).evaluate((node) => getComputedStyle(node).fontWeight)), `${title} weight`).toBeGreaterThanOrEqual(800);
   }
+  expect(Number(await page.locator("#comrade-title").evaluate((node) => getComputedStyle(node).fontWeight)), "#comrade-title weight").toBeGreaterThanOrEqual(700);
+  expect(await page.locator("#quirky-title .hd-qb-logo").evaluate((node) => getComputedStyle(node).display)).toBe("block");
 
   const footer = await page.locator(".site-footer").evaluate((node) => {
     const rect = (selector) => node.querySelector(selector).getBoundingClientRect();
@@ -388,7 +471,153 @@ test("home desktop keeps the normal cursor over the desk hero and its screen ope
   })).toBe(true);
 });
 
-test("home reduced motion keeps a still desk, a flat screen row and paused videos", async ({ page }) => {
+// ---------- hero hand-off (setupHeroGlide): one wheel / swipe / key / in-page link in the duck scene plays the zoom calmly ----------
+// Samples scrollY every frame for `ms` milliseconds, so a test can tell an eased glide from an instant jump.
+const sampleScroll = (page, ms) => page.evaluate((duration) => new Promise((resolve) => {
+  const samples = [];
+  const start = performance.now();
+  const tick = () => {
+    const at = performance.now() - start;
+    samples.push([Math.round(at), Math.round(scrollY)]);
+    if (at >= duration) resolve(samples); else requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}), ms);
+const expectGlide = (samples, landing, label) => {
+  const values = samples.map((sample) => sample[1]);
+  expect(Math.max(...values), `${label} reaches the destination`).toBeGreaterThanOrEqual(landing - 4);
+  const distinct = new Set(values.filter((value) => value > 8 && value < landing - 8));
+  expect(distinct.size, `${label} is an eased glide, not a jump (frames in between: ${distinct.size})`).toBeGreaterThan(8);
+  for (let i = 1; i < values.length; i += 1) expect(values[i], `${label} never runs backwards`).toBeGreaterThanOrEqual(values[i - 1] - 1);
+};
+
+test("hero hand-off: one wheel notch in the duck scene glides to the 10key card, and wheeling up from the scene glides back", async ({ page, isMobile }) => {
+  test.skip(isMobile, "wheel input is a desktop gesture; the phone swipe is covered below");
+  await page.goto("/?lang=ko");
+  await page.waitForTimeout(650);
+  const landing = await glideLanding(page);
+  expect(landing, "the 10key card lies far below the desk").toBeGreaterThan(600);
+
+  // Down: a single notch plays the whole zoom, lasts at least a second, and lands the 10key card under the bar.
+  const down = sampleScroll(page, 3600);
+  await page.mouse.move(700, 450);
+  await page.mouse.wheel(0, 120);
+  const samples = await down;
+  const moving = samples.filter((sample) => sample[1] > 4 && sample[1] < landing - 4);
+  expect(moving.length, "the glide takes many frames").toBeGreaterThan(20);
+  expect(moving[moving.length - 1][0] - moving[0][0], "the glide lasts about 1.1 to 2.4 seconds").toBeGreaterThan(900);
+  expect(moving[moving.length - 1][0] - moving[0][0], "the glide lasts about 1.1 to 2.4 seconds").toBeLessThan(3200);
+  expectGlide(samples, landing, "wheel down");
+  await scrollSettlesAt(page, landing, 3);
+  await expect(page.locator("#studio")).toHaveClass(/is-entered/);
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+  expect(await page.evaluate(() => document.querySelector(".hd-tenkey-grid").getBoundingClientRect().top)).toBeLessThan(110);
+
+  // Up: from inside the scene (above the landing spot) one notch up glides back to the top, and the bar turns clear again.
+  await jumpTo(page, Math.round(landing * 0.6));
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+  const up = sampleScroll(page, 3600);
+  await page.mouse.wheel(0, -120);
+  const upSamples = await up;
+  expect(new Set(upSamples.map((sample) => sample[1]).filter((value) => value > 8 && value < landing * 0.6 - 8)).size, "wheel up is an eased glide").toBeGreaterThan(8);
+  await scrollSettlesAt(page, 0, 2);
+  await expect(page.locator("#studio")).not.toHaveClass(/is-entered/);
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
+});
+
+test("hero hand-off: keys glide the same way, window.scrollTo stays instant, and below the 10key card the page scrolls normally", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard hand-off is a desktop gesture");
+  await page.goto("/?lang=ko");
+  await page.waitForTimeout(650);
+  const landing = await glideLanding(page);
+  // scrollTo is not intercepted: it lands at once (the zoom tests rely on this).
+  await jumpTo(page, 300);
+  expect(await page.evaluate(() => Math.round(scrollY))).toBe(300);
+  await jumpTo(page, 0);
+
+  for (const [key, label] of [["ArrowDown", "arrow down"], ["PageDown", "page down"], ["Space", "space"]]) {
+    await jumpTo(page, 0);
+    await page.evaluate(() => document.activeElement?.blur());
+    const sampling = sampleScroll(page, 3400);
+    await page.keyboard.press(key);
+    expectGlide(await sampling, landing, label);
+    await scrollSettlesAt(page, landing, 3);
+    // Going up from inside the scene glides back; Shift+Space and PageUp count as "up".
+    await jumpTo(page, Math.round(landing * 0.5));
+    await page.keyboard.press(key === "Space" ? "Shift+Space" : "PageUp");
+    await scrollSettlesAt(page, 0, 2);
+  }
+
+  // Past the landing spot the glide leaves the page alone: a wheel notch is not turned into a jump to the top or anywhere else.
+  await jumpTo(page, landing + 500);
+  const intercepted = await page.evaluate(() => {
+    const wheel = new WheelEvent("wheel", { deltaY: 120, cancelable: true, bubbles: true });
+    window.dispatchEvent(wheel);
+    return wheel.defaultPrevented;
+  });
+  expect(intercepted).toBe(false);
+  expect(await page.evaluate(() => Math.round(scrollY))).toBe(landing + 500);
+});
+
+test("hero hand-off: the CRT screen and the header Games / Studio links glide too and update the URL", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the desk screen and header links are exercised with a mouse");
+  await page.goto("/?lang=ko");
+  await page.waitForTimeout(650);
+  const landing = await glideLanding(page);
+
+  // The glowing screen in the scene.
+  const toGames = sampleScroll(page, 3600);
+  await page.locator(".hd-desk-screen-link").click();
+  expectGlide(await toGames, landing, "screen link");
+  await scrollSettlesAt(page, landing, 3);
+  await expect(page).toHaveURL(/#games$/);
+
+  // Header "Studio" glides back to the top of the page; header "Games" glides down again. Both are in-page links.
+  const toStudio = sampleScroll(page, 3600);
+  await page.locator('.site-nav a[href="#studio"]').click();
+  const studioSamples = await toStudio;
+  expect(new Set(studioSamples.map((sample) => sample[1]).filter((value) => value > 8 && value < landing - 8)).size, "Studio link is an eased glide").toBeGreaterThan(8);
+  await scrollSettlesAt(page, 0, 2);
+  await expect(page).toHaveURL(/#studio$/);
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+
+  await page.waitForTimeout(500);
+  await page.locator('.site-nav a[href="#games"]').click();
+  await scrollSettlesAt(page, landing, 3);
+  await expect(page).toHaveURL(/#games$/);
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+});
+
+test("hero hand-off: a swipe up in the duck scene glides to the 10key card on a phone", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "touch swipes are a phone gesture");
+  await page.goto("/?lang=ko");
+  await page.waitForTimeout(650);
+  const landing = await glideLanding(page);
+  expect(landing).toBeGreaterThan(400);
+  const cdp = await page.context().newCDPSession(page);
+  const swipe = async (fromY, toY) => {
+    const x = 200;
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: fromY }] });
+    for (let step = 1; step <= 8; step += 1) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: fromY + ((toY - fromY) * step) / 8 }] });
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  };
+  const sampling = sampleScroll(page, 3600);
+  await swipe(600, 300);
+  expectGlide(await sampling, landing, "swipe up");
+  await scrollSettlesAt(page, landing, 3);
+  await expect(page.locator("#studio")).toHaveClass(/is-entered/);
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+
+  // A swipe down from inside the scene glides back to the duck.
+  await jumpTo(page, Math.round(landing * 0.5));
+  await swipe(300, 600);
+  await scrollSettlesAt(page, 0, 2);
+  await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+});
+
+test("home reduced motion keeps a still desk, a finished logo, no hero glide and paused videos", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=ko");
   await expect(page.locator("body")).toHaveAttribute("data-hd-motion", "reduce");
@@ -410,16 +639,29 @@ test("home reduced motion keeps a still desk, a flat screen row and paused video
   await page.waitForTimeout(180);
   await expect(page.locator(".youtube-card canvas")).toHaveCount(0);
 
-  // Quirky Ball: the ten screens lie flat in a scrollable row instead of the 3D stack.
-  const shots = await page.locator("[data-shot]").evaluateAll((nodes) => nodes.map((node) => ({ position: getComputedStyle(node).position, transform: getComputedStyle(node).transform, opacity: getComputedStyle(node).opacity })));
-  expect(shots).toHaveLength(10);
-  for (const shot of shots) expect(shot).toEqual({ position: "static", transform: "none", opacity: "1" });
-  expect(await page.locator("[data-stack-list]").evaluate((list) => getComputedStyle(list).overflowX)).toBe("auto");
+  // Quirky Ball: the logo is simply there, finished, with no drop-in or idle animation on any letter.
+  await expect(page.locator("[data-qb-logo]")).toHaveClass(/is-in/);
+  const letters = await page.locator(".hd-qb-piece").evaluateAll((nodes) => nodes.map((node) => ({ opacity: getComputedStyle(node).opacity, animation: getComputedStyle(node).animationName })));
+  expect(letters).toHaveLength(13);
+  for (const letter of letters) expect(letter).toEqual({ opacity: "1", animation: "none" });
 
-  // The phone video never starts by itself.
-  await page.locator("[data-hero-gameplay]").scrollIntoViewIfNeeded();
-  await page.waitForTimeout(250);
-  await expect.poll(() => page.locator("[data-hero-gameplay]").evaluate((video) => ({ autoplay: video.autoplay, paused: video.paused }))).toEqual({ autoplay: false, paused: true });
+  // The hero hand-off does not take over the wheel, keys or links: the page scrolls the browser's own way.
+  const intercepted = await page.evaluate(() => {
+    const wheel = new WheelEvent("wheel", { deltaY: 120, cancelable: true, bubbles: true });
+    window.dispatchEvent(wheel);
+    const key = new KeyboardEvent("keydown", { key: "ArrowDown", cancelable: true, bubbles: true });
+    document.body.dispatchEvent(key);
+    return { wheel: wheel.defaultPrevented, key: key.defaultPrevented };
+  });
+  expect(intercepted).toEqual({ wheel: false, key: false });
+
+  // None of the three phone videos starts by itself.
+  for (const selector of ["#games", "#quirky", "#comrade"]) {
+    const video = page.locator(`${selector} [data-hero-gameplay]`);
+    await video.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(250);
+    await expect.poll(() => video.evaluate((node) => ({ autoplay: node.autoplay, paused: node.paused })), { message: `${selector} loop stays still` }).toEqual({ autoplay: false, paused: true });
+  }
 });
 
 test("home shows the console min_version and keeps 2.0.0 when the lookup fails", async ({ page }) => {
@@ -444,16 +686,21 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
       const title = rect("#tenkey-title");
       const glass = rect(".hd-glass");
       const phone = rect(".hd-phone-shell");
-      const bodyFonts = [".hd-lede", ".hd-quirky-body .hd-lede"]
+      const bodyFonts = [".hd-lede", ".hd-quirky-copy .hd-lede"]
         .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
-      const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link")]
+      const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link, .store-button")]
         .filter((node) => getComputedStyle(node).display !== "none")
         .map((node) => node.getBoundingClientRect().height);
       const support = rect("#player-support");
+      const quirky = rect("#quirky");
       const farewell = rect(".home-farewell");
+      const lab = rect("#lab-notes");
       const footer = rect(".site-footer");
+      // On a phone the Quirky Ball column reads: eyebrow, logo, lede, phone, store buttons, link, community numbers.
+      const flow = ["#quirky .hd-eyebrow-row", "#quirky .hd-qb-title", "#quirky .hd-lede", "#quirky .hd-qb-phone", "#quirky .project-stores", "#quirky .hd-keycap-cta", "#quirky .hd-research"]
+        .map((selector) => { const box = rect(selector); return { selector, top: box.top + scrollY, bottom: box.bottom + scrollY, left: box.left, right: box.right }; });
       const copyClipped = [...document.querySelectorAll(".hd-glass *, .hd-quirky-copy *")]
-        .filter((node) => node.scrollWidth > node.clientWidth + 1 && getComputedStyle(node).display !== "inline" && !node.closest(".counter-digits, .counter-accessible, .hd-research-total strong"))
+        .filter((node) => node.scrollWidth > node.clientWidth + 1 && getComputedStyle(node).display !== "inline" && !node.closest(".counter-digits, .counter-accessible, .hd-research-total strong, .hd-visually-hidden"))
         .map((node) => node.className || node.tagName);
       return {
         titleBottom: title.bottom,
@@ -462,8 +709,10 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodyFonts,
         controlHeights,
-        afterSupport: farewell.top - support.bottom,
-        afterFarewell: footer.top - farewell.bottom,
+        afterQuirky: farewell.top - quirky.bottom,
+        afterFarewell: lab.top - farewell.bottom,
+        afterSupport: footer.top - support.bottom,
+        flow,
         supportHeight: support.height,
         copyClipped,
         homeAssets: [...document.querySelectorAll('link[href*="home"], script[src*="home"], link[href*="studio-home"], script[src*="studio-home"]')].map((node) => node.href || node.src),
@@ -481,10 +730,16 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
     expect(layout.controlHeights).not.toHaveLength(0);
     expect(Math.min(...layout.controlHeights)).toBeGreaterThanOrEqual(44);
     expect(layout.supportHeight).toBeGreaterThan(0);
-    expect(layout.afterSupport).toBeGreaterThanOrEqual(0);
-    expect(layout.afterSupport).toBeLessThanOrEqual(8);
-    expect(layout.afterFarewell).toBeGreaterThanOrEqual(0);
-    expect(layout.afterFarewell).toBeLessThanOrEqual(8);
+    // Sections meet edge to edge: Quirky Ball, the Comrade farewell, lab notes, then support and the footer.
+    for (const gap of ["afterQuirky", "afterFarewell", "afterSupport"]) {
+      expect(layout[gap], `${route} ${gap}`).toBeGreaterThanOrEqual(0);
+      expect(layout[gap], `${route} ${gap}`).toBeLessThanOrEqual(8);
+    }
+    for (let i = 1; i < layout.flow.length; i += 1) expect(layout.flow[i].top, `${route} ${layout.flow[i].selector} follows ${layout.flow[i - 1].selector}`).toBeGreaterThanOrEqual(layout.flow[i - 1].bottom - 1);
+    for (const box of layout.flow) {
+      expect(box.left, `${route} ${box.selector} left`).toBeGreaterThanOrEqual(0);
+      expect(box.right, `${route} ${box.selector} right`).toBeLessThanOrEqual(390);
+    }
     // Cache-busted home assets only; the quirky-ball/ stylesheet and script are not loaded here.
     expect(layout.homeAssets.map((asset) => new URL(asset).pathname.split("/").pop()).sort()).toEqual(["home-desk.css", "home-desk.js", "home.css", "home.js"]);
     for (const asset of layout.homeAssets) expect(new URL(asset).search.length, `${asset} carries a cache-busting version`).toBeGreaterThan(1);
@@ -538,26 +793,34 @@ test("home carries no Quirky Ball playable demo and requests no game files", asy
   expect(requests).toEqual([]);
 });
 
-test("home plays the 10key Survival phone video only while it is on screen", async ({ page }) => {
+test("home plays each phone video (10key Survival, Quirky Ball, Comrade farewell) only while it is on screen", async ({ page }) => {
   await page.goto("/?lang=ko");
-  const video = page.locator("[data-hero-gameplay]");
-  await expect(video).toHaveJSProperty("paused", true);
+  for (const selector of ["#games", "#quirky", "#comrade"]) {
+    const video = page.locator(`${selector} [data-hero-gameplay]`);
+    await expect(video).toHaveJSProperty("paused", true);
 
-  await video.scrollIntoViewIfNeeded();
-  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
+    await video.scrollIntoViewIfNeeded();
+    await expect.poll(() => video.evaluate((node) => node.paused), { message: `${selector} starts when it appears` }).toBe(false);
 
-  await jumpTo(page, 0);
-  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(true);
+    await jumpTo(page, 0);
+    await expect.poll(() => video.evaluate((node) => node.paused), { message: `${selector} stops when it leaves` }).toBe(true);
 
-  await video.scrollIntoViewIfNeeded();
-  await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
+    await video.scrollIntoViewIfNeeded();
+    await expect.poll(() => video.evaluate((node) => node.paused), { message: `${selector} resumes` }).toBe(false);
+    await jumpTo(page, 0);
+  }
 });
 
 test("home keycaps sink while pressed; pressing a keypad key cracks it and clears the hint", async ({ page, isMobile }) => {
   test.skip(isMobile, "the decorative keypad sits behind the card on a phone");
   await page.goto("/?lang=ko");
   await page.locator("#games").scrollIntoViewIfNeeded();
-  const cta = page.locator(".hd-keycap-cta");
+  // The Quirky Ball link is the same yellow keycap, labelled like the 10key one, and sinks the same way.
+  const quirkyCta = page.locator("#quirky .hd-keycap-cta");
+  await expect(quirkyCta).toHaveAttribute("href", "quirky-ball/?lang=ko");
+  await expect(quirkyCta).toHaveAttribute("data-pressable", "");
+  await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText(await page.locator("#games .hd-keycap-face").innerText());
+  const cta = page.locator("#games .hd-keycap-cta");
   const ctaBox = await cta.boundingBox();
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y + ctaBox.height / 2);
   await page.mouse.down();
@@ -590,16 +853,29 @@ test("home keycaps sink while pressed; pressing a keypad key cracks it and clear
   await expect(hint).toHaveClass(/is-hidden/);
   await expect(key).toHaveAttribute("data-state", String(target.state + 1));
   await page.mouse.up();
+
+  // The Quirky Ball keycap sinks while pressed and releases when the pointer leaves, without following its link.
+  await quirkyCta.scrollIntoViewIfNeeded();
+  const quirkyBox = await quirkyCta.boundingBox();
+  await page.mouse.move(quirkyBox.x + quirkyBox.width / 2, quirkyBox.y + quirkyBox.height / 2);
+  await page.mouse.down();
+  await expect(quirkyCta).toHaveClass(/is-down/);
+  await page.mouse.move(quirkyBox.x + quirkyBox.width / 2, quirkyBox.y - 60);
+  await expect(quirkyCta).not.toHaveClass(/is-down/);
+  await page.mouse.up();
+  expect(page.url()).not.toContain("quirky-ball");
 });
 
 test("primary navigation shows a readable hover tint without motion", async ({ page, isMobile }) => {
   test.skip(isMobile, "mouse hover is covered by the desktop project");
   await page.goto("/?lang=ko");
   const luminance = (rgb) => { const [r, g, b] = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
-  // Over the night desk and over the paper page the pill changes tone; both must keep the hover readable.
-  for (const [scrollTop, theme, backdrop] of [[0, "night", [11, 15, 42]], [2400, "paper", [251, 251, 253]]]) {
+  // Over the clear bar on the night desk and over the dark House Duck bar further down, the hover must stay readable.
+  for (const [scrollTop, theme, overHero, backdrop] of [[0, "night", true, [11, 15, 42]], [2400, "paper", false, [17, 20, 25]]]) {
     await jumpTo(page, scrollTop);
     await expect(page.locator("body")).toHaveAttribute("data-hd-theme", theme);
+    if (overHero) await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
+    else await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
     for (const link of await page.locator(".site-nav > a").all()) {
       const before = await link.evaluate((node) => getComputedStyle(node).backgroundColor);
       await link.hover();
@@ -695,39 +971,93 @@ test("all Quirky Ball locales keep a 320px viewport free of horizontal scroll", 
   }
 });
 
-test("Quirky Ball zone keeps custom light localized Play badges next to its copy", async ({ page }) => {
-  for (const [route, lang] of [["/?lang=ko", "ko"], ["/index_en.html?lang=en", "en"], ["/index_de.html?lang=de", "de"], ["/index_ja.html?lang=ja", "ja"]]) {
+test("Quirky Ball zone shows two matching HTML store buttons, localized, beside its copy", async ({ page }) => {
+  const stores = {
+    "/?lang=ko": { smallFirst: false, google: { label: "Google Play에서 다운로드", small: "다운로드" }, apple: { label: "App Store에서 다운로드", small: "다운로드" } },
+    "/index_en.html?lang=en": { smallFirst: true, google: { label: "Get it on Google Play", small: "GET IT ON" }, apple: { label: "Download on the App Store", small: "Download on the" } },
+    "/index_de.html?lang=de": { smallFirst: true, google: { label: "Jetzt bei Google Play", small: "JETZT BEI" }, apple: { label: "Im App Store laden", small: "Laden im" } },
+    "/index_ja.html?lang=ja": { smallFirst: false, google: { label: "Google Play で手に入れよう", small: "で手に入れよう" }, apple: { label: "App Storeからダウンロード", small: "からダウンロード" } },
+  };
+  for (const [route, expected] of Object.entries(stores)) {
     await page.goto(route);
     const zone = page.locator('[data-project="quirky-ball"]');
     await zone.scrollIntoViewIfNeeded();
     await expect(page.locator(".hero-hook, .studio-signature")).toHaveCount(0);
     await expect(zone.locator(".release-actions a")).toHaveCount(2);
-    await expect(zone.locator(".app-store-badge")).not.toHaveAttribute("aria-disabled", "true");
-    await expect(zone.locator(".app-store-badge")).toHaveAttribute("href", "https://apps.apple.com/app/id6797996754");
+    await expect(zone.locator(".release-actions a.store-button")).toHaveCount(2);
     await expect(page.locator(".coming-soon-bubble")).toHaveCount(0);
-    const badge = zone.locator(".google-play-badge");
-    await expect(badge).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
-    await expect(badge.locator("img")).toHaveAttribute("src", "assets/store-badges/google-play-" + lang + "-light.svg");
-    await expect(badge.locator("img")).toBeVisible();
-    const metrics = await badge.evaluate(node => {
-      const img = node.querySelector("img");
-      const copy = node.closest(".hd-quirky-copy");
-      const box = img.getBoundingClientRect();
-      // Store-badge rules want clear space of a quarter of the badge height on every side: measure the distance from the badge image
-      // to the nearest thing around it (the App Store badge beside it, the disclosure below, the paragraph above).
-      const clearSpaceTo = (other) => {
-        const rect = other.getBoundingClientRect();
-        const dx = Math.max(rect.left - box.right, box.left - rect.right, 0);
-        const dy = Math.max(rect.top - box.bottom, box.top - rect.bottom, 0);
-        return Math.hypot(dx, dy);
+    const apple = zone.locator("a.store-button.app-store-badge");
+    const google = zone.locator("a.store-button.google-play-badge");
+    await expect(apple).not.toHaveAttribute("aria-disabled", "true");
+    await expect(apple).toHaveAttribute("href", "https://apps.apple.com/app/id6797996754");
+    await expect(google).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.quirkyball.app");
+    await expect(google).toHaveAttribute("aria-label", expected.google.label);
+    await expect(apple).toHaveAttribute("aria-label", expected.apple.label);
+    // Both are plain HTML buttons set in the site's type: an inline Play prism and an App Store mark, no bitmap badge artwork.
+    await expect(google.locator("svg.store-icon path")).toHaveCount(4);
+    await expect(apple.locator("svg.store-icon")).toHaveCount(1);
+    await expect(zone.locator(".release-actions img")).toHaveCount(0);
+    await expect(google.locator(".store-copy strong")).toHaveText("Google Play");
+    await expect(apple.locator(".store-copy strong")).toHaveText("App Store");
+    await expect(google.locator(".store-copy small")).toHaveText(expected.google.small);
+    await expect(apple.locator(".store-copy small")).toHaveText(expected.apple.small);
+
+    const metrics = await zone.evaluate((node, smallFirst) => {
+      const box = (element) => { const rect = element.getBoundingClientRect(); return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height }; };
+      const google = box(node.querySelector(".google-play-badge"));
+      const apple = box(node.querySelector(".app-store-badge"));
+      const copy = node.querySelector(".hd-quirky-copy");
+      const order = (button) => {
+        const small = button.querySelector("small").getBoundingClientRect();
+        const strong = button.querySelector("strong").getBoundingClientRect();
+        return small.top < strong.top;
       };
-      const neighbours = [copy.querySelector(".app-store-badge"), copy.querySelector(".store-disclosure"), copy.querySelector(".hd-quirky-body .hd-lede")];
-      return { loaded: img.complete && img.naturalWidth > 0, height: box.height, clearSpace: neighbours.map(clearSpaceTo), left: box.left, aboveLeft: copy.querySelector("h2").getBoundingClientRect().left, belowLeft: copy.querySelector(".store-disclosure").getBoundingClientRect().left };
-    });
-    expect(metrics.loaded).toBe(true);
-    expect(Math.abs(metrics.left - metrics.aboveLeft)).toBeLessThan(1);
-    expect(Math.abs(metrics.left - metrics.belowLeft)).toBeLessThan(1);
-    expect(metrics.height).toBeGreaterThanOrEqual(28);
-    expect(Math.min(...metrics.clearSpace), `${route} Google Play badge clear space (App Store badge, disclosure, paragraph)`).toBeGreaterThanOrEqual(metrics.height / 4);
+      return {
+        google, apple,
+        disclosure: box(copy.querySelector(".store-disclosure")),
+        lede: box(copy.querySelector(".hd-lede")),
+        cta: box(copy.querySelector(".hd-keycap-cta")),
+        smallFirst: { google: order(node.querySelector(".google-play-badge")), apple: order(node.querySelector(".app-store-badge")) },
+        expectedSmallFirst: smallFirst,
+        fonts: [...node.querySelectorAll(".store-copy strong")].map((strong) => getComputedStyle(strong).fontFamily),
+        clipped: [...node.querySelectorAll(".store-button, .store-copy")].filter((item) => item.scrollWidth > item.clientWidth + 1).length,
+      };
+    }, expected.smallFirst);
+    // Matching pair: same height and baseline row, a clear gap between them, whole inside the copy column and not squeezed.
+    expect(metrics.google.height).toBe(metrics.apple.height);
+    expect(Math.abs(metrics.google.top - metrics.apple.top)).toBeLessThan(1);
+    expect(metrics.google.height, `${route} store button height`).toBeGreaterThanOrEqual(44);
+    expect(metrics.apple.left - metrics.google.right, `${route} gap between the two buttons`).toBeGreaterThanOrEqual(8);
+    expect(metrics.clipped, `${route} store text is not clipped`).toBe(0);
+    expect(metrics.smallFirst, `${route} small line position`).toEqual({ google: metrics.expectedSmallFirst, apple: metrics.expectedSmallFirst });
+    expect(metrics.fonts[0], `${route} both store names share one typeface`).toBe(metrics.fonts[1]);
+    // Left edge lines up with the disclosure below; the lede sits above, the keycap link below.
+    expect(Math.abs(metrics.google.left - metrics.disclosure.left)).toBeLessThan(1);
+    expect(metrics.google.top, `${route} buttons sit under the lede`).toBeGreaterThan(metrics.lede.bottom);
+    expect(metrics.disclosure.top, `${route} disclosure sits under the buttons`).toBeGreaterThanOrEqual(metrics.google.bottom);
+    expect(metrics.cta.top, `${route} keycap link sits under the disclosure`).toBeGreaterThanOrEqual(metrics.disclosure.bottom);
   }
+});
+
+test("home header: dark House Duck bar, uppercase tracked nav, red dot before YouTube", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the nav collapses into the menu button on a phone");
+  await page.goto("/?lang=ko");
+  await jumpTo(page, 2400);
+  await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
+  await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(17, 20, 25, 0.97)");
+  const links = await page.locator(".site-nav > a").evaluateAll((nodes) => nodes.map((node) => {
+    const style = getComputedStyle(node);
+    const dot = getComputedStyle(node, "::before");
+    return { text: node.textContent, transform: style.textTransform, spacing: parseFloat(style.letterSpacing), dot: { content: dot.content, background: dot.backgroundColor, radius: dot.borderRadius, width: dot.width } };
+  }));
+  expect(links.map((link) => link.text)).toEqual(["YouTube", "Games", "Studio", "About", "Support"]);
+  for (const link of links) {
+    expect(link.transform, `${link.text} is uppercase`).toBe("uppercase");
+    expect(link.spacing, `${link.text} is tracked`).toBeGreaterThan(1);
+  }
+  expect(links[0].dot.content).toBe('""');
+  expect(links[0].dot.radius).toBe("50%");
+  expect(links[0].dot.width).toBe("7px");
+  expect(links[0].dot.background).not.toBe("rgba(0, 0, 0, 0)");
+  for (const link of links.slice(1)) expect(link.dot.content, `${link.text} has no dot`).not.toBe('""');
 });

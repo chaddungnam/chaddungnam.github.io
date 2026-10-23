@@ -66,7 +66,7 @@ assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke=
 
 // ---------------------------------------------------------------------------------------------
 // The House Duck home (rebuilt 2026-10-23): night desk hero -> 10key Survival -> Quirky Ball ->
-// lab notes -> player support -> Comrade farewell. assets/studio-home.* now only serve quirky-ball/.
+// Comrade farewell -> lab notes -> player support. assets/studio-home.* now only serve quirky-ball/.
 // ---------------------------------------------------------------------------------------------
 function webpSize(file) {
   const data = fs.readFileSync(file);
@@ -81,11 +81,13 @@ const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const sectionOf = (html, id) => (html.match(new RegExp(`<section\\b[^>]*\\bid="${id}"[\\s\\S]*?</section>`)) || [""])[0];
 
 const homeLocales = {
-  "index.html": { lang: "ko", self: "./?lang=ko", about: "about/", support: "support/", videoGroup: "딸깍 서바이벌 실제 플레이 영상", videoLabel: "딸깍 서바이벌 실제 플레이", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계" },
-  "index_en.html": { lang: "en", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoGroup: "10key Survival gameplay video", videoLabel: "10key Survival gameplay", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World" },
-  "index_de.html": { lang: "de", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoGroup: "10key Survival Gameplay-Video", videoLabel: "10key Survival Gameplay", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt" },
-  "index_ja.html": { lang: "ja", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoGroup: "10key Survivalのプレイ映像", videoLabel: "10key Survivalのプレイ", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World" },
+  "index.html": { lang: "ko", tenkeyHref: "10key/", more: "자세히 보기", self: "./?lang=ko", about: "about/", support: "support/", videoGroup: "딸깍 서바이벌 실제 플레이 영상", videoLabel: "딸깍 서바이벌 실제 플레이", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계", smallFirst: false, qbGroup: "Quirky Ball 실제 플레이 영상", qbVideo: "Quirky Ball 2.0 실제 플레이", comradeGroup: "동무와 멋진신세계 실제 플레이 영상", comradeVideo: "동무와 멋진신세계 실제 플레이" },
+  "index_en.html": { lang: "en", tenkeyHref: "10key/index_en.html", more: "Learn more", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoGroup: "10key Survival gameplay video", videoLabel: "10key Survival gameplay", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: true, qbGroup: "Quirky Ball gameplay video", qbVideo: "Quirky Ball 2.0 gameplay", comradeGroup: "Comrade and the Brave New World gameplay video", comradeVideo: "Comrade and the Brave New World gameplay" },
+  "index_de.html": { lang: "de", tenkeyHref: "10key/index_en.html", more: "Mehr erfahren", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoGroup: "10key Survival Gameplay-Video", videoLabel: "10key Survival Gameplay", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt", smallFirst: true, qbGroup: "Quirky Ball Gameplay-Video", qbVideo: "Quirky Ball 2.0 Gameplay", comradeGroup: "Genosse und die schöne neue Welt – Gameplay-Video", comradeVideo: "Genosse und die schöne neue Welt – Gameplay" },
+  "index_ja.html": { lang: "ja", tenkeyHref: "10key/index_en.html", more: "詳しく見る", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoGroup: "10key Survivalのプレイ映像", videoLabel: "10key Survivalのプレイ", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: false, qbGroup: "Quirky Ballのプレイ映像", qbVideo: "Quirky Ball 2.0のプレイ", comradeGroup: "Comrade and the Brave New Worldのプレイ映像", comradeVideo: "Comrade and the Brave New Worldのプレイ" },
 };
+// The Quirky Ball logo is cut into these pieces (assets/media/home/qb-logo/<piece>.webp); home.js lands them one by one.
+const QB_PIECES = ["q", "u", "i", "r", "k", "y", "b", "a", "l1", "l2", "dot", "hex", "ball"];
 
 // Home media: the desk scene layers drawn on the hero canvas, the 10key loop and the social image.
 const homeMedia = {
@@ -94,6 +96,7 @@ const homeMedia = {
   "assets/media/tenkey-gameplay-poster.webp": 150_000,
   "assets/media/tenkey-og.jpg": 300_000,
   "assets/media/comrade-gameplay-poster.jpg": 100_000,
+  "assets/media/comrade-gameplay.mp4": 3_500_000,
   "assets/media/home/desk-landscape.png": 100_000,
   "assets/media/home/desk-portrait.png": 100_000,
   "assets/media/home/duck-landscape.png": 50_000,
@@ -213,18 +216,19 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   const l = homeLocales[file];
   for (const text of copy) assert.ok(html.includes(text), `${file} must include ${text}`);
 
-  // --- section order: hero, 10key Survival first, Quirky Ball (with its community block), lab notes, support, farewell ---
+  // --- section order: hero, 10key Survival first, Quirky Ball (with its community block), the Comrade farewell right under it, lab notes, support ---
   const hero = sectionOf(html, "studio");
   const tenkey = sectionOf(html, "games");
   const quirky = sectionOf(html, "quirky");
   const lab = sectionOf(html, "lab-notes");
   const support = sectionOf(html, "player-support");
-  const farewell = (html.match(/<section class="hd-farewell home-farewell"[\s\S]*?<\/section>/) || [""])[0];
+  const farewell = sectionOf(html, "comrade");
   for (const [name, block] of Object.entries({ hero, tenkey, quirky, lab, support, farewell })) assert.ok(block, `${file} needs its ${name} section`);
-  const positions = ['id="studio"', 'id="games"', 'id="quirky"', 'id="lab-notes"', 'id="player-support"', 'class="hd-farewell home-farewell"', "</main>"].map((token) => html.indexOf(token));
-  assert.ok(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1])), `${file} sections read hero, 10key Survival, Quirky Ball, lab notes, support, farewell`);
+  const positions = ['id="studio"', 'id="games"', 'id="quirky"', 'id="comrade"', 'id="lab-notes"', 'id="player-support"', "</main>", "<footer"].map((token) => html.indexOf(token));
+  assert.ok(positions.every((position, index) => position >= 0 && (index === 0 || position > positions[index - 1])), `${file} sections read hero, 10key Survival, Quirky Ball, Comrade farewell, lab notes, support, footer`);
   assert.equal((html.match(/class="hd-farewell home-farewell"/g) || []).length, 1, `${file} needs one quiet Comrade farewell`);
-  assert.ok(html.indexOf('class="hd-farewell home-farewell"') < html.indexOf("</main>") && html.indexOf("</main>") < html.indexOf("<footer"), `${file} farewell is the last block before the footer`);
+  assert.equal(html.slice(html.indexOf(quirky) + quirky.length, html.indexOf(farewell)).trim(), "", `${file} the Comrade farewell sits directly after Quirky Ball, not at the end of the page`);
+  assert.equal(html.slice(html.indexOf(farewell) + farewell.length, html.indexOf(lab)).trim(), "", `${file} lab notes follow the Comrade farewell`);
 
   // --- hero: the pixel desk scene, no overlay copy, the h1 is for search and screen readers ---
   assert.match(hero, /^<section class="hd-hero" id="studio" data-theme="night" aria-labelledby="studio-title">/, `${file} night hero`);
@@ -241,7 +245,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(tenkey, /<span class="hd-chip hd-chip-status">[^<]+<\/span>/, `${file} shows a release status chip`);
   assert.ok(tenkey.includes(`hd-chip hd-chip-status">${copy[2]}<`), `${file} status chip says ${copy[2]}`);
   assert.deepEqual([...tenkey.matchAll(/<li class="hd-chip">([^<]+)<\/li>/g)].map((match) => match[1]).slice(0, 2), ["iOS", "Android"], `${file} names both platforms`);
-  assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), ['<a class="hd-keycap-cta" href="10key/" data-pressable>'], `${file} one pressable keycap link to the 10key page`);
+  assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [`<a class="hd-keycap-cta" href="${l.tenkeyHref}" data-pressable>`], `${file} one pressable keycap link to the 10key page (Korean page in ko, the English page in en/de/ja)`);
+  assert.ok(tenkey.includes(`<span class="hd-keycap-face">${l.more}</span>`), `${file} 10key keycap is labelled ${l.more}`);
   assert.match(tenkey, /<p class="hd-disclosure">[^<]+<\/p>/, `${file} discloses the paid model`);
   assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop in the 10key phone`);
   const video = tenkey.match(/<video\b[^>]*>/)[0];
@@ -254,33 +259,61 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.doesNotMatch(hero + tenkey, /play\.google\.com|apps\.apple\.com|google-play-badge|app-store-badge/, `${file} 10key Survival has no store link before release`);
   assert.doesNotMatch(tenkey, /Quirky/, `${file} the 10key Survival section does not mention Quirky Ball`);
 
-  // --- Quirky Ball: the only released game, store badges, live version, ten real screens, community block ---
+  // --- Quirky Ball: the only released game; its own logo cut into letters, matching store buttons, keycap link, real play loop, community block ---
   assert.match(quirky, /^<section class="hd-quirky" id="quirky" data-theme="paper" aria-labelledby="quirky-title" data-project="quirky-ball">/, `${file} Quirky Ball section`);
   assert.equal((html.match(/data-project="/g) || []).length, 1, `${file} only Quirky Ball is a data-project zone`);
   assert.doesNotMatch(html, /data-project="(?:hexaworld1984|tenkey-survival)"|hexaworld1984\//, `${file} must not show or link the dropped Comrade project`);
   assert.ok(html.indexOf('id="games"') < html.indexOf('id="quirky"'), `${file} 10key Survival comes before Quirky Ball`);
-  assert.match(quirky, /<h2 class="hd-title" id="quirky-title">Quirky Ball<\/h2>/, `${file} Quirky Ball title`);
   assert.match(quirky, /<span data-live-version>2\.0\.0<\/span>/, `${file} shows the 2.0.0 fallback until the console version arrives`);
   assert.equal((html.match(/data-live-version/g) || []).length, 1, `${file} one live version hook`);
-  assert.match(quirky, new RegExp(`<a class="google-play-badge" href="https://play\\.google\\.com/store/apps/details\\?id=com\\.quirkyball\\.app"><img src="assets/store-badges/google-play-${l.lang}-light\\.svg" width="182" height="54" alt="[^"]+">`), `${file} localized Google Play badge`);
-  assert.ok(fs.existsSync(path.join(root, `assets/store-badges/google-play-${l.lang}-light.svg`)), `${file} badge image exists`);
-  assert.match(quirky, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store links to the released iOS app`);
-  assert.equal((quirky.match(/class="(?:google-play|app-store)-badge"/g) || []).length, 2, `${file} exactly the two store badges`);
-  assert.match(quirky, /<p class="store-disclosure">[^<]+<\/p>/, `${file} discloses ads and purchases`);
-  assert.ok(quirky.includes(`<a class="hd-arrow-link" href="quirky-ball/?lang=${l.lang}">`), `${file} links the Quirky Ball page in its own language`);
-  const shots = [...quirky.matchAll(/<figure class="hd-shot" role="listitem" data-shot data-caption="([^"]+)"><img src="(quirky-ball\/v2\/shot-(\d\d)-600\.webp)" width="600" height="1298" alt="([^"]+)" loading="(eager|lazy)" decoding="async"><\/figure>/g)];
-  assert.deepEqual(shots.map((shot) => shot[3]), ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"], `${file} stack shows the ten 2.0 store screens in order`);
-  assert.deepEqual(shots.map((shot) => shot[5]), ["eager", ...Array(9).fill("lazy")], `${file} only the first screen loads eagerly`);
-  assert.equal(new Set(shots.map((shot) => shot[1])).size, 10, `${file} every screen has its own caption`);
-  for (const shot of shots) {
-    assert.ok(fs.existsSync(path.join(root, shot[2])), `${file}: ${shot[2]} must exist`);
-    assert.deepEqual(webpSize(path.join(root, shot[2])), { width: 600, height: 1298 }, `${file}: ${shot[2]} must match its declared 600x1298 so the stack keeps its proportions`);
-    assert.ok(fs.statSync(path.join(root, shot[2])).size <= 120_000, `${shot[2]} must stay a compressed display-size WebP`);
-    assert.ok(shot[4].includes(shot[1]), `${file}: alt text of ${shot[2]} names its caption`);
+
+  // the title is the game's logo: a hidden text name for search and screen readers, and 13 decorative letter pieces animated in by home.js
+  const qbTitle = (quirky.match(/<h2 class="hd-qb-title" id="quirky-title">[\s\S]*?<\/h2>/) || [""])[0];
+  assert.ok(qbTitle, `${file} Quirky Ball title is an h2.hd-qb-title#quirky-title`);
+  assert.match(qbTitle, /^<h2 class="hd-qb-title" id="quirky-title"><span class="hd-visually-hidden">Quirky Ball<\/span><span class="hd-qb-logo" data-qb-logo aria-hidden="true">/, `${file} logo title keeps a visually hidden "Quirky Ball" and an aria-hidden logo`);
+  const pieces = [...qbTitle.matchAll(/<img class="hd-qb-piece" data-piece="(\w+)" src="(assets\/media\/home\/qb-logo\/(\w+)\.webp)" alt="" style="--l:([\d.]+)%;--t:([\d.]+)%;--w:([\d.]+)%;--i:(\d+)">/g)];
+  assert.deepEqual(pieces.map((piece) => piece[1]), QB_PIECES, `${file} logo is cut into ${QB_PIECES.join(", ")}`);
+  assert.equal((qbTitle.match(/<img\b/g) || []).length, QB_PIECES.length, `${file} the logo holds only its letter pieces`);
+  for (const piece of pieces) {
+    assert.equal(piece[3], piece[1], `${file} piece ${piece[1]} points at its own file`);
+    assert.ok(fs.existsSync(path.join(root, piece[2])), `${file}: ${piece[2]} must exist`);
+    assert.ok(fs.statSync(path.join(root, piece[2])).size <= 20_000, `${piece[2]} must stay a small letter sprite`);
+    assert.ok(Number(piece[4]) >= 0 && Number(piece[5]) >= 0 && Number(piece[4]) + Number(piece[6]) <= 100.5, `${file} piece ${piece[1]} sits inside the logo box`);
   }
-  assert.match(quirky, /data-stack-list role="list" aria-label="[^"]+"/, `${file} stack is a labelled list`);
-  assert.deepEqual([...quirky.matchAll(/data-stack-index>([^<]+)</g)].map((match) => match[1]), ["01 / 10", "01 / 10"], `${file} counter starts at 01 / 10`);
-  assert.deepEqual([...quirky.matchAll(/data-stack-caption>([^<]+)</g)].map((match) => match[1]), [shots[0][1], shots[0][1]], `${file} caption starts with the first screen`);
+  assert.ok(new Set(pieces.map((piece) => piece[2])).size === QB_PIECES.length, `${file} every piece is its own image`);
+  assert.doesNotMatch(quirky, /hd-shot|data-stack|data-shot|hd-stack|data-caption|01 \/ 10/, `${file} the ten-screenshot 3D stack, its captions and counter are gone`);
+  assert.doesNotMatch(quirky, /quirky-ball\/v2\/shot-/, `${file} Quirky Ball section shows no store screenshots`);
+  assert.doesNotMatch(quirky, /hd-arrow-link|↗/, `${file} Quirky Ball section no longer uses the arrow link`);
+
+  // store buttons: two matching HTML buttons set in the site's type (no Google Play <img> artwork any more)
+  const storeButtons = [...quirky.matchAll(/<a class="store-button (google-play|app-store)-badge" href="([^"]+)" aria-label="([^"]+)">([\s\S]*?)<\/a>/g)];
+  assert.deepEqual(storeButtons.map((button) => button[1]), ["google-play", "app-store"], `${file} Google Play then App Store button`);
+  assert.equal((quirky.match(/class="store-button /g) || []).length, 2, `${file} exactly the two store buttons`);
+  assert.equal((quirky.match(/class="(?:google-play|app-store)-badge"/g) || []).length, 0, `${file} no unmatched legacy badge anchors`);
+  assert.deepEqual(storeButtons.map((button) => button[2]), ["https://play.google.com/store/apps/details?id=com.quirkyball.app", "https://apps.apple.com/app/id6797996754"], `${file} stores link to the released Android and iOS apps`);
+  for (const [index, name] of ["Google Play", "App Store"].entries()) {
+    const [, , , label, inner] = storeButtons[index];
+    assert.ok(label.trim() && label.includes(name), `${file} ${name} button has a localized accessible name that includes ${name}`);
+    assert.match(inner, /^<svg class="store-icon(?: app-store-icon)?" viewBox="[^"]+" aria-hidden="true">[\s\S]*<\/svg><span class="store-copy">(?:<strong>[^<]+<\/strong><small>[^<]+<\/small>|<small>[^<]+<\/small><strong>[^<]+<\/strong>)<\/span>$/, `${file} ${name} button is an inline icon plus a store-copy label`);
+    assert.equal((inner.match(/<strong>([^<]+)<\/strong>/) || [])[1], name, `${file} ${name} button names the store in <strong>`);
+    assert.ok(inner.indexOf("<small>") < inner.indexOf("<strong>") === l.smallFirst, `${file} ${name} button puts its small line ${l.smallFirst ? "first" : "second"}`);
+    assert.doesNotMatch(inner, /<img\b/, `${file} ${name} button draws no bitmap badge`);
+  }
+  assert.match(quirky, /<p class="store-disclosure">[^<]+<\/p>/, `${file} discloses ads and purchases`);
+
+  // yellow keycap CTA to the game page, labelled like the 10key one
+  assert.ok(quirky.includes(`<a class="hd-keycap-cta" href="quirky-ball/?lang=${l.lang}" data-pressable><span class="hd-keycap-face">${l.more}</span></a>`), `${file} keycap link opens the Quirky Ball page in its own language, labelled ${l.more}`);
+  assert.equal((quirky.match(/<a class="hd-keycap-cta"/g) || []).length, 1, `${file} one keycap CTA in the Quirky Ball section`);
+
+  // phone with the real 2.0 play loop
+  assert.equal((quirky.match(/<video\b/g) || []).length, 1, `${file} one play loop in the Quirky Ball phone`);
+  assert.match(quirky, /<figure class="hd-phone-figure hd-qb-phone">/, `${file} Quirky Ball phone figure`);
+  assert.ok(quirky.includes(`role="group" aria-label="${l.qbGroup}"`), `${file} Quirky Ball phone is a labelled group`);
+  const qbVideo = quirky.match(/<video\b[^>]*>/)[0];
+  for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="quirky-ball/v2/loop-poster.webp"', `aria-label="${l.qbVideo}"`]) assert.ok(qbVideo.includes(attribute), `${file} Quirky Ball video needs ${attribute.trim()}`);
+  assert.ok(quirky.includes('<source src="quirky-ball/v2/loop.mp4" type="video/mp4"><source src="quirky-ball/v2/loop.webm" type="video/webm">'), `${file} Quirky Ball video has mp4 and webm sources`);
+  assert.equal((quirky.match(/class="hd-phone-button /g) || []).length, 3, `${file} Quirky Ball phone shows its three side buttons`);
+
   assert.equal((html.match(/data-community-stats/g) || []).length, 1, `${file} one community stats block`);
   assert.ok(quirky.includes('<div class="hd-research" data-community-stats aria-busy="true">'), `${file} Quirky community stats live inside the Quirky Ball section`);
   assert.doesNotMatch(html, /<section class="community-section"|data-game-preview/, `${file} the old community band and project video preview are gone`);
@@ -299,14 +332,23 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(support.includes(`<a class="hd-btn hd-btn-primary" href="${l.support}" data-pressable>`), `${file} support button opens the right language section`);
   assert.deepEqual([...support.matchAll(/<nav class="hd-topics"[\s\S]*?<\/nav>/g)].map((match) => [...match[0].matchAll(/href="([^"]+)"/g)].map((link) => link[1]))[0], [`support/#${l.lang}-purchase`, `support/#${l.lang}-bug`, `support/#${l.lang}-progress`, `quirky-ball/privacy/delete_${l.lang}.html`, `privacy/${l.lang}.html`], `${file} support topics`);
 
-  // --- farewell: quiet, no link, no status, Comrade nowhere else on the page ---
+  // --- farewell: the dropped game, right under Quirky Ball: its old play loop in a phone, one line, no link, no status ---
+  assert.match(farewell, /^<section class="hd-farewell home-farewell" id="comrade" data-theme="night" aria-labelledby="comrade-title">/, `${file} night farewell section`);
   assert.ok(farewell.includes(`<p class="farewell-name hd-farewell-name">${l.farewellName}</p>`), `${file} farewell names the game`);
-  assert.ok(farewell.includes(`<p class="farewell-line hd-farewell-line">${copy[3]}</p>`), `${file} farewell line`);
+  assert.ok(farewell.includes(`<h2 class="farewell-line hd-farewell-line" id="comrade-title">${copy[3]}</h2>`), `${file} farewell line is the section heading`);
+  assert.ok(farewell.indexOf("farewell-name") < farewell.indexOf("farewell-line"), `${file} the game name comes before the line`);
   assert.doesNotMatch(farewell, /<a\b|개발 중|In development|In Entwicklung|開発中/, `${file} farewell has no link and no development status`);
-  assert.match(farewell, /<div class="hd-ghost" data-ghost data-ghost-src="assets\/media\/comrade-gameplay-poster\.jpg"><canvas class="hd-ghost-canvas" aria-hidden="true"><\/canvas><img class="hd-ghost-fallback" src="assets\/media\/comrade-gameplay-poster\.jpg" width="640" height="1402" alt="" loading="lazy" decoding="async"><\/div>/, `${file} ASCII ghost of the poster with a plain image fallback`);
+  assert.match(farewell, /<figure class="hd-phone-figure hd-farewell-phone">/, `${file} farewell phone figure`);
+  assert.ok(farewell.includes(`role="group" aria-label="${l.comradeGroup}"`), `${file} farewell phone is a labelled group`);
+  assert.equal((farewell.match(/<video\b/g) || []).length, 1, `${file} one old play loop in the farewell phone`);
+  const comradeVideo = farewell.match(/<video\b[^>]*>/)[0];
+  for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/comrade-gameplay-poster.jpg"', `aria-label="${l.comradeVideo}"`]) assert.ok(comradeVideo.includes(attribute), `${file} farewell video needs ${attribute.trim()}`);
+  assert.ok(farewell.includes('<source src="assets/media/comrade-gameplay.mp4" type="video/mp4"></video>'), `${file} farewell video plays the Comrade mp4`);
+  assert.equal((farewell.match(/class="hd-phone-button /g) || []).length, 3, `${file} farewell phone shows its three side buttons`);
+  assert.doesNotMatch(html, /hd-ghost|data-ghost|hd-ghost-canvas/, `${file} the ASCII ghost is gone`);
   assert.doesNotMatch(html.match(/<head>[\s\S]*<\/head>/)[0], /Comrade|동무|Genosse/, `${file} head must not mention the dropped Comrade project`);
   assert.doesNotMatch(html.replace(/<head>[\s\S]*<\/head>/, "").replace(farewell, ""), /comrade|동무|genosse/i, `${file} Comrade appears only in the farewell`);
-  assert.doesNotMatch(html, /comrade-gameplay\.mp4/, `${file} must not play Comrade footage`);
+  assert.equal((html.match(/comrade-gameplay\.mp4/g) || []).length, 1, `${file} Comrade footage plays only in the farewell phone`);
 
   // --- retired home features stay retired ---
   assert.doesNotMatch(html, /data-studio-hero|data-release-chamber|class="section-rail"|hero-background-word|data-motion-toggle|data-game-cursor|class="release-(?:copy|visual|heading|lede|button|readout|version)|class="project-(?:zone|card|phone|media|copy)|data-scroll-quirky/, `${file} old hero, rail, motion toggle and project zones stay removed`);
@@ -342,7 +384,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
-  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 1, `${file} Quirky Ball 2.0 loop is wired once (on the desk CRT)`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 2, `${file} Quirky Ball 2.0 loop is wired twice: on the desk CRT and in the Quirky Ball phone`);
   const [title, description, imageAlt] = expectedOpenGraph[file];
   assert.ok(html.includes(`property="og:title" content="${title}"`), `${file} needs a localized Open Graph title`);
   assert.ok(html.includes(`property="og:description" content="${description}"`), `${file} needs a localized Open Graph description`);
@@ -363,16 +405,36 @@ const deskJs = read("assets/home-desk.js");
 assert.match(homeCss, /\.hd-phone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*18/s, "9:16 footage sits in a slightly shorter phone so the HUD is not cropped");
 assert.match(homeCss, /\.hd-phone-video\s*\{[^}]*object-fit:\s*contain/s, "10key footage letterboxes instead of cropping");
 assert.match(homeCss, /\.hd-lab-grid\s*\{[^}]*repeat\(3,/s, "lab notes are three equal columns");
-assert.match(homeCss, /\.hd-shot img\s*\{[^}]*object-fit:\s*cover/s, "store screens fill their frame");
+assert.match(homeCss, /\.hd-qb-logo\s*\{[^}]*aspect-ratio:\s*861\s*\/\s*551/s, "the Quirky Ball logo box keeps the proportions of the full logo the pieces were cut from");
+assert.match(homeCss, /\.hd-qb-piece\s*\{[^}]*position:\s*absolute;[^}]*top:\s*var\(--t\);[^}]*left:\s*var\(--l\);[^}]*width:\s*var\(--w\)/s, "each logo piece sits at its own --l/--t/--w inside the logo box");
+assert.match(homeCss, /\.hd-qb-logo\.is-in \.hd-qb-piece\s*\{[^}]*animation:\s*hd-qb-drop[^}]*calc\(var\(--i\) \* \d+ms\)/s, "once in view, the letters drop in one by one by their --i order");
+assert.match(homeCss, /body\[data-hd-motion="full"\] \.hd-qb-logo:not\(\.is-in\) \.hd-qb-piece\s*\{\s*opacity:\s*0/, "letters stay hidden until the logo scrolls into view (full motion only)");
+assert.match(homeCss, /\.store-button\s*\{[^}]*height:\s*54px[^}]*\}/s, "both store buttons share one height");
+assert.match(homeCss, /\.store-copy strong\s*\{[^}]*font-size:\s*16px/s, "store buttons set the store name in the site's own type");
+assert.match(homeCss, /\.hd-qb-phone \.hd-phone\s*\{[^}]*width:/s, "the Quirky Ball phone has its own size");
+assert.doesNotMatch(homeCss, /\.hd-shot\b|\.hd-stack\b|\.hd-quirky-track|\.hd-ghost\b|google-play-badge img/, "the screenshot stack, the ASCII ghost and the Google Play bitmap badge have no styles left");
 assert.match(homeCss, /\.hd-farewell\s*\{[^}]*background:\s*var\(--hd-night\)/s, "the farewell closes the page in the night tone");
-assert.match(homeCss, /\.hd-ghost\s*\{[^}]*aspect-ratio:\s*640\s*\/\s*1402/s, "the ghost keeps the poster proportions");
-assert.match(homeCss, /body\[data-page="studio"\]\[data-hd-theme="paper"\]/, "the header pill has a paper variant");
+assert.match(homeCss, /\.hd-farewell-phone \.hd-phone\s*\{[^}]*width:/s, "the farewell phone has its own size");
+// Header: the dark House Duck bar by default; clear only while the bar is over the duck scene (data-hd-over-hero).
+assert.match(homeCss, /body\[data-page="studio"\]\s*\{[^}]*--bar-bg:\s*rgba\(17,\s*20,\s*25,\s*\.97\)/s, "the studio header bar is dark by default");
+assert.match(homeCss, /body\[data-page="studio"\]\[data-hd-over-hero\]\s*\{[^}]*--bar-bg:\s*transparent/s, "the bar turns transparent only over the hero");
+assert.doesNotMatch(homeCss, /body\[data-page="studio"\]\[data-hd-theme="paper"\]\s*\{/, "the bar no longer turns paper over light sections");
+assert.match(homeCss, /\.site-nav > a\s*\{[^}]*letter-spacing:\s*\.13em;[^}]*text-transform:\s*uppercase/s, "nav items are uppercase and tracked");
+assert.match(homeCss, /\.site-nav \.nav-youtube::before\s*\{[^}]*display:\s*inline-block[^}]*border-radius:\s*50%[^}]*background:\s*var\(--hd-key-red\)/s, "the YouTube nav item keeps its red dot");
 assert.ok(Number(deskCss.match(/\.hd-hero\s*\{[^}]*?\bheight:\s*(\d+)vh/s)?.[1]) >= 150, "the hero is a tall scroll track for the zoom into the CRT");
 assert.match(deskCss, /\.hd-hero-sticky\s*\{[^}]*position:\s*sticky/s, "the desk stays pinned while the visitor scrolls through the track");
 assert.match(deskCss, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.hd-hero\s*\{\s*height:\s*100vh/, "reduced motion turns the hero into one still screen");
-assert.match(homeCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.hd-shot\s*\{[^}]*transform:\s*none !important/, "reduced motion lays the Quirky Ball screens flat");
+assert.match(homeCss, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.hd-qb-piece\s*\{[^}]*animation:\s*none !important;[^}]*opacity:\s*1 !important/, "reduced motion shows the Quirky Ball logo letters in place");
 assert.match(homeJs, /function reducedMotion\(\)[\s\S]*prefers-reduced-motion: reduce/, "home.js reads the reduced-motion setting");
 assert.match(homeJs, /document\.body\.dataset\.hdMotion = reduced \? "reduce" : "full"/, "home.js exposes the motion mode on <body>");
+assert.match(homeJs, /function setupQbLogo\(reduced\)[\s\S]*querySelector\("\[data-qb-logo\]"\)[\s\S]*classList\.add\("is-in"\)/, "home.js lands the Quirky Ball logo pieces by adding .is-in");
+assert.match(homeJs, /if \(reduced \|\| !\("IntersectionObserver" in window\)\) \{ logo\.classList\.add\("is-in"\); return; \}/, "reduced motion (or no observer) shows the logo at once");
+assert.match(homeJs, /function setupHeaderTheme\(\)[\s\S]*document\.body\.dataset\.hdTheme = theme[\s\S]*document\.body\.toggleAttribute\("data-hd-over-hero", overHero\)/, "home.js sets data-hd-theme per section and toggles data-hd-over-hero");
+assert.match(homeJs, /overHero = !!hero && !hero\.classList\.contains\("is-entered"\) && hero\.getBoundingClientRect\(\)\.bottom > y/, "the bar is clear only while it is over the hero and the hero has not been entered");
+assert.match(homeJs, /function setupHeroGlide\(reduced\)[\s\S]*addEventListener\("wheel"[\s\S]*addEventListener\("touchmove"[\s\S]*addEventListener\("keydown"[\s\S]*a\[href\^="#"\]/, "home.js glides the hero hand-off on wheel, swipe, key and in-page link");
+assert.match(homeJs, /Math\.min\(2400, Math\.max\(1100, /, "the hero glide lasts about 1.1 to 2.4 seconds");
+assert.match(homeJs, /setupHeroGlide\(reduced\);[\s\S]*setupQbLogo\(reduced\);/, "init wires the hero glide and the Quirky Ball logo");
+assert.doesNotMatch(homeJs, /setupStack|setupGhost|data-stack|data-ghost/, "the screenshot stack and the ASCII ghost are gone from home.js");
 assert.match(deskJs, /matchMedia\('\(prefers-reduced-motion: reduce\)'\)/, "home-desk.js reads the reduced-motion setting");
 assert.match(deskJs, /if \(reduceMotion\.matches\) return 0;/, "reduced motion freezes the zoom at the desk");
 assert.match(read("assets/home-desk.css"), /\.hd-visually-hidden\s*\{[^}]*clip-path:\s*inset\(50%\)/s, "the hero h1 stays available to screen readers");

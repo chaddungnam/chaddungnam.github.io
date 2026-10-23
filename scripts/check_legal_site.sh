@@ -57,7 +57,6 @@ selector_pages=(
   "quirky-ball/terms/index.html"
   "10key/privacy/index.html"
   "10key/terms/index.html"
-  "10key/index.html"
 )
 
 for page in "${localized_pages[@]}" "${selector_pages[@]}" "support/index.html"; do
@@ -317,8 +316,22 @@ done
 require_token "privacy/de.html" 'id="section-13">13. 10key Survival</h2>'
 require_token "privacy/de.html" "/10key/terms/en.html"
 require_token "terms/de.html" "../10key/terms/en.html"
-require_token "10key/index.html" 'href="terms/"'
-require_token "10key/index.html" 'href="privacy/"'
+# /10key/ (ko) and /10key/index_en.html are the game's introduction pages (own stylesheet, no legal shell); they keep the legal and support links in the footer.
+for page in 10key/index.html 10key/index_en.html; do
+  test -s "$repo_dir/$page" || fail "$page does not exist"
+  require_token "$page" "/assets/tenkey-page.css"
+  require_token "$page" 'class="skip-link"'
+  require_token "$page" "<main"
+  require_token "$page" "data-current-year"
+  require_token "$page" 'href="terms/"'
+  require_token "$page" 'href="privacy/"'
+  require_token "$page" 'href="/support/'
+  reject_token "$page" "<style"
+  reject_token "$page" "fonts.googleapis.com"
+  reject_token "$page" "cdn."
+  reject_token "$page" "tailwind"
+  reject_token "$page" "iconify"
+done
 
 printf 'legal site contract (10key): PASS\n'
 

@@ -36,7 +36,9 @@ assert.match(home, /\.hd-phone-video\s*\{[^}]*object-fit:\s*contain/s, "10key Su
 assert.match(home, /\.hd-lab-grid\s*\{[^}]*repeat\(3,/s, "three equal video cards");
 assert.match(home, /\.hd-tenkey\s*\{[^}]*background:/s, "the 10key section paints its own tone");
 assert.match(home, /\.hd-farewell\s*\{[^}]*background:\s*var\(--hd-night\)/s, "the quiet Comrade farewell is styled as the night bookend");
-assert.match(home, /\.hd-quirky-track\s*\{[^}]*grid-template-columns:/s, "the Quirky Ball stack sits in a two-column track");
+assert.match(home, /\.hd-quirky-grid\s*\{[^}]*grid-template-columns:/s, "Quirky Ball copy and its phone sit in a two-column grid");
+assert.match(home, /\.hd-farewell-inner\s*\{[^}]*grid-template-columns:/s, "the Comrade farewell lays its phone beside its line");
+assert.match(home, /body\[data-page="studio"\]\[data-hd-over-hero\]\s*\{[^}]*--bar-bg:\s*transparent/s, "the header bar is clear only over the duck scene");
 assert.ok(Number(homeDesk.match(/\.hd-hero\s*\{[^}]*?\bheight:\s*(\d+)vh/s)?.[1]) >= 150, "the desk hero is a scroll track");
 assert.match(homeDesk, /\.hd-desk-canvas\s*\{[^}]*image-rendering:\s*pixelated/s, "the pixel desk is never smoothed");
 assert.match(fonts, /font-family:\s*"Montserrat"/);
@@ -78,7 +80,7 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /class="hd-hero"/);
   assert.match(html, /data-desk /);
-  assert.match(html, /<body data-page="studio" data-hd-theme="night">/);
+  assert.match(html, /<body data-page="studio" data-hd-theme="night" data-hd-over-hero>/);
   assert.doesNotMatch(html, /data-studio-hero|studio-hero-tenkey/, "the old studio hero is gone");
   assert.doesNotMatch(html, /data-quirky-mechanic|assets\/red-quirky\.svg/, "the 10key Survival page does not carry the Quirky hero stage or mascot");
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3);
@@ -87,8 +89,9 @@ for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.ht
   assert.doesNotMatch(html, /history-section|journal-section/);
   assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
   assert.equal((html.match(/data-game-preview/g) || []).length, 0, "the Quirky Ball loop plays on the desk CRT; no project video preview is left");
-  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, "the 10key section plays the 10key Survival loop");
-  assert.equal((html.match(/data-shot /g) || []).length, 10, "ten Quirky Ball store screens in the stack");
+  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 3, "three phones play a loop: 10key Survival, Quirky Ball and the Comrade farewell");
+  assert.equal((html.match(/data-shot /g) || []).length, 0, "the Quirky Ball screenshot stack is gone");
+  assert.equal((html.match(/class="hd-qb-piece"/g) || []).length, 13, "the Quirky Ball logo is thirteen animated pieces");
 }
 
 for (const file of ["about/index.html", "about/index_en.html", "about/index_de.html", "about/index_ja.html"]) {

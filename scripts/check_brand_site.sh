@@ -86,7 +86,7 @@ done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
-  # Rebuilt home (owner 2026-10-23): night pixel-desk hero, 10key Survival, Quirky Ball, lab notes, support, Comrade farewell.
+  # Rebuilt home (owner 2026-10-23): night pixel-desk hero, 10key Survival, Quirky Ball, Comrade farewell, lab notes, support.
   require_token "$page" 'class="hd-hero"'
   require_token "$page" 'data-desk '
   require_token "$page" 'data-desk-tenkey="assets/media/tenkey-gameplay.mp4"'
@@ -108,11 +108,21 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" "assets/media/tenkey-gameplay.mp4"
   require_token "$page" "assets/media/tenkey-gameplay-poster.webp"
   require_token "$page" "quirky-ball/v2/loop.mp4"
-  require_token "$page" "quirky-ball/v2/shot-10-600.webp"
+  require_token "$page" "quirky-ball/v2/loop-poster.webp"
+  require_token "$page" 'data-qb-logo'
+  for piece in q u i r k y b a l1 l2 dot hex ball; do
+    require_token "$page" "assets/media/home/qb-logo/$piece.webp"
+    test -s "$repo_dir/assets/media/home/qb-logo/$piece.webp" || fail "assets/media/home/qb-logo/$piece.webp is missing"
+  done
+  require_token "$page" 'class="store-button google-play-badge"'
+  require_token "$page" 'class="store-button app-store-badge"'
+  require_token "$page" 'class="hd-keycap-cta" href="quirky-ball/?lang='
   require_token "$page" "assets/media/comrade-gameplay-poster.jpg"
-  require_token "$page" 'class="hd-farewell home-farewell"'
-  # The hero is the 10key Survival desk: no Quirky playable demo, old hero stage, section rail, motion toggle, project zones, scroll mascot or Comrade footage on the home.
-  for retired in 'data-studio-hero' 'data-release-chamber' 'class="section-rail"' 'hero-background-word' 'data-motion-toggle' 'data-game-preview' 'class="project-zone' 'class="community-section' 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="tenkey-survival"' 'data-project="hexaworld1984"' 'comrade-gameplay.mp4'; do
+  require_token "$page" "assets/media/comrade-gameplay.mp4"
+  require_token "$page" 'class="hd-farewell home-farewell" id="comrade"'
+  require_token "$page" 'data-hd-over-hero'
+  # The hero is the 10key Survival desk: no Quirky playable demo, old hero stage, section rail, motion toggle, project zones, scroll mascot, Quirky screenshot stack, ASCII ghost or Google Play bitmap badge on the home.
+  for retired in 'data-studio-hero' 'data-release-chamber' 'class="section-rail"' 'hero-background-word' 'data-motion-toggle' 'data-game-preview' 'class="project-zone' 'class="community-section' 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="tenkey-survival"' 'data-project="hexaworld1984"' 'data-stack' 'class="hd-shot"' 'quirky-ball/v2/shot-' 'data-ghost' 'assets/store-badges/google-play-'; do
     if grep -Fq "$retired" "$repo_dir/$page"; then fail "$page still contains retired home element $retired"; fi
   done
   require_token "$page" "https://www.youtube.com/@houseduck_in"

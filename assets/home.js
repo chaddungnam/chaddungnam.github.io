@@ -91,7 +91,7 @@
       .catch(() => {});
   }
 
-  /* ---------- header pill: night glass over night sections, paper glass over paper sections ---------- */
+  /* ---------- header: dark bar everywhere, clear only over the duck scene; data-hd-theme tells the section tone under it ---------- */
   function setupHeaderTheme() {
     const header = document.querySelector(".site-header");
     const sections = [...document.querySelectorAll("main [data-theme]")];
@@ -111,6 +111,10 @@
         theme = themeOf(section);
       }
       if (document.body.dataset.hdTheme !== theme) document.body.dataset.hdTheme = theme;
+      // The bar is clear only over the duck scene; everywhere else it is the dark House Duck bar.
+      const hero = sections[0].classList.contains("hd-hero") ? sections[0] : null;
+      const overHero = !!hero && !hero.classList.contains("is-entered") && hero.getBoundingClientRect().bottom > y;
+      document.body.toggleAttribute("data-hd-over-hero", overHero);
     };
     const request = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(update); } };
     addEventListener("scroll", request, { passive: true });
@@ -397,79 +401,17 @@
     addEventListener("load", layout, { once: true });
   }
 
-  /* ---------- Quirky Ball: scroll-driven 3D stack ---------- */
-  function setupStack(reduced) {
-    const track = document.querySelector("[data-stack]");
-    const col = track?.querySelector("[data-stack-col]");
-    const stage = track?.querySelector("[data-stack-stage]");
-    const shots = [...(track?.querySelectorAll("[data-shot]") || [])];
-    if (!track || !col || !stage || shots.length < 2 || reduced) return;
-    const count = shots.length;
-    const indexNodes = [...track.querySelectorAll("[data-stack-index]")];
-    const captionNodes = [...track.querySelectorAll("[data-stack-caption]")];
-    let position = 0;
-    let goal = 0;
-    let frame = 0;
-    let active = -1;
-    const pad = (n) => String(n + 1).padStart(2, "0");
-
-    function readGoal() {
-      const rect = col.getBoundingClientRect();
-      const travel = Math.max(1, col.offsetHeight - stage.offsetHeight);
-      goal = clamp(-rect.top / travel, 0, 1) * (count - 1);
-    }
-
-    function paint() {
-      const step = shots[0].offsetHeight || 500;
-      for (const [index, shot] of shots.entries()) {
-        const off = index - position;
-        const abs = Math.abs(off);
-        if (abs > 2.6) { shot.style.opacity = "0"; shot.style.visibility = "hidden"; continue; }
-        const tilt = clamp(off, -1, 1);
-        const ty = off * step * .62 + Math.sign(off) * Math.min(abs, 1) * step * .07;
-        const tz = -abs * 140;
-        const rotate = -tilt * 72;
-        const scale = 1 - Math.min(abs, 2) * .04;
-        shot.style.visibility = "visible";
-        shot.style.opacity = String(abs < 1 ? 1 : clamp(1.18 - abs * .42, 0, 1));
-        shot.style.zIndex = String(20 - Math.round(abs * 4));
-        shot.style.setProperty("--shade", (Math.min(abs, 1) * .86).toFixed(3));
-        if (off > 0) shot.dataset.below = ""; else delete shot.dataset.below;
-        shot.style.transform = `translate3d(-50%, calc(-50% + ${ty.toFixed(1)}px), ${tz.toFixed(1)}px) rotateX(${rotate.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-      }
-      const next = clamp(Math.round(position), 0, count - 1);
-      if (next !== active) {
-        active = next;
-        for (const node of indexNodes) node.textContent = `${pad(active)} / ${String(count).padStart(2, "0")}`;
-        for (const node of captionNodes) node.textContent = shots[active].dataset.caption || "";
-        for (const [index, shot] of shots.entries()) shot.classList.toggle("is-active", index === active);
-        track.dataset.stackActive = String(active);
-      }
-    }
-
-    function tick() {
-      frame = 0;
-      const delta = goal - position;
-      if (Math.abs(delta) < .0015) { position = goal; paint(); return; }
-      position += delta * .16;
-      paint();
-      frame = requestAnimationFrame(tick);
-    }
-
-    const request = () => { readGoal(); if (!frame) frame = requestAnimationFrame(tick); };
-    addEventListener("scroll", request, { passive: true });
-    addEventListener("resize", request);
-    for (const [index, shot] of shots.entries()) {
-      shot.addEventListener("click", () => {
-        if (index === active) return;
-        const rect = col.getBoundingClientRect();
-        const travel = Math.max(1, col.offsetHeight - stage.offsetHeight);
-        scrollTo({ top: rect.top + scrollY + (index / (count - 1)) * travel, behavior: "smooth" });
-      });
-    }
-    readGoal();
-    position = goal;
-    paint();
+  /* ---------- Quirky Ball logo: the game's own logo cut into its letters, landing one by one like its title screen ---------- */
+  function setupQbLogo(reduced) {
+    const logo = document.querySelector("[data-qb-logo]");
+    if (!logo) return;
+    if (reduced || !("IntersectionObserver" in window)) { logo.classList.add("is-in"); return; }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      logo.classList.add("is-in");
+      observer.disconnect();
+    }, { threshold: .4 });
+    observer.observe(logo);
   }
 
   /* ---------- lab notes: monospace characters dissolve in Bayer order to reveal each thumbnail ---------- */
@@ -592,94 +534,77 @@
     }
   }
 
-  /* ---------- farewell: the Comrade poster as a dim ASCII ghost ---------- */
-  function setupGhost(reduced) {
-    const ghost = document.querySelector("[data-ghost]");
-    const canvas = ghost?.querySelector("canvas");
-    if (!ghost || !canvas) return;
-    const context = canvas.getContext("2d");
-    const image = new Image();
-    image.decoding = "async";
-    const cell = { w: 6, h: 9 };
-    const RAMP = " .:-=+*#%@";
-    let cells = [];
-    let cols = 0;
-    let rows = 0;
-    let timer = 0;
-    let visible = false;
+  /* ---------- hero hand-off (owner 10-23): one scroll, swipe, key or click in the duck scene plays the zoom
+     at a calm pace and lands on 10key; going back up from there returns to the duck the same way ---------- */
+  function setupHeroGlide(reduced) {
+    const hero = document.querySelector(".hd-hero");
+    const grid = document.querySelector(".hd-tenkey-grid");
+    if (!hero || !grid || reduced) return;
+    const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const landing = () => Math.max(0, Math.round(grid.getBoundingClientRect().top + scrollY - (innerWidth > 720 ? 96 : 76)));
+    let frame = 0;
+    let quietUntil = 0;
+    const busy = () => frame !== 0 || performance.now() < quietUntil;
+    const inScene = () => scrollY < landing() - 4;
 
-    function sample() {
-      const rect = ghost.getBoundingClientRect();
-      cols = Math.max(8, Math.round(rect.width / cell.w));
-      rows = Math.max(8, Math.round(rect.height / cell.h));
-      const probe = document.createElement("canvas");
-      probe.width = cols;
-      probe.height = rows;
-      const pc = probe.getContext("2d", { willReadFrequently: true });
-      pc.drawImage(image, 0, 0, cols, rows);
-      const data = pc.getImageData(0, 0, cols, rows).data;
-      cells = [];
-      for (let i = 0; i < cols * rows; i += 1) {
-        const r = data[i * 4];
-        const g = data[i * 4 + 1];
-        const b = data[i * 4 + 2];
-        const lum = (r * .299 + g * .587 + b * .114) / 255;
-        const red = r > 110 && r > g * 1.7 && r > b * 1.7;
-        const gold = r > 150 && g > 110 && b < 90 && !red;
-        cells.push({ lum, red, gold });
-      }
-      const ratio = Math.min(devicePixelRatio || 1, 2);
-      canvas.width = Math.round(rect.width * ratio);
-      canvas.height = Math.round(rect.height * ratio);
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      context.font = `500 9px ui-monospace, "SF Mono", Menlo, monospace`;
-      context.textBaseline = "middle";
-      context.textAlign = "center";
-      draw(false);
+    function glide(to) {
+      cancelAnimationFrame(frame);
+      const from = scrollY;
+      const distance = Math.abs(to - from);
+      if (distance < 2) return;
+      const duration = Math.min(2400, Math.max(1100, 900 + distance * .6));
+      const start = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        scrollTo({ top: from + (to - from) * ease(t), behavior: "instant" });
+        if (t < 1) frame = requestAnimationFrame(step);
+        else { frame = 0; quietUntil = performance.now() + 450; }
+      };
+      frame = requestAnimationFrame(step);
     }
 
-    function paintCell(i, jitter) {
-      const x = i % cols;
-      const y = Math.floor(i / cols);
-      const info = cells[i];
-      let lum = clamp(info.lum * 1.25, 0, 1);
-      if (jitter) lum = clamp(lum + (Math.random() - .5) * .3, 0, 1);
-      const glyph = RAMP[Math.min(RAMP.length - 1, Math.floor(lum * RAMP.length))];
-      context.clearRect(x * cell.w, y * cell.h, cell.w, cell.h);
-      if (glyph === " ") return;
-      const alpha = .1 + lum * .55;
-      context.fillStyle = info.red ? `rgba(236,106,53,${(.25 + lum * .6).toFixed(3)})`
-        : info.gold ? `rgba(245,183,49,${(.2 + lum * .55).toFixed(3)})`
-          : `rgba(214,222,255,${alpha.toFixed(3)})`;
-      context.fillText(glyph, x * cell.w + cell.w / 2, y * cell.h + cell.h / 2 + .5);
-    }
+    addEventListener("wheel", (event) => {
+      if (event.ctrlKey) return;
+      if (busy()) { event.preventDefault(); return; }
+      if (!inScene() || Math.abs(event.deltaY) < 1) return;
+      if (event.deltaY < 0 && scrollY <= 0) return;
+      event.preventDefault();
+      glide(event.deltaY > 0 ? landing() : 0);
+    }, { passive: false });
 
-    function draw(jitter) {
-      for (let i = 0; i < cells.length; i += 1) paintCell(i, jitter);
-    }
+    let touchY = null;
+    addEventListener("touchstart", (event) => { touchY = event.touches.length === 1 ? event.touches[0].clientY : null; }, { passive: true });
+    addEventListener("touchmove", (event) => {
+      if (busy()) { event.preventDefault(); return; }
+      if (touchY === null || !inScene()) return;
+      const dy = touchY - event.touches[0].clientY;
+      if (Math.abs(dy) < 8 || (dy < 0 && scrollY <= 0)) return;
+      event.preventDefault();
+      touchY = null;
+      glide(dy > 0 ? landing() : 0);
+    }, { passive: false });
 
-    function shimmer() {
-      if (!visible || reduced) return;
-      const count = Math.max(6, Math.round(cells.length * .025));
-      for (let n = 0; n < count; n += 1) paintCell(Math.floor(Math.random() * cells.length), true);
-      timer = setTimeout(shimmer, 110);
-    }
+    addEventListener("keydown", (event) => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(document.activeElement?.tagName || "")) return;
+      const down = ["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey);
+      const up = ["ArrowUp", "PageUp", "Home"].includes(event.key) || (event.key === " " && event.shiftKey);
+      if (busy() && (down || up)) { event.preventDefault(); return; }
+      if (!inScene() || (!down && !up) || (up && scrollY <= 0)) return;
+      event.preventDefault();
+      glide(down ? landing() : 0);
+    });
 
-    function sync() {
-      clearTimeout(timer);
-      timer = 0;
-      if (visible && !reduced && cells.length) timer = setTimeout(shimmer, 110);
-    }
-
-    image.addEventListener("load", () => {
-      try { sample(); } catch (_) { ghost.classList.add("is-fallback"); return; }
-      ghost.dataset.ghostReady = "true";
-      if ("IntersectionObserver" in window) new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { threshold: .1 }).observe(ghost);
-      else { visible = true; sync(); }
-      addEventListener("resize", () => { try { sample(); } catch (_) {} });
-    }, { once: true });
-    image.addEventListener("error", () => ghost.classList.add("is-fallback"), { once: true });
-    image.src = ghost.dataset.ghostSrc;
+    // In-page links (the screen in the scene, header Games / Studio) take the same calm pace instead of the browser's quick jump.
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest?.('a[href^="#"]');
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      const id = link.getAttribute("href").slice(1);
+      const target = id === "games" ? null : document.getElementById(id);
+      if (id !== "games" && !target) return;
+      event.preventDefault();
+      glide(id === "games" ? landing() : Math.max(0, Math.round(target.getBoundingClientRect().top + scrollY - (id === "studio" ? 0 : 84))));
+      history.replaceState(null, "", `#${id}`);
+    });
   }
 
   function init() {
@@ -688,12 +613,12 @@
     setupYouTube();
     setupLiveVersion();
     setupHeaderTheme();
+    setupHeroGlide(reduced);
     setupVideos(reduced);
     setupPressables();
     setupKeys(reduced);
-    setupStack(reduced);
+    setupQbLogo(reduced);
     setupAscii();
-    setupGhost(reduced);
   }
 
   return { init, bayerThreshold, renderYouTube, applyLiveVersion, EASE };
