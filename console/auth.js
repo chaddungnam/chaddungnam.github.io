@@ -70,7 +70,7 @@
       return;
     }
     // A fresh credential for the SAME admin while their 72h ticket is still valid is just a
-    // silent token refresh (e.g. the HEXAWORLD project re-verifying an expiring Google ID token) —
+    // silent token refresh (e.g. another project (10key Survival) re-verifying an expiring Google ID token) —
     // keep the ticket. Any other case (first login, switched account, expired/absent ticket)
     // still clears it, same as before.
     if (!hadValidTicket || email !== previousEmail) clearTicket();
@@ -162,7 +162,7 @@
     notify();
   }
 
-  // Re-renders the same Google Sign-In button into another container (e.g. a HEXAWORLD
+  // Re-renders the same Google Sign-In button into another container (e.g. a 10key Survival
   // "session expired" panel) so a project can recover a stale Google ID token in place, without
   // touching the QB admin ticket. Clicking it still goes through handleGoogleCredential above.
   function renderGoogleButton(container, options = {}) {

@@ -1194,21 +1194,54 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .announcement-document [data-link-preview] { white-space: normal; margin-bottom: 16px; }
 @media(max-width:600px) { .announcement-document { padding: 14px; min-height: 300px; } }
 
-/* ─────────────────────────────────────────── HEXAWORLD 1984 */
-.category-update { color: #145a8a; background: #e3f0ff; }
-.category-maintenance { color: #854000; background: #fff0d7; }
-.hx-status-badge { display: inline-block; padding: 4px 7px; color: var(--ink-soft); background: #f1ede4; border-radius: 999px; font-size: 8px; font-weight: 900; }
-.hx-status-badge[data-hx-status="live"] { color: #17665e; background: var(--teal-soft); }
-.hx-status-badge[data-hx-status="scheduled"] { color: #6e5621; background: var(--gold-soft); }
-.hx-status-badge[data-hx-status="ended"] { color: var(--ink-soft); background: #ece7dc; }
-.hx-status-badge[data-hx-status="inactive"] { color: #a93f34; background: var(--coral-soft); }
-.hexaworld-reward-rows { display: grid; gap: 9px; margin-bottom: 9px; }
-.hexaworld-reward-rows .form-pair { grid-template-columns: 1fr 1fr auto; align-items: end; gap: 9px; }
-.hexaworld-reward-rows .form-pair button { min-height: 42px; white-space: nowrap; }
-#hexaworldNoticeLinkCheck { display: flex; align-items: center; gap: 6px; }
-#hexaworldNoticeLinkCheck .text-button { padding: 4px 8px; }
-.hexaworld-auth-recovery { display: grid; gap: 10px; margin: 10px 0; }
-.hexaworld-auth-recovery p { margin: 0; }
+/* ─────────────────────────────────────────── 10key Survival (House Duck game server) */
+.tk-badge { display: inline-block; padding: 4px 7px; color: var(--ink-soft); background: #f1ede4; border-radius: 999px; font-size: 9px; font-weight: 900; white-space: nowrap; }
+.tk-badge[data-tone="good"] { color: #17665e; background: var(--teal-soft); }
+.tk-badge[data-tone="watch"] { color: #6e5621; background: var(--gold-soft); }
+.tk-badge[data-tone="quiet"] { color: var(--ink-soft); background: #ece7dc; }
+.tk-badge[data-tone="risk"] { color: #a93f34; background: var(--coral-soft); }
+.console-auth-recovery { display: grid; gap: 10px; margin: 10px 0; }
+.console-auth-recovery p { margin: 0; }
+.tenkey-toolbar { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.tenkey-toolbar > label:first-child:has(input[type="search"]) { grid-column: span 2; }
+.tenkey-summary { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 14px; }
+.tenkey-summary strong { font-size: 20px; }
+[data-route^="tenkey-"] .table-scroll th, [data-route^="tenkey-"] .table-scroll td { text-align: left; }
+[data-route^="tenkey-"] .table-scroll th.tk-num, [data-route^="tenkey-"] .table-scroll td[data-route^="tenkey-"] .panel-heading { flex-wrap: wrap; }
+[data-route^="tenkey-"] .panel-total { flex: 0 0 auto; white-space: nowrap; }
+.tk-num { text-align: right; }
+.tk-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tk-wrap { max-width: 360px; white-space: normal; overflow-wrap: anywhere; }
+.tk-sub { display: block; margin-top: 2px; color: var(--ink-soft); font-size: 9px; font-weight: 500; }
+tr.is-dim td { opacity: .55; }
+tr[data-tk-group] { cursor: pointer; }
+tr[data-tk-group]:hover td, tr[data-tk-group]:focus-visible td { background: var(--teal-soft); }
+tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
+.tk-log { max-height: 380px; margin: 8px 0 0; padding: 12px 14px; overflow: auto; color: #d7deea; background: #101624; border-radius: 10px; font: 11px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tk-trail { margin: 8px 0 0; padding: 0 0 0 20px; color: var(--ink-soft); font-size: 11px; line-height: 1.6; }
+.tk-detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 9px; margin: 0 0 12px; }
+.tk-detail-grid div { padding: 11px 12px; background: #f7f4ec; border-radius: 10px; min-width: 0; }
+.tk-detail-grid dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; }
+.tk-detail-grid dd { margin: 4px 0 0; font-size: 14px; font-weight: 900; overflow-wrap: anywhere; }
+.tk-section { margin-top: 18px; }
+.tk-section h3 { margin: 0 0 8px; font-size: 13px; }
+.tk-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tk-section.impact-form { padding: 14px 16px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 12px; }
+.tenkey-previews { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
+.tenkey-notice-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 14px 16px; color: #f3f4f8; background: #1a1d2b; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
+.tenkey-notice-card::before { content: attr(lang); color: #8c95ab; font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.tenkey-notice-card strong { font-size: 14px; overflow-wrap: anywhere; }
+.tenkey-notice-card p { margin: 0; color: #c9cfdd; font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tenkey-notice-card small { color: #8c95ab; font-size: 10px; }
+.tenkey-notice-card.is-fallback { border-style: dashed; }
+@media (max-width: 760px) {
+  #tenkeyNav { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  #tenkeyNav a { font-size: 9px; }
+}
+@media (max-width: 720px) {
+  .tenkey-previews { grid-template-columns: 1fr; }
+  .tenkey-toolbar > label:first-child:has(input[type="search"]) { grid-column: auto; }
+}
 
 /* 10KEY app config: Android and iOS numbers sit in separate boxes so they are never mixed up. */
 .tenkey-group { display: grid; gap: 9px; min-width: 0; margin: 0; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 12px; }

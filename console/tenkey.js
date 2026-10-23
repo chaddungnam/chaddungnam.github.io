@@ -1,18 +1,37 @@
-// 10KEY (10key Survival) force-update settings. Same Supabase project and hx-admin function as
-// Comrade, so the Comrade project client ("hexaworld") is reused; only the actions differ.
+// 10key Survival ("10KEY") project of the console: shared helpers, the admin call and the force-update settings page.
+// Every call goes to the House Duck game server's tenkey-admin function (the console ticket + the admin allow list, see
+// server docs docs/server/tenkey_server.md §15). The other 10KEY pages (tenkey-overview.js, tenkey-players.js,
+// tenkey-crashes.js, tenkey-notices.js, tenkey-more.js) add their mount functions to window.ConsoleTenkey.
 (function attachConsoleTenkey(root) {
   const byId = (id) => document.getElementById(id);
   const FORM_MESSAGE = "tenkeyConfigFormMessage";
   const PAGE_MESSAGE = "tenkeyConfigMessage";
   const NUMBER_FIELDS = ["minVersionCode", "latestVersionCode", "minBuildIos", "latestBuildIos"];
   const ERROR_MESSAGES = {
-    unknown_action: "서버에 10KEY 설정이 아직 배포되지 않았습니다.",
+    unknown_action: "서버에 10KEY 기능이 아직 배포되지 않았습니다.",
     invalid_number: "번호는 0 이상의 정수로 입력해 주세요 (0은 꺼짐).",
     min_above_latest_android: "Android 최소 versionCode는 최신 versionCode보다 클 수 없습니다.",
     min_above_latest_ios: "iOS 최소 빌드 번호는 최신 빌드 번호보다 클 수 없습니다.",
     invalid_store_url: "스토어 링크는 비우거나 https://로 시작해야 합니다.",
     ios_store_url_required: "iOS 번호를 0보다 크게 하려면 App Store 링크가 필요합니다.",
     reason_required: "변경 이유를 입력해 주세요.",
+    invalid_request_id: "요청 번호를 만들지 못했습니다. 새로고침 후 다시 시도해 주세요.",
+    invalid_title: "제목을 확인해 주세요 (한국어 1~80자, 영어 80자 이하).",
+    invalid_body: "본문을 확인해 주세요 (한국어 1~2000자, 영어 2000자 이하).",
+    invalid_priority: "우선순위는 -100에서 100 사이 정수여야 합니다.",
+    invalid_starts_at: "게시 시작 시각을 확인해 주세요.",
+    invalid_ends_at: "게시 종료는 시작보다 뒤여야 합니다.",
+    invalid_notice: "공지 형식을 확인해 주세요.",
+    not_found: "이미 삭제되었거나 없는 항목입니다. 목록을 새로고침해 주세요.",
+    invalid_player_id: "플레이어 번호 형식이 맞지 않습니다.",
+    invalid_banned: "정지 값 형식이 맞지 않습니다.",
+    invalid_range: "기간 값을 확인해 주세요.",
+    invalid_platform: "플랫폼 값을 확인해 주세요.",
+    invalid_query: "검색어는 100자 이하여야 합니다.",
+    invalid_sort: "정렬 값을 확인해 주세요.",
+    invalid_group: "묶는 기준을 확인해 주세요.",
+    invalid_filter: "필터 값을 확인해 주세요.",
+    invalid_board: "보드 이름을 확인해 주세요.",
     admin_session_required: "Google 로그인이 만료되어 서버가 요청을 거부했습니다. 아래 버튼으로 Google에 다시 로그인해 주세요.",
     admin_required: "이 Google 계정은 관리자 목록에 없습니다. 다른 관리자 계정으로 전환해 주세요.",
     origin_not_allowed: "허용되지 않은 주소에서 접속했습니다. houseduck.in에서 다시 열어 주세요.",
@@ -23,7 +42,40 @@
   const state = { bound: false, config: null };
   const pendingRequests = new WeakMap();
 
-  const errorText = (error) => ERROR_MESSAGES[error?.message] || `요청을 처리하지 못했습니다: ${error?.message || "알 수 없는 오류"}`;
+  const errorText = (error) => {
+    if (error?.message === "rpc_failed") return `서버가 요청을 거부했습니다: ${error.detail || "알 수 없는 오류"}`;
+    return ERROR_MESSAGES[error?.message] || `요청을 처리하지 못했습니다: ${error?.message || "알 수 없는 오류"}`;
+  };
+
+  // ── small formatters shared by every 10KEY page ──
+  const esc = (value) => String(value ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" })[c]);
+  const num = (value) => (value === null || value === undefined || value === "" || Number.isNaN(Number(value))) ? "—" : Number(value).toLocaleString("ko-KR");
+  const time = (value) => {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime()) ? date.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "—";
+  };
+  const shortTime = (value) => {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime()) ? date.toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }) : "—";
+  };
+  const dayText = (value) => {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }) : "—";
+  };
+  const duration = (ms) => {
+    const sec = Math.round(Number(ms) / 1000);
+    if (!Number.isFinite(sec) || sec < 0) return "—";
+    return sec >= 60 ? `${Math.floor(sec / 60)}분 ${sec % 60}초` : `${sec}초`;
+  };
+  const bytes = (value) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    if (n >= 1024 * 1024 * 1024) return `${(n / 1024 / 1024 / 1024).toFixed(2)} GB`;
+    return n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`;
+  };
+  const pct = (part, whole) => (Number(whole) > 0 ? `${Math.round(Number(part) / Number(whole) * 1000) / 10}%` : "—");
+  const PLATFORM_NAMES = { web: "웹 (CrazyGames)", android: "Android", ios: "iOS", mobile: "앱", crazygames: "웹 (CrazyGames)", supabase: "앱 계정" };
+  const platformName = (value) => PLATFORM_NAMES[String(value || "").toLowerCase()] || String(value || "—");
 
   function setMessage(id, value, error = false) {
     const el = byId(id);
@@ -39,19 +91,19 @@
     if (error?.status !== 403 || !["admin_session_required", "admin_required"].includes(error.message)) return;
     const panel = document.createElement("div");
     panel.dataset.tenkeyAuthRecovery = "true";
-    panel.className = "read-only-banner hexaworld-auth-recovery";
+    panel.className = "read-only-banner console-auth-recovery";
     root.ConsoleAuth.renderGoogleButton(panel, { text: "signin_with", size: "medium" });
     byId(id).insertAdjacentElement("afterend", panel);
   }
 
-  // hx-admin answers validation failures as HTTP 200 with data.ok === false: re-throw as an Error
+  // The server answers validation failures as HTTP 200 with data.ok === false: re-throw as an Error
   // whose message is the server code, so every caller has one catch path.
   function unwrap(result) {
     if (result?.data?.ok === false) throw new Error(result.data.error || "rpc_failed");
     return result;
   }
   // A write gets a fresh request_id, reused only when the exact same payload is retried from the
-  // same form (network hiccup), so a retry never double-applies. Same rule as Comrade's callHxWrite.
+  // same form (network hiccup), so a retry never double-applies (a notice create is idempotent by it).
   async function call(action, params, formKey) {
     const body = { action, params };
     if (formKey) {
@@ -61,13 +113,40 @@
       pendingRequests.set(formKey, { fingerprint, requestId: body.request_id });
     }
     try {
-      const result = unwrap(await root.ConsoleAPI.postProject("hexaworld", "hx-admin", body));
+      const result = unwrap(await root.ConsoleAPI.postProject("houseduck", "tenkey-admin", body));
       if (formKey) pendingRequests.delete(formKey);
       return result;
     } catch (error) {
       if (formKey && Number(error?.status) >= 400 && Number(error?.status) < 500) pendingRequests.delete(formKey);
       throw error;
     }
+  }
+
+  // A small dialog that asks for the reason a list action (end / delete) is audited with; resolves with the text or null.
+  function askReason(title, body) {
+    const dialog = byId("tenkeyReasonDialog");
+    if (dialog.open) return Promise.resolve(null);
+    const input = byId("tenkeyReasonInput");
+    byId("tenkeyReasonTitle").textContent = title;
+    byId("tenkeyReasonBody").textContent = body;
+    input.value = "";
+    dialog.returnValue = "cancel";
+    dialog.showModal();
+    return new Promise((resolve) => dialog.addEventListener("close", () => resolve(dialog.returnValue === "confirm" ? input.value.trim() || null : null), { once: true }));
+  }
+
+  // Pagination used by every list: `loader(page)` fetches and renders, `render` shows "n / N".
+  function pager(ids, pageSize, loader) {
+    const st = { page: 1, total: 0 };
+    const draw = () => {
+      const last = Math.max(1, Math.ceil(st.total / pageSize));
+      byId(ids.label).textContent = `${st.page} / ${last}`;
+      byId(ids.prev).disabled = st.page <= 1;
+      byId(ids.next).disabled = st.page >= last;
+    };
+    byId(ids.prev).addEventListener("click", () => { if (st.page > 1) { st.page -= 1; loader(st.page); } });
+    byId(ids.next).addEventListener("click", () => { if (st.page * pageSize < st.total) { st.page += 1; loader(st.page); } });
+    return { st, draw, reset() { st.page = 1; } };
   }
 
   // Form values -> {config, reason}, or {error: <server error code>}. Mirrors the server checks so
@@ -120,7 +199,7 @@
   async function loadConfig() {
     setMessage(PAGE_MESSAGE, "10KEY 설정을 불러오는 중입니다...");
     try {
-      state.config = (await call("tenkey.config_get", {})).data || {};
+      state.config = (await call("config.get", {})).data || {};
       fillForm(state.config);
       const saved = state.config.updated_at ? new Date(state.config.updated_at) : null;
       const savedText = saved && !Number.isNaN(saved.getTime()) ? ` 마지막 저장: ${saved.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" })}` : "";
@@ -145,7 +224,7 @@
       const { config, reason } = checked;
       if (!await root.ConsoleApp.confirmChange("10KEY 앱 설정 변경", summary(config, reason))) return;
       setMessage(FORM_MESSAGE, "저장하는 중입니다...");
-      const result = await call("tenkey.config_set", { config, reason }, form);
+      const result = await call("config.set", { config, reason }, form);
       state.config = result.data?.config || config;
       fillForm(state.config);
       form.elements.reason.value = "";
@@ -166,5 +245,9 @@
     loadConfig();
   }
 
-  root.ConsoleTenkey = { mountConfig, validate };
+  root.ConsoleTenkey = {
+    mountConfig, validate,
+    call, report, setMessage, errorText, pager, askReason,
+    fmt: { esc, num, time, shortTime, dayText, duration, bytes, pct, platformName },
+  };
 })(window);

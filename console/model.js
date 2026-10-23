@@ -5,9 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
   const pages = new Set([
     "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
-    "hexaworld-overview", "hexaworld-notices", "hexaworld-attendance", "hexaworld-mail", "hexaworld-config", "hexaworld-audit",
-    "hexaworld-players",
-    "tenkey-config",
+    "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-purchases", "tenkey-ranking",
+    "tenkey-config", "tenkey-audit",
   ]);
 
   function routeFromHash(hash) {
@@ -18,6 +17,13 @@
         return { page: "player", userId: decodeURIComponent(parts[1]) };
       } catch (_error) {
         return { page: "players" };
+      }
+    }
+    if (parts[0] === "tenkey-players" && parts[1]) {
+      try {
+        return { page: "tenkey-player", userId: decodeURIComponent(parts[1]) };
+      } catch (_error) {
+        return { page: "tenkey-players" };
       }
     }
     return { page: pages.has(parts[0]) ? parts[0] : "analytics" };

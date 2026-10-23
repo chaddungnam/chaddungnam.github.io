@@ -50,14 +50,9 @@
           <span class="project-card-copy"><strong>Quirky Ball</strong><small>분석 · 플레이어 · 운영</small></span>
           <span class="project-card-arrow" aria-hidden="true">↗</span>
         </button>
-        <button id="projectHexaworld" class="project-card" type="button">
-          <span class="project-card-mark" aria-hidden="true">C</span>
-          <span class="project-card-copy"><strong>Comrade & the Brave New World</strong><small>동무와 멋진신세계 · 공지 · 출석 · 우편 · 설정</small></span>
-          <span class="project-card-arrow" aria-hidden="true">↗</span>
-        </button>
         <button id="projectTenkey" class="project-card" type="button">
           <span class="project-card-mark" aria-hidden="true">10</span>
-          <span class="project-card-copy"><strong>10key Survival</strong><small>10KEY · 딸깍 서바이벌</small></span>
+          <span class="project-card-copy"><strong>10key Survival</strong><small>딸깍 서바이벌 · 접속자 · 플레이어 · 크래시 · 공지</small></span>
           <span class="project-card-arrow" aria-hidden="true">↗</span>
         </button>
       </div>
@@ -79,17 +74,15 @@
         <a href="#/audit" data-page="audit"><span class="nav-index">07</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
         <a href="#/notes" data-page="notes"><span class="nav-index">08</span><span class="nav-copy">메모<small>판단·기록</small></span></a>
       </nav>
-      <nav id="hexaworldNav" hidden>
-        <a href="#/hexaworld-overview" data-page="hexaworld-overview"><span class="nav-index">01</span><span class="nav-copy">운영 개요<small>현황 요약</small></span></a>
-        <a href="#/hexaworld-notices" data-page="hexaworld-notices"><span class="nav-index">02</span><span class="nav-copy">공지<small>작성·수정·삭제</small></span></a>
-        <a href="#/hexaworld-attendance" data-page="hexaworld-attendance"><span class="nav-index">03</span><span class="nav-copy">출석 보상<small>일차별 구성</small></span></a>
-        <a href="#/hexaworld-mail" data-page="hexaworld-mail"><span class="nav-index">04</span><span class="nav-copy">우편 발송<small>전체 발송</small></span></a>
-        <a href="#/hexaworld-config" data-page="hexaworld-config"><span class="nav-index">05</span><span class="nav-copy">앱 설정<small>버전·점검·플래그</small></span></a>
-        <a href="#/hexaworld-audit" data-page="hexaworld-audit"><span class="nav-index">06</span><span class="nav-copy">감사 로그<small>변경 이력</small></span></a>
-        <a href="#/hexaworld-players" data-page="hexaworld-players"><span class="nav-index">07</span><span class="nav-copy">시험 계정<small>재화·스테이지·알림</small></span></a>
-      </nav>
       <nav id="tenkeyNav" hidden>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">01</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
+        <a href="#/tenkey-overview" data-page="tenkey-overview"><span class="nav-index">01</span><span class="nav-copy">한눈 요약<small>접속자·신규·플레이</small></span></a>
+        <a href="#/tenkey-players" data-page="tenkey-players"><span class="nav-index">02</span><span class="nav-copy">플레이어<small>검색·상세</small></span></a>
+        <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">03</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
+        <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">04</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
+        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">05</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
+        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">06</span><span class="nav-copy">랭킹<small>보드·의심 기록</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">07</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">08</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -445,209 +438,161 @@
       </section>
 
 
-      <section id="hexaworldOverviewView" class="route-view" data-route="hexaworld-overview" hidden>
-        <nav class="workspace-jumps" aria-label="Comrade 바로가기"><a href="#/hexaworld-notices">공지 작성 ↗</a><a href="#/hexaworld-mail">전체 우편 발송 ↗</a><a href="#/hexaworld-config">점검 모드 ↗</a></nav>
-        <p id="hexaworldOverviewMessage" class="dashboard-message" role="status"></p>
-        <div id="hexaworldOverviewSummary" class="operations-summary"></div>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">APP CONFIG</p><h2>현재 앱 설정 요약</h2></div><span id="hexaworldOverviewAuthMode" class="status-label">—</span></div><div id="hexaworldOverviewConfig" class="coverage-grid" aria-live="polite"></div></section>
+      <section id="tenkeyOverviewView" class="route-view" data-route="tenkey-overview" hidden>
+        <section id="tenkeyOverview" class="overview" aria-labelledby="tenkeyOverviewTitle" aria-busy="false">
+          <h2 id="tenkeyOverviewTitle" class="sr-only">10key Survival 한눈 요약</h2>
+          <div class="ov-bar" role="group" aria-label="한눈 요약 필터">
+            <div class="overview-segment" role="group" aria-label="기간"><button class="overview-switch" type="button" data-tk-period="7" aria-pressed="true">7일</button><button class="overview-switch" type="button" data-tk-period="30" aria-pressed="false">30일</button><button class="overview-switch" type="button" data-tk-period="90" aria-pressed="false">90일</button></div>
+            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-tk-platform="" aria-pressed="true" title="Android와 iOS 앱을 합친 숫자 (웹은 식별자를 보내지 않아 빠짐)">전체(앱)</button><button class="overview-switch" type="button" data-tk-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-tk-platform="ios" aria-pressed="false">iOS</button></div>
+            <div class="ov-bar-end">
+              <p id="tenkeyOverviewStatus" class="ov-status" role="status">불러오는 중</p>
+              <button id="tenkeyOverviewRefresh" class="overview-refresh" type="button">새로 집계</button>
+            </div>
+          </div>
+          <section class="ov-summary" aria-labelledby="tenkeyOverviewSummaryTitle"><h3 id="tenkeyOverviewSummaryTitle">이번 기간 요약</h3><ol id="tenkeyOverviewSummary" class="ov-summary-list"><li>요약을 불러오는 중이에요</li></ol></section>
+          <div id="tenkeyOverviewKpis" class="ov-kpis" aria-live="polite"></div>
+          <div id="tenkeyOverviewCharts" class="ov-charts"></div>
+          <details id="tenkeyOverviewDetails" class="ov-details">
+            <summary><strong>서버 상태 · 집계 기준</strong><small>공용 서버 용량(무료 500MB)과 숫자가 어떻게 만들어지는지. 한눈에 볼 때는 열지 않아도 됩니다.</small></summary>
+            <div class="ov-details-body"><div id="tenkeyOverviewServer" class="lab-facts" aria-live="polite"></div><section class="overview-notes"><h4>집계 기준</h4><ul id="tenkeyOverviewNotes"></ul></section></div>
+          </details>
+          <div id="tenkeyTip" class="ov-tip" role="tooltip" hidden></div>
+        </section>
+        <p id="tenkeyOverviewMessage" class="dashboard-message" role="status"></p>
       </section>
 
-      <section id="hexaworldNoticesView" class="route-view" data-route="hexaworld-notices" hidden>
-        <nav class="workspace-jumps" aria-label="공지 바로가기"><button type="button" data-console-jump="hexaworldNoticeForm">공지 작성</button><button type="button" data-console-jump="hexaworldNoticeList">공지 목록</button></nav>
-        <p id="hexaworldNoticesMessage" class="dashboard-message" role="status"></p>
-        <form id="hexaworldNoticeForm" class="panel admin-form impact-form impact-form-critical">
-          <p class="eyebrow">COMRADE NOTICE</p><h2 id="hexaworldNoticeFormTitle">공지 작성</h2>
-          <p class="impact-note">활성 공지는 게시 시작일부터 종료일까지 게임 내 공지 화면에 표시됩니다. 한국어는 필수, 영어는 선택입니다.</p>
+      <section id="tenkeyPlayersView" class="route-view" data-route="tenkey-players" hidden>
+        <form id="tenkeyPlayerSearchForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>플레이어 검색<input id="tenkeyPlayerSearch" type="search" maxlength="100" placeholder="닉네임 · 플레이어 ID · 로그인 ID"></label>
+          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 (CrazyGames)</option><option value="android">Android</option><option value="ios">iOS</option></select></label>
+          <label>정렬<select id="tenkeyPlayerSort"><option value="last_seen_at">마지막 접속</option><option value="created_at">가입</option><option value="best">최고 점수</option><option value="name">이름</option></select></label>
+          <label>방향<select id="tenkeyPlayerDirection"><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
+          <button class="primary-button" type="submit">검색</button>
+        </form>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 사람들입니다 (웹은 CrazyGames 로그인, 앱은 게스트 계정). 로그인하지 않은 웹 플레이어는 서버에 없습니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>플랫폼</th><th>가입</th><th>마지막 접속</th><th class="tk-num">최고 점수</th><th>나이대</th><th>상태</th><th>처리</th></tr></thead><tbody id="tenkeyPlayersTable"></tbody></table></div>
+          <div class="pagination"><button id="tenkeyPlayersPrevious" type="button">이전</button><span id="tenkeyPlayersPage">1 / 1</span><button id="tenkeyPlayersNext" type="button">다음</button></div>
+        </section>
+        <p id="tenkeyPlayersMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="tenkeyPlayerView" class="route-view" data-route="tenkey-player" hidden>
+        <a class="text-button" href="#/tenkey-players">← 목록으로</a>
+        <p id="tenkeyPlayerMessage" class="dashboard-message" role="status"></p>
+        <div id="tenkeyPlayerDetail"></div>
+      </section>
+
+      <section id="tenkeyCrashesView" class="route-view" data-route="tenkey-crashes" hidden>
+        <form id="tenkeyCrashFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>묶는 기준<select id="tenkeyCrashBy"><option value="message">오류 내용</option><option value="version">앱 버전</option><option value="device">기기</option><option value="kind">종류</option></select></label>
+          <label>기간<select id="tenkeyCrashDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option></select></label>
+          <label>플랫폼<select id="tenkeyCrashPlatform"><option value="">전체</option><option value="android">Android</option><option value="ios">iOS</option><option value="web">웹</option></select></label>
+          <label>종류<select id="tenkeyCrashKind"><option value="">전체</option><option value="unclean_exit">화면을 켠 채 꺼짐</option><option value="anr_suspect">멈춤 (5초 이상)</option><option value="script_error">스크립트 오류</option></select></label>
+          <label>검색<input id="tenkeyCrashQuery" type="search" maxlength="100" placeholder="오류 내용 · 기기 · 버전"></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <section class="purchase-summary tenkey-summary" id="tenkeyCrashSummary" aria-label="크래시 요약">
+          <article data-tone="neutral"><span>기간 내 보고</span><strong data-crash-summary="rows">—</strong></article>
+          <article data-tone="risk"><span>발생 횟수 (같은 오류 합산)</span><strong data-crash-summary="times">—</strong></article>
+          <article data-tone="watch"><span>묶음 수</span><strong data-crash-summary="groups">—</strong></article>
+          <article data-tone="neutral"><span>가장 최근 보고</span><strong data-crash-summary="last">—</strong></article>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">CRASH GROUPS</p><h2 id="tenkeyCrashGroupsTitle">오류 내용별 묶음</h2><small>같은 오류는 하루 5건까지만 줄로 남고 그 뒤는 횟수만 늘어납니다. 묶음을 누르면 아래 목록이 그 묶음으로 좁혀집니다. 앱을 홈 키로 끄거나 최근 앱에서 밀어 끈 것은 크래시로 세지 않습니다.</small></div><span id="tenkeyCrashGroupsTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>묶음</th><th class="tk-num">횟수</th><th class="tk-num">보고</th><th class="tk-num">설치 수</th><th class="tk-num">기기</th><th class="tk-num">버전</th><th>처음</th><th>마지막</th></tr></thead><tbody id="tenkeyCrashGroups"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">CRASH REPORTS</p><h2>크래시 목록</h2></div><span id="tenkeyCrashTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>시각</th><th>종류</th><th>오류 내용</th><th>버전</th><th>기기 · OS</th><th class="tk-num">횟수</th><th>로그</th></tr></thead><tbody id="tenkeyCrashTable"></tbody></table></div>
+          <div class="pagination"><button id="tenkeyCrashPrevious" type="button">이전</button><span id="tenkeyCrashPage">1 / 1</span><button id="tenkeyCrashNext" type="button">다음</button></div>
+        </section>
+        <section id="tenkeyCrashDetail" class="panel" hidden></section>
+        <p id="tenkeyCrashMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="tenkeyNoticesView" class="route-view" data-route="tenkey-notices" hidden>
+        <nav class="workspace-jumps" aria-label="공지 바로가기"><button type="button" data-console-jump="tenkeyNoticeForm">공지 작성</button><button type="button" data-console-jump="tenkeyNoticeList">공지 목록</button></nav>
+        <p id="tenkeyNoticesMessage" class="dashboard-message" role="status"></p>
+        <form id="tenkeyNoticeForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">10KEY NOTICE</p><h2 id="tenkeyNoticeFormTitle">공지 작성</h2>
+          <p class="impact-note">게시 시작 시각부터 종료 시각까지 앱 안 공지 창에 보입니다 (시작을 미래로 하면 예약, 종료를 비우면 계속). 한국어 기기는 한국어, 그 밖의 기기는 영어를 봅니다. 영어가 비어 있으면 영어 기기에도 한국어가 나가니 영어도 꼭 채우세요. 앱을 새로 켜거나 공지를 다시 읽을 때 반영됩니다.</p>
           <input type="hidden" name="noticeId">
           <div class="form-pair">
-            <label>분류<select name="category" required><option value="notice">[공지]</option><option value="event">[이벤트]</option><option value="update">[업데이트]</option><option value="maintenance">[점검]</option></select></label>
-            <label class="check-label"><input name="pinned" type="checkbox"> 상단 고정</label>
-          </div>
-          <div class="form-pair">
             <label>제목 (한국어)<input name="titleKo" maxlength="80" required><small data-counter="titleKo">0 / 80자</small></label>
-            <label>제목 (영어, 선택)<input name="titleEn" maxlength="80"><small data-counter="titleEn">0 / 80자</small></label>
+            <label>제목 (영어)<input name="titleEn" maxlength="80" required><small data-counter="titleEn">0 / 80자</small></label>
           </div>
           <div class="form-pair">
             <label>본문 (한국어)<textarea name="bodyKo" maxlength="2000" rows="6" required></textarea><small data-counter="bodyKo">0 / 2000자</small></label>
-            <label>본문 (영어, 선택)<textarea name="bodyEn" maxlength="2000" rows="6"></textarea><small data-counter="bodyEn">0 / 2000자</small></label>
-          </div>
-          <div><p class="eyebrow">미리보기 (한국어)</p><div id="hexaworldNoticePreview" class="reward-template-preview" aria-live="polite"></div></div>
-          <div class="form-pair">
-            <label>링크 URL (선택)<input name="linkUrl" type="url" maxlength="500" placeholder="https://"></label>
-            <label>이미지 URL (선택, https만)<input name="imageUrl" type="url" maxlength="500" placeholder="https://"></label>
-          </div>
-          <p id="hexaworldNoticeLinkCheck" class="status-label" hidden></p>
-          <div class="form-pair">
-            <label>링크 버튼 라벨 (한국어)<input name="linkLabelKo" maxlength="40"></label>
-            <label>링크 버튼 라벨 (영어)<input name="linkLabelEn" maxlength="40"></label>
-          </div>
-          <div class="form-pair">
-            <label>우선순위<input name="priority" type="number" step="1" value="0"></label>
-            <label class="check-label"><input name="active" type="checkbox" checked> 활성</label>
+            <label>본문 (영어)<textarea name="bodyEn" maxlength="2000" rows="6" required></textarea><small data-counter="bodyEn">0 / 2000자</small></label>
           </div>
           <div class="form-pair">
             <label>게시 시작 (KST)<input name="startsAt" type="datetime-local" required></label>
-            <label>게시 종료 (KST, 선택)<input name="endsAt" type="datetime-local"></label>
+            <label>게시 종료 (KST, 비우면 계속)<input name="endsAt" type="datetime-local"></label>
           </div>
-          <label>작성·수정 사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 신규 이벤트 안내"></label>
-          <p id="hexaworldNoticeFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <div class="form-pair"><button class="danger-button" type="submit" data-submit-label="공지 발행" data-edit-label="공지 수정">공지 발행</button><button id="hexaworldNoticeReset" class="warning-button" type="button">새 공지</button></div>
+          <div class="form-pair">
+            <label>우선순위 (큰 수가 위, -100~100)<input name="priority" type="number" step="1" min="-100" max="100" value="0"></label>
+            <label class="check-label"><input name="active" type="checkbox" checked> 켜짐 (끄면 기간이어도 숨김)</label>
+          </div>
+          <div><p class="eyebrow">앱 안 미리보기</p><div class="tenkey-previews"><div id="tenkeyNoticePreviewKo" class="tenkey-notice-card" lang="ko"></div><div id="tenkeyNoticePreviewEn" class="tenkey-notice-card" lang="en"></div></div></div>
+          <label>작성·수정 사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 점검 안내"></label>
+          <p id="tenkeyNoticeFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <div class="form-pair"><button class="danger-button" type="submit" data-submit-label="공지 발행" data-edit-label="공지 수정">공지 발행</button><button id="tenkeyNoticeReset" class="warning-button" type="button">새 공지</button></div>
         </form>
-        <section id="hexaworldNoticeList" class="panel"><div class="panel-heading"><div><p class="eyebrow">NOTICES</p><h2>공지 목록</h2></div><span id="hexaworldNoticesTotal" class="panel-total">—</span></div><div id="hexaworldNoticesListing" class="audit-list"></div></section>
+        <section id="tenkeyNoticeList" class="panel"><div class="panel-heading"><div><p class="eyebrow">NOTICES</p><h2>공지 목록</h2><small>상태: 게시 중 · 예약 · 종료 · 꺼짐. 앱에는 게시 중인 것만, 우선순위 높은 순에 최신순으로 보입니다.</small></div><span id="tenkeyNoticesTotal" class="panel-total">—</span></div><div id="tenkeyNoticesListing" class="audit-list"></div></section>
       </section>
 
-      <section id="hexaworldAttendanceView" class="route-view" data-route="hexaworld-attendance" hidden>
-        <p id="hexaworldAttendanceMessage" class="dashboard-message" role="status"></p>
-        <div id="hexaworldAttendanceSummary" class="operations-summary"></div>
-        <form id="hexaworldAttendanceForm" class="panel admin-form impact-form impact-form-critical">
-          <p class="eyebrow">DAILY ATTENDANCE</p><h2>출석 보상 사이클</h2>
-          <p class="impact-note">일차는 1부터 연속이어야 합니다 (최대 28일). 칸을 비워두면 그 보상은 지급하지 않습니다. 한도: 코인·부품 최대 10,000,000 · 젬 최대 100,000 · 열쇠 최대 1,000.</p>
-          <div class="table-scroll"><table><thead><tr><th>일차</th><th>코인</th><th>젬</th><th>열쇠</th><th>부품</th><th></th></tr></thead><tbody id="hexaworldAttendanceTable"></tbody></table></div>
-          <div class="form-pair"><button id="hexaworldAttendanceAddDay" type="button">마지막 날 추가</button><span id="hexaworldAttendanceDayCount" class="status-label">0일</span></div>
-          <label>변경 사유<input name="reason" maxlength="300" required></label>
-          <p id="hexaworldAttendanceFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="danger-button" type="submit">출석 보상 저장</button>
+      <section id="tenkeyPurchasesView" class="route-view" data-route="tenkey-purchases" hidden>
+        <form id="tenkeyPurchaseFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyPurchaseRange"><option value="7">최근 7일</option><option value="30" selected>최근 30일</option><option value="90">최근 90일</option><option value="365">최근 1년</option><option value="0">전체</option></select></label>
+          <label>스토어<select id="tenkeyPurchasePlatform"><option value="">전체</option><option value="android">Google Play</option><option value="ios">App Store</option></select></label>
+          <label>상태<select id="tenkeyPurchaseState"><option value="">전체</option><option value="granted">결제 완료</option><option value="sandbox">테스트 결제</option><option value="refunded">환불</option></select></label>
+          <label>검색<input id="tenkeyPurchaseQuery" type="search" maxlength="100" placeholder="닉네임 · 상품 · 주문번호 뒤 · 로그인 ID 앞"></label>
+          <button class="primary-button" type="submit">조회</button>
         </form>
-      </section>
-
-      <section id="hexaworldMailView" class="route-view" data-route="hexaworld-mail" hidden>
-        <p id="hexaworldMailMessage" class="dashboard-message" role="status"></p>
-        <form id="hexaworldMailForm" class="panel admin-form impact-form impact-form-critical">
-          <p class="eyebrow">COMRADE MAIL</p><h2>전체 보상 우편</h2>
-          <p class="impact-note">모든 플레이어에게 즉시 발송됩니다. 제목·본문·보상·기한을 확인한 뒤 진행하세요.</p>
-          <div class="form-pair">
-            <label>제목 (한국어)<input name="titleKo" maxlength="60" required><small data-counter="mailTitleKo">0 / 60자</small></label>
-            <label>제목 (영어, 선택)<input name="titleEn" maxlength="60"><small data-counter="mailTitleEn">0 / 60자</small></label>
-          </div>
-          <div class="form-pair">
-            <label>본문 (한국어)<textarea name="bodyKo" maxlength="500" rows="4" required></textarea><small data-counter="mailBodyKo">0 / 500자</small></label>
-            <label>본문 (영어, 선택)<textarea name="bodyEn" maxlength="500" rows="4"></textarea><small data-counter="mailBodyEn">0 / 500자</small></label>
-          </div>
-          <div><p class="eyebrow">REWARDS</p><div id="hexaworldMailRewards" class="hexaworld-reward-rows"></div><button id="hexaworldMailAddReward" type="button">보상 추가</button></div>
-          <label>수령 기한 (일, 1~30)<input name="expiresDays" type="number" min="1" max="30" step="1" value="7" required></label>
-          <label>발송 사유<input name="reason" maxlength="300" required></label>
-          <p id="hexaworldMailFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="danger-button" type="submit">전체 발송</button>
-        </form>
-      </section>
-
-      <section id="hexaworldConfigView" class="route-view" data-route="hexaworld-config" hidden>
-        <p id="hexaworldConfigMessage" class="dashboard-message" role="status"></p>
-        <form id="hexaworldConfigForm" class="panel admin-form impact-form impact-form-critical">
-          <p class="eyebrow">APP CONFIG</p><h2>앱 설정</h2>
-          <p class="impact-note">강제 업데이트는 플랫폼마다 따로 봅니다: Android는 versionCode, iOS는 빌드 번호. 최소보다 낮은 앱은 업데이트 안내만 뜨고 더 진행할 수 없습니다. 올리기 전에 그 스토어에 새 빌드가 배포됐는지 먼저 확인하세요. 점검을 켜면 즉시 모든 플레이어에게 점검 화면이 표시됩니다.</p>
-          <div class="form-pair">
-            <label>Android 최소 versionCode<input name="minVersionCode" type="number" min="0" step="1" required></label>
-            <label>Android 최신 versionCode<input name="latestVersionCode" type="number" min="0" step="1" required></label>
-          </div>
-          <div class="form-pair">
-            <label>iOS 최소 빌드 번호<input name="minBuildIos" type="number" min="1" step="1" required></label>
-            <label>iOS 최신 빌드 번호<input name="latestBuildIos" type="number" min="1" step="1" required></label>
-          </div>
-          <div class="form-pair">
-            <label>Android 스토어 URL<input name="storeUrlAndroid" type="url" maxlength="500"></label>
-            <label>iOS 스토어 URL<input name="storeUrlIos" type="url" maxlength="500"></label>
-          </div>
-          <label class="check-label"><input name="maintenance" type="checkbox"> 점검 모드 사용</label>
-          <div class="form-pair">
-            <label>점검 안내 (한국어)<textarea name="maintenanceMsgKo" maxlength="300" rows="3"></textarea></label>
-            <label>점검 안내 (영어)<textarea name="maintenanceMsgEn" maxlength="300" rows="3"></textarea></label>
-          </div>
-          <label>기능 플래그 (JSON)<textarea name="featureFlags" maxlength="4000" rows="5" spellcheck="false"></textarea></label>
-          <label>보상 배율 (JSON, 0.5~3)<textarea name="balance" maxlength="2000" rows="5" spellcheck="false" placeholder='{"econ_mult":{"idle":1}}'></textarea><small>idle, chest_normal, directive_daily, directive_weekly, leaflet, crate, ad_double. 비우면 배율은 바꾸지 않습니다.</small></label>
-          <p id="hexaworldConfigJsonMessage" class="dashboard-message" role="status"></p>
-          <label>변경 사유<input name="reason" maxlength="300" required></label>
-          <p id="hexaworldConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="danger-button" type="submit">앱 설정 저장</button>
-        </form>
-        <section class="panel" aria-labelledby="hexaworldConfigHistoryTitle">
-          <p class="eyebrow">CONFIG HISTORY</p><h2 id="hexaworldConfigHistoryTitle">이전 설정 복구</h2>
-          <p id="hexaworldConfigHistoryMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <ul id="hexaworldConfigHistory" class="admin-list"></ul>
+        <section id="tenkeyPurchaseSummary" class="purchase-summary tenkey-summary" aria-label="구매 요약">
+          <article data-tone="neutral"><span>전체</span><strong data-tk-summary="total">—</strong></article>
+          <article data-tone="good"><span>결제 완료</span><strong data-tk-summary="granted">—</strong></article>
+          <article data-tone="neutral"><span>테스트 결제</span><strong data-tk-summary="sandbox">—</strong></article>
+          <article data-tone="risk"><span>환불</span><strong data-tk-summary="refunded">—</strong></article>
+          <article data-tone="watch"><span>환불 비율</span><strong data-tk-summary="refundRate">—</strong></article>
         </section>
-        <section class="panel" aria-labelledby="hexaworldEventsTitle">
-          <p class="eyebrow">LIVE EVENTS</p><h2 id="hexaworldEventsTitle">라이브 이벤트</h2>
-          <p class="impact-note">시작 48시간 전까지 등록해야 하며, 시작 뒤에는 보상표를 바꿀 수 없습니다. 중단은 5분 안에 모든 클라이언트에 반영됩니다.</p>
-          <p id="hexaworldEventsMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <ul id="hexaworldEventsList" class="admin-list"></ul>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">GEMS</p><h2>젬 · 리바이브 패스</h2><small>젬은 앱 저장에 있고, 서버는 구매로 받은 것과 앱이 알려준 쓴 기록만 장부로 가집니다 (잔액의 정본이 아닙니다).</small></div></div>
+          <div id="tenkeyGemFacts" class="lab-facts" aria-live="polite"></div>
         </section>
-        <form id="hexaworldEventForm" class="panel admin-form impact-form">
-          <p class="eyebrow">NEW EVENT</p><h2>이벤트 등록</h2>
-          <div class="form-pair">
-            <label>이벤트 키 (영소문자·숫자·_)<input name="eventKey" pattern="[a-z0-9_]{3,40}" maxlength="40" required></label>
-            <label>종류<select name="kind" required><option value="reward">보상</option><option value="incident">사건</option><option value="pattern">패턴 변형</option></select></label>
-          </div>
-          <div class="form-pair">
-            <label>제목 (한국어)<input name="titleKo" maxlength="80" required></label>
-            <label>제목 (영어)<input name="titleEn" maxlength="80" required></label>
-          </div>
-          <div class="form-pair">
-            <label>시작 (KST)<input name="startsAt" type="datetime-local" required></label>
-            <label>종료 (KST)<input name="endsAt" type="datetime-local" required></label>
-          </div>
-          <label>보상표 (JSON 배열)<textarea name="rewardTable" maxlength="4000" rows="4" spellcheck="false"></textarea></label>
-          <p id="hexaworldEventFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="danger-button" type="submit">이벤트 등록</button>
-        </form>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">STORE RECORDS</p><h2>구매 기록</h2><small>서버가 스토어에서 확인해 기록한 것만 보입니다. 금액은 스토어 정산 화면에서 확인하세요.</small></div><span id="tenkeyPurchaseTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>상품</th><th>스토어</th><th>상태</th><th>주문 번호 끝</th><th>환불</th></tr></thead><tbody id="tenkeyPurchasesTable"></tbody></table></div>
+          <div class="pagination"><button id="tenkeyPurchasesPrevious" type="button">이전</button><span id="tenkeyPurchasesPage">1 / 1</span><button id="tenkeyPurchasesNext" type="button">다음</button></div>
+        </section>
+        <p id="tenkeyPurchasesMessage" class="dashboard-message" role="status"></p>
       </section>
 
-      <section id="hexaworldPlayersView" class="route-view" data-route="hexaworld-players" hidden>
-        <form id="hexaworldPlayerSearch" class="panel admin-toolbar" role="search">
-          <label>닉네임, 계정 번호 또는 친구 코드<input id="hexaworldPlayerQuery" name="query" maxlength="100" required></label>
-          <button class="primary-button" type="submit">찾기</button>
+      <section id="tenkeyRankingView" class="route-view" data-route="tenkey-ranking" hidden>
+        <form id="tenkeyBoardForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>보드<select id="tenkeyBoardSelect"><option value="week">이번 주</option><option value="all">전체 기간</option></select></label>
+          <label>표시 개수<select id="tenkeyBoardLimit"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
         </form>
-        <p id="hexaworldPlayerSearchMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-        <ul id="hexaworldPlayerResults" class="admin-list"></ul>
-        <section id="hexaworldPlayerDetail" class="panel" hidden>
-          <p class="eyebrow">TEST ACCOUNT</p>
-          <h2 id="hexaworldPlayerTitle">시험 계정</h2>
-          <p id="hexaworldPlayerMeta"></p>
-          <p class="impact-note">재화·스테이지·포탑·룬·해금·튜토리얼·VIP·시험 구매는 그 계정이 다음에 접속할 때 그 기기에 반영됩니다. 출석 기록은 서버에서 바로 지워집니다. 시험 구매는 스토어 영수증을 만들지 않습니다.</p>
-          <form id="hexaworldPlayerPatch" class="admin-form">
-            <div class="form-pair">
-              <label>배급표 증감<input name="coupons" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
-              <label>보석 증감<input name="gems" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
-            </div>
-            <div class="form-pair">
-              <label>열쇠 증감<input name="keys" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
-              <label>부품 증감<input name="parts" type="number" step="1" inputmode="numeric" placeholder="비우면 그대로"></label>
-            </div>
-            <div class="form-pair">
-              <label>지금 스테이지 (1~10000)<input name="stage" type="number" min="1" max="10000" step="1"></label>
-              <label>최고 스테이지 (1~10000)<input name="bestStage" type="number" min="1" max="10000" step="1"></label>
-            </div>
-            <div id="hexaworldTurretFields" class="form-pair"></div>
-            <div id="hexaworldRuneFields" class="form-pair"></div>
-            <label class="check-label"><input name="unlockAll" type="checkbox"> 포탑 칸을 모두 열기</label>
-            <label class="check-label"><input name="resetTutorial" type="checkbox"> 튜토리얼을 처음부터</label>
-            <label class="check-label"><input name="resetAttendance" type="checkbox"> 출석 기록을 지우기</label>
-            <div class="form-pair">
-              <label>VIP 시험<select name="vip"><option value="">그대로</option><option value="on">등급 1로 켜기 (결제 금액은 그대로)</option><option value="off">시험 표시 끄기</option></select></label>
-              <label>시험 구매<select name="testPurchase"><option value="">그대로</option><option value="on">상점 버튼을 시험 지급으로</option><option value="off">시험 지급 끄기</option></select></label>
-            </div>
-            <label>사유<input name="reason" maxlength="300" required></label>
-            <p id="hexaworldPlayerPatchMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-            <button class="danger-button" type="submit">다음 접속에 적용</button>
-          </form>
-          <div class="form-pair">
-            <button id="hexaworldTestMail" type="button">시험 우편 보내기</button>
-            <button id="hexaworldTestPush" type="button">시험 알림 보내기</button>
-          </div>
-          <form id="hexaworldPlayerWipe" class="admin-form">
-            <label>지울 계정의 닉네임<input name="confirmNick" maxlength="80" autocomplete="off"></label>
-            <p id="hexaworldPlayerActionMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-            <button class="danger-button" type="submit">계정 기록 지우기</button>
-          </form>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">RANKING BOARD</p><h2 id="tenkeyBoardTitle">랭킹 보드</h2><small id="tenkeyBoardMeta">앱에 보이는 순위 그대로입니다. 정지된 플레이어와 옛 점수 규칙의 기록은 순위 없이 아래에 흐리게 보입니다.</small></div><span id="tenkeyBoardTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th class="tk-num">순위</th><th>플레이어</th><th class="tk-num">점수</th><th class="tk-num">레벨</th><th>시간</th><th>기록 시각</th><th>상태</th></tr></thead><tbody id="tenkeyBoardTable"></tbody></table></div>
         </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">FLAGGED RUNS</p><h2>의심 기록 (서버가 순위에서 뺀 판)</h2><small>시간·레벨·점수가 말이 안 되거나 두 판이 겹친 기록입니다. 순위에는 올라가지 않습니다 (90일 보관). 계속 나오는 플레이어는 상세에서 정지할 수 있습니다.</small></div><span id="tenkeyFlaggedTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th class="tk-num">점수</th><th class="tk-num">레벨</th><th>시간</th><th>이유</th><th>플랫폼 · 빌드</th></tr></thead><tbody id="tenkeyFlaggedTable"></tbody></table></div>
+        </section>
+        <p id="tenkeyBoardMessage" class="dashboard-message" role="status"></p>
       </section>
 
-      <section id="hexaworldAuditView" class="route-view" data-route="hexaworld-audit" hidden>
-        <form id="hexaworldAuditFilterForm" class="panel admin-toolbar" role="search">
-          <label>표시 개수<select id="hexaworldAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
+      <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
+        <form id="tenkeyAuditFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>표시 개수<select id="tenkeyAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
           <button class="primary-button" type="submit">새로고침</button>
         </form>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">COMRADE AUDIT</p><h2>감사 로그</h2></div><span id="hexaworldAuditTotal" class="panel-total">—</span></div><div id="hexaworldAuditList" class="audit-list"></div></section>
-        <p id="hexaworldAuditMessage" class="dashboard-message" role="status"></p>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">10KEY AUDIT</p><h2>감사 기록</h2><small>공지·정지·앱 설정 변경을 누가 언제 왜 했는지 남깁니다 (이 화면이 생긴 뒤의 변경부터).</small></div><span id="tenkeyAuditTotal" class="panel-total">—</span></div><div id="tenkeyAuditList" class="audit-list"></div></section>
+        <p id="tenkeyAuditMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="tenkeyConfigView" class="route-view" data-route="tenkey-config" hidden>
@@ -706,6 +651,14 @@
       <div class="dialog-actions"><button value="cancel" type="submit">취소</button><button class="danger-button" value="confirm" type="submit">확인</button></div>
     </form>
   </dialog>
+  <dialog id="tenkeyReasonDialog" class="confirm-dialog" aria-labelledby="tenkeyReasonTitle">
+    <form method="dialog" class="admin-form">
+      <h2 id="tenkeyReasonTitle">확인</h2>
+      <p id="tenkeyReasonBody"></p>
+      <label>사유 (감사 기록용)<input id="tenkeyReasonInput" maxlength="300" required></label>
+      <div class="dialog-actions"><button value="cancel" type="submit" formnovalidate>취소</button><button class="danger-button" value="confirm" type="submit">확인</button></div>
+    </form>
+  </dialog>
   <dialog id="insightReasonDialog" class="confirm-dialog insight-dialog">
     <form method="dialog"><p class="eyebrow">INSIGHT REASON</p><h2 id="insightReasonTitle">판단 근거</h2><p id="insightReasonBody"></p><div class="dialog-actions"><button value="cancel" type="submit">닫기</button></div></form>
   </dialog>
@@ -722,8 +675,12 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="hexaworld.js?v=20261007-hx"></script>
-  <script src="tenkey.js?v=20261022-tk"></script>
+  <script src="tenkey.js?v=20261023-tk"></script>
+  <script src="tenkey-overview.js?v=20261023-tk"></script>
+  <script src="tenkey-players.js?v=20261023-tk"></script>
+  <script src="tenkey-crashes.js?v=20261023-tk"></script>
+  <script src="tenkey-notices.js?v=20261023-tk"></script>
+  <script src="tenkey-more.js?v=20261023-tk"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>

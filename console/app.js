@@ -5,12 +5,13 @@ const CONSOLE_CONFIG = {
   functionBaseUrl: "https://bbgwvpwzkyudbtcgrbtm.supabase.co/functions/v1",
 };
 
-// Second game, separate Supabase project — never merged into CONSOLE_CONFIG above so the
-// Quirky Ball client's requests stay byte-for-byte unchanged. See console/hexaworld.js.
-const HEXAWORLD_CONFIG = {
+// House Duck game server (one Supabase project for every game on it, separate from Quirky Ball's) — never merged into
+// CONSOLE_CONFIG above so the Quirky Ball client's requests stay byte-for-byte unchanged. 10key Survival's admin
+// function is tenkey-admin (console/tenkey*.js).
+const HOUSEDUCK_CONFIG = {
   functionBaseUrl: "https://frepunpqswciugwoyvxo.supabase.co/functions/v1",
   publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyZXB1bnBxc3djaXVnd295dnhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDA3ODQsImV4cCI6MjEwNzgxNjc4NH0.BTfi0LS35wVbsgLkdKpvRQN8e0pw2F7-vcJ2UEnWTv4",
-  allowedFunctions: ["hx-admin"],
+  allowedFunctions: ["tenkey-admin"],
 };
 
 const pageTitles = {
@@ -23,14 +24,15 @@ const pageTitles = {
   cs: "CS",
   audit: "감사 기록",
   notes: "메모",
-  "hexaworld-overview": "운영 개요",
-  "hexaworld-notices": "공지",
-  "hexaworld-attendance": "출석 보상",
-  "hexaworld-mail": "우편 발송",
-  "hexaworld-config": "앱 설정",
-  "hexaworld-audit": "감사 로그",
-  "hexaworld-players": "시험 계정",
+  "tenkey-overview": "한눈 요약",
+  "tenkey-players": "플레이어",
+  "tenkey-player": "플레이어 상세",
+  "tenkey-crashes": "크래시",
+  "tenkey-notices": "공지",
+  "tenkey-purchases": "구매 · 젬",
+  "tenkey-ranking": "랭킹",
   "tenkey-config": "앱 설정 / 강제 업데이트",
+  "tenkey-audit": "감사 기록",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -42,14 +44,15 @@ const pageDescriptions = {
   cs: "답변이 필요한 문의를 우선순위대로 확인하고 처리합니다.",
   audit: "누가 무엇을 바꿨는지 확인하고 가능한 변경만 안전하게 되돌립니다.",
   notes: "정한 것과 그 이유를 남겨 두고 나중에 같은 판단을 다시 찾습니다.",
-  "hexaworld-overview": "플레이어, 출석, 공지, 우편 현황을 한눈에 확인합니다.",
-  "hexaworld-notices": "게임 내 공지를 작성·수정·삭제합니다.",
-  "hexaworld-attendance": "출석 보상 사이클을 구성합니다.",
-  "hexaworld-mail": "모든 플레이어에게 보상 우편을 발송합니다.",
-  "hexaworld-config": "버전, 점검, 스토어 링크, 기능 플래그, 보상 배율을 관리합니다.",
-  "hexaworld-audit": "Comrade 관리자 변경 이력을 확인합니다.",
-  "hexaworld-players": "한 계정의 재화, 스테이지, 포탑, 룬, 우편, 알림을 시험용으로 바꿉니다.",
+  "tenkey-overview": "접속자(DAU), 신규 설치, 플레이 횟수, 유지율과 크래시를 하루·7일·30일 단위로 한눈에 봅니다.",
+  "tenkey-players": "랭킹 서버에 있는 플레이어를 찾고 기록·구매·상태를 확인합니다.",
+  "tenkey-player": "한 플레이어의 계정, 기록, 구매와 젬 장부, 정지 여부를 확인하고 처리합니다.",
+  "tenkey-crashes": "앱이 보낸 크래시·멈춤·오류 보고를 오류 내용, 버전, 기기별로 묶어 보고 로그를 확인합니다.",
+  "tenkey-notices": "게임 안 공지를 작성·예약하고 한국어와 영어 미리보기로 확인한 뒤 종료합니다.",
+  "tenkey-purchases": "스토어 구매·환불 기록과 젬·리바이브 패스 장부를 확인합니다.",
+  "tenkey-ranking": "이번 주와 전체 랭킹 보드를 앱에 보이는 그대로 보고, 서버가 걸러 낸 의심 기록을 확인합니다.",
   "tenkey-config": "10KEY 강제 업데이트 기준(Android versionCode, iOS 빌드 번호)과 스토어 링크를 관리합니다.",
+  "tenkey-audit": "10KEY 관리자 변경(공지·정지·앱 설정)을 누가 언제 왜 했는지 확인합니다.",
 };
 
 let currentProjectKey = "";
@@ -96,15 +99,12 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 }
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
-const HEXAWORLD_ROUTE_PATTERN = /^#\/(hexaworld-(?:overview|notices|attendance|mail|config|audit|players))(?:[/?]|$)/;
-const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:config))(?:[/?]|$)/;
+const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|notices|purchases|ranking|config|audit))(?:[/?]|$)/;
 
 // One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
-// Route keys keep the old "hexaworld" name; the game is Comrade.
 const PROJECTS = {
   quirky_ball: { title: "Quirky Ball", nav: "consoleNav", routePattern: QB_ROUTE_PATTERN, home: "#/analytics" },
-  hexaworld: { title: "Comrade & the Brave New World", nav: "hexaworldNav", routePattern: HEXAWORLD_ROUTE_PATTERN, home: "#/hexaworld-overview" },
-  tenkey: { title: "10key Survival", nav: "tenkeyNav", routePattern: TENKEY_ROUTE_PATTERN, home: "#/tenkey-config" },
+  tenkey: { title: "10key Survival", nav: "tenkeyNav", routePattern: TENKEY_ROUTE_PATTERN, home: "#/tenkey-overview" },
 };
 
 function selectProject(projectKey) {
@@ -130,7 +130,8 @@ function renderRoute() {
     view.hidden = view.dataset.route !== route.page;
   });
   document.querySelectorAll(Object.values(PROJECTS).map((entry) => `#${entry.nav} a`).join(", ")).forEach((link) => {
-    if (link.dataset.page === route.page || route.page === "player" && link.dataset.page === "players") link.setAttribute("aria-current", "page");
+    const parent = route.page === "player" ? "players" : route.page === "tenkey-player" ? "tenkey-players" : route.page;
+    if (link.dataset.page === route.page || link.dataset.page === parent) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
   const routeKey = `${route.page}:${route.userId || ""}`;
@@ -150,13 +151,14 @@ function renderRoute() {
   if (route.page === "cs") { window.ConsoleCs.mount(); window.ConsoleLab?.loadReports(); }
   if (route.page === "audit") window.ConsoleAudit.mount();
   if (route.page === "notes") window.ConsoleNotes.mount();
-  if (route.page === "hexaworld-overview") window.ConsoleHexaworld.mountOverview();
-  if (route.page === "hexaworld-notices") window.ConsoleHexaworld.mountNotices();
-  if (route.page === "hexaworld-attendance") window.ConsoleHexaworld.mountAttendance();
-  if (route.page === "hexaworld-mail") window.ConsoleHexaworld.mountMail();
-  if (route.page === "hexaworld-config") window.ConsoleHexaworld.mountConfig();
-  if (route.page === "hexaworld-audit") window.ConsoleHexaworld.mountAudit();
-  if (route.page === "hexaworld-players") window.ConsoleHexaworld.mountPlayers();
+  if (route.page === "tenkey-overview") window.ConsoleTenkey.mountOverview();
+  if (route.page === "tenkey-players") window.ConsoleTenkey.mountPlayers();
+  if (route.page === "tenkey-player") window.ConsoleTenkey.mountPlayer(route.userId);
+  if (route.page === "tenkey-crashes") window.ConsoleTenkey.mountCrashes();
+  if (route.page === "tenkey-notices") window.ConsoleTenkey.mountNotices();
+  if (route.page === "tenkey-purchases") window.ConsoleTenkey.mountPurchases();
+  if (route.page === "tenkey-ranking") window.ConsoleTenkey.mountRanking();
+  if (route.page === "tenkey-audit") window.ConsoleTenkey.mountAudit();
   if (route.page === "tenkey-config") window.ConsoleTenkey.mountConfig();
 }
 
@@ -198,7 +200,6 @@ byId("challengeForm").addEventListener("submit", async (event) => {
 });
 
 byId("projectQuirkyBall").addEventListener("click", () => selectProject("quirky_ball"));
-byId("projectHexaworld").addEventListener("click", () => selectProject("hexaworld"));
 byId("projectTenkey").addEventListener("click", () => selectProject("tenkey"));
 byId("changeProjectButton").addEventListener("click", returnToProjectPicker);
 ["challengeLogout", "pickerLogout", "logoutButton"].forEach((id) => byId(id).addEventListener("click", () => window.ConsoleAuth.logout()));
@@ -231,7 +232,7 @@ window.addEventListener("console-auth-change", (event) => renderAuth(event.detai
 
 (async () => {
   window.ConsoleAPI.initialize({ functionBaseUrl: CONSOLE_CONFIG.functionBaseUrl });
-  window.ConsoleAPI.initializeProject?.("hexaworld", HEXAWORLD_CONFIG);
+  window.ConsoleAPI.initializeProject?.("houseduck", HOUSEDUCK_CONFIG);
   const finishLogin = window.ConsoleUiState.beginRequest(byId("loginPanel"));
   window.ConsoleUiState.setMessage(byId("loginMessage"), "Google 로그인 버튼을 불러오는 중입니다.");
   try {

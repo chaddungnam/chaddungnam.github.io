@@ -1,7 +1,7 @@
 (function attachConsoleApi(root) {
   const allowedFunctions = new Set(["analytics-dashboard", "analytics-dashboard-v2", "admin-console", "cs-summarize"]);
   let functionBaseUrl = "";
-  // Additional per-project clients (e.g. HEXAWORLD) — separate base URL + publishable key,
+  // Additional per-project clients (the House Duck game server: tenkey-admin) — separate base URL + publishable key,
   // never mixed into the Quirky Ball client above so its requests stay byte-for-byte unchanged.
   const projects = new Map();
 
@@ -34,7 +34,7 @@
   }
 
   // Separate from post(): a different project may need admin_session_required handled without
-  // wiping the Quirky Ball ticket (see console/hexaworld.js), so this never calls requireChallenge.
+  // wiping the Quirky Ball ticket (see console/tenkey.js), so this never calls requireChallenge.
   async function postProject(projectKey, functionName, body) {
     const project = projects.get(String(projectKey));
     if (!project || !project.allowedFunctions.has(functionName) || !project.functionBaseUrl) throw new Error("invalid_console_endpoint");

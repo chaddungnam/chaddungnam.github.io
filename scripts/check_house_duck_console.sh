@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js tenkey.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js tenkey.js tenkey-overview.js tenkey-players.js tenkey-crashes.js tenkey-notices.js tenkey-more.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -38,7 +38,11 @@ rg -F -q 'action: "purchases.list"' "$console_dir/purchases.js"
 rg -F -q 'rangeDays: Number(byId("purchaseRange").value)' "$console_dir/purchases.js"
 rg -q 'data-route="cs"' "$console_dir/index.html"
 rg -q 'data-route="audit"' "$console_dir/index.html"
-rg -q 'Comrade & the Brave New World' "$console_dir/index.html"
+! rg -q -i 'hexaworld|Comrade' "$console_dir/index.html" "$console_dir/app.js"
+rg -q 'data-route="tenkey-overview"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-crashes"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-notices"' "$console_dir/index.html"
+rg -F -q 'postProject("houseduck", "tenkey-admin"' "$console_dir/tenkey.js"
 rg -q 'id="projectTenkey"' "$console_dir/index.html"
 rg -q '자동 동기화 미연동' "$console_dir/index.html"
 rg -q 'sessionStorage' "$console_dir/auth.js"
@@ -64,13 +68,13 @@ rg -q 'name="templateKey"' "$console_dir/index.html"
 rg -q 'overflow-y: auto' "$console_dir/styles.css"
 rg -F -q 'max-height: min(62vh, 680px)' "$console_dir/styles.css"
 rg -q 'action: "audit.revert"' "$console_dir/audit.js"
-# 10KEY (10key Survival) force-update page: third project card, its own menu, form and hx-admin actions.
+# 10KEY (10key Survival) force-update page: second project card, its own menu, pages and tenkey-admin actions.
 rg -q 'id="tenkeyNav"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-config"' "$console_dir/index.html"
 rg -q 'id="tenkeyConfigForm"' "$console_dir/index.html"
 rg -F -q 'window.ConsoleTenkey.mountConfig()' "$console_dir/app.js"
-rg -F -q '"tenkey.config_get"' "$console_dir/tenkey.js"
-rg -F -q '"tenkey.config_set"' "$console_dir/tenkey.js"
+rg -F -q '"config.get"' "$console_dir/tenkey.js"
+rg -F -q '"config.set"' "$console_dir/tenkey.js"
 for action in reward_mail.broadcast min_version.update qa_access.set; do
   rg -F -q "action: \"$action\"" "$console_dir/operations.js"
 done
