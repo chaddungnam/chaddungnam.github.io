@@ -86,22 +86,33 @@ done
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
-  require_token "$page" 'data-studio-hero'
+  # Rebuilt home (owner 2026-10-23): night pixel-desk hero, 10key Survival, Quirky Ball, lab notes, support, Comrade farewell.
+  require_token "$page" 'class="hd-hero"'
+  require_token "$page" 'data-desk '
+  require_token "$page" 'data-desk-tenkey="assets/media/tenkey-gameplay.mp4"'
+  require_token "$page" 'data-desk-quirky="quirky-ball/v2/loop.mp4"'
+  require_token "$page" 'data-tenkey'
   require_token "$page" 'data-youtube-feed'
   require_token "$page" 'data-community-stats'
-  require_token "$page" 'data-project="tenkey-survival"'
   require_token "$page" 'data-project="quirky-ball"'
-  require_token "$page" 'assets/studio-home.css'
-  require_token "$page" 'assets/studio-home.js'
+  require_token "$page" 'data-live-version'
+  require_token "$page" 'assets/home.css'
+  require_token "$page" 'assets/home-desk.css'
+  require_token "$page" 'assets/home.js'
+  require_token "$page" 'assets/home-desk.js'
+  reject_token "$page" 'assets/studio-home.css'
+  reject_token "$page" 'assets/studio-home.js'
   require_token "$page" 'assets/media/tenkey-og.jpg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
   require_token "$page" "assets/media/tenkey-gameplay.mp4"
   require_token "$page" "assets/media/tenkey-gameplay-poster.webp"
   require_token "$page" "quirky-ball/v2/loop.mp4"
+  require_token "$page" "quirky-ball/v2/shot-10-600.webp"
   require_token "$page" "assets/media/comrade-gameplay-poster.jpg"
-  # The hero is 10key Survival: no Quirky playable demo, hero stage, scroll mascot or Comrade zone on the home.
-  for retired in 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="hexaworld1984"' 'comrade-gameplay.mp4'; do
+  require_token "$page" 'class="hd-farewell home-farewell"'
+  # The hero is the 10key Survival desk: no Quirky playable demo, old hero stage, section rail, motion toggle, project zones, scroll mascot or Comrade footage on the home.
+  for retired in 'data-studio-hero' 'data-release-chamber' 'class="section-rail"' 'hero-background-word' 'data-motion-toggle' 'data-game-preview' 'class="project-zone' 'class="community-section' 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="tenkey-survival"' 'data-project="hexaworld1984"' 'comrade-gameplay.mp4'; do
     if grep -Fq "$retired" "$repo_dir/$page"; then fail "$page still contains retired home element $retired"; fi
   done
   require_token "$page" "https://www.youtube.com/@houseduck_in"
@@ -109,6 +120,10 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   reject_token "$page" 'journal-section'
   reject_token "$page" '작게 만들더라도 오래 기억되는 게임'
   reject_token "$page" "European Restroom Map"
+done
+
+for asset in assets/home.css assets/home-desk.css assets/home.js assets/home-desk.js assets/media/home/desk-landscape.json assets/media/home/desk-landscape.png assets/media/home/desk-portrait.json assets/media/home/desk-portrait.png; do
+  test -s "$repo_dir/$asset" || fail "$asset is missing"
 done
 
 for page in quirky-ball/index.html quirky-ball/index_en.html quirky-ball/index_de.html quirky-ball/index_ja.html; do

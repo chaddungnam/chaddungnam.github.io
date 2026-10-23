@@ -1,0 +1,102 @@
+{
+ "name": "portrait",
+ "size": [
+  177,
+  262
+ ],
+ "sourceBlock": [
+  5.75,
+  5.85
+ ],
+ "screen": {
+  "quad": [
+   [
+    25.91,
+    62.2
+   ],
+   [
+    92.36,
+    69.71
+   ],
+   [
+    94.54,
+    130.11
+   ],
+   [
+    28.64,
+    137.44
+   ]
+  ],
+  "fill": "#0a1030"
+ },
+ "duck": {
+  "file": "duck-portrait.png",
+  "x": 88,
+  "y": 125,
+  "w": 87,
+  "h": 135,
+  "eye": [
+   106,
+   150,
+   5,
+   8
+  ]
+ },
+ "blink": {
+  "file": "duck-blink-portrait.png",
+  "x": 105,
+  "y": 149,
+  "w": 7,
+  "h": 10
+ },
+ "leds": [
+  {
+   "x": 145,
+   "y": 76,
+   "w": 2,
+   "h": 2,
+   "color": "#03f507",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 97,
+   "y": 138,
+   "w": 1,
+   "h": 2,
+   "color": "#06d411",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 70,
+   "y": 168,
+   "w": 1,
+   "h": 1,
+   "color": "#02c11e",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 145,
+   "y": 82,
+   "w": 2,
+   "h": 2,
+   "color": "#f3273e",
+   "kind": "red",
+   "blink": true
+  }
+ ],
+ "focal": {
+  "x": 0.5,
+  "y": 0.42
+ },
+ "frame": "cover",
+ "pad": {
+  "file": "desk-portrait-pad.png",
+  "x": 60,
+  "y": 60,
+  "note": "same scene continued outward and faded into night; draw at (-x, -y)"
+ },
+ "night": "#0b0f2a"
+}

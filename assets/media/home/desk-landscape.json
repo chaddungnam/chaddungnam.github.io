@@ -1,0 +1,111 @@
+{
+ "name": "landscape",
+ "size": [
+  231,
+  164
+ ],
+ "sourceBlock": [
+  6.63,
+  6.22
+ ],
+ "screen": {
+  "quad": [
+   [
+    29.5,
+    14.39
+   ],
+   [
+    112.63,
+    21.4
+   ],
+   [
+    115.57,
+    88.81
+   ],
+   [
+    32.45,
+    96.03
+   ]
+  ],
+  "fill": "#0a1030"
+ },
+ "duck": {
+  "file": "duck-landscape.png",
+  "x": 133,
+  "y": 64,
+  "w": 95,
+  "h": 98,
+  "eye": [
+   148,
+   89,
+   4,
+   9
+  ]
+ },
+ "blink": {
+  "file": "duck-blink-landscape.png",
+  "x": 147,
+  "y": 88,
+  "w": 6,
+  "h": 11
+ },
+ "leds": [
+  {
+   "x": 180,
+   "y": 34,
+   "w": 2,
+   "h": 2,
+   "color": "#07eb1a",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 118,
+   "y": 97,
+   "w": 1,
+   "h": 2,
+   "color": "#10af34",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 123,
+   "y": 118,
+   "w": 2,
+   "h": 1,
+   "color": "#1ba74e",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 107,
+   "y": 120,
+   "w": 1,
+   "h": 1,
+   "color": "#1da953",
+   "kind": "green",
+   "blink": false
+  },
+  {
+   "x": 180,
+   "y": 40,
+   "w": 2,
+   "h": 2,
+   "color": "#f52948",
+   "kind": "red",
+   "blink": true
+  }
+ ],
+ "focal": {
+  "x": 0.5,
+  "y": 0.5
+ },
+ "frame": "fit",
+ "pad": {
+  "file": "desk-landscape-pad.png",
+  "x": 110,
+  "y": 60,
+  "note": "same scene continued outward and faded into night; draw at (-x, -y)"
+ },
+ "night": "#0b0f2a"
+}

@@ -101,9 +101,9 @@ test('BGM is manual, audio-only, stoppable and removed on mobile', async ({page,
 });
 
 for(const [lang,hash,title] of locales){
- test(`support ${lang}: useful without external requests or login`, async ({page}) => {
+ test(`support ${lang}: useful without external requests or login`, async ({page,baseURL}) => {
   const external=[],errors=[];
-  page.on('request',r=>{if(!r.url().startsWith('http://127.0.0.1:4173/'))external.push(r.url());});
+  page.on('request',r=>{if(!r.url().startsWith(new URL('/',baseURL).href))external.push(r.url());});
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(`/support/?lang=${lang}`);
   await expect(page.locator('html')).toHaveAttribute('lang',lang);

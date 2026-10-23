@@ -138,33 +138,40 @@ for (const [file] of quirkyPages) {
 for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{2})?\.html$/.test(name))) {
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
+  const farewellBlock = (html.match(/<section class="hd-farewell home-farewell"[\s\S]*?<\/section>/) || [""])[0];
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
   assert.match(html, /href="10key\/"/, `${file} 10key Survival details link`);
   assert.doesNotMatch(html, /href="[^"]*hexaworld1984\//, `${file} must not link the dropped Comrade project`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
   assert.doesNotMatch(html, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);
   assert.match(html, /data-youtube-feed/, `${file} synchronized YouTube feed`);
-  assert.match(html, /data-studio-hero/, `${file} studio hero`);
+  assert.match(html, /<section class="hd-hero" id="studio"[^>]*>\s*<div class="hd-hero-sticky">\s*<div class="hd-desk" data-desk /, `${file} pixel-desk hero`);
+  assert.doesNotMatch(html, /data-studio-hero|data-release-chamber|class="section-rail"|hero-background-word|data-motion-toggle/, `${file} the old hero, section rail and motion toggle stay removed`);
   assert.doesNotMatch(html, /data-quirky-mechanic|data-quirky-canvas|data-playable-phone|scroll-quirky|hero-quirky/, `${file} hero no longer shows Quirky Ball`);
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} latest videos`);
-  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} 10key Survival and Quirky Ball zones`);
-  assert.match(html, /data-project="tenkey-survival"/, `${file} 10key Survival zone`);
+  assert.match(html, /<section class="hd-tenkey" id="games"[^>]*data-tenkey/, `${file} 10key Survival section`);
+  assert.equal((html.match(/data-project="/g) || []).length, 1, `${file} Quirky Ball is the only project zone`);
   assert.match(html, /data-project="quirky-ball"/, `${file} Quirky Ball zone`);
-  assert.ok(html.indexOf('data-project="tenkey-survival"') < html.indexOf('data-project="quirky-ball"'), `${file} 10key Survival comes first`);
-  assert.ok(html.indexOf('data-project="quirky-ball"') < html.indexOf("data-community-stats"), `${file} Quirky community stats follow the Quirky Ball zone`);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} one project video preview (Quirky Ball)`);
+  assert.ok(html.indexOf("data-tenkey") < html.indexOf('data-project="quirky-ball"'), `${file} 10key Survival comes first`);
+  assert.ok(html.indexOf('data-project="quirky-ball"') < html.indexOf("data-community-stats"), `${file} Quirky community stats follow the Quirky Ball heading`);
+  assert.ok(html.indexOf("data-community-stats") < html.indexOf('id="lab-notes"'), `${file} Quirky community stats stay inside the Quirky Ball section`);
   assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} one hero gameplay loop (10key Survival)`);
-  assert.match(html, /quirky-ball\/v2\/loop\.mp4/, `${file} Quirky Ball gameplay video`);
+  assert.equal((html.match(/<video\b/g) || []).length, 1, `${file} the only <video> in the markup is the 10key Survival loop`);
+  assert.match(html, /data-desk-quirky="quirky-ball\/v2\/loop\.mp4"/, `${file} Quirky Ball gameplay video plays on the desk CRT`);
   assert.match(html, /assets\/media\/tenkey-gameplay\.mp4/, `${file} 10key Survival hero loop`);
   assert.doesNotMatch(html, /comrade-gameplay\.mp4/, `${file} must not play Comrade footage`);
-  assert.match(html, /class="home-farewell"/, `${file} Comrade farewell block`);
-  assert.ok(html.indexOf('class="home-farewell"') > html.indexOf('id="player-support"') && html.indexOf('class="home-farewell"') < html.indexOf('<footer'), `${file} farewell sits at the bottom, above the footer`);
+  assert.equal((html.match(/home-farewell/g) || []).length, 1, `${file} Comrade farewell block`);
+  assert.ok(html.indexOf('class="hd-farewell home-farewell"') > html.indexOf('id="player-support"') && html.indexOf('class="hd-farewell home-farewell"') < html.indexOf('<footer'), `${file} farewell sits at the bottom, above the footer`);
   assert.ok(publicText.includes(farewell[locale]), `${file} farewell line`);
+  assert.ok(farewellBlock.includes(farewell[locale]), `${file} farewell line sits in the farewell block`);
+  assert.doesNotMatch(html.replace(/<head>[\s\S]*<\/head>/, "").replace(farewellBlock, ""), /comrade|동무|genosse/i, `${file} Comrade appears only as the farewell`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);
   assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store links to the released iOS app`);
   assert.doesNotMatch(html, /class="intro-collage|SMALL IDEAS|REAL THINGS/, `${file} must not use the oversized collage hero`);
   assert.doesNotMatch(html, /history-section|journal-section/, `${file} keeps only the approved sections`);
+  assert.match(html, /<link rel="stylesheet" href="assets\/home\.css\?v=[\w.-]+">/, `${file} loads the home styles`);
+  assert.doesNotMatch(html, /studio-home\.(?:css|js)/, `${file} no longer loads the quirky-ball/ studio-home assets`);
 }
 
 assert.doesNotMatch(read("sitemap.xml"), /https:\/\/houseduck\.in\/story\//, "sitemap must not publish founder-story URLs");
@@ -175,5 +182,10 @@ assert.match(studioCss, /\.project-phone video/, "live builds should show inside
 assert.match(studioCss, /\.project-card\s*\{[^}]*overflow:\s*visible/s, "phone cards must allow upward overflow");
 assert.match(studioCss, /\.youtube-card/, "latest videos should be fully clickable");
 assert.match(studioCss, /prefers-reduced-motion:\s*reduce[\s\S]*animation/, "studio motion must respect reduced-motion settings");
+
+const homeCss = read("assets/home.css");
+assert.match(homeCss, /\.youtube-card\s*\{/, "latest videos should be fully clickable cards on the home");
+assert.match(homeCss, /prefers-reduced-motion:\s*reduce[\s\S]*\.hd-smudge\s*\{\s*animation:\s*none/, "home motion must respect reduced-motion settings");
+assert.doesNotMatch(homeCss, /html\[data-theme="dark"\]/, "the home stays light-only (its night sections are fixed art direction, not a theme switch)");
 
 console.log("brand catalog contract: PASS");

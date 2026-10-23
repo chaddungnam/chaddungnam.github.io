@@ -27,15 +27,17 @@
   <link rel="icon" type="image/png" href="assets/house-duck-logo.png">
   <link rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/site-fonts.css">
   <link rel="stylesheet" href="assets/brand-site.css">
-  <link rel="stylesheet" href="assets/studio-home.css?v=20261023-tenkey-home">
+  <link rel="stylesheet" href="assets/home.css?v=20261023-home-v3">
+  <link rel="stylesheet" href="assets/home-desk.css?v=20261023-home-v3">
   <link rel="stylesheet" href="assets/studio-music.css?v=20260907-icons">
   <script src="assets/brand-site.js?v=20260907-no-blog" defer></script>
-  <script src="assets/studio-home.js?v=20261023-tenkey-home" defer></script>
+  <script src="assets/home.js?v=20261023-home-v3" defer></script>
+  <script src="assets/home-desk.js?v=20261023-home-v3" defer></script>
   <script src="assets/community-stats.js?v=20261006" defer></script>
   <script src="assets/studio-music.js?v=20260907" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://houseduck.in/#organization","name":"House Duck","url":"https://houseduck.in/","logo":"https://houseduck.in/assets/house-duck-logo.png","description":"딸깍 서바이벌(10key Survival)과 Quirky Ball을 만드는 1인 인디 게임 스튜디오입니다.","sameAs":["https://www.youtube.com/@houseduck_in"]},{"@type":"WebSite","@id":"https://houseduck.in/#website","url":"https://houseduck.in/","name":"House Duck","publisher":{"@id":"https://houseduck.in/#organization"},"inLanguage":["ko","en","de","ja"]}]}</script>
 </head>
-<body data-page="studio" style="--studio-tone:#f5f4ef">
+<body data-page="studio" data-hd-theme="night">
   <a class="skip-link" href="#main-content">본문으로 바로가기</a>
   <header class="site-header"><div class="container header-inner">
     <a class="brand-lockup" href="./?lang=ko" aria-label="House Duck 홈"><img class="brand-duck-image" src="assets/house-duck-logo-96.webp" width="96" height="96" alt=""><img class="brand-wordmark-image" src="assets/house-duck-wordmark-360.webp" width="360" height="84" alt="House Duck"></a>
@@ -44,73 +46,103 @@
   </div></header>
 
   <main id="main-content">
-    <section class="studio-hero studio-hero-tenkey" id="studio" data-studio-hero data-tone="#f5f4ef" aria-labelledby="studio-title">
-      <div class="container release-grid" data-release-chamber>
-        <div class="release-copy">
-          <p class="eyebrow">NEW GAME · COMING TO iOS &amp; ANDROID</p>
-          <div class="release-heading"><h1 id="studio-title">딸깍 서바이벌 <span class="release-title-alt" lang="en">10key Survival</span></h1><span class="release-version">출시 준비 중</span></div>
-          <p class="hero-loop"><span>DIG DOWN</span><span>LEVEL UP</span><span>SURVIVE</span></p>
-          <p class="release-lede">살아 있는 텐키(숫자 키패드)가 되어 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 레벨업마다 새 스킬을 고르고, 마우스에게서 살아남으세요.</p>
-          <div class="release-actions"><a class="release-button release-button-primary" href="10key/">자세히 보기 ↗</a></div>
-          <p class="store-disclosure">유료 앱 · 앱 내 구매 포함</p>
-          <dl class="release-readout"><div><dt>PLATFORM</dt><dd>MOBILE</dd></div><div><dt>ADS</dt><dd>NONE</dd></div><div><dt>STATUS</dt><dd>COMING SOON</dd></div></dl>
+    <section class="hd-hero" id="studio" data-theme="night" aria-labelledby="studio-title">
+      <div class="hd-hero-sticky">
+        <div class="hd-desk" data-desk data-desk-tenkey="assets/media/tenkey-gameplay.mp4" data-desk-quirky="quirky-ball/v2/loop.mp4">
+          <a class="hd-desk-screen-link" href="#games" aria-label="딸깍 서바이벌 보러 가기"></a>
         </div>
-        <div class="release-visual">
-          <p class="specimen-index">10KEY—001 / PREVIEW BUILD</p>
-          <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden><span>FX</span><strong data-motion-state>ON</strong></button>
-          <div class="hero-phone" role="group" aria-label="10key Survival 실제 플레이 영상"><span class="iphone-shell"><span class="phone-side-button phone-side-button-top"></span><span class="phone-side-button phone-side-button-bottom"></span><span class="phone-camera" aria-hidden="true"></span><video data-hero-gameplay autoplay muted loop playsinline preload="metadata" poster="assets/media/tenkey-gameplay-poster.webp" aria-label="딸깍 서바이벌(10key Survival) 실제 플레이"><source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm"></video><span class="phone-home-indicator" aria-hidden="true"></span></span></div>
-          <p class="safety-note">HOLD TO DIG · LEVEL UP · DODGE THE MOUSE</p>
-          <p class="demo-disclosure">출시 전 빌드의 실제 플레이 화면입니다.</p>
-        </div>
-      </div>
-      <p class="hero-background-word" aria-hidden="true">DIG DEEPER</p>
-    </section>
-
-    <div id="games">
-      <div class="project-zone project-zone-tenkey" data-project="tenkey-survival" data-tone="#f5f4ef"><div class="container">
-        <article class="project-card project-card-reverse">
-          <div class="project-copy"><p class="eyebrow">01 · 신작</p><p class="project-display" aria-hidden="true">10<br>KEY</p><h2 id="tenkey-title">딸깍 서바이벌</h2><p class="project-keywords">키보드 파기 · 스킬 카드 · 마우스 피하기 · 영구 강화</p><p class="project-status">출시 준비 중</p><p>키 하나하나를 부수며 아래로. 레벨업마다 카드 세 장 중 하나를 골라 나만의 텐키를 만들고, 키보드 밑에서 튀어나오는 마우스를 피하세요.</p><a class="project-link" href="10key/">게임 자세히 보기 ↗</a></div>
-          <div class="project-media"><a class="project-phone" href="10key/" aria-label="딸깍 서바이벌 자세히 보기"><span class="iphone-shell"><span class="phone-side-button phone-side-button-top"></span><span class="phone-side-button phone-side-button-bottom"></span><span class="phone-camera" aria-hidden="true"></span><img src="assets/media/tenkey-zone-ko.webp" width="600" height="1171" alt="딸깍 서바이벌 플레이 화면. 붉은 길로 돌진하는 마우스를 피하는 텐키" loading="lazy" decoding="async"><span class="phone-home-indicator" aria-hidden="true"></span></span></a></div>
-        </article>
-      </div></div>
-
-      <div class="project-zone project-zone-quirky" data-project="quirky-ball" data-tone="#dce6ff"><div class="container">
-        <article class="project-card">
-          <div class="project-copy"><p class="eyebrow">02 · RELEASE <span data-live-version>2.0.0</span></p><p class="project-display" aria-hidden="true">2D<br>3D<br>BOSS</p><h2 id="quirky-title">Quirky Ball</h2><p class="project-keywords">2D 머지 · 3D 비커 · 보스전 · 로그라이크 성장</p><p>2D 머지에서 3D 비커, 보스전까지. 쿼키와 함께 실험실을 탈출하세요.</p><div class="project-stores"><div class="release-actions"><a class="google-play-badge" href="https://play.google.com/store/apps/details?id=com.quirkyball.app"><img src="assets/store-badges/google-play-ko-light.svg" width="182" height="54" alt="Google Play에서 다운로드"></a><a class="app-store-badge" href="https://apps.apple.com/app/id6797996754" aria-label="App Store에서 다운로드"><svg class="app-store-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M12 5L26 27M20 5L6 27M5 21H27" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg><span class="app-store-copy"><strong>App Store</strong><small>다운로드</small></span></a></div><p class="store-disclosure">무료 다운로드 · 광고 및 앱 내 구매 포함</p></div><a class="project-link" href="quirky-ball/?lang=ko">게임 자세히 보기 ↗</a></div>
-          <div class="project-media"><a class="project-phone" href="quirky-ball/?lang=ko" aria-label="Quirky Ball 자세히 보기"><span class="iphone-shell"><span class="phone-side-button phone-side-button-top"></span><span class="phone-side-button phone-side-button-bottom"></span><span class="phone-camera" aria-hidden="true"></span><video data-game-preview muted loop playsinline preload="none" poster="quirky-ball/v2/loop-poster.webp" aria-label="Quirky Ball 실제 플레이"><source src="quirky-ball/v2/loop.mp4" type="video/mp4"><source src="quirky-ball/v2/loop.webm" type="video/webm"></video><span class="phone-home-indicator" aria-hidden="true"></span></span></a></div>
-        </article>
-      </div></div>
-    </div>
-
-    <section class="community-section" id="research" data-tone="#ffdc35" aria-labelledby="research-title" data-community-stats aria-busy="true">
-      <div class="container community-grid">
-        <div class="community-main"><p class="eyebrow">03 / QUIRKY BALL COMMUNITY RESEARCH</p><p class="community-window">모든 점수 기록과 쿼키력의 합계</p><h2 id="research-title"><span>플레이어들이 함께</span><strong data-community-total>—</strong><span>점을 연구했어요!</span></h2><p class="community-status" data-community-status role="status">기록을 불러오는 중…</p><button type="button" class="community-retry" data-community-retry hidden>다시 시도</button></div>
-        <div class="community-side"><p class="community-count"><strong data-community-count>—</strong><span>최근 플레이 횟수</span></p><p class="community-invite">다음 실험은, 당신 차례.</p><a class="release-button" href="https://play.google.com/store/apps/details?id=com.quirkyball.app">실험에 참여하기 ↗</a></div>
-        <details class="community-method"><summary>어떤 점수를 더했나요?</summary><p>클래식·실험실 연구 판의 점수 기록과 지금 모든 플레이어의 쿼키력을 더했어요. 최근 플레이 횟수는 점수가 기록된 판과 실험실 탈출 판의 수예요. 테스트·운영 계정, 관리자가 제외하거나 고친 기록, 계정에 연결되지 않은 기록과 중복은 뺐어요. 서비스 초기 기록 일부는 서버 보관 기간이 지나 이미 지워져 들어 있지 않아요.</p></details>
+        <h1 class="hd-visually-hidden" id="studio-title">House Duck</h1>
       </div>
     </section>
 
-    <section class="youtube-section" id="lab-notes" data-tone="#ffffff" aria-labelledby="youtube-title"><div class="container">
-      <header class="section-heading"><div><p class="eyebrow">04 / LAB NOTES</p><h2 id="youtube-title">개발실에서 생긴 일.</h2><p class="section-subtitle">HOUSE DUCK / YOUTUBE</p></div><a class="arrow-link" href="https://www.youtube.com/@houseduck_in">채널에서 모두 보기 ↗</a></header>
-      <div class="youtube-grid" data-youtube-feed>
-        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=Y6uukWpHU7c"><img src="https://i.ytimg.com/vi/Y6uukWpHU7c/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"><span><small>HOUSE DUCK · YOUTUBE</small><strong>“아몰랑 AI는 일단 싫어요”</strong></span></a>
-        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=-OnOWZ6jufM"><img src="https://i.ytimg.com/vi/-OnOWZ6jufM/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"><span><small>HOUSE DUCK · YOUTUBE</small><strong>요즘 누가 크롬씀?</strong></span></a>
-        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=KySM38fx8Lg"><img src="https://i.ytimg.com/vi/KySM38fx8Lg/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"><span><small>HOUSE DUCK · YOUTUBE</small><strong>인공지능 vs 김정은 | 1인 게임 개발</strong></span></a>
+    <section class="hd-tenkey" id="games" data-theme="paper" data-tenkey aria-labelledby="tenkey-title">
+      <div class="hd-keyfield" data-keyfield aria-hidden="true"></div>
+      <div class="container hd-tenkey-grid">
+        <div class="hd-glass" data-glass>
+          <p class="hd-eyebrow-row"><span class="hd-eyebrow">신작</span><span class="hd-chip hd-chip-status">출시 준비 중</span></p>
+          <h2 class="hd-title" id="tenkey-title">딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span></h2>
+          <p class="hd-lede">살아 있는 텐키(숫자 키패드)가 되어 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 레벨업마다 스킬 카드를 고르고, 마우스에게서 살아남으세요.</p>
+          <ul class="hd-facts" aria-label="출시 정보"><li class="hd-chip">iOS</li><li class="hd-chip">Android</li><li class="hd-chip">광고 없음</li></ul>
+          <div class="hd-cta-row"><a class="hd-keycap-cta" href="10key/" data-pressable><span class="hd-keycap-face">자세히 보기</span></a><p class="hd-disclosure">유료 앱, 앱 내 구매 포함</p></div>
+        </div>
+        <figure class="hd-phone-figure">
+          <div class="hd-phone" role="group" aria-label="딸깍 서바이벌 실제 플레이 영상">
+            <span class="hd-phone-shell">
+              <span class="hd-phone-island" aria-hidden="true"></span>
+              <video class="hd-phone-video" data-hero-gameplay autoplay muted loop playsinline preload="none" poster="assets/media/tenkey-gameplay-poster.webp" aria-label="딸깍 서바이벌 실제 플레이"><source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm"></video>
+              <span class="hd-phone-home" aria-hidden="true"></span>
+            </span>
+            <span class="hd-phone-button hd-phone-button-a" aria-hidden="true"></span>
+            <span class="hd-phone-button hd-phone-button-b" aria-hidden="true"></span>
+            <span class="hd-phone-button hd-phone-button-c" aria-hidden="true"></span>
+          </div>
+          <figcaption class="hd-micro">출시 전 빌드의 실제 플레이 화면</figcaption>
+        </figure>
+      </div>
+      <p class="hd-key-hint hd-micro" data-key-hint aria-hidden="true">키를 눌러 보세요</p>
+    </section>
+
+    <section class="hd-quirky" id="quirky" data-theme="paper" aria-labelledby="quirky-title" data-project="quirky-ball">
+      <div class="hd-quirky-track" data-stack>
+        <div class="hd-quirky-copy">
+          <div class="hd-quirky-lead">
+            <p class="hd-eyebrow-row"><span class="hd-eyebrow">출시작</span><span class="hd-micro">버전 <span data-live-version>2.0.0</span></span></p>
+            <h2 class="hd-title" id="quirky-title">Quirky Ball</h2>
+            <p class="hd-stack-label" data-stack-label><span class="hd-stack-index" data-stack-index>01 / 10</span><span class="hd-stack-caption" data-stack-caption>타이틀</span></p>
+          </div>
+          <div class="hd-quirky-body">
+            <p class="hd-lede">2D 머지에서 3D 비커, 보스전까지. 쿼키와 함께 실험실을 탈출하세요.</p>
+            <div class="project-stores"><div class="release-actions"><a class="google-play-badge" href="https://play.google.com/store/apps/details?id=com.quirkyball.app"><img src="assets/store-badges/google-play-ko-light.svg" width="182" height="54" alt="Google Play에서 다운로드"></a><a class="app-store-badge" href="https://apps.apple.com/app/id6797996754" aria-label="App Store에서 다운로드"><svg class="app-store-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M12 5L26 27M20 5L6 27M5 21H27" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg><span class="app-store-copy"><strong>App Store</strong><small>다운로드</small></span></a></div><p class="store-disclosure">무료 다운로드, 광고 및 앱 내 구매 포함</p></div>
+            <a class="hd-arrow-link" href="quirky-ball/?lang=ko">게임 자세히 보기 ↗</a>
+            <div class="hd-research" data-community-stats aria-busy="true">
+              <h2 class="hd-research-total"><span>플레이어들이 함께 연구한 점수</span><strong data-community-total>—</strong><span>점</span></h2>
+              <p class="hd-research-count"><strong data-community-count>—</strong><span>최근 플레이 횟수</span></p>
+              <p class="hd-research-status community-status" data-community-status role="status">기록을 불러오는 중…</p>
+              <button type="button" class="hd-research-retry community-retry" data-community-retry hidden>다시 시도</button>
+              <details class="hd-research-method community-method"><summary>어떤 점수를 더했나요?</summary><p>클래식·실험실 연구 판의 점수 기록과 지금 모든 플레이어의 쿼키력을 더했어요. 최근 플레이 횟수는 점수가 기록된 판과 실험실 탈출 판의 수예요. 테스트·운영 계정, 관리자가 제외하거나 고친 기록, 계정에 연결되지 않은 기록과 중복은 뺐어요. 서비스 초기 기록 일부는 서버 보관 기간이 지나 이미 지워져 들어 있지 않아요.</p></details>
+            </div>
+          </div>
+        </div>
+        <div class="hd-quirky-stagecol" data-stack-col>
+          <div class="hd-quirky-stage" data-stack-stage>
+            <div class="hd-stack" data-stack-list role="list" aria-label="Quirky Ball 화면 10장">
+              <figure class="hd-shot" role="listitem" data-shot data-caption="타이틀"><img src="quirky-ball/v2/shot-01-600.webp" width="600" height="1298" alt="Quirky Ball 화면 1, 타이틀" loading="eager" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="과열"><img src="quirky-ball/v2/shot-02-600.webp" width="600" height="1298" alt="Quirky Ball 화면 2, 과열" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="3D 비커 머지"><img src="quirky-ball/v2/shot-03-600.webp" width="600" height="1298" alt="Quirky Ball 화면 3, 3D 비커 머지" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="교수님과 첫 만남"><img src="quirky-ball/v2/shot-04-600.webp" width="600" height="1298" alt="Quirky Ball 화면 4, 교수님과 첫 만남" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="시한폭탄"><img src="quirky-ball/v2/shot-05-600.webp" width="600" height="1298" alt="Quirky Ball 화면 5, 시한폭탄" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="실험실 탈출"><img src="quirky-ball/v2/shot-06-600.webp" width="600" height="1298" alt="Quirky Ball 화면 6, 실험실 탈출" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="비행선 보스"><img src="quirky-ball/v2/shot-07-600.webp" width="600" height="1298" alt="Quirky Ball 화면 7, 비행선 보스" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="쿼키력 랭킹"><img src="quirky-ball/v2/shot-08-600.webp" width="600" height="1298" alt="Quirky Ball 화면 8, 쿼키력 랭킹" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="스킬 카드"><img src="quirky-ball/v2/shot-09-600.webp" width="600" height="1298" alt="Quirky Ball 화면 9, 스킬 카드" loading="lazy" decoding="async"></figure>
+              <figure class="hd-shot" role="listitem" data-shot data-caption="보스전"><img src="quirky-ball/v2/shot-10-600.webp" width="600" height="1298" alt="Quirky Ball 화면 10, 보스전" loading="lazy" decoding="async"></figure>
+            </div>
+            <p class="hd-stack-label hd-stack-label-stage" data-stack-label aria-hidden="true"><span class="hd-stack-brand hd-micro">Quirky Ball</span><span class="hd-stack-index" data-stack-index>01 / 10</span><span class="hd-stack-caption" data-stack-caption>타이틀</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hd-lab" id="lab-notes" data-theme="paper" aria-labelledby="lab-title"><div class="container">
+      <header class="hd-section-head"><div><p class="hd-eyebrow">개발실 기록</p><h2 class="hd-title" id="lab-title">개발실에서 생긴 일</h2></div><a class="hd-arrow-link" href="https://www.youtube.com/@houseduck_in">채널에서 모두 보기 ↗</a></header>
+      <div class="hd-lab-grid" data-youtube-feed>
+        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=Y6uukWpHU7c"><span class="hd-thumb"><img src="https://i.ytimg.com/vi/Y6uukWpHU7c/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"></span><span><strong>“아몰랑 AI는 일단 싫어요”</strong></span></a>
+        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=-OnOWZ6jufM"><span class="hd-thumb"><img src="https://i.ytimg.com/vi/-OnOWZ6jufM/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"></span><span><strong>요즘 누가 크롬씀?</strong></span></a>
+        <a class="youtube-card" data-youtube-card href="https://www.youtube.com/watch?v=KySM38fx8Lg"><span class="hd-thumb"><img src="https://i.ytimg.com/vi/KySM38fx8Lg/hqdefault.jpg" width="480" height="360" alt="" loading="lazy"></span><span><strong>인공지능 vs 김정은 | 1인 게임 개발</strong></span></a>
       </div>
     </div></section>
 
-    <section class="home-support" id="player-support" data-tone="#f5f4ef" aria-labelledby="help-title"><div class="container help-grid">
-      <div><p class="eyebrow">05 / PLAYER SUPPORT</p><h2 id="help-title">막혔나요?<br>바로 도와드릴게요.</h2><p class="help-description">로그인도, 긴 양식도 없이. 필요한 도움부터 골라주세요.</p><a class="release-button release-button-primary" href="support/">고객지원 열기 ↗</a></div>
-      <nav class="help-topics" aria-label="고객지원 열기"><a href="support/#ko-purchase"><span class="topic-number">01</span><span>결제·구매 복원</span><span aria-hidden="true">↗</span></a><a href="support/#ko-bug"><span class="topic-number">02</span><span>버그·플레이 문제</span><span aria-hidden="true">↗</span></a><a href="support/#ko-progress"><span class="topic-number">03</span><span>계정·진행 데이터</span><span aria-hidden="true">↗</span></a><a href="quirky-ball/privacy/delete_ko.html"><span class="topic-number">04</span><span>계정 삭제</span><span aria-hidden="true">↗</span></a><a class="help-privacy" href="privacy/ko.html">개인정보·데이터 권리 ↗</a></nav>
+    <section class="hd-support home-support" id="player-support" data-theme="paper" aria-labelledby="help-title"><div class="container hd-support-grid">
+      <div class="hd-support-copy"><p class="hd-eyebrow">고객지원</p><h2 class="hd-title" id="help-title">막혔나요?<br>바로 도와드릴게요.</h2><p class="hd-lede">로그인도, 긴 양식도 없이. 필요한 도움부터 골라주세요.</p><a class="hd-btn hd-btn-primary" href="support/" data-pressable><span class="hd-btn-face">고객지원 열기</span></a></div>
+      <nav class="hd-topics" aria-label="고객지원 주제"><a href="support/#ko-purchase"><span>결제·구매 복원</span><span aria-hidden="true">↗</span></a><a href="support/#ko-bug"><span>버그·플레이 문제</span><span aria-hidden="true">↗</span></a><a href="support/#ko-progress"><span>계정·진행 데이터</span><span aria-hidden="true">↗</span></a><a href="quirky-ball/privacy/delete_ko.html"><span>계정 삭제</span><span aria-hidden="true">↗</span></a><a class="hd-topics-privacy" href="privacy/ko.html">개인정보·데이터 권리 ↗</a></nav>
     </div></section>
 
-    <section class="home-farewell" aria-label="동무와 멋진신세계 작별 인사"><div class="container farewell-inner">
-      <img src="assets/media/comrade-gameplay-poster.jpg" width="640" height="1402" alt="" loading="lazy" decoding="async">
-      <div><p class="farewell-name">동무와 멋진신세계</p><p class="farewell-line">다른 장르의 게임에서 만나요</p></div>
+    <section class="hd-farewell home-farewell" data-theme="night" aria-label="동무와 멋진신세계 작별 인사"><div class="container hd-farewell-inner">
+      <div class="hd-ghost" data-ghost data-ghost-src="assets/media/comrade-gameplay-poster.jpg"><canvas class="hd-ghost-canvas" aria-hidden="true"></canvas><img class="hd-ghost-fallback" src="assets/media/comrade-gameplay-poster.jpg" width="640" height="1402" alt="" loading="lazy" decoding="async"></div>
+      <div class="hd-farewell-text"><p class="farewell-name hd-farewell-name">동무와 멋진신세계</p><p class="farewell-line hd-farewell-line">다른 장르의 게임에서 만나요</p></div>
     </div></section>
   </main>
 
-  <nav class="section-rail" aria-label="섹션 바로가기"><a href="#studio" aria-label="01 신작"><span>01</span><small>신작</small></a><a href="#games" aria-label="02 게임"><span>02</span><small>게임</small></a><a href="#research" aria-label="03 연구 기록"><span>03</span><small>연구 기록</small></a><a href="#lab-notes" aria-label="04 개발일지"><span>04</span><small>개발일지</small></a></nav>
   <footer class="site-footer"><div class="container footer-inner"><div><div class="footer-brand-images"><img class="brand-duck-image" src="assets/house-duck-logo-96.webp" width="96" height="96" alt=""><img class="footer-wordmark-image" src="assets/house-duck-wordmark-360.webp" width="360" height="84" alt="House Duck"></div><small>© <span data-current-year>2026</span> House Duck.</small></div><nav class="footer-links" aria-label="법적 문서와 고객지원"><a href="terms/ko.html">이용약관</a><a href="privacy/ko.html">개인정보처리방침</a><a href="privacy/en.html#section-14" lang="en">House Duck Console (staff only)</a><a href="impressum/ko.html">Impressum</a><a href="about/">소개</a><a href="support/">고객지원</a><a href="mailto:business@houseduck.in">business@houseduck.in</a></nav></div></footer>
 </body>
 </html>

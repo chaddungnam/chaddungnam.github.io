@@ -35,15 +35,24 @@ async function main() {
     assert.match(html, /data-community-stats[^>]*aria-busy="true"/);
     assert.ok(html.includes('<strong data-community-total>—</strong>'));
     assert.ok(html.includes('<strong data-community-count>—</strong>'));
-    assert.ok(html.includes(`<p class="community-status" data-community-status role="status">${loading}</p>`));
-    assert.ok(html.includes(`<button type="button" class="community-retry" data-community-retry hidden>${retry}</button>`));
-    assert.match(html, /studio-home\.css\?v=20261023-tenkey-home/);
+    assert.ok(html.includes(`<p class="hd-research-status community-status" data-community-status role="status">${loading}</p>`));
+    assert.ok(html.includes(`<button type="button" class="hd-research-retry community-retry" data-community-retry hidden>${retry}</button>`));
+    // community-stats.js drives the block through its data hooks; the home rebuild keeps all of them inside the Quirky Ball section.
+    const quirkySection = html.match(/<section class="hd-quirky"[\s\S]*?<\/section>/)[0];
+    for (const hook of ['data-community-stats', 'data-community-total', 'data-community-count', 'data-community-status', 'data-community-retry']) {
+      assert.equal((html.match(new RegExp(hook + '(?![\\w-])', 'g')) || []).length, 1, `${file} ${hook} appears once`);
+      assert.ok(quirkySection.includes(hook), `${file} ${hook} sits in the Quirky Ball section`);
+    }
+    assert.match(quirkySection, /<h2 class="hd-research-total"><span>[^<]+<\/span><strong data-community-total>/, `${file} the total reads as a sentence the counter can animate`);
+    assert.match(html, /home\.css\?v=[\w.-]+/);
+    assert.match(html, /home-desk\.css\?v=[\w.-]+/);
+    assert.doesNotMatch(html, /studio-home\.css/, `${file} no longer loads the quirky-ball/ stylesheet`);
     assert.match(html, /studio-music\.css\?v=20260907/);
     assert.match(html, /community-stats\.js\?v=20261006/);
     assert.match(html, /studio-music\.js\?v=20260907/);
     assert.doesNotMatch(html, /data-stats-as-of|community-date/);
     assert.doesNotMatch(html, /community-window[^>]*>[^<]*28/);
-    const method = html.match(/<details class="community-method">[\s\S]*?<\/details>/)?.[0];
+    const method = html.match(/<details class="hd-research-method community-method">[\s\S]*?<\/details>/)?.[0];
     assert.ok(method);
     assert.doesNotMatch(method, /2026|202건|202 completed|202 abgeschlossenen|2026年/);
     // Legal documents are English + Korean + German (owner 2026-10-20); ja legal URLs redirect to English.

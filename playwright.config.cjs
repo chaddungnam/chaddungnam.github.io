@@ -16,7 +16,8 @@ module.exports = defineConfig({
     { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: "python3 -c \"from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler; ThreadingHTTPServer(('127.0.0.1', 4173), SimpleHTTPRequestHandler).serve_forever()\"",
+    // A deeper listen queue: the home loads many small hero/keycap assets at once and the default backlog (5) resets connections.
+    command: "python3 -c \"from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler; ThreadingHTTPServer.request_queue_size = 128; ThreadingHTTPServer(('127.0.0.1', 4173), SimpleHTTPRequestHandler).serve_forever()\"",
     url: "http://127.0.0.1:4173/",
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",

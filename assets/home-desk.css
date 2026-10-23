@@ -1,0 +1,79 @@
+/* House Duck home hero: the desk at night (section 1 + the zoom into the CRT). */
+.hd-hero {
+  --desk-progress: 0;
+  --hd-night: #0b0f2a;
+  --hd-paper: #efeef2;
+  --hd-white: #fbfbfd;
+  position: relative;
+  height: 240vh;
+  margin: 0;
+  background: var(--hd-night);
+  color: var(--hd-white);
+}
+
+.hd-hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--hd-night);
+}
+
+.hd-desk {
+  position: absolute;
+  inset: 0;
+  background: var(--hd-night);
+  overflow: hidden;
+}
+
+.hd-desk-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.hd-desk video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hd-desk-screen-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  border-radius: 6px;
+  outline: none;
+}
+
+.hd-desk-screen-link:focus-visible {
+  box-shadow: 0 0 0 3px var(--hd-white);
+}
+
+/* The scene carries no overlay copy (owner 2026-10-23); the h1 stays for search and screen readers only. */
+.hd-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hd-hero { height: 100vh; height: 100svh; }
+}

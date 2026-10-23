@@ -154,18 +154,21 @@ test("product navigation keeps the remaining game and support routes", () => {
 test("home leads with 10key Survival, then Quirky Ball with its store badges, and YouTube", () => {
   for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
-    const hero = html.match(/<section class="studio-hero[\s\S]*?<\/section>/)[0];
-    const quirkyZone = html.match(/<div class="project-zone project-zone-quirky"[\s\S]*?<\/article>/)[0];
-    assert.match(html, /data-studio-hero/);
-    assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/);
+    const hero = html.match(/<section class="hd-hero"[\s\S]*?<\/section>/)[0];
+    const tenkey = html.match(/<section class="hd-tenkey"[\s\S]*?<\/section>/)[0];
+    const quirky = html.match(/<section class="hd-quirky"[\s\S]*?<\/section>/)[0];
+    assert.match(hero, /data-desk /, `${file} hero is the pixel desk`);
+    assert.doesNotMatch(html, /data-studio-hero|class="section-rail"|class="(?:hero-hook|studio-signature)"/);
     assert.match(hero, /id="studio-title"/, `${file} hero title`);
-    assert.doesNotMatch(hero, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} hero is 10key Survival only, without Quirky Ball or store badges`);
-    assert.match(quirkyZone, /class="google-play-badge"/, `${file} Quirky Ball zone keeps the Google Play badge`);
-    assert.match(quirkyZone, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} Quirky Ball zone keeps the App Store badge`);
+    assert.doesNotMatch(hero, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} hero is the desk scene only, without Quirky Ball text or store badges`);
+    assert.doesNotMatch(tenkey, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} 10key Survival section has no Quirky Ball and no store badges before its release`);
+    assert.match(quirky, /class="google-play-badge"/, `${file} Quirky Ball section keeps the Google Play badge`);
+    assert.match(quirky, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} Quirky Ball section keeps the App Store badge`);
+    assert.ok(html.indexOf('class="hd-tenkey"') < html.indexOf('class="hd-quirky"'), `${file} 10key Survival comes first`);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
-    assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects (10key Survival + Quirky Ball)`);
-    assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} video game preview (Quirky Ball)`);
-    assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} hero gameplay loop (10key Survival)`);
+    assert.equal((html.match(/data-project="/g) || []).length, 1, `${file} one project zone (Quirky Ball); 10key Survival is the data-tenkey section`);
+    assert.equal((html.match(/data-game-preview/g) || []).length, 0, `${file} no project video preview (the Quirky Ball loop plays on the desk CRT)`);
+    assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} gameplay loop (10key Survival)`);
     assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 0, `${file} must not preview the dropped Comrade project`);
     assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }
@@ -264,6 +267,17 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
   assert.equal(wordmark.width, "132px", "the House Duck wordmark must remain visible beside the duck");
   assert.equal(cssDeclarations(studioCss, ".project-card").overflow, "visible", "phone tops must not be clipped by project cards");
   assert.match(studioCss, /^\.project-media\s*\{[^}]*overflow:\s*visible/m, "phone tops must not be clipped by media stages");
+
+  // The House Duck home draws its own header pill; the lockup must stay as legible as on the other pages.
+  const homeCss = read("assets/home.css");
+  const homeDuck = cssDeclarations(homeCss, 'body[data-page="studio"] .brand-lockup .brand-duck-image');
+  const homeWordmark = cssDeclarations(homeCss, 'body[data-page="studio"] .brand-lockup .brand-wordmark-image');
+  assert.ok(parseFloat(homeDuck.width) >= 30, "the home duck mark must remain legible");
+  assert.ok(parseFloat(homeWordmark.width) >= 100, "the home wordmark must remain visible beside the duck");
+  assert.notEqual(homeWordmark.display, "none", "the home wordmark must not be hidden");
+  // The home header may be restyled again; whichever rule wins must keep a comfortable tap height.
+  const headerHeights = [...homeCss.matchAll(/body\[data-page="studio"\] \.header-inner\s*\{[^}]*?min-height:\s*(\d+)px/g)].map((match) => Number(match[1]));
+  assert.ok(headerHeights.length > 0 && headerHeights.at(-1) >= 48, "the home header keeps a comfortable tap height");
 });
 
 test("terms show the effective date and avoid unconfirmed business status", () => {
