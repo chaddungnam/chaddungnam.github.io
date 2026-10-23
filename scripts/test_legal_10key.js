@@ -83,7 +83,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-10-20"/, `${locale}: last updated 2026-10-20`);
+    assert.match(html, /datetime="2026-10-23"/, `${locale}: last updated 2026-10-23`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -118,7 +118,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-10-20"/, "de: last updated 2026-10-20");
+  assert.match(html, /datetime="2026-10-23"/, "de: last updated 2026-10-23");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
