@@ -65,25 +65,47 @@ assert.match(svg, /data-part="smirk" d="M90 166Q123 180 150 150" fill="none" str
 assert.match(svg, /data-part="smirk-curl" d="M150 150l10-10" fill="none" stroke="#101827" stroke-width="7\.5"/, "Quirky smirk needs its raised curl");
 
 const expectedCopy = {
-  "index.html": ["https://apps.apple.com/app/id6797996754", "출시 일정 미정"],
-  "index_en.html": ["https://apps.apple.com/app/id6797996754", "Release date TBD"],
-  "index_de.html": ["https://apps.apple.com/app/id6797996754", "Veröffentlichungstermin offen"],
-  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "発売時期未定"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "출시 준비 중", "다른 장르의 게임에서 만나요", "동무와 멋진신세계"],
+  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Coming soon", "See you in a game of another genre", "Comrade and the Brave New World"],
+  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Bald verfügbar", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt"],
+  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "近日配信予定", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World"],
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "준비됐나요? House Duck의 릴리스 랩에서 Quirky Ball 2.0을 만나보세요.", "House Duck 릴리스 랩의 Quirky Ball 2.0 실제 플레이"],
-  "index_en.html": ["House Duck — Independent Game Studio", "Are you ready? Quirky Ball 2.0 in the House Duck release lab.", "Quirky Ball 2.0 gameplay in the House Duck release lab"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "Bereit? Quirky Ball 2.0 im Release-Labor von House Duck.", "Quirky Ball 2.0 Gameplay im Release-Labor von House Duck"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "準備はいい？House DuckのリリースラボでQuirky Ball 2.0を紹介します。", "House Duckのリリースラボで動くQuirky Ball 2.0"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 출시 준비 중이에요. Quirky Ball은 지금 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
+  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming soon. Quirky Ball is out now on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival erscheint bald. Quirky Ball gibt es jetzt auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key Survivalは近日配信予定。Quirky Ballは今すぐiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
 };
 
 const expectedHeroLabels = {
-  "index.html": "LIVE CAPTURE · Quirky Ball 2.0 실제 플레이 보기",
-  "index_en.html": "LIVE CAPTURE · Watch real Quirky Ball 2.0 gameplay",
-  "index_de.html": "LIVE CAPTURE · Echtes Quirky Ball 2.0 Gameplay ansehen",
-  "index_ja.html": "LIVE CAPTURE · Quirky Ball 2.0の実際のプレイを見る",
+  "index.html": "10key Survival 실제 플레이 영상",
+  "index_en.html": "Real 10key Survival gameplay",
+  "index_de.html": "Echtes 10key-Survival-Gameplay",
+  "index_ja.html": "10key Survivalの実際のプレイ映像",
 };
+
+const expectedDescriptions = {
+  "index.html": "딸깍 서바이벌(10key Survival)과 Quirky Ball을",
+  "index_en.html": "10key Survival and Quirky Ball",
+  "index_de.html": "10key Survival und Quirky Ball",
+  "index_ja.html": "10key SurvivalとQuirky Ball",
+};
+
+// 10key Survival home media (copied from the game repo, sized for the web).
+const tenkeyMedia = { "assets/media/tenkey-gameplay.mp4": 2_500_000, "assets/media/tenkey-gameplay.webm": 2_500_000, "assets/media/tenkey-gameplay-poster.webp": 150_000, "assets/media/tenkey-zone-ko.webp": 150_000, "assets/media/tenkey-zone-en.webp": 150_000, "assets/media/tenkey-og.jpg": 300_000 };
+for (const [asset, limit] of Object.entries(tenkeyMedia)) {
+  assert.ok(fs.existsSync(path.join(root, asset)), `${asset} must exist`);
+  assert.ok(fs.statSync(path.join(root, asset)).size <= limit, `${asset} must stay web-sized (<= ${limit} bytes)`);
+}
+const ogImage = fs.readFileSync(path.join(root, "assets/media/tenkey-og.jpg"));
+let jpegSize;
+for (let offset = 2; offset < ogImage.length;) {
+  const marker = ogImage[offset + 1];
+  if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) { jpegSize = { height: ogImage.readUInt16BE(offset + 5), width: ogImage.readUInt16BE(offset + 7) }; break; }
+  offset += 2 + ogImage.readUInt16BE(offset + 2);
+}
+assert.deepEqual(jpegSize, { width: 1200, height: 630 }, "the 10key Survival social image must be 1200x630");
 
 for (const asset of ["assets/house-duck-logo-96.webp", "assets/house-duck-wordmark-360.webp"]) {
   assert.ok(fs.existsSync(path.join(root, asset)), `${asset} must exist`);
@@ -94,7 +116,28 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   const html = read(file);
   for (const text of copy) assert.ok(html.includes(text), `${file} must include ${text}`);
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} needs three equal video cards`);
-  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} needs exactly two projects`);
+  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} needs exactly two projects (10key Survival, Quirky Ball)`);
+  assert.doesNotMatch(html, /data-project="hexaworld1984"|hexaworld1984\//, `${file} must not show or link the dropped Comrade project`);
+  assert.doesNotMatch(html, /data-quirky-mechanic|data-quirky-canvas|data-playable-phone|<iframe\b|scroll-quirky|hero-quirky|red-quirky\.svg/, `${file} hero must not show Quirky Ball anymore`);
+  assert.match(html, /<h1 id="studio-title">(?:10key Survival|딸깍 서바이벌 <span class="release-title-alt" lang="en">10key Survival<\/span>)<\/h1>/, `${file} hero title is the game`);
+  assert.ok(html.match(/name="description" content="([^"]*)"/)[1].includes(expectedDescriptions[file]), `${file} description names 10key Survival and Quirky Ball`);
+  assert.doesNotMatch(html.match(/<head>[\s\S]*<\/head>/)[0], /Comrade|동무|Genosse/, `${file} head must not mention the dropped Comrade project`);
+  assert.ok(html.includes('property="og:image" content="https://houseduck.in/assets/media/tenkey-og.jpg"'), `${file} social image is the 10key Survival key art`);
+  assert.ok(html.includes("assets/media/tenkey-gameplay.mp4") && html.includes("assets/media/tenkey-gameplay.webm") && html.includes("assets/media/tenkey-gameplay-poster.webp"), `${file} hero plays the 10key Survival loop`);
+  const unreleased = html.match(/<section class="studio-hero[\s\S]*?<\/section>/)[0] + html.match(/<div class="project-zone project-zone-tenkey"[\s\S]*?<div class="project-zone project-zone-quirky"/)[0];
+  assert.doesNotMatch(unreleased, /play\.google\.com|apps\.apple\.com/, `${file} 10key Survival has no store link before release`);
+  assert.match(html, /<section class="studio-hero studio-hero-tenkey"/, `${file} hero is the 10key Survival hero`);
+  assert.ok(html.indexOf('class="project-zone project-zone-tenkey"') < html.indexOf('class="project-zone project-zone-quirky"'), `${file} 10key Survival zone comes before Quirky Ball`);
+  assert.ok(html.indexOf("data-community-stats") > html.indexOf('class="project-zone project-zone-quirky"'), `${file} community stats follow the Quirky Ball zone`);
+  assert.match(html, /class="project-stores"><div class="release-actions"><a class="google-play-badge"/, `${file} Quirky Ball keeps its store badges inside its zone`);
+  assert.doesNotMatch(html.match(/<section class="studio-hero[\s\S]*?<\/section>/)[0], /google-play-badge|app-store-badge/, `${file} hero must not show store badges for an unreleased game`);
+  const eyebrows = [...html.matchAll(/<p class="eyebrow">(\d\d) [\/·]/g)].map((match) => Number(match[1]));
+  assert.deepEqual(eyebrows, [1, 2, 3, 4, 5], `${file} numbered eyebrows read in page order`);
+  assert.deepEqual([...html.matchAll(/class="section-rail"[\s\S]*?<\/nav>/g)].map((m) => [...m[0].matchAll(/href="(#[^"]+)"/g)].map((x) => x[1]))[0], ["#studio", "#games", "#research", "#lab-notes"], `${file} section rail follows page order`);
+  for (const text of ["#studio", "#games", "#research", "#lab-notes", "#player-support"]) assert.ok(html.includes(`id="${text.slice(1)}"`), `${file} needs ${text}`);
+  assert.equal((html.match(/class="home-farewell"/g) || []).length, 1, `${file} needs one quiet Comrade farewell`);
+  assert.ok(html.indexOf('class="home-farewell"') > html.indexOf('id="player-support"') && html.indexOf('class="home-farewell"') < html.indexOf("</main>"), `${file} farewell is the last block before the footer`);
+  assert.doesNotMatch(html.match(/<section class="home-farewell"[\s\S]*?<\/section>/)[0], /<a\b|개발 중|In development|In Entwicklung|開発中/, `${file} farewell has no link and no development status`);
   assert.doesNotMatch(html, /<section class="project-zone/, `${file} project articles must not be wrapped in redundant sections`);
   assert.equal((html.match(/data-motion-toggle/g) || []).length, 1, `${file} needs one automatic-motion control`);
   assert.match(html, /og:image:width" content="1200"/);
@@ -105,8 +148,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /<script src="assets\/brand-site\.js(?:\?[^\"]+)?" defer><\/script>/, `${file} must not render-block on shared JavaScript`);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
-  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 2, `${file} must use the 2.0 loop in both gameplay previews`);
-  assert.equal((html.match(/quirky-ball\/v2\/loop-poster\.webp"/g) || []).length, 2, `${file} must use the 2.0 loop poster in both previews`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 1, `${file} Quirky Ball zone must use the 2.0 loop`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop-poster\.webp"/g) || []).length, 1, `${file} Quirky Ball zone must use the 2.0 loop poster`);
   assert.ok(html.includes(expectedHeroLabels[file]), `${file} must include its localized hero label`);
   assert.doesNotMatch(html, /<button class="motion-toggle"[^>]+aria-label=/, `${file} motion control must use its visible label`);
   assert.doesNotMatch(html, /<p class="hero-loop"[^>]+aria-label=/, `${file} action keywords must use their visible text`);

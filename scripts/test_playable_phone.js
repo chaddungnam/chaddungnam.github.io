@@ -21,12 +21,9 @@ const expectedHashes = {
   "index.wasm.zip": "29b5bea06061f80658986bc07185d3b69c6ae6e1487ffa95c325632a4f818a0e",
 };
 
-const homeContracts = {
-  "index.html": ["지금 플레이", "게임 불러오는 중…", "플레이 준비 완료", "게임을 불러오지 못했습니다", "종료", "다시 시도"],
-  "index_en.html": ["Play now", "Loading game…", "Ready to play", "Could not load game", "Exit", "Retry"],
-  "index_de.html": ["Jetzt spielen", "Spiel wird geladen…", "Spiel bereit", "Spiel konnte nicht geladen werden", "Beenden", "Erneut versuchen"],
-  "index_ja.html": ["今すぐプレイ", "ゲームを読み込み中…", "プレイ準備完了", "ゲームを読み込めませんでした", "終了", "再試行"],
-};
+// The House Duck home is centred on 10key Survival (owner 2026-10-23); the Quirky Ball playable demo no longer launches from it.
+// The immutable snapshot and the site wrapper stay in the repository for later reuse.
+const homePages = ["index.html", "index_en.html", "index_de.html", "index_ja.html"];
 
 assert.ok(existsSync(snapshotDir), "play/quirky-ball snapshot directory must exist");
 assert.ok(existsSync(join(__dirname, "..", ".gdignore")), "parent Godot scans must not recreate website import sidecars");
@@ -64,12 +61,10 @@ for (const asset of ["YTGameSDK.js", "index.js", "index.png"]) {
 }
 assert.match(wrapperHtml, /"executable":"\.\.\/quirky-ball\/index"/, "site wrapper must load the immutable PCK and WASM base path");
 
-for (const [filename, labels] of Object.entries(homeContracts)) {
+for (const filename of homePages) {
   const html = readFileSync(join(__dirname, "..", filename), "utf8");
-  assert.equal((html.match(/data-playable-phone(?:[\s=>])/g) || []).length, 1, `${filename} must have one playable phone`);
-  assert.match(html, /data-playable-src="play\/quirky-ball-site\/index\.html"/, `${filename} must reference the site wrapper`);
-  assert.doesNotMatch(html, /<iframe\b/i, `${filename} must not load the playable before PLAY`);
-  for (const label of labels) assert.ok(html.includes(label), `${filename} must include ${label}`);
+  assert.doesNotMatch(html, /data-playable-|<iframe\b/i, `${filename} must not carry the Quirky Ball playable demo`);
+  assert.doesNotMatch(html, /play\/quirky-ball-site\//, `${filename} must not reference the playable site wrapper`);
 }
 
 console.log("quirky ball playable snapshot: PASS");

@@ -24,6 +24,11 @@ assert.match(studio, /\.project-card\s*\{[^}]*overflow:\s*visible/s);
 assert.match(studio, /\.project-phone \.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*20/s);
 assert.match(studio, /\.project-phone \.phone-home-indicator\s*\{[^}]*height:\s*4px/s);
 assert.match(studio, /\.youtube-grid\s*\{[^}]*repeat\(3,/s);
+// 10key Survival home: 9:16 footage keeps the shared shell with a slightly shorter ratio and no HUD cropping.
+assert.match(studio, /\.studio-hero-tenkey \.hero-phone \.iphone-shell,\s*\.project-zone-tenkey \.project-phone \.iphone-shell\s*\{[^}]*aspect-ratio:\s*9\s*\/\s*18/s);
+assert.match(studio, /\.studio-hero-tenkey \.hero-phone video\s*\{[^}]*object-fit:\s*contain/s);
+assert.match(studio, /\.project-zone-tenkey\s*\{[^}]*background:/s, "the 10key zone paints its own dark circuit-board tone");
+assert.match(studio, /\.home-farewell\s*\{/, "the quiet Comrade farewell is styled");
 assert.match(studio, /\.project-phone img\s*\{[^}]*object-fit:\s*contain/s);
 assert.match(fonts, /font-family:\s*"Montserrat"/);
 for (const file of ["Montserrat-Variable.woff2", "DoHyeon-Regular.woff2", "Chilgok_Kaj-subset.woff2"]) {
@@ -63,13 +68,14 @@ assert.match(studio, /body:is\(\[data-page="studio"\], \[data-page="quirky-ball"
 for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
   assert.match(html, /data-studio-hero/);
-  assert.match(html, /data-quirky-mechanic/);
-  assert.match(html, /assets\/red-quirky\.svg/);
+  assert.match(html, /studio-hero-tenkey/);
+  assert.doesNotMatch(html, /data-quirky-mechanic|assets\/red-quirky\.svg/, "the 10key Survival hero does not carry the Quirky hero stage or mascot");
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3);
   assert.equal((html.match(/data-project="/g) || []).length, 2);
   assert.doesNotMatch(html, /history-section|journal-section/);
   assert.doesNotMatch(html, /AI를 사용하지만|We use AI|Wir nutzen KI|AIを使いながらも/);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 2);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 1, "Quirky Ball keeps the only project video preview");
+  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, "the hero plays the 10key Survival loop");
 }
 
 for (const file of ["about/index.html", "about/index_en.html", "about/index_de.html", "about/index_ja.html"]) {

@@ -415,3 +415,63 @@ body:is([data-page="studio"], [data-page="quirky-ball"]) .footer-links a { displ
   body:is([data-page="studio"], [data-page="quirky-ball"]) .site-nav a::after { display:none; }
   body:is([data-page="studio"], [data-page="quirky-ball"]) .language-picker summary { width:100%; justify-content:space-between; }
 }
+
+/* 10key Survival home (2026-10-23): the hero and the first game zone belong to 10key; Quirky Ball keeps its own zone below. */
+.studio-hero-tenkey .release-heading { flex-wrap: wrap; align-items: flex-start; row-gap: 10px; }
+.studio-hero-tenkey .release-heading h1 { max-width: none; font-size: clamp(3.6rem, 6.4vw, 6.4rem); }
+html[lang="ko"] .studio-hero-tenkey .release-heading h1 { letter-spacing: -.045em; word-break: keep-all; }
+.release-title-alt { display: block; margin-top: .75em; color: var(--studio-red); font-size: clamp(.78rem, 1vw, .95rem); font-weight: 850; letter-spacing: .16em; line-height: 1.3; text-transform: uppercase; }
+.studio-hero-tenkey .release-version { flex: none; padding: 0 14px; text-transform: uppercase; white-space: nowrap; }
+.studio-hero-tenkey .release-actions { margin-top: 28px; }
+.studio-hero-tenkey .release-actions .release-button { min-width: 188px; }
+.studio-hero-tenkey .release-visual::before { border-color: #b8ab74; background: repeating-linear-gradient(90deg, rgba(60,50,10,.1) 0 1px, transparent 1px 46px), repeating-linear-gradient(0deg, rgba(60,50,10,.1) 0 1px, transparent 1px 46px), #efe6c1; }
+.studio-hero-tenkey .release-visual::after { content: "10KEY / 001"; }
+/* 9:16 gameplay in the shared iPhone shell: a slightly shorter shell and letterboxing keep the whole HUD visible. */
+.studio-hero-tenkey .hero-phone .iphone-shell,
+.project-zone-tenkey .project-phone .iphone-shell { aspect-ratio: 9 / 18; }
+.studio-hero-tenkey .hero-phone video { background: #050607; object-fit: contain; }
+.project-zone-tenkey .project-phone img { background: #0c0f09; object-fit: contain; }
+
+.project-zone-tenkey { --tk-bg: #1b2016; --tk-cream: #f4efdd; --tk-gold: #ffd21f; --tk-orange: #ff9a3c; color: var(--tk-cream); background: repeating-linear-gradient(90deg, rgba(255,210,31,.05) 0 1px, transparent 1px 56px), repeating-linear-gradient(0deg, rgba(255,210,31,.05) 0 1px, transparent 1px 56px), radial-gradient(90% 70% at 82% 22%, rgba(255,154,60,.17), transparent 62%), var(--tk-bg); }
+.project-zone-tenkey .project-card { border-color: rgba(255,210,31,.42); background: rgba(8,11,6,.5); box-shadow: 16px 16px 0 rgba(0,0,0,.28); }
+.project-zone-tenkey .project-card::before { border-color: var(--tk-gold); color: var(--tk-bg); background: var(--tk-gold); }
+.project-zone-tenkey .project-copy,
+.project-zone-tenkey .project-card-reverse .project-copy { border-color: rgba(255,255,255,.16); }
+.project-zone-tenkey .eyebrow { color: var(--tk-gold); }
+.project-zone-tenkey .project-copy h2 { color: #fff; }
+.project-zone-tenkey .project-keywords { color: var(--tk-orange); }
+.project-zone-tenkey .project-status { border-color: var(--tk-gold); color: var(--tk-bg); background: var(--tk-gold); font-family: "Montserrat", "Noto Sans KR", sans-serif; font-size: .78rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.project-zone-tenkey .project-copy > p:not(.eyebrow):not(.project-display):not(.project-keywords):not(.project-status) { color: rgba(244,239,221,.88); }
+.project-zone-tenkey .project-link { color: var(--tk-gold); }
+.project-zone-tenkey .project-link:hover,
+.project-zone-tenkey .project-link:focus-visible { color: #fff; }
+.project-zone-tenkey .project-display { color: rgba(255,210,31,.09); }
+.project-zone-tenkey .project-media::before { border-color: rgba(255,210,31,.24); background: linear-gradient(90deg, transparent 49.8%, rgba(255,210,31,.1) 50%, transparent 50.2%), linear-gradient(transparent 49.8%, rgba(255,210,31,.1) 50%, transparent 50.2%), rgba(255,255,255,.03); }
+.project-zone-tenkey + .project-zone { border-top-color: rgba(255,210,31,.3); }
+
+/* Quirky Ball keeps its store badges inside its own zone. */
+.project-stores { margin: 2px 0 10px; }
+.project-stores .release-actions { margin-top: 4px; }
+.project-stores .google-play-badge { background: transparent; }
+.project-stores .store-disclosure { margin-top: 0; }
+
+/* Quiet farewell for the dropped Comrade project, just above the footer. */
+.home-farewell { padding: clamp(30px, 4vw, 44px) 0; border-top: 1px solid var(--studio-line); background: #f5f4ef; }
+.farewell-inner { display: flex; align-items: center; gap: 16px; }
+.farewell-inner img { display: block; width: 52px; height: 52px; flex: none; border-radius: 10px; object-fit: cover; object-position: 50% 0; filter: grayscale(.9); opacity: .5; }
+.farewell-name { margin: 0 0 4px; color: #545b66; font-size: .72rem; font-weight: 850; letter-spacing: .12em; line-height: 1.4; }
+.farewell-line { margin: 0; color: var(--studio-copy); font-size: .92rem; line-height: 1.6; word-break: keep-all; }
+html[lang="ja"] .farewell-line { overflow-wrap: anywhere; word-break: normal; }
+
+@media (max-width: 900px) {
+  .studio-hero-tenkey .release-grid { grid-template-columns: minmax(0, 1fr); }
+  .studio-hero-tenkey .release-visual { min-height: 600px; }
+}
+@media (max-width: 700px) {
+  .studio-hero-tenkey .release-heading h1 { font-size: clamp(2.9rem, 15vw, 4.6rem); }
+  .release-title-alt { margin-top: .6em; }
+  .studio-hero-tenkey .release-actions { margin-top: 22px; }
+  .studio-hero-tenkey .release-actions .release-button { min-width: 0; }
+  .studio-hero-tenkey .release-visual { min-height: 500px; }
+  .project-zone-tenkey .project-copy { min-height: 380px; }
+}

@@ -11,7 +11,8 @@ const projectPages = [
   ["hexaworld1984/index_de.html", "de"],
   ["hexaworld1984/index_ja.html", "ja"]
 ];
-const projectReleaseStatus = { ko: "출시 일정 미정", en: "Release date TBD", de: "Veröffentlichungstermin offen", ja: "発売時期未定" };
+// Comrade was dropped (owner 2026-10-23): its landing pages say goodbye instead of announcing a release.
+const farewell = { ko: "다른 장르의 게임에서 만나요", en: "See you in a game of another genre", de: "Wir sehen uns in einem Spiel eines anderen Genres", ja: "別のジャンルのゲームでまた会いましょう" };
 const aboutPages = [
   ["about/index.html", "ko"],
   ["about/index_en.html", "en"],
@@ -69,7 +70,8 @@ for (const [file, locale] of projectPages) {
   assert.match(html, new RegExp(`data-locale="${locale}"`), `${file} locale`);
   assert.match(html, /data-page="hexaworld1984"/, `${file} page marker`);
   assert.match(html, /class="language-picker"/, `${file} language picker`);
-  assert.ok(publicText.includes(projectReleaseStatus[locale]), `${file} open release status`);
+  assert.ok(publicText.includes(farewell[locale]), `${file} farewell line`);
+  assert.doesNotMatch(html, /<dt>(?:Status|Target)<\/dt>/, `${file} must not announce a development status or release target`);
   assert.doesNotMatch(publicText, /2026[\s\S]{0,80}2027/, `${file} must not promise a release window`);
   assert.doesNotMatch(publicText, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);
 
@@ -137,17 +139,27 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   const html = read(file);
   const publicText = html.replace(/<[^>]*>/g, " ");
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
-  assert.match(html, /href="[^"]*hexaworld1984\//, `${file} HEXAWORLD 1984 link`);
+  assert.match(html, /href="10key\/"/, `${file} 10key Survival details link`);
+  assert.doesNotMatch(html, /href="[^"]*hexaworld1984\//, `${file} must not link the dropped Comrade project`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
   assert.doesNotMatch(html, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);
   assert.match(html, /data-youtube-feed/, `${file} synchronized YouTube feed`);
   assert.match(html, /data-studio-hero/, `${file} studio hero`);
-  assert.match(html, /data-quirky-mechanic/, `${file} Quirky shooting mechanic`);
+  assert.doesNotMatch(html, /data-quirky-mechanic|data-quirky-canvas|data-playable-phone|scroll-quirky|hero-quirky/, `${file} hero no longer shows Quirky Ball`);
   assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} latest videos`);
-  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} two projects only`);
-  assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} two video game previews`);
-  assert.match(html, /quirky-ball\/v2\/loop\.mp4/, `${file} gameplay video`);
-  assert.match(html, /assets\/media\/comrade-gameplay\.mp4/, `${file} C&tBNW looping gameplay preview`);
+  assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} 10key Survival and Quirky Ball zones`);
+  assert.match(html, /data-project="tenkey-survival"/, `${file} 10key Survival zone`);
+  assert.match(html, /data-project="quirky-ball"/, `${file} Quirky Ball zone`);
+  assert.ok(html.indexOf('data-project="tenkey-survival"') < html.indexOf('data-project="quirky-ball"'), `${file} 10key Survival comes first`);
+  assert.ok(html.indexOf('data-project="quirky-ball"') < html.indexOf("data-community-stats"), `${file} Quirky community stats follow the Quirky Ball zone`);
+  assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} one project video preview (Quirky Ball)`);
+  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} one hero gameplay loop (10key Survival)`);
+  assert.match(html, /quirky-ball\/v2\/loop\.mp4/, `${file} Quirky Ball gameplay video`);
+  assert.match(html, /assets\/media\/tenkey-gameplay\.mp4/, `${file} 10key Survival hero loop`);
+  assert.doesNotMatch(html, /comrade-gameplay\.mp4/, `${file} must not play Comrade footage`);
+  assert.match(html, /class="home-farewell"/, `${file} Comrade farewell block`);
+  assert.ok(html.indexOf('class="home-farewell"') > html.indexOf('id="player-support"') && html.indexOf('class="home-farewell"') < html.indexOf('<footer'), `${file} farewell sits at the bottom, above the footer`);
+  assert.ok(publicText.includes(farewell[locale]), `${file} farewell line`);
   assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/, `${file} removed hero copy stays removed`);
   assert.match(html, /class="google-play-badge"/, `${file} Google Play download badge`);
   assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} App Store links to the released iOS app`);

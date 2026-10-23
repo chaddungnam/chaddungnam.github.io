@@ -151,17 +151,22 @@ test("product navigation keeps the remaining game and support routes", () => {
   }
 });
 
-test("home leads with store badges, YouTube, and exactly two game previews", () => {
+test("home leads with 10key Survival, then Quirky Ball with its store badges, and YouTube", () => {
   for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html"]) {
     const html = read(file);
+    const hero = html.match(/<section class="studio-hero[\s\S]*?<\/section>/)[0];
+    const quirkyZone = html.match(/<div class="project-zone project-zone-quirky"[\s\S]*?<\/article>/)[0];
     assert.match(html, /data-studio-hero/);
     assert.doesNotMatch(html, /class="(?:hero-hook|studio-signature)"/);
-    assert.match(html, /class="google-play-badge"/);
-    assert.match(html, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/);
+    assert.match(hero, /id="studio-title"/, `${file} hero title`);
+    assert.doesNotMatch(hero, /Quirky|google-play-badge|app-store-badge|data-playable/, `${file} hero is 10key Survival only, without Quirky Ball or store badges`);
+    assert.match(quirkyZone, /class="google-play-badge"/, `${file} Quirky Ball zone keeps the Google Play badge`);
+    assert.match(quirkyZone, /<a class="app-store-badge" href="https:\/\/apps\.apple\.com\/app\/id6797996754"/, `${file} Quirky Ball zone keeps the App Store badge`);
     assert.equal((html.match(/data-youtube-card/g) || []).length, 3, `${file} YouTube cards`);
-    assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects`);
-    assert.equal((html.match(/data-game-preview/g) || []).length, 2, `${file} video game previews (Quirky Ball + C&tBNW)`);
-    assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 1, `${file} C&tBNW looping preview`);
+    assert.equal((html.match(/data-project="/g) || []).length, 2, `${file} projects (10key Survival + Quirky Ball)`);
+    assert.equal((html.match(/data-game-preview/g) || []).length, 1, `${file} video game preview (Quirky Ball)`);
+    assert.equal((html.match(/data-hero-gameplay/g) || []).length, 1, `${file} hero gameplay loop (10key Survival)`);
+    assert.equal((html.match(/data-hexaworld-preview/g) || []).length, 0, `${file} must not preview the dropped Comrade project`);
     assert.doesNotMatch(html, /European Restroom Map|project-compact-grid|PROJECT_CATALOG|history-section|journal-section/);
   }
 

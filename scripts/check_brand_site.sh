@@ -88,17 +88,22 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'data-page="studio"'
   require_token "$page" 'data-studio-hero'
   require_token "$page" 'data-youtube-feed'
-  require_token "$page" 'data-quirky-mechanic'
+  require_token "$page" 'data-community-stats'
+  require_token "$page" 'data-project="tenkey-survival"'
   require_token "$page" 'data-project="quirky-ball"'
-  require_token "$page" 'data-project="hexaworld1984"'
   require_token "$page" 'assets/studio-home.css'
   require_token "$page" 'assets/studio-home.js'
-  require_token "$page" 'assets/house-duck-social.jpg'
-  require_token "$page" 'assets/red-quirky.svg'
+  require_token "$page" 'assets/media/tenkey-og.jpg'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
+  require_token "$page" "assets/media/tenkey-gameplay.mp4"
+  require_token "$page" "assets/media/tenkey-gameplay-poster.webp"
   require_token "$page" "quirky-ball/v2/loop.mp4"
-  require_token "$page" "assets/media/comrade-gameplay.mp4"
+  require_token "$page" "assets/media/comrade-gameplay-poster.jpg"
+  # The hero is 10key Survival: no Quirky playable demo, hero stage, scroll mascot or Comrade zone on the home.
+  for retired in 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="hexaworld1984"' 'comrade-gameplay.mp4'; do
+    if grep -Fq "$retired" "$repo_dir/$page"; then fail "$page still contains retired home element $retired"; fi
+  done
   require_token "$page" "https://www.youtube.com/@houseduck_in"
   reject_token "$page" 'history-section'
   reject_token "$page" 'journal-section'

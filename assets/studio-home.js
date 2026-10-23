@@ -600,7 +600,8 @@
     setupLiveVersion();
     setupToneAndMascot();
     setupVideos(reducedMotion);
-    setupGameCursor(reducedMotion);
+    // The red shot cursor decorates the Quirky hero stage; pages without that stage keep the normal cursor.
+    if (document.querySelector("[data-quirky-mechanic]")) setupGameCursor(reducedMotion);
     setupCanvas(reducedMotion);
     setupMotionToggle(reducedMotion);
     setupPlayablePhone();
