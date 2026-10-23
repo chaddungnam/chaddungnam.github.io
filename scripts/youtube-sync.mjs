@@ -14,13 +14,16 @@ function tag(entry, name) {
   return decode(entry.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`))?.[1]?.trim() || "");
 }
 
+// Comrade (dropped 2026-10-23) keeps only its farewell line on the home page, so its BGM uploads stay off the feed.
+const RETIRED = /\[C&tBNW\]|동무와\s*멋진\s*신세계/;
+
 export function parseYouTubeFeed(xml) {
   const videos = [];
   for (const match of xml.matchAll(/<entry(?:\s[^>]*)?>([\s\S]*?)<\/entry>/g)) {
     const videoId = tag(match[1], "yt:videoId");
     const title = tag(match[1], "title");
     const published = new Date(tag(match[1], "published"));
-    if (!/^[A-Za-z0-9_-]{11}$/.test(videoId) || !title || Number.isNaN(published.valueOf())) continue;
+    if (!/^[A-Za-z0-9_-]{11}$/.test(videoId) || !title || Number.isNaN(published.valueOf()) || RETIRED.test(title)) continue;
     videos.push({ videoId, title, published: published.toISOString() });
     if (videos.length === 3) break;
   }

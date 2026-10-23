@@ -1,21 +1,21 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-10-14T09:00:07.000Z",
+  "updated": "2026-10-23T14:10:15.000Z",
   "videos": [
+    {
+      "videoId": "tCjSpgDLMGQ",
+      "title": "아.. 1주일만에 딸깍으로 만든 게임이 더 재미있네요..",
+      "published": "2026-10-23T14:10:15.000Z"
+    },
     {
       "videoId": "xOoLVxA6AM0",
       "title": "AI로 게임만들고 실패했지만, 포기하지 않는 이유",
       "published": "2026-10-14T09:00:07.000Z"
     },
     {
-      "videoId": "6zm2Ah72x8o",
-      "title": "[C&tBNW] '렬병식' 동무와 멋진 신세계 BGM",
-      "published": "2026-10-08T05:00:31.000Z"
-    },
-    {
-      "videoId": "BlSWw3Fec3s",
-      "title": "[C&tBNW] 'Comrade!!!' 동무와 멋진 신세계 BGM",
-      "published": "2026-10-07T05:00:26.000Z"
+      "videoId": "rnksH-UdAAc",
+      "title": "Quirky Ball 2.0.0 Mobile Game",
+      "published": "2026-10-05T11:32:34.000Z"
     }
   ]
 }

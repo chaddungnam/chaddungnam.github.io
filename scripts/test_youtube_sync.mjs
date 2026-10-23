@@ -11,6 +11,7 @@ const { parseYouTubeFeed } = await import(script);
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns="http://www.w3.org/2005/Atom">
   <entry><yt:videoId>Y6uukWpHU7c</yt:videoId><title>First &amp; best</title><published>2026-08-25T10:00:00+00:00</published></entry>
+  <entry><yt:videoId>6zm2Ah72x8o</yt:videoId><title>[C&amp;tBNW] '렬병식' 동무와 멋진 신세계 BGM</title><published>2026-08-24T12:00:00+00:00</published></entry>
   <entry><yt:videoId>-OnOWZ6jufM</yt:videoId><title>Second</title><published>2026-08-24T10:00:00+00:00</published></entry>
   <entry><yt:videoId>KySM38fx8Lg</yt:videoId><title>Third</title><published>2026-08-23T10:00:00+00:00</published></entry>
   <entry><yt:videoId>invalid</yt:videoId><title>Skip me</title><published>2026-08-22T10:00:00+00:00</published></entry>
