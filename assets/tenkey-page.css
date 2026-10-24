@@ -1,651 +1,291 @@
-/* 딸깍 서바이벌 / 10key Survival game page (2026-10-23). Own styles; the patterns (night, frosted glass, phone frame, pressable keycap button, chips)
-   are copied from the House Duck home so both pages read as one site. Loaded after brand-site.css, which only supplies the logo lockup and skip link. */
+/* 딸깍 서바이벌 / 10key Survival game page. Rebuilt 2026-10-24 (owner: less generic, pre-registration visible at a glance).
+   One dark night from top to bottom, real game footage and screenshots, and the pre-registration form in the first screen.
+   Also styles /10key/prereg/ (confirm / unsubscribe) and /10key/get/ (the one download link of the launch mail).
+   Loaded after brand-site.css, which only supplies the logo lockup and the skip link. */
 
 :root {
   --tk-night: #0b0f2a;
   --tk-night-2: #12173a;
-  --tk-night-deep: #080b20;
-  --tk-paper: #efeef2;
-  --tk-white: #fbfbfd;
-  --tk-ink: #14162b;
-  --tk-ink-2: #4b4e66;
-  --tk-ink-3: #5c5f78;
-  --tk-line: rgba(20, 22, 43, .10);
+  --tk-night-3: #181f4a;
+  --tk-night-deep: #070a1e;
   --tk-duck: #f5b731;
+  --tk-duck-soft: #f8d27a;
   --tk-crt: #2a4fc4;
   --tk-key-gold: #f2b63c;
-  --tk-key-cream: #f3ecdc;
-  --tk-on-night: rgba(255, 255, 255, .82);
-  --tk-on-night-2: rgba(255, 255, 255, .62);
-  --tk-edge-night: rgba(255, 255, 255, .14);
+  --tk-key-side: #b8821f;
+  --tk-cream: #f3ecdc;
+  --tk-text: rgba(255, 255, 255, .92);
+  --tk-text-2: rgba(255, 255, 255, .72);
+  --tk-text-3: rgba(255, 255, 255, .56);
+  --tk-edge: rgba(255, 255, 255, .12);
+  --tk-edge-2: rgba(255, 255, 255, .22);
+  --tk-ok: #7ee2a8;
+  --tk-err: #ff9d8a;
   --tk-ease: cubic-bezier(.2, .7, .2, 1);
   --tk-font: "Montserrat", -apple-system, "Apple SD Gothic Neo", "Hiragino Sans", "Noto Sans KR", "Noto Sans JP", sans-serif;
-  --tk-gutter: clamp(16px, 4vw, 40px);
+  --tk-gutter: clamp(18px, 4vw, 40px);
   --tk-bar: 60px;
-  --tk-shadow-card: 0 1px 2px rgba(20, 22, 43, .04), 0 12px 32px rgba(20, 22, 43, .08);
-  --tk-shadow-float: 0 2px 4px rgba(20, 22, 43, .06), 0 30px 70px rgba(20, 22, 43, .22);
 }
 
 html { color-scheme: dark; scroll-behavior: smooth; background: var(--tk-night-deep); }
-
 body.tk-page {
   min-width: 0;
   margin: 0;
-  color: var(--tk-ink);
+  color: var(--tk-text);
   background: var(--tk-night);
   font-family: var(--tk-font);
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-
 body.tk-page::before { display: none; }
 body.tk-page main { position: relative; z-index: 1; }
 body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset: 3px; }
-body.tk-page .tk-how :focus-visible,
-body.tk-page .tk-features :focus-visible { outline-color: var(--tk-crt); }
-#how { scroll-margin-top: 24px; }
+[id] { scroll-margin-top: calc(var(--tk-bar) + 16px); }
+.tk-wrap { width: min(1160px, 100% - 2 * var(--tk-gutter)); margin-inline: auto; }
+.tk-page a { color: inherit; }
 
-.tk-wrap { width: min(1200px, 100% - 2 * var(--tk-gutter)); margin-inline: auto; }
-
-/* ---------- header: the dark House Duck bar (same lockup as the Quirky Ball page) ---------- */
+/* ---------- header (same lockup as the home) ---------- */
 .tk-page .site-header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 100;
-  border: 0;
-  color: #fff;
-  background: rgba(11, 15, 42, .88);
+  position: fixed; top: 0; right: 0; left: 0; z-index: 100;
+  border: 0; color: #fff;
+  background: rgba(11, 15, 42, .9);
   box-shadow: 0 1px 0 rgba(255, 255, 255, .08);
   backdrop-filter: blur(16px) saturate(1.3);
   -webkit-backdrop-filter: blur(16px) saturate(1.3);
 }
-
-.tk-page .header-inner { min-height: var(--tk-bar); gap: 16px; }
+.tk-page .header-inner { display: flex; min-height: var(--tk-bar); align-items: center; justify-content: space-between; gap: 16px; }
 .tk-page .brand-lockup { height: 44px; min-height: 44px; gap: 9px; color: inherit; }
 .tk-page .brand-lockup:hover { transform: none; }
 .tk-page .brand-lockup .brand-duck-image { width: 30px; height: 30px; }
 .tk-page .brand-lockup .brand-wordmark-image { width: 100px; filter: brightness(0) invert(1); }
-
 .tk-nav { display: flex; align-items: center; gap: 4px; }
 .tk-nav-link {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  padding: 0 12px;
-  border-radius: 8px;
-  color: var(--tk-on-night-2);
-  font-size: .86rem;
-  font-weight: 600;
-  text-decoration: none;
+  display: inline-flex; min-height: 44px; align-items: center; padding: 0 12px; border-radius: 8px;
+  color: var(--tk-text-2); font-size: .86rem; font-weight: 600; text-decoration: none;
   transition: color 160ms var(--tk-ease), background-color 160ms var(--tk-ease);
 }
-
-.tk-nav-link:hover,
-.tk-nav-link:focus-visible { color: #fff; background: rgba(255, 255, 255, .1); }
-
-.tk-lang { display: inline-flex; margin-left: 8px; padding: 3px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; }
+.tk-nav-link:hover, .tk-nav-link:focus-visible { color: #fff; background: rgba(255, 255, 255, .1); }
+.tk-nav-cta { color: var(--tk-night); background: var(--tk-duck); }
+.tk-nav-cta:hover, .tk-nav-cta:focus-visible { color: var(--tk-night); background: var(--tk-duck-soft); }
+.tk-lang { display: inline-flex; margin-left: 6px; padding: 3px; border: 1px solid var(--tk-edge-2); border-radius: 999px; }
 .tk-lang a {
-  display: inline-flex;
-  min-width: 40px;
-  min-height: 36px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  color: var(--tk-on-night-2);
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-decoration: none;
-  transition: color 160ms var(--tk-ease), background-color 160ms var(--tk-ease);
+  display: inline-flex; min-width: 40px; min-height: 36px; align-items: center; justify-content: center; border-radius: 999px;
+  color: var(--tk-text-2); font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-decoration: none;
 }
-
 .tk-lang a:hover { color: #fff; }
 .tk-lang a[aria-current="page"] { color: var(--tk-night); background: #fff; }
 
-/* ---------- shared bits: chips, titles, buttons ---------- */
-.tk-chip {
-  display: inline-flex;
-  min-height: 30px;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 0 13px;
-  border: 1px solid var(--tk-edge-night);
-  border-radius: 999px;
-  color: var(--tk-on-night);
-  background: rgba(255, 255, 255, .06);
-  font-size: .8rem;
-  font-weight: 600;
-  letter-spacing: .01em;
-  line-height: 1;
+/* ---------- keycap button (pressable, the game's own look) ---------- */
+.tk-key {
+  --btn: var(--tk-key-gold); --btn-side: var(--tk-key-side); --btn-ink: #2a1c05; --depth: 6px;
+  position: relative; display: inline-flex; min-height: 56px; margin: 0 0 var(--depth); padding: 0;
+  border: 0; border-radius: 14px; color: var(--btn-ink); background: none;
+  font: inherit; font-size: 1rem; font-weight: 800; letter-spacing: -.01em; text-decoration: none;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation;
 }
-
-.tk-chip-status { border-color: rgba(245, 183, 49, .5); color: #f8d27a; background: rgba(245, 183, 49, .14); }
-.tk-chip-status::before { width: 7px; height: 7px; border-radius: 50%; content: ""; background: var(--tk-duck); box-shadow: 0 0 0 0 rgba(245, 183, 49, .6); animation: tk-pulse 2.4s ease-out infinite; }
-
-@keyframes tk-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(245, 183, 49, .55); }
-  70%, 100% { box-shadow: 0 0 0 9px rgba(245, 183, 49, 0); }
-}
-
-.tk-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.tk-eyebrow { margin: 0 0 14px; color: var(--tk-ink-3); font-size: .82rem; font-weight: 700; letter-spacing: .02em; line-height: 1.4; }
-:lang(en) .tk-eyebrow { letter-spacing: .12em; text-transform: uppercase; }
-
-.tk-h2 {
-  margin: 0;
-  color: var(--tk-ink);
-  font-size: clamp(1.95rem, 3.7vw, 3.1rem);
-  font-weight: 800;
-  letter-spacing: -.03em;
-  line-height: 1.12;
-  text-wrap: balance;
-  word-break: keep-all;
-}
-
-.tk-cta {
-  --btn: var(--tk-key-gold);
-  --btn-side: #b8821f;
-  --btn-ink: #2a1c05;
-  --btn-depth: 7px;
-  position: relative;
-  display: inline-flex;
-  min-height: 58px;
-  margin-bottom: 8px;
-  border-radius: 14px;
-  color: var(--btn-ink);
-  font-size: 1.02rem;
-  font-weight: 800;
-  letter-spacing: -.01em;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  touch-action: manipulation;
-}
-
-.tk-cta-face {
-  display: inline-flex;
-  min-height: inherit;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 30px 0 32px;
-  border-radius: inherit;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .06) 40%, rgba(0, 0, 0, .04) 100%),
-    var(--btn);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .55),
-    inset 0 0 0 1px rgba(255, 255, 255, .18),
-    inset 0 -2px 0 rgba(0, 0, 0, .08),
-    0 var(--btn-depth) 0 var(--btn-side),
-    0 calc(var(--btn-depth) + 2px) 6px rgba(0, 0, 0, .22),
-    0 calc(var(--btn-depth) + 16px) 32px rgba(184, 130, 31, .3);
-  transform: translateY(0);
+.tk-key-face {
+  display: inline-flex; width: 100%; min-height: inherit; align-items: center; justify-content: center; gap: 10px;
+  padding: 0 26px; border-radius: inherit; white-space: nowrap;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .06) 40%, rgba(0, 0, 0, .04)), var(--btn);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 0 0 1px rgba(255, 255, 255, .18),
+    0 var(--depth) 0 var(--btn-side), 0 calc(var(--depth) + 2px) 6px rgba(0, 0, 0, .28);
   transition: transform 110ms var(--tk-ease), box-shadow 110ms var(--tk-ease), filter 160ms var(--tk-ease);
 }
-
-.tk-cta svg { width: 16px; height: 16px; flex: none; }
-.tk-cta:hover .tk-cta-face { filter: brightness(1.05); }
-.tk-cta:active .tk-cta-face {
-  transform: translateY(calc(var(--btn-depth) - 1px));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .4),
-    inset 0 0 0 1px rgba(255, 255, 255, .14),
-    inset 0 -2px 0 rgba(0, 0, 0, .08),
-    0 1px 0 var(--btn-side),
-    0 2px 4px rgba(0, 0, 0, .2),
-    0 6px 14px rgba(184, 130, 31, .2);
+.tk-key:hover .tk-key-face { filter: brightness(1.05); }
+.tk-key:active .tk-key-face, .tk-key[aria-busy="true"] .tk-key-face {
+  transform: translateY(calc(var(--depth) - 1px));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 var(--btn-side), 0 2px 4px rgba(0, 0, 0, .25);
 }
+.tk-key[disabled] { cursor: progress; }
+.tk-key-ghost { --btn: #e9ebf7; --btn-side: #9aa0c3; --btn-ink: var(--tk-night); }
 
-.tk-link {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  gap: 6px;
-  padding: 0 18px;
-  border: 1px solid var(--tk-edge-night);
-  border-radius: 999px;
-  color: #fff;
-  font-size: .88rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 160ms var(--tk-ease), border-color 160ms var(--tk-ease);
-}
-
-.tk-link:hover,
-.tk-link:focus-visible { border-color: rgba(255, 255, 255, .5); background: rgba(255, 255, 255, .08); }
-
-/* ---------- intro scene: the night, the real gameplay in a phone, the title ---------- */
-.tk-intro {
-  --tk-phone-w: clamp(200px, calc((100vh - 200px) / 2), 320px);
+/* ---------- first screen: title, pre-registration, real gameplay ---------- */
+.tk-hero {
   position: relative;
-  display: grid;
-  min-height: 100vh;
-  min-height: 100svh;
-  align-items: center;
-  padding: calc(var(--tk-bar) + clamp(20px, 4vw, 52px)) 0 calc(clamp(40px, 6vw, 72px) + 32px);
+  padding: calc(var(--tk-bar) + clamp(28px, 5vw, 64px)) 0 clamp(48px, 7vw, 88px);
   overflow: clip;
-  color: #fff;
-  background: linear-gradient(180deg, #0b0f2a 0%, #0e1334 55%, #0b0f2a 100%);
-  isolation: isolate;
-}
-
-@supports (height: 100svh) {
-  .tk-intro { --tk-phone-w: clamp(200px, calc((100svh - 200px) / 2), 320px); }
-}
-
-.tk-intro::before {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  content: "";
   background:
-    radial-gradient(46% 54% at 76% 50%, rgba(42, 79, 196, .46), transparent 70%),
-    radial-gradient(30% 38% at 72% 64%, rgba(245, 183, 49, .17), transparent 72%),
-    radial-gradient(42% 48% at 8% 6%, rgba(42, 79, 196, .24), transparent 70%);
+    radial-gradient(42% 60% at 78% 46%, rgba(42, 79, 196, .42), transparent 70%),
+    radial-gradient(30% 40% at 74% 70%, rgba(245, 183, 49, .14), transparent 72%),
+    linear-gradient(180deg, #0b0f2a 0%, #0e1334 60%, #0b0f2a 100%);
 }
-
-.tk-intro::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background-image: radial-gradient(rgba(255, 255, 255, .22) 1px, transparent 1.3px);
-  background-size: 30px 30px;
-  opacity: .45;
-  -webkit-mask-image: radial-gradient(75% 80% at 72% 48%, #000, transparent 88%);
-  mask-image: radial-gradient(75% 80% at 72% 48%, #000, transparent 88%);
+.tk-hero-grid {
+  --tk-phone-w: clamp(220px, 24vw, 300px);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(32px, 6vw, 88px);
 }
+.tk-hero-copy { min-width: 0; max-width: 36rem; }
+.tk-kicker { margin: 0 0 18px; color: var(--tk-duck-soft); font-size: .86rem; font-weight: 700; letter-spacing: .02em; }
+:lang(en) .tk-kicker { letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+#game-title { display: flex; flex-direction: column; margin: 0; color: #fff; line-height: 1.04; }
+.tk-title-main { font-size: clamp(2.8rem, 6.4vw, 5rem); font-weight: 800; letter-spacing: -.045em; word-break: keep-all; text-shadow: 0 2px 40px rgba(42, 79, 196, .55); }
+.tk-title-alt { margin-top: 12px; color: var(--tk-text-3); font-size: clamp(.92rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .1em; }
+html:lang(ko) #game-title { flex-direction: column-reverse; }
+html:lang(ko) .tk-title-alt { margin: 12px 0 0; }
+html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
+.tk-lede { max-width: 31rem; margin: 22px 0 0; color: var(--tk-text-2); font-size: clamp(1.02rem, 1.3vw, 1.16rem); line-height: 1.7; word-break: keep-all; text-wrap: pretty; }
 
-.tk-intro-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
-  align-items: center;
-  gap: clamp(32px, 6vw, 96px);
+/* the pre-registration card */
+.tk-prereg {
+  margin-top: 30px; padding: clamp(20px, 2.6vw, 28px);
+  border: 1px solid rgba(245, 183, 49, .38); border-radius: 22px;
+  background: linear-gradient(180deg, rgba(245, 183, 49, .10), rgba(245, 183, 49, .03) 60%), rgba(18, 23, 58, .82);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .35);
 }
-
-.tk-intro-copy { min-width: 0; max-width: 40rem; }
-.tk-status-row { margin: 0 0 22px; }
-
-#game-title {
-  display: flex;
-  margin: 0;
-  color: #fff;
-  letter-spacing: -.03em;
-  line-height: 1.05;
+.tk-prereg-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.tk-prereg h2 { margin: 0; color: #fff; font-size: 1.32rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.3; word-break: keep-all; }
+.tk-prereg-free { margin: 0; color: var(--tk-duck-soft); font-size: .84rem; font-weight: 700; }
+.tk-prereg-sub { margin: 8px 0 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
+.tk-form-row { display: flex; gap: 10px; }
+.tk-field { position: relative; flex: 1 1 auto; min-width: 0; }
+.tk-input {
+  width: 100%; height: 56px; box-sizing: border-box; padding: 0 16px;
+  border: 1px solid var(--tk-edge-2); border-radius: 14px; color: #fff; background: rgba(7, 10, 30, .72);
+  font: inherit; font-size: 1rem; outline: none;
+  transition: border-color 160ms var(--tk-ease), box-shadow 160ms var(--tk-ease);
 }
+.tk-input::placeholder { color: var(--tk-text-3); }
+.tk-input:focus { border-color: var(--tk-duck); box-shadow: 0 0 0 3px rgba(245, 183, 49, .25); }
+.tk-input[aria-invalid="true"] { border-color: var(--tk-err); }
+.tk-form-row .tk-key { flex: none; }
+.tk-consent { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; color: var(--tk-text-2); font-size: .85rem; line-height: 1.55; word-break: keep-all; cursor: pointer; }
+.tk-consent input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--tk-duck); cursor: pointer; }
+.tk-consent a { color: #fff; text-underline-offset: 3px; }
+.tk-hp { position: absolute !important; left: -10000px !important; width: 1px; height: 1px; overflow: hidden; }
+.tk-status { min-height: 0; margin: 0; font-size: .92rem; font-weight: 600; line-height: 1.55; word-break: keep-all; }
+.tk-status:not(:empty) { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, .06); }
+.tk-status[data-tone="ok"] { color: var(--tk-ok); background: rgba(126, 226, 168, .1); }
+.tk-status[data-tone="err"] { color: var(--tk-err); background: rgba(255, 157, 138, .1); }
+.tk-prereg.is-done .tk-form-body { display: none; }
+.tk-facts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 0; padding: 16px 0 0; border-top: 1px solid var(--tk-edge); list-style: none; color: var(--tk-text-2); font-size: .86rem; }
+.tk-facts li { display: inline-flex; align-items: center; gap: 8px; }
+.tk-facts li::before { width: 6px; height: 6px; border-radius: 2px; content: ""; background: var(--tk-duck); }
+.tk-facts b { color: #fff; font-weight: 700; }
 
-.tk-title-main {
-  display: block;
-  font-size: clamp(2.9rem, 7.2vw, 5.6rem);
-  font-weight: 800;
-  letter-spacing: -.045em;
-  line-height: 1.04;
-  text-shadow: 0 2px 40px rgba(42, 79, 196, .55);
-  text-wrap: balance;
-  word-break: keep-all;
-}
-
-.tk-title-alt {
-  display: block;
-  color: var(--tk-on-night-2);
-  font-size: clamp(.95rem, 1.25vw, 1.12rem);
-  font-weight: 700;
-  letter-spacing: .12em;
-  line-height: 1.3;
-}
-
-/* Korean page: big Korean name, small English name under it. English page: big English name, small Korean name under it. */
-html:lang(ko) #game-title { flex-direction: column-reverse; } /* the source reads 10key Survival first, the screen shows the Korean name first */
-html:lang(ko) .tk-title-alt { margin-top: 14px; }
-html:lang(en) #game-title { flex-direction: column; }
-html:lang(en) .tk-title-alt { margin-top: 14px; letter-spacing: .06em; }
-html:lang(en) .tk-title-main { font-size: clamp(2.6rem, 6.6vw, 5rem); letter-spacing: -.04em; }
-
-.tk-lede {
-  max-width: 32rem;
-  margin: 24px 0 0;
-  color: var(--tk-on-night);
-  font-size: clamp(1.02rem, 1.3vw, 1.2rem);
-  font-weight: 450;
-  line-height: 1.7;
-  text-wrap: balance;
-  word-break: keep-all;
-}
-
-.tk-intro .tk-chips { margin-top: 24px; }
-.tk-intro-cta { margin-top: 32px; }
-
-/* decorative keycaps (the real renders the home uses), tumbling slowly around the phone */
-.tk-cap {
-  position: absolute;
-  z-index: 2;
-  width: var(--w, 100px);
-  aspect-ratio: 1;
-  transform: rotate(var(--r, 0deg));
-  animation: tk-bob var(--d, 7s) ease-in-out var(--delay, 0s) infinite alternate;
-  pointer-events: none;
-}
-
-.tk-cap img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.tk-cap-a { --w: 112px; --r: -14deg; --d: 7s; left: -92px; bottom: 11%; }
-.tk-cap-b { --w: 104px; --r: 15deg; --d: 8s; --delay: -2s; right: -84px; top: 3%; }
-.tk-cap-c { --w: 92px; --r: 8deg; --d: 6.5s; --delay: -4s; left: -74px; top: 1%; }
-.tk-cap-d { --w: 100px; --r: -11deg; --d: 7.5s; --delay: -1s; right: -80px; bottom: 20%; }
-.tk-cap-e { --w: 52px; --r: 30deg; --d: 9s; --delay: -3s; left: -34px; bottom: -3%; }
-.tk-cap-f { --w: 60px; --r: -40deg; --d: 8.5s; --delay: -5s; right: -58px; top: 46%; }
-
-@keyframes tk-bob {
-  from { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
-  to { transform: translate3d(0, -14px, 0) rotate(calc(var(--r, 0deg) + 4deg)); }
-}
-
-/* phone frame (same build as the home's) */
-.tk-phone-figure { display: grid; justify-items: center; gap: 16px; margin: 0; }
+/* phone with the real gameplay loop */
+.tk-phone-figure { display: grid; justify-items: center; gap: 14px; margin: 0; }
 .tk-phone { position: relative; width: var(--tk-phone-w); }
-.tk-phone::before {
-  position: absolute;
-  inset: 8% -22% 2%;
-  z-index: -1;
-  content: "";
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(42, 79, 196, .5), rgba(245, 183, 49, .10) 70%, transparent);
-  filter: blur(20px);
-}
-
+.tk-phone::before { position: absolute; inset: 8% -24% 2%; z-index: -1; content: ""; border-radius: 50%; background: radial-gradient(closest-side, rgba(42, 79, 196, .55), rgba(245, 183, 49, .1) 70%, transparent); filter: blur(22px); }
 .tk-phone-shell {
-  position: relative;
-  display: block;
-  aspect-ratio: 9 / 18;
-  padding: 10px;
-  overflow: hidden;
-  border-radius: calc(var(--tk-phone-w) * .166);
-  background: #0e1020;
-  box-shadow:
-    inset 0 0 0 1.5px #3a3d55,
-    inset 0 0 0 5px #0b0c19,
-    0 2px 2px rgba(255, 255, 255, .22),
-    0 40px 80px rgba(0, 0, 0, .55);
+  position: relative; display: block; aspect-ratio: 9 / 18; padding: 10px; overflow: hidden;
+  border-radius: calc(var(--tk-phone-w) * .166); background: #0e1020;
+  box-shadow: inset 0 0 0 1.5px #3a3d55, inset 0 0 0 5px #0b0c19, 0 2px 2px rgba(255, 255, 255, .22), 0 40px 80px rgba(0, 0, 0, .55);
 }
-
-.tk-phone-video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: calc(var(--tk-phone-w) * .133);
-  background: #000;
-  object-fit: contain; /* the 9:16 footage keeps its whole HUD; the shell is slightly taller, so thin black bars sit above and below */
-}
-
+.tk-phone-video { display: block; width: 100%; height: 100%; border-radius: calc(var(--tk-phone-w) * .133); background: #000; object-fit: contain; }
 .tk-phone-island { position: absolute; top: 18px; left: 50%; z-index: 3; width: 32%; height: 24px; border-radius: 999px; background: #050610; transform: translateX(-50%); }
 .tk-phone-home { position: absolute; bottom: 18px; left: 50%; z-index: 3; width: 36%; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, .8); transform: translateX(-50%); }
-.tk-phone-button { position: absolute; width: 3px; border-radius: 2px; background: #2f3249; }
-.tk-phone-button-a { top: 20%; left: -3px; height: 28px; }
-.tk-phone-button-b { top: 28%; left: -3px; height: 46px; }
-.tk-phone-button-c { top: 24%; right: -3px; height: 64px; }
-
-.tk-phone-figure figcaption {
-  display: flex;
-  max-width: calc(var(--tk-phone-w) + 80px);
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 0;
-  color: var(--tk-on-night-2);
-  font-size: .8rem;
-  font-weight: 500;
-  line-height: 1.4;
-  text-align: center;
-}
-
+.tk-phone-figure figcaption { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--tk-text-3); font-size: .8rem; text-align: center; }
 .tk-video-toggle {
-  position: relative;
-  display: inline-grid;
-  width: 36px;
-  height: 36px;
-  flex: none;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, .26);
-  border-radius: 50%;
-  color: #fff;
-  background: rgba(255, 255, 255, .08);
-  cursor: pointer;
-  transition: background-color 160ms var(--tk-ease), border-color 160ms var(--tk-ease);
+  display: inline-grid; width: 36px; height: 36px; flex: none; place-items: center; padding: 0;
+  border: 1px solid var(--tk-edge-2); border-radius: 50%; color: #fff; background: rgba(255, 255, 255, .08); cursor: pointer;
 }
-
-.tk-video-toggle:hover { border-color: rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .16); }
 .tk-video-toggle span { position: relative; display: block; width: 12px; height: 12px; }
-.tk-video-toggle span::before,
-.tk-video-toggle span::after { position: absolute; top: 0; width: 4px; height: 12px; border-radius: 1px; content: ""; background: currentColor; }
+.tk-video-toggle span::before, .tk-video-toggle span::after { position: absolute; top: 0; width: 4px; height: 12px; border-radius: 1px; content: ""; background: currentColor; }
 .tk-video-toggle span::before { left: 1px; }
 .tk-video-toggle span::after { right: 1px; }
 .tk-video-toggle[data-state="paused"] span::before { left: 2px; width: 0; height: 0; border-radius: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid currentColor; background: transparent; }
 .tk-video-toggle[data-state="paused"] span::after { display: none; }
 
-/* ---------- how it plays: four screenshots, one short line each ---------- */
-.tk-how {
-  position: relative;
-  z-index: 2;
-  margin-top: -32px;
-  padding: clamp(72px, 9vw, 128px) 0 clamp(80px, 10vw, 144px);
-  border-radius: 32px 32px 0 0;
-  background:
-    radial-gradient(50% 40% at 12% 0%, rgba(245, 183, 49, .14), transparent 70%),
-    radial-gradient(40% 36% at 92% 30%, rgba(42, 79, 196, .07), transparent 70%),
-    var(--tk-paper);
-}
+/* ---------- sections ---------- */
+.tk-section { padding: clamp(64px, 8vw, 104px) 0; }
+.tk-section + .tk-section { border-top: 1px solid var(--tk-edge); }
+.tk-h2 { margin: 0 0 clamp(28px, 4vw, 44px); color: #fff; font-size: clamp(1.7rem, 3.2vw, 2.5rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.18; word-break: keep-all; text-wrap: balance; }
+.tk-h2 small { display: block; margin-top: 10px; color: var(--tk-text-2); font-size: clamp(.98rem, 1.3vw, 1.08rem); font-weight: 500; letter-spacing: 0; line-height: 1.6; }
 
-.tk-section-head { max-width: 44rem; margin-bottom: clamp(40px, 6vw, 72px); }
+/* how it plays: four real screenshots, numbered by the game's own keycaps */
+.tk-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); margin: 0; padding: 0; list-style: none; }
+.tk-step { min-width: 0; }
+.tk-step figure { position: relative; margin: 0 0 18px; }
+.tk-step-shot { display: block; padding: 6px; border-radius: 30px; background: #0e1020; box-shadow: inset 0 0 0 1.5px #3a3d55, 0 24px 50px rgba(0, 0, 0, .4); }
+.tk-step-shot img { display: block; width: 100%; height: auto; aspect-ratio: 600 / 1171; border-radius: 24px; background: #0b0c19; object-fit: cover; }
+.tk-step-key { position: absolute; top: -18px; left: -12px; width: 64px; height: 64px; transform: rotate(-8deg); pointer-events: none; }
+.tk-step-key img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tk-step h3 { margin: 0 0 6px; color: #fff; font-size: 1.08rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.35; word-break: keep-all; }
+.tk-step p { margin: 0; color: var(--tk-text-2); font-size: .93rem; line-height: 1.65; word-break: keep-all; text-wrap: pretty; }
 
-.tk-beats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(20px, 2.8vw, 44px);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+/* the facts, as a plain sheet */
+.tk-sheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--tk-edge); border-radius: 20px; overflow: hidden; background: var(--tk-night-2); }
+.tk-sheet div { padding: 22px 24px; border-right: 1px solid var(--tk-edge); border-bottom: 1px solid var(--tk-edge); }
+.tk-sheet div:nth-child(3n) { border-right: 0; }
+.tk-sheet div:nth-last-child(-n + 3) { border-bottom: 0; }
+.tk-sheet dt { margin: 0 0 6px; color: var(--tk-text-3); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
+.tk-sheet dd { margin: 0; color: #fff; font-size: 1.02rem; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+.tk-sheet dd span { display: block; margin-top: 2px; color: var(--tk-text-2); font-size: .88rem; font-weight: 500; }
+.tk-sheet .is-key { background: rgba(245, 183, 49, .08); }
+.tk-sheet .is-key dd { color: var(--tk-duck-soft); }
 
-.tk-beat { display: grid; align-content: start; gap: 26px; min-width: 0; }
-.tk-beat:nth-child(even) { margin-top: 56px; }
+/* questions */
+.tk-faq { display: grid; gap: 10px; max-width: 52rem; }
+.tk-faq details { border: 1px solid var(--tk-edge); border-radius: 16px; background: var(--tk-night-2); }
+.tk-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; padding: 0 20px; color: #fff; font-weight: 700; line-height: 1.4; cursor: pointer; list-style: none; word-break: keep-all; }
+.tk-faq summary::-webkit-details-marker { display: none; }
+.tk-faq summary::after { flex: none; width: 10px; height: 10px; border-right: 2px solid var(--tk-text-2); border-bottom: 2px solid var(--tk-text-2); content: ""; transform: rotate(45deg) translate(-2px, -2px); transition: transform 160ms var(--tk-ease); }
+.tk-faq details[open] summary::after { transform: rotate(225deg) translate(-2px, -2px); }
+.tk-faq details p { margin: 0; padding: 0 20px 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.7; word-break: keep-all; }
 
-.tk-beat-shot { position: relative; margin: 0; }
-.tk-shot {
-  display: block;
-  padding: 7px;
-  border-radius: 36px;
-  background: #0e1020;
-  box-shadow:
-    inset 0 0 0 1.5px #3a3d55,
-    0 2px 4px rgba(20, 22, 43, .06),
-    0 30px 60px rgba(20, 22, 43, .24);
-}
-
-.tk-shot img { display: block; width: 100%; height: auto; aspect-ratio: 600 / 1171; border-radius: 29px; background: #0b0c19; object-fit: cover; }
-
-.tk-beat-key {
-  position: absolute;
-  top: -34px;
-  left: 50%;
-  z-index: 2;
-  width: 76px;
-  height: 76px;
-  margin-left: -38px;
-  transform: rotate(-9deg);
-  pointer-events: none;
-}
-
-.tk-beat:nth-child(even) .tk-beat-key { transform: rotate(8deg); }
-.tk-beat-key img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.tk-beat-text { min-width: 0; }
-.tk-beat h3 { margin: 0 0 8px; color: var(--tk-ink); font-size: 1.2rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
-.tk-beat p { margin: 0; color: var(--tk-ink-2); font-size: .96rem; line-height: 1.7; word-break: keep-all; text-wrap: balance; }
-
-/* ---------- features ---------- */
-.tk-features { padding: clamp(72px, 9vw, 120px) 0; color: var(--tk-ink); background: var(--tk-white); }
-.tk-features .tk-section-head { margin-bottom: clamp(32px, 5vw, 52px); }
-.tk-feature-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 0; padding: 0; list-style: none; }
-.tk-feature {
-  flex: 0 1 calc((100% - 4 * 16px) / 5);
-  min-width: 0;
-  padding: 26px 22px 28px;
-  border: 1px solid var(--tk-line);
-  border-radius: 22px;
-  background: #fff;
-  box-shadow: var(--tk-shadow-card);
-}
-
-.tk-feature-icon {
-  position: relative;
-  display: grid;
-  width: 54px;
-  height: 54px;
-  place-items: center;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  color: var(--tk-ink);
-  background: linear-gradient(180deg, #fbf5e6, var(--tk-key-cream));
-  box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255, 255, 255, .5), 0 5px 0 #b9ad8f, 0 9px 14px rgba(20, 22, 43, .16);
-}
-
-.tk-feature-icon svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.tk-feature-icon b { font-size: 1.02rem; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
-.tk-feature h3 { margin: 0 0 6px; color: var(--tk-ink); font-size: 1.04rem; font-weight: 800; letter-spacing: -.015em; line-height: 1.35; word-break: keep-all; }
-.tk-feature p { margin: 0; color: var(--tk-ink-2); font-size: .9rem; line-height: 1.65; word-break: keep-all; text-wrap: pretty; }
-
-/* ---------- release: not out yet, so no store buttons ---------- */
-.tk-release {
-  position: relative;
-  padding: clamp(72px, 9vw, 128px) 0;
-  overflow: clip;
-  color: #fff;
-  background:
-    radial-gradient(50% 60% at 85% 30%, rgba(42, 79, 196, .34), transparent 70%),
-    radial-gradient(40% 50% at 8% 90%, rgba(245, 183, 49, .12), transparent 70%),
-    var(--tk-night);
-  isolation: isolate;
-}
-
-.tk-release-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(32px, 6vw, 88px); }
-.tk-release-copy { min-width: 0; }
-.tk-release .tk-h2 { margin-top: 20px; color: #fff; }
-.tk-release-text { max-width: 30rem; margin: 20px 0 0; color: var(--tk-on-night); font-size: 1.04rem; line-height: 1.7; word-break: keep-all; text-wrap: pretty; }
-.tk-release-note { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 28px; }
-.tk-disclosure {
-  flex-basis: 100%;
-  order: 2;
-  margin: 0;
-  color: rgba(255, 255, 255, .58);
-  font-size: .82rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.tk-keyart {
-  margin: 0;
-  overflow: hidden;
-  border-radius: 28px;
-  background: #0b0c19;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 30px 80px rgba(0, 0, 0, .5);
-}
-
+/* last call */
+.tk-final { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: clamp(28px, 5vw, 72px); }
+.tk-final .tk-h2 { margin-bottom: 22px; }
+.tk-keyart { margin: 0; overflow: hidden; border-radius: 24px; background: #0b0c19; box-shadow: 0 0 0 1px var(--tk-edge), 0 30px 80px rgba(0, 0, 0, .5); }
 .tk-keyart img { display: block; width: 100%; height: auto; aspect-ratio: 960 / 469; }
+.tk-final-links { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
+.tk-text-link { color: var(--tk-text-2); font-size: .9rem; font-weight: 600; text-underline-offset: 4px; }
+.tk-text-link:hover { color: #fff; }
 
-/* ---------- footer: a quiet list ---------- */
-.tk-footer { padding: 24px 0 36px; color: var(--tk-on-night-2); background: var(--tk-night-deep); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
+/* ---------- small pages: /10key/prereg/ and /10key/get/ ---------- */
+.tk-small { display: grid; min-height: 100vh; min-height: 100svh; place-items: center; padding: calc(var(--tk-bar) + 32px) 0 48px; box-sizing: border-box;
+  background: radial-gradient(50% 50% at 50% 40%, rgba(42, 79, 196, .35), transparent 70%), var(--tk-night); }
+.tk-card { width: min(520px, 100% - 2 * var(--tk-gutter)); padding: clamp(24px, 4vw, 36px); box-sizing: border-box; border: 1px solid var(--tk-edge); border-radius: 24px; background: rgba(18, 23, 58, .9); text-align: center; box-shadow: 0 30px 70px rgba(0, 0, 0, .4); }
+.tk-card-key { display: block; width: 84px; height: 84px; margin: 0 auto 14px; position: relative; }
+.tk-card-key img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tk-card h1 { margin: 0 0 10px; color: #fff; font-size: clamp(1.5rem, 4vw, 1.9rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.25; word-break: keep-all; }
+.tk-card p { margin: 0 0 12px; color: var(--tk-text-2); line-height: 1.7; word-break: keep-all; }
+.tk-card .tk-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
+.tk-card .tk-store-note { margin-top: 18px; color: var(--tk-text-3); font-size: .84rem; }
+
+/* ---------- footer ---------- */
+.tk-footer { padding: 24px 0 36px; color: var(--tk-text-3); background: var(--tk-night-deep); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
 .tk-footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 32px; }
 .tk-footer-links { display: flex; flex-wrap: wrap; gap: 0 26px; margin: 0; padding: 0; list-style: none; }
-.tk-footer-links a { display: inline-flex; min-height: 44px; align-items: center; color: var(--tk-on-night); font-size: .86rem; font-weight: 600; text-decoration: none; transition: color 160ms var(--tk-ease); }
-.tk-footer-links a:hover,
-.tk-footer-links a:focus-visible { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
-.tk-footer small { font-size: .78rem; font-weight: 500; }
+.tk-footer-links a { display: inline-flex; min-height: 44px; align-items: center; color: var(--tk-text-2); font-size: .86rem; font-weight: 600; text-decoration: none; }
+.tk-footer-links a:hover, .tk-footer-links a:focus-visible { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+.tk-footer small { font-size: .78rem; }
 
 /* ---------- reveal on scroll (only when the script runs) ---------- */
-.tk-js .tk-reveal { opacity: 0; transform: translateY(26px); transition: opacity 700ms var(--tk-ease), transform 700ms var(--tk-ease); transition-delay: calc(var(--i, 0) * 90ms); }
+.tk-js .tk-reveal { opacity: 0; transform: translateY(22px); transition: opacity 600ms var(--tk-ease), transform 600ms var(--tk-ease); transition-delay: calc(var(--i, 0) * 80ms); }
 .tk-js .tk-reveal.is-in { opacity: 1; transform: none; }
+.tk-flash { animation: tk-flash 1.2s var(--tk-ease); }
+@keyframes tk-flash { 0% { box-shadow: 0 0 0 0 rgba(245, 183, 49, .7), 0 30px 70px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 18px rgba(245, 183, 49, 0), 0 30px 70px rgba(0, 0, 0, .35); } }
 
 /* ---------- responsive ---------- */
-@media (max-width: 1100px) {
-  .tk-cap-c { left: -64px; }
-  .tk-cap-d { right: -66px; }
-  .tk-beats { gap: 20px; }
-  .tk-beat:nth-child(even) { margin-top: 40px; }
-  .tk-feature { flex-basis: calc((100% - 2 * 16px) / 3); }
+@media (max-width: 960px) {
+  .tk-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px; }
+  .tk-sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tk-sheet div:nth-child(3n) { border-right: 1px solid var(--tk-edge); }
+  .tk-sheet div:nth-child(2n) { border-right: 0; }
+  .tk-sheet div:nth-last-child(-n + 3) { border-bottom: 1px solid var(--tk-edge); }
+  .tk-sheet div:nth-last-child(-n + 2) { border-bottom: 0; }
 }
-
 @media (max-width: 860px) {
-  .tk-intro { --tk-phone-w: clamp(176px, calc((100vh - 480px) / 2), 280px); align-items: start; padding-bottom: 64px; }
-  .tk-intro-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
-  .tk-intro-copy { max-width: 36rem; }
-  .tk-intro-cta { display: none; }
-  .tk-cap-a { --w: 74px; left: -52px; bottom: 7%; }
-  .tk-cap-b { --w: 76px; right: -64px; top: -3%; }
-  .tk-cap-c, .tk-cap-d, .tk-cap-e, .tk-cap-f { display: none; }
-  .tk-beats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 56px; }
-  .tk-beat:nth-child(even) { margin-top: 0; }
-  .tk-release-grid { grid-template-columns: minmax(0, 1fr); }
-  .tk-release-copy { order: 2; }
-  .tk-keyart { order: 1; }
+  .tk-hero-grid { grid-template-columns: minmax(0, 1fr); --tk-phone-w: clamp(200px, 58vw, 260px); }
+  .tk-hero-copy { max-width: none; }
+  .tk-phone-figure { order: 2; }
+  .tk-final { grid-template-columns: minmax(0, 1fr); }
+  .tk-nav-link:not(.tk-nav-cta) { display: none; }
 }
-
-@supports (height: 100svh) {
-  @media (max-width: 860px) {
-    .tk-intro { --tk-phone-w: clamp(176px, calc((100svh - 480px) / 2), 280px); }
-  }
+@media (max-width: 520px) {
+  .tk-form-row { flex-direction: column; }
+  .tk-form-row .tk-key { width: 100%; }
+  .tk-steps { gap: 28px 14px; }
+  .tk-step-key { width: 50px; height: 50px; top: -14px; left: -8px; }
+  .tk-sheet { grid-template-columns: minmax(0, 1fr); }
+  .tk-sheet div, .tk-sheet div:nth-child(3n), .tk-sheet div:nth-child(2n) { border-right: 0; border-bottom: 1px solid var(--tk-edge); }
+  .tk-sheet div:last-child { border-bottom: 0; }
+  .tk-page .brand-lockup .brand-wordmark-image { display: none; }
 }
-
-@media (max-width: 640px) {
-  :root { --tk-bar: 56px; }
-  .tk-page .brand-lockup .brand-wordmark-image { width: 92px; }
-  .tk-intro { padding-top: calc(var(--tk-bar) + 20px); }
-  .tk-status-row { margin-bottom: 16px; }
-  .tk-lede { margin-top: 18px; }
-  .tk-intro .tk-chips { margin-top: 18px; }
-  .tk-beats { grid-template-columns: minmax(0, 1fr); row-gap: 44px; }
-  .tk-beat { grid-template-columns: minmax(0, 42%) minmax(0, 1fr); align-items: center; gap: 22px; }
-  .tk-beat:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 42%); }
-  .tk-beat:nth-child(even) .tk-beat-shot { order: 2; }
-  .tk-beat:nth-child(even) .tk-beat-text { order: 1; }
-  .tk-shot { padding: 5px; border-radius: 26px; }
-  .tk-shot img { border-radius: 21px; }
-  .tk-beat-key { top: -24px; width: 58px; height: 58px; margin-left: -29px; }
-  .tk-beat h3 { font-size: 1.1rem; }
-  .tk-feature { display: grid; grid-template-columns: 54px minmax(0, 1fr); flex-basis: 100%; align-items: center; gap: 0 18px; padding: 18px 18px 22px; }
-  .tk-feature-icon { grid-row: 1 / span 2; margin: 0 0 5px; }
-  .tk-feature h3 { align-self: end; margin-bottom: 2px; }
-  .tk-feature p { align-self: start; }
-  .tk-keyart { border-radius: 20px; }
-  .tk-footer-inner { flex-direction: column; align-items: flex-start; }
-  .tk-footer-links { gap: 0 22px; }
-}
-
-@media (max-width: 480px) {
-  .tk-nav-link { display: none; }
-  .tk-lang { margin-left: 0; }
-}
-
-@media (max-height: 640px) and (min-width: 861px) {
-  .tk-intro { --tk-phone-w: 220px; }
-}
-
-/* ---------- reduced motion: the poster stands in for the video, nothing drifts or fades in ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .tk-cap { animation: none; }
-  .tk-chip-status::before { animation: none; }
   .tk-js .tk-reveal { opacity: 1; transform: none; transition: none; }
-  .tk-cta-face, .tk-link, .tk-lang a, .tk-nav-link, .tk-video-toggle { transition: none; }
+  .tk-flash { animation: none; }
 }
-
-@media print {
-  .tk-page .site-header, .tk-cap, .tk-video-toggle { display: none; }
-  .tk-intro { min-height: 0; color: #000; background: #fff; }
-  .tk-intro::before, .tk-intro::after { display: none; }
-}
+.tk-page [hidden] { display: none !important; }

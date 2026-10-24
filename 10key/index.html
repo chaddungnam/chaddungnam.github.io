@@ -2,20 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <script>try{if(!new URLSearchParams(location.search).has("lang")&&String(navigator.language||"").toLowerCase().indexOf("ko")!==0)location.replace("index_en.html");}catch(e){}</script>
+  <script>try{if(!new URLSearchParams(location.search).has("lang")&&String(navigator.language||"").toLowerCase().indexOf("ko")!==0)location.replace("index_en.html"+location.hash);}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0f2a">
-  <title>딸깍 서바이벌 (10key Survival) | House Duck</title>
-  <meta name="description" content="살아 있는 숫자 키패드 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요. 레벨업마다 스킬을 고르고 마우스에게서 살아남는 House Duck의 신작. iOS·Android 출시 준비 중, 광고 없음.">
-  <meta property="og:title" content="딸깍 서바이벌 (10key Survival) | House Duck">
-  <meta property="og:description" content="텐키 하나로 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 스킬을 고르고, 마우스에게서 살아남으세요. iOS·Android 출시 준비 중.">
+  <title>딸깍 서바이벌 (10key Survival) 사전예약 | House Duck</title>
+  <meta name="description" content="텐키가 되어 끝없는 3D 키보드를 파고 내려가는 House Duck의 신작 딸깍 서바이벌. 이메일로 사전예약하면 iOS·Android 출시 날 다운로드 링크를 보내 드려요.">
+  <meta property="og:title" content="딸깍 서바이벌 (10key Survival) 사전예약 | House Duck">
+  <meta property="og:description" content="이메일로 사전예약하면 출시 날 iOS·Android 다운로드 링크를 보내 드려요. 광고 없음.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:url" content="https://houseduck.in/10key/">
   <meta property="og:image" content="https://houseduck.in/assets/media/tenkey-og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스">
+  <meta property="og:image:alt" content="딸깍 서바이벌 대표 이미지. 3D 키보드 위의 텐키와 마우스">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://houseduck.in/10key/">
   <link rel="alternate" hreflang="ko" href="https://houseduck.in/10key/">
@@ -26,9 +26,9 @@
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/brand-site.css">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261023-tk1">
-  <script src="/assets/tenkey-page.js?v=20261023-tk1" defer></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"딸깍 서바이벌","alternateName":"10key Survival","url":"https://houseduck.in/10key/","description":"살아 있는 숫자 키패드 텐키가 끝없는 3D 키보드를 파고 내려가는 아케이드 서바이벌 게임. 출시 준비 중.","image":"https://houseduck.in/assets/media/tenkey-og.jpg","genre":["Arcade","Action"],"gamePlatform":["iOS","Android"],"inLanguage":["ko","en"],"publisher":{"@type":"Organization","name":"House Duck","url":"https://houseduck.in/"}}</script>
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261024-tk2">
+  <script src="/assets/tenkey-page.js?v=20261024-tk2" defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "딸깍 서바이벌", "alternateName": "10key Survival", "url": "https://houseduck.in/10key/", "description": "텐키가 되어 끝없는 3D 키보드를 파고 내려가는 House Duck의 신작 딸깍 서바이벌. 이메일로 사전예약하면 iOS·Android 출시 날 다운로드 링크를 보내 드려요.", "image": "https://houseduck.in/assets/media/tenkey-og.jpg", "genre": ["Arcade", "Action"], "gamePlatform": ["iOS", "Android"], "inLanguage": ["ko", "en"], "publisher": {"@type": "Organization", "name": "House Duck", "url": "https://houseduck.in/"}}</script>
 </head>
 <body class="tk-page" data-page="tenkey">
   <a class="skip-link" href="#main-content">본문으로 바로가기</a>
@@ -37,86 +37,102 @@
     <nav class="tk-nav" aria-label="주요 메뉴">
       <a class="tk-nav-link" href="../?lang=ko#games">게임</a>
       <a class="tk-nav-link" href="/support/">고객지원</a>
+      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump>사전예약</a>
       <span class="tk-lang" role="group" aria-label="언어 선택"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko" aria-current="page">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en">EN</a></span>
     </nav>
   </div></header>
 
   <main id="main-content">
-    <section class="tk-intro" aria-labelledby="game-title">
-      <div class="tk-wrap tk-intro-grid">
-        <div class="tk-intro-copy">
-          <p class="tk-status-row"><span class="tk-chip tk-chip-status">출시 준비 중</span></p>
+    <section class="tk-hero" aria-labelledby="game-title">
+      <div class="tk-wrap tk-hero-grid">
+        <div class="tk-hero-copy">
+          <p class="tk-kicker">House Duck 신작 · iOS / Android 출시 준비 중</p>
           <h1 id="game-title"><span class="tk-title-alt" lang="en">10key Survival</span> <span class="tk-title-main">딸깍 서바이벌</span></h1>
-          <p class="tk-lede">살아 있는 숫자 키패드, 텐키가 되어 끝없는 3D&nbsp;키보드를 파고 내려가세요. 마우스에게서 살아남으세요.</p>
-          <ul class="tk-chips" aria-label="출시 정보"><li class="tk-chip">iOS</li><li class="tk-chip">Android</li><li class="tk-chip">광고 없음</li></ul>
-          <div class="tk-intro-cta"><a class="tk-cta" href="#how"><span class="tk-cta-face">플레이 방법 보기<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></div>
+          <p class="tk-lede">살아 있는 숫자 키패드 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 스킬을 고르고, 마우스의 돌진에서 살아남으세요.</p>
+
+          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="ko" data-consent-version="2026-10-24" data-msgs='{"sending": "보내는 중…", "ok": "확인 메일을 보냈어요. 메일함에서 ‘사전예약 확인’ 버튼을 누르면 완료돼요. 메일이 안 보이면 스팸함도 확인해 주세요.", "invalid": "이메일 주소를 다시 확인해 주세요.", "consent": "동의 항목에 체크해 주세요.", "busy": "신청이 많아 잠시 뒤에 다시 시도해 주세요.", "mail": "확인 메일을 보내지 못했어요. 잠시 뒤에 다시 시도해 주세요.", "error": "연결에 실패했어요. 잠시 뒤에 다시 시도해 주세요."}'>
+            <h2 id="prereg-title">출시 알림 사전예약</h2>
+            <p class="tk-prereg-sub">이메일을 남기면 출시되는 날 iOS·Android 다운로드 링크를 메일 한 통으로 보내 드려요.</p>
+            <form class="tk-form-body" novalidate data-prereg-form>
+              <div class="tk-form-row">
+                <label class="tk-field"><span class="tk-hp">이메일 주소</span><input class="tk-input" type="email" name="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="이메일 주소" aria-label="이메일 주소" aria-describedby="prereg-status"></label>
+                <button class="tk-key" type="submit"><span class="tk-key-face">사전예약하기</span></button>
+              </div>
+              <label class="tk-hp" aria-hidden="true">website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+              <label class="tk-consent"><input type="checkbox" name="consent" required><span>출시 알림 메일을 받기 위해 이메일 주소를 보내는 데 동의해요. 확인 메일의 버튼을 눌러야 완료돼요. 출시 알림을 보낸 뒤 30일 안에 삭제해요. <a href="/privacy/ko.html#section-13">개인정보처리방침</a></span></label>
+            </form>
+            <p class="tk-status" id="prereg-status" role="status" aria-live="polite" data-prereg-status></p>
+            <ul class="tk-facts"><li>iOS · Android</li><li>광고 없음</li><li>한국어 · 영어</li></ul>
+          </section>
         </div>
+
         <figure class="tk-phone-figure">
           <div class="tk-phone" role="group" aria-label="딸깍 서바이벌 실제 플레이 영상">
             <span class="tk-phone-shell">
               <span class="tk-phone-island" aria-hidden="true"></span>
-              <video class="tk-phone-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="딸깍 서바이벌 실제 플레이"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video>
+              <video class="tk-phone-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="딸깍 서바이벌 실제 플레이 영상"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video>
               <span class="tk-phone-home" aria-hidden="true"></span>
             </span>
-            <span class="tk-phone-button tk-phone-button-a" aria-hidden="true"></span>
-            <span class="tk-phone-button tk-phone-button-b" aria-hidden="true"></span>
-            <span class="tk-phone-button tk-phone-button-c" aria-hidden="true"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-a"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" decoding="async"><img src="/assets/media/home/page-legend-5.webp" width="336" height="336" alt="" decoding="async"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-b"><img src="/assets/media/home/page-key-1u_crack_2.webp" width="336" height="336" alt="" decoding="async"><img src="/assets/media/home/page-legend-9.webp" width="336" height="336" alt="" decoding="async"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-c"><img src="/assets/media/home/page-key-1u_broken.webp" width="336" height="336" alt="" decoding="async"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-d"><img src="/assets/media/home/page-key-mod_intact.webp" width="336" height="336" alt="" decoding="async"><img src="/assets/media/home/page-legend-del.webp" width="336" height="336" alt="" decoding="async"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-e"><img src="/assets/media/home/page-key-shard_2.webp" width="336" height="336" alt="" decoding="async"></span>
-            <span aria-hidden="true" class="tk-cap tk-cap-f"><img src="/assets/media/home/page-key-shard_3.webp" width="336" height="336" alt="" decoding="async"></span>
           </div>
           <figcaption><span>출시 전 빌드의 실제 플레이 화면</span><button class="tk-video-toggle" type="button" data-tk-video-toggle data-pause-label="영상 일시정지" data-play-label="영상 재생" aria-label="영상 일시정지"><span aria-hidden="true"></span></button></figcaption>
         </figure>
       </div>
     </section>
 
-    <section class="tk-how" id="how" aria-labelledby="how-title">
+    <section class="tk-section" id="how" aria-labelledby="how-title">
       <div class="tk-wrap">
-        <header class="tk-section-head tk-reveal"><p class="tk-eyebrow">플레이 방법</p><h2 class="tk-h2" id="how-title">파고, 고르고, 피하고, 다시</h2></header>
-        <ol class="tk-beats">
-          <li class="tk-beat tk-reveal" style="--i:0">
-            <figure class="tk-beat-shot"><span class="tk-beat-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-1.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span><span class="tk-shot"><img src="/assets/media/tenkey-page/shot-dig-ko.webp" width="600" height="1171" alt="텐키가 키보드의 키를 부수며 파고드는 플레이 화면" loading="lazy" decoding="async"></span></figure>
-            <div class="tk-beat-text"><h3>키를 부수며 파고들기</h3><p>방향을 누르고 있으면 계속 파고 내려가요. 깊이 갈수록 키는 더 단단해져요.</p></div>
+        <h2 class="tk-h2 tk-reveal" id="how-title">이렇게 플레이해요<small>한 판은 짧고, 내려갈수록 단단해져요.</small></h2>
+        <ol class="tk-steps">
+          <li class="tk-step tk-reveal" style="--i:0">
+            <figure><span class="tk-step-shot"><img src="/assets/media/tenkey-page/shot-dig-ko.webp" width="600" height="1171" alt="텐키가 키보드의 키를 부수며 파고드는 플레이 화면" loading="lazy" decoding="async"></span><span class="tk-step-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-1.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span></figure>
+            <h3>키를 부수며 파고들기</h3><p>방향을 누르고 있으면 계속 파고 내려가요. 깊이 갈수록 키가 단단해져요.</p>
           </li>
-          <li class="tk-beat tk-reveal" style="--i:1">
-            <figure class="tk-beat-shot"><span class="tk-beat-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-2.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span><span class="tk-shot"><img src="/assets/media/tenkey-page/shot-card-ko.webp" width="600" height="1171" alt="레벨업 화면. 스킬 카드 세 장 중 하나를 고른다" loading="lazy" decoding="async"></span></figure>
-            <div class="tk-beat-text"><h3>레벨업마다 카드 한 장</h3><p>카드 세 장 중 하나를 골라 새 스킬을 달거나, 가진 스킬을 더 강하게 만들어요.</p></div>
+          <li class="tk-step tk-reveal" style="--i:1">
+            <figure><span class="tk-step-shot"><img src="/assets/media/tenkey-page/shot-card-ko.webp" width="600" height="1171" alt="레벨업 화면. 스킬 카드 세 장 중 하나를 고른다" loading="lazy" decoding="async"></span><span class="tk-step-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-2.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span></figure>
+            <h3>레벨업마다 카드 한 장</h3><p>세 장 중 하나를 골라 새 스킬을 달거나 가진 스킬을 키워요.</p>
           </li>
-          <li class="tk-beat tk-reveal" style="--i:2">
-            <figure class="tk-beat-shot"><span class="tk-beat-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-3.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span><span class="tk-shot"><img src="/assets/media/tenkey-page/shot-mouse-ko.webp" width="600" height="1171" alt="마우스가 붉은 길을 따라 텐키에게 돌진하는 플레이 화면" loading="lazy" decoding="async"></span></figure>
-            <div class="tk-beat-text"><h3>마우스의 돌진 피하기</h3><p>마우스가 붉은 길을 표시한 뒤 돌진해요. 붉은 곳에서 벗어나세요.</p></div>
+          <li class="tk-step tk-reveal" style="--i:2">
+            <figure><span class="tk-step-shot"><img src="/assets/media/tenkey-page/shot-mouse-ko.webp" width="600" height="1171" alt="마우스가 붉은 길을 따라 텐키에게 돌진하는 플레이 화면" loading="lazy" decoding="async"></span><span class="tk-step-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-3.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span></figure>
+            <h3>마우스의 돌진 피하기</h3><p>마우스가 붉은 길을 표시한 뒤 돌진해요. 붉은 곳에서 벗어나세요.</p>
           </li>
-          <li class="tk-beat tk-reveal" style="--i:3">
-            <figure class="tk-beat-shot"><span class="tk-beat-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-4.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span><span class="tk-shot"><img src="/assets/media/tenkey-page/shot-upgrade-ko.webp" width="600" height="1171" alt="모은 부품으로 드릴과 배터리를 영구 강화하는 강화 화면" loading="lazy" decoding="async"></span></figure>
-            <div class="tk-beat-text"><h3>더 강해져서 다시</h3><p>모아 온 부품으로 드릴, 배터리 셀, 모터를 영구 강화하고 다시 내려가요.</p></div>
+          <li class="tk-step tk-reveal" style="--i:3">
+            <figure><span class="tk-step-shot"><img src="/assets/media/tenkey-page/shot-upgrade-ko.webp" width="600" height="1171" alt="모은 부품으로 드릴과 배터리를 영구 강화하는 강화 화면" loading="lazy" decoding="async"></span><span class="tk-step-key" aria-hidden="true"><img src="/assets/media/home/page-key-1u_intact.webp" width="336" height="336" alt="" loading="lazy" decoding="async"><img src="/assets/media/home/page-legend-4.webp" width="336" height="336" alt="" loading="lazy" decoding="async"></span></figure>
+            <h3>더 강해져서 다시</h3><p>모아 온 부품으로 드릴, 배터리, 모터를 영구 강화해요.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <section class="tk-features" aria-labelledby="features-title">
+    <section class="tk-section" id="facts" aria-labelledby="facts-title">
       <div class="tk-wrap">
-        <header class="tk-section-head tk-reveal"><p class="tk-eyebrow">특징</p><h2 class="tk-h2" id="features-title">한 손으로, 오프라인에서도</h2></header>
-        <ul class="tk-feature-list">
-          <li class="tk-feature tk-reveal" style="--i:0"><span class="tk-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg></span><h3>한 손 터치 조작</h3><p>왼손·오른손 엄지 조이스틱 중에 고를 수 있어요.</p></li>
-          <li class="tk-feature tk-reveal" style="--i:1"><span class="tk-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg></span><h3>진짜 키보드 소리</h3><p>실제로 녹음한 타건음이에요.</p></li>
-          <li class="tk-feature tk-reveal" style="--i:2"><span class="tk-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 9.5a12 12 0 0 1 17 0M6.5 12.8a7.7 7.7 0 0 1 11 0M9.6 16a3.4 3.4 0 0 1 4.8 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/><path d="M4 4l16 16"/></svg></span><h3>오프라인 플레이</h3><p>진행 상황은 기기에 저장돼요.</p></li>
-          <li class="tk-feature tk-reveal" style="--i:3"><span class="tk-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="6" width="17" height="12" rx="2.5"/><path d="M8 14l1.6-4 1.6 4M8.6 12.6h2M14 10v4M14 10.5h1.2a1.5 1.5 0 0 1 0 3H14" stroke-width="1.6"/><path d="M4 4l16 16"/></svg></span><h3>광고 없음</h3><p>게임 중에 광고가 나오지 않아요.</p></li>
-          <li class="tk-feature tk-reveal" style="--i:4"><span class="tk-feature-icon" aria-hidden="true"><b>가A</b></span><h3>한국어·영어</h3><p>두 언어를 지원해요.</p></li>
-        </ul>
+        <h2 class="tk-h2 tk-reveal" id="facts-title">알아 두면 좋은 것</h2>
+        <dl class="tk-sheet tk-reveal">
+          <div class="is-key"><dt>플랫폼</dt><dd>iOS · Android<span>출시 일정은 아직 정해지지 않았어요.</span></dd></div>
+          <div><dt>광고</dt><dd>없음<span>게임 중에 광고가 나오지 않아요.</span></dd></div>
+          <div><dt>소리</dt><dd>진짜 키보드 타건음<span>실제로 녹음한 소리를 넣었어요.</span></dd></div>
+          <div><dt>조작</dt><dd>한 손 터치<span>왼손·오른손 엄지 조이스틱 중에 골라요.</span></dd></div>
+          <div><dt>오프라인</dt><dd>가능<span>진행 상황은 기기에 저장돼요.</span></dd></div>
+          <div><dt>언어</dt><dd>한국어 · 영어<span>두 언어 모두 들어 있어요.</span></dd></div>
+        </dl>
       </div>
     </section>
 
-    <section class="tk-release" id="release" aria-labelledby="release-title">
-      <div class="tk-wrap tk-release-grid">
-        <div class="tk-release-copy tk-reveal">
-          <p class="tk-status-row"><span class="tk-chip tk-chip-status">출시 준비 중</span></p>
-          <h2 class="tk-h2" id="release-title">iOS와 Android에서 만나요</h2>
-          <p class="tk-release-text">출시 일정은 아직 정해지지 않았어요.</p>
-          <div class="tk-release-note"><p class="tk-disclosure">유료 앱, 앱 내 구매 포함</p><a class="tk-link" href="https://www.youtube.com/@houseduck_in">개발 영상 보기 ↗</a></div>
+    <section class="tk-section" id="faq" aria-labelledby="faq-title">
+      <div class="tk-wrap">
+        <h2 class="tk-h2 tk-reveal" id="faq-title">자주 묻는 질문</h2>
+        <div class="tk-faq tk-reveal">
+          <details><summary>사전예약하면 무엇을 받나요?</summary><p>출시되는 날 다운로드 링크가 담긴 메일을 한 번 받아요. 링크 하나로 아이폰은 App Store, 안드로이드는 Google Play가 열려요. 그 밖의 광고 메일은 보내지 않아요.</p></details>
+          <details><summary>확인 메일이 오지 않아요.</summary><p>support@houseduck.in에서 보낸 메일이 스팸함에 있는지 확인해 주세요. 10분이 지나면 같은 주소로 다시 신청해 확인 메일을 다시 받을 수 있어요.</p></details>
+          <details><summary>신청을 취소하고 싶어요.</summary><p>받은 메일 아래쪽의 수신 거부 링크를 누르거나 support@houseduck.in으로 알려 주세요. 확인하지 않은 신청은 30일 뒤 자동으로 지워져요.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="tk-section" aria-labelledby="final-title">
+      <div class="tk-wrap tk-final">
+        <div class="tk-reveal">
+          <h2 class="tk-h2" id="final-title">출시 날, 메일로 알려 드릴게요<small>이메일 주소 하나면 충분해요.</small></h2>
+          <div class="tk-final-links"><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">사전예약하러 가기</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">개발 영상 보기 ↗</a></div>
         </div>
         <figure class="tk-keyart tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/keyart-ko.webp" width="960" height="469" alt="딸깍 서바이벌 대표 이미지. 3D 키보드 위의 텐키와 마우스" loading="lazy" decoding="async"></figure>
       </div>

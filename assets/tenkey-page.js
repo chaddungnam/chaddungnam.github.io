@@ -83,4 +83,75 @@
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
     items.forEach(function (item) { seen.observe(item); });
   }
+  // Pre-registration (owner 2026-10-24). The form posts text/plain JSON to the tenkey-prereg edge function, so the browser
+  // sends no CORS preflight. Double opt-in: the function mails a confirmation link from support@houseduck.in.
+  var box = document.querySelector("[data-prereg]");
+  var form = box && box.querySelector("[data-prereg-form]");
+  if (box && form) {
+    var status = box.querySelector("[data-prereg-status]");
+    var emailInput = form.querySelector("input[name='email']");
+    var consentInput = form.querySelector("input[name='consent']");
+    var trap = form.querySelector("input[name='website']");
+    var button = form.querySelector("button[type='submit']");
+    var msgs = {};
+    try { msgs = JSON.parse(box.getAttribute("data-msgs") || "{}"); } catch (_error) { msgs = {}; }
+    var sending = false;
+
+    var say = function (text, tone) {
+      status.textContent = text || "";
+      if (tone) status.setAttribute("data-tone", tone); else status.removeAttribute("data-tone");
+    };
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (sending) return;
+      var email = String(emailInput.value || "").trim();
+      var looksRight = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email) && email.length <= 254;
+      emailInput.setAttribute("aria-invalid", looksRight ? "false" : "true");
+      if (!looksRight) { say(msgs.invalid, "err"); emailInput.focus(); return; }
+      if (!consentInput.checked) { say(msgs.consent, "err"); consentInput.focus(); return; }
+      sending = true;
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      say(msgs.sending);
+      fetch(box.getAttribute("data-endpoint"), {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
+        body: JSON.stringify({ v: 1, action: "signup", email: email, locale: box.getAttribute("data-locale"), consent: box.getAttribute("data-consent-version"), hp: trap ? trap.value : "" })
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) { return { status: res.status, data: data }; });
+      }).then(function (r) {
+        if (r.status === 200 && r.data && r.data.ok) {
+          box.classList.add("is-done");
+          say(msgs.ok, "ok");
+          return;
+        }
+        var code = r.data && r.data.error;
+        if (code === "invalid_email") { emailInput.setAttribute("aria-invalid", "true"); say(msgs.invalid, "err"); }
+        else if (code === "consent_required") say(msgs.consent, "err");
+        else if (code === "busy") say(msgs.busy, "err");
+        else if (code === "mail_failed") say(msgs.mail, "err");
+        else say(msgs.error, "err");
+      }).catch(function () {
+        say(msgs.error, "err");
+      }).then(function () {
+        sending = false;
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+      });
+    });
+
+    // Every "pre-register" link lands on the card and puts the cursor in the email box.
+    document.querySelectorAll("[data-prereg-jump]").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        box.classList.remove("tk-flash");
+        void box.offsetWidth;
+        box.classList.add("tk-flash");
+        if (!box.classList.contains("is-done")) window.setTimeout(function () { emailInput.focus({ preventScroll: true }); }, reduceMotion ? 0 : 450);
+        try { history.replaceState(null, "", "#prereg"); } catch (_error) { /* ignore */ }
+      });
+    });
+  }
 })();

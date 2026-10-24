@@ -83,7 +83,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-10-23"/, `${locale}: last updated 2026-10-23`);
+    assert.match(html, /datetime="2026-10-24"/, `${locale}: last updated 2026-10-24`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -118,7 +118,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-10-23"/, "de: last updated 2026-10-23");
+  assert.match(html, /datetime="2026-10-24"/, "de: last updated 2026-10-24");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -212,4 +212,14 @@ test("public pages use the store names; the old name 10KEY appears only in the d
   for (const file of Object.values(privacyLogs)) assert.equal((read(file).match(/10KEY/g) || []).length, 1, `${file}: one rename entry`);
   const home = read("10key/index.html");
   assert.match(home, /<h1 id="game-title">.*10key Survival.*딸깍 서바이벌.*<\/h1>/, "/10key/ shows both store names");
+});
+
+// 2026-10-24: section 13 tells visitors about the launch pre-registration on /10key/ (double opt-in, consent, Resend, 30 days).
+test("section 13 covers the 10key Survival launch pre-registration in every language", () => {
+  for (const [locale, words] of Object.entries({ en: ["Double opt-in", "Art. 6(1)(a) GDPR", "Resend", "30 days"], ko: ["더블 옵트인", "제6조 제1항 a호", "Resend", "30일"], de: ["Double-Opt-in", "Art. 6 Abs. 1 lit. a DSGVO", "Resend", "30 Tagen"] })) {
+    const html = fs.readFileSync(path.join(repoDir, "privacy", `${locale}.html`), "utf8");
+    const s13 = html.slice(html.indexOf('id="section-13"'), html.indexOf('id="section-14"'));
+    assert.match(s13, /id="10key-prereg"/, `${locale}: pre-registration subsection`);
+    for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
+  }
 });
