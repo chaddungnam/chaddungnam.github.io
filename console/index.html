@@ -80,7 +80,7 @@
         <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">03</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
         <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">04</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
         <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">05</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
-        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">06</span><span class="nav-copy">랭킹<small>보드·의심 기록</small></span></a>
+        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">06</span><span class="nav-copy">랭킹<small>보드</small></span></a>
         <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">07</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
         <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">08</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
@@ -579,10 +579,6 @@
           <div class="panel-heading"><div><p class="eyebrow">RANKING BOARD</p><h2 id="tenkeyBoardTitle">랭킹 보드</h2><small id="tenkeyBoardMeta">앱에 보이는 순위 그대로입니다. 정지된 플레이어와 옛 점수 규칙의 기록은 순위 없이 아래에 흐리게 보입니다.</small></div><span id="tenkeyBoardTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th class="tk-num">순위</th><th>플레이어</th><th class="tk-num">점수</th><th class="tk-num">레벨</th><th>시간</th><th>기록 시각</th><th>상태</th></tr></thead><tbody id="tenkeyBoardTable"></tbody></table></div>
         </section>
-        <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">FLAGGED RUNS</p><h2>의심 기록 (서버가 순위에서 뺀 판)</h2><small>시간·레벨·점수가 말이 안 되거나 두 판이 겹친 기록입니다. 순위에는 올라가지 않습니다 (90일 보관). 계속 나오는 플레이어는 상세에서 정지할 수 있습니다.</small></div><span id="tenkeyFlaggedTotal" class="panel-total">—</span></div>
-          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th class="tk-num">점수</th><th class="tk-num">레벨</th><th>시간</th><th>이유</th><th>플랫폼 · 빌드</th></tr></thead><tbody id="tenkeyFlaggedTable"></tbody></table></div>
-        </section>
         <p id="tenkeyBoardMessage" class="dashboard-message" role="status"></p>
       </section>
 
@@ -676,11 +672,11 @@
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
   <script src="tenkey.js?v=20261024-tk"></script>
-  <script src="tenkey-overview.js?v=20261024-tk"></script>
-  <script src="tenkey-players.js?v=20261024-tk"></script>
+  <script src="tenkey-overview.js?v=20261024-nf"></script>
+  <script src="tenkey-players.js?v=20261024-nf"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261023-tk"></script>
-  <script src="tenkey-more.js?v=20261023-tk"></script>
+  <script src="tenkey-more.js?v=20261024-nf"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -692,6 +688,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261022-tk" defer></script>
+  <script src="app.js?v=20261024-nf" defer></script>
 </body>
 </html>

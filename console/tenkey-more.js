@@ -1,5 +1,6 @@
-// 10key Survival: 구매·젬, 랭킹 (보드 + 의심 기록), 감사 기록. Read-only views over what the server already keeps: purchase receipts
-// verified with the stores, the gem ledger, the weekly / all-time boards and the runs the server flagged, plus the audit rows
+// 10key Survival: 구매·젬, 랭킹 (보드), 감사 기록. Read-only views over what the server already keeps: purchase receipts
+// verified with the stores, the gem ledger, the weekly / all-time boards (no automatic suspicious runs since 2026-10-24: sanctions are
+// manual, a ban from the player detail), plus the audit rows
 // of the admin writes (notices, bans, force-update settings).
 (function attachConsoleTenkeyMore(root) {
   const T = root.ConsoleTenkey;
@@ -8,7 +9,6 @@
   const state = { purchases: { bound: false, q: {} }, ranking: { bound: false }, audit: { bound: false } };
   let purchasePager = null;
 
-  const FLAG_NAMES = { time: "시간 이상", level: "레벨 이상", score: "점수 이상", overlap: "두 판 겹침", banned: "정지된 플레이어" };
   const STATE_NAMES = { granted: ["결제 완료", "good"], sandbox: ["테스트 결제", "quiet"], refunded: ["환불", "risk"] };
   const playerLink = (id, name) => (id ? `<a class="player-identity-link" href="#/tenkey-players/${esc(id)}"><span class="player-identity-name">${esc(name || "(이름 없음)")}</span></a>` : esc(name || "—"));
 
@@ -100,27 +100,12 @@
     }
   }
 
-  async function loadFlagged() {
-    try {
-      const result = await T.call("ranking.flagged", { days: 30, limit: 50 });
-      const rows = result.data.rows || [];
-      byId("tenkeyFlaggedTotal").textContent = `${num(rows.length)}건`;
-      byId("tenkeyFlaggedTable").innerHTML = rows.length ? rows.map((r) => `<tr><td data-label="시각">${esc(time(r.created_at))}</td><td data-label="플레이어">${playerLink(r.player_id, r.name)}</td>
-        <td class="tk-num" data-label="점수">${esc(num(r.score))}</td><td class="tk-num" data-label="레벨">${esc(r.level)}</td><td data-label="시간">${esc(duration(r.time_ms))}</td>
-        <td data-label="이유"><span class="tk-badge" data-tone="risk">${esc(FLAG_NAMES[r.flag] || r.flag)}</span></td><td data-label="플랫폼 · 빌드">${esc(r.platform)} · ${esc(r.build)}</td></tr>`).join("")
-        : '<tr><td colspan="7" class="empty-panel">최근 30일에 서버가 걸러 낸 기록이 없습니다.</td></tr>';
-    } catch (error) {
-      T.report("tenkeyBoardMessage", error);
-    }
-  }
-
   function mountRanking() {
     if (!state.ranking.bound) {
       state.ranking.bound = true;
       byId("tenkeyBoardForm").addEventListener("submit", (event) => { event.preventDefault(); loadBoard(); });
     }
     loadBoard();
-    loadFlagged();
   }
 
   // ── 감사 기록 ──

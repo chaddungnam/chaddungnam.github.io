@@ -150,7 +150,7 @@
     const dauTips = rows.map((r) => tip(dayLabel(r.day), [["접속자", `${num(r.dau)}명`], ["신규 설치", `${num(r.new_installs)}명`], ["플레이", `${num(r.runs)}회`]]));
     const dauLine = lineChart(rows, "dau", dauTips);
     const newCols = columns(rows.map((r) => Number(r.new_installs || 0)), rows.map((r) => tip(dayLabel(r.day), [["신규 설치", `${num(r.new_installs)}명`], ["신규 계정", `${num(r.new_accounts)}명`]])));
-    const runCols = columns(rows.map((r) => Number(r.runs || 0)), rows.map((r) => tip(dayLabel(r.day), [["플레이", `${num(r.runs)}회`], ["서버에 남은 기록(신기록·의심)", `${num(r.stored_runs)}회`]])));
+    const runCols = columns(rows.map((r) => Number(r.runs || 0)), rows.map((r) => tip(dayLabel(r.day), [["플레이", `${num(r.runs)}회`], ["서버에 남은 기록(신기록)", `${num(r.stored_runs)}회`]])));
     const crashCols = columns(rows.map((r) => Number(r.crashes || 0)), rows.map((r) => tip(dayLabel(r.day), [["크래시", `${num(r.crashes)}건`]])), "is-v2");
     const buyCols = columns(rows.map((r) => Number(r.purchases || 0)), rows.map((r) => tip(dayLabel(r.day), [["결제 완료", `${num(r.purchases)}건`]])));
     const activeTotal = (data.platforms || []).reduce((s, r) => s + r.n, 0);

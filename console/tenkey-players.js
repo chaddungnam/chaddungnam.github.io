@@ -11,7 +11,7 @@
   const AUTO_MS = 20000;
   let autoTimer = 0;
 
-  const FLAG_NAMES = { time: "시간 이상", level: "레벨 이상", score: "점수 이상", overlap: "두 판 겹침", banned: "정지 상태" };
+  const FLAG_NAMES = { banned: "정지 상태" };  // only a manual ban holds a run back (2026-10-24)
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
   const ageName = (band) => (band ? `${band}세 이상` : "미확인");
   const scoreText = (row) => (row.best_score == null ? "—" : `${num(row.best_score)}${row.best_level ? ` · Lv ${row.best_level}` : ""}`);
@@ -103,7 +103,7 @@
       ])}
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>
       <div class="tk-section"><h3>보드별 최고 기록</h3>${table(["보드", "점수", "레벨", "시간", "기록 시각", "점수 규칙"], bests, "기록이 없습니다.")}</div>
-      <div class="tk-section"><h3>최근 서버 기록 (신기록·의심 판만 남음, 최근 20)</h3>${table(["시각", "점수", "레벨", "시간", "깊이", "부품", "콤보", "스킬", "끝난 이유", "플랫폼 · 빌드", "판정"], runs, "남은 판이 없습니다.")}</div>
+      <div class="tk-section"><h3>최근 서버 기록 (신기록 판만 남음, 최근 20)</h3>${table(["시각", "점수", "레벨", "시간", "깊이", "부품", "콤보", "스킬", "끝난 이유", "플랫폼 · 빌드", "판정"], runs, "남은 판이 없습니다.")}</div>
       ${mobile ? `<div class="tk-section"><h3>구매 · 권한</h3>${table(["시각", "상품", "스토어", "상태", "주문 번호 끝", "환불"], buys, "구매 기록이 없습니다.")}${(d.entitlements || []).length ? `<p class="tk-sub">권한: ${(d.entitlements || []).map((e) => esc(e.key)).join(", ")}</p>` : ""}</div>
       <div class="tk-section"><h3>젬 장부 (잔액 ${esc(num(d.wallet?.balance))} · 서버가 아는 합계)</h3>${table(["시각", "구분", "수량", "이유", "출처"], ledger, "장부가 비어 있습니다.")}</div>` : ""}
       ${mobile ? `<form id="tenkeyRenameForm" class="admin-form tk-section impact-form">
@@ -117,7 +117,7 @@
       <form id="tenkeyBanForm" class="admin-form tk-section impact-form impact-form-critical">
         <p class="eyebrow">RANKING MODERATION</p>
         <p class="impact-note">${p.banned ? "정지를 풀면 이 플레이어의 기록이 다시 랭킹에 보입니다." : "정지하면 이 플레이어는 모든 랭킹 보드에서 숨고 새 기록도 순위에 오르지 않습니다. 계정과 기록은 지워지지 않고, 언제든 풀 수 있습니다. 랭킹 순위는 몇 분 안에 새로 계산됩니다."}</p>
-        <label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 점수 조작 의심 (의심 기록 3건)"></label>
+        <label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 점수 조작 확인 (직접 확인 후 정지)"></label>
         <p id="tenkeyBanMessage" class="dashboard-message" role="status" aria-live="polite"></p>
         <div class="tk-actions"><button class="${p.banned ? "warning-button" : "danger-button"}" type="submit">${p.banned ? "정지 풀기" : "랭킹에서 정지"}</button></div>
       </form>

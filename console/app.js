@@ -50,7 +50,7 @@ const pageDescriptions = {
   "tenkey-crashes": "앱이 보낸 크래시·멈춤·오류 보고를 오류 내용, 버전, 기기별로 묶어 보고 로그를 확인합니다.",
   "tenkey-notices": "게임 안 공지를 작성·예약하고 한국어와 영어 미리보기로 확인한 뒤 종료합니다.",
   "tenkey-purchases": "스토어 구매·환불 기록과 젬·리바이브 패스 장부를 확인합니다.",
-  "tenkey-ranking": "이번 주와 전체 랭킹 보드를 앱에 보이는 그대로 보고, 서버가 걸러 낸 의심 기록을 확인합니다.",
+  "tenkey-ranking": "이번 주와 전체 랭킹 보드를 앱에 보이는 그대로 봅니다. 제재는 플레이어 상세의 정지로 직접 합니다.",
   "tenkey-config": "10KEY 강제 업데이트 기준(Android versionCode, iOS 빌드 번호)과 스토어 링크를 관리합니다.",
   "tenkey-audit": "10KEY 관리자 변경(공지·정지·앱 설정)을 누가 언제 왜 했는지 확인합니다.",
 };
