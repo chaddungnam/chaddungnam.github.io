@@ -163,7 +163,7 @@ test("purchases, ranking and audit pages render from the server shapes", async (
   await page.evaluate(() => { window.location.hash = "#/tenkey-ranking"; });
   await expect(page.locator("#tenkeyBoardTable tr")).toHaveCount(13);
   await expect(page.locator("#tenkeyBoardTable tr.is-dim")).toHaveCount(1);
-  await expect(page.locator("#tenkeyFlaggedTable tr")).toHaveCount(2);
+  await expect(page.locator("#tenkeyFlaggedTable")).toHaveCount(0);  // no suspicious-runs panel since 2026-10-24
   await shot(page, "ranking");
   await page.locator("#tenkeyBoardSelect").selectOption("all");
   await page.locator("#tenkeyBoardForm button[type=submit]").click();
