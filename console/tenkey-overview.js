@@ -238,6 +238,14 @@
       setPressed("[data-tk-platform]", "data-tk-platform", state.platform);
     }
     load();
+    // Owner 2026-10-24: new players show up without a reload. Every minute while the overview is on screen and the tab
+    // is visible; stops by itself when the admin leaves the page (the section leaves the layout).
+    clearInterval(state.auto);
+    state.auto = setInterval(() => {
+      const section = byId("tenkeyOverview");
+      if (!section || !section.offsetParent) { clearInterval(state.auto); return; }
+      if (!document.hidden) load();
+    }, 60000);
   }
 
   T.mountOverview = mountOverview;

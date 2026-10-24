@@ -1,12 +1,15 @@
 // 10key Survival: 플레이어 (user pool) and 플레이어 상세. The pool is tenkey.players: CrazyGames web players who signed in
 // there and mobile guest accounts. Search by name / player id / login id; the detail shows the account, ranks, bests, recent
-// stored runs, purchases + gem ledger, and the ranking ban (reason + confirm, audited).
+// stored runs, purchases + gem ledger, the nickname change and the ranking ban (reason + confirm, audited).
+// The list refreshes itself every AUTO_MS while it is on screen (owner 2026-10-24: new nicknames show up without a reload).
 (function attachConsoleTenkeyPlayers(root) {
   const T = root.ConsoleTenkey;
   const { esc, num, time, duration, platformName } = T.fmt;
   const byId = (id) => document.getElementById(id);
   const state = { bound: false, query: "", platform: "", sort: "last_seen_at", direction: "desc", detail: null };
   let pager = null;
+  const AUTO_MS = 20000;
+  let autoTimer = 0;
 
   const FLAG_NAMES = { time: "시간 이상", level: "레벨 이상", score: "점수 이상", overlap: "두 판 겹침", banned: "정지 상태" };
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
@@ -27,8 +30,8 @@
       <td data-label="처리"><a class="player-open-link" href="#/tenkey-players/${esc(row.id)}">상세</a></td></tr>`;
   }
 
-  async function loadList(page = 1) {
-    T.setMessage("tenkeyPlayersMessage", "플레이어를 불러오는 중입니다...");
+  async function loadList(page = 1, quiet = false) {
+    if (!quiet) T.setMessage("tenkeyPlayersMessage", "플레이어를 불러오는 중입니다...");
     try {
       const result = await T.call("players.list", { query: state.query, platform: state.platform || undefined, sort: state.sort, direction: state.direction, page });
       const data = result.data;
@@ -39,7 +42,8 @@
         ? data.rows.map(rowMarkup).join("")
         : '<tr><td colspan="8" class="empty-panel">조건에 맞는 플레이어가 없습니다.</td></tr>';
       pager.draw();
-      T.setMessage("tenkeyPlayersMessage", "마지막 접속은 기록을 보내거나 앱이 계정을 확인한 때입니다. 6개월(183일) 오지 않은 플레이어는 자동으로 지워집니다.");
+      const at = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      T.setMessage("tenkeyPlayersMessage", `${at} 기준 · 20초마다 자동으로 새로 불러옵니다. 마지막 접속은 기록을 보내거나 앱이 계정을 확인한 때입니다. 6개월(183일) 오지 않은 플레이어는 자동으로 지워집니다.`);
     } catch (error) {
       T.report("tenkeyPlayersMessage", error);
     }
@@ -59,6 +63,19 @@
       });
     }
     loadList(pager.st.page || 1);
+    startAuto();
+  }
+
+  // Reloads the list page that is open, only while the list is on screen and the tab is visible; stops by itself when
+  // the admin goes to another page (the list table leaves the layout) and starts again on the next mount.
+  function startAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => {
+      const table = byId("tenkeyPlayersTable");
+      if (!table || !table.offsetParent) { clearInterval(autoTimer); return; }
+      if (document.hidden || document.activeElement === byId("tenkeyPlayerSearch")) return;
+      loadList(pager.st.page || 1, true);
+    }, AUTO_MS);
   }
 
   // ── detail ──
@@ -89,6 +106,14 @@
       <div class="tk-section"><h3>최근 서버 기록 (신기록·의심 판만 남음, 최근 20)</h3>${table(["시각", "점수", "레벨", "시간", "깊이", "부품", "콤보", "스킬", "끝난 이유", "플랫폼 · 빌드", "판정"], runs, "남은 판이 없습니다.")}</div>
       ${mobile ? `<div class="tk-section"><h3>구매 · 권한</h3>${table(["시각", "상품", "스토어", "상태", "주문 번호 끝", "환불"], buys, "구매 기록이 없습니다.")}${(d.entitlements || []).length ? `<p class="tk-sub">권한: ${(d.entitlements || []).map((e) => esc(e.key)).join(", ")}</p>` : ""}</div>
       <div class="tk-section"><h3>젬 장부 (잔액 ${esc(num(d.wallet?.balance))} · 서버가 아는 합계)</h3>${table(["시각", "구분", "수량", "이유", "출처"], ledger, "장부가 비어 있습니다.")}</div>` : ""}
+      ${mobile ? `<form id="tenkeyRenameForm" class="admin-form tk-section impact-form">
+        <p class="eyebrow">NICKNAME</p>
+        <p class="impact-note">앱의 닉네임 규칙(2~10자, 한글·영문·숫자, 금지어·중복 불가)을 그대로 따릅니다. 플레이어의 변경 횟수에는 들어가지 않으며, 앱은 다음 실행 때 새 이름을 받고 랭킹에는 몇 분 안에 반영됩니다.</p>
+        <label>새 닉네임<input name="nickname" maxlength="10" required value="${esc(account.nickname || p.name || "")}"></label>
+        <label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 부적절한 닉네임 신고"></label>
+        <p id="tenkeyRenameMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+        <div class="tk-actions"><button class="warning-button" type="submit">닉네임 바꾸기</button></div>
+      </form>` : ""}
       <form id="tenkeyBanForm" class="admin-form tk-section impact-form impact-form-critical">
         <p class="eyebrow">RANKING MODERATION</p>
         <p class="impact-note">${p.banned ? "정지를 풀면 이 플레이어의 기록이 다시 랭킹에 보입니다." : "정지하면 이 플레이어는 모든 랭킹 보드에서 숨고 새 기록도 순위에 오르지 않습니다. 계정과 기록은 지워지지 않고, 언제든 풀 수 있습니다. 랭킹 순위는 몇 분 안에 새로 계산됩니다."}</p>
@@ -121,6 +146,28 @@
     }
   }
 
+  async function submitRename(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const finish = root.ConsoleUiState.beginRequest(form);
+    if (!finish) return;
+    try {
+      if (!form.reportValidity()) return;
+      const player = state.detail.player;
+      const nickname = form.elements.nickname.value.trim();
+      const reason = form.elements.reason.value.trim();
+      if (!await root.ConsoleApp.confirmChange("닉네임 바꾸기", `${player.name || player.id} → ${nickname}\n사유: ${reason}`)) return;
+      T.setMessage("tenkeyRenameMessage", "처리하는 중입니다...");
+      await T.call("players.rename", { player_id: player.id, nickname, reason }, form);
+      await loadDetail(player.id);
+      T.setMessage("tenkeyPlayerMessage", `닉네임을 ${nickname}(으)로 바꿨습니다.`);
+    } catch (error) {
+      T.report("tenkeyRenameMessage", error);
+    } finally {
+      finish();
+    }
+  }
+
   async function loadDetail(id) {
     T.setMessage("tenkeyPlayerMessage", "플레이어를 불러오는 중입니다...");
     try {
@@ -128,6 +175,7 @@
       state.detail = result.data;
       byId("tenkeyPlayerDetail").innerHTML = detailMarkup(state.detail);
       byId("tenkeyBanForm").addEventListener("submit", submitBan);
+      byId("tenkeyRenameForm")?.addEventListener("submit", submitRename);
       T.setMessage("tenkeyPlayerMessage", "");
     } catch (error) {
       byId("tenkeyPlayerDetail").innerHTML = "";
