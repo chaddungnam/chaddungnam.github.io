@@ -1,11 +1,15 @@
 // 10key Survival: 밸런스. Every finished run's short anonymous record (tenkey.run_stats_v1, owner 2026-10-25), read through
 // tenkey-admin "balance.get" (tenkey.admin_balance_v1): where and why runs end, how far DRIFT and the robot go, which level-up
 // cards are taken and when, the mobs met, per day / build / balance-knob version. Store apps only, keyed by a random install id.
+// Below it the four server balance values (tenkey-admin config.get "balance" / knobs.set): store apps take them at launch
+// and use them from the next run; each save is a new version the runs above are split by.
 (function attachConsoleTenkeyBalance(root) {
   const T = root.ConsoleTenkey;
-  const { esc, num, duration, pct } = T.fmt;
+  const { esc, num, duration, pct, time } = T.fmt;
   const byId = (id) => document.getElementById(id);
   const state = { bound: false, q: { days: 7, build: "", mode: "" } };
+  const KNOBS = ["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"];
+  const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", clear: "노멀 모드 완주" };
@@ -84,9 +88,58 @@
     }
   }
 
+  // ── 서버 밸런스 조정값 ──
+  function fillKnobs(b) {
+    const form = byId("tenkeyKnobForm");
+    for (const k of KNOBS) form.elements[k].value = Number(b?.[k] ?? 1).toFixed(2);
+    const ver = Number(b?.ver || 0);
+    byId("tenkeyKnobVersion").textContent = ver > 0
+      ? `지금 조정값 ${ver}번 · ${time(b.updated_at)}${b.updated_by ? ` · ${b.updated_by}` : ""}`
+      : "아직 바꾼 적 없음: 모두 게임에 들어 있는 값 (1.00)";
+  }
+
+  async function loadKnobs() {
+    try {
+      fillKnobs((await T.call("config.get", {})).data?.balance);
+      T.setMessage("tenkeyKnobMessage", "");
+    } catch (error) {
+      T.report("tenkeyKnobMessage", error);
+    }
+  }
+
+  async function submitKnobs(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const finish = root.ConsoleUiState.beginRequest(form);
+    if (!finish) return;
+    try {
+      if (!form.reportValidity()) return;
+      const knobs = Object.fromEntries(KNOBS.map((k) => [k, Math.round(Number(form.elements[k].value) * 100) / 100]));
+      if (Object.values(knobs).some((v) => !Number.isFinite(v) || v < 0.7 || v > 1.3)) {
+        T.setMessage("tenkeyKnobMessage", T.errorText({ message: "invalid_knob_value" }), true);
+        return;
+      }
+      const reason = form.elements.reason.value.trim();
+      const lines = KNOBS.map((k) => `${KNOB_NAMES[k]} ${knobs[k].toFixed(2)}`);
+      if (!await root.ConsoleApp.confirmChange("10KEY 밸런스 조정값 변경", [...lines, "스토어 앱이 다음에 켤 때 받아 그다음 판부터 씁니다.", `변경 이유: ${reason}`].join("\n"))) return;
+      T.setMessage("tenkeyKnobMessage", "저장하는 중입니다...");
+      const result = await T.call("knobs.set", { knobs, reason }, form);
+      const d = result.data || {};
+      fillKnobs({ ...d.balance, updated_at: new Date().toISOString() });
+      form.elements.reason.value = "";
+      T.setMessage("tenkeyKnobMessage", d.unchanged ? "지금 값과 같아서 그대로 두었습니다." : `조정값 ${d.balance?.ver}번으로 저장했습니다. 스토어 앱은 다음에 켤 때 받아 그다음 판부터 씁니다.`);
+    } catch (error) {
+      T.report("tenkeyKnobMessage", error);
+    } finally {
+      finish();
+    }
+  }
+
   function mountBalance() {
     if (!state.bound) {
       state.bound = true;
+      byId("tenkeyKnobForm").addEventListener("submit", submitKnobs);
+      byId("tenkeyKnobDefaults").addEventListener("click", () => { for (const k of KNOBS) byId("tenkeyKnobForm").elements[k].value = "1.00"; });
       byId("tenkeyBalanceForm").addEventListener("submit", (event) => {
         event.preventDefault();
         state.q = { days: Number(byId("tenkeyBalanceDays").value), build: byId("tenkeyBalanceBuild").value, mode: byId("tenkeyBalanceMode").value };
@@ -94,6 +147,7 @@
       });
     }
     load();
+    loadKnobs();
   }
 
   T.mountBalance = mountBalance;

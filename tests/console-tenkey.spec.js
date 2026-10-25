@@ -355,6 +355,36 @@ test("밸런스 page: where and why runs end, evolution, cards and mobs in the g
   expect(errors).toEqual([]);
 });
 
+test("밸런스 page: the four server balance values load, save with a reason through the confirm dialog, bump the version; out of range is refused", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  const form = page.locator("#tenkeyKnobForm");
+  await expect(form.locator('[name="xp_scale"]')).toHaveValue("1.00");
+  await expect(page.locator("#tenkeyKnobVersion")).toContainText("아직 바꾼 적 없음");
+  await form.locator('[name="xp_scale"]').fill("1.2");
+  await form.locator('[name="mouse_pace"]').fill("0.9");
+  await form.locator('[name="reason"]').fill("first runs end too early");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toContainText("경험치 배율 1.20");
+  await expect(page.locator("#confirmDialog")).toContainText("마우스 속도 0.90");
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyKnobMessage")).toContainText("조정값 1번으로 저장했습니다");
+  await expect(page.locator("#tenkeyKnobVersion")).toContainText("지금 조정값 1번");
+  const sent = (await calls(page, "knobs.set")).at(-1);
+  expect(sent.params).toEqual({ knobs: { xp_scale: 1.2, mouse_pace: 0.9, battery_drain_scale: 1, robot_power_scale: 1 }, reason: "first runs end too early" });
+  expect(sent.request_id).toMatch(/^[0-9a-f-]{36}$/);
+  await page.locator("#tenkeyKnobDefaults").click();
+  await expect(form.locator('[name="xp_scale"]')).toHaveValue("1.00");
+  await form.locator('[name="robot_power_scale"]').fill("1.5");
+  await form.locator('[name="reason"]').fill("too strong");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toBeHidden();
+  expect((await calls(page, "knobs.set")).length).toBe(1);
+  await shot(page, "balance_knobs", "#tenkeyKnobForm");
+  await page.evaluate(() => { window.location.hash = "#/tenkey-audit"; });
+  await expect(page.locator("#tenkeyAuditList")).toContainText("밸런스 조정값 변경");
+  expect(errors).toEqual([]);
+});
+
 test("a server error is shown in Korean without breaking the page", async ({ page }) => {
   await open(page, "#/tenkey-crashes");
   await page.evaluate(() => { window.__mockFailures["crashes.groups"] = "rpc_failed"; });

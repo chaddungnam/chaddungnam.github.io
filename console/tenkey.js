@@ -15,6 +15,8 @@
     invalid_store_url: "스토어 링크는 비우거나 https://로 시작해야 합니다.",
     ios_store_url_required: "iOS 번호를 0보다 크게 하려면 App Store 링크가 필요합니다.",
     reason_required: "변경 이유를 입력해 주세요.",
+    invalid_knobs: "바꿀 밸런스 조정값이 없습니다.",
+    invalid_knob_value: "밸런스 조정값은 0.70 ~ 1.30 사이의 숫자로 입력해 주세요.",
     invalid_request_id: "요청 번호를 만들지 못했습니다. 새로고침 후 다시 시도해 주세요.",
     invalid_title: "제목을 확인해 주세요 (한국어 1~80자).",
     invalid_body: "본문을 확인해 주세요 (한국어 1~2000자).",

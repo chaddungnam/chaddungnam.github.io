@@ -109,12 +109,13 @@
   }
 
   // ── 감사 기록 ──
-  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "앱 설정 변경" };
+  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "앱 설정 변경", "knobs.set": "밸런스 조정값 변경" };
   function auditSummary(a) {
     const p = a.params || {};
     if (a.action === "notices.save") return p.notice?.title_en ? `${p.notice?.title_ko || ""} / ${p.notice.title_en}` : `${p.notice?.title_ko || ""}${p.notice?.translations ? " (자동 번역 포함)" : ""}`;
     if (a.action === "players.ban") return `${p.banned ? "정지" : "정지 해제"} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "config.set") return JSON.stringify(p.config || {});
+    if (a.action === "knobs.set") return JSON.stringify(p.knobs || {});
     return `공지 #${p.id ?? "?"}`;
   }
   function auditRow(a) {
