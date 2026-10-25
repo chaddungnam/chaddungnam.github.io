@@ -2,9 +2,10 @@
 // (priority high first, then newest) in its own language. This page creates / edits / schedules / ends / deletes them. Times
 // are typed and shown in KST (computed by hand, not the admin's browser time zone).
 // Owner 2026-10-25 ("내가 한국어를 작성하면 나머지도 알아서 번역되게끔 (쿼키볼 공지사항처럼)"): only Korean is typed. The other seven
-// game languages come from tenkey-admin (notices.translate, the same keyless Google translation as Quirky Ball's notices):
-// "번역 미리 보기" fills the preview cards, and publishing translates whatever is still missing first, so a notice is never
-// saved half translated. A card can be corrected by hand ("고치기"); a correction is kept while the Korean stays the same,
+// game languages come from the same keyless Google translation as Quirky Ball's notices, asked from this browser first (it
+// refused the Supabase servers with HTTP 429 on the first live try) and from tenkey-admin (notices.translate) for whatever the
+// browser could not get: "번역 미리 보기" fills the preview cards, and publishing translates whatever is still missing first,
+// so a notice is never saved half translated. A card can be corrected by hand ("고치기"); a correction is kept while the Korean stays the same,
 // and changing the Korean marks the translations as old (they are made again on publish).
 (function attachConsoleTenkeyNotices(root) {
   const T = root.ConsoleTenkey;
@@ -43,6 +44,43 @@
   const sourceKey = ({ title, body }) => JSON.stringify([title, body]);
   const fresh = () => state.tr.source !== "" && state.tr.source === sourceKey(korean());
   const missingLangs = () => LANGS.map(([lang]) => lang).filter((lang) => !fresh() || !state.tr.texts[lang]);
+
+  // The browser's copy of tenkey-admin translate.ts: the game's name becomes each language's store title, House Duck stays in
+  // Latin letters, the title is the first line and the body follows, the answer must keep the Korean's lines (text / blank),
+  // three tries per language.
+  const GTX_URL = "https://translate.googleapis.com/translate_a/single";
+  const GTX_TARGET = { en: "en", ja: "ja", de: "de", zh_TW: "zh-TW", fr: "fr", es: "es", pt: "pt" };
+  const GAME_NAME = { en: "10key Survival", ja: "ポチサバイバー", de: "Klick-Survival", zh_TW: "咔噠求生", fr: "Clic Survie", es: "Clic Survival", pt: "Clique Survival" };
+  const GAME_TOKEN = "TKZQ";
+  const textLines = (text) => text.replace(/\r\n?/g, "\n").split("\n");
+  const shape = (text) => textLines(text).map((line) => (line.trim() ? "t" : "b")).join("");
+  const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function browserTranslateOne(source, lang) {
+    for (const delay of [0, 500, 1500]) {
+      if (delay) await pause(delay);
+      try {
+        const response = await fetch(GTX_URL, {
+          method: "POST", credentials: "omit", signal: AbortSignal.timeout(15000),
+          body: new URLSearchParams({ client: "gtx", sl: "ko", tl: GTX_TARGET[lang], dt: "t", q: source }),
+        });
+        const data = await response.json();
+        const parts = response.ok && Array.isArray(data?.[0]) ? data[0] : [];
+        const out = parts.map((part) => (Array.isArray(part) && typeof part[0] === "string" ? part[0] : "")).join("").replaceAll(GAME_TOKEN, GAME_NAME[lang]);
+        if (!out || shape(out) !== shape(source)) continue;
+        const [first, ...rest] = textLines(out);
+        const text = { title: first.trim(), body: rest.join("\n").trim() };
+        if (text.title && text.body && text.title.length <= 300 && text.body.length <= 8000) return text;
+      } catch { /* the next try */ }
+    }
+    return null;
+  }
+  // {lang: {title, body}} for the languages of `langs` the browser got; the others are left out.
+  async function browserTranslate({ title, body }, langs) {
+    const source = `${title}\n${textLines(body).join("\n")}`.replace(/딸깍\s*서바이벌/g, GAME_TOKEN).replace(/하우스\s*덕/g, "House Duck");
+    const done = await Promise.all(langs.map(async (lang) => [lang, await browserTranslateOne(source, lang)]));
+    return Object.fromEntries(done.filter(([, text]) => text));
+  }
 
   // Languages a saved notice already has (old rows have only the English columns).
   function savedTexts(notice) {
@@ -145,25 +183,32 @@
     f.titleKo.focus();
   }
 
-  // Fills the preview from tenkey-admin. keep = the Korean has not changed, so languages already there (loaded or fixed by
-  // hand) stay and only the missing ones are taken. Returns false when the Korean changed while the server was translating.
+  // Fills the preview: the browser first, tenkey-admin for the languages it could not get. keep = the Korean has not changed,
+  // so languages already there (loaded or fixed by hand) stay and only the missing ones are taken. Returns false when the
+  // Korean changed while translating; throws (keeping what the browser got) when the server fails too.
   async function translate(keep) {
     const ko = korean();
     const key = sourceKey(ko);
+    const kept = keep ? state.tr.texts : {};
     state.tr.busy = true;
     state.tr.editing = "";
     updatePreview();
-    try {
-      const result = await T.call("notices.translate", { notice: { title_ko: ko.title, body_ko: ko.body } });
-      if (sourceKey(korean()) !== key) return false;
-      const got = result.data?.translations || {};
+    const store = (got) => {
       const texts = {};
       LANGS.forEach(([lang]) => {
-        const t = keep && state.tr.texts[lang] ? state.tr.texts[lang] : got[lang];
+        const t = kept[lang] || got[lang];
         if (t && t.title && t.body) texts[lang] = { title: t.title, body: t.body };
       });
       state.tr = { ...state.tr, source: key, texts, edited: keep ? state.tr.edited : new Set() };
       return LANGS.every(([lang]) => texts[lang]);
+    };
+    try {
+      const got = await browserTranslate(ko, LANGS.map(([lang]) => lang).filter((lang) => !kept[lang]));
+      if (sourceKey(korean()) !== key) return false;
+      if (store(got)) return true;
+      const result = await T.call("notices.translate", { notice: { title_ko: ko.title, body_ko: ko.body } });
+      if (sourceKey(korean()) !== key) return false;
+      return store({ ...result.data?.translations, ...got });
     } finally {
       state.tr.busy = false;
       updatePreview();

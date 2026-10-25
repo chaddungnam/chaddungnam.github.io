@@ -15,6 +15,7 @@ async function open(page, hash = "") {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
+  await page.route("https://translate.googleapis.com/**", (route) => route.abort());
   await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
   await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API }));
   await page.goto("/console/");
@@ -33,6 +34,20 @@ async function shot(page, name, selector) {
 }
 
 const calls = (page, action) => page.evaluate((a) => window.__mockCalls.filter((c) => c.action === a), action);
+
+// Google's keyless web translation as the console's browser sees it: "[lang] line" for every text line. how(lang) = "ok",
+// "fail" (no answer) or "flat" (the lines run together, which the console must refuse).
+async function fakeGoogle(page, how) {
+  await page.route("https://translate.googleapis.com/**", (route) => {
+    const form = new URLSearchParams(route.request().postData() || "");
+    const lang = String(form.get("tl")).replace("-", "_");
+    const q = String(form.get("q"));
+    const mode = how(lang);
+    if (mode === "fail") return route.abort();
+    const out = mode === "flat" ? q.replace(/\n+/g, " ") : q.split("\n").map((line) => (line.trim() ? `[${lang}] ${line}` : line)).join("\n");
+    return route.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify([[[out, q, null, null, 1]], null, "ko"]) });
+  });
+}
 
 test("the project picker has no Comrade card; 10key Survival opens on the overview with its eight pages", async ({ page }) => {
   const errors = [];
@@ -95,6 +110,27 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
   await expect(page.locator("#tenkeyOverviewServer")).toContainText("공용 DB 전체");
   await page.locator("#tenkeyOverviewCharts .ov-hit").first().hover();
   await expect(page.locator("#tenkeyTip")).toBeVisible();
+
+  // The closed-test build sends no ping: the game server's own counts stand in, never a row of zeros.
+  await page.evaluate(() => { window.__mockNoPing = true; });
+  await page.locator("#tenkeyOverviewRefresh").click();
+  await expect(page.locator("#tenkeyOverviewNotice")).toBeVisible();
+  await expect(page.locator("#tenkeyOverviewNotice")).toContainText("게임 서버 기록");
+  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText("31명");
+  await expect(today.nth(0)).toContainText("게임 서버 기록 · 앱·웹 합산");
+  await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("새 플레이어");
+  await expect(today.nth(2).locator(".tk-glance-label")).toHaveText("판을 끝낸 사람");
+  await expect(today.nth(2).locator(".tk-glance-value")).toHaveText("24명");
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText("260명");
+  await expect(week.nth(0)).toContainText("비교는 새 빌드부터");
+  await expect(week.nth(3)).toContainText("새 빌드부터 셈");
+  const fresh = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })
+    .then((r) => [r.data.series.at(-1).new_accounts, r.data.series.slice(-7).reduce((n, row) => n + row.new_accounts, 0)]));
+  await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[0]}명`);
+  await expect(week.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[1]}명`);
+  await expect(page.locator("#tenkeyOverviewCharts h3")).toHaveText("날마다 새로 온 플레이어");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-wait")).toHaveCount(0);
+  await shot(page, "overview_no_ping");
   expect(errors).toEqual([]);
 });
 
@@ -142,8 +178,10 @@ test("crashes: groups, a group narrows the list, one report shows its trail and 
   expect(errors).toEqual([]);
 });
 
-test("notices: Korean only, the seven other languages filled by the server and correctable, then end and delete with a reason", async ({ page }) => {
+test("notices: Korean only, the seven other languages translated in the browser (the server when that fails) and correctable, then end and delete with a reason", async ({ page }) => {
   const errors = await open(page, "#/tenkey-notices");
+  let google = () => "ok";
+  await fakeGoogle(page, (lang) => google(lang));
   await expect(page.locator("#tenkeyNoticesListing .audit-item")).toHaveCount(4);
   await expect(page.locator('[data-notice-id="4"]')).toContainText("8개 언어");
   await expect(page.locator('[data-notice-id="3"]')).toContainText("2개 언어");
@@ -182,7 +220,7 @@ test("notices: Korean only, the seven other languages filled by the server and c
   expect(Object.keys(save.params.notice.translations).sort()).toEqual(["de", "en", "es", "fr", "ja", "pt", "zh_TW"]);
   expect(save.params.notice.translations.en).toEqual({ title: "New keycap event", body: "[en] 이번 주말 2배 이벤트\n[en] 놓치지 마세요" });
   expect(save.request_id).toMatch(/^[0-9a-f-]{36}$/);
-  expect((await calls(page, "notices.translate")).length).toBe(1);
+  expect((await calls(page, "notices.translate")).length).toBe(0);
   await expect(page.locator('[data-notice-id="5"]')).toContainText("8개 언어");
 
   // Publishing straight away translates first; a Korean change after a preview makes the translations old.
@@ -202,7 +240,18 @@ test("notices: Korean only, the seven other languages filled by the server and c
   await expect(page.locator("#tenkeyNoticePreviews .is-old")).toHaveCount(7);
   await expect(page.locator("[data-tr-toggle]")).toHaveCount(0);
 
-  // The translation server failing saves nothing and says so in Korean.
+  // A language the browser cannot get comes from the server; the browser's other six stay.
+  google = (lang) => (lang === "ja" ? "flat" : "ok");
+  await page.evaluate(() => { window.__mockTranslate = (title, body) => Object.fromEntries(["en", "ja", "de", "zh_TW", "fr", "es", "pt"].map((l) => [l, { title: `srv ${title}`, body: `srv ${body}` }])); });
+  await page.locator("#tenkeyNoticeTranslate").click();
+  await expect(page.locator('#tenkeyNoticePreviews [lang="ja"] strong')).toHaveText("srv 새 제목");
+  await expect(page.locator('#tenkeyNoticePreviews [lang="en"] strong')).toHaveText("[en] 새 제목");
+  expect((await calls(page, "notices.translate")).length).toBe(1);
+  await page.evaluate(() => { delete window.__mockTranslate; });
+
+  // The browser and the server both failing saves nothing and says so in Korean.
+  google = () => "fail";
+  await form.locator("[name=titleKo]").fill("둘 다 실패");
   await page.evaluate(() => { window.__mockFailures["notices.translate"] = "notice_translation_unavailable"; });
   await form.locator("[name=reason]").fill("실패 확인");
   await form.locator("button[type=submit]").click();

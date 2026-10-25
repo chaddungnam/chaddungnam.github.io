@@ -1,9 +1,13 @@
 // 10key Survival: 한눈 요약. One tenkey-admin call ("overview.get", always 90 days) feeds two rows of plain numbers (오늘 /
 // 최근 7일, one number per card with one line of words under it), the daily chart of devices that opened the app and, folded away, the other charts.
 // Owner 2026-10-25 ("한눈요약 개선처리해줘. 한눈에 안들어옴"): the numbers that matter first, big and in plain Korean; the
-// breakdowns live under "그래프 더 보기". Days are Berlin dates (the server's day). The numbers come from the app's daily ping
+// breakdowns live under "그래프 더 보기". Days are Berlin dates (the server's day). Device numbers come from the app's daily ping
 // (Android / iOS players with a guest account), so web (CrazyGames) is not in them; the unfinished "today" is shown next to
 // yesterday's whole day, never judged up or down (only the 7-day windows get an arrow).
+// Owner 2026-10-25 ("테스터가 꽤 많을텐데 0명인건 논리적으로 안맞음"): the closed-test build (1.0.0, 2026-10-22) predates the
+// ping, so "앱을 연 사람" is the larger of the ping and the people the game server saw (data.server: sign-in, progress, runs;
+// app and web), and until the first ping arrives the install / play cards and the main chart use the game server's own
+// counts (new players, people who finished a run) instead of zeros.
 (function attachConsoleTenkeyOverview(root) {
   const T = root.ConsoleTenkey;
   const { esc, num, bytes, pct } = T.fmt;
@@ -123,38 +127,57 @@
     const weekBefore = (k) => sum(all.slice(0, -7), k, 7);
     const crashes = Number(totals.crash_times_24h || 0);
     const anyPlatform = state.platform ? " (플랫폼 구분 없음)" : "";
+    const seen = data.server?.seen || {};
+    const played = data.server?.played || {};
+    const opened = (k) => Math.max(Number(active[k] || 0), Number(seen[k] || 0));
+    const newToday = Number(all.at(-1)?.new_accounts || 0);
+    const newYesterday = Number(all.at(-2)?.new_accounts || 0);
+    const OPENED_HELP = "게임 서버가 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 앱이 하루 한 번 보내는 접속 신호 중 큰 쪽. 같은 사람은 한 번만 셉니다.";
 
     byId("tenkeyOverviewNotice").hidden = !noSignal;
-    byId("tenkeyOverviewNotice").textContent = noSignal ? "아직 앱이 보낸 접속 신호가 없어요. 신호를 보내는 빌드가 스토어에 나가면 아래 숫자가 채워집니다." : "";
+    byId("tenkeyOverviewNotice").textContent = noSignal ? "지금 테스트 빌드는 하루 접속 신호를 보내지 않아요. 그래서 아래 숫자는 게임 서버 기록(로그인·진행 저장·기록 전송)으로 센 사람 수예요. 설치 수, 판 수, 어제·지난주와 비교는 신호를 보내는 새 빌드가 나가면 채워집니다." : "";
     byId("tenkeyGlanceToday").innerHTML = [
-      glance("앱을 연 사람", num(active.d1), "명", `어제 하루 ${num(active.d1_prev)}명`,
-        { help: "오늘 앱을 연 기기 수 (Android·iOS). 하루에 한 번 보내는 신호를 셉니다. 오늘은 아직 끝나지 않은 날이라 어제 하루 전체와 나란히만 보여 줍니다." }),
-      glance("새로 설치", num(fresh.d1), "명", `어제 하루 ${num(fresh.d1_prev)}명`,
-        { help: "이 기기에서 처음 신호를 받은 날 기준. 앱을 지우고 다시 깔면 새 설치로 셉니다." }),
-      glance("플레이", num(runs.d1), "판", `어제 하루 ${num(runs.d1_prev)}판`,
-        { help: "앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이). 강제 종료된 날은 적게 잡힙니다." }),
+      glance("앱을 연 사람", num(opened("d1")), "명", noSignal ? `게임 서버 기록 · 앱·웹 합산${anyPlatform}` : `어제 하루 ${num(active.d1_prev)}명`,
+        { help: `오늘 게임에 들어온 사람. ${OPENED_HELP} 오늘은 아직 끝나지 않은 날이라 어제 하루 전체와 나란히만 보여 줍니다.` }),
+      noSignal
+        ? glance("새 플레이어", num(newToday), "명", `어제 하루 ${num(newYesterday)}명${anyPlatform}`,
+          { help: "오늘 게임 서버에 처음 들어온 사람 (새 계정). 설치 수는 접속 신호를 보내는 새 빌드부터 셉니다." })
+        : glance("새로 설치", num(fresh.d1), "명", `어제 하루 ${num(fresh.d1_prev)}명`,
+          { help: "이 기기에서 처음 신호를 받은 날 기준. 앱을 지우고 다시 깔면 새 설치로 셉니다." }),
+      noSignal
+        ? glance("판을 끝낸 사람", num(played.d1), "명", "판 수는 새 빌드부터 셈",
+          { help: "오늘 한 판 이상 끝까지 해서 기록을 서버에 보낸 사람. 몇 판 했는지는 접속 신호를 보내는 새 빌드부터 셉니다." })
+        : glance("플레이", num(runs.d1), "판", `어제 하루 ${num(runs.d1_prev)}판`,
+          { help: "앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이). 강제 종료된 날은 적게 잡힙니다." }),
       crashes > 0
         ? glance("크래시 (최근 24시간)", num(crashes), "건", `크래시 화면에서 확인${anyPlatform} →`,
           { tone: "risk", href: "#/tenkey-crashes", help: "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산). 홈 키나 최근 앱에서 끈 것은 세지 않습니다." })
         : glance("크래시 (최근 24시간)", "0", "건", `없음${anyPlatform}`, { tone: "good", help: "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산)." }),
     ].join("");
-    const peopleWeek = versus(active.d7, active.d7_prev, "명");
-    const installWeek = versus(fresh.d7, fresh.d7_prev, "명");
+    const peopleWeek = noSignal ? { note: `그 전 7일과 비교는 새 빌드부터${anyPlatform}`, noteTone: "" } : versus(active.d7, active.d7_prev, "명");
+    const installWeek = noSignal ? versus(week("new_accounts"), weekBefore("new_accounts"), "명") : versus(fresh.d7, fresh.d7_prev, "명");
     const buyWeek = versus(week("purchases"), weekBefore("purchases"), "건");
     byId("tenkeyGlanceWeek").innerHTML = [
-      glance("앱을 연 사람", num(active.d7), "명", peopleWeek.note,
-        { noteTone: peopleWeek.noteTone, help: "최근 7일(오늘 포함) 동안 한 번이라도 앱을 연 기기 수. 같은 기기는 한 번만 셉니다." }),
-      glance("새로 설치", num(fresh.d7), "명", installWeek.note,
-        { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
+      glance("앱을 연 사람", num(opened("d7")), "명", peopleWeek.note,
+        { noteTone: peopleWeek.noteTone, help: `최근 7일(오늘 포함) 동안 한 번이라도 게임에 들어온 사람. ${OPENED_HELP}` }),
+      noSignal
+        ? glance("새 플레이어", num(week("new_accounts")), "명", `${installWeek.note}${anyPlatform}`,
+          { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 게임 서버에 처음 들어온 사람 (새 계정)." })
+        : glance("새로 설치", num(fresh.d7), "명", installWeek.note,
+          { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
       glance("결제", num(week("purchases")), "건", `${buyWeek.note}${anyPlatform}`,
         { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외). Android와 iOS를 합친 숫자입니다." }),
       glance("다음 날 다시 온 비율", retRate(ret.d1), Number(ret.d1?.cohort) > 0 ? "%" : "",
-        Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : "아직 셀 수 없음 (설치 이틀 뒤부터)",
+        Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
         { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." }),
     ].join("");
 
-    const dauTips = rows.map((r) => tip(dayLabel(r.day), [["앱을 연 사람", `${num(r.dau)}명`], ["새로 설치", `${num(r.new_installs)}명`], ["플레이", `${num(r.runs)}판`]]));
-    const dauLine = lineChart(rows, "dau", dauTips);
+    // Until the first ping the main chart shows new players a day (the game server's own count) instead of a flat zero line.
+    const mainTitle = noSignal ? "날마다 새로 온 플레이어" : "날마다 앱을 연 사람";
+    const dauTips = noSignal
+      ? rows.map((r) => tip(dayLabel(r.day), [["새 플레이어", `${num(r.new_accounts)}명`]], "게임 서버에 처음 들어온 사람 (새 계정)"))
+      : rows.map((r) => tip(dayLabel(r.day), [["앱을 연 사람", `${num(r.dau)}명`], ["새로 설치", `${num(r.new_installs)}명`], ["플레이", `${num(r.runs)}판`]]));
+    const dauLine = lineChart(rows, noSignal ? "new_accounts" : "dau", dauTips);
     const newCols = columns(rows.map((r) => Number(r.new_installs || 0)), rows.map((r) => tip(dayLabel(r.day), [["새로 설치", `${num(r.new_installs)}명`], ["새 계정", `${num(r.new_accounts)}명`]])));
     const runCols = columns(rows.map((r) => Number(r.runs || 0)), rows.map((r) => tip(dayLabel(r.day), [["플레이", `${num(r.runs)}판`], ["서버에 남은 기록(신기록)", `${num(r.stored_runs)}판`]])));
     const crashCols = columns(rows.map((r) => Number(r.crashes || 0)), rows.map((r) => tip(dayLabel(r.day), [["크래시", `${num(r.crashes)}건`]])), "is-v2");
@@ -163,11 +186,11 @@
     const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음" })[k] || k)}</div></article>`;
     const periods = [7, 30, 90].map((d) => `<button class="overview-switch${d === state.period ? " active" : ""}" type="button" data-tk-period="${d}" aria-pressed="${d === state.period}">${d}일</button>`).join("");
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
-      <header class="ov-card-head"><h3>날마다 앱을 연 사람</h3><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
-      <figure class="ov-figure" tabindex="0" aria-label="날마다 앱을 연 사람"><div class="ov-plot has-y">${dauLine.plot}${waiting ? `<p class="ov-wait">${esc(waiting)}</p>` : ""}</div>${xAxis(rows)}</figure></article>`;
+      <header class="ov-card-head"><h3>${mainTitle}</h3><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
+      <figure class="ov-figure" tabindex="0" aria-label="${mainTitle}"><div class="ov-plot has-y">${dauLine.plot}</div>${xAxis(rows)}</figure></article>`;
     const facts = [
-      ["30일 동안 앱을 연 사람", `${num(active.d30)}명`], ["지금까지 설치", `${num(fresh.all)}명`], ["전체 계정", `${num(totals.accounts)}개`],
-      ["7일 동안 플레이", `${num(runs.d7)}판`], ["7일 뒤 다시 온 비율", retRow(ret.d7)], ["30일 뒤 다시 온 비율", retRow(ret.d30)],
+      ["30일 동안 앱을 연 사람", `${num(opened("d30"))}명`], ["지금까지 설치", `${num(fresh.all)}명`], ["전체 계정", `${num(totals.accounts)}개`],
+      noSignal ? ["7일 동안 판을 끝낸 사람", `${num(played.d7)}명`] : ["7일 동안 플레이", `${num(runs.d7)}판`], ["7일 뒤 다시 온 비율", retRow(ret.d7)], ["30일 뒤 다시 온 비율", retRow(ret.d30)],
     ].map(([name, value]) => `<div><dt>${esc(name)}</dt><dd>${esc(value)}</dd></div>`).join("");
     byId("tenkeyOverviewMoreCharts").innerHTML = [
       `<div class="lab-facts tk-more-facts">${facts}</div>`,
@@ -185,6 +208,7 @@
     ].map(([name, value]) => `<div><dt>${esc(name)}</dt><dd>${esc(value)}</dd></div>`).join("");
     byId("tenkeyOverviewNotes").innerHTML = [
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
+      "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·판을 끝낸 사람을 보여 줍니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",
       "서버에서 신호 수집을 끄는 스위치: tenkey_private.ops_flags.ping_on (꺼지면 앱이 하루 쉽니다).",

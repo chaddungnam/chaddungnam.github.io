@@ -23,18 +23,22 @@
     };
   });
   const sumLast = (key, n) => series.slice(-n).reduce((s, r) => s + r[key], 0);
+  // window.__mockNoPing = the closed-test build of 2026-10-22, which sends no daily ping: every ping-based number is 0 and only
+  // the game server's own counts (server.seen / played, the series' new_accounts) are there.
   const overview = (platform) => {
-    const k = platform ? (platform === "android" ? 0.7 : 0.3) : 1;
+    const k = window.__mockNoPing ? 0 : platform ? (platform === "android" ? 0.7 : 0.3) : 1;
     const scale = (v) => Math.round(v * k);
     const last = series.at(-1);
     const prev = series.at(-2);
     return {
       ok: true, today: TODAY, days: DAYS, platform: platform || null,
-      series: platform ? series.map((r) => ({ ...r, dau: scale(r.dau), runs: scale(r.runs), new_installs: scale(r.new_installs) })) : series,
+      series: k !== 1 ? series.map((r) => ({ ...r, dau: scale(r.dau), runs: scale(r.runs), new_installs: scale(r.new_installs) })) : series,
       active: { d1: scale(last.dau), d1_prev: scale(prev.dau), d7: scale(420), d7_prev: scale(310), d30: scale(780), d30_prev: 0 },
       runs: { d1: scale(last.runs), d1_prev: scale(prev.runs), d7: scale(sumLast("runs", 7)), d7_prev: scale(1900), d30: scale(sumLast("runs", 30)), d30_prev: 0 },
       new_installs: { d1: scale(last.new_installs), d1_prev: scale(prev.new_installs), d7: scale(sumLast("new_installs", 7)), d7_prev: scale(120), d30: scale(sumLast("new_installs", 30)), d30_prev: 0, all: scale(sumLast("new_installs", 90)) },
-      retention: { d1: { cohort: 96, back: 41 }, d7: { cohort: 52, back: 14 }, d30: { cohort: 0, back: 0 } },
+      retention: window.__mockNoPing ? { d1: { cohort: 0, back: 0 }, d7: { cohort: 0, back: 0 }, d30: { cohort: 0, back: 0 } }
+        : { d1: { cohort: 96, back: 41 }, d7: { cohort: 52, back: 14 }, d30: { cohort: 0, back: 0 } },
+      server: { seen: { d1: 31, d7: 260, d30: 600 }, played: { d1: 24, d7: 190, d30: 410 }, players: 842 },
       platforms: [{ key: "android", n: 330 }, { key: "ios", n: 90 }],
       versions: [{ key: "1.0.0 a2 i2", n: 310 }, { key: "1.0.0 a1 i1", n: 110 }],
       langs: [{ key: "ko", n: 560 }, { key: "en", n: 190 }, { key: "?", n: 30 }],
