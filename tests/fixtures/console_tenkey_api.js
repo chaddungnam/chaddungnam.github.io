@@ -55,6 +55,8 @@
     { id: "c3333333-3333-4333-8333-333333333333", name: "cg_player_77", nickname: null, provider: "crazygames", platform: "web", created_at: "2026-10-18T19:00:00+00:00", last_seen_at: "2026-10-22T20:15:00+00:00", best_score: 51200, best_level: 9, banned: false, age_band: null, runs_stored: 4 },
     { id: "d4444444-4444-4444-8444-444444444444", name: "의심스러운덕", nickname: "의심스러운덕", provider: "supabase", platform: "android", created_at: "2026-10-20T01:00:00+00:00", last_seen_at: "2026-10-22T23:59:00+00:00", best_score: 9990000, best_level: 40, banned: true, age_band: 18, runs_stored: 9 },
     { id: "e5555555-5555-4555-8555-555555555555", name: "초보오리", nickname: "초보오리", provider: "supabase", platform: "mobile", created_at: "2026-10-23T06:20:00+00:00", last_seen_at: "2026-10-23T06:20:00+00:00", best_score: null, best_level: null, banned: false, age_band: 18, runs_stored: 0 },
+    { id: "f6666666-6666-4666-8666-666666666666", name: "창문덕", nickname: "창문덕", provider: "supabase", platform: "windows", created_at: "2026-10-24T10:00:00+00:00", last_seen_at: "2026-10-24T12:00:00+00:00", best_score: 30500, best_level: 7, banned: false, age_band: 18, runs_stored: 2 },
+    { id: "a7777777-7777-4777-8777-777777777777", name: "사과덕", nickname: "사과덕", provider: "supabase", platform: "macos", created_at: "2026-10-24T11:00:00+00:00", last_seen_at: "2026-10-24T13:00:00+00:00", best_score: 12000, best_level: 5, banned: false, age_band: 18, runs_stored: 1 },
   ];
   const detailFor = (id) => {
     const p = PLAYERS.find((x) => x.id === id) || PLAYERS[0];
@@ -125,7 +127,9 @@
     { id: 2, at: "2026-10-22T21:10:00+00:00", admin_email: "ops@houseduck.in", action: "players.ban", params: { reason: "점수 조작 의심 (의심 기록 3건)", player_id: PLAYERS[3].id, banned: true }, result: { ok: true } },
     { id: 1, at: "2026-10-22T09:00:00+00:00", admin_email: "ops@houseduck.in", action: "config.set", params: { reason: "1.0.0 배포", config: { min_version_code: 1, latest_version_code: 2 } }, result: { ok: true } },
   ];
-  let config = { min_version_code: 1, latest_version_code: 2, min_build_ios: 0, latest_build_ios: 0, store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "", updated_at: "2026-10-22T09:00:00+00:00",
+  let config = { min_version_code: 1, latest_version_code: 2, min_build_ios: 0, latest_build_ios: 0, store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "https://testflight.apple.com/join/RqNJg7Dp", updated_at: "2026-10-22T09:00:00+00:00",
+    links: { android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", ios: "https://testflight.apple.com/join/RqNJg7Dp", ios_official: false, ios_checked_at: "2026-10-25T17:58:00+00:00" },
+    builds: [{ platform: "android", build: 3, players: 0, installs: 4 }, { platform: "android", build: 2, players: 8, installs: 0 }, { platform: "ios", build: 3, players: 0, installs: 2 }, { platform: "ios", build: 2, players: 1, installs: 0 }],
     balance: { ver: 0, xp_scale: 1, mouse_pace: 1, battery_drain_scale: 1, robot_power_scale: 1, updated_at: "2026-10-25T15:34:00+00:00", updated_by: "" } };
 
   window.__mockCalls = [];

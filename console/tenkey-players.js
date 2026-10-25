@@ -15,12 +15,13 @@
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
   const ageName = (band) => (band ? `${band}세 이상` : "미확인");
   const scoreText = (row) => (row.best_score == null ? "—" : `${num(row.best_score)}${row.best_level ? ` · Lv ${row.best_level}` : ""}`);
-  const platformOf = (row) => (row.provider === "crazygames" ? platformName("web") : platformName(row.platform === "mobile" ? "mobile" : row.platform));
+  // Where the player last played (the server: the latest stored run's platform; CrazyGames sign-ins are always that portal).
+  const platformOf = (row) => platformName(row.provider === "crazygames" ? "web_crazygames" : row.platform);
 
   function rowMarkup(row) {
     const name = row.name || row.nickname || "(이름 없음)";
     return `<tr${row.banned ? ' class="is-dim"' : ""}>
-      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a><span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "앱 게스트 계정")}</span></td>
+      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a><span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
       <td data-label="플랫폼">${esc(platformOf(row))}</td>
       <td data-label="가입">${esc(time(row.created_at))}</td>
       <td data-label="마지막 접속">${esc(time(row.last_seen_at))}</td>
@@ -90,10 +91,10 @@
     const account = d.account || {};
     const mobile = (d.identities || []).some((i) => i.provider === "supabase");
     const bests = (d.bests || []).map((b) => `<tr><td>${esc(boardName(b.board))}</td><td class="tk-num">${esc(num(b.score))}</td><td class="tk-num">${esc(b.level)}</td><td>${esc(duration(b.time_ms))}</td><td>${esc(time(b.achieved_at))}</td><td class="tk-num">${esc(b.rules)}</td></tr>`);
-    const runs = (d.runs || []).map((r) => `<tr${r.flag ? ' class="is-dim"' : ""}><td>${esc(time(r.created_at))}</td><td class="tk-num">${esc(num(r.score))}</td><td class="tk-num">${esc(r.level)}</td><td>${esc(duration(r.time_ms))}</td><td class="tk-num">${esc(num(r.depth))}</td><td class="tk-num">${esc(num(r.scrap))}</td><td class="tk-num">${esc(num(r.combo))}</td><td class="tk-num">${esc(r.skills)}</td><td>${esc(r.cause || "—")}</td><td>${esc(r.platform)} · ${esc(r.build)}</td><td><span class="tk-badge" data-tone="${r.flag ? "risk" : "good"}">${esc(flagName(r.flag))}</span></td></tr>`);
+    const runs = (d.runs || []).map((r) => `<tr${r.flag ? ' class="is-dim"' : ""}><td>${esc(time(r.created_at))}</td><td class="tk-num">${esc(num(r.score))}</td><td class="tk-num">${esc(r.level)}</td><td>${esc(duration(r.time_ms))}</td><td class="tk-num">${esc(num(r.depth))}</td><td class="tk-num">${esc(num(r.scrap))}</td><td class="tk-num">${esc(num(r.combo))}</td><td class="tk-num">${esc(r.skills)}</td><td>${esc(r.cause || "—")}</td><td>${esc(platformName(r.platform))} · ${esc(r.build)}</td><td><span class="tk-badge" data-tone="${r.flag ? "risk" : "good"}">${esc(flagName(r.flag))}</span></td></tr>`);
     const buys = (d.purchases || []).map((b) => `<tr><td>${esc(time(b.created_at))}</td><td>${esc(b.product_id)}</td><td>${esc(platformName(b.platform))}</td><td><span class="tk-badge" data-tone="${b.state === "refunded" ? "risk" : b.state === "sandbox" ? "quiet" : "good"}">${esc({ granted: "결제 완료", sandbox: "테스트", refunded: "환불" }[b.state] || b.state)}</span></td><td>${esc(b.order_tail || "—")}</td><td>${esc(b.refunded_at ? `${time(b.refunded_at)} · ${b.refund_reason_category || ""}` : "—")}</td></tr>`);
     const ledger = ((d.wallet || {}).ledger || []).map((g) => `<tr><td>${esc(time(g.at))}</td><td>${esc(g.kind === "grant" ? "받음" : "씀")}</td><td class="tk-num">${esc(num(g.amount))}</td><td>${esc(g.reason || "—")}</td><td>${esc(g.source === "server" ? "서버(구매)" : "앱 보고")}</td></tr>`);
-    const ids = (d.identities || []).map((i) => `<tr><td>${esc(i.provider === "crazygames" ? "CrazyGames" : "앱 게스트 로그인")}</td><td><code>${esc(i.subject)}</code></td><td><code>${esc(i.login || "—")}</code></td><td>${esc(time(i.created_at))}</td></tr>`);
+    const ids = (d.identities || []).map((i) => `<tr><td>${esc(i.provider === "crazygames" ? "CrazyGames" : "게스트 로그인")}</td><td><code>${esc(i.subject)}</code></td><td><code>${esc(i.login || "—")}</code></td><td>${esc(time(i.created_at))}</td></tr>`);
     return `<section class="panel">
       <div class="player-detail-head"><div><p class="eyebrow">PLAYER</p><h2>${esc(p.name || "(이름 없음)")} <span class="tk-badge" data-tone="${p.banned ? "risk" : "good"}">${p.banned ? "정지" : "정상"}</span></h2><code>${esc(p.id)}</code></div></div>
       ${facts([

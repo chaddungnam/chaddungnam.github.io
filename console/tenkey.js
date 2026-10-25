@@ -1,4 +1,4 @@
-// 10key Survival ("10KEY") project of the console: shared helpers, the admin call and the force-update settings page.
+// 10key Survival ("10KEY") project of the console: shared helpers, the admin call and the force-update page.
 // Every call goes to the House Duck game server's tenkey-admin function (the console ticket + the admin allow list, see
 // server docs docs/server/tenkey_server.md §15). The other 10KEY pages (tenkey-overview.js, tenkey-players.js,
 // tenkey-crashes.js, tenkey-notices.js, tenkey-more.js) add their mount functions to window.ConsoleTenkey.
@@ -6,14 +6,18 @@
   const byId = (id) => document.getElementById(id);
   const FORM_MESSAGE = "tenkeyConfigFormMessage";
   const PAGE_MESSAGE = "tenkeyConfigMessage";
-  const NUMBER_FIELDS = ["minVersionCode", "latestVersionCode", "minBuildIos", "latestBuildIos"];
+  // One number per store since 2026-10-25 (owner: the two-number form with typed store links was too much): the minimum
+  // build. It is sent as both min and latest, so the skippable "new version" prompt never shows on its own; the links are
+  // the server's (Google Play; iOS = TestFlight until the hourly App Store lookup finds the game).
+  const NUMBER_FIELDS = ["minVersionCode", "minBuildIos"];
+  const STORES = [{ platform: "android", field: "minVersionCode", body: "tenkeyBuildsAndroid", name: "Android" },
+    { platform: "ios", field: "minBuildIos", body: "tenkeyBuildsIos", name: "iOS" }];
   const ERROR_MESSAGES = {
     unknown_action: "서버에 10KEY 기능이 아직 배포되지 않았습니다.",
-    invalid_number: "번호는 0 이상의 정수로 입력해 주세요 (0은 꺼짐).",
+    invalid_number: "빌드 번호는 0 이상의 정수로 입력해 주세요 (0은 꺼짐).",
     min_above_latest_android: "Android 최소 versionCode는 최신 versionCode보다 클 수 없습니다.",
     min_above_latest_ios: "iOS 최소 빌드 번호는 최신 빌드 번호보다 클 수 없습니다.",
     invalid_store_url: "스토어 링크는 비우거나 https://로 시작해야 합니다.",
-    ios_store_url_required: "iOS 번호를 0보다 크게 하려면 App Store 링크가 필요합니다.",
     reason_required: "변경 이유를 입력해 주세요.",
     invalid_knobs: "바꿀 밸런스 조정값이 없습니다.",
     invalid_knob_value: "밸런스 조정값은 0.70 ~ 1.30 사이의 숫자로 입력해 주세요.",
@@ -85,7 +89,14 @@
     return n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`;
   };
   const pct = (part, whole) => (Number(whole) > 0 ? `${Math.round(Number(part) / Number(whole) * 1000) / 10}%` : "—");
-  const PLATFORM_NAMES = { web: "웹 (CrazyGames)", android: "Android", ios: "iOS", mobile: "앱", crazygames: "웹 (CrazyGames)", supabase: "앱 계정" };
+  // The platform names the game sends (a run's platform, an install ping, a crash report): OS.get_name() lowercased for the
+  // store apps and desktop builds, "web" for a web build with no portal, the portal builds by name. "mobile" = a guest
+  // account with no run yet (the server does not know where it plays).
+  const PLATFORM_NAMES = {
+    android: "Android", ios: "iOS", windows: "Windows", macos: "Mac", linux: "Linux", steam: "Steam (PC)",
+    web: "웹 (공통)", web_crazygames: "웹 · CrazyGames", crazygames: "웹 · CrazyGames", web_itch: "웹 · itch.io",
+    mobile: "모름 (판 기록 없음)", supabase: "앱 계정",
+  };
   const platformName = (value) => PLATFORM_NAMES[String(value || "").toLowerCase()] || String(value || "—");
 
   function setMessage(id, value, error = false) {
@@ -169,42 +180,71 @@
       if (!/^\d+$/.test(text) || !Number.isSafeInteger(Number(text))) return { error: "invalid_number" };
       n[key] = Number(text);
     }
-    if (n.minVersionCode > n.latestVersionCode) return { error: "min_above_latest_android" };
-    if (n.minBuildIos > n.latestBuildIos) return { error: "min_above_latest_ios" };
-    const android = String(values.storeUrlAndroid ?? "").trim();
-    const ios = String(values.storeUrlIos ?? "").trim();
-    if ([android, ios].some((url) => url && !/^https:\/\/\S+$/.test(url))) return { error: "invalid_store_url" };
-    if ((n.minBuildIos > 0 || n.latestBuildIos > 0) && !ios) return { error: "ios_store_url_required" };
     const reason = String(values.reason ?? "").trim();
     if (!reason) return { error: "reason_required" };
     return {
       reason,
       config: {
-        min_version_code: n.minVersionCode, latest_version_code: n.latestVersionCode,
-        min_build_ios: n.minBuildIos, latest_build_ios: n.latestBuildIos,
-        store_url_android: android, store_url_ios: ios,
+        min_version_code: n.minVersionCode, latest_version_code: n.minVersionCode,
+        min_build_ios: n.minBuildIos, latest_build_ios: n.minBuildIos,
       },
     };
   }
 
+  // Builds in use (config.get `builds`) that a minimum would block: an app below a minimum above 0.
+  const blocked = (builds, platform, min) => (builds || []).filter((b) => b.platform === platform && min > 0 && Number(b.build) < min);
+  const whoText = (b) => [b.installs ? `켠 기기 ${num(b.installs)}` : "", b.players ? `판 한 사람 ${num(b.players)}` : ""].filter(Boolean).join(" · ");
+
   function summary(config, reason) {
+    const builds = state.config?.builds || [];
+    const hit = [["Android", "android", config.min_version_code], ["iOS", "ios", config.min_build_ios]]
+      .flatMap(([name, platform, min]) => blocked(builds, platform, min).map((b) => `${name} 빌드 ${b.build} (${whoText(b) || "기록 없음"})`));
     return [
-      `Android 최소 ${config.min_version_code} · 최신 ${config.latest_version_code}`,
-      `iOS 최소 빌드 ${config.min_build_ios} · 최신 ${config.latest_build_ios}`,
-      `Google Play 링크: ${config.store_url_android || "(없음)"}`,
-      `App Store 링크: ${config.store_url_ios || "(없음)"}`,
+      `Android 최소 빌드 ${config.min_version_code}${config.min_version_code ? "" : " (끔)"}`,
+      `iOS 최소 빌드 ${config.min_build_ios}${config.min_build_ios ? "" : " (끔)"}`,
+      `막히는 빌드: ${hit.length ? hit.join(", ") : "없음 (지금 쓰는 빌드 기준)"}`,
       `변경 이유: ${reason}`,
     ].join("\n");
+  }
+
+  // The builds in use per store, each marked with what the number in the box would do to it (redrawn as it is typed).
+  function renderBuilds() {
+    const fields = byId("tenkeyConfigForm").elements;
+    const builds = state.config?.builds || [];
+    for (const store of STORES) {
+      const min = Number(fields[store.field].value) || 0;
+      const rows = builds.filter((b) => b.platform === store.platform).map((b) => {
+        const stop = min > 0 && Number(b.build) < min;
+        return `<tr><td>빌드 ${esc(b.build)}</td><td class="tk-num">${esc(num(b.installs))}</td><td class="tk-num">${esc(num(b.players))}</td>
+          <td><span class="tk-gate ${stop ? "is-blocked" : "is-open"}">${stop ? "막힘 · 업데이트 창" : "그대로 플레이"}</span></td></tr>`;
+      });
+      byId(store.body).innerHTML = rows.join("") || `<tr><td colspan="4">최근 기록이 없습니다.</td></tr>`;
+    }
+  }
+
+  function renderLinks(config) {
+    const links = config.links || {};
+    const android = byId("tenkeyLinkAndroid");
+    const ios = byId("tenkeyLinkIos");
+    const androidUrl = links.android || config.store_url_android || "";
+    const iosUrl = links.ios || config.store_url_ios || "";
+    android.textContent = androidUrl ? "Google Play" : "없음";
+    android.href = androidUrl || "#";
+    android.title = androidUrl;
+    ios.textContent = !iosUrl ? "없음" : links.ios_official ? "App Store" : /testflight\.apple\.com/.test(iosUrl) ? "TestFlight 공개 링크" : "App Store";
+    ios.href = iosUrl || "#";
+    ios.title = iosUrl;
+    byId("tenkeyLinkIosNote").textContent = links.ios_official
+      ? "App Store에 나온 것을 서버가 찾아 저절로 바꾼 링크입니다."
+      : `App Store에 나오면 저절로 바뀝니다${links.ios_checked_at ? ` · 마지막 확인 ${time(links.ios_checked_at)} (아직 없음)` : ""}.`;
   }
 
   function fillForm(config) {
     const fields = byId("tenkeyConfigForm").elements;
     fields.minVersionCode.value = config.min_version_code ?? 0;
-    fields.latestVersionCode.value = config.latest_version_code ?? 0;
     fields.minBuildIos.value = config.min_build_ios ?? 0;
-    fields.latestBuildIos.value = config.latest_build_ios ?? 0;
-    fields.storeUrlAndroid.value = config.store_url_android || "";
-    fields.storeUrlIos.value = config.store_url_ios || "";
+    renderLinks(config);
+    renderBuilds();
   }
 
   async function loadConfig() {
@@ -233,14 +273,14 @@
         return;
       }
       const { config, reason } = checked;
-      if (!await root.ConsoleApp.confirmChange("10KEY 앱 설정 변경", summary(config, reason))) return;
+      if (!await root.ConsoleApp.confirmChange("10KEY 강제 업데이트 변경", summary(config, reason))) return;
       setMessage(FORM_MESSAGE, "저장하는 중입니다...");
       const result = await call("config.set", { config, reason }, form);
-      state.config = result.data?.config || config;
+      state.config = result.data?.config || { ...state.config, ...config };
       fillForm(state.config);
       form.elements.reason.value = "";
       setMessage(FORM_MESSAGE, "");
-      setMessage(PAGE_MESSAGE, "10KEY 앱 설정을 저장했습니다.");
+      setMessage(PAGE_MESSAGE, "강제 업데이트 번호를 저장했습니다. 다음에 앱을 켤 때부터 적용됩니다.");
     } catch (error) {
       report(FORM_MESSAGE, error);
     } finally {
@@ -251,7 +291,9 @@
   function mountConfig() {
     if (!state.bound) {
       state.bound = true;
-      byId("tenkeyConfigForm").addEventListener("submit", submitConfig);
+      const form = byId("tenkeyConfigForm");
+      form.addEventListener("submit", submitConfig);
+      form.addEventListener("input", (event) => { if (NUMBER_FIELDS.includes(event.target?.name)) renderBuilds(); });
     }
     loadConfig();
   }

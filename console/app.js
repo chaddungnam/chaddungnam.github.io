@@ -32,7 +32,7 @@ const pageTitles = {
   "tenkey-purchases": "구매 · 젬",
   "tenkey-ranking": "랭킹",
   "tenkey-balance": "밸런스",
-  "tenkey-config": "앱 설정 / 강제 업데이트",
+  "tenkey-config": "강제 업데이트",
   "tenkey-audit": "감사 기록",
 };
 const pageDescriptions = {
@@ -53,8 +53,8 @@ const pageDescriptions = {
   "tenkey-purchases": "스토어 구매·환불 기록과 젬·리바이브 패스 장부를 확인합니다.",
   "tenkey-ranking": "이번 주와 전체 랭킹 보드를 앱에 보이는 그대로 봅니다. 제재는 플레이어 상세의 정지로 직접 합니다.",
   "tenkey-balance": "모든 판의 짧은 기록으로 판이 어디서 왜 끝나는지, DRIFT·로봇까지 얼마나 가는지, 어떤 카드를 고르는지 봅니다.",
-  "tenkey-config": "10KEY 강제 업데이트 기준(Android versionCode, iOS 빌드 번호)과 스토어 링크를 관리합니다.",
-  "tenkey-audit": "10KEY 관리자 변경(공지·정지·앱 설정)을 누가 언제 왜 했는지 확인합니다.",
+  "tenkey-config": "Android·iOS 앱에서 이보다 낮은 빌드는 업데이트하기 전까지 게임을 못 하게 막습니다.",
+  "tenkey-audit": "10KEY 관리자 변경(공지·정지·업데이트 번호·밸런스)을 누가 언제 왜 했는지 확인합니다.",
 };
 
 let currentProjectKey = "";

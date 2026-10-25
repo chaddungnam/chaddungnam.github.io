@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20261025-bal">
+  <link rel="stylesheet" href="styles.css?v=20261025-upd">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -82,7 +82,7 @@
         <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">05</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
         <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">06</span><span class="nav-copy">랭킹<small>보드</small></span></a>
         <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">07</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">08</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">08</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
         <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">09</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
@@ -479,13 +479,13 @@
       <section id="tenkeyPlayersView" class="route-view" data-route="tenkey-players" hidden>
         <form id="tenkeyPlayerSearchForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>플레이어 검색<input id="tenkeyPlayerSearch" type="search" maxlength="100" placeholder="닉네임 · 플레이어 ID · 로그인 ID"></label>
-          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 (CrazyGames)</option><option value="android">Android</option><option value="ios">iOS</option></select></label>
+          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 · CrazyGames</option><option value="android">Android</option><option value="ios">iOS</option></select></label>
           <label>정렬<select id="tenkeyPlayerSort"><option value="last_seen_at">마지막 접속</option><option value="created_at">가입</option><option value="best">최고 점수</option><option value="name">이름</option></select></label>
           <label>방향<select id="tenkeyPlayerDirection"><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
           <button class="primary-button" type="submit">검색</button>
         </form>
         <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 사람들입니다 (웹은 CrazyGames 로그인, 앱은 게스트 계정). 로그인하지 않은 웹 플레이어는 서버에 없습니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 사람들입니다 (CrazyGames 웹은 CrazyGames 로그인, 스토어 앱·PC는 게스트 계정). 플랫폼 = 마지막 판을 한 곳 (Android · iOS · Windows · Mac · 웹 공통 · 웹 CrazyGames 등). 로그인하지 않은 웹 플레이어는 서버에 없습니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>플랫폼</th><th>가입</th><th>마지막 접속</th><th class="tk-num">최고 점수</th><th>나이대</th><th>상태</th><th>처리</th></tr></thead><tbody id="tenkeyPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="tenkeyPlayersPrevious" type="button">이전</button><span id="tenkeyPlayersPage">1 / 1</span><button id="tenkeyPlayersNext" type="button">다음</button></div>
         </section>
@@ -665,35 +665,34 @@
           <label>표시 개수<select id="tenkeyAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
           <button class="primary-button" type="submit">새로고침</button>
         </form>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">10KEY AUDIT</p><h2>감사 기록</h2><small>공지·정지·앱 설정 변경을 누가 언제 왜 했는지 남깁니다 (이 화면이 생긴 뒤의 변경부터).</small></div><span id="tenkeyAuditTotal" class="panel-total">—</span></div><div id="tenkeyAuditList" class="audit-list"></div></section>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">10KEY AUDIT</p><h2>감사 기록</h2><small>공지·정지·업데이트 번호 변경을 누가 언제 왜 했는지 남깁니다 (이 화면이 생긴 뒤의 변경부터).</small></div><span id="tenkeyAuditTotal" class="panel-total">—</span></div><div id="tenkeyAuditList" class="audit-list"></div></section>
         <p id="tenkeyAuditMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="tenkeyConfigView" class="route-view" data-route="tenkey-config" hidden>
         <p id="tenkeyConfigMessage" class="dashboard-message" role="status"></p>
         <form id="tenkeyConfigForm" class="panel admin-form impact-form impact-form-critical">
-          <p class="eyebrow">10KEY APP CONFIG</p><h2>앱 설정 / 강제 업데이트</h2>
-          <p class="impact-note">Android는 versionCode, iOS는 빌드 번호를 따로 비교합니다 (버전 표시 "1  1.0.0  1" = Android versionCode 1 · 버전 1.0.0 · iOS 빌드 1). 0은 꺼짐입니다.</p>
-          <p class="impact-note">최소보다 낮은 앱은 스토어 버튼이 있는 "업데이트가 필요합니다" 창에 막히고, 최신보다 낮은 앱은 새 번호마다 한 번 "새 버전이 있습니다"(건너뛰기 가능)가 뜹니다. 웹(CrazyGames)·데스크톱에는 뜨지 않습니다. 최소는 그 스토어에 새 빌드가 배포된 뒤에 올리세요.</p>
-          <fieldset class="tenkey-group">
-            <legend>Android (versionCode)</legend>
-            <div class="form-pair">
-              <label>최소 versionCode<input name="minVersionCode" type="number" min="0" step="1" required><small>이보다 낮으면 업데이트 필수 · 0 = 끔</small></label>
-              <label>최신 versionCode<input name="latestVersionCode" type="number" min="0" step="1" required><small>이보다 낮으면 새 버전 안내 · 0 = 끔</small></label>
-            </div>
-            <label>Google Play 링크<input name="storeUrlAndroid" type="url" maxlength="500" placeholder="https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival"></label>
-          </fieldset>
-          <fieldset class="tenkey-group">
-            <legend>iOS (build)</legend>
-            <div class="form-pair">
-              <label>최소 빌드 번호<input name="minBuildIos" type="number" min="0" step="1" required><small>이보다 낮으면 업데이트 필수 · 0 = 끔</small></label>
-              <label>최신 빌드 번호<input name="latestBuildIos" type="number" min="0" step="1" required><small>이보다 낮으면 새 버전 안내 · 0 = 끔</small></label>
-            </div>
-            <label>App Store 링크<input name="storeUrlIos" type="url" maxlength="500" placeholder="https://apps.apple.com/..."><small>iOS 번호를 0보다 크게 하려면 꼭 필요합니다. 링크는 https://로 시작해야 합니다.</small></label>
-          </fieldset>
+          <p class="eyebrow">10KEY FORCE UPDATE</p><h2>앱 강제 업데이트</h2>
+          <p class="impact-note">스토어 앱(Android·iOS)은 켤 때마다 이 번호를 확인합니다. 앱의 빌드 번호가 이 번호보다 낮으면 "업데이트가 필요합니다" 창이 떠서 게임을 할 수 없고, 창의 버튼은 아래 링크로 갑니다. 0 = 끔. 웹·PC 판에는 뜨지 않습니다.</p>
+          <p class="impact-note">새 빌드를 스토어(iOS는 TestFlight)에서 받을 수 있게 된 뒤에 그 빌드 번호로 올리세요. 게임 화면의 버전 표시 "3  1.0.0  3  4"에서 첫 숫자가 Android 빌드, 세 번째 숫자가 iOS 빌드입니다.</p>
+          <div class="tk-update-grid">
+            <fieldset class="tenkey-group">
+              <legend>Android</legend>
+              <label>최소 빌드 (versionCode)<input name="minVersionCode" type="number" min="0" step="1" required><small>이보다 낮은 Android 앱은 막힘 · 0 = 끔</small></label>
+              <p class="tk-update-link">업데이트 버튼이 여는 곳: <a id="tenkeyLinkAndroid" target="_blank" rel="noopener">—</a></p>
+              <div class="table-scroll"><table><thead><tr><th>쓰는 빌드</th><th class="tk-num">켠 기기</th><th class="tk-num">판 한 사람</th><th>이 번호면</th></tr></thead><tbody id="tenkeyBuildsAndroid"></tbody></table></div>
+            </fieldset>
+            <fieldset class="tenkey-group">
+              <legend>iOS</legend>
+              <label>최소 빌드<input name="minBuildIos" type="number" min="0" step="1" required><small>이보다 낮은 iOS 앱은 막힘 · 0 = 끔</small></label>
+              <p class="tk-update-link">업데이트 버튼이 여는 곳: <a id="tenkeyLinkIos" target="_blank" rel="noopener">—</a><small id="tenkeyLinkIosNote"></small></p>
+              <div class="table-scroll"><table><thead><tr><th>쓰는 빌드</th><th class="tk-num">켠 기기</th><th class="tk-num">판 한 사람</th><th>이 번호면</th></tr></thead><tbody id="tenkeyBuildsIos"></tbody></table></div>
+            </fieldset>
+          </div>
+          <p class="impact-note">켠 기기 = 최근 7일 안에 그 빌드로 앱을 켠 기기 수 (빌드 3부터 셈) · 판 한 사람 = 최근 30일 안에 그 빌드로 판을 끝낸 플레이어 수. 링크는 직접 넣지 않습니다: Android는 Google Play, iOS는 App Store에 나오기 전까지 TestFlight 공개 링크이고, 나오면 서버가 1시간마다 확인해 App Store 링크로 저절로 바꿉니다.</p>
           <label>변경 이유<input name="reason" maxlength="300" required></label>
           <p id="tenkeyConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="danger-button" type="submit">앱 설정 저장</button>
+          <button class="danger-button" type="submit">강제 업데이트 번호 저장</button>
         </form>
       </section>
 
@@ -749,12 +748,12 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261025-knob"></script>
+  <script src="tenkey.js?v=20261025-upd"></script>
   <script src="tenkey-overview.js?v=20261025-dau2"></script>
-  <script src="tenkey-players.js?v=20261024-nf"></script>
+  <script src="tenkey-players.js?v=20261025-upd"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
-  <script src="tenkey-more.js?v=20261025-knob"></script>
+  <script src="tenkey-more.js?v=20261025-upd"></script>
   <script src="tenkey-balance.js?v=20261025-knob"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
@@ -767,6 +766,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261025-bal" defer></script>
+  <script src="app.js?v=20261025-upd" defer></script>
 </body>
 </html>

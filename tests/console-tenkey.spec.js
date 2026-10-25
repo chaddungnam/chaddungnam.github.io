@@ -152,8 +152,10 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
 
 test("players: search, open one, ban with a reason through the confirm dialog", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players");
-  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(5);
-  await expect(page.locator("#tenkeyPlayerTotal")).toHaveText("5명");
+  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
+  await expect(page.locator("#tenkeyPlayerTotal")).toHaveText("7명");
+  const platforms = await page.locator('#tenkeyPlayersTable td[data-label="플랫폼"]').allTextContents();
+  expect(platforms).toEqual(["Android", "iOS", "웹 · CrazyGames", "Android", "모름 (판 기록 없음)", "Windows", "Mac"]);
   await shot(page, "players");
   await page.locator("#tenkeyPlayerSearch").fill("딸깍");
   await page.locator("#tenkeyPlayerSearchForm button[type=submit]").click();
@@ -162,6 +164,7 @@ test("players: search, open one, ban with a reason through the confirm dialog", 
   await expect(page.locator("#pageTitle")).toHaveText("플레이어 상세");
   await expect(page.locator("#tenkeyPlayerDetail")).toContainText("젬 장부");
   await expect(page.locator("#tenkeyPlayerDetail")).toContainText("보드별 최고 기록");
+  await expect(page.locator("#tenkeyPlayerDetail")).toContainText("Android · 1.0.0 (2)");
   await shot(page, "player_detail");
   await page.locator("#tenkeyBanForm [name=reason]").fill("점수 조작 의심");
   await page.locator("#tenkeyBanForm button[type=submit]").click();
@@ -311,8 +314,21 @@ test("purchases, ranking and audit pages render from the server shapes", async (
   await expect(page.locator("#tenkeyAuditList")).toContainText("플레이어 정지 / 해제");
   await shot(page, "audit");
   await page.evaluate(() => { window.location.hash = "#/tenkey-config"; });
-  await expect(page.locator('#tenkeyConfigForm [name="latestVersionCode"]')).toHaveValue("2");
+  await expect(page.locator('#tenkeyConfigForm [name="minVersionCode"]')).toHaveValue("1");
+  await expect(page.locator('#tenkeyConfigForm [name="latestVersionCode"], #tenkeyConfigForm [name="storeUrlIos"], #tenkeyConfigForm [name="storeUrlAndroid"]')).toHaveCount(0);
+  await expect(page.locator("#tenkeyLinkIos")).toHaveText("TestFlight 공개 링크");
+  await expect(page.locator("#tenkeyLinkIos")).toHaveAttribute("href", "https://testflight.apple.com/join/RqNJg7Dp");
+  await expect(page.locator("#tenkeyBuildsAndroid tr")).toHaveCount(2);
+  await expect(page.locator("#tenkeyBuildsAndroid .tk-gate.is-blocked")).toHaveCount(0);
+  await page.locator('#tenkeyConfigForm [name="minVersionCode"]').fill("3");
+  await expect(page.locator("#tenkeyBuildsAndroid tr").nth(1)).toContainText("막힘 · 업데이트 창");
   await shot(page, "config");
+  await page.locator('#tenkeyConfigForm [name="reason"]').fill("빌드 3 배포");
+  await page.locator("#tenkeyConfigForm button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toContainText("막히는 빌드: Android 빌드 2 (판 한 사람 8)");
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyConfigMessage")).toContainText("저장했습니다");
+  expect((await calls(page, "config.set")).at(-1).params.config).toEqual({ min_version_code: 3, latest_version_code: 3, min_build_ios: 0, latest_build_ios: 0 });
   expect(errors).toEqual([]);
 });
 

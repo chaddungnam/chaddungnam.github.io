@@ -24,16 +24,15 @@ function node(extra = {}) {
   };
 }
 
-const FIELDS = ["minVersionCode", "latestVersionCode", "minBuildIos", "latestBuildIos", "storeUrlAndroid", "storeUrlIos", "reason"];
-const GOOD = {
-  minVersionCode: "2", latestVersionCode: "3", minBuildIos: "1", latestBuildIos: "2",
-  storeUrlAndroid: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival",
-  storeUrlIos: "https://apps.apple.com/app/id1", reason: "첫 강제 업데이트",
-};
+const FIELDS = ["minVersionCode", "minBuildIos", "reason"];
+const GOOD = { minVersionCode: "3", minBuildIos: "3", reason: "첫 강제 업데이트" };
+const TESTFLIGHT = "https://testflight.apple.com/join/RqNJg7Dp";
 const SERVER_CONFIG = {
   min_version_code: 0, latest_version_code: 1, min_build_ios: 0, latest_build_ios: 0,
-  store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "",
+  store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: TESTFLIGHT,
   updated_at: "2026-10-22T09:00:00Z",
+  links: { android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", ios: TESTFLIGHT, ios_official: false, ios_checked_at: "2026-10-25T17:58:00Z" },
+  builds: [{ platform: "android", build: 3, players: 0, installs: 4 }, { platform: "android", build: 2, players: 8, installs: 0 }, { platform: "ios", build: 3, players: 0, installs: 2 }, { platform: "ios", build: 2, players: 1, installs: 0 }],
 };
 
 function pageFixture(post, confirm = async () => true) {
@@ -64,23 +63,14 @@ function pageFixture(post, confirm = async () => true) {
   return { window, byId, form, calls, confirmations, fill, submit };
 }
 
-test("validation: integers >= 0, min <= latest per platform, https links, iOS link, reason", () => {
+test("validation: one minimum per store (sent as min and latest), integers >= 0, no links, reason", () => {
   const { window } = pageFixture(async () => ({}));
   const check = (patch) => window.ConsoleTenkey.validate({ ...GOOD, ...patch });
-  assert.deepEqual(plain(check({}).config), {
-    min_version_code: 2, latest_version_code: 3, min_build_ios: 1, latest_build_ios: 2,
-    store_url_android: GOOD.storeUrlAndroid, store_url_ios: GOOD.storeUrlIos,
-  });
+  assert.deepEqual(plain(check({}).config), { min_version_code: 3, latest_version_code: 3, min_build_ios: 3, latest_build_ios: 3 });
   assert.equal(check({}).reason, "첫 강제 업데이트");
   for (const bad of ["", "-1", "1.5", "abc", "1e3", " "]) assert.equal(check({ minVersionCode: bad }).error, "invalid_number", `bad number ${JSON.stringify(bad)}`);
-  assert.equal(check({ minVersionCode: "4" }).error, "min_above_latest_android");
-  assert.equal(check({ minBuildIos: "3" }).error, "min_above_latest_ios");
-  assert.equal(check({ storeUrlAndroid: "http://play.google.com/x" }).error, "invalid_store_url");
-  assert.equal(check({ storeUrlIos: "apps.apple.com/app/id1" }).error, "invalid_store_url");
-  assert.equal(check({ storeUrlIos: "" }).error, "ios_store_url_required");
-  assert.equal(check({ minBuildIos: "0", latestBuildIos: "0", storeUrlIos: "" }).config.store_url_ios, "", "iOS off needs no iOS link");
-  assert.equal(check({ storeUrlAndroid: "" }).config.store_url_android, "", "Android link may stay empty");
-  assert.equal(check({ minVersionCode: "0", latestVersionCode: "0" }).config.latest_version_code, 0, "0 means off");
+  assert.equal(check({ minBuildIos: "x" }).error, "invalid_number");
+  assert.deepEqual(plain(check({ minVersionCode: "0", minBuildIos: "0" }).config), { min_version_code: 0, latest_version_code: 0, min_build_ios: 0, latest_build_ios: 0 }, "0 means off");
   assert.equal(check({ reason: "   " }).error, "reason_required");
 });
 
@@ -88,9 +78,14 @@ test("opening the page reads config.get through the House Duck project client (t
   const { window, byId, form, calls } = pageFixture(async () => ({ ok: true, data: SERVER_CONFIG }));
   window.ConsoleTenkey.mountConfig(); await tick();
   assert.deepEqual(plain(calls[0]), ["houseduck", "tenkey-admin", { action: "config.get", params: {} }]);
-  assert.equal(form.elements.latestVersionCode.value, 1);
+  assert.equal(form.elements.minVersionCode.value, 0);
   assert.equal(form.elements.minBuildIos.value, 0);
-  assert.equal(form.elements.storeUrlAndroid.value, SERVER_CONFIG.store_url_android);
+  assert.equal(byId("tenkeyLinkAndroid").textContent, "Google Play");
+  assert.equal(byId("tenkeyLinkAndroid").href, SERVER_CONFIG.links.android);
+  assert.equal(byId("tenkeyLinkIos").textContent, "TestFlight 공개 링크");
+  assert.equal(byId("tenkeyLinkIos").href, TESTFLIGHT);
+  assert.match(byId("tenkeyLinkIosNote").textContent, /App Store에 나오면 저절로 바뀝니다 · 마지막 확인 .+ \(아직 없음\)/);
+  assert.equal((byId("tenkeyBuildsAndroid").innerHTML.match(/그대로 플레이/g) || []).length, 2, "0 = off blocks nothing");
   assert.match(byId("tenkeyConfigMessage").textContent, /현재 값/);
 });
 
@@ -100,24 +95,36 @@ test("a server without the 10KEY actions shows the Korean not-deployed message",
   assert.equal(byId("tenkeyConfigMessage").textContent, "서버에 10KEY 기능이 아직 배포되지 않았습니다.");
 });
 
-test("saving confirms the numbers and links, then sends config.set with a request_id", async () => {
+test("the builds table marks what the typed number blocks; an official App Store link says so", async () => {
+  const { window, byId, form } = pageFixture(async () => ({ ok: true, data: { ...SERVER_CONFIG, links: { ...SERVER_CONFIG.links, ios: "https://apps.apple.com/app/id6740012345", ios_official: true } } }));
+  window.ConsoleTenkey.mountConfig(); await tick();
+  form.elements.minVersionCode.value = "3";
+  form.events.input({ target: { name: "minVersionCode" } });
+  const android = byId("tenkeyBuildsAndroid").innerHTML;
+  assert.match(android, /빌드 3[\s\S]*그대로 플레이[\s\S]*빌드 2[\s\S]*막힘 · 업데이트 창/);
+  assert.equal((byId("tenkeyBuildsIos").innerHTML.match(/막힘/g) || []).length, 0, "iOS box still 0");
+  assert.equal(byId("tenkeyLinkIos").textContent, "App Store");
+  assert.match(byId("tenkeyLinkIosNote").textContent, /저절로 바꾼 링크/);
+});
+
+test("saving confirms the numbers and the builds they block, then sends config.set with a request_id", async () => {
   const { window, byId, form, calls, confirmations, fill, submit } = pageFixture(async (_, __, body) =>
     body.action === "config.get" ? { ok: true, data: SERVER_CONFIG } : { ok: true, data: { ok: true, config: body.params.config } });
   window.ConsoleTenkey.mountConfig(); await tick();
   fill(GOOD); await submit();
   assert.equal(confirmations.length, 1);
-  assert.equal(confirmations[0].title, "10KEY 앱 설정 변경");
+  assert.equal(confirmations[0].title, "10KEY 강제 업데이트 변경");
   assert.equal(confirmations[0].body, [
-    "Android 최소 2 · 최신 3", "iOS 최소 빌드 1 · 최신 2",
-    `Google Play 링크: ${GOOD.storeUrlAndroid}`, `App Store 링크: ${GOOD.storeUrlIos}`, "변경 이유: 첫 강제 업데이트",
+    "Android 최소 빌드 3", "iOS 최소 빌드 3",
+    "막히는 빌드: Android 빌드 2 (판 한 사람 8), iOS 빌드 2 (판 한 사람 1)", "변경 이유: 첫 강제 업데이트",
   ].join("\n"));
   const [project, fn, body] = calls.at(-1);
   assert.deepEqual([project, fn, body.action], ["houseduck", "tenkey-admin", "config.set"]);
   assert.match(body.request_id, /^[0-9a-f-]{36}$/);
   assert.deepEqual(plain(body.params), { config: plain(window.ConsoleTenkey.validate(GOOD).config), reason: "첫 강제 업데이트" });
   assert.equal(form.elements.reason.value, "", "the reason is cleared so the next change needs its own");
-  assert.equal(form.elements.minVersionCode.value, 2);
-  assert.equal(byId("tenkeyConfigMessage").textContent, "10KEY 앱 설정을 저장했습니다.");
+  assert.equal(form.elements.minVersionCode.value, 3);
+  assert.equal(byId("tenkeyConfigMessage").textContent, "강제 업데이트 번호를 저장했습니다. 다음에 앱을 켤 때부터 적용됩니다.");
 });
 
 test("cancelling the confirmation and invalid input send nothing", async () => {
@@ -126,13 +133,13 @@ test("cancelling the confirmation and invalid input send nothing", async () => {
   const before = calls.length;
   fill(GOOD); await submit();
   assert.equal(calls.length, before, "cancel");
-  fill({ ...GOOD, minBuildIos: "5" }); await submit();
+  fill({ ...GOOD, minBuildIos: "-5" }); await submit();
   assert.equal(calls.length, before, "invalid");
-  assert.equal(byId("tenkeyConfigFormMessage").textContent, "iOS 최소 빌드 번호는 최신 빌드 번호보다 클 수 없습니다.");
+  assert.equal(byId("tenkeyConfigFormMessage").textContent, "빌드 번호는 0 이상의 정수로 입력해 주세요 (0은 꺼짐).");
 });
 
 test("server error codes map to Korean text; a retry of the same payload reuses its request_id", async () => {
-  const outcomes = [new Error("network down"), { ok: true, data: { ok: false, error: "ios_store_url_required" } }, { ok: true, data: { ok: true } }, { ok: true, data: { ok: true } }];
+  const outcomes = [new Error("network down"), { ok: true, data: { ok: false, error: "min_above_latest_ios" } }, { ok: true, data: { ok: true } }, { ok: true, data: { ok: true } }];
   const { window, byId, calls, fill, submit } = pageFixture(async (_, __, body) => {
     if (body.action === "config.get") return { ok: true, data: SERVER_CONFIG };
     const next = outcomes.shift();
@@ -144,9 +151,9 @@ test("server error codes map to Korean text; a retry of the same payload reuses 
   fill(GOOD); await submit();
   assert.match(byId("tenkeyConfigFormMessage").textContent, /network down/);
   fill(GOOD); await submit();
-  assert.equal(byId("tenkeyConfigFormMessage").textContent, "iOS 번호를 0보다 크게 하려면 App Store 링크가 필요합니다.");
+  assert.equal(byId("tenkeyConfigFormMessage").textContent, "iOS 최소 빌드 번호는 최신 빌드 번호보다 클 수 없습니다.");
   assert.equal(writes()[1], writes()[0], "same payload retried after a failure keeps its request_id");
-  fill({ ...GOOD, latestVersionCode: "9" }); await submit();
+  fill({ ...GOOD, minVersionCode: "9" }); await submit();
   assert.notEqual(writes()[2], writes()[0], "a changed payload gets a new request_id");
 });
 
@@ -204,7 +211,7 @@ test("the project picker has Quirky Ball and 10key Survival only; 10key opens on
   window.location.hash = "#/tenkey-config";
   byId("projectTenkey").events.click();
   assert.equal(window.location.hash, "#/tenkey-config", "a route the game owns is kept");
-  assert.equal(byId("pageTitle").textContent, "앱 설정 / 강제 업데이트");
+  assert.equal(byId("pageTitle").textContent, "강제 업데이트");
 
   window.location.hash = "#/tenkey-players/a1111111-1111-4111-8111-111111111111";
   byId("projectTenkey").events.click();
