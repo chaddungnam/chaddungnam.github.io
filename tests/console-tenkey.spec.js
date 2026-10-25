@@ -49,7 +49,7 @@ async function fakeGoogle(page, how) {
   });
 }
 
-test("the project picker has no Comrade card; 10key Survival opens on the overview with its eight pages", async ({ page }) => {
+test("the project picker has no Comrade card; 10key Survival opens on the overview with its nine pages", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
@@ -63,7 +63,7 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   await page.locator("#projectTenkey").click();
   await expect(page.locator("#currentProject")).toHaveText("10key Survival");
   await expect(page).toHaveURL(/#\/tenkey-overview$/);
-  await expect(page.locator("#tenkeyNav a")).toHaveCount(8);
+  await expect(page.locator("#tenkeyNav a")).toHaveCount(9);
   await expect(page.locator("#hexaworldNav")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -313,6 +313,45 @@ test("purchases, ranking and audit pages render from the server shapes", async (
   await page.evaluate(() => { window.location.hash = "#/tenkey-config"; });
   await expect(page.locator('#tenkeyConfigForm [name="latestVersionCode"]')).toHaveValue("2");
   await shot(page, "config");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: where and why runs end, evolution, cards and mobs in the game's words; filters go to the server; an empty week says why", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  await expect(page.locator("#pageTitle")).toHaveText("밸런스");
+  const card = (k) => page.locator(`#tenkeyBalanceSummary [data-tk-summary="${k}"]`);
+  await expect(card("runs")).toHaveText("240");
+  await expect(card("time")).toHaveText("4분 12초");
+  await expect(card("drift")).toHaveText("35%");
+  await expect(card("revive")).toHaveText("18 / 40");
+  await expect(page.locator("#tenkeyBalanceLevels li")).toHaveCount(5);
+  await expect(page.locator("#tenkeyBalanceLevels")).toContainText("Lv 11–15");
+  await expect(page.locator("#tenkeyBalanceCauses")).toContainText("마우스 포획");
+  await expect(page.locator("#tenkeyBalanceCauses")).toContainText("평균 Lv 21.4");
+  await expect(page.locator("#tenkeyBalanceForms")).toContainText("텐키 그대로");
+  await expect(page.locator("#tenkeyBalanceCards tr")).toHaveCount(4);
+  await expect(page.locator("#tenkeyBalanceCards tr").first()).toContainText("레이저");
+  await expect(page.locator("#tenkeyBalanceCards")).toContainText("DRIFT 카드");
+  await expect(page.locator("#tenkeyBalanceMobs tr")).toHaveCount(2);  // a mob nobody met is left out
+  await expect(page.locator("#tenkeyBalanceMobs")).toContainText("휠 마우스");
+  await expect(page.locator("#tenkeyBalanceDaily tr")).toHaveCount(7);
+  await expect(page.locator("#tenkeyBalanceBuild option")).toHaveCount(3);
+  await expect(page.locator("#tenkeyBalanceKnobPanel")).toBeHidden();  // no server-side balance values yet
+  await expect(page.locator("#tenkeyBalanceEmpty")).toBeHidden();
+  await shot(page, "balance");
+  await page.locator("#tenkeyBalanceDays").selectOption("30");
+  await page.locator("#tenkeyBalanceBuild").selectOption("5");
+  await page.locator("#tenkeyBalanceMode").selectOption("classic");
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 30, build: 5, mode: "classic" });
+  await expect(page.locator("#tenkeyBalanceBuild")).toHaveValue("5");
+  await page.evaluate(() => { window.__mockBalanceEmpty = true; });
+  await page.locator("#tenkeyBalanceDays").selectOption("1");
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect(page.locator("#tenkeyBalanceEmpty")).toBeVisible();
+  await expect(page.locator("#tenkeyBalanceEmpty")).toContainText("다음 스토어 빌드부터");
+  await expect(page.locator("#tenkeyBalanceBody")).toBeHidden();
+  await expect(card("runs")).toHaveText("0");
   expect(errors).toEqual([]);
 });
 

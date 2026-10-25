@@ -103,7 +103,7 @@ assert.match(analyticsSource, /knownNumber\(state\.payload\?\.accountActivity\?\
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20261022-tk/, "the Console must cache-bust catalog labels and mail summaries");
+assert.match(consoleHtml, /model\.js\?v=20261025-bal/, "the Console must cache-bust catalog labels and mail summaries");
 assert.match(consoleHtml, /같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시/, "button hesitation must disclose both the duration and sample gates");
 assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>명/, "button hesitation must use the requested people terminology");
 assert.match(analyticsSource, /Math\.max\(5, Math\.round\(value \* 10\)/, "hesitation formatting must preserve the five-second lower bound");
@@ -124,7 +124,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20261025-dau2/, "the Console must cache-bust the unified notice editor layout");
+assert.match(consoleHtml, /styles\.css\?v=20261025-bal/, "the Console must cache-bust the unified notice editor layout");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");

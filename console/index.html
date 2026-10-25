@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20261025-dau2">
+  <link rel="stylesheet" href="styles.css?v=20261025-bal">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -81,8 +81,9 @@
         <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">04</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
         <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">05</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
         <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">06</span><span class="nav-copy">랭킹<small>보드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">07</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
-        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">08</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">07</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">08</span><span class="nav-copy">앱 설정<small>강제 업데이트</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">09</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -596,6 +597,53 @@
         <p id="tenkeyBoardMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="tenkeyBalanceView" class="route-view tk-balance" data-route="tenkey-balance" hidden>
+        <form id="tenkeyBalanceForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="90">최근 90일</option></select></label>
+          <label>빌드<select id="tenkeyBalanceBuild"><option value="">전체</option></select></label>
+          <label>모드<select id="tenkeyBalanceMode"><option value="">전체</option><option value="classic">노멀 모드</option><option value="hard">하드 모드</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <p class="impact-note">스토어 앱(Android·iOS)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 90일 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다.</p>
+        <section id="tenkeyBalanceSummary" class="purchase-summary tenkey-summary" aria-label="밸런스 요약">
+          <article data-tone="neutral"><span>기록된 판</span><strong data-tk-summary="runs">—</strong></article>
+          <article data-tone="neutral"><span>판을 한 기기</span><strong data-tk-summary="installs">—</strong></article>
+          <article data-tone="neutral"><span>한 판 길이 (가운데 값)</span><strong data-tk-summary="time">—</strong></article>
+          <article data-tone="neutral"><span>끝난 레벨 (가운데 값)</span><strong data-tk-summary="level">—</strong></article>
+          <article data-tone="watch"><span>DRIFT까지 간 판</span><strong data-tk-summary="drift">—</strong></article>
+          <article data-tone="watch"><span>로봇까지 간 판</span><strong data-tk-summary="robot">—</strong></article>
+          <article data-tone="neutral"><span>로봇 이슈로 키보드 복귀</span><strong data-tk-summary="back">—</strong></article>
+          <article data-tone="good"><span>노멀 모드 완주</span><strong data-tk-summary="clear">—</strong></article>
+          <article data-tone="neutral"><span>부활한 판 / 부활 창이 뜬 판</span><strong data-tk-summary="revive">—</strong></article>
+          <article data-tone="neutral"><span>변신 모드를 산 기기의 판</span><strong data-tk-summary="owned">—</strong></article>
+        </section>
+        <section id="tenkeyBalanceEmpty" class="panel" hidden><p class="empty-panel">아직 기록된 판이 없습니다. 판 기록은 이 기능이 들어간 다음 스토어 빌드부터 쌓입니다 (웹·PC 판은 보내지 않음).</p></section>
+        <div id="tenkeyBalanceBody">
+          <section class="panel tk-balance-pair">
+            <div><p class="eyebrow">WHERE RUNS END</p><h2>판이 끝난 레벨</h2><small>막대 = 그 레벨 구간에서 끝난 판 수 · 전체 판 중 비율</small><div id="tenkeyBalanceLevels"></div></div>
+            <div><p class="eyebrow">WHY RUNS END</p><h2>판이 끝난 이유</h2><small>판 수 · 비율 · 그 이유로 끝난 판의 평균 레벨</small><div id="tenkeyBalanceCauses"></div></div>
+          </section>
+          <section class="panel tk-balance-pair">
+            <div><p class="eyebrow">EVOLUTION</p><h2>판이 끝날 때의 모습</h2><small>텐키 그대로 / DRIFT / 로봇</small><div id="tenkeyBalanceForms"></div></div>
+            <div><h2>DRIFT가 된 레벨</h2><small>DRIFT까지 간 판 중 비율</small><div id="tenkeyBalanceDriftLv"></div><h2>로봇이 된 레벨</h2><small>로봇까지 간 판 중 비율</small><div id="tenkeyBalanceRobotLv"></div></div>
+          </section>
+          <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">LEVEL-UP CARDS</p><h2>레벨업 때 고른 카드</h2><small>한 판에 처음 24장까지 셉니다. 고른 판의 끝 레벨이 전체 평균보다 높으면 그 카드를 고른 판이 더 오래 간 것입니다 (카드 때문이라는 뜻은 아님).</small><span id="tenkeyBalanceAvg" class="tk-balance-avg">—</span></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th>종류</th><th class="tk-num">고른 판 · 비율</th><th class="tk-num">고른 횟수</th><th class="tk-num">고를 때 평균 레벨</th><th class="tk-num">그 판의 평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceCards"></tbody></table></div>
+          </section>
+          <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">MOBS</p><h2>만난 적</h2><small>이긴 횟수 = 그 적을 물리치거나 버텨 낸 횟수</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>적</th><th class="tk-num">만난 판 · 비율</th><th class="tk-num">만난 횟수</th><th class="tk-num">이긴 횟수</th><th class="tk-num">이긴 비율</th></tr></thead><tbody id="tenkeyBalanceMobs"></tbody></table></div>
+          </section>
+          <section class="panel tk-balance-pair">
+            <div><p class="eyebrow">PER DAY</p><h2>날마다</h2><div class="table-scroll"><table><thead><tr><th>날짜</th><th class="tk-num">판</th><th class="tk-num">기기</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceDaily"></tbody></table></div></div>
+            <div><p class="eyebrow">PER BUILD</p><h2>빌드별</h2><small>새 빌드에서 판이 길어졌는지 비교합니다 (빌드 필터와 상관없이 전부 보임)</small><div class="table-scroll"><table><thead><tr><th>빌드</th><th>버전</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceBuilds"></tbody></table></div>
+              <div id="tenkeyBalanceKnobPanel" hidden><h2>밸런스 조정값별</h2><small>서버에서 바꾼 밸런스 수치 묶음의 번호 (게임 기본값 = 바꾸지 않음)</small><div class="table-scroll"><table><thead><tr><th>조정값</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceKnobs"></tbody></table></div></div></div>
+          </section>
+        </div>
+        <p id="tenkeyBalanceMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
         <form id="tenkeyAuditFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>표시 개수<select id="tenkeyAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
@@ -675,7 +723,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261022-tk"></script>
+  <script src="model.js?v=20261025-bal"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261007-hx"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -691,6 +739,7 @@
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261025-tr"></script>
+  <script src="tenkey-balance.js?v=20261025-bal"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -702,6 +751,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261025-gl" defer></script>
+  <script src="app.js?v=20261025-bal" defer></script>
 </body>
 </html>

@@ -165,6 +165,21 @@
       case "ranking.flagged": return { ok: true, rows: [
         { id: "f1", created_at: "2026-10-21T10:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 9990000, level: 40, time_ms: 4000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "score" },
         { id: "f2", created_at: "2026-10-21T09:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 120000, level: 30, time_ms: 9000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "level" }] };
+      case "balance.get": {
+        if (window.__mockBalanceEmpty) return { ok: true, days: p.days, total: { runs: 0, installs: 0 }, levels: [], causes: [], forms: [], drift_levels: [], robot_levels: [], skills: [], encounters: [], daily: [], builds: [], knobs: [] };
+        return { ok: true, days: p.days ?? 7, from: dayAt(6), today: TODAY, build: p.build ?? null, mode: p.mode ?? null,
+          total: { runs: 240, installs: 31, median_ms: 252000, median_level: 18, avg_level: 19.6, drift: 84, robot: 30, robot_returned: 9, cleared: 4, revive_offered: 40, revived: 18, transformer_owned: 12 },
+          levels: [{ lv: 3, n: 20 }, { lv: 8, n: 34 }, { lv: 12, n: 60 }, { lv: 14, n: 22 }, { lv: 18, n: 70 }, { lv: 26, n: 34 }],
+          causes: [{ cause: "battery", n: 150, avg_level: 17.2 }, { cause: "mouse", n: 70, avg_level: 21.4 }, { cause: "wheel_mouse", n: 16, avg_level: 27 }, { cause: "clear", n: 4, avg_level: 40 }],
+          forms: [{ form: "tenkey", n: 156 }, { form: "drift", n: 63 }, { form: "robot", n: 21 }],
+          drift_levels: [{ lv: 10, n: 50 }, { lv: 11, n: 34 }], robot_levels: [{ lv: 20, n: 22 }, { lv: 22, n: 8 }],
+          skills: [{ skill: "laser", kind: "n", picks: 190, runs: 170, avg_pick_level: 4.2, avg_end_level: 20.8 }, { skill: "drift", kind: "d", picks: 90, runs: 84, avg_pick_level: 10, avg_end_level: 24.1 },
+            { skill: "laser", kind: "u", picks: 120, runs: 80, avg_pick_level: 9.5, avg_end_level: 22 }, { skill: "nitro", kind: "p", picks: 40, runs: 38, avg_pick_level: 12.3, avg_end_level: 25.5 }],
+          encounters: [{ id: "mouse", met: 260, won: 190, runs: 200 }, { id: "wheel_mouse", met: 30, won: 14, runs: 28 }, { id: "spacebar", met: 0, won: 0, runs: 0 }],
+          daily: Array.from({ length: 7 }, (_, i) => ({ day: dayAt(6 - i), runs: 20 + i * 6, installs: 8 + i, avg_level: 18 + i / 2 })),
+          builds: [{ build: 5, version: "1.0.1", runs: 200, avg_level: 20.1 }, { build: 2, version: "1.0.0", runs: 40, avg_level: 17.3 }],
+          knobs: [{ kv: 0, runs: 240, avg_level: 19.6 }] };
+      }
       case "audit.list": return audit.slice(0, p.limit || 50);
       case "config.get": return config;
       case "config.set": config = { ...config, ...p.config, updated_at: new Date().toISOString() }; audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } }); return { ok: true, config };

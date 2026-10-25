@@ -1235,6 +1235,27 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tenkey-tr-status { margin: 3px 0 0; color: var(--ink); font-size: 12px; font-weight: 800; }
 .tenkey-tr-button { min-height: 40px; padding: 8px 16px; color: var(--ink); background: var(--teal-soft); border: 1px solid rgba(66,189,176,.45); border-radius: 12px; font-weight: 900; }
 .tenkey-tr-button:disabled { opacity: .55; }
+/* 10key 밸런스: the overview's bar lists, two blocks side by side on a wide screen */
+.tk-balance { --ov-bar: #5b6b8c; --ov-muted: #5f687b; }
+.tk-balance-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px 28px; }
+.tk-balance-pair > div { min-width: 0; }
+.tk-balance-pair h2 { margin: 2px 0 2px; font-size: 16px; }
+.tk-balance-pair h2 ~ h2 { margin-top: 18px; }
+.tk-balance-pair small { display: block; color: var(--ink-soft); font-size: 11px; }
+.tk-balance-pair .table-scroll { margin-top: 8px; }
+.console-main .tk-balance-pair .table-scroll table { min-width: 0; }
+.tk-balance .tk-num { text-align: right; }
+.tk-balance-avg { display: block; margin-top: 6px; color: var(--ink); font-size: 12px; font-weight: 800; }
+@media (max-width: 600px) {
+  .tk-balance .tk-stack { overflow: visible; }
+  .tk-balance .tk-stack table, .tk-balance .tk-stack tbody, .tk-balance .tk-stack tr, .tk-balance .tk-stack td { display: block; width: 100%; min-width: 0; }
+  .tk-balance .tk-stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .tk-balance .tk-stack tbody tr { padding-block: 8px; border-bottom: 1px solid var(--line); }
+  .tk-balance .tk-stack td { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px; padding-block: 3px; text-align: left; }
+  .tk-balance .tk-stack td::before { content: attr(data-label); color: var(--ink-soft); font-weight: 700; }
+  .tk-balance .tk-stack td.empty-panel { display: block; }
+  .tk-balance .tk-stack td.empty-panel::before { content: none; }
+}
 .tenkey-previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .tenkey-notice-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 12px 14px; color: #f3f4f8; background: #1a1d2b; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
 .tenkey-notice-card:first-child { border-color: rgba(231,185,67,.7); }
@@ -1252,8 +1273,8 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tenkey-notice-card input, .tenkey-notice-card textarea { font-size: 13px; }
 .tenkey-tr-edit { min-height: 28px; padding: 3px 10px; color: #1a1d2b; background: #e9edf5; border: 0; border-radius: 8px; font-size: 11px; font-weight: 900; }
 @media (max-width: 760px) {
-  #tenkeyNav { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-  #tenkeyNav a { font-size: 9px; }
+  #tenkeyNav { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+  #tenkeyNav a { padding-inline: 0; font-size: 9px; }
 }
 @media (max-width: 720px) {
   .tenkey-previews { grid-template-columns: 1fr; }
