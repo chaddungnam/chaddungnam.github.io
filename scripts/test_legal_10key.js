@@ -83,7 +83,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-10-24"/, `${locale}: last updated 2026-10-24`);
+    assert.match(html, /datetime="2026-10-25"/, `${locale}: last updated 2026-10-25`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -118,7 +118,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-10-24"/, "de: last updated 2026-10-24");
+  assert.match(html, /datetime="2026-10-25"/, "de: last updated 2026-10-25");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -212,6 +212,17 @@ test("public pages use the store names; the old name 10KEY appears only in the d
   for (const file of Object.values(privacyLogs)) assert.equal((read(file).match(/10KEY/g) || []).length, 1, `${file}: one rename entry`);
   const home = read("10key/index.html");
   assert.match(home, /<h1 id="game-title">.*10key Survival.*딸깍 서바이벌.*<\/h1>/, "/10key/ shows both store names");
+});
+
+// 2026-10-25: section 13 lists the run record (every finished run, store apps, install ID, 90 days) in every language.
+test("section 13 covers the 10key Survival run records in every language", () => {
+  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 90 days", "do not send these three"],
+    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 90일 후 삭제됩니다", "이 셋을 보내지 않으며"],
+    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 90 Tagen gelöscht", "diese drei nicht"] })) {
+    const html = fs.readFileSync(path.join(repoDir, "privacy", `${locale}.html`), "utf8");
+    const s13 = html.slice(html.indexOf('id="section-13"'), html.indexOf('id="section-14"'));
+    for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
+  }
 });
 
 // 2026-10-24: section 13 tells visitors about the launch pre-registration on /10key/ (double opt-in, consent, Resend, 30 days).
