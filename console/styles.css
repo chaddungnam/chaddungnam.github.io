@@ -1582,6 +1582,7 @@ a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-of
 .tk-dau-day span { position: relative; color: var(--ink); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tk-dau-day small { position: relative; color: var(--ink-soft); font-size: 11px; font-weight: 700; white-space: nowrap; }
 .tk-dau-day.is-today { border-style: dashed; }
+.tk-dau-day.is-empty::after { display: none; }
 .tk-main-chart { grid-template-columns: 1fr; margin-top: 14px; }
 .tk-main-chart .ov-card-head h3 { font-size: 15px; }
 .tk-more-facts { grid-column: 1 / -1; }

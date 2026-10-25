@@ -185,9 +185,9 @@
       const p = share(r);
       const isToday = String(r.day) === today;
       const text = p === null ? "—" : `${p}%`;
-      return `<li class="tk-dau-day${isToday ? " is-today" : ""}" tabindex="0" style="--share:${p ?? 0}%" aria-label="${esc(`${dayLabel(r.day)} ${num(r.people)}명, 그날까지 가입한 ${num(r.players)}명 중 ${text}`)}"
+      return `<li class="tk-dau-day${isToday ? " is-today" : ""}${p === null ? " is-empty" : ""}" tabindex="0" style="--share:${p ?? 0}%" aria-label="${esc(`${dayLabel(r.day)} ${num(r.people)}명, 그날까지 가입한 ${num(r.players)}명 중 ${text}`)}"
         data-tip="${tip(dayLabel(r.day), [["앱을 연 사람", `${num(r.people)}명`], ["그날까지 가입한 플레이어", `${num(r.players)}명`], ["비율", text]], isToday ? "오늘은 아직 끝나지 않은 날" : "")}">
-        <strong>${esc(text)}</strong><span>${esc(num(r.people))} / ${esc(num(r.players))}명</span><small>${isToday ? "오늘" : esc(dayLabel(r.day))}</small></li>`;
+        <strong>${esc(text)}</strong><span>${r.players > 0 ? `${esc(num(r.people))} / ${esc(num(r.players))}명` : "가입자 없음"}</span><small>${isToday ? "오늘" : esc(dayLabel(r.day))}</small></li>`;
     }).join("");
 
     const dailyRows = daily.slice(-state.period);
