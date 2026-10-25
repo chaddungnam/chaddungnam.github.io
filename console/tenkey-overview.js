@@ -1,7 +1,9 @@
-// 10key Survival: 한눈 요약. One tenkey-admin call ("overview.get", always 90 days) feeds six number tiles, six charts and
-// a few sentences, in the same frame as the Quirky Ball overview (the ov-* styles). Days are Berlin dates (the server's
-// day). The numbers come from the app's daily ping (Android / iOS players with a guest account), so web (CrazyGames) is not in
-// them; the unfinished "today" is shown but not compared as a trend.
+// 10key Survival: 한눈 요약. One tenkey-admin call ("overview.get", always 90 days) feeds two rows of plain numbers (오늘 /
+// 최근 7일, one number per card with one line of words under it), the daily chart of devices that opened the app and, folded away, the other charts.
+// Owner 2026-10-25 ("한눈요약 개선처리해줘. 한눈에 안들어옴"): the numbers that matter first, big and in plain Korean; the
+// breakdowns live under "그래프 더 보기". Days are Berlin dates (the server's day). The numbers come from the app's daily ping
+// (Android / iOS players with a guest account), so web (CrazyGames) is not in them; the unfinished "today" is shown next to
+// yesterday's whole day, never judged up or down (only the 7-day windows get an arrow).
 (function attachConsoleTenkeyOverview(root) {
   const T = root.ConsoleTenkey;
   const { esc, num, bytes, pct } = T.fmt;
@@ -83,25 +85,20 @@
     <figure class="ov-figure" tabindex="0" aria-label="${esc(title)}"><div class="ov-plot has-y">${body}${wait ? `<p class="ov-wait">${esc(wait)}</p>` : ""}</div>${xAxis(rows)}</figure></article>`;
   const key = (tone, kind, text) => `<span class="ov-legend-item"><span class="ov-key ${tone}" data-kind="${kind}" aria-hidden="true"></span>${esc(text)}</span>`;
 
-  function chip(current, previous, goodWhenUp = true) {
-    if (!Number.isFinite(Number(previous)) || Number(previous) === 0 && Number(current) === 0) return '<span class="ov-chip" data-tone="quiet">변화 없음</span>';
-    const diff = Number(current) - Number(previous);
-    if (diff === 0) return '<span class="ov-chip" data-tone="quiet">같음</span>';
+  // One number per card: label, the number with its unit, one line of words (a link when there is something to look at).
+  function glance(label, value, unit, note, { tone = "", noteTone = "", help = "", href = "" } = {}) {
+    const noteHtml = href
+      ? `<a class="tk-glance-note" href="${esc(href)}">${esc(note)}</a>`
+      : `<p class="tk-glance-note"${noteTone ? ` data-tone="${noteTone}"` : ""}>${esc(note)}</p>`;
+    return `<article class="tk-glance-card"${tone ? ` data-tone="${tone}"` : ""} tabindex="0" data-tip="${tip(label, [], help)}" aria-label="${esc(`${label} ${value}${unit} · ${note}`)}">
+      <h4 class="tk-glance-label">${esc(label)}</h4><p class="tk-glance-value"><strong>${esc(value)}</strong>${unit ? `<span>${esc(unit)}</span>` : ""}</p>${noteHtml}</article>`;
+  }
+  // The 7-day window against the 7 days before it, in words.
+  function versus(current, previous, unit, goodWhenUp = true) {
+    const diff = Number(current || 0) - Number(previous || 0);
+    if (!Number.isFinite(diff) || diff === 0) return { note: "그 전 7일과 같음", noteTone: "" };
     const up = diff > 0;
-    const tone = up === goodWhenUp ? "good" : "bad";
-    return `<span class="ov-chip" data-tone="${tone}"><span aria-hidden="true">${up ? "▲" : "▼"}</span>${esc(num(Math.abs(diff)))}</span>`;
-  }
-  function spark(rows, k) {
-    const values = rows.map((r) => Number(r[k] || 0));
-    if (!values.some((v) => v > 0)) return '<div class="ov-spark is-empty" aria-hidden="true"></div>';
-    const max = niceMax(Math.max(...values));
-    const tips = rows.map((r, i) => tip(dayLabel(r.day), [["값", num(values[i])]]));
-    return `<div class="ov-spark"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="ov-area" d="${linePath(values, max)} L${((values.length - 0.5) / values.length * 100).toFixed(2)} 100 L${(0.5 / values.length * 100).toFixed(2)} 100 Z"></path><path class="ov-line" d="${linePath(values, max)}" vector-effect="non-scaling-stroke"></path></svg>${hits(tips)}</div>`;
-  }
-  function tile(label, value, chipHtml, sparkHtml, rows, help) {
-    const body = rows.map(([name, v]) => `<span class="ov-row"><span class="ov-row-name">${esc(name)}</span><b class="ov-row-value${v === "—" ? " is-empty" : ""}">${esc(v)}</b></span>`).join("");
-    return `<article class="ov-kpi" tabindex="0" data-tip-group aria-label="${esc(`${label} ${value}`)}">
-      <div class="ov-kpi-top" data-tip="${tip(label, [], help)}"><h3 class="ov-kpi-label">${esc(label)}</h3><p class="ov-kpi-main"><strong class="ov-kpi-value">${esc(value)}</strong>${chipHtml}</p></div>${sparkHtml}<div class="ov-kpi-rows">${body}</div></article>`;
+    return { note: `${up ? "▲" : "▼"} 그 전 7일보다 ${num(Math.abs(diff))}${unit} ${up ? "많음" : "적음"}`, noteTone: up === goodWhenUp ? "good" : "bad" };
   }
 
   function distribution(title, rows, total, nameOf = (k) => k) {
@@ -120,58 +117,66 @@
     const fresh = data.new_installs || {};
     const ret = data.retention || {};
     const totals = data.totals || {};
-    const dau = rows.map((r) => Number(r.dau || 0));
-    const retText = (r) => (r && Number(r.cohort) > 0 ? pct(r.back, r.cohort) : "—");
-    const retRow = (r) => (r && Number(r.cohort) > 0 ? `${pct(r.back, r.cohort)} (${num(r.back)}/${num(r.cohort)})` : "표본 없음");
+    const retRate = (r) => (r && Number(r.cohort) > 0 ? String(Math.round(Number(r.back) / Number(r.cohort) * 1000) / 10) : "—");
+    const retRow = (r) => (r && Number(r.cohort) > 0 ? `${pct(r.back, r.cohort)} (${num(r.back)}/${num(r.cohort)}명)` : "아직 셀 수 없음");
     const week = (k) => sum(all, k, 7);
-    const month = (k) => sum(all, k, 30);
+    const weekBefore = (k) => sum(all.slice(0, -7), k, 7);
+    const crashes = Number(totals.crash_times_24h || 0);
+    const anyPlatform = state.platform ? " (플랫폼 구분 없음)" : "";
 
-    byId("tenkeyOverviewKpis").innerHTML = [
-      tile("접속자 (DAU)", num(active.d1), chip(active.d1, active.d1_prev), spark(rows, "dau"),
-        [["어제", num(active.d1_prev)], ["7일 활성", num(active.d7)], ["30일 활성", num(active.d30)]],
-        "앱을 연 기기 수. 하루에 한 번 보내는 신호를 세고, 오늘(베를린 시간)은 아직 끝나지 않은 날입니다."),
-      tile("신규 설치", num(fresh.d1), chip(fresh.d1, fresh.d1_prev), spark(rows, "new_installs"),
-        [["7일", num(fresh.d7)], ["30일", num(fresh.d30)], ["지금까지", num(fresh.all)]],
-        "이 기기에서 처음 신호를 받은 날 기준. 앱을 지우고 다시 깔면 새 설치로 셉니다."),
-      tile("플레이 횟수", num(runs.d1), chip(runs.d1, runs.d1_prev), spark(rows, "runs"),
-        [["7일", num(runs.d7)], ["30일", num(runs.d30)], ["접속자당 (7일)", Number(active.d7) > 0 ? (Number(runs.d7) / Number(active.d7)).toFixed(1) : "—"]],
-        "앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이). 강제 종료된 날은 적게 잡힙니다."),
-      tile("신규 계정", num(rows.at(-1)?.new_accounts), chip(rows.at(-1)?.new_accounts, rows.at(-2)?.new_accounts), spark(rows, "new_accounts"),
-        [["7일", num(week("new_accounts"))], ["30일", num(month("new_accounts"))], ["전체 계정", num(totals.accounts)]],
-        "앱에서 닉네임을 정해 서버에 만든 계정 (웹 CrazyGames 로그인은 계정이 아닌 플레이어로만 셉니다)."),
-      tile("크래시", num(totals.crash_times_24h), '<span class="ov-chip" data-tone="quiet">24시간</span>', spark(rows, "crashes"),
-        [["7일", num(week("crashes"))], ["30일", num(month("crashes"))], ["접속자 대비 (7일)", Number(active.d7) > 0 ? pct(week("crashes"), active.d7) : "—"]],
-        "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산). 홈 키나 최근 앱에서 끈 것은 세지 않습니다."),
-      tile("복귀율", retText(ret.d1), "", '<div class="ov-spark is-empty" aria-hidden="true"></div>',
-        [["D1", retRow(ret.d1)], ["D7", retRow(ret.d7)], ["D30", retRow(ret.d30)]],
-        "설치한 다음 날(D1)·7일 뒤·30일 뒤에 다시 연 기기의 비율. 설치 직후 며칠은 아직 셀 수 없어 표본이 비어 있습니다."),
+    byId("tenkeyOverviewNotice").hidden = !noSignal;
+    byId("tenkeyOverviewNotice").textContent = noSignal ? "아직 앱이 보낸 접속 신호가 없어요. 신호를 보내는 빌드가 스토어에 나가면 아래 숫자가 채워집니다." : "";
+    byId("tenkeyGlanceToday").innerHTML = [
+      glance("앱을 연 사람", num(active.d1), "명", `어제 하루 ${num(active.d1_prev)}명`,
+        { help: "오늘 앱을 연 기기 수 (Android·iOS). 하루에 한 번 보내는 신호를 셉니다. 오늘은 아직 끝나지 않은 날이라 어제 하루 전체와 나란히만 보여 줍니다." }),
+      glance("새로 설치", num(fresh.d1), "명", `어제 하루 ${num(fresh.d1_prev)}명`,
+        { help: "이 기기에서 처음 신호를 받은 날 기준. 앱을 지우고 다시 깔면 새 설치로 셉니다." }),
+      glance("플레이", num(runs.d1), "판", `어제 하루 ${num(runs.d1_prev)}판`,
+        { help: "앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이). 강제 종료된 날은 적게 잡힙니다." }),
+      crashes > 0
+        ? glance("크래시 (최근 24시간)", num(crashes), "건", `크래시 화면에서 확인${anyPlatform} →`,
+          { tone: "risk", href: "#/tenkey-crashes", help: "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산). 홈 키나 최근 앱에서 끈 것은 세지 않습니다." })
+        : glance("크래시 (최근 24시간)", "0", "건", `없음${anyPlatform}`, { tone: "good", help: "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산)." }),
+    ].join("");
+    const peopleWeek = versus(active.d7, active.d7_prev, "명");
+    const installWeek = versus(fresh.d7, fresh.d7_prev, "명");
+    const buyWeek = versus(week("purchases"), weekBefore("purchases"), "건");
+    byId("tenkeyGlanceWeek").innerHTML = [
+      glance("앱을 연 사람", num(active.d7), "명", peopleWeek.note,
+        { noteTone: peopleWeek.noteTone, help: "최근 7일(오늘 포함) 동안 한 번이라도 앱을 연 기기 수. 같은 기기는 한 번만 셉니다." }),
+      glance("새로 설치", num(fresh.d7), "명", installWeek.note,
+        { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
+      glance("결제", num(week("purchases")), "건", `${buyWeek.note}${anyPlatform}`,
+        { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외). Android와 iOS를 합친 숫자입니다." }),
+      glance("다음 날 다시 온 비율", retRate(ret.d1), Number(ret.d1?.cohort) > 0 ? "%" : "",
+        Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : "아직 셀 수 없음 (설치 이틀 뒤부터)",
+        { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." }),
     ].join("");
 
-    const dauTips = rows.map((r) => tip(dayLabel(r.day), [["접속자", `${num(r.dau)}명`], ["신규 설치", `${num(r.new_installs)}명`], ["플레이", `${num(r.runs)}회`]]));
+    const dauTips = rows.map((r) => tip(dayLabel(r.day), [["앱을 연 사람", `${num(r.dau)}명`], ["새로 설치", `${num(r.new_installs)}명`], ["플레이", `${num(r.runs)}판`]]));
     const dauLine = lineChart(rows, "dau", dauTips);
-    const newCols = columns(rows.map((r) => Number(r.new_installs || 0)), rows.map((r) => tip(dayLabel(r.day), [["신규 설치", `${num(r.new_installs)}명`], ["신규 계정", `${num(r.new_accounts)}명`]])));
-    const runCols = columns(rows.map((r) => Number(r.runs || 0)), rows.map((r) => tip(dayLabel(r.day), [["플레이", `${num(r.runs)}회`], ["서버에 남은 기록(신기록)", `${num(r.stored_runs)}회`]])));
+    const newCols = columns(rows.map((r) => Number(r.new_installs || 0)), rows.map((r) => tip(dayLabel(r.day), [["새로 설치", `${num(r.new_installs)}명`], ["새 계정", `${num(r.new_accounts)}명`]])));
+    const runCols = columns(rows.map((r) => Number(r.runs || 0)), rows.map((r) => tip(dayLabel(r.day), [["플레이", `${num(r.runs)}판`], ["서버에 남은 기록(신기록)", `${num(r.stored_runs)}판`]])));
     const crashCols = columns(rows.map((r) => Number(r.crashes || 0)), rows.map((r) => tip(dayLabel(r.day), [["크래시", `${num(r.crashes)}건`]])), "is-v2");
     const buyCols = columns(rows.map((r) => Number(r.purchases || 0)), rows.map((r) => tip(dayLabel(r.day), [["결제 완료", `${num(r.purchases)}건`]])));
     const activeTotal = (data.platforms || []).reduce((s, r) => s + r.n, 0);
-    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 활성 설치)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", "?": "기록 없음" })[k] || k)}</div></article>`;
-    byId("tenkeyOverviewCharts").innerHTML = [
-      card("접속자 (DAU)", key("", "area", "하루 접속 기기"), dauLine.plot, rows, true, waiting),
-      card("신규 설치", key("", "bar", "처음 신호를 받은 기기"), newCols.plot, rows, true, waiting),
-      card("플레이 횟수", key("", "bar", "앱이 알려준 판 수"), runCols.plot, rows, true, waiting),
+    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음" })[k] || k)}</div></article>`;
+    const periods = [7, 30, 90].map((d) => `<button class="overview-switch${d === state.period ? " active" : ""}" type="button" data-tk-period="${d}" aria-pressed="${d === state.period}">${d}일</button>`).join("");
+    byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
+      <header class="ov-card-head"><h3>날마다 앱을 연 사람</h3><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
+      <figure class="ov-figure" tabindex="0" aria-label="날마다 앱을 연 사람"><div class="ov-plot has-y">${dauLine.plot}${waiting ? `<p class="ov-wait">${esc(waiting)}</p>` : ""}</div>${xAxis(rows)}</figure></article>`;
+    const facts = [
+      ["30일 동안 앱을 연 사람", `${num(active.d30)}명`], ["지금까지 설치", `${num(fresh.all)}명`], ["전체 계정", `${num(totals.accounts)}개`],
+      ["7일 동안 플레이", `${num(runs.d7)}판`], ["7일 뒤 다시 온 비율", retRow(ret.d7)], ["30일 뒤 다시 온 비율", retRow(ret.d30)],
+    ].map(([name, value]) => `<div><dt>${esc(name)}</dt><dd>${esc(value)}</dd></div>`).join("");
+    byId("tenkeyOverviewMoreCharts").innerHTML = [
+      `<div class="lab-facts tk-more-facts">${facts}</div>`,
+      card(`새로 설치 (${state.period}일)`, key("", "bar", "처음 신호를 받은 기기"), newCols.plot, rows, true, waiting),
+      card(`플레이 (${state.period}일)`, key("", "bar", "앱이 알려준 판 수"), runCols.plot, rows, true, waiting),
       distCard,
-      card("크래시", key("is-v2", "bar", "보고 + 반복 횟수"), crashCols.plot, rows, false, ""),
-      card("결제 완료", key("", "bar", "스토어 확인된 구매"), buyCols.plot, rows, false, ""),
+      card(`크래시 (${state.period}일)`, key("is-v2", "bar", "보고 + 반복 횟수"), crashCols.plot, rows, false, ""),
+      card(`결제 완료 (${state.period}일)`, key("", "bar", "스토어 확인된 구매"), buyCols.plot, rows, false, ""),
     ].join("");
-
-    const lines = noSignal
-      ? [["", "아직 앱이 보낸 접속 신호가 없어요. 신호를 보내는 빌드가 스토어에 나가면 접속자·신규·플레이가 채워집니다."]]
-      : [
-        [Number(active.d1) >= Number(active.d1_prev) ? "up" : "down", `오늘 접속 ${num(active.d1)}명 (어제 하루 ${num(active.d1_prev)}명)`],
-        ["", `최근 7일 활성 ${num(active.d7)}명 · 신규 설치 ${num(fresh.d7)}명 · 플레이 ${num(runs.d7)}회`],
-        [Number(totals.crash_times_24h) > 0 ? "down" : "", Number(totals.crash_times_24h) > 0 ? `최근 24시간 크래시 ${num(totals.crash_times_24h)}건` : "최근 24시간 크래시 없음"],
-      ];
-    byId("tenkeyOverviewSummary").innerHTML = lines.map(([dir, text]) => `<li${dir ? ` data-direction="${dir}"` : ""}>${esc(text)}</li>`).join("");
 
     byId("tenkeyOverviewServer").innerHTML = [
       ["플레이어 (서버)", num(totals.players)], ["정지", num(totals.banned)], ["서버에 남은 판", num(totals.stored_runs)],

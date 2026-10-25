@@ -53,19 +53,44 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   expect(errors).toEqual([]);
 });
 
-test("overview: six tiles, six charts, period and platform switches", async ({ page }) => {
+test("overview: today and 7-day numbers first in plain words, one chart, the rest folded; period and platform switches", async ({ page }) => {
   const errors = await open(page);
   await expect(page.locator("#pageTitle")).toHaveText("한눈 요약");
-  await expect(page.locator("#tenkeyOverviewKpis .ov-kpi")).toHaveCount(6);
-  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(6);
-  await expect(page.locator("#tenkeyOverviewKpis .ov-kpi").first()).toContainText("접속자 (DAU)");
-  await expect(page.locator("#tenkeyOverviewSummary li").first()).toContainText("오늘 접속");
+  const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
+  const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
+  await expect(today).toHaveCount(4);
+  await expect(week).toHaveCount(4);
+  // The fixture: today 132 (yesterday 122), installs 8 (14), plays 721 (731), 9 crashes; 7 days 420 vs 310 before.
+  await expect(today.nth(0)).toContainText("앱을 연 사람");
+  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText("132명");
+  await expect(today.nth(0)).toContainText("어제 하루 122명");
+  await expect(today.nth(1).locator(".tk-glance-value")).toHaveText("8명");
+  await expect(today.nth(2).locator(".tk-glance-value")).toHaveText("721판");
+  await expect(today.nth(3)).toHaveAttribute("data-tone", "risk");
+  await expect(today.nth(3).locator("a.tk-glance-note")).toHaveAttribute("href", "#/tenkey-crashes");
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText("420명");
+  await expect(week.nth(0)).toContainText("▲ 그 전 7일보다 110명 많음");
+  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("42.7%");
+  await expect(week.nth(3)).toContainText("설치한 96명 중 41명");
+  // 7-day purchases come from the daily series (the last 7 days against the 7 before them).
+  const buys = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })
+    .then((r) => [r.data.series.slice(-7), r.data.series.slice(-14, -7)].map((rows) => rows.reduce((n, row) => n + row.purchases, 0))));
+  await expect(week.nth(2).locator(".tk-glance-value")).toHaveText(`${buys[0]}건`);
+  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(1);
+  await expect(page.locator("#tenkeyOverviewMore")).not.toHaveAttribute("open", "");
+  await expect(page.locator("#tenkeyOverviewNotice")).toBeHidden();
   await expect(page.locator("#tenkeyOverviewStatus")).toContainText("베를린 2026-10-23");
   await shot(page, "overview");
   await page.locator('[data-tk-period="30"]').click();
   await expect(page.locator('[data-tk-period="30"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-hit")).toHaveCount(30);
+  await page.locator("#tenkeyOverviewMore summary").click();
+  await expect(page.locator("#tenkeyOverviewMoreCharts .ov-card")).toHaveCount(5);
+  await expect(page.locator("#tenkeyOverviewMoreCharts")).toContainText("새로 설치 (30일)");
+  await expect(page.locator("#tenkeyOverviewMoreCharts")).toContainText("30일 동안 앱을 연 사람");
   await page.locator('[data-tk-platform="android"]').click();
   await expect.poll(async () => (await calls(page, "overview.get")).at(-1)?.params.platform).toBe("android");
+  await expect(today.nth(3)).toContainText("플랫폼 구분 없음");
   await page.locator("#tenkeyOverviewDetails summary").click();
   await expect(page.locator("#tenkeyOverviewServer")).toContainText("공용 DB 전체");
   await page.locator("#tenkeyOverviewCharts .ov-hit").first().hover();
@@ -117,29 +142,74 @@ test("crashes: groups, a group narrows the list, one report shows its trail and 
   expect(errors).toEqual([]);
 });
 
-test("notices: schedule one with both languages, preview, end and delete with a reason", async ({ page }) => {
+test("notices: Korean only, the seven other languages filled by the server and correctable, then end and delete with a reason", async ({ page }) => {
   const errors = await open(page, "#/tenkey-notices");
   await expect(page.locator("#tenkeyNoticesListing .audit-item")).toHaveCount(4);
-  await expect(page.locator("#tenkeyNoticesListing")).toContainText("영어 없음");
+  await expect(page.locator('[data-notice-id="4"]')).toContainText("8개 언어");
+  await expect(page.locator('[data-notice-id="3"]')).toContainText("2개 언어");
+  await expect(page.locator('[data-notice-id="2"]')).toContainText("한국어만");
   const form = page.locator("#tenkeyNoticeForm");
+  await expect(form.locator("[name=titleEn], [name=bodyEn]")).toHaveCount(0);
   await form.locator("[name=titleKo]").fill("새 키캡 이벤트");
   await form.locator("[name=bodyKo]").fill("이번 주말 2배 이벤트\n놓치지 마세요");
-  await form.locator("[name=titleEn]").fill("New keycap event");
-  await form.locator("[name=bodyEn]").fill("Double rewards this weekend");
   await form.locator("[name=startsAt]").fill("2026-12-01T10:00");
   await form.locator("[name=endsAt]").fill("2026-12-03T10:00");
   await form.locator("[name=reason]").fill("주말 이벤트 예약");
-  await expect(page.locator("#tenkeyNoticePreviewKo")).toContainText("새 키캡 이벤트");
-  await expect(page.locator("#tenkeyNoticePreviewEn")).toContainText("New keycap event");
+  const cards = page.locator("#tenkeyNoticePreviews .tenkey-notice-card");
+  await expect(cards.first()).toContainText("새 키캡 이벤트");
+  await expect(page.locator("#tenkeyNoticeTrStatus")).toContainText("발행할 때 자동 번역");
   await expect(form.locator('[data-counter="titleKo"]')).toHaveText("8 / 80자");
+
+  await page.locator("#tenkeyNoticeTranslate").click();
+  await expect(cards).toHaveCount(8);
+  await expect(page.locator('#tenkeyNoticePreviews [lang="ja"]')).toContainText("[ja] 새 키캡 이벤트");
+  await expect(page.locator('#tenkeyNoticePreviews [lang="zh-TW"]')).toContainText("[zh_TW] 놓치지 마세요");
+  await expect(page.locator("#tenkeyNoticeTrStatus")).toContainText("8개 언어 준비 완료");
+  await page.locator('[data-tr-toggle="en"]').click();
+  await page.locator('[data-tr-lang="en"][data-tr-field="title"]').fill("New keycap event");
+  await page.locator('[data-tr-toggle="en"]').click();
+  await expect(page.locator('#tenkeyNoticePreviews [lang="en"]')).toContainText("직접 고침");
+  await expect(page.locator('#tenkeyNoticePreviews [lang="en"] strong')).toHaveText("New keycap event");
   await shot(page, "notices");
   await form.locator("button[type=submit]").click();
   await expect(page.locator("#confirmDialog")).toContainText("예약");
+  await expect(page.locator("#confirmDialog")).toContainText("직접 고친 것 1개");
   await page.locator("#confirmDialog button[value=confirm]").click();
   await expect(page.locator("#tenkeyNoticesListing .audit-item")).toHaveCount(5);
   const save = (await calls(page, "notices.save"))[0];
-  expect(save.params.notice).toMatchObject({ title_ko: "새 키캡 이벤트", title_en: "New keycap event", starts_at: "2026-12-01T01:00:00.000Z", ends_at: "2026-12-03T01:00:00.000Z" });
+  expect(save.params.notice).toMatchObject({ title_ko: "새 키캡 이벤트", body_ko: "이번 주말 2배 이벤트\n놓치지 마세요", starts_at: "2026-12-01T01:00:00.000Z", ends_at: "2026-12-03T01:00:00.000Z" });
+  expect(save.params.notice.title_en).toBeUndefined();
+  expect(Object.keys(save.params.notice.translations).sort()).toEqual(["de", "en", "es", "fr", "ja", "pt", "zh_TW"]);
+  expect(save.params.notice.translations.en).toEqual({ title: "New keycap event", body: "[en] 이번 주말 2배 이벤트\n[en] 놓치지 마세요" });
   expect(save.request_id).toMatch(/^[0-9a-f-]{36}$/);
+  expect((await calls(page, "notices.translate")).length).toBe(1);
+  await expect(page.locator('[data-notice-id="5"]')).toContainText("8개 언어");
+
+  // Publishing straight away translates first; a Korean change after a preview makes the translations old.
+  await form.locator("[name=titleKo]").fill("바로 발행");
+  await form.locator("[name=bodyKo]").fill("미리보기 없이");
+  await form.locator("[name=reason]").fill("바로");
+  await form.locator("button[type=submit]").click();
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect.poll(async () => (await calls(page, "notices.save")).length).toBe(2);
+  expect((await calls(page, "notices.save"))[1].params.notice.translations.fr).toEqual({ title: "[fr] 바로 발행", body: "[fr] 미리보기 없이" });
+  await form.locator("[name=titleKo]").fill("예전 제목");
+  await form.locator("[name=bodyKo]").fill("본문");
+  await page.locator("#tenkeyNoticeTranslate").click();
+  await expect(cards).toHaveCount(8);
+  await form.locator("[name=titleKo]").fill("새 제목");
+  await expect(page.locator("#tenkeyNoticeTrStatus")).toContainText("한국어가 바뀌어");
+  await expect(page.locator("#tenkeyNoticePreviews .is-old")).toHaveCount(7);
+  await expect(page.locator("[data-tr-toggle]")).toHaveCount(0);
+
+  // The translation server failing saves nothing and says so in Korean.
+  await page.evaluate(() => { window.__mockFailures["notices.translate"] = "notice_translation_unavailable"; });
+  await form.locator("[name=reason]").fill("실패 확인");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#tenkeyNoticeFormMessage")).toContainText("자동 번역 서버가 응답하지 않았습니다");
+  expect((await calls(page, "notices.save")).length).toBe(2);
+  await page.evaluate(() => { delete window.__mockFailures["notices.translate"]; });
+
   await page.locator('[data-end-notice="3"]').click();
   await page.locator("#tenkeyReasonInput").fill("업데이트 안내 끝");
   await page.locator("#tenkeyReasonDialog button[value=confirm]").click();
@@ -148,9 +218,12 @@ test("notices: schedule one with both languages, preview, end and delete with a 
   await page.locator('[data-delete-notice="1"]').click();
   await page.locator("#tenkeyReasonDialog button[value=cancel]").click();
   expect((await calls(page, "notices.delete")).length).toBe(0);
-  await page.locator('[data-edit-notice="2"]').click();
-  await expect(form.locator("[name=noticeId]")).toHaveValue("2");
-  await expect(page.locator("#tenkeyNoticePreviewEn")).toHaveClass(/is-fallback/);
+  // An old notice (English only) shows what it has; the rest is filled on publish.
+  await page.locator('[data-edit-notice="3"]').click();
+  await expect(form.locator("[name=noticeId]")).toHaveValue("3");
+  await expect(page.locator('#tenkeyNoticePreviews [lang="en"]')).toContainText("Update 1.0.0");
+  await expect(page.locator("#tenkeyNoticePreviews .is-waiting")).toContainText("일본어");
+  await expect(page.locator("#tenkeyNoticeTrStatus")).toContainText("2개 언어 준비");
   expect(errors).toEqual([]);
 });
 

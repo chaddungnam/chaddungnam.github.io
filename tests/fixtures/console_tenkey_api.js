@@ -91,9 +91,13 @@
       log_tail: c.has_log ? "Godot Engine v4.7.2.stable.official\nOpenGL API OpenGL ES 3.2\n...\nERROR: Condition \"!is_inside_tree()\" is true.\n   at: get_global_transform (scene/3d/node_3d.cpp:412)\n================================================================\nhandle_crash: Program crashed with signal 11\nEngine version: Godot Engine v4.7.2.stable.official\nDumping the backtrace. Please include this when reporting the bug to the project developer.\n[1] 0x1a2b3c4d" : "" } };
   };
 
+  // notices.translate stand-in: "[lang] text" per line, unless a test sets window.__mockTranslate(title, body) -> {lang: {title, body}}.
+  const TR_LANGS = ["en", "ja", "de", "zh_TW", "fr", "es", "pt"];
+  const fakeTranslations = (title, body) => (window.__mockTranslate ? window.__mockTranslate(title, body)
+    : Object.fromEntries(TR_LANGS.map((l) => [l, { title: `[${l}] ${title}`, body: body.split("\n").map((line) => (line.trim() ? `[${l}] ${line}` : line)).join("\n") }])));
   let nextNotice = 5;
   const notices = [
-    { id: 4, title_ko: "점검 안내", title_en: "Maintenance", body_ko: "10월 25일 오전 3시부터 1시간 점검합니다.\n점검 중에는 랭킹이 보이지 않습니다.", body_en: "Short maintenance on Oct 25, 3 AM KST for one hour.\nRankings are hidden meanwhile.", priority: 5, starts_at: "2026-10-24T18:00:00+00:00", ends_at: "2026-10-24T19:30:00+00:00", active: true, created_by: "ops@houseduck.in", updated_by: "ops@houseduck.in", created_at: "2026-10-23T09:00:00+00:00", updated_at: "2026-10-23T09:00:00+00:00", status: "scheduled" },
+    { id: 4, title_ko: "점검 안내", title_en: "Maintenance", body_ko: "10월 25일 오전 3시부터 1시간 점검합니다.\n점검 중에는 랭킹이 보이지 않습니다.", body_en: "Short maintenance on Oct 25, 3 AM KST for one hour.\nRankings are hidden meanwhile.", translations: fakeTranslations("점검 안내", "10월 25일 오전 3시부터 1시간 점검합니다.\n점검 중에는 랭킹이 보이지 않습니다."), priority: 5, starts_at: "2026-10-24T18:00:00+00:00", ends_at: "2026-10-24T19:30:00+00:00", active: true, created_by: "ops@houseduck.in", updated_by: "ops@houseduck.in", created_at: "2026-10-23T09:00:00+00:00", updated_at: "2026-10-23T09:00:00+00:00", status: "scheduled" },
     { id: 3, title_ko: "1.0.0 업데이트", title_en: "Update 1.0.0", body_ko: "키캡 소리가 새로워졌어요.", body_en: "New keycap sounds.", priority: 0, starts_at: "2026-10-20T00:00:00+00:00", ends_at: null, active: true, created_by: "ops@houseduck.in", updated_by: "ops@houseduck.in", created_at: "2026-10-20T00:00:00+00:00", updated_at: "2026-10-20T00:00:00+00:00", status: "live" },
     { id: 2, title_ko: "오픈 기념 이벤트", title_en: "", body_ko: "오픈을 기념해 젬을 드립니다.", body_en: "", priority: 0, starts_at: "2026-10-10T00:00:00+00:00", ends_at: "2026-10-17T00:00:00+00:00", active: true, created_by: "ops@houseduck.in", updated_by: "ops@houseduck.in", created_at: "2026-10-09T00:00:00+00:00", updated_at: "2026-10-09T00:00:00+00:00", status: "ended" },
     { id: 1, title_ko: "테스트 공지 (숨김)", title_en: "Test notice", body_ko: "x", body_en: "x", priority: -5, starts_at: "2026-10-01T00:00:00+00:00", ends_at: null, active: false, created_by: "ops@houseduck.in", updated_by: "ops@houseduck.in", created_at: "2026-10-01T00:00:00+00:00", updated_at: "2026-10-01T00:00:00+00:00", status: "off" },
@@ -134,8 +138,12 @@
       case "crashes.groups": return groups(p.by);
       case "crashes.get": return crashDetail(p.id);
       case "notices.list": notices.forEach((n) => { n.status = statusOf(n); }); return notices.slice().sort((a, b) => b.id - a.id);
+      case "notices.translate": return { translations: fakeTranslations(p.notice.title_ko, p.notice.body_ko) };
       case "notices.save": {
-        const n = p.notice;
+        const n = { ...p.notice };
+        const filled = fakeTranslations(n.title_ko, n.body_ko);
+        n.translations = Object.fromEntries(TR_LANGS.map((l) => [l, n.translations?.[l] || filled[l]]));
+        n.title_en = n.translations.en.title; n.body_en = n.translations.en.body;
         if (n.id) { Object.assign(notices.find((x) => x.id === n.id), n, { updated_by: "qa@houseduck.in" }); }
         else notices.push({ ...n, id: nextNotice++, ends_at: n.ends_at || null, created_by: "qa@houseduck.in", updated_by: "qa@houseduck.in", created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
         audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } });

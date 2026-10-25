@@ -1227,19 +1227,37 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tk-section h3 { margin: 0 0 8px; font-size: 13px; }
 .tk-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .tk-section.impact-form { padding: 14px 16px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 12px; }
-.tenkey-previews { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
-.tenkey-notice-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 14px 16px; color: #f3f4f8; background: #1a1d2b; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
-.tenkey-notice-card::before { content: attr(lang); color: #8c95ab; font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+/* 10KEY notices (owner 10-25): Korean is typed, the seven other game languages are filled by the server and shown as the
+   app's dark notice cards, Korean first. A card can be corrected by hand; old translations (the Korean changed) fade. */
+.tenkey-tr { display: grid; gap: 8px; }
+.tenkey-tr-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 12px; }
+.tenkey-tr-bar .eyebrow { margin: 0; }
+.tenkey-tr-status { margin: 3px 0 0; color: var(--ink); font-size: 12px; font-weight: 800; }
+.tenkey-tr-button { min-height: 40px; padding: 8px 16px; color: var(--ink); background: var(--teal-soft); border: 1px solid rgba(66,189,176,.45); border-radius: 12px; font-weight: 900; }
+.tenkey-tr-button:disabled { opacity: .55; }
+.tenkey-previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.tenkey-notice-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 12px 14px; color: #f3f4f8; background: #1a1d2b; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
+.tenkey-notice-card:first-child { border-color: rgba(231,185,67,.7); }
+.tenkey-card-head { display: flex; align-items: center; gap: 6px; min-height: 24px; }
+.tenkey-card-lang { margin-right: auto; color: #aab3c7; font-size: 11px; font-weight: 900; }
 .tenkey-notice-card strong { font-size: 14px; overflow-wrap: anywhere; }
-.tenkey-notice-card p { margin: 0; color: #c9cfdd; font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tenkey-notice-card p { max-height: 190px; margin: 0; overflow: auto; color: #c9cfdd; font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .tenkey-notice-card small { color: #8c95ab; font-size: 10px; }
-.tenkey-notice-card.is-fallback { border-style: dashed; }
+.tenkey-notice-card.is-old { opacity: .5; }
+.tenkey-notice-card.is-waiting { background: transparent; color: var(--ink); border: 1px dashed var(--line); }
+.tenkey-notice-card.is-waiting .tenkey-card-lang { color: var(--ink); }
+.tenkey-notice-card.is-waiting p { color: var(--ink-soft); }
+.tenkey-notice-card.is-editing { grid-column: span 2; }
+.tenkey-notice-card label { color: #aab3c7; }
+.tenkey-notice-card input, .tenkey-notice-card textarea { font-size: 13px; }
+.tenkey-tr-edit { min-height: 28px; padding: 3px 10px; color: #1a1d2b; background: #e9edf5; border: 0; border-radius: 8px; font-size: 11px; font-weight: 900; }
 @media (max-width: 760px) {
   #tenkeyNav { grid-template-columns: repeat(8, minmax(0, 1fr)); }
   #tenkeyNav a { font-size: 9px; }
 }
 @media (max-width: 720px) {
   .tenkey-previews { grid-template-columns: 1fr; }
+  .tenkey-notice-card.is-editing { grid-column: auto; }
   .tenkey-toolbar > label:first-child:has(input[type="search"]) { grid-column: auto; }
 }
 
@@ -1531,4 +1549,40 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
   .overview-switch { min-height: 36px; padding: 6px 8px; }
   .ov-kpi-value { font-size: 28px; }
   .overview-bars li { grid-template-columns: minmax(70px, 34%) minmax(0, 1fr) auto; gap: 8px; }
+}
+
+/* 10KEY 한눈 요약 (owner 2026-10-25 "한눈에 안들어옴"): two rows of plain numbers first (오늘 / 최근 7일), one number and
+   one line of words per card, then the daily-visitors chart; every breakdown sits under "그래프 더 보기". */
+.tk-glance-notice { margin: 10px 0 0; padding: 10px 14px; color: #6e5621; background: var(--gold-soft); border-radius: 12px; font-size: 13px; font-weight: 700; }
+.tk-glance { margin-top: 14px; }
+.tk-glance-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 8px; }
+.tk-glance-head h3 { margin: 0; color: var(--ink); font-size: 17px; }
+.tk-glance-head small { color: var(--ink-soft); font-size: 12px; font-weight: 600; }
+.tk-glance-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tk-glance-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 14px 16px 15px; background: var(--paper); border: 1px solid var(--line); border-left: 5px solid #cfd5e1; border-radius: 14px; outline: none; }
+.tk-glance-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.tk-glance-card[data-tone="good"] { border-left-color: var(--teal); }
+.tk-glance-card[data-tone="risk"] { background: var(--coral-soft); border-left-color: var(--coral); }
+.tk-glance-label { margin: 0; color: var(--ink-soft); font-size: 14px; font-weight: 800; }
+.tk-glance-value { display: flex; align-items: baseline; gap: 4px; margin: 0; color: var(--ink); }
+.tk-glance-value strong { font-size: 44px; font-weight: 900; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tk-glance-value span { color: var(--ink-soft); font-size: 17px; font-weight: 800; }
+.tk-glance.is-week .tk-glance-value strong { font-size: 32px; }
+.tk-glance.is-week .tk-glance-value span { font-size: 15px; }
+.tk-glance-note { margin: 0; color: var(--ink-soft); font-size: 13px; font-weight: 700; word-break: keep-all; }
+.tk-glance-note[data-tone="good"] { color: #17665e; }
+.tk-glance-note[data-tone="bad"] { color: #a93f34; }
+a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-offset: 3px; }
+.tk-main-chart { grid-template-columns: 1fr; margin-top: 14px; }
+.tk-main-chart .ov-card-head h3 { font-size: 15px; }
+.tk-more-facts { grid-column: 1 / -1; }
+@media (max-width: 900px) {
+  .tk-glance-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tk-glance-value strong { font-size: 36px; }
+  .tk-glance.is-week .tk-glance-value strong { font-size: 28px; }
+}
+@media (max-width: 520px) {
+  .tk-glance-row { gap: 8px; }
+  .tk-glance-card { padding: 12px 12px 13px; }
+  .tk-glance-label, .tk-glance-note { font-size: 12px; }
 }
