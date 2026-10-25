@@ -155,7 +155,7 @@ test("players: search, open one, ban with a reason through the confirm dialog", 
   await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
   await expect(page.locator("#tenkeyPlayerTotal")).toHaveText("7명");
   const platforms = await page.locator('#tenkeyPlayersTable td[data-label="플랫폼"]').allTextContents();
-  expect(platforms).toEqual(["Android", "iOS", "웹 · CrazyGames", "Android", "모름 (판 기록 없음)", "Windows", "Mac"]);
+  expect(platforms).toEqual(["Android", "iOS", "웹 · CrazyGames", "Android", "모름", "Windows", "Mac"]);
   await shot(page, "players");
   await page.locator("#tenkeyPlayerSearch").fill("딸깍");
   await page.locator("#tenkeyPlayerSearchForm button[type=submit]").click();

@@ -91,11 +91,11 @@
   const pct = (part, whole) => (Number(whole) > 0 ? `${Math.round(Number(part) / Number(whole) * 1000) / 10}%` : "—");
   // The platform names the game sends (a run's platform, an install ping, a crash report): OS.get_name() lowercased for the
   // store apps and desktop builds, "web" for a web build with no portal, the portal builds by name. "mobile" = a guest
-  // account with no run yet (the server does not know where it plays).
+  // account the server cannot place (no stored run, no sign-in from the game's own HTTP client).
   const PLATFORM_NAMES = {
     android: "Android", ios: "iOS", windows: "Windows", macos: "Mac", linux: "Linux", steam: "Steam (PC)",
     web: "웹 (공통)", web_crazygames: "웹 · CrazyGames", crazygames: "웹 · CrazyGames", web_itch: "웹 · itch.io",
-    mobile: "모름 (판 기록 없음)", supabase: "앱 계정",
+    mobile: "모름", supabase: "앱 계정",
   };
   const platformName = (value) => PLATFORM_NAMES[String(value || "").toLowerCase()] || String(value || "—");
 
