@@ -38,7 +38,8 @@
       new_installs: { d1: scale(last.new_installs), d1_prev: scale(prev.new_installs), d7: scale(sumLast("new_installs", 7)), d7_prev: scale(120), d30: scale(sumLast("new_installs", 30)), d30_prev: 0, all: scale(sumLast("new_installs", 90)) },
       retention: window.__mockNoPing ? { d1: { cohort: 0, back: 0 }, d7: { cohort: 0, back: 0 }, d30: { cohort: 0, back: 0 } }
         : { d1: { cohort: 96, back: 41 }, d7: { cohort: 52, back: 14 }, d30: { cohort: 0, back: 0 } },
-      server: { seen: { d1: 31, d7: 260, d30: 600 }, played: { d1: 24, d7: 190, d30: 410 }, players: 842 },
+      server: { seen: { d1: 31, d1_prev: 27, d7: 260, d7_prev: 200, d30: 600 }, played: { d1: 24, d7: 190, d30: 410 }, players: 842,
+        days: series.map((r, i) => ({ day: r.day, active: Math.round(r.dau / 4), players: 500 + series.slice(0, i + 1).reduce((n, x) => n + x.new_accounts, 0) })) },
       platforms: [{ key: "android", n: 330 }, { key: "ios", n: 90 }],
       versions: [{ key: "1.0.0 a2 i2", n: 310 }, { key: "1.0.0 a1 i1", n: 110 }],
       langs: [{ key: "ko", n: 560 }, { key: "en", n: 190 }, { key: "?", n: 30 }],

@@ -92,6 +92,21 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
     .then((r) => [r.data.series.slice(-7), r.data.series.slice(-14, -7)].map((rows) => rows.reduce((n, row) => n + row.purchases, 0))));
   await expect(week.nth(2).locator(".tk-glance-value")).toHaveText(`${buys[0]}건`);
   await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(1);
+  // 최근 7일 DAU: each day's people (the larger of the ping and the game server) over the players that existed by then.
+  const dauCells = page.locator("#tenkeyDauWeek .tk-dau-day");
+  await expect(dauCells).toHaveCount(7);
+  const dauWant = () => page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} }).then((r) => {
+    const srv = new Map(r.data.server.days.map((d) => [d.day, d]));
+    return r.data.series.slice(-7).map((row) => {
+      const d = srv.get(row.day);
+      const people = Math.max(row.dau, d.active);
+      return `${Math.round(Math.min(people, d.players) / d.players * 100)}%|${people} / ${d.players}명`;
+    });
+  }));
+  const dauSeen = () => dauCells.evaluateAll((cells) => cells.map((c) => `${c.querySelector("strong").textContent}|${c.querySelector("span").textContent}`));
+  expect(await dauSeen()).toEqual(await dauWant());
+  await expect(dauCells.last()).toHaveClass(/is-today/);
+  await expect(dauCells.last().locator("small")).toHaveText("오늘");
   await expect(page.locator("#tenkeyOverviewMore")).not.toHaveAttribute("open", "");
   await expect(page.locator("#tenkeyOverviewNotice")).toBeHidden();
   await expect(page.locator("#tenkeyOverviewStatus")).toContainText("베를린 2026-10-23");
@@ -117,18 +132,19 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
   await expect(page.locator("#tenkeyOverviewNotice")).toBeVisible();
   await expect(page.locator("#tenkeyOverviewNotice")).toContainText("게임 서버 기록");
   await expect(today.nth(0).locator(".tk-glance-value")).toHaveText("31명");
-  await expect(today.nth(0)).toContainText("게임 서버 기록 · 앱·웹 합산");
+  await expect(today.nth(0)).toContainText("어제 하루 27명");
   await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("새 플레이어");
-  await expect(today.nth(2).locator(".tk-glance-label")).toHaveText("판을 끝낸 사람");
+  await expect(today.nth(2).locator(".tk-glance-label")).toHaveText("기록을 올린 사람");
   await expect(today.nth(2).locator(".tk-glance-value")).toHaveText("24명");
   await expect(week.nth(0).locator(".tk-glance-value")).toHaveText("260명");
-  await expect(week.nth(0)).toContainText("비교는 새 빌드부터");
+  await expect(week.nth(0)).toContainText("▲ 그 전 7일보다 60명 많음");
   await expect(week.nth(3)).toContainText("새 빌드부터 셈");
   const fresh = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })
     .then((r) => [r.data.series.at(-1).new_accounts, r.data.series.slice(-7).reduce((n, row) => n + row.new_accounts, 0)]));
   await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[0]}명`);
   await expect(week.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[1]}명`);
-  await expect(page.locator("#tenkeyOverviewCharts h3")).toHaveText("날마다 새로 온 플레이어");
+  await expect(page.locator("#tenkeyOverviewCharts h3")).toHaveText("날마다 앱을 연 사람");
+  expect(await dauSeen()).toEqual(await dauWant());
   await expect(page.locator("#tenkeyOverviewCharts .ov-wait")).toHaveCount(0);
   await shot(page, "overview_no_ping");
   expect(errors).toEqual([]);

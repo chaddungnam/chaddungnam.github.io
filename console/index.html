@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
-  <link rel="stylesheet" href="styles.css?v=20261025-tr">
+  <link rel="stylesheet" href="styles.css?v=20261025-dau">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -442,7 +442,7 @@
         <section id="tenkeyOverview" class="overview" aria-labelledby="tenkeyOverviewTitle" aria-busy="false">
           <h2 id="tenkeyOverviewTitle" class="sr-only">10key Survival 한눈 요약</h2>
           <div class="ov-bar" role="group" aria-label="한눈 요약 필터">
-            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-tk-platform="" aria-pressed="true" title="Android와 iOS 앱을 합친 숫자 (웹은 식별자를 보내지 않아 빠짐)">전체(앱)</button><button class="overview-switch" type="button" data-tk-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-tk-platform="ios" aria-pressed="false">iOS</button></div>
+            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-tk-platform="" aria-pressed="true" title="Android·iOS 앱과 웹을 합친 숫자 (설치·판 수는 앱만 셉니다)">전체</button><button class="overview-switch" type="button" data-tk-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-tk-platform="ios" aria-pressed="false">iOS</button></div>
             <div class="ov-bar-end">
               <p id="tenkeyOverviewStatus" class="ov-status" role="status">불러오는 중</p>
               <button id="tenkeyOverviewRefresh" class="overview-refresh" type="button">새로 집계</button>
@@ -456,6 +456,10 @@
           <section class="tk-glance is-week" aria-labelledby="tenkeyGlanceWeekTitle">
             <div class="tk-glance-head"><h3 id="tenkeyGlanceWeekTitle">최근 7일</h3><small>오늘 포함 · 화살표는 그 전 7일과 비교</small></div>
             <div id="tenkeyGlanceWeek" class="tk-glance-row" aria-live="polite"></div>
+          </section>
+          <section class="tk-glance is-dau" aria-labelledby="tenkeyDauTitle">
+            <div class="tk-glance-head"><h3 id="tenkeyDauTitle">최근 7일 DAU</h3><small>날마다 앱을 연 사람 ÷ 그날까지 가입한 플레이어</small></div>
+            <ol id="tenkeyDauWeek" class="tk-dau-week" aria-live="polite"></ol>
           </section>
           <div id="tenkeyOverviewCharts" class="ov-charts tk-main-chart"></div>
           <details id="tenkeyOverviewMore" class="ov-details">
@@ -682,7 +686,7 @@
   <script src="announcement-editor.js?v=20260909-1"></script>
   <script src="operations.js?v=20260909-1"></script>
   <script src="tenkey.js?v=20261025-tr"></script>
-  <script src="tenkey-overview.js?v=20261025-gl2"></script>
+  <script src="tenkey-overview.js?v=20261025-dau"></script>
   <script src="tenkey-players.js?v=20261024-nf"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>

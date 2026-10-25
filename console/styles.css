@@ -1573,6 +1573,15 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tk-glance-note[data-tone="good"] { color: #17665e; }
 .tk-glance-note[data-tone="bad"] { color: #a93f34; }
 a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-offset: 3px; }
+/* 최근 7일 DAU: one cell a day, the share of players filled from the bottom (owner 2026-10-25) */
+.tk-dau-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tk-dau-day { position: relative; display: grid; justify-items: center; align-content: end; gap: 3px; min-width: 0; min-height: 116px; padding: 10px 4px 9px; overflow: hidden; background: linear-gradient(to top, var(--teal-soft) var(--share, 0%), var(--paper) var(--share, 0%)); border: 1px solid var(--line); border-radius: 12px; outline: none; text-align: center; }
+.tk-dau-day::after { position: absolute; inset: auto 0 calc(var(--share, 0%) - 1px) 0; height: 2px; background: var(--teal); content: ""; }
+.tk-dau-day:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.tk-dau-day strong { position: relative; color: var(--ink); font-size: 22px; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tk-dau-day span { position: relative; color: var(--ink); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tk-dau-day small { position: relative; color: var(--ink-soft); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.tk-dau-day.is-today { border-style: dashed; }
 .tk-main-chart { grid-template-columns: 1fr; margin-top: 14px; }
 .tk-main-chart .ov-card-head h3 { font-size: 15px; }
 .tk-more-facts { grid-column: 1 / -1; }
@@ -1585,4 +1594,8 @@ a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-of
   .tk-glance-row { gap: 8px; }
   .tk-glance-card { padding: 12px 12px 13px; }
   .tk-glance-label, .tk-glance-note { font-size: 12px; }
+  .tk-dau-week { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .tk-dau-day { min-height: 92px; padding: 8px 2px; border-radius: 10px; }
+  .tk-dau-day strong { font-size: 18px; }
+  .tk-dau-day small { font-size: 10px; }
 }
