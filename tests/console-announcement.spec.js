@@ -1,6 +1,6 @@
 const { test, expect } = require("@playwright/test");
 
-test("operator can publish a notice from operations", async ({ page }) => {
+test("operator can publish a notice from operations", async ({ page, isMobile }) => {
   await page.route('**/*', route => {
     const url = new URL(route.request().url());
     return ['127.0.0.1', 'localhost'].includes(url.hostname) ? route.continue() : route.abort();
@@ -21,7 +21,8 @@ test("operator can publish a notice from operations", async ({ page }) => {
     noticeBody.boundingBox(),
   ]);
   expect(Math.abs(gridBox.width - formBox.width)).toBeLessThanOrEqual(1);
-  expect(bodyBox.height).toBeGreaterThanOrEqual(320);
+  // console/styles.css: the editor is at least 320px tall, 300px on phones (max-width: 600px)
+  expect(bodyBox.height).toBeGreaterThanOrEqual(isMobile ? 300 : 320);
   expect(bodyBox.height).toBeLessThanOrEqual(500);
   await expect(noticeBody).toHaveCSS("font-size", "16px");
   await expect(noticeBody).toHaveCSS("line-height", "28px");

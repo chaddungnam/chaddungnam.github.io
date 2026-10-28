@@ -100,6 +100,8 @@ test("marketing review gate renders raw waiting evidence and defines explicit ap
 
   await page.goto("/console/");
   await page.locator("#projectQuirkyBall").click();
+  // Since the 10-01 overview (7a9cbc2) these 1.x panels sit in the folded "1.x 레거시 · 기존 상세 분석" and load when it opens.
+  await page.locator("#legacyAnalytics > summary").click();
 
   await expect(page.locator("#execCompleted")).toHaveText("1명");
   await expect(page.locator("#execCompletedDetail")).toContainText("1판");
@@ -181,6 +183,7 @@ test("gameplay diagnostics survive hidden-panel open, resize, legacy choices, an
 
   await page.goto("/console/");
   await page.locator("#projectQuirkyBall").click();
+  await page.locator("#legacyAnalytics > summary").click();
   await page.locator("#operatorDetails > summary").click();
 
   await expect(page.locator("#tutorialStagesTable")).toContainText("첫 목표 소개");
