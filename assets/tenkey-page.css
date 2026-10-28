@@ -1,6 +1,7 @@
 /* 딸깍 서바이벌 / 10key Survival game page. Rebuilt 2026-10-28 to match the itch.io page (owner): its dark theme and
    background art, the banner, the three description images, the store screenshots and one big PLAY that opens the
-   browser build on itch.io. The app pre-registration (2026-10-24) and the odds stay further down the page.
+   browser build on itch.io. Owner, same day: the game is a paid app, so the pre-registration form (2026-10-24) stays the
+   main action in the first screen and itch.io is the secondary "free preview" link; the odds are on the page as text.
    Also styles /10key/prereg/ (confirm / unsubscribe) and /10key/get/ (the one download link of the launch mail).
    Loaded after brand-site.css, which only supplies the logo lockup and the skip link. */
 
@@ -104,7 +105,7 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
 .tk-key[disabled] { cursor: progress; }
 .tk-key-ghost { --btn: #ece6d6; --btn-side: #a39d8d; --btn-ink: var(--tk-night); }
 
-/* ---------- first screen: banner, title, pitch, PLAY, real gameplay (the itch.io page's look) ---------- */
+/* ---------- first screen: banner, title, pitch, pre-registration, the free preview, real gameplay (the itch.io page's look) ---------- */
 .tk-hero {
   position: relative;
   padding: calc(var(--tk-bar) + clamp(28px, 5vw, 64px)) 0 clamp(48px, 7vw, 88px);
@@ -113,8 +114,8 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
 }
 .tk-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); align-items: center; gap: clamp(32px, 6vw, 96px); }
 .tk-hero-copy { min-width: 0; }
-.tk-logo { display: block; margin: 0 0 clamp(26px, 3vw, 36px); }
-.tk-logo img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-edge), 0 24px 60px rgba(0, 0, 0, .45); }
+.tk-logo { display: block; margin: 0 0 clamp(22px, 2.6vw, 30px); }
+.tk-logo img { display: block; width: 100%; max-width: 480px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-edge), 0 24px 60px rgba(0, 0, 0, .45); }
 #game-title { display: flex; flex-direction: column; margin: 0; color: var(--tk-text); line-height: 1.04; }
 .tk-title-main { font-family: var(--tk-pixel); font-size: 48px; font-weight: 700; line-height: 1.25; word-break: keep-all; }
 .tk-title-alt { margin-top: 10px; color: var(--tk-text-3); font-size: clamp(.92rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .1em; }
@@ -123,13 +124,18 @@ html:lang(ko) .tk-title-alt { margin: 10px 0 0; text-transform: uppercase; }
 html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-pitch { margin: 18px 0 0; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.5; word-break: keep-all; text-wrap: balance; }
 .tk-lede { max-width: 34rem; margin: 14px 0 0; color: var(--tk-text-2); font-size: clamp(1.02rem, 1.3vw, 1.12rem); line-height: 1.7; word-break: keep-all; text-wrap: pretty; }
-.tk-play-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
-.tk-key.tk-play { --depth: 8px; min-height: 72px; border-radius: 16px; font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; }
-.tk-play .tk-key-face { gap: 14px; min-width: 260px; padding: 0 36px; box-sizing: border-box;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--depth) 0 var(--btn-side), 0 calc(var(--depth) + 16px) 36px rgba(255, 210, 63, .22); }
 .tk-play-icon { width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-left: 18px solid currentColor; }
 .tk-play-note { max-width: 26ch; margin: 0; color: var(--tk-text-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
-.tk-hero-app { display: inline-flex; min-height: 44px; align-items: center; margin-top: 18px; }
+/* the free browser preview on itch.io: an outlined secondary button under the pre-registration card */
+.tk-preview-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 22px; }
+.tk-page a.tk-preview {
+  display: inline-flex; min-height: 52px; align-items: center; gap: 10px; padding: 0 22px; box-sizing: border-box;
+  border: 2px solid rgba(255, 210, 63, .55); border-radius: 14px; color: var(--tk-duck); background: rgba(255, 210, 63, .06);
+  font-size: .98rem; font-weight: 800; line-height: 1.25; text-decoration: none; word-break: keep-all;
+  transition: background-color 160ms var(--tk-ease), border-color 160ms var(--tk-ease);
+}
+.tk-page a.tk-preview:hover, .tk-page a.tk-preview:focus-visible { border-color: var(--tk-duck); background: rgba(255, 210, 63, .14); }
+.tk-preview .tk-play-icon { flex: none; border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
 
 /* the play loop in a plain game frame, like the itch.io embed (portrait 9:16) */
 .tk-screen { display: grid; justify-items: center; gap: 12px; margin: 0; }
@@ -139,7 +145,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 
 /* the pre-registration card */
 .tk-prereg {
-  padding: clamp(20px, 2.6vw, 28px);
+  margin-top: 28px; padding: clamp(20px, 2.6vw, 28px);
   border: 1px solid rgba(255, 210, 63, .38); border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 210, 63, .08), rgba(255, 210, 63, .02) 60%), var(--tk-night-2);
   box-shadow: 0 30px 70px rgba(0, 0, 0, .35);
@@ -225,8 +231,6 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-odds-table td + td, .tk-odds-table th + th { text-align: right; font-variant-numeric: tabular-nums; }
 .tk-odds-table tfoot td { border-bottom: 0; color: var(--tk-text); font-weight: 700; }
 
-.tk-app .tk-prereg { max-width: 40rem; margin: 0 auto; }
-
 /* the facts, as a plain sheet */
 .tk-sheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--tk-edge); border-radius: 16px; overflow: hidden; background: var(--tk-night-2); }
 .tk-sheet div { padding: 22px 24px; border-right: 1px solid var(--tk-edge); border-bottom: 1px solid var(--tk-edge); }
@@ -310,9 +314,8 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
   .tk-form-row .tk-key { width: 100%; }
   .tk-title-main { font-size: 36px; }
   .tk-h2 { font-size: 24px; }
-  .tk-play-row { gap: 14px; }
-  .tk-key.tk-play, .tk-play .tk-key-face { width: 100%; }
   .tk-play-note { max-width: none; }
+  .tk-page a.tk-preview { width: 100%; justify-content: center; }
   .tk-sheet { grid-template-columns: minmax(0, 1fr); }
   .tk-sheet div, .tk-sheet div:nth-child(3n), .tk-sheet div:nth-child(2n) { border-right: 0; border-bottom: 1px solid var(--tk-edge); }
   .tk-sheet div:last-child { border-bottom: 0; }
