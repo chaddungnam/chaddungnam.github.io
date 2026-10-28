@@ -21,3 +21,21 @@
   font-weight: 400;
   font-display: swap;
 }
+
+/* 10key Survival's own pixel fonts, subset to the 10key sections by scripts/build_tenkey_fonts.py (Galmuri: OFL 1.1;
+   PixelMplus: M+ FONT LICENSE). PixelMplus covers the Japanese text Galmuri has no glyphs for. */
+@font-face {
+  font-family: "Galmuri11";
+  src: url("/assets/fonts/Galmuri11-Bold-10key.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PixelMplus12";
+  src: url("/assets/fonts/PixelMplus12-Bold-10key.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
