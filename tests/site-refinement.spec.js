@@ -193,7 +193,7 @@ for(const [lang] of locales){
  // Legal documents are English + Korean + German (owner 2026-10-20); ja legal URLs redirect to the English page.
  const legalLang=['ko','en','de'].includes(lang);
  test(`legal ${lang}: unchanged public routes, usable contents, bottom update date`,async({page})=>{
-  for(const [route,date] of [[`/privacy/${lang}.html`,'2026-10-19'],[`/quirky-ball/terms/${lang}.html`,'2026-10-05'],[`/quirky-ball/privacy/delete_${lang}.html`,'2026-09-08'],[`/impressum/${lang}.html`,'2026-09-05']]){
+  for(const [route,date] of [[`/privacy/${lang}.html`,'2026-10-25'],[`/quirky-ball/terms/${lang}.html`,'2026-10-05'],[`/quirky-ball/privacy/delete_${lang}.html`,'2026-09-08'],[`/impressum/${lang}.html`,'2026-09-05']]){
    const response=await page.goto(route);expect(response.ok()).toBeTruthy();
    if(!legalLang&&!route.startsWith('/impressum/')){await expect(page).toHaveURL(/\/(?:privacy\/en|quirky-ball\/terms\/en|quirky-ball\/privacy\/delete_en)\.html$/);continue;}
    await expect(page.locator('.legal-document-footer time')).toHaveAttribute('datetime',date);
