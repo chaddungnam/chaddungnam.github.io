@@ -103,6 +103,7 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 var(--btn-side), 0 2px 4px rgba(0, 0, 0, .25);
 }
 .tk-key[disabled] { cursor: progress; }
+.tk-prereg.is-offline .tk-key { cursor: not-allowed; opacity: .55; }
 .tk-key-ghost { --btn: #ece6d6; --btn-side: #a39d8d; --btn-ink: var(--tk-night); }
 
 /* ---------- first screen: banner, title, pitch, pre-registration, the free preview, real gameplay (the itch.io page's look) ---------- */

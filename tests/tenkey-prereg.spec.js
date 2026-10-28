@@ -62,6 +62,41 @@ for (const [home, [form, language]] of Object.entries({ "/?lang=ko": ["/10key/",
   });
 }
 
+for (const [url, offline] of Object.entries({ "/10key/?lang=ko": "사전예약 기능을 불러오지 못했어요", "/10key/index_en.html?lang=en": "The pre-registration could not load" })) {
+  test(`without its script the form never submits and never puts the email in the address bar (${url})`, async ({ page }) => {
+    const posts = [];
+    await page.route(FN, (route) => { posts.push(route.request().postData()); route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }); });
+    await page.route(/\/assets\/tenkey-page\.js/, (route) => route.abort());
+    const navigations = [];
+    page.on("framenavigated", (frame) => { if (frame === page.mainFrame()) navigations.push(frame.url()); });
+    await page.goto(url);
+    const card = page.locator("#prereg");
+    const button = card.locator("button[type=submit]");
+    await expect(button).toBeDisabled();
+    await expect(card.locator("[data-prereg-status]")).toContainText(offline);
+    await expect(card).toHaveClass(/is-offline/);
+    await card.locator("input[name=email]").fill("player@example.com");
+    await card.locator("input[name=consent]").check();
+    await button.click({ force: true });
+    await card.locator("input[name=email]").press("Enter");
+    await page.waitForTimeout(500);
+    expect(page.url()).not.toContain("player");
+    expect(page.url()).not.toContain("email=");
+    expect(navigations).toHaveLength(1);
+    expect(posts).toHaveLength(0);
+  });
+}
+
+test("with its script the form is ready: the button is enabled and no offline note shows", async ({ page }) => {
+  await page.goto("/10key/?lang=ko");
+  const card = page.locator("#prereg");
+  await expect(card).toHaveAttribute("data-ready", "");
+  await expect(card.locator("button[type=submit]")).toBeEnabled();
+  await expect(card.locator("[data-prereg-status]")).toHaveText("");
+  await expect(card).not.toHaveClass(/is-offline/);
+  await expect(card.locator("form")).toHaveAttribute("method", "post");
+});
+
 test("confirm link page confirms through the function", async ({ page }) => {
   await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true,"locale":"ko"}' }));
   await page.goto("/10key/prereg/?a=confirm&t=11111111-2222-4333-8444-555555555555&lang=ko");

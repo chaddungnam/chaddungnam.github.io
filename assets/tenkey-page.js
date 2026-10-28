@@ -85,6 +85,8 @@
   }
   // Pre-registration (owner 2026-10-24). The form posts text/plain JSON to the tenkey-prereg edge function, so the browser
   // sends no CORS preflight. Double opt-in: the function mails a confirmation link from support@houseduck.in.
+  // The submit button ships disabled and is enabled here, so without this script the form can never submit natively (which
+  // would put the email in the address bar); a small inline script then says to reload instead.
   var box = document.querySelector("[data-prereg]");
   var form = box && box.querySelector("[data-prereg-form]");
   if (box && form) {
@@ -140,6 +142,9 @@
         button.removeAttribute("aria-busy");
       });
     });
+
+    button.disabled = false;
+    box.setAttribute("data-ready", "");
 
     // Every "pre-register" link lands on the card and puts the cursor in the email box.
     document.querySelectorAll("[data-prereg-jump]").forEach(function (link) {
