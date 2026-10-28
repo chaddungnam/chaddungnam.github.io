@@ -21,20 +21,64 @@ LANGS = ("en", "de", "ja")
 TEXT = {
     "딸깍 서바이벌 보러 가기": ("See 10key Survival", "10key Survival ansehen", "10key Survivalを見る"),
     "신작": ("New game", "Neues Spiel", "新作"),
-    "출시 준비 중": ("Coming soon", "Bald verfügbar", "近日配信予定"),
     "딸깍 서바이벌": ("10key Survival", "10key Survival", "10key Survival"),
-    "살아 있는 텐키(숫자 키패드)가 되어 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 레벨업마다 스킬 카드를 고르고, 마우스에게서 살아남으세요.": (
-        "Dig through an endless 3D keyboard as a living numpad. Smash keys, pick a new skill at every level-up and outlast the mouse.",
-        "Gräbe dich als lebendiger Ziffernblock durch eine endlose 3D-Tastatur. Zerschlage Tasten, wähle bei jedem Levelaufstieg einen neuen Skill und überlebe die Maus.",
-        "生きたテンキとなって、終わりのない3Dキーボードを掘り進もう。キーを壊し、レベルアップごとに新しいスキルを選び、マウスから生き延びよう。"),
-    "출시 정보": ("Release facts", "Eckdaten", "リリース情報"),
-    "광고 없음": ("No ads", "Keine Werbung", "広告なし"),
     "자세히 보기": ("Learn more", "Mehr erfahren", "詳しく見る"),
-    "유료 앱, 앱 내 구매 포함": ("Paid app, includes in-app purchases", "Bezahl-App mit In-App-Käufen", "有料アプリ（アプリ内課金あり）"),
-    "딸깍 서바이벌 실제 플레이 영상": ("10key Survival gameplay video", "10key Survival Gameplay-Video", "10key Survivalのプレイ映像"),
+    "10key Survival 로고와 3D 키보드 위의 텐키, 마우스": (
+        "10key Survival logo with the tenkey and the mouse on a 3D keyboard",
+        "10key-Survival-Logo mit dem Tenkey und der Maus auf einer 3D-Tastatur",
+        "10key Survivalのロゴと、3Dキーボードの上のテンキとマウス"),
+    "브라우저에서 무료": ("Free in your browser", "Kostenlos im Browser", "ブラウザで無料"),
+    "화려한 모험, 그리고 ASMR": ("A dazzling adventure, and ASMR", "Ein funkelndes Abenteuer – und ASMR", "華やかな冒険、そしてASMR"),
+    "부수는 키마다 실제로 녹음한 키보드 소리가 딸깍, 와장창 울려요. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요.": (
+        "Every key you break clicks, clacks and shatters with real recorded keyboard sounds. Dig through an endless 3D keyboard as a living numpad.",
+        "Jede Taste, die du zerschlägst, klickt, klackert und zerspringt mit echten aufgenommenen Tastaturgeräuschen. Grabe dich als lebendiger Ziffernblock durch eine endlose 3D-Tastatur.",
+        "壊すキーのひとつひとつから、実際に録音したキーボードの音がカチッ、ガシャンと響きます。生きたテンキとなって、終わりのない3Dキーボードを掘り進もう。"),
+    "지금 플레이": ("Play now", "Jetzt spielen", "今すぐプレイ"),
+    "itch.io에서 바로 시작돼요. 무료, 설치·가입 없음, 광고 없음.": (
+        "Opens on itch.io and starts right away. Free, no download, no sign-up, no ads.",
+        "Öffnet sich auf itch.io und startet sofort. Kostenlos, ohne Download, ohne Anmeldung, ohne Werbung.",
+        "itch.ioでそのまま始まります。無料・インストール不要・登録不要・広告なし。"),
+    "실제 플레이 화면": ("Real gameplay", "Echtes Gameplay", "実際のプレイ画面"),
+    "키를 부수며 파고드는 화면, 레벨업 카드 고르기, 황금 피버": (
+        "Digging through keys, picking a level-up card, Golden Fever",
+        "Tasten durchgraben, eine Karte beim Levelaufstieg wählen, Golden Fever",
+        "キーを壊して掘り進む画面、レベルアップのカード選択、ゴールデンフィーバー"),
+    "파고들기": ("Dig", "Graben", "掘る"),
+    "방향을 누르고 있으면 키를 부수며 내려가요. 레벨업마다 카드 세 장 중 하나를 골라요.": (
+        "Hold a direction to smash your way down. Every level-up, pick 1 of 3 cards.",
+        "Halte eine Richtung gedrückt und brich dich nach unten durch. Bei jedem Levelaufstieg wählst du eine von drei Karten.",
+        "方向を押し続けると、キーを壊しながら掘り進みます。レベルアップごとに3枚のカードから1枚を選びます。"),
+    "마우스의 돌진, 내려찍는 스페이스바, NUM LOCK 철창": (
+        "The mouse charging, the spacebar slamming down, a NUM LOCK cage",
+        "Die Maus stürmt los, die Leertaste schlägt ein, ein NUM-LOCK-Käfig",
+        "突進するマウス、叩きつけるスペースキー、NUM LOCKの檻"),
+    "살아남기": ("Survive", "Überleben", "生き残る"),
+    "레벨 7부터 마우스가, 레벨 14부터 스페이스바가 쫓아와요. 계속 움직이세요.": (
+        "The mouse hunts you from level 7, the spacebar from level 14. Keep moving.",
+        "Ab Level 7 jagt dich die Maus, ab Level 14 auch die Leertaste. Bleib in Bewegung.",
+        "レベル7からはマウスが、レベル14からはスペースキーが追ってきます。止まらずに動き続けよう。"),
+    "드리프트 키보드와 로봇으로 변신한 텐키": (
+        "The tenkey as a drifting keyboard and as a robot",
+        "Der Tenkey als driftende Tastatur und als Roboter",
+        "ドリフトキーボードとロボットに変身したテンキ"),
+    "진화하기": ("Evolve", "Verwandeln", "進化する"),
+    "드리프트 카드로 키보드가 되고, 변신 카드로 로봇이 될 수 있어요.": (
+        "A DRIFT card can turn you into a drifting keyboard, a TRANSFORM card into a robot.",
+        "Mit der Karte DRIFT wirst du zur driftenden Tastatur, mit der Karte VERWANDLUNG zum Roboter.",
+        "ドリフトのカードでキーボードに、変身のカードでロボットになれます。"),
+    "딸깍 서바이벌 스크린샷": ("10key Survival screenshots", "10key Survival Screenshots", "10key Survivalのスクリーンショット"),
+    "키보드를 부수며 파고들기": ("Smash the keyboard and dig down", "Die Tastatur zerschlagen und nach unten graben", "キーボードを壊して掘り進む"),
+    "마우스 돌진 피하기": ("Dodge the mouse's charge", "Dem Ansturm der Maus ausweichen", "マウスの突進をよける"),
+    "레벨업 카드 고르기": ("Level up: pick a card", "Levelaufstieg: eine Karte wählen", "レベルアップ：カードを選ぶ"),
+    "코드를 입력해 NUM LOCK 철창에서 탈출": (
+        "Type the code to escape the NUM LOCK cage", "Den Code eingeben und aus dem NUM-LOCK-Käfig ausbrechen", "コードを入力してNUM LOCKの檻から脱出"),
+    "황금 피버: 점수 2배": ("Golden Fever: double score", "Golden Fever: doppelte Punkte", "ゴールデンフィーバー：スコア2倍"),
+    "iOS·Android 앱 출시 준비 중: 유료 앱, 앱 내 구매 포함. 확률형 아이템(모듈 뽑기) 포함: 모듈 12종, 각 8.333%(1/12).": (
+        "iOS and Android apps coming soon: paid apps with in-app purchases. Includes random items (module draws): 12 modules, 8.333% (1/12) each.",
+        "iOS- und Android-Apps bald verfügbar: Bezahl-Apps mit In-App-Käufen. Enthält Zufallsobjekte (Modulziehung): 12 Module, je 8,333 % (1/12).",
+        "iOS・Android版は近日配信予定（有料アプリ・アプリ内課金あり）。確率型アイテム（モジュールの抽選）を含みます：モジュール12種、各8.333%（1/12）。"),
+    "확률 정보": ("Odds", "Wahrscheinlichkeiten (auf Englisch)", "確率情報（英語）"),
     "딸깍 서바이벌 실제 플레이": ("10key Survival gameplay", "10key Survival Gameplay", "10key Survivalのプレイ"),
-    "출시 전 빌드의 실제 플레이 화면": ("Gameplay from a pre-release build", "Gameplay aus einer Vorabversion", "リリース前のビルドの実際のプレイ画面"),
-    "키를 눌러 보세요": ("Press a key", "Drück eine Taste", "キーを押してみて"),
     "출시작": ("Out now", "Erschienen", "配信中"),
     "버전": ("Version", "Version", "バージョン"),
     "2D 머지에서 3D 비커, 보스전까지. 쿼키와 함께 실험실을 탈출하세요.": (
@@ -106,6 +150,8 @@ def translate_main(main, lang, badges):
     main = re.sub(r'<span class="hd-title-alt"[^>]*>[^<]*</span>', "", main)  # the Latin name is already the title
     main = main.replace('href="quirky-ball/?lang=ko"', f'href="quirky-ball/?lang={lang}"')
     main = main.replace('href="10key/"', 'href="10key/index_en.html"')  # the 10key Survival page exists in Korean and English only
+    main = main.replace('href="10key/odds/"', 'href="10key/odds/#en"')  # one page, Korean then English
+    main = re.sub(r'(assets/media/tenkey-itch/shot-[a-z]+)-ko\.webp', rf'\1-{lang}.webp', main)  # the store screenshots exist per language
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')
     main = main.replace('href="privacy/ko.html"', f'href="privacy/{lang}.html"')
     main = re.sub(r'href="support/#ko-', f'href="support/#{lang}-', main)

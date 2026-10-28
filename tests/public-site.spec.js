@@ -181,14 +181,18 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
     { source: "quirky-ball/v2/loop.mp4", muted: true, loop: true, playsInline: true },
   ]);
 
-  // 10key Survival: the first game, unreleased, so no store links yet.
+  // 10key Survival: the first game, free in the browser on itch.io; the apps are unreleased, so no store links yet.
   await tenkey.scrollIntoViewIfNeeded();
   await expect(tenkey).toContainText("딸깍 서바이벌");
   await expect(tenkey).toContainText("10key Survival");
-  await expect(tenkey).toContainText("출시 준비 중");
+  await expect(tenkey).toContainText("브라우저에서 무료");
+  await expect(tenkey).toContainText("화려한 모험, 그리고 ASMR");
   await expect(tenkey).not.toContainText("Quirky");
-  await expect(tenkey.locator("a")).toHaveCount(1);
-  await expect(tenkey.locator("a")).toHaveAttribute("href", "10key/");
+  await expect(tenkey.locator("a")).toHaveCount(3);
+  await expect(tenkey.locator("a.hd-tk-play")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(tenkey.locator("a.hd-tk-play")).toHaveText("지금 플레이");
+  await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
+  await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
   await expect(video).toBeVisible();
   expect(await video.evaluate((node) => ({
@@ -208,11 +212,11 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   await page.goto("/?lang=ko");
   await expect(page.locator("#tenkey-title")).toContainText("딸깍 서바이벌");
   await expect(page.locator("#tenkey-title .hd-title-alt")).toHaveText("10key Survival");
-  await expect(page.locator("#games .hd-lede")).toHaveText("살아 있는 텐키(숫자 키패드)가 되어 끝없는 3D 키보드를 파고 내려가세요. 키를 부수고, 레벨업마다 스킬 카드를 고르고, 마우스에게서 살아남으세요.");
+  await expect(page.locator("#games .hd-lede")).toHaveText("부수는 키마다 실제로 녹음한 키보드 소리가 딸깍, 와장창 울려요. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요.");
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(1);
   await expect(page.locator("[data-tenkey]")).toHaveCount(1);
-  await expect(page.locator("#games")).toContainText("출시 준비 중");
+  await expect(page.locator("#games")).toContainText("브라우저에서 무료");
   await expect(page.locator("[data-project='quirky-ball']")).toContainText("Quirky Ball");
   await expect(page.locator("[data-project='hexaworld1984'], [data-hexaworld-preview]")).toHaveCount(0);
   await expect(page.locator(".history-section, .journal-section")).toHaveCount(0);
@@ -220,11 +224,12 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   await expect(page.locator(".section-rail, [data-motion-toggle], [data-game-preview], [data-release-chamber], [data-studio-hero], .project-zone, .community-section")).toHaveCount(0);
   await expect(page.locator(".brand-lockup .brand-duck-image")).toBeVisible();
   await expect(page.locator(".brand-lockup .brand-wordmark-image")).toBeVisible();
-  // Three phones on the page: 10key Survival, Quirky Ball and the Comrade farewell, each with one loop.
-  await expect(page.locator(".hd-phone")).toHaveCount(3);
-  await expect(page.locator(".hd-phone-button")).toHaveCount(9);
-  await expect(page.locator(".hd-phone-island")).toHaveCount(3);
-  await expect(page.locator(".hd-phone-home")).toHaveCount(3);
+  // Two phones (Quirky Ball and the Comrade farewell); 10key Survival plays its loop in the plain itch.io-style frame. One loop each.
+  await expect(page.locator(".hd-phone")).toHaveCount(2);
+  await expect(page.locator(".hd-phone-button")).toHaveCount(6);
+  await expect(page.locator(".hd-phone-island")).toHaveCount(2);
+  await expect(page.locator(".hd-phone-home")).toHaveCount(2);
+  await expect(page.locator("#games .hd-tk-screen-frame")).toHaveCount(1);
   await expect(page.locator("[data-hero-gameplay]")).toHaveCount(3);
   await expect(page.locator("#games [data-hero-gameplay]")).toHaveCount(1);
   await expect(page.locator("#quirky [data-hero-gameplay]")).toHaveCount(1);
@@ -240,10 +245,10 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   const cardHeights = await page.locator("[data-youtube-card]").evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().height));
   if (!isMobile) expect(Math.max(...cardHeights) - Math.min(...cardHeights)).toBeLessThan(2);
 
-  // Every phone is never cut: it sits whole inside every ancestor that clips (the 10key section clips its decorative keys,
-  // the Quirky Ball and farewell sections clip their glows).
+  // Every phone and the 10key game frame is never cut: it sits whole inside every ancestor that clips (the 10key section
+  // clips its background art, the Quirky Ball and farewell sections clip their glows).
   for (const index of [0, 1, 2]) {
-    const phone = page.locator(".hd-phone").nth(index);
+    const phone = page.locator("#games .hd-tk-screen-frame, .hd-phone").nth(index);
     await phone.scrollIntoViewIfNeeded();
     const clippedBy = await phone.evaluate((node) => {
       const rect = node.getBoundingClientRect();
@@ -260,15 +265,16 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 
-  // The header tracks what is under it. data-hd-theme names the section tone (night over the desk, paper once the zoom has handed over
-  // to the 10key page); data-hd-over-hero is on only while the bar sits over the desk before its zoom ends, and the bar is the dark House Duck bar elsewhere.
+  // The header tracks what is under it. data-hd-theme names the section tone (night over the desk, and still night once the zoom has
+  // handed over to the dark 10key section); data-hd-over-hero is on only while the bar sits over the desk before its zoom ends, and the
+  // bar is the dark House Duck bar elsewhere.
   await jumpTo(page, 0);
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
   await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");
   const track = await heroTrack(page);
   await jumpTo(page, track.height - track.viewport);
   await expect(page.locator("#studio")).toHaveClass(/is-entered/);
-  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
   await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
   await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(17, 20, 25, 0.97)");
   await jumpToSection(page, "#lab-notes");
@@ -341,18 +347,27 @@ test("Quirky Ball title is the game's own logo, cut into letters that land one b
   expect(Math.abs(boxes.pieces.dot.midX - boxes.pieces.i.midX)).toBeLessThan(boxes.frame.width * 0.03);
 });
 
-test("10key Survival shows its real gameplay in the phone and the quiet Comrade farewell sits right under Quirky Ball", async ({ page }) => {
+test("10key Survival shows its real gameplay in its game frame and the quiet Comrade farewell sits right under Quirky Ball", async ({ page }) => {
   for (const [route, copy] of Object.entries(homeCopy)) {
     const [name, line] = copy.comrade;
     await page.goto(route);
     const zone = page.locator("#games");
     await zone.scrollIntoViewIfNeeded();
-    const video = zone.locator(".hd-phone video");
+    const video = zone.locator(".hd-tk-screen video");
     await expect(video).toBeVisible();
     await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
-    await expect(zone.locator("a")).toHaveCount(1);
-    await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(20, 22, 43)");
+    await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']")).toHaveCount(1);
+    await expect(zone.locator("a")).toHaveCount(3);
+    // the itch.io theme: light text (#ECE6D6) on the dark page (#141318), the game's own pixel font
+    await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(236, 230, 214)");
+    await expect(zone.locator("#tenkey-title")).toHaveCSS("font-family", /Galmuri11/);
+    // five store screenshots in the page's language, loaded only when they come near
+    const shots = await zone.locator(".hd-tk-shots img").evaluateAll((nodes) => nodes.map((node) => ({ src: node.getAttribute("src"), lazy: node.loading })));
+    expect(shots, `${route} screenshots`).toHaveLength(5);
+    for (const shot of shots) expect(shot.lazy).toBe("lazy");
+    const pageLang = await page.evaluate(() => document.documentElement.lang);
+    for (const shot of shots) expect(shot.src, `${route} screenshot language`).toMatch(new RegExp(`-${pageLang}\\.webp$`));
     expect(await zone.locator("a[href*='play.google.com'], a[href*='apps.apple.com']").count(), `${route} no store links before release`).toBe(0);
 
     // The dropped game: night section right after Quirky Ball, its old play loop in a phone, one line, no link, no status.
@@ -398,9 +413,11 @@ test("10key Survival shows its real gameplay in the phone and the quiet Comrade 
 test("home keeps its titles heavy and the footer lockup compact", async ({ page }) => {
   await page.goto("/?lang=ko");
   // Quirky Ball's title is its logo (no font weight); the farewell line is a calmer bold on the night section.
-  for (const title of ["#tenkey-title", "#lab-title", "#help-title"]) {
+  for (const title of ["#lab-title", "#help-title"]) {
     expect(Number(await page.locator(title).evaluate((node) => getComputedStyle(node).fontWeight)), `${title} weight`).toBeGreaterThanOrEqual(800);
   }
+  // 10key Survival's title is set in the game's bold pixel font, like its itch.io page.
+  expect(Number(await page.locator("#tenkey-title").evaluate((node) => getComputedStyle(node).fontWeight)), "#tenkey-title weight").toBeGreaterThanOrEqual(700);
   expect(Number(await page.locator("#comrade-title").evaluate((node) => getComputedStyle(node).fontWeight)), "#comrade-title weight").toBeGreaterThanOrEqual(700);
   expect(await page.locator("#quirky-title .hd-qb-logo").evaluate((node) => getComputedStyle(node).display)).toBe("block");
 
@@ -510,7 +527,7 @@ test("hero hand-off: one wheel notch in the duck scene glides to the 10key card,
   expectGlide(samples, landing, "wheel down");
   await scrollSettlesAt(page, landing, 3);
   await expect(page.locator("#studio")).toHaveClass(/is-entered/);
-  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
   await expect(page.locator("body")).not.toHaveAttribute("data-hd-over-hero", "");
   expect(await page.evaluate(() => document.querySelector(".hd-tenkey-grid").getBoundingClientRect().top)).toBeLessThan(110);
 
@@ -676,7 +693,7 @@ test("home shows the console min_version and keeps 2.0.0 when the lookup fails",
   await expect(page.locator("[data-live-version]").first()).toHaveText("2.0.0");
 });
 
-test("localized homes keep the 10key Survival copy, phone and sections readable at 390px", async ({ page }) => {
+test("localized homes keep the 10key Survival copy, game frame and sections readable at 390px", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of homeRoutes) {
     await page.goto(route);
@@ -684,8 +701,8 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
     const layout = await page.evaluate(() => {
       const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
       const title = rect("#tenkey-title");
-      const glass = rect(".hd-glass");
-      const phone = rect(".hd-phone-shell");
+      const glass = rect(".hd-tk-copy");
+      const phone = rect(".hd-tk-screen-frame");
       const bodyFonts = [".hd-lede", ".hd-quirky-copy .hd-lede"]
         .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
       const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link, .store-button")]
@@ -699,7 +716,7 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
       // On a phone the Quirky Ball column reads: eyebrow, logo, lede, phone, store buttons, link, community numbers.
       const flow = ["#quirky .hd-eyebrow-row", "#quirky .hd-qb-title", "#quirky .hd-lede", "#quirky .hd-qb-phone", "#quirky .project-stores", "#quirky .hd-keycap-cta", "#quirky .hd-research"]
         .map((selector) => { const box = rect(selector); return { selector, top: box.top + scrollY, bottom: box.bottom + scrollY, left: box.left, right: box.right }; });
-      const copyClipped = [...document.querySelectorAll(".hd-glass *, .hd-quirky-copy *")]
+      const copyClipped = [...document.querySelectorAll(".hd-tk-copy *, .hd-quirky-copy *")]
         .filter((node) => node.scrollWidth > node.clientWidth + 1 && getComputedStyle(node).display !== "inline" && !node.closest(".counter-digits, .counter-accessible, .hd-research-total strong, .hd-visually-hidden"))
         .map((node) => node.className || node.tagName);
       return {
@@ -718,7 +735,7 @@ test("localized homes keep the 10key Survival copy, phone and sections readable 
         homeAssets: [...document.querySelectorAll('link[href*="home"], script[src*="home"], link[href*="studio-home"], script[src*="studio-home"]')].map((node) => node.href || node.src),
       };
     });
-    // On a phone the text card comes first and the phone follows it, whole and centred.
+    // On a phone the copy and PLAY come first and the game frame follows, whole and centred.
     expect(layout.phone.top, `${route} phone follows the copy`).toBeGreaterThanOrEqual(layout.glass.bottom - 1);
     expect(layout.phone.left).toBeGreaterThanOrEqual(0);
     expect(layout.phone.right).toBeLessThanOrEqual(390);
@@ -768,11 +785,11 @@ test("hero zoom follows the scroll into the CRT and hands over to 10key Survival
   expect(await hero.locator(".hd-hero-sticky").evaluate((node) => Math.round(node.getBoundingClientRect().top))).toBe(0);
   await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
 
-  // At the end the zoom is complete and the page is on the paper tone.
+  // At the end the zoom is complete and the page is on the 10key section's dark tone (the zoom fades to it).
   await jumpTo(page, track.height - track.viewport);
   await expect(hero).toHaveClass(/is-entered/);
   await expect.poll(progress).toBeGreaterThanOrEqual(0.98);
-  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "paper");
+  await expect(page.locator("body")).toHaveAttribute("data-hd-theme", "night");
 
   // Scrolling back reverses it.
   await jumpTo(page, 0);
@@ -811,17 +828,20 @@ test("home plays each phone video (10key Survival, Quirky Ball, Comrade farewell
   }
 });
 
-test("home keycaps sink while pressed; pressing a keypad key cracks it and clears the hint", async ({ page, isMobile }) => {
-  test.skip(isMobile, "the decorative keypad sits behind the card on a phone");
+test("home keycaps sink while pressed and release without following their link", async ({ page, isMobile }) => {
+  test.skip(isMobile, "pointer presses are covered by the desktop project");
   await page.goto("/?lang=ko");
   await page.locator("#games").scrollIntoViewIfNeeded();
-  // The Quirky Ball link is the same yellow keycap, labelled like the 10key one, and sinks the same way.
+  // 10key Survival's PLAY is the big gold keycap; the Quirky Ball link is the same keycap and sinks the same way.
   const quirkyCta = page.locator("#quirky .hd-keycap-cta");
   await expect(quirkyCta).toHaveAttribute("href", "quirky-ball/?lang=ko");
   await expect(quirkyCta).toHaveAttribute("data-pressable", "");
-  await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText(await page.locator("#games .hd-keycap-face").innerText());
+  await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText("자세히 보기");
   const cta = page.locator("#games .hd-keycap-cta");
+  await expect(cta).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(cta).toHaveAttribute("data-pressable", "");
   const ctaBox = await cta.boundingBox();
+  expect(ctaBox.height, "PLAY is a big button").toBeGreaterThanOrEqual(72);
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y + ctaBox.height / 2);
   await page.mouse.down();
   await expect(cta).toHaveClass(/is-down/);
@@ -830,29 +850,9 @@ test("home keycaps sink while pressed; pressing a keypad key cracks it and clear
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y - 40);
   await expect(cta).not.toHaveClass(/is-down/);
   await page.mouse.up();
-  expect(page.url()).not.toContain("10key");
-
-  // Pressing one of the keycaps behind the card hides the hint and cracks that key one step.
-  const hint = page.locator("[data-key-hint]");
-  await expect(hint).not.toHaveClass(/is-hidden/);
-  const target = await page.evaluate(() => {
-    for (const key of document.querySelectorAll(".hd-key")) {
-      const box = key.getBoundingClientRect();
-      const x = box.x + box.width / 2;
-      const y = box.y + box.height / 2;
-      const hit = document.elementFromPoint(x, y);
-      // Scrolling the page already digs the keys (data-state 0..4); pick one that can still crack.
-      if (y > 0 && y < innerHeight && Number(key.dataset.state) < 4 && (hit === key || key.contains(hit))) return { x, y, id: key.dataset.key, state: Number(key.dataset.state) };
-    }
-    return null;
-  });
-  expect(target, "at least one keycap is exposed beside the card").not.toBeNull();
-  const key = page.locator(`.hd-key[data-key="${target.id}"]`);
-  await page.mouse.move(target.x, target.y);
-  await page.mouse.down();
-  await expect(hint).toHaveClass(/is-hidden/);
-  await expect(key).toHaveAttribute("data-state", String(target.state + 1));
-  await page.mouse.up();
+  expect(page.url()).not.toContain("itch.io");
+  // The keycap toy that used to sit behind the 10key card is gone.
+  await expect(page.locator("[data-keyfield], .hd-key, [data-key-hint]")).toHaveCount(0);
 
   // The Quirky Ball keycap sinks while pressed and releases when the pointer leaves, without following its link.
   await quirkyCta.scrollIntoViewIfNeeded();
@@ -871,7 +871,7 @@ test("primary navigation shows a readable hover tint without motion", async ({ p
   await page.goto("/?lang=ko");
   const luminance = (rgb) => { const [r, g, b] = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   // Over the clear bar on the night desk and over the dark House Duck bar further down, the hover must stay readable.
-  for (const [scrollTop, theme, overHero, backdrop] of [[0, "night", true, [11, 15, 42]], [2400, "paper", false, [17, 20, 25]]]) {
+  for (const [scrollTop, theme, overHero, backdrop] of [[0, "night", true, [11, 15, 42]], [2400, "night", false, [17, 20, 25]]]) {
     await jumpTo(page, scrollTop);
     await expect(page.locator("body")).toHaveAttribute("data-hd-theme", theme);
     if (overHero) await expect(page.locator("body")).toHaveAttribute("data-hd-over-hero", "");

@@ -389,126 +389,103 @@ body[data-page="studio"] .menu-button-lines::before,
 body[data-page="studio"] .menu-button-lines::after { width: 18px; background-color: currentColor; }
 body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines { background-color: transparent; }
 
-/* ---------- 10key: pale page, pressable keycaps drifting behind frosted glass (reference 4 + 3) ---------- */
+/* ---------- 10key Survival (owner 10-28: match the itch.io page): its dark theme, background art, banner, the three
+   description images and the store screenshots; one big PLAY that opens the browser build on itch.io ---------- */
 .hd-tenkey {
+  --hd-hand-off: #141318; /* home-desk.js fades the zoomed screen to this colour, so the hand-off has no light flash */
+  --tk-bg: #141318;
+  --tk-bg-2: #1d1d23;
+  --tk-ink: #ece6d6;
+  --tk-ink-2: rgba(236, 230, 214, .72);
+  --tk-ink-3: rgba(236, 230, 214, .5);
+  --tk-gold: #ffd23f;
+  --tk-line: rgba(236, 230, 214, .14);
+  --tk-pixel: "Galmuri11", "PixelMplus12", var(--hd-font);
   position: relative;
   z-index: 1;
   overflow: clip;
-  margin-top: -50vh; /* rises over the hero's last stretch, while the zoomed screen fades to paper, so no blank screen sits between them */
-  padding: clamp(72px, 9vw, 128px) 0 clamp(72px, 9vw, 128px);
-  background: linear-gradient(to bottom, rgba(239, 238, 242, 0), var(--hd-paper) 240px);
+  margin-top: -50vh; /* rises over the hero's last stretch, while the zoomed screen fades to this colour, so no blank screen sits between them */
+  padding: clamp(72px, 9vw, 128px) 0 clamp(72px, 9vw, 120px);
+  color: var(--tk-ink);
+  background: linear-gradient(to bottom, rgba(20, 19, 24, 0), var(--tk-bg) 240px);
   isolation: isolate;
 }
 
+/* the itch.io page background (blurred keyboard art, dark below), faded in under the top so it has no hard edge */
 .hd-tenkey::before {
   position: absolute;
-  inset: 0;
-  z-index: -2;
+  top: 200px;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  height: 1080px;
   content: "";
-  background:
-    radial-gradient(60% 50% at 18% 70%, rgba(245, 183, 49, .16), transparent 70%),
-    radial-gradient(40% 40% at 86% 20%, rgba(42, 79, 196, .07), transparent 70%);
-}
-
-.hd-keyfield {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: visible;
+  background: url("media/tenkey-itch/bg.webp") center top / max(1920px, 100%) auto no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 220px);
+  mask-image: linear-gradient(to bottom, transparent, #000 220px);
   pointer-events: none;
-}
-
-/* the real 10key keycaps (pre-rendered from the game's models): one frame per key, five states stacked, the legend on top */
-.hd-key {
-  --fw: 102px;
-  --fh: 102px;
-  --smudge: rgba(60, 50, 30, .16);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--fw);
-  height: var(--fh);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  pointer-events: auto;
-  will-change: transform;
-  transform: translate3d(calc(var(--x, 0px) - var(--fw) / 2), calc(var(--y, 0px) - var(--fh) / 2), 0);
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  touch-action: manipulation;
-}
-
-.hd-key[data-fam="mod"], .hd-key[data-fam="tall"] { --smudge: rgba(255, 255, 255, .26); }
-.hd-key-sprite { position: absolute; inset: 0; overflow: hidden; transition: transform 90ms var(--hd-ease), filter 90ms var(--hd-ease); }
-.hd-key.is-down .hd-key-sprite { transform: translateY(4px) scale(.985); filter: brightness(.95); }
-.hd-key[data-state="4"].is-down .hd-key-sprite { transform: none; filter: none; }
-.hd-key img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity 140ms var(--hd-ease); }
-.hd-key[data-state="0"] img[data-s="0"],
-.hd-key[data-state="1"] img[data-s="1"],
-.hd-key[data-state="2"] img[data-s="2"],
-.hd-key[data-state="3"] img[data-s="3"],
-.hd-key[data-state="4"] img[data-s="4"],
-.hd-key:not([data-state="4"]) .hd-key-legend { opacity: 1; }
-.hd-key:focus-visible { outline: 0; }
-.hd-shard {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 6;
-  width: var(--fw);
-  height: var(--fh);
-  opacity: 0;
-  pointer-events: none;
-  animation: hd-shard-fly 760ms cubic-bezier(.2, .6, .3, 1) forwards;
-}
-
-@keyframes hd-shard-fly {
-  0% { opacity: 1; transform: translate3d(calc(var(--x) - var(--fw) / 2), calc(var(--y) - var(--fh) / 2), 0) rotate(0deg) scale(1); }
-  45% { opacity: 1; transform: translate3d(calc(var(--x) - var(--fw) / 2 + var(--dx) * .6), calc(var(--y) - var(--fh) / 2 + var(--dy)), 0) rotate(calc(var(--rot) * .6)) scale(1); }
-  100% { opacity: 0; transform: translate3d(calc(var(--x) - var(--fw) / 2 + var(--dx)), calc(var(--y) - var(--fh) / 2 + var(--dy) * -.4 + 18px), 0) rotate(var(--rot)) scale(.92); }
 }
 
 .hd-tenkey-grid {
-  position: relative;
-  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(190px, .55fr) minmax(0, 1.25fr) minmax(250px, .8fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
   align-items: center;
-  gap: clamp(24px, 3.4vw, 48px);
+  gap: clamp(32px, 6vw, 96px);
 }
 
-.hd-tenkey-grid { pointer-events: none; } /* the keypad under it stays pressable; the glass and the phone take their own events */
-.hd-tenkey-grid > * { pointer-events: auto; }
-.hd-tenkey-grid > .hd-glass { grid-column: 2; }
-.hd-tenkey-grid > .hd-phone-figure { grid-column: 3; }
+.hd-tk-copy { min-width: 0; }
+.hd-tk-logo { display: block; margin: 0 0 clamp(28px, 3.4vw, 40px); }
+.hd-tk-logo img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-line), 0 24px 60px rgba(0, 0, 0, .45); }
+.hd-tenkey .hd-eyebrow { color: var(--tk-ink-2); }
+.hd-tenkey .hd-chip-status { border-color: rgba(255, 210, 63, .4); color: var(--tk-gold); background: rgba(255, 210, 63, .1); }
+.hd-tenkey .hd-title { color: var(--tk-ink); font-family: var(--tk-pixel); font-size: 48px; font-weight: 700; letter-spacing: 0; line-height: 1.25; }
+.hd-tenkey .hd-title-alt { color: var(--tk-ink-3); font-family: var(--hd-font); }
+.hd-tk-pitch { margin: 18px 0 0; color: var(--tk-gold); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.5; text-wrap: balance; word-break: keep-all; }
+.hd-tenkey .hd-lede { margin-top: 14px; color: var(--tk-ink-2); }
 
-.hd-glass {
-  position: relative;
-  padding: clamp(32px, 4.2vw, 60px);
-  border: 1px solid rgba(255, 255, 255, .8);
-  border-radius: var(--hd-r-l);
-  background: rgba(255, 255, 255, .36);
-  box-shadow: var(--hd-shadow-glass);
-  backdrop-filter: blur(30px) saturate(1.3);
-  -webkit-backdrop-filter: blur(30px) saturate(1.3);
+.hd-tk-play-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
+.hd-tk-play.hd-keycap-cta {
+  --btn: var(--tk-gold);
+  --btn-side: #a9820f;
+  --btn-ink: #141318;
+  --btn-depth: 8px;
+  min-height: 72px;
+  border-radius: 16px;
+  font-family: var(--tk-pixel);
+  font-size: 24px;
+  font-weight: 700;
 }
+.hd-tk-play .hd-keycap-face { gap: 14px; min-width: 260px; padding: 0 36px; }
+.hd-tk-play .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side), 0 calc(var(--btn-depth) + 16px) 36px rgba(255, 210, 63, .22); }
+.hd-tk-play-icon { width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-left: 18px solid currentColor; }
+.hd-tk-play-note { max-width: 26ch; margin: 0; color: var(--tk-ink-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
+.hd-tenkey .hd-tk-more { margin-top: 26px; border-color: var(--tk-line); color: var(--tk-ink); }
+.hd-tenkey .hd-tk-more::after { content: "→"; }
+.hd-tenkey .hd-tk-more:hover,
+.hd-tenkey .hd-tk-more:focus-visible { border-color: var(--tk-ink); background: rgba(236, 230, 214, .08); }
 
-.hd-glass::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .25));
-  pointer-events: none;
-}
+/* the play loop sits in a plain game frame, like the itch.io embed (portrait 9:16) */
+.hd-tk-screen { display: grid; justify-items: center; gap: 14px; margin: 0; }
+.hd-tk-screen-frame { display: block; width: 100%; padding: 8px; border: 1px solid var(--tk-line); border-radius: 14px; background: var(--tk-bg-2); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
+.hd-tk-video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 8px; background: #000; object-fit: cover; }
+.hd-tenkey .hd-micro { color: var(--tk-ink-3); }
 
-.hd-glass > * { position: relative; z-index: 1; }
-.hd-facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; padding: 0; list-style: none; }
+.hd-tk-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); margin: clamp(72px, 9vw, 112px) 0 0; padding: 0; list-style: none; }
+.hd-tk-features li { display: grid; grid-template-rows: auto auto 1fr; overflow: hidden; border: 1px solid var(--tk-line); border-radius: 14px; background: var(--tk-bg-2); }
+.hd-tk-features img { display: block; width: 100%; height: auto; aspect-ratio: 959 / 520; object-fit: cover; object-position: center top; }
+.hd-tk-features h3 { margin: 20px 22px 0; color: var(--tk-gold); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
+.hd-tk-features p { margin: 10px 22px 24px; color: var(--tk-ink-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
+
+.hd-tk-shots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); margin: clamp(28px, 3.4vw, 40px) 0 0; padding: 0; list-style: none; }
+.hd-tk-shots img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-line), 0 16px 40px rgba(0, 0, 0, .4); }
+.hd-tk-shots:focus-visible { outline: 3px solid var(--tk-gold); outline-offset: 6px; }
+.hd-tk-fine { margin: 28px 0 0; color: var(--tk-ink-3); font-size: .8rem; line-height: 1.6; word-break: keep-all; }
+.hd-tk-fine a { color: var(--tk-ink-2); text-decoration: underline; text-underline-offset: 3px; }
+.hd-tk-fine a:hover { color: var(--tk-ink); }
+.hd-tenkey :focus-visible { outline-color: var(--tk-gold); }
+
+/* phone shells used by the Quirky Ball and farewell sections */
 .hd-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 30px; }
-.hd-disclosure { margin: 0; color: var(--hd-ink-3); font-size: .8rem; line-height: 1.5; }
-
 .hd-phone-figure { display: grid; justify-items: center; gap: 18px; margin: 0; }
 .hd-phone { position: relative; width: clamp(240px, 22vw, 300px); }
 .hd-phone-shell {
@@ -541,9 +518,6 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-phone-button-a { top: 20%; left: -3px; height: 28px; }
 .hd-phone-button-b { top: 28%; left: -3px; height: 46px; }
 .hd-phone-button-c { top: 24%; right: -3px; height: 64px; }
-.hd-key-hint { position: absolute; bottom: clamp(24px, 3vw, 40px); left: 50%; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 0 2px; color: var(--hd-ink-2); white-space: nowrap; transform: translateX(-50%); transition: opacity 400ms var(--hd-ease); }
-.hd-key-hint::before { display: inline-block; width: 18px; height: 1px; content: ""; background: currentColor; opacity: .6; }
-.hd-key-hint.is-hidden { opacity: 0; }
 
 /* ---------- Quirky Ball (owner 10-23: show the game's own assets, not screenshots): its logo, cut into letters that land
    one by one like the title screen, next to the real play loop ---------- */
@@ -729,17 +703,21 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
 
 /* ---------- responsive ---------- */
 @media (max-width: 1040px) {
-  .hd-tenkey-grid { grid-template-columns: minmax(150px, .5fr) minmax(0, 1.3fr) minmax(230px, .8fr); gap: 20px; }
+  .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 40px; }
   .hd-phone { width: clamp(220px, 21vw, 280px); }
 }
 
 @media (max-width: 860px) {
   .hd-tenkey { margin-top: -36vh; padding-top: 64px; }
-  .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr); gap: 318px; }
-  .hd-tenkey-grid > .hd-glass, .hd-tenkey-grid > .hd-phone-figure { grid-column: auto; }
-  .hd-tenkey-grid > .hd-phone-figure { order: 2; }
+  .hd-tenkey::before { top: 120px; height: 540px; background-image: url("media/tenkey-itch/bg-960.webp"); background-size: 960px auto; }
+  .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .hd-tk-screen-frame { width: min(72vw, 320px); }
+  .hd-tk-features { grid-template-columns: minmax(0, 1fr); }
+  /* five screenshots side by side would be thumbnails on a phone: they scroll sideways instead */
+  .hd-tk-shots { display: flex; gap: 12px; margin-right: calc(-1 * var(--hd-gutter)); margin-left: calc(-1 * var(--hd-gutter)); padding: 0 var(--hd-gutter) 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-padding: 0 var(--hd-gutter); scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .hd-tk-shots::-webkit-scrollbar { display: none; }
+  .hd-tk-shots li { flex: 0 0 min(58vw, 260px); scroll-snap-align: start; }
   .hd-phone { width: min(62vw, 300px); }
-  .hd-key-hint { bottom: 18px; }
   .hd-quirky-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .hd-quirky-copy { display: contents; }
   .hd-quirky-copy > .hd-eyebrow-row { order: 1; }
@@ -770,7 +748,10 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
   body[data-page="studio"] .language-picker { margin: 4px 0 0; }
   body[data-page="studio"] .language-picker summary { width: 100%; min-height: 48px; justify-content: space-between; padding: 0 14px; border: 0; border-radius: 12px; color: var(--bar-ink); font-size: .86rem; }
   body[data-page="studio"] .language-menu { position: static; margin-top: 4px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .hd-glass { padding: 28px 22px 30px; border-radius: 26px; }
+  .hd-tenkey .hd-title { font-size: 36px; }
+  .hd-tk-play-row { gap: 14px; }
+  .hd-tk-play.hd-keycap-cta, .hd-tk-play .hd-keycap-face { width: 100%; }
+  .hd-tk-play-note { max-width: none; }
   .hd-title { font-size: clamp(2.1rem, 9vw, 2.8rem); }
   .hd-lede { font-size: 1rem; }
   .hd-cta-row { margin-top: 26px; }
@@ -790,8 +771,7 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
   html { scroll-behavior: auto; }
   .hd-tenkey { margin-top: 0; }
   .hd-smudge { animation: none; opacity: .9; }
-  .hd-shard { display: none; }
-  .hd-key-sprite, .hd-key img, .hd-btn-face, .hd-keycap-face, .youtube-card, .hd-topics a, .hd-arrow-link, body[data-page="studio"] .header-inner { transition: none; }
+  .hd-btn-face, .hd-keycap-face, .youtube-card, .hd-topics a, .hd-arrow-link, body[data-page="studio"] .header-inner { transition: none; }
   .hd-qb-piece { animation: none !important; opacity: 1 !important; }
   .youtube-card canvas { display: none; }
 }

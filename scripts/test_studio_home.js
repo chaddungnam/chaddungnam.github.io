@@ -81,10 +81,10 @@ const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const sectionOf = (html, id) => (html.match(new RegExp(`<section\\b[^>]*\\bid="${id}"[\\s\\S]*?</section>`)) || [""])[0];
 
 const homeLocales = {
-  "index.html": { lang: "ko", tenkeyHref: "10key/", more: "자세히 보기", self: "./?lang=ko", about: "about/", support: "support/", videoGroup: "딸깍 서바이벌 실제 플레이 영상", videoLabel: "딸깍 서바이벌 실제 플레이", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계", smallFirst: false, qbGroup: "Quirky Ball 실제 플레이 영상", qbVideo: "Quirky Ball 2.0 실제 플레이", comradeGroup: "동무와 멋진신세계 실제 플레이 영상", comradeVideo: "동무와 멋진신세계 실제 플레이" },
-  "index_en.html": { lang: "en", tenkeyHref: "10key/index_en.html", more: "Learn more", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoGroup: "10key Survival gameplay video", videoLabel: "10key Survival gameplay", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: true, qbGroup: "Quirky Ball gameplay video", qbVideo: "Quirky Ball 2.0 gameplay", comradeGroup: "Comrade and the Brave New World gameplay video", comradeVideo: "Comrade and the Brave New World gameplay" },
-  "index_de.html": { lang: "de", tenkeyHref: "10key/index_en.html", more: "Mehr erfahren", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoGroup: "10key Survival Gameplay-Video", videoLabel: "10key Survival Gameplay", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt", smallFirst: true, qbGroup: "Quirky Ball Gameplay-Video", qbVideo: "Quirky Ball 2.0 Gameplay", comradeGroup: "Genosse und die schöne neue Welt – Gameplay-Video", comradeVideo: "Genosse und die schöne neue Welt – Gameplay" },
-  "index_ja.html": { lang: "ja", tenkeyHref: "10key/index_en.html", more: "詳しく見る", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoGroup: "10key Survivalのプレイ映像", videoLabel: "10key Survivalのプレイ", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: false, qbGroup: "Quirky Ballのプレイ映像", qbVideo: "Quirky Ball 2.0のプレイ", comradeGroup: "Comrade and the Brave New Worldのプレイ映像", comradeVideo: "Comrade and the Brave New Worldのプレイ" },
+  "index.html": { lang: "ko", tenkeyHref: "10key/", more: "자세히 보기", self: "./?lang=ko", about: "about/", support: "support/", videoLabel: "딸깍 서바이벌 실제 플레이", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계", smallFirst: false, qbGroup: "Quirky Ball 실제 플레이 영상", qbVideo: "Quirky Ball 2.0 실제 플레이", comradeGroup: "동무와 멋진신세계 실제 플레이 영상", comradeVideo: "동무와 멋진신세계 실제 플레이" },
+  "index_en.html": { lang: "en", tenkeyHref: "10key/index_en.html", more: "Learn more", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoLabel: "10key Survival gameplay", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: true, qbGroup: "Quirky Ball gameplay video", qbVideo: "Quirky Ball 2.0 gameplay", comradeGroup: "Comrade and the Brave New World gameplay video", comradeVideo: "Comrade and the Brave New World gameplay" },
+  "index_de.html": { lang: "de", tenkeyHref: "10key/index_en.html", more: "Mehr erfahren", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoLabel: "10key Survival Gameplay", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt", smallFirst: true, qbGroup: "Quirky Ball Gameplay-Video", qbVideo: "Quirky Ball 2.0 Gameplay", comradeGroup: "Genosse und die schöne neue Welt – Gameplay-Video", comradeVideo: "Genosse und die schöne neue Welt – Gameplay" },
+  "index_ja.html": { lang: "ja", tenkeyHref: "10key/index_en.html", more: "詳しく見る", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoLabel: "10key Survivalのプレイ", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: false, qbGroup: "Quirky Ballのプレイ映像", qbVideo: "Quirky Ball 2.0のプレイ", comradeGroup: "Comrade and the Brave New Worldのプレイ映像", comradeVideo: "Comrade and the Brave New Worldのプレイ" },
 };
 // The Quirky Ball logo is cut into these pieces (assets/media/home/qb-logo/<piece>.webp); home.js lands them one by one.
 const QB_PIECES = ["q", "u", "i", "r", "k", "y", "b", "a", "l1", "l2", "dot", "hex", "ball"];
@@ -190,17 +190,17 @@ assert.deepEqual(Object.keys(home).sort(), ["EASE", "applyLiveVersion", "bayerTh
 
 // ---------- the four home pages ----------
 const expectedCopy = {
-  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "출시 준비 중", "다른 장르의 게임에서 만나요", "동무와 멋진신세계"],
-  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Coming soon", "See you in a game of another genre", "Comrade and the Brave New World"],
-  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Bald verfügbar", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt"],
-  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "近日配信予定", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "브라우저에서 무료", "다른 장르의 게임에서 만나요", "동무와 멋진신세계", "화려한 모험, 그리고 ASMR", "지금 플레이"],
+  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Free in your browser", "See you in a game of another genre", "Comrade and the Brave New World", "A dazzling adventure, and ASMR", "Play now"],
+  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Kostenlos im Browser", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt", "Ein funkelndes Abenteuer – und ASMR", "Jetzt spielen"],
+  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "ブラウザで無料", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World", "華やかな冒険、そしてASMR", "今すぐプレイ"],
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 출시 준비 중이에요. Quirky Ball은 지금 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
-  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming soon. Quirky Ball is out now on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival erscheint bald. Quirky Ball gibt es jetzt auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key Survivalは近日配信予定。Quirky Ballは今すぐiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 지금 브라우저에서 무료로 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
+  "index_en.html": ["House Duck — Independent Game Studio", "Play 10key Survival free in your browser now. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival jetzt kostenlos im Browser spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key Survivalは今すぐブラウザで無料プレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
 };
 
 const expectedDescriptions = {
@@ -239,23 +239,33 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.equal(hero.replace(/<[^>]*>/g, "").trim(), "House Duck", `${file} the desk scene carries no overlay copy`);
   assert.doesNotMatch(hero, /Quirky|google-play|apps\.apple|<video|<img|<button/, `${file} hero is the scene only`);
 
-  // --- 10key Survival (first game, unreleased: no store links) ---
-  assert.match(tenkey, /^<section class="hd-tenkey" id="games" data-theme="paper" data-tenkey aria-labelledby="tenkey-title">/, `${file} 10key Survival section`);
+  // --- 10key Survival (owner 10-28: the itch.io page's look; one PLAY to the free browser build, no store links yet) ---
+  const lang = l.lang;
+  assert.match(tenkey, /^<section class="hd-tenkey" id="games" data-theme="night" data-tenkey aria-labelledby="tenkey-title">/, `${file} 10key Survival section`);
   assert.ok(tenkey.includes(`<h2 class="hd-title" id="tenkey-title">${l.tenkeyTitle}</h2>`), `${file} section title is the game`);
-  assert.match(tenkey, /<span class="hd-chip hd-chip-status">[^<]+<\/span>/, `${file} shows a release status chip`);
   assert.ok(tenkey.includes(`hd-chip hd-chip-status">${copy[2]}<`), `${file} status chip says ${copy[2]}`);
-  assert.deepEqual([...tenkey.matchAll(/<li class="hd-chip">([^<]+)<\/li>/g)].map((match) => match[1]).slice(0, 2), ["iOS", "Android"], `${file} names both platforms`);
-  assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [`<a class="hd-keycap-cta" href="${l.tenkeyHref}" data-pressable>`], `${file} one pressable keycap link to the 10key page (Korean page in ko, the English page in en/de/ja)`);
-  assert.ok(tenkey.includes(`<span class="hd-keycap-face">${l.more}</span>`), `${file} 10key keycap is labelled ${l.more}`);
-  assert.match(tenkey, /<p class="hd-disclosure">[^<]+<\/p>/, `${file} discloses the paid model`);
-  assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop in the 10key phone`);
+  assert.ok(tenkey.includes(`<p class="hd-tk-pitch">${copy[5]}</p>`), `${file} the store subtitle is the pitch`);
+  const odds = lang === "ko" ? "10key/odds/" : "10key/odds/#en";
+  assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [
+    '<a class="hd-keycap-cta hd-tk-play" href="https://houseduck.itch.io/10key-survival" data-pressable>',
+    `<a class="hd-arrow-link hd-tk-more" href="${l.tenkeyHref}">`,
+    `<a href="${odds}">`,
+  ], `${file} one big PLAY to itch.io, the 10key page (Korean page in ko, the English page in en/de/ja) and the odds`);
+  assert.ok(tenkey.includes(`<span class="hd-tk-play-icon" aria-hidden="true"></span>${copy[6]}</span>`), `${file} PLAY is labelled ${copy[6]}`);
+  assert.ok(tenkey.includes(`">${l.more}</a>`), `${file} the 10key page link is labelled ${l.more}`);
+  assert.match(tenkey, /<p class="hd-tk-play-note">[^<]*itch\.io[^<]*<\/p>/, `${file} says PLAY opens itch.io`);
+  assert.match(tenkey, /<p class="hd-tk-fine">[^<]*8[.,]333[^<]*<a /, `${file} states the module odds as text`);
+  assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop`);
   const video = tenkey.match(/<video\b[^>]*>/)[0];
   for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/tenkey-gameplay-poster.webp"', `aria-label="${l.videoLabel}"`]) assert.ok(video.includes(attribute), `${file} gameplay video needs ${attribute.trim()}`);
   assert.ok(tenkey.includes('<source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm">'), `${file} gameplay video has mp4 and webm sources`);
-  assert.ok(tenkey.includes(`role="group" aria-label="${l.videoGroup}"`), `${file} phone is a labelled group`);
-  assert.match(tenkey, /<figcaption class="hd-micro">[^<]+<\/figcaption>/, `${file} says the footage comes from a pre-release build`);
-  assert.equal((tenkey.match(/class="hd-phone-button /g) || []).length, 3, `${file} phone shows its three side buttons`);
-  assert.match(tenkey, /data-key-hint aria-hidden="true">[^<]+<\/p>/, `${file} hints that the keycaps can be pressed`);
+  assert.match(tenkey, /<figcaption class="hd-micro">[^<]+<\/figcaption>/, `${file} captions the footage`);
+  assert.ok(tenkey.includes('<source media="(max-width: 600px)" srcset="assets/media/tenkey-itch/cover.webp" width="630" height="500"><img src="assets/media/tenkey-itch/banner.webp" width="960" height="300"'), `${file} itch.io banner (cover on phones)`);
+  assert.deepEqual([...tenkey.matchAll(/src="assets\/media\/tenkey-itch\/(desc-[a-z]+)\.webp"[^>]*loading="lazy"/g)].map((match) => match[1]), ["desc-dig", "desc-survive", "desc-evolve"], `${file} the three itch.io description images, lazy`);
+  assert.deepEqual([...tenkey.matchAll(/src="assets\/media\/tenkey-itch\/shot-([a-z]+)-([a-z]+)\.webp"[^>]*loading="lazy"/g)].map((match) => `${match[1]}-${match[2]}`),
+    ["dig", "mouse", "levelup", "numlock", "fever"].map((shot) => `${shot}-${lang}`), `${file} five store screenshots in its own language, lazy`);
+  for (const ref of tenkey.matchAll(/(?:src|srcset)="(assets\/media\/tenkey-itch\/[^"]+)"/g)) assert.ok(fs.existsSync(path.join(root, ref[1])), `${file}: ${ref[1]} must exist`);
+  assert.doesNotMatch(tenkey, /data-keyfield|data-glass|data-key-hint|hd-phone/, `${file} the keycap toy and the phone mock-up are gone`);
   assert.doesNotMatch(hero + tenkey, /play\.google\.com|apps\.apple\.com|google-play-badge|app-store-badge/, `${file} 10key Survival has no store link before release`);
   assert.doesNotMatch(tenkey, /Quirky/, `${file} the 10key Survival section does not mention Quirky Ball`);
 

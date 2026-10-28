@@ -486,6 +486,10 @@
     hero = desk.closest('.hd-hero') || desk.parentElement;
     sticky = desk.closest('.hd-hero-sticky') || hero;
     link = desk.querySelector('.hd-desk-screen-link');
+    // the zoom fades to the colour of the section that rises over it (--hd-hand-off on the 10key section)
+    var next = document.getElementById('games');
+    var handOff = next ? getComputedStyle(next).getPropertyValue('--hd-hand-off').trim() : '';
+    if (handOff) PAPER = handOff;
     if (!link) { link = document.createElement('a'); link.className = 'hd-desk-screen-link'; link.href = '#games'; desk.appendChild(link); }
     canvas = document.createElement('canvas');
     canvas.className = 'hd-desk-canvas';

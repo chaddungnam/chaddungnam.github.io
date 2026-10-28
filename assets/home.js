@@ -101,8 +101,9 @@
       scheduled = false;
       const probe = header.getBoundingClientRect();
       const y = probe.top + probe.height / 2;
-      // The hero fades to paper once its zoom has ended (.is-entered), so the pill goes light there too.
-      const themeOf = (section) => section.classList.contains("hd-hero") && section.classList.contains("is-entered") ? "paper" : section.dataset.theme;
+      // The hero fades to the 10key section's tone once its zoom has ended (.is-entered), so the bar follows it there too.
+      const handOff = document.getElementById("games")?.dataset.theme || "paper";
+      const themeOf = (section) => section.classList.contains("hd-hero") && section.classList.contains("is-entered") ? handOff : section.dataset.theme;
       let theme = themeOf(sections[0]);
       for (const section of sections) {
         const rect = section.getBoundingClientRect();
