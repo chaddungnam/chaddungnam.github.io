@@ -43,17 +43,22 @@ test("tracked player identity opens detail and memo tags persist", async ({ page
   await identity.click();
 
   await expect(page.locator("#pageTitle")).toHaveText("플레이어 상세");
+  const noteFold = page.locator("details.player-fold").filter({ has: page.locator("#playerNoteForm") });
+  await expect(noteFold.locator("summary")).toHaveText("추적 메모 · 추적 중 · 유튜브 구독자");
+  await noteFold.locator("summary").click();
   await expect(page.locator("#playerNoteForm")).toBeVisible();
   await expect(page.locator("#playerNoteForm [name=tracked]")).toBeChecked();
   await expect(page.locator("#playerNoteForm [name=tags]")).toHaveValue("유튜브 구독자");
   await expect(page.locator("#playerNoteForm [name=note]")).toHaveValue("첫 실행 버그 확인 중");
   await expect(page.locator("article.player-facts")).toContainText("최근 완료");
   await expect(page.locator("article.player-facts")).toContainText("계정 생성");
-  await expect(page.getByRole("region", { name: "최초 튜토리얼" })).toContainText("확인 불가");
+  await expect(page.locator("details.player-fold > summary", { hasText: "최초 튜토리얼" })).toHaveText("최초 튜토리얼 · 확인 불가");
 
   await page.locator("#playerNoteForm [name=tags]").fill("유튜브 구독자, 지인");
   await page.locator("#playerNoteForm [name=note]").fill("튜토리얼 재현 영상 요청");
   await page.locator("#playerNoteForm button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toContainText("추적 메모 저장");
+  await page.locator("#confirmDialog button[value=confirm]").click();
 
   await expect(page.locator("#playerMessage")).toContainText("추적 메모를 저장했습니다");
   await expect(page.locator(".player-detail-head")).toContainText("지인");
