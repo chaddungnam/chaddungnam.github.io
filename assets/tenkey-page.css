@@ -1,24 +1,27 @@
-/* 딸깍 서바이벌 / 10key Survival game page. Rebuilt 2026-10-24 (owner: less generic, pre-registration visible at a glance).
-   One dark night from top to bottom, real game footage and screenshots, and the pre-registration form in the first screen.
+/* 딸깍 서바이벌 / 10key Survival game page. Rebuilt 2026-10-28 to match the itch.io page (owner): its dark theme and
+   background art, the banner, the three description images, the store screenshots and one big PLAY that opens the
+   browser build on itch.io. The app pre-registration (2026-10-24) and the odds stay further down the page.
    Also styles /10key/prereg/ (confirm / unsubscribe) and /10key/get/ (the one download link of the launch mail).
    Loaded after brand-site.css, which only supplies the logo lockup and the skip link. */
 
 :root {
-  --tk-night: #0b0f2a;
-  --tk-night-2: #12173a;
-  --tk-night-3: #181f4a;
-  --tk-night-deep: #070a1e;
-  --tk-duck: #f5b731;
-  --tk-duck-soft: #f8d27a;
+  /* the itch.io theme: BG #141318, BG2 #1D1D23, text #ECE6D6, links and buttons #FFD23F */
+  --tk-night: #141318;
+  --tk-night-2: #1d1d23;
+  --tk-night-3: #26252d;
+  --tk-night-deep: #0e0d11;
+  --tk-duck: #ffd23f;
+  --tk-duck-soft: #ffe07a;
   --tk-crt: #2a4fc4;
-  --tk-key-gold: #f2b63c;
-  --tk-key-side: #b8821f;
-  --tk-cream: #f3ecdc;
-  --tk-text: rgba(255, 255, 255, .92);
-  --tk-text-2: rgba(255, 255, 255, .72);
-  --tk-text-3: rgba(255, 255, 255, .56);
-  --tk-edge: rgba(255, 255, 255, .12);
-  --tk-edge-2: rgba(255, 255, 255, .22);
+  --tk-key-gold: #ffd23f;
+  --tk-key-side: #a9820f;
+  --tk-cream: #ece6d6;
+  --tk-text: #ece6d6;
+  --tk-text-2: rgba(236, 230, 214, .74);
+  --tk-text-3: rgba(236, 230, 214, .56);
+  --tk-edge: rgba(236, 230, 214, .12);
+  --tk-edge-2: rgba(236, 230, 214, .22);
+  --tk-pixel: "Galmuri11", "PixelMplus12", "Montserrat", -apple-system, "Apple SD Gothic Neo", "Hiragino Sans", sans-serif;
   --tk-ok: #7ee2a8;
   --tk-err: #ff9d8a;
   --tk-ease: cubic-bezier(.2, .7, .2, 1);
@@ -49,7 +52,7 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
 .tk-page .site-header {
   position: fixed; top: 0; right: 0; left: 0; z-index: 100;
   border: 0; color: #fff;
-  background: rgba(11, 15, 42, .9);
+  background: rgba(20, 19, 24, .9);
   box-shadow: 0 1px 0 rgba(255, 255, 255, .08);
   backdrop-filter: blur(16px) saturate(1.3);
   -webkit-backdrop-filter: blur(16px) saturate(1.3);
@@ -66,8 +69,8 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
   transition: color 160ms var(--tk-ease), background-color 160ms var(--tk-ease);
 }
 .tk-nav-link:hover, .tk-nav-link:focus-visible { color: #fff; background: rgba(255, 255, 255, .1); }
-.tk-nav-cta { color: var(--tk-night); background: var(--tk-duck); }
-.tk-nav-cta:hover, .tk-nav-cta:focus-visible { color: var(--tk-night); background: var(--tk-duck-soft); }
+.tk-page .tk-nav-cta { color: var(--tk-night); background: var(--tk-duck); }
+.tk-page .tk-nav-cta:hover, .tk-page .tk-nav-cta:focus-visible { color: var(--tk-night); background: var(--tk-duck-soft); }
 .tk-lang { display: inline-flex; margin-left: 6px; padding: 3px; border: 1px solid var(--tk-edge-2); border-radius: 999px; }
 .tk-lang a {
   display: inline-flex; min-width: 40px; min-height: 36px; align-items: center; justify-content: center; border-radius: 999px;
@@ -78,7 +81,7 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
 
 /* ---------- keycap button (pressable, the game's own look) ---------- */
 .tk-key {
-  --btn: var(--tk-key-gold); --btn-side: var(--tk-key-side); --btn-ink: #2a1c05; --depth: 6px;
+  --btn: var(--tk-key-gold); --btn-side: var(--tk-key-side); --btn-ink: #141318; --depth: 6px;
   position: relative; display: inline-flex; min-height: 56px; margin: 0 0 var(--depth); padding: 0;
   border: 0; border-radius: 14px; color: var(--btn-ink); background: none;
   font: inherit; font-size: 1rem; font-weight: 800; letter-spacing: -.01em; text-decoration: none;
@@ -92,60 +95,69 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset:
     0 var(--depth) 0 var(--btn-side), 0 calc(var(--depth) + 2px) 6px rgba(0, 0, 0, .28);
   transition: transform 110ms var(--tk-ease), box-shadow 110ms var(--tk-ease), filter 160ms var(--tk-ease);
 }
+.tk-page a.tk-key { color: var(--btn-ink); }
 .tk-key:hover .tk-key-face { filter: brightness(1.05); }
 .tk-key:active .tk-key-face, .tk-key[aria-busy="true"] .tk-key-face {
   transform: translateY(calc(var(--depth) - 1px));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 var(--btn-side), 0 2px 4px rgba(0, 0, 0, .25);
 }
 .tk-key[disabled] { cursor: progress; }
-.tk-key-ghost { --btn: #e9ebf7; --btn-side: #9aa0c3; --btn-ink: var(--tk-night); }
+.tk-key-ghost { --btn: #ece6d6; --btn-side: #a39d8d; --btn-ink: var(--tk-night); }
 
-/* ---------- first screen: title, pre-registration, real gameplay ---------- */
+/* ---------- first screen: banner, title, pitch, PLAY, real gameplay (the itch.io page's look) ---------- */
 .tk-hero {
   position: relative;
   padding: calc(var(--tk-bar) + clamp(28px, 5vw, 64px)) 0 clamp(48px, 7vw, 88px);
   overflow: clip;
-  background:
-    radial-gradient(42% 60% at 78% 46%, rgba(42, 79, 196, .42), transparent 70%),
-    radial-gradient(30% 40% at 74% 70%, rgba(245, 183, 49, .14), transparent 72%),
-    linear-gradient(180deg, #0b0f2a 0%, #0e1334 60%, #0b0f2a 100%);
+  background: url("media/tenkey-itch/bg.webp") center top / max(1920px, 100%) auto no-repeat, var(--tk-night);
 }
-.tk-hero-grid {
-  --tk-phone-w: clamp(220px, 24vw, 300px);
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(32px, 6vw, 88px);
-}
-.tk-hero-copy { min-width: 0; max-width: 36rem; }
-.tk-kicker { margin: 0 0 18px; color: var(--tk-duck-soft); font-size: .86rem; font-weight: 700; letter-spacing: .02em; }
-:lang(en) .tk-kicker { letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
-#game-title { display: flex; flex-direction: column; margin: 0; color: #fff; line-height: 1.04; }
-.tk-title-main { font-size: clamp(2.8rem, 6.4vw, 5rem); font-weight: 800; letter-spacing: -.045em; word-break: keep-all; text-shadow: 0 2px 40px rgba(42, 79, 196, .55); }
-.tk-title-alt { margin-top: 12px; color: var(--tk-text-3); font-size: clamp(.92rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .1em; }
+.tk-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); align-items: center; gap: clamp(32px, 6vw, 96px); }
+.tk-hero-copy { min-width: 0; }
+.tk-logo { display: block; margin: 0 0 clamp(26px, 3vw, 36px); }
+.tk-logo img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-edge), 0 24px 60px rgba(0, 0, 0, .45); }
+#game-title { display: flex; flex-direction: column; margin: 0; color: var(--tk-text); line-height: 1.04; }
+.tk-title-main { font-family: var(--tk-pixel); font-size: 48px; font-weight: 700; line-height: 1.25; word-break: keep-all; }
+.tk-title-alt { margin-top: 10px; color: var(--tk-text-3); font-size: clamp(.92rem, 1.2vw, 1.05rem); font-weight: 700; letter-spacing: .1em; }
 html:lang(ko) #game-title { flex-direction: column-reverse; }
-html:lang(ko) .tk-title-alt { margin: 12px 0 0; }
-html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
-.tk-lede { max-width: 31rem; margin: 22px 0 0; color: var(--tk-text-2); font-size: clamp(1.02rem, 1.3vw, 1.16rem); line-height: 1.7; word-break: keep-all; text-wrap: pretty; }
+html:lang(ko) .tk-title-alt { margin: 10px 0 0; text-transform: uppercase; }
+html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
+.tk-pitch { margin: 18px 0 0; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.5; word-break: keep-all; text-wrap: balance; }
+.tk-lede { max-width: 34rem; margin: 14px 0 0; color: var(--tk-text-2); font-size: clamp(1.02rem, 1.3vw, 1.12rem); line-height: 1.7; word-break: keep-all; text-wrap: pretty; }
+.tk-play-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
+.tk-key.tk-play { --depth: 8px; min-height: 72px; border-radius: 16px; font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; }
+.tk-play .tk-key-face { gap: 14px; min-width: 260px; padding: 0 36px; box-sizing: border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--depth) 0 var(--btn-side), 0 calc(var(--depth) + 16px) 36px rgba(255, 210, 63, .22); }
+.tk-play-icon { width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-left: 18px solid currentColor; }
+.tk-play-note { max-width: 26ch; margin: 0; color: var(--tk-text-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
+.tk-hero-app { display: inline-flex; min-height: 44px; align-items: center; margin-top: 18px; }
+
+/* the play loop in a plain game frame, like the itch.io embed (portrait 9:16) */
+.tk-screen { display: grid; justify-items: center; gap: 12px; margin: 0; }
+.tk-screen-frame { display: block; width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid var(--tk-edge); border-radius: 14px; background: var(--tk-night-2); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
+.tk-screen-video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 8px; background: #000; object-fit: cover; }
+.tk-screen figcaption { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--tk-text-3); font-size: .8rem; text-align: center; }
 
 /* the pre-registration card */
 .tk-prereg {
-  margin-top: 30px; padding: clamp(20px, 2.6vw, 28px);
-  border: 1px solid rgba(245, 183, 49, .38); border-radius: 22px;
-  background: linear-gradient(180deg, rgba(245, 183, 49, .10), rgba(245, 183, 49, .03) 60%), rgba(18, 23, 58, .82);
+  padding: clamp(20px, 2.6vw, 28px);
+  border: 1px solid rgba(255, 210, 63, .38); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 210, 63, .08), rgba(255, 210, 63, .02) 60%), var(--tk-night-2);
   box-shadow: 0 30px 70px rgba(0, 0, 0, .35);
 }
 .tk-prereg-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
-.tk-prereg h2 { margin: 0; color: #fff; font-size: 1.32rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.3; word-break: keep-all; }
+.tk-prereg h2 { margin: 0; color: var(--tk-text); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
 .tk-prereg-free { margin: 0; color: var(--tk-duck-soft); font-size: .84rem; font-weight: 700; }
 .tk-prereg-sub { margin: 8px 0 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
 .tk-form-row { display: flex; gap: 10px; }
 .tk-field { position: relative; flex: 1 1 auto; min-width: 0; }
 .tk-input {
   width: 100%; height: 56px; box-sizing: border-box; padding: 0 16px;
-  border: 1px solid var(--tk-edge-2); border-radius: 14px; color: #fff; background: rgba(7, 10, 30, .72);
+  border: 1px solid var(--tk-edge-2); border-radius: 14px; color: #fff; background: rgba(14, 13, 17, .72);
   font: inherit; font-size: 1rem; outline: none;
   transition: border-color 160ms var(--tk-ease), box-shadow 160ms var(--tk-ease);
 }
 .tk-input::placeholder { color: var(--tk-text-3); }
-.tk-input:focus { border-color: var(--tk-duck); box-shadow: 0 0 0 3px rgba(245, 183, 49, .25); }
+.tk-input:focus { border-color: var(--tk-duck); box-shadow: 0 0 0 3px rgba(255, 210, 63, .25); }
 .tk-input[aria-invalid="true"] { border-color: var(--tk-err); }
 .tk-form-row .tk-key { flex: none; }
 .tk-consent { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; color: var(--tk-text-2); font-size: .85rem; line-height: 1.55; word-break: keep-all; cursor: pointer; }
@@ -162,19 +174,6 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
 .tk-facts li::before { width: 6px; height: 6px; border-radius: 2px; content: ""; background: var(--tk-duck); }
 .tk-facts b { color: #fff; font-weight: 700; }
 
-/* phone with the real gameplay loop */
-.tk-phone-figure { display: grid; justify-items: center; gap: 14px; margin: 0; }
-.tk-phone { position: relative; width: var(--tk-phone-w); }
-.tk-phone::before { position: absolute; inset: 8% -24% 2%; z-index: -1; content: ""; border-radius: 50%; background: radial-gradient(closest-side, rgba(42, 79, 196, .55), rgba(245, 183, 49, .1) 70%, transparent); filter: blur(22px); }
-.tk-phone-shell {
-  position: relative; display: block; aspect-ratio: 9 / 18; padding: 10px; overflow: hidden;
-  border-radius: calc(var(--tk-phone-w) * .166); background: #0e1020;
-  box-shadow: inset 0 0 0 1.5px #3a3d55, inset 0 0 0 5px #0b0c19, 0 2px 2px rgba(255, 255, 255, .22), 0 40px 80px rgba(0, 0, 0, .55);
-}
-.tk-phone-video { display: block; width: 100%; height: 100%; border-radius: calc(var(--tk-phone-w) * .133); background: #000; object-fit: contain; }
-.tk-phone-island { position: absolute; top: 18px; left: 50%; z-index: 3; width: 32%; height: 24px; border-radius: 999px; background: #050610; transform: translateX(-50%); }
-.tk-phone-home { position: absolute; bottom: 18px; left: 50%; z-index: 3; width: 36%; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, .8); transform: translateX(-50%); }
-.tk-phone-figure figcaption { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--tk-text-3); font-size: .8rem; text-align: center; }
 .tk-video-toggle {
   display: inline-grid; width: 36px; height: 36px; flex: none; place-items: center; padding: 0;
   border: 1px solid var(--tk-edge-2); border-radius: 50%; color: #fff; background: rgba(255, 255, 255, .08); cursor: pointer;
@@ -189,29 +188,54 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
 /* ---------- sections ---------- */
 .tk-section { padding: clamp(64px, 8vw, 104px) 0; }
 .tk-section + .tk-section { border-top: 1px solid var(--tk-edge); }
-.tk-h2 { margin: 0 0 clamp(28px, 4vw, 44px); color: #fff; font-size: clamp(1.7rem, 3.2vw, 2.5rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.18; word-break: keep-all; text-wrap: balance; }
-.tk-h2 small { display: block; margin-top: 10px; color: var(--tk-text-2); font-size: clamp(.98rem, 1.3vw, 1.08rem); font-weight: 500; letter-spacing: 0; line-height: 1.6; }
+.tk-h2 { margin: 0 0 clamp(28px, 4vw, 44px); color: var(--tk-text); font-family: var(--tk-pixel); font-size: 36px; font-weight: 700; line-height: 1.3; word-break: keep-all; text-wrap: balance; }
+.tk-h2 small { display: block; margin-top: 12px; color: var(--tk-text-2); font-family: var(--tk-font); font-size: clamp(.98rem, 1.3vw, 1.08rem); font-weight: 500; letter-spacing: 0; line-height: 1.6; }
 
-/* how it plays: four real screenshots, numbered by the game's own keycaps */
-.tk-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); margin: 0; padding: 0; list-style: none; }
-.tk-step { min-width: 0; }
-.tk-step figure { position: relative; margin: 0 0 18px; }
-.tk-step-shot { display: block; padding: 6px; border-radius: 30px; background: #0e1020; box-shadow: inset 0 0 0 1.5px #3a3d55, 0 24px 50px rgba(0, 0, 0, .4); }
-.tk-step-shot img { display: block; width: 100%; height: auto; aspect-ratio: 600 / 1171; border-radius: 24px; background: #0b0c19; object-fit: cover; }
-.tk-step-key { position: absolute; top: -18px; left: -12px; width: 64px; height: 64px; transform: rotate(-8deg); pointer-events: none; }
-.tk-step-key img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.tk-step h3 { margin: 0 0 6px; color: #fff; font-size: 1.08rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.35; word-break: keep-all; }
-.tk-step p { margin: 0; color: var(--tk-text-2); font-size: .93rem; line-height: 1.65; word-break: keep-all; text-wrap: pretty; }
+/* how to play: the three itch.io description images, each with its rules */
+.tk-features { display: grid; gap: clamp(20px, 3vw, 32px); }
+.tk-feature { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; overflow: hidden; border: 1px solid var(--tk-edge); border-radius: 16px; background: var(--tk-night-2); }
+.tk-feature img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; aspect-ratio: 959 / 520; }
+.tk-feature > div { padding: clamp(22px, 3vw, 36px); }
+.tk-feature h3 { margin: 0 0 14px; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
+.tk-feature ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tk-feature li { position: relative; padding-left: 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.65; word-break: keep-all; text-wrap: pretty; }
+.tk-feature li::before { position: absolute; top: .62em; left: 0; width: 6px; height: 6px; border-radius: 1px; content: ""; background: var(--tk-duck); }
+
+/* the store screenshots, in the visitor's language */
+.tk-shots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); margin: 0; padding: 0; list-style: none; }
+.tk-shots img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-edge), 0 16px 40px rgba(0, 0, 0, .4); }
+.tk-shots:focus-visible { outline-offset: 6px; }
+
+/* controls, with the keys drawn as keycaps */
+.tk-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0; border: 1px solid var(--tk-edge); border-radius: 16px; overflow: hidden; background: var(--tk-night-2); }
+.tk-controls div { display: grid; gap: 8px; padding: 20px 24px; border-bottom: 1px solid var(--tk-edge); }
+.tk-controls div:nth-child(odd) { border-right: 1px solid var(--tk-edge); }
+.tk-controls div:nth-last-child(-n + 2) { border-bottom: 0; }
+.tk-controls dt { color: var(--tk-text-3); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
+.tk-controls dd { margin: 0; color: var(--tk-text); font-size: .95rem; line-height: 2; word-break: keep-all; }
+.tk-controls kbd { display: inline-block; min-width: 1.9em; margin: 0 1px; padding: 0 .45em; box-sizing: border-box; border-radius: 6px; color: #141318; background: var(--tk-cream); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .14), 0 2px 0 #a39d8d; font-family: var(--tk-pixel); font-size: .82rem; font-weight: 700; line-height: 1.7; text-align: center; }
+
+/* odds of the app's module draw, as text on the page (Korea's probability-item disclosure) */
+.tk-odds { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 420px); align-items: start; gap: clamp(28px, 5vw, 72px); }
+.tk-odds p { max-width: 36rem; margin: 0 0 18px; color: var(--tk-text-2); line-height: 1.7; word-break: keep-all; }
+.tk-odds-table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; background: var(--tk-night-2); box-shadow: 0 0 0 1px var(--tk-edge); font-size: .92rem; }
+.tk-odds-table caption { padding: 0 0 12px; color: var(--tk-text-3); font-size: .8rem; font-weight: 700; text-align: left; }
+.tk-odds-table th, .tk-odds-table td { padding: 9px 18px; border-bottom: 1px solid var(--tk-edge); text-align: left; }
+.tk-odds-table th { color: var(--tk-text-3); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+.tk-odds-table td + td, .tk-odds-table th + th { text-align: right; font-variant-numeric: tabular-nums; }
+.tk-odds-table tfoot td { border-bottom: 0; color: var(--tk-text); font-weight: 700; }
+
+.tk-app .tk-prereg { max-width: 40rem; margin: 0 auto; }
 
 /* the facts, as a plain sheet */
-.tk-sheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--tk-edge); border-radius: 20px; overflow: hidden; background: var(--tk-night-2); }
+.tk-sheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border: 1px solid var(--tk-edge); border-radius: 16px; overflow: hidden; background: var(--tk-night-2); }
 .tk-sheet div { padding: 22px 24px; border-right: 1px solid var(--tk-edge); border-bottom: 1px solid var(--tk-edge); }
 .tk-sheet div:nth-child(3n) { border-right: 0; }
 .tk-sheet div:nth-last-child(-n + 3) { border-bottom: 0; }
 .tk-sheet dt { margin: 0 0 6px; color: var(--tk-text-3); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
 .tk-sheet dd { margin: 0; color: #fff; font-size: 1.02rem; font-weight: 700; line-height: 1.5; word-break: keep-all; }
 .tk-sheet dd span { display: block; margin-top: 2px; color: var(--tk-text-2); font-size: .88rem; font-weight: 500; }
-.tk-sheet .is-key { background: rgba(245, 183, 49, .08); }
+.tk-sheet .is-key { background: rgba(255, 210, 63, .08); }
 .tk-sheet .is-key dd { color: var(--tk-duck-soft); }
 
 /* questions */
@@ -226,7 +250,7 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
 /* last call */
 .tk-final { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: clamp(28px, 5vw, 72px); }
 .tk-final .tk-h2 { margin-bottom: 22px; }
-.tk-keyart { margin: 0; overflow: hidden; border-radius: 24px; background: #0b0c19; box-shadow: 0 0 0 1px var(--tk-edge), 0 30px 80px rgba(0, 0, 0, .5); }
+.tk-keyart { margin: 0; overflow: hidden; border-radius: 16px; background: #0b0c19; box-shadow: 0 0 0 1px var(--tk-edge), 0 30px 80px rgba(0, 0, 0, .5); }
 .tk-keyart img { display: block; width: 100%; height: auto; aspect-ratio: 960 / 469; }
 .tk-final-links { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
 .tk-text-link { color: var(--tk-text-2); font-size: .9rem; font-weight: 600; text-underline-offset: 4px; }
@@ -234,8 +258,8 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
 
 /* ---------- small pages: /10key/prereg/ and /10key/get/ ---------- */
 .tk-small { display: grid; min-height: 100vh; min-height: 100svh; place-items: center; padding: calc(var(--tk-bar) + 32px) 0 48px; box-sizing: border-box;
-  background: radial-gradient(50% 50% at 50% 40%, rgba(42, 79, 196, .35), transparent 70%), var(--tk-night); }
-.tk-card { width: min(520px, 100% - 2 * var(--tk-gutter)); padding: clamp(24px, 4vw, 36px); box-sizing: border-box; border: 1px solid var(--tk-edge); border-radius: 24px; background: rgba(18, 23, 58, .9); text-align: center; box-shadow: 0 30px 70px rgba(0, 0, 0, .4); }
+  background: url("media/tenkey-itch/bg.webp") center top / max(1920px, 100%) auto no-repeat, var(--tk-night); }
+.tk-card { width: min(520px, 100% - 2 * var(--tk-gutter)); padding: clamp(24px, 4vw, 36px); box-sizing: border-box; border: 1px solid var(--tk-edge); border-radius: 16px; background: rgba(29, 29, 35, .94); text-align: center; box-shadow: 0 30px 70px rgba(0, 0, 0, .4); }
 .tk-card-key { display: block; width: 84px; height: 84px; margin: 0 auto 14px; position: relative; }
 .tk-card-key img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .tk-card h1 { margin: 0 0 10px; color: #fff; font-size: clamp(1.5rem, 4vw, 1.9rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.25; word-break: keep-all; }
@@ -255,11 +279,12 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
 .tk-js .tk-reveal { opacity: 0; transform: translateY(22px); transition: opacity 600ms var(--tk-ease), transform 600ms var(--tk-ease); transition-delay: calc(var(--i, 0) * 80ms); }
 .tk-js .tk-reveal.is-in { opacity: 1; transform: none; }
 .tk-flash { animation: tk-flash 1.2s var(--tk-ease); }
-@keyframes tk-flash { 0% { box-shadow: 0 0 0 0 rgba(245, 183, 49, .7), 0 30px 70px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 18px rgba(245, 183, 49, 0), 0 30px 70px rgba(0, 0, 0, .35); } }
+@keyframes tk-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 210, 63, .7), 0 30px 70px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 18px rgba(255, 210, 63, 0), 0 30px 70px rgba(0, 0, 0, .35); } }
 
 /* ---------- responsive ---------- */
 @media (max-width: 960px) {
-  .tk-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px; }
+  .tk-feature { grid-template-columns: minmax(0, 1fr); }
+  .tk-odds { grid-template-columns: minmax(0, 1fr); }
   .tk-sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tk-sheet div:nth-child(3n) { border-right: 1px solid var(--tk-edge); }
   .tk-sheet div:nth-child(2n) { border-right: 0; }
@@ -267,17 +292,27 @@ html:lang(en) .tk-title-alt { margin: 12px 0 0; letter-spacing: .02em; }
   .tk-sheet div:nth-last-child(-n + 2) { border-bottom: 0; }
 }
 @media (max-width: 860px) {
-  .tk-hero-grid { grid-template-columns: minmax(0, 1fr); --tk-phone-w: clamp(200px, 58vw, 260px); }
-  .tk-hero-copy { max-width: none; }
-  .tk-phone-figure { order: 2; }
+  .tk-hero { background-image: url("media/tenkey-itch/bg-960.webp"); background-size: 960px auto; }
+  .tk-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .tk-screen-frame { width: min(72vw, 320px); }
+  .tk-controls { grid-template-columns: minmax(0, 1fr); }
+  .tk-controls div:nth-child(odd) { border-right: 0; }
+  .tk-controls div:nth-last-child(2) { border-bottom: 1px solid var(--tk-edge); }
+  /* five screenshots side by side would be thumbnails on a phone: they scroll sideways instead */
+  .tk-shots { display: flex; gap: 12px; margin-right: calc(-1 * var(--tk-gutter)); margin-left: calc(-1 * var(--tk-gutter)); padding: 0 var(--tk-gutter) 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-padding: 0 var(--tk-gutter); scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .tk-shots::-webkit-scrollbar { display: none; }
+  .tk-shots li { flex: 0 0 min(58vw, 260px); scroll-snap-align: start; }
   .tk-final { grid-template-columns: minmax(0, 1fr); }
   .tk-nav-link:not(.tk-nav-cta) { display: none; }
 }
 @media (max-width: 520px) {
   .tk-form-row { flex-direction: column; }
   .tk-form-row .tk-key { width: 100%; }
-  .tk-steps { gap: 28px 14px; }
-  .tk-step-key { width: 50px; height: 50px; top: -14px; left: -8px; }
+  .tk-title-main { font-size: 36px; }
+  .tk-h2 { font-size: 24px; }
+  .tk-play-row { gap: 14px; }
+  .tk-key.tk-play, .tk-play .tk-key-face { width: 100%; }
+  .tk-play-note { max-width: none; }
   .tk-sheet { grid-template-columns: minmax(0, 1fr); }
   .tk-sheet div, .tk-sheet div:nth-child(3n), .tk-sheet div:nth-child(2n) { border-right: 0; border-bottom: 1px solid var(--tk-edge); }
   .tk-sheet div:last-child { border-bottom: 0; }

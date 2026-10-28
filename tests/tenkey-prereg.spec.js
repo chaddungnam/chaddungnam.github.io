@@ -1,21 +1,31 @@
-// 10key Survival page (rebuilt 2026-10-24): the pre-registration form is in the first screen, and posts
-// a double opt-in sign-up to the tenkey-prereg edge function (mocked here, no real mail). Also /10key/prereg/ and /10key/get/.
+// 10key Survival page (rebuilt 2026-10-28 to match the itch.io page): the first screen is the big PLAY to the free browser build on
+// itch.io; the app pre-registration is one click away (the link under PLAY) and posts a double opt-in sign-up to the tenkey-prereg
+// edge function (mocked here, no real mail). The page states the module odds as text. Also /10key/prereg/ and /10key/get/.
 const { test, expect } = require("@playwright/test");
 
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { submit: "사전예약하기", ok: "확인 메일을 보냈어요", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { submit: "Pre-register", ok: "We sent you a confirmation email", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { play: "지금 플레이", odds: "odds/", submit: "사전예약하기", ok: "확인 메일을 보냈어요", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { play: "Play now", odds: "odds/#en", submit: "Pre-register", ok: "We sent you a confirmation email", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
-  test(`pre-registration is visible at once and signs up (${url})`, async ({ page }) => {
+  test(`PLAY opens itch.io from the first screen, the odds are text, and pre-registration signs up (${url})`, async ({ page }) => {
     const posts = [];
     await page.route(FN, async (route) => {
       posts.push({ body: route.request().postData(), type: route.request().headers()["content-type"] });
       await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' });
     });
     await page.goto(url);
+    const play = page.locator(".tk-hero .tk-play");
+    await expect(play).toBeInViewport();
+    await expect(play).toHaveText(words.play);
+    await expect(play).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+    await expect(page.locator(".tk-odds-table tbody tr")).toHaveCount(12);
+    await expect(page.locator(".tk-odds-table tbody")).toContainText("8.333%");
+    await expect(page.locator(`#odds-info a[href='${words.odds}']`)).toHaveCount(1);
+
     const card = page.locator("#prereg");
+    await page.locator(".tk-hero-app").click();
     await expect(card).toBeInViewport();
     await expect(card.getByRole("button", { name: words.submit })).toBeInViewport();
     await expect(card).not.toContainText(/유료|무료|paid|free/i);
