@@ -190,17 +190,17 @@ assert.deepEqual(Object.keys(home).sort(), ["EASE", "applyLiveVersion", "bayerTh
 
 // ---------- the four home pages ----------
 const expectedCopy = {
-  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "브라우저에서 무료", "다른 장르의 게임에서 만나요", "동무와 멋진신세계", "화려한 모험, 그리고 ASMR", "지금 플레이"],
-  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Free in your browser", "See you in a game of another genre", "Comrade and the Brave New World", "A dazzling adventure, and ASMR", "Play now"],
-  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Kostenlos im Browser", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt", "Ein funkelndes Abenteuer – und ASMR", "Jetzt spielen"],
-  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "ブラウザで無料", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World", "華やかな冒険、そしてASMR", "今すぐプレイ"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "출시 준비 중", "다른 장르의 게임에서 만나요", "동무와 멋진신세계", "화려한 모험, 그리고 ASMR", "사전예약하기", "itch.io에서 미리 플레이해보기"],
+  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Coming soon", "See you in a game of another genre", "Comrade and the Brave New World", "A dazzling adventure, and ASMR", "Pre-register", "Play the free preview on itch.io"],
+  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Bald verfügbar", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt", "Ein funkelndes Abenteuer – und ASMR", "Vorregistrieren", "Kostenlose Vorschau auf itch.io spielen"],
+  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "近日配信予定", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World", "華やかな冒険、そしてASMR", "事前登録する", "itch.ioで無料体験版をプレイ"],
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 지금 브라우저에서 무료로 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
-  "index_en.html": ["House Duck — Independent Game Studio", "Play 10key Survival free in your browser now. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival jetzt kostenlos im Browser spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key Survivalは今すぐブラウザで無料プレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하고 itch.io에서 무료 미리보기를 플레이해 보세요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
+  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now, or play the free preview on itch.io. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren oder die kostenlose Vorschau auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録、またはitch.ioで無料体験版をプレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
 };
 
 const expectedDescriptions = {
@@ -239,7 +239,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.equal(hero.replace(/<[^>]*>/g, "").trim(), "House Duck", `${file} the desk scene carries no overlay copy`);
   assert.doesNotMatch(hero, /Quirky|google-play|apps\.apple|<video|<img|<button/, `${file} hero is the scene only`);
 
-  // --- 10key Survival (owner 10-28: the itch.io page's look; one PLAY to the free browser build, no store links yet) ---
+  // --- 10key Survival (owner 10-28: the itch.io page's look; a paid app, so the big gold key is the pre-registration and the
+  //     itch.io browser build is the outlined free preview under it; no store links yet) ---
   const lang = l.lang;
   assert.match(tenkey, /^<section class="hd-tenkey" id="games" data-theme="night" data-tenkey aria-labelledby="tenkey-title">/, `${file} 10key Survival section`);
   assert.ok(tenkey.includes(`<h2 class="hd-title" id="tenkey-title">${l.tenkeyTitle}</h2>`), `${file} section title is the game`);
@@ -247,13 +248,15 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(tenkey.includes(`<p class="hd-tk-pitch">${copy[5]}</p>`), `${file} the store subtitle is the pitch`);
   const odds = lang === "ko" ? "10key/odds/" : "10key/odds/#en";
   assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [
-    '<a class="hd-keycap-cta hd-tk-play" href="https://houseduck.itch.io/10key-survival" data-pressable>',
+    `<a class="hd-keycap-cta hd-tk-prereg" href="${l.tenkeyHref}#prereg" data-pressable>`,
+    '<a class="hd-tk-preview" href="https://houseduck.itch.io/10key-survival">',
     `<a class="hd-arrow-link hd-tk-more" href="${l.tenkeyHref}">`,
     `<a href="${odds}">`,
-  ], `${file} one big PLAY to itch.io, the 10key page (Korean page in ko, the English page in en/de/ja) and the odds`);
-  assert.ok(tenkey.includes(`<span class="hd-tk-play-icon" aria-hidden="true"></span>${copy[6]}</span>`), `${file} PLAY is labelled ${copy[6]}`);
+  ], `${file} the big pre-registration key (the form on the 10key page: Korean page in ko, the English page in en/de/ja), the itch.io preview, the 10key page and the odds`);
+  assert.ok(tenkey.includes(`<span class="hd-keycap-face">${copy[6]}</span>`), `${file} the gold key is labelled ${copy[6]}`);
+  assert.ok(tenkey.includes(`<span class="hd-tk-play-icon" aria-hidden="true"></span>${copy[7]}</a>`), `${file} the itch.io link is labelled ${copy[7]}`);
   assert.ok(tenkey.includes(`">${l.more}</a>`), `${file} the 10key page link is labelled ${l.more}`);
-  assert.match(tenkey, /<p class="hd-tk-play-note">[^<]*itch\.io[^<]*<\/p>/, `${file} says PLAY opens itch.io`);
+  assert.equal((tenkey.match(/<p class="hd-tk-note">[^<]+<\/p>/g) || []).length, 2, `${file} a short note under each button`);
   assert.match(tenkey, /<p class="hd-tk-fine">[^<]*8[.,]333[^<]*<a /, `${file} states the module odds as text`);
   assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop`);
   const video = tenkey.match(/<video\b[^>]*>/)[0];

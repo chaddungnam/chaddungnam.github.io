@@ -185,12 +185,15 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await tenkey.scrollIntoViewIfNeeded();
   await expect(tenkey).toContainText("딸깍 서바이벌");
   await expect(tenkey).toContainText("10key Survival");
-  await expect(tenkey).toContainText("브라우저에서 무료");
+  await expect(tenkey).toContainText("출시 준비 중");
   await expect(tenkey).toContainText("화려한 모험, 그리고 ASMR");
   await expect(tenkey).not.toContainText("Quirky");
-  await expect(tenkey.locator("a")).toHaveCount(3);
-  await expect(tenkey.locator("a.hd-tk-play")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
-  await expect(tenkey.locator("a.hd-tk-play")).toHaveText("지금 플레이");
+  await expect(tenkey.locator("a")).toHaveCount(4);
+  // a paid app: the big gold key is the pre-registration, the itch.io build is the free preview under it
+  await expect(tenkey.locator("a.hd-tk-prereg")).toHaveAttribute("href", "10key/#prereg");
+  await expect(tenkey.locator("a.hd-tk-prereg")).toHaveText("사전예약하기");
+  await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("itch.io에서 미리 플레이해보기");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
   await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
@@ -216,7 +219,7 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   await expect(page.locator("[data-youtube-card]")).toHaveCount(3);
   await expect(page.locator("[data-project]")).toHaveCount(1);
   await expect(page.locator("[data-tenkey]")).toHaveCount(1);
-  await expect(page.locator("#games")).toContainText("브라우저에서 무료");
+  await expect(page.locator("#games")).toContainText("출시 준비 중");
   await expect(page.locator("[data-project='quirky-ball']")).toContainText("Quirky Ball");
   await expect(page.locator("[data-project='hexaworld1984'], [data-hexaworld-preview]")).toHaveCount(0);
   await expect(page.locator(".history-section, .journal-section")).toHaveCount(0);
@@ -358,7 +361,8 @@ test("10key Survival shows its real gameplay in its game frame and the quiet Com
     await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
     await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']")).toHaveCount(1);
-    await expect(zone.locator("a")).toHaveCount(3);
+    await expect(zone.locator(`a[href='${copy.tenkeyHref}#prereg']`)).toHaveCount(1);
+    await expect(zone.locator("a")).toHaveCount(4);
     // the itch.io theme: light text (#ECE6D6) on the dark page (#141318), the game's own pixel font
     await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(236, 230, 214)");
     await expect(zone.locator("#tenkey-title")).toHaveCSS("font-family", /Galmuri11/);
@@ -832,16 +836,16 @@ test("home keycaps sink while pressed and release without following their link",
   test.skip(isMobile, "pointer presses are covered by the desktop project");
   await page.goto("/?lang=ko");
   await page.locator("#games").scrollIntoViewIfNeeded();
-  // 10key Survival's PLAY is the big gold keycap; the Quirky Ball link is the same keycap and sinks the same way.
+  // 10key Survival's pre-registration is the big gold keycap; the Quirky Ball link is the same keycap and sinks the same way.
   const quirkyCta = page.locator("#quirky .hd-keycap-cta");
   await expect(quirkyCta).toHaveAttribute("href", "quirky-ball/?lang=ko");
   await expect(quirkyCta).toHaveAttribute("data-pressable", "");
   await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText("자세히 보기");
   const cta = page.locator("#games .hd-keycap-cta");
-  await expect(cta).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(cta).toHaveAttribute("href", "10key/#prereg");
   await expect(cta).toHaveAttribute("data-pressable", "");
   const ctaBox = await cta.boundingBox();
-  expect(ctaBox.height, "PLAY is a big button").toBeGreaterThanOrEqual(72);
+  expect(ctaBox.height, "pre-registration is a big button").toBeGreaterThanOrEqual(72);
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y + ctaBox.height / 2);
   await page.mouse.down();
   await expect(cta).toHaveClass(/is-down/);
@@ -850,7 +854,7 @@ test("home keycaps sink while pressed and release without following their link",
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y - 40);
   await expect(cta).not.toHaveClass(/is-down/);
   await page.mouse.up();
-  expect(page.url()).not.toContain("itch.io");
+  expect(page.url()).not.toContain("10key");
   // The keycap toy that used to sit behind the 10key card is gone.
   await expect(page.locator("[data-keyfield], .hd-key, [data-key-hint]")).toHaveCount(0);
 

@@ -27,17 +27,22 @@ TEXT = {
         "10key Survival logo with the tenkey and the mouse on a 3D keyboard",
         "10key-Survival-Logo mit dem Tenkey und der Maus auf einer 3D-Tastatur",
         "10key Survivalのロゴと、3Dキーボードの上のテンキとマウス"),
-    "브라우저에서 무료": ("Free in your browser", "Kostenlos im Browser", "ブラウザで無料"),
+    "출시 준비 중": ("Coming soon", "Bald verfügbar", "近日配信予定"),
     "화려한 모험, 그리고 ASMR": ("A dazzling adventure, and ASMR", "Ein funkelndes Abenteuer – und ASMR", "華やかな冒険、そしてASMR"),
     "부수는 키마다 실제로 녹음한 키보드 소리가 딸깍, 와장창 울려요. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요.": (
         "Every key you break clicks, clacks and shatters with real recorded keyboard sounds. Dig through an endless 3D keyboard as a living numpad.",
         "Jede Taste, die du zerschlägst, klickt, klackert und zerspringt mit echten aufgenommenen Tastaturgeräuschen. Grabe dich als lebendiger Ziffernblock durch eine endlose 3D-Tastatur.",
         "壊すキーのひとつひとつから、実際に録音したキーボードの音がカチッ、ガシャンと響きます。生きたテンキとなって、終わりのない3Dキーボードを掘り進もう。"),
-    "지금 플레이": ("Play now", "Jetzt spielen", "今すぐプレイ"),
-    "itch.io에서 바로 시작돼요. 무료, 설치·가입 없음, 광고 없음.": (
-        "Opens on itch.io and starts right away. Free, no download, no sign-up, no ads.",
-        "Öffnet sich auf itch.io und startet sofort. Kostenlos, ohne Download, ohne Anmeldung, ohne Werbung.",
-        "itch.ioでそのまま始まります。無料・インストール不要・登録不要・広告なし。"),
+    "사전예약하기": ("Pre-register", "Vorregistrieren", "事前登録する"),
+    "출시 날 iOS·Android 다운로드 링크를 메일 한 통으로 보내 드려요.": (
+        "On launch day we send you one email with the iOS and Android download link.",
+        "Am Starttag schicken wir dir eine E-Mail mit dem Download-Link für iOS und Android.",
+        "配信日に、iOS・Androidのダウンロードリンクをメールで1通お送りします。"),
+    "itch.io에서 미리 플레이해보기": ("Play the free preview on itch.io", "Kostenlose Vorschau auf itch.io spielen", "itch.ioで無料体験版をプレイ"),
+    "출시 전 무료 미리보기예요. 설치·가입 없이 브라우저에서 바로 시작돼요.": (
+        "Free before launch, right in your browser. No download, no sign-up.",
+        "Kostenlos vor dem Start, direkt im Browser. Ohne Download, ohne Anmeldung.",
+        "配信前の無料体験版です。インストールも登録も不要で、ブラウザですぐ始まります。"),
     "실제 플레이 화면": ("Real gameplay", "Echtes Gameplay", "実際のプレイ画面"),
     "키를 부수며 파고드는 화면, 레벨업 카드 고르기, 황금 피버": (
         "Digging through keys, picking a level-up card, Golden Fever",
@@ -150,6 +155,7 @@ def translate_main(main, lang, badges):
     main = re.sub(r'<span class="hd-title-alt"[^>]*>[^<]*</span>', "", main)  # the Latin name is already the title
     main = main.replace('href="quirky-ball/?lang=ko"', f'href="quirky-ball/?lang={lang}"')
     main = main.replace('href="10key/"', 'href="10key/index_en.html"')  # the 10key Survival page exists in Korean and English only
+    main = main.replace('href="10key/#prereg"', 'href="10key/index_en.html#prereg"')  # the pre-registration form, English page
     main = main.replace('href="10key/odds/"', 'href="10key/odds/#en"')  # one page, Korean then English
     main = re.sub(r'(assets/media/tenkey-itch/shot-[a-z]+)-ko\.webp', rf'\1-{lang}.webp', main)  # the store screenshots exist per language
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')

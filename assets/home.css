@@ -390,7 +390,8 @@ body[data-page="studio"] .menu-button-lines::after { width: 18px; background-col
 body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines { background-color: transparent; }
 
 /* ---------- 10key Survival (owner 10-28: match the itch.io page): its dark theme, background art, banner, the three
-   description images and the store screenshots; one big PLAY that opens the browser build on itch.io ---------- */
+   description images and the store screenshots. It is a paid app, so the big gold key is the pre-registration (the form on
+   /10key/#prereg); the browser build on itch.io is the outlined secondary "free preview" ---------- */
 .hd-tenkey {
   --hd-hand-off: #141318; /* home-desk.js fades the zoomed screen to this colour, so the hand-off has no light flash */
   --tk-bg: #141318;
@@ -443,8 +444,9 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-tk-pitch { margin: 18px 0 0; color: var(--tk-gold); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.5; text-wrap: balance; word-break: keep-all; }
 .hd-tenkey .hd-lede { margin-top: 14px; color: var(--tk-ink-2); }
 
-.hd-tk-play-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
-.hd-tk-play.hd-keycap-cta {
+.hd-tk-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
+.hd-tk-cta-row.hd-tk-preview-row { gap: 10px 18px; margin-top: 22px; }
+.hd-tk-prereg.hd-keycap-cta {
   --btn: var(--tk-gold);
   --btn-side: #a9820f;
   --btn-ink: #141318;
@@ -455,10 +457,17 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
   font-size: 24px;
   font-weight: 700;
 }
-.hd-tk-play .hd-keycap-face { gap: 14px; min-width: 260px; padding: 0 36px; }
-.hd-tk-play .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side), 0 calc(var(--btn-depth) + 16px) 36px rgba(255, 210, 63, .22); }
-.hd-tk-play-icon { width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-left: 18px solid currentColor; }
-.hd-tk-play-note { max-width: 26ch; margin: 0; color: var(--tk-ink-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
+.hd-tk-prereg .hd-keycap-face { gap: 14px; min-width: 260px; padding: 0 36px; }
+.hd-tk-prereg .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side), 0 calc(var(--btn-depth) + 16px) 36px rgba(255, 210, 63, .22); }
+.hd-tk-note { max-width: 28ch; margin: 0; color: var(--tk-ink-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
+.hd-tk-preview {
+  display: inline-flex; min-height: 52px; align-items: center; gap: 10px; padding: 0 22px; box-sizing: border-box;
+  border: 2px solid rgba(255, 210, 63, .55); border-radius: 14px; color: var(--tk-gold); background: rgba(255, 210, 63, .06);
+  font-size: .98rem; font-weight: 800; line-height: 1.25; text-decoration: none; word-break: keep-all;
+  transition: background-color 160ms var(--hd-ease), border-color 160ms var(--hd-ease);
+}
+.hd-tk-preview:hover, .hd-tk-preview:focus-visible { border-color: var(--tk-gold); background: rgba(255, 210, 63, .14); }
+.hd-tk-play-icon { flex: none; width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 11px solid currentColor; }
 .hd-tenkey .hd-tk-more { margin-top: 26px; border-color: var(--tk-line); color: var(--tk-ink); }
 .hd-tenkey .hd-tk-more::after { content: "→"; }
 .hd-tenkey .hd-tk-more:hover,
@@ -749,9 +758,10 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
   body[data-page="studio"] .language-picker summary { width: 100%; min-height: 48px; justify-content: space-between; padding: 0 14px; border: 0; border-radius: 12px; color: var(--bar-ink); font-size: .86rem; }
   body[data-page="studio"] .language-menu { position: static; margin-top: 4px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .hd-tenkey .hd-title { font-size: 36px; }
-  .hd-tk-play-row { gap: 14px; }
-  .hd-tk-play.hd-keycap-cta, .hd-tk-play .hd-keycap-face { width: 100%; }
-  .hd-tk-play-note { max-width: none; }
+  .hd-tk-cta-row { gap: 14px; }
+  .hd-tk-prereg.hd-keycap-cta, .hd-tk-prereg .hd-keycap-face, .hd-tk-preview { width: 100%; }
+  .hd-tk-preview { justify-content: center; }
+  .hd-tk-note { max-width: none; }
   .hd-title { font-size: clamp(2.1rem, 9vw, 2.8rem); }
   .hd-lede { font-size: 1rem; }
   .hd-cta-row { margin-top: 26px; }
