@@ -150,9 +150,11 @@
       clearTimeout(previewTimer);
       previewTimer = setTimeout(refreshPreviews, 350);
     }
+    // An image's alt/width fields or a link preview are not a caret position: keep the last text caret instead.
     function rememberSelection() {
       const selection = window.getSelection();
-      if (selection?.rangeCount && editor.contains(selection.anchorNode) && editor.contains(selection.focusNode)) savedRange = selection.getRangeAt(0).cloneRange();
+      const editable = node => editor.contains(node) && !(node.nodeType === 1 ? node : node.parentElement).closest('figure, hr, [data-link-preview]');
+      if (selection?.rangeCount && editable(selection.anchorNode) && editable(selection.focusNode)) savedRange = selection.getRangeAt(0).cloneRange();
     }
     function restoreSelection() {
       editor.focus();

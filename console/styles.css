@@ -1444,7 +1444,7 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .ov-cols { position: absolute; inset: 0; }
 .ov-cols.is-v2 .ov-col-bar { background: var(--ov-accent); }
 .ov-win-dot { position: absolute; left: 50%; width: 8px; height: 8px; margin: 0 0 -4px -4px; background: var(--ov-ink-mark); border-radius: 50%; box-shadow: 0 0 0 2px var(--paper); }
-.ov-wait { position: absolute; top: 50%; left: 50%; z-index: 2; margin: 0; padding: 6px 12px; color: var(--ov-muted); background: #f5f6f8; border: 1px solid #e7eaee; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; transform: translate(-50%, -50%); pointer-events: none; }
+.ov-wait { position: absolute; top: 50%; left: 50%; z-index: 2; width: max-content; max-width: calc(100% - 16px); margin: 0; padding: 6px 12px; color: var(--ov-muted); background: #f5f6f8; border: 1px solid #e7eaee; border-radius: 999px; font-size: 12px; font-weight: 700; text-align: center; transform: translate(-50%, -50%); pointer-events: none; }
 .ov-wait[data-place="top"] { top: 6px; transform: translateX(-50%); }
 .ov-wait[data-place="top-right"] { top: 4px; right: 4px; left: auto; transform: none; }
 .ov-funnel { display: flex; flex-direction: column; justify-content: center; height: 100%; }
