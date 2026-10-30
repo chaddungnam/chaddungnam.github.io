@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-10-24T09:09:07.000Z",
+  "updated": "2026-10-30T09:00:13.000Z",
   "videos": [
+    {
+      "videoId": "VbHA6_nGiVI",
+      "title": "키보드 ASMR 좋아하는 행님들 주목 · 딸깍 서바이벌 #shorts",
+      "published": "2026-10-30T09:00:13.000Z"
+    },
     {
       "videoId": "OnAcvzFmChA",
       "title": "[개발일지] 딸깍 서바이벌 플레이영상",
@@ -11,11 +16,6 @@
       "videoId": "tCjSpgDLMGQ",
       "title": "이번 신작은 느낌이 다릅니다. (AI로 게임만들기)",
       "published": "2026-10-23T14:10:15.000Z"
-    },
-    {
-      "videoId": "xOoLVxA6AM0",
-      "title": "AI로 게임만들고 실패했지만, 포기하지 않는 이유",
-      "published": "2026-10-14T09:00:07.000Z"
     }
   ]
 }
