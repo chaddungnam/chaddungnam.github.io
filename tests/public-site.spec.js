@@ -122,8 +122,8 @@ const scrollSettlesAt = async (page, target, tolerance = 4) => {
 const homeCopy = {
   "/?lang=ko": { tenkeyHref: "10key/", more: "자세히 보기", comrade: ["동무와 멋진신세계", "다른 장르의 게임에서 만나요"], quirkyHref: "quirky-ball/?lang=ko" },
   "/index_en.html?lang=en": { tenkeyHref: "10key/index_en.html", more: "Learn more", comrade: ["Comrade and the Brave New World", "See you in a game of another genre"], quirkyHref: "quirky-ball/?lang=en" },
-  "/index_de.html?lang=de": { tenkeyHref: "10key/index_en.html", more: "Mehr erfahren", comrade: ["Genosse und die schöne neue Welt", "Wir sehen uns in einem Spiel eines anderen Genres"], quirkyHref: "quirky-ball/?lang=de" },
-  "/index_ja.html?lang=ja": { tenkeyHref: "10key/index_en.html", more: "詳しく見る", comrade: ["Comrade and the Brave New World", "別のジャンルのゲームでまた会いましょう"], quirkyHref: "quirky-ball/?lang=ja" },
+  "/index_de.html?lang=de": { tenkeyHref: "10key/index_en.html?lang=de", more: "Mehr erfahren", comrade: ["Genosse und die schöne neue Welt", "Wir sehen uns in einem Spiel eines anderen Genres"], quirkyHref: "quirky-ball/?lang=de" },
+  "/index_ja.html?lang=ja": { tenkeyHref: "10key/index_en.html?lang=ja", more: "詳しく見る", comrade: ["Comrade and the Brave New World", "別のジャンルのゲームでまた会いましょう"], quirkyHref: "quirky-ball/?lang=ja" },
 };
 
 test("all localized home pages fit a 320px viewport", async ({ page }) => {

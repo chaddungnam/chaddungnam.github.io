@@ -57,7 +57,7 @@ async function main() {
     assert.doesNotMatch(method, /2026|202건|202 completed|202 abgeschlossenen|2026年/);
     // Legal documents are English + Korean + German (owner 2026-10-20); ja legal URLs redirect to English.
     const legalLang = ['ko', 'en', 'de'].includes(lang);
-    for (const [legal, date] of [[`privacy/${lang}.html`, '2026-10-25'], [`quirky-ball/terms/${lang}.html`, '2026-10-05'],
+    for (const [legal, date] of [[`privacy/${lang}.html`, '2026-10-30'], [`quirky-ball/terms/${lang}.html`, '2026-10-05'],
       [`quirky-ball/privacy/delete_${lang}.html`, '2026-09-08'], [`impressum/${lang}.html`, '2026-09-05']]) {
       if (!legalLang && !legal.startsWith('impressum/')) {
         assert.match(read(legal), /http-equiv="refresh" content="0;url=\/[^"]*(?:en|delete_en)\.html"/, legal);

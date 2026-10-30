@@ -25,8 +25,9 @@
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/brand-site.css">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261028-prereg2">
-  <script src="/assets/tenkey-page.js?v=20261028-prereg2" defer></script>
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261030-prereg3">
+  <script src="/assets/tenkey-page.js?v=20261030-prereg3" defer></script>
+  <script src="/assets/tenkey-ads.js?v=20261030-prereg3" defer></script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "10key Survival", "alternateName": "딸깍 서바이벌", "url": "https://houseduck.in/10key/index_en.html", "description": "A dazzling adventure, and ASMR. In 10key Survival, the new House Duck game, you dig through an endless 3D keyboard as a living numpad. Pre-register with your email and get the iOS and Android download link on launch day, or play the free preview on itch.io.", "image": "https://houseduck.in/assets/media/tenkey-og.jpg", "genre": ["Arcade", "Action"], "gamePlatform": ["Web browser", "iOS", "Android"], "inLanguage": ["en", "ko", "ja", "de", "fr", "es", "pt-BR", "zh-Hant"], "sameAs": ["https://houseduck.itch.io/10key-survival"], "publisher": {"@type": "Organization", "name": "House Duck", "url": "https://houseduck.in/"}}</script>
 </head>
 <body class="tk-page" data-page="tenkey">
@@ -50,7 +51,7 @@
           <h1 id="game-title"><span class="tk-title-main">10key Survival</span> <span class="tk-title-alt" lang="ko">딸깍 서바이벌</span></h1>
           <p class="tk-pitch">A dazzling adventure, and ASMR</p>
           <p class="tk-lede">Every key you break clicks, clacks and shatters with real recorded keyboard sounds. Dig through an endless 3D keyboard as a living numpad.</p>
-          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="en" data-consent-version="2026-10-24" data-msgs='{"sending": "Sending…", "ok": "We sent you a confirmation email. Click “Confirm pre-registration” in it to finish. If you cannot find it, check your spam folder.", "invalid": "Please check your email address.", "consent": "Please tick the consent box.", "busy": "Too many sign-ups right now. Please try again shortly.", "mail": "We could not send the confirmation email. Please try again shortly.", "error": "Connection failed. Please try again shortly.", "offline": "The pre-registration could not load. Please reload the page in a moment and try again."}'>
+          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="en" data-consent-version="2026-10-30" data-msgs='{"sending": "Sending…", "ok": "You are pre-registered! We will send the download link to this address on launch day. A short receipt is on its way.", "invalid": "Please check your email address.", "consent": "Please tick the consent box.", "busy": "Too many sign-ups right now. Please try again shortly.", "mail": "We could not send the confirmation email. Please try again shortly.", "error": "Connection failed. Please try again shortly.", "offline": "The pre-registration could not load. Please reload the page in a moment and try again."}'>
             <h2 id="prereg-title">Pre-register for launch news</h2>
             <p class="tk-prereg-sub">Leave your email and we send you one email on launch day with the iOS and Android download link.</p>
             <form class="tk-form-body" method="post" novalidate data-prereg-form>
@@ -59,7 +60,7 @@
                 <button class="tk-key" type="submit" disabled><span class="tk-key-face">Pre-register</span></button>
               </div>
               <label class="tk-hp" aria-hidden="true">website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
-              <label class="tk-consent"><input type="checkbox" name="consent" required><span>I agree to send my email address to get the launch email. It is only complete after I click the button in the confirmation email. The address is deleted within 30 days after the launch email. <a href="/privacy/en.html#section-13">Privacy policy</a></span></label>
+              <label class="tk-consent"><input type="checkbox" name="consent" required><span>I agree to send my email address to get the launch email. The address is deleted within 30 days after the launch email. <a href="/privacy/en.html#10key-prereg">Privacy policy</a></span></label>
             </form>
             <p class="tk-status" id="prereg-status" role="status" aria-live="polite" data-prereg-status></p>
             <noscript><p class="tk-status" data-tone="err">Pre-registration needs JavaScript turned on in your browser.</p></noscript>
@@ -188,8 +189,8 @@
           <details><summary>Can I play before launch?</summary><p>Yes: the free preview runs on the 10key Survival page on itch.io, right in your browser, on a computer or a phone. No download or sign-up.</p></details>
           <details><summary>Where is my preview progress saved?</summary><p>In the browser version you play as a guest, and your progress is saved in that browser only. Clearing site data deletes it, and it does not move to other devices. The ranking tab shows the online board, but your own runs stay on that device.</p></details>
           <details><summary>What do I get for pre-registering?</summary><p>One email on launch day with the download link. The same link opens the App Store on iPhone and Google Play on Android. No other marketing email.</p></details>
-          <details><summary>The confirmation email did not arrive.</summary><p>Check your spam folder for mail from support@houseduck.in. After 10 minutes you can sign up again with the same address to get it again.</p></details>
-          <details><summary>How do I cancel?</summary><p>Use the unsubscribe link at the bottom of our email, or write to support@houseduck.in. Unconfirmed sign-ups are deleted after 30 days.</p></details>
+          <details><summary>The receipt email did not arrive.</summary><p>Your pre-registration is done the moment you press Pre-register. If the receipt from support@houseduck.in is not in your inbox, check your spam folder. You will get the launch email either way.</p></details>
+          <details><summary>How do I cancel?</summary><p>Use the cancel link in the receipt email, or write to support@houseduck.in. Cancelled addresses are deleted within 30 days.</p></details>
         </div>
       </div>
     </section>
@@ -212,6 +213,7 @@
       <li><a href="odds/#en">Odds</a></li>
       <li><a href="/support/">Support</a></li>
       <li><a href="../?lang=en">House Duck home</a></li>
+      <li><button type="button" data-ads-settings>Ad measurement settings</button></li>
     </ul>
     <small>© <span data-current-year>2026</span> House Duck</small>
   </div></footer>

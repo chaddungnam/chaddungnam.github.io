@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <script>try{if(!new URLSearchParams(location.search).has("lang")&&String(navigator.language||"").toLowerCase().indexOf("ko")!==0)location.replace("index_en.html"+location.hash);}catch(e){}</script>
+  <script>try{if(!new URLSearchParams(location.search).has("lang")&&String(navigator.language||"").toLowerCase().indexOf("ko")!==0)location.replace("index_en.html"+location.search+location.hash);}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#141318">
   <title>딸깍 서바이벌 (10key Survival) 사전예약 · 무료 미리 플레이 | House Duck</title>
@@ -26,8 +26,9 @@
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/brand-site.css">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261028-prereg2">
-  <script src="/assets/tenkey-page.js?v=20261028-prereg2" defer></script>
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261030-prereg3">
+  <script src="/assets/tenkey-page.js?v=20261030-prereg3" defer></script>
+  <script src="/assets/tenkey-ads.js?v=20261030-prereg3" defer></script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "딸깍 서바이벌", "alternateName": "10key Survival", "url": "https://houseduck.in/10key/", "description": "화려한 모험, 그리고 ASMR. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가는 House Duck의 신작 딸깍 서바이벌. 이메일로 사전예약하면 iOS·Android 출시 날 다운로드 링크를 보내 드려요. 출시 전에는 itch.io에서 무료 미리보기를 플레이할 수 있어요.", "image": "https://houseduck.in/assets/media/tenkey-og.jpg", "genre": ["Arcade", "Action"], "gamePlatform": ["Web browser", "iOS", "Android"], "inLanguage": ["ko", "en", "ja", "de", "fr", "es", "pt-BR", "zh-Hant"], "sameAs": ["https://houseduck.itch.io/10key-survival"], "publisher": {"@type": "Organization", "name": "House Duck", "url": "https://houseduck.in/"}}</script>
 </head>
 <body class="tk-page" data-page="tenkey">
@@ -51,7 +52,7 @@
           <h1 id="game-title"><span class="tk-title-alt" lang="en">10key Survival</span> <span class="tk-title-main">딸깍 서바이벌</span></h1>
           <p class="tk-pitch">화려한 모험, 그리고 ASMR</p>
           <p class="tk-lede">부수는 키마다 실제로 녹음한 키보드 소리가 딸깍, 와장창 울려요. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요.</p>
-          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="ko" data-consent-version="2026-10-24" data-msgs='{"sending": "보내는 중…", "ok": "확인 메일을 보냈어요. 메일함에서 ‘사전예약 확인’ 버튼을 누르면 완료돼요. 메일이 안 보이면 스팸함도 확인해 주세요.", "invalid": "이메일 주소를 다시 확인해 주세요.", "consent": "동의 항목에 체크해 주세요.", "busy": "신청이 많아 잠시 뒤에 다시 시도해 주세요.", "mail": "확인 메일을 보내지 못했어요. 잠시 뒤에 다시 시도해 주세요.", "error": "연결에 실패했어요. 잠시 뒤에 다시 시도해 주세요.", "offline": "사전예약 기능을 불러오지 못했어요. 잠시 후 페이지를 새로 고쳐 다시 시도해 주세요."}'>
+          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="ko" data-consent-version="2026-10-30" data-msgs='{"sending": "보내는 중…", "ok": "사전예약 완료! 출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요. 완료 안내 메일도 보냈어요.", "invalid": "이메일 주소를 다시 확인해 주세요.", "consent": "동의 항목에 체크해 주세요.", "busy": "신청이 많아 잠시 뒤에 다시 시도해 주세요.", "mail": "확인 메일을 보내지 못했어요. 잠시 뒤에 다시 시도해 주세요.", "error": "연결에 실패했어요. 잠시 뒤에 다시 시도해 주세요.", "offline": "사전예약 기능을 불러오지 못했어요. 잠시 후 페이지를 새로 고쳐 다시 시도해 주세요."}'>
             <h2 id="prereg-title">출시 알림 사전예약</h2>
             <p class="tk-prereg-sub">이메일을 남기면 출시되는 날 iOS·Android 다운로드 링크를 메일 한 통으로 보내 드려요.</p>
             <form class="tk-form-body" method="post" novalidate data-prereg-form>
@@ -60,7 +61,7 @@
                 <button class="tk-key" type="submit" disabled><span class="tk-key-face">사전예약하기</span></button>
               </div>
               <label class="tk-hp" aria-hidden="true">website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
-              <label class="tk-consent"><input type="checkbox" name="consent" required><span>출시 알림 메일을 받기 위해 이메일 주소를 보내는 데 동의해요. 확인 메일의 버튼을 눌러야 완료돼요. 출시 알림을 보낸 뒤 30일 안에 삭제해요. <a href="/privacy/ko.html#section-13">개인정보처리방침</a></span></label>
+              <label class="tk-consent"><input type="checkbox" name="consent" required><span>출시 알림 메일을 받기 위해 이메일 주소를 보내는 데 동의해요. 출시 알림을 보낸 뒤 30일 안에 삭제해요. <a href="/privacy/ko.html#10key-prereg">개인정보처리방침</a></span></label>
             </form>
             <p class="tk-status" id="prereg-status" role="status" aria-live="polite" data-prereg-status></p>
             <noscript><p class="tk-status" data-tone="err">사전예약은 자바스크립트가 켜진 브라우저에서 할 수 있어요.</p></noscript>
@@ -189,8 +190,8 @@
           <details><summary>출시 전에 해 볼 수 있나요?</summary><p>itch.io의 딸깍 서바이벌 페이지에서 브라우저로 무료 미리보기를 할 수 있어요. 컴퓨터와 휴대폰 브라우저 모두 돼요. 설치나 가입이 필요 없어요.</p></details>
           <details><summary>미리보기 진행 상황은 어디에 저장되나요?</summary><p>브라우저 버전은 게스트로 플레이하고, 진행 상황은 그 브라우저에만 저장돼요. 사이트 데이터를 지우면 사라지고 다른 기기로 옮겨지지 않아요. 랭킹 탭에서 온라인 순위는 볼 수 있지만 내 기록은 그 기기에만 남아요.</p></details>
           <details><summary>사전예약하면 무엇을 받나요?</summary><p>출시되는 날 다운로드 링크가 담긴 메일을 한 번 받아요. 링크 하나로 아이폰은 App Store, 안드로이드는 Google Play가 열려요. 그 밖의 광고 메일은 보내지 않아요.</p></details>
-          <details><summary>확인 메일이 오지 않아요.</summary><p>support@houseduck.in에서 보낸 메일이 스팸함에 있는지 확인해 주세요. 10분이 지나면 같은 주소로 다시 신청해 확인 메일을 다시 받을 수 있어요.</p></details>
-          <details><summary>신청을 취소하고 싶어요.</summary><p>받은 메일 아래쪽의 수신 거부 링크를 누르거나 support@houseduck.in으로 알려 주세요. 확인하지 않은 신청은 30일 뒤 자동으로 지워져요.</p></details>
+          <details><summary>완료 메일이 오지 않아요.</summary><p>사전예약은 사전예약하기를 누른 순간 끝나요. support@houseduck.in에서 보낸 완료 안내 메일이 안 보이면 스팸함을 확인해 주세요. 그 메일이 없어도 출시 알림은 그대로 보내 드려요.</p></details>
+          <details><summary>신청을 취소하고 싶어요.</summary><p>완료 안내 메일의 사전예약 취소 링크를 누르거나 support@houseduck.in으로 알려 주세요. 취소한 주소는 30일 안에 지워져요.</p></details>
         </div>
       </div>
     </section>
@@ -213,6 +214,7 @@
       <li><a href="odds/">확률 정보</a></li>
       <li><a href="/support/">고객지원</a></li>
       <li><a href="../?lang=ko">House Duck 홈</a></li>
+      <li><button type="button" data-ads-settings>광고 측정 설정</button></li>
     </ul>
     <small>© <span data-current-year>2026</span> House Duck</small>
   </div></footer>

@@ -84,7 +84,10 @@
     items.forEach(function (item) { seen.observe(item); });
   }
   // Pre-registration (owner 2026-10-24). The form posts text/plain JSON to the tenkey-prereg edge function, so the browser
-  // sends no CORS preflight. Double opt-in: the function mails a confirmation link from support@houseduck.in.
+  // sends no CORS preflight. Single step since 2026-10-30 (owner): submitting IS the pre-registration; the function mails
+  // one receipt from support@houseduck.in. Mail language = the House Duck page language the visitor used (owner 10-30):
+  // ?lang=ko|en|de|ja (the de/ja home links add it), else the language saved by the site switcher, else this page's.
+  // On success the Google Ads conversion is sent through tenkey-ads.js, only if the visitor allowed it there.
   // The submit button ships disabled and is enabled here, so without this script the form can never submit natively (which
   // would put the email in the address bar); a small inline script then says to reload instead.
   var box = document.querySelector("[data-prereg]");
@@ -98,6 +101,18 @@
     var msgs = {};
     try { msgs = JSON.parse(box.getAttribute("data-msgs") || "{}"); } catch (_error) { msgs = {}; }
     var sending = false;
+    var mailLocale = (function () {
+      var ok = { ko: 1, en: 1, de: 1, ja: 1 };
+      var fromUrl = null;
+      var saved = null;
+      try { fromUrl = new URLSearchParams(location.search).get("lang"); } catch (_error) { fromUrl = null; }
+      try { saved = window.localStorage.getItem("house_duck_site_language"); } catch (_error) { saved = null; }
+      var pageLocale = box.getAttribute("data-locale") || "en";
+      if (fromUrl && ok[fromUrl]) return fromUrl;
+      // A saved ko/en that disagrees with this page means the visitor switched pages on purpose: follow the page.
+      if (saved === "de" || saved === "ja") return pageLocale === "ko" ? "ko" : saved;
+      return pageLocale;
+    })();
 
     var say = function (text, tone) {
       status.textContent = text || "";
@@ -119,20 +134,20 @@
       fetch(box.getAttribute("data-endpoint"), {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=UTF-8" },
-        body: JSON.stringify({ v: 1, action: "signup", email: email, locale: box.getAttribute("data-locale"), consent: box.getAttribute("data-consent-version"), hp: trap ? trap.value : "" })
+        body: JSON.stringify({ v: 1, action: "signup", email: email, locale: mailLocale, consent: box.getAttribute("data-consent-version"), hp: trap ? trap.value : "" })
       }).then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (data) { return { status: res.status, data: data }; });
       }).then(function (r) {
         if (r.status === 200 && r.data && r.data.ok) {
           box.classList.add("is-done");
           say(msgs.ok, "ok");
+          try { if (window.hdAds) window.hdAds.conversion(); } catch (_error) { /* measurement must never break the form */ }
           return;
         }
         var code = r.data && r.data.error;
         if (code === "invalid_email") { emailInput.setAttribute("aria-invalid", "true"); say(msgs.invalid, "err"); }
         else if (code === "consent_required") say(msgs.consent, "err");
         else if (code === "busy") say(msgs.busy, "err");
-        else if (code === "mail_failed") say(msgs.mail, "err");
         else say(msgs.error, "err");
       }).catch(function () {
         say(msgs.error, "err");

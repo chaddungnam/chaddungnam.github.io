@@ -1,15 +1,17 @@
 // 10key Survival page (2026-10-28, the itch.io page's look): it is a paid iOS/Android app, so the first screen is the app
-// pre-registration form, which posts a double opt-in sign-up to the tenkey-prereg edge function (mocked here, no real mail); the
+// pre-registration form, which posts a sign-up to the tenkey-prereg edge function (mocked here, no real mail; single step since
+// 2026-10-30: submitting is the pre-registration); the
 // browser build on itch.io sits under it as the free preview. The page states the module odds as text. Also /10key/prereg/ and /10key/get/.
 const { test, expect } = require("@playwright/test");
 
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { preview: "itch.io에서 미리 플레이해보기", odds: "odds/", submit: "사전예약하기", ok: "확인 메일을 보냈어요", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { preview: "Play the free preview on itch.io", odds: "odds/#en", submit: "Pre-register", ok: "We sent you a confirmation email", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { preview: "itch.io에서 미리 플레이해보기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { preview: "Play the free preview on itch.io", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
   test(`pre-registration is visible at once and signs up, itch.io is the free preview, the odds are text (${url})`, async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
     const posts = [];
     await page.route(FN, async (route) => {
       posts.push({ body: route.request().postData(), type: route.request().headers()["content-type"] });
@@ -43,7 +45,7 @@ for (const [url, words] of Object.entries({
     expect(posts).toHaveLength(1);
     expect(posts[0].type).toContain("text/plain");
     const sent = JSON.parse(posts[0].body);
-    expect(sent).toMatchObject({ v: 1, action: "signup", email: "player@example.com", consent: "2026-10-24", hp: "" });
+    expect(sent).toMatchObject({ v: 1, action: "signup", email: "player@example.com", locale: url.includes("ko") ? "ko" : "en", consent: "2026-10-30", hp: "" });
     await expect(card.locator("input[name=email]")).toBeHidden();
   });
 }
@@ -108,4 +110,77 @@ test("download link page waits for launch and points to pre-registration", async
   await expect(page.locator("h1")).toHaveText("Not out yet");
   await expect(page.locator("[data-store]:visible")).toHaveCount(0);
   await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/index_en.html?lang=en#prereg");
+});
+
+// Mail language follows the House Duck page language (owner 2026-10-30): the de/ja home links carry ?lang=de|ja.
+for (const [home, locale] of Object.entries({ "/index_de.html?lang=de": "de", "/index_ja.html?lang=ja": "ja" })) {
+  test(`the ${locale} home sends visitors to the form with ?lang=${locale} and the sign-up asks for ${locale} mail`, async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+    const posts = [];
+    await page.route(FN, (route) => { posts.push(JSON.parse(route.request().postData())); route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }); });
+    await page.goto(home);
+    const key = page.locator("#games a.hd-tk-prereg");
+    await expect(key).toHaveAttribute("href", new RegExp(`lang=${locale}#prereg$`));
+    await page.goto(`/10key/index_en.html?lang=${locale}#prereg`);
+    const card = page.locator("#prereg");
+    await card.locator("input[name=email]").fill("player@example.com");
+    await card.locator("input[name=consent]").check();
+    await card.locator("button[type=submit]").click();
+    await expect(card.locator("[data-prereg-status]")).toContainText("You are pre-registered!");
+    expect(posts[0].locale).toBe(locale);
+  });
+}
+
+// Google Ads measurement (owner 2026-10-30): nothing from Google before "Allow"; after it the tag loads and a successful
+// pre-registration sends the conversion, never the email address.
+test("ads measurement: no Google request before consent, conversion after allow", async ({ page }) => {
+  const google = [];
+  await page.route(/googletagmanager\.com|google\.com|doubleclick\.net|googleadservices\.com/, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
+  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
+  await page.goto("/10key/?lang=ko");
+  const bar = page.locator(".tk-adsbar");
+  await expect(bar).toBeVisible();
+  await page.waitForTimeout(300);
+  expect(google).toHaveLength(0);
+  await bar.getByRole("button", { name: "허용" }).click();
+  await expect(bar).toHaveCount(0);
+  await expect.poll(() => google.length).toBeGreaterThan(0);
+  expect(google[0]).toContain("gtag/js?id=AW-18020492251");
+  const card = page.locator("#prereg");
+  await card.locator("input[name=email]").fill("player@example.com");
+  await card.locator("input[name=consent]").check();
+  await card.getByRole("button", { name: "사전예약하기" }).click();
+  await expect(card.locator("[data-prereg-status]")).toContainText("사전예약 완료!");
+  const layer = await page.evaluate(() => JSON.stringify(window.dataLayer.map((a) => Array.from(a))));
+  expect(layer).toContain('"conversion",{"send_to":"AW-18020492251/h5j8CPjd7K4dENvH65BD"}');
+  expect(layer).not.toContain("player@example.com");
+  // the choice is remembered and can be changed from the footer
+  await page.reload();
+  await expect(page.locator(".tk-adsbar")).toHaveCount(0);
+  await page.locator("[data-ads-settings]").click();
+  await expect(page.locator(".tk-adsbar")).toBeVisible();
+});
+
+test("ads measurement: declining keeps Google away and the form works", async ({ page }) => {
+  const google = [];
+  await page.route(/googletagmanager\.com|googleadservices\.com|doubleclick\.net/, (route) => { google.push(route.request().url()); route.abort(); });
+  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
+  await page.goto("/10key/index_en.html?lang=en");
+  await page.locator(".tk-adsbar").getByRole("button", { name: "Decline" }).click();
+  const card = page.locator("#prereg");
+  await card.locator("input[name=email]").fill("player@example.com");
+  await card.locator("input[name=consent]").check();
+  await card.getByRole("button", { name: "Pre-register" }).click();
+  await expect(card.locator("[data-prereg-status]")).toContainText("You are pre-registered!");
+  await page.reload();
+  await expect(page.locator(".tk-adsbar")).toHaveCount(0);
+  expect(google).toHaveLength(0);
+});
+
+test("the cancel link page works in German and Japanese", async ({ page }) => {
+  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true,"locale":"de"}' }));
+  await page.goto("/10key/prereg/?a=unsub&t=11111111-2222-4333-8444-555555555555&lang=de");
+  await expect(page.locator("h1")).toHaveText("Vorregistrierung storniert");
+  await page.goto("/10key/prereg/?a=unsub&t=11111111-2222-4333-8444-555555555555&lang=ja");
+  await expect(page.locator("h1")).toHaveText("事前登録を取り消しました");
 });

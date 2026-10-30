@@ -1,5 +1,6 @@
 // /10key/prereg/ (confirm or unsubscribe from the pre-registration mail) and /10key/get/ (the one download link of the
-// launch mail). Owner 2026-10-24. Language: ?lang=ko|en, else the browser language.
+// launch mail). Owner 2026-10-24. Language: ?lang=ko|en|de|ja (de/ja since 2026-10-30, the mail language), else the
+// browser language. Elements carry data-ko/data-en only; de and ja fall back to the English text.
 (function () {
   "use strict";
 
@@ -12,13 +13,17 @@
 
   var params = new URLSearchParams(location.search);
   var lang = params.get("lang");
-  if (lang !== "ko" && lang !== "en") lang = String(navigator.language || "").toLowerCase().indexOf("ko") === 0 ? "ko" : "en";
+  if (lang !== "ko" && lang !== "en" && lang !== "de" && lang !== "ja") {
+    var nav = String(navigator.language || "").toLowerCase().slice(0, 2);
+    lang = nav === "ko" || nav === "de" || nav === "ja" ? nav : "en";
+  }
   document.documentElement.lang = lang;
+  var ui = lang === "ko" ? "ko" : "en";
   document.querySelectorAll("[data-ko]").forEach(function (node) {
-    node.textContent = node.getAttribute("data-" + lang);
+    node.textContent = node.getAttribute("data-" + lang) || node.getAttribute("data-" + ui);
   });
   document.querySelectorAll("[data-href-ko]").forEach(function (node) {
-    node.setAttribute("href", node.getAttribute("data-href-" + lang));
+    node.setAttribute("href", node.getAttribute("data-href-" + lang) || node.getAttribute("data-href-" + ui));
   });
   document.querySelectorAll("[data-current-year]").forEach(function (node) { node.textContent = String(new Date().getFullYear()); });
 
@@ -40,6 +45,24 @@
       error: ["Connection failed", "Please reload this page in a moment."],
       soon: ["Not out yet", "10key Survival is getting ready for iOS and Android. Pre-register and we will email you on launch day."],
       pick: ["Get 10key Survival", "Pick the store for your device."]
+    },
+    de: {
+      working: ["Wird geprüft…", "Einen Moment bitte."],
+      confirmed: ["Sie sind vorregistriert!", "Am Starttag senden wir den Download-Link an diese Adresse."],
+      unsubscribed: ["Vorregistrierung storniert", "Wir senden keine Vorregistrierungs-E-Mails mehr an diese Adresse. Die übrigen Daten werden innerhalb von 30 Tagen gelöscht."],
+      invalid: ["Dieser Link funktioniert nicht", "Er wurde schon verwendet oder ist abgelaufen. Für eine neue Vorregistrierung nutzen Sie die Spielseite."],
+      error: ["Verbindung fehlgeschlagen", "Bitte laden Sie diese Seite gleich neu."],
+      soon: ["Noch nicht erschienen", "10key Survival erscheint bald für iOS und Android. Mit einer Vorregistrierung erfahren Sie es am Starttag per E-Mail."],
+      pick: ["10key Survival holen", "Wählen Sie den Store für Ihr Gerät."]
+    },
+    ja: {
+      working: ["確認しています…", "少々お待ちください。"],
+      confirmed: ["事前登録が完了しました！", "リリース日にこのアドレスへダウンロードリンクをお送りします。"],
+      unsubscribed: ["事前登録を取り消しました", "このアドレスには事前登録のメールをお送りしません。残りの情報は30日以内に削除します。"],
+      invalid: ["このリンクは使えません", "すでに使われたか、期限が切れています。もう一度事前登録するには、ゲームのページからお申し込みください。"],
+      error: ["接続できませんでした", "少し待ってから、このページを再読み込みしてください。"],
+      soon: ["まだリリース前です", "10key SurvivalはiOS・Android向けに準備中です。事前登録すると、リリース日にメールでお知らせします。"],
+      pick: ["10key Survivalを入手", "お使いの端末のストアを選んでください。"]
     }
   }[lang];
 
