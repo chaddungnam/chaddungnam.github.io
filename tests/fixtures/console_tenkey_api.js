@@ -40,7 +40,7 @@
         : { d1: { cohort: 96, back: 41 }, d7: { cohort: 52, back: 14 }, d30: { cohort: 0, back: 0 } },
       server: { seen: { d1: 31, d1_prev: 27, d7: 260, d7_prev: 200, d30: 600 }, played: { d1: 24, d7: 190, d30: 410 }, players: 842,
         days: series.map((r, i) => ({ day: r.day, active: Math.round(r.dau / 4), players: 500 + series.slice(0, i + 1).reduce((n, x) => n + x.new_accounts, 0) })) },
-      platforms: [{ key: "android", n: 330 }, { key: "ios", n: 90 }],
+      platforms: [{ key: "android", n: 330 }, { key: "ios", n: 90 }, { key: "web_itch", n: 12 }],
       versions: [{ key: "1.0.0 a2 i2", n: 310 }, { key: "1.0.0 a1 i1", n: 110 }],
       langs: [{ key: "ko", n: 560 }, { key: "en", n: 190 }, { key: "?", n: 30 }],
       totals: { players: 842, accounts: 611, banned: 2, crash_rows_24h: 5, crash_times_24h: 9, notices_live: 1, purchases_30d: 14, stored_runs: 1834,

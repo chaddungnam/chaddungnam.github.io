@@ -2,8 +2,11 @@
 // 최근 7일, one number per card with one line of words under it), the daily chart of devices that opened the app and, folded away, the other charts.
 // Owner 2026-10-25 ("한눈요약 개선처리해줘. 한눈에 안들어옴"): the numbers that matter first, big and in plain Korean; the
 // breakdowns live under "그래프 더 보기". Days are Berlin dates (the server's day). Device numbers come from the app's daily ping
-// (Android / iOS players with a guest account), so web (CrazyGames) is not in them; the unfinished "today" is shown next to
-// yesterday's whole day, never judged up or down (only the 7-day windows get an arrow).
+// (Android / iOS players with a guest account) and, since 2026-10-30, the itch.io web build's anonymous ping (after the Terms +
+// Privacy agreement on its title; filter "웹(itch)"); CrazyGames web still sends nothing. The web id is new on every page load
+// (the client's STORE_ID switch is off), so on the web filter "people" are visits and there is no return rate. Runs = per
+// device and day the larger of the ping counters and the run records (server 20261030150001); the unfinished "today" is
+// shown next to yesterday's whole day, never judged up or down (only the 7-day windows get an arrow).
 // Owner 2026-10-25 ("테스터가 꽤 많을텐데 0명인건 논리적으로 안맞음"): the closed-test build (1.0.0, 2026-10-22) predates the
 // ping, so every count of people is the larger of the ping and the people the game server saw (data.server, a row per player
 // and day: sign-in, progress, runs; app and web), and until the first ping arrives the install / play cards use the game
@@ -115,7 +118,7 @@
   function render(data) {
     const all = data.series || [];
     const rows = all.slice(-state.period);
-    const noSignal = Number(data.new_installs?.all || 0) === 0;
+    const noSignal = state.platform !== "web_itch" && Number(data.new_installs?.all || 0) === 0;  // web: its own numbers only
     const waiting = noSignal ? "앱이 접속 신호를 보내면 채워져요" : "";
     const active = data.active || {};
     const runs = data.runs || {};
@@ -130,7 +133,8 @@
     const anyPlatform = state.platform ? " (플랫폼 구분 없음)" : "";
     const seen = data.server?.seen || {};
     const played = data.server?.played || {};
-    const opened = (k) => Math.max(Number(active[k] || 0), Number(seen[k] || 0));
+    const web = state.platform === "web_itch";  // itch has no accounts: the game server's people are never web visits
+    const opened = (k) => (web ? Number(active[k] || 0) : Math.max(Number(active[k] || 0), Number(seen[k] || 0)));
     const newToday = Number(all.at(-1)?.new_accounts || 0);
     const newYesterday = Number(all.at(-2)?.new_accounts || 0);
     const OPENED_HELP = "게임 서버가 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 앱이 하루 한 번 보내는 접속 신호 중 큰 쪽. 같은 사람은 한 번만 셉니다.";
@@ -138,12 +142,13 @@
     const serverDays = new Map((data.server?.days || []).map((d) => [String(d.day), d]));
     const daily = all.map((r) => {
       const srv = serverDays.get(String(r.day)) || {};
-      return { ...r, people: Math.max(Number(r.dau || 0), Number(srv.active || 0)), players: Number(srv.players || 0) };
+      return { ...r, people: web ? Number(r.dau || 0) : Math.max(Number(r.dau || 0), Number(srv.active || 0)), players: Number(srv.players || 0) };
     });
     const share = (r) => (r.players > 0 ? Math.round(Math.min(r.people, r.players) / r.players * 100) : null);
 
-    byId("tenkeyOverviewNotice").hidden = !noSignal;
-    byId("tenkeyOverviewNotice").textContent = noSignal ? "지금 테스트 빌드는 하루 접속 신호를 보내지 않아요. 그래서 사람 수는 게임 서버 기록(로그인·진행 저장·기록 전송)으로 셉니다. 설치 수와 판 수는 신호를 보내는 새 빌드가 나가면 채워집니다." : "";
+    byId("tenkeyOverviewNotice").hidden = !noSignal && !web;
+    byId("tenkeyOverviewNotice").textContent = web ? "웹(itch)은 게임 페이지를 열 때마다 새 익명 번호를 씁니다. 그래서 ‘앱을 연 사람’은 방문 수, ‘새로 설치’는 새 방문 수이고, 다시 온 비율은 셀 수 없습니다. 판 수는 판마다 오는 기록으로 셉니다."
+      : noSignal ? "지금 테스트 빌드는 하루 접속 신호를 보내지 않아요. 그래서 사람 수는 게임 서버 기록(로그인·진행 저장·기록 전송)으로 셉니다. 설치 수와 판 수는 신호를 보내는 새 빌드가 나가면 채워집니다." : "";
     byId("tenkeyGlanceToday").innerHTML = [
       glance("앱을 연 사람", num(opened("d1")), "명", `어제 하루 ${num(opened("d1_prev"))}명${anyPlatform}`,
         { help: `오늘 게임에 들어온 사람. ${OPENED_HELP} 오늘은 아직 끝나지 않은 날이라 어제 하루 전체와 나란히만 보여 줍니다.` }),
@@ -156,7 +161,7 @@
         ? glance("기록을 올린 사람", num(played.d1), "명", "판 수는 새 빌드부터 셈",
           { help: "오늘 이번 주 자기 최고 기록을 넘겨 서버에 기록을 올린 사람. 게임은 최고 기록을 넘긴 판만 서버에 보냅니다. 몇 판 했는지는 접속 신호를 보내는 새 빌드부터 셉니다." })
         : glance("플레이", num(runs.d1), "판", `어제 하루 ${num(runs.d1_prev)}판`,
-          { help: "앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이). 강제 종료된 날은 적게 잡힙니다." }),
+          { help: "기기·날마다 앱이 알려준 판 수의 증가분(열 때 값과 닫을 때 값의 차이)과 판마다 오는 기록 중 큰 쪽. 웹(itch)은 판마다 오는 기록으로 셉니다." }),
       crashes > 0
         ? glance("크래시 (최근 24시간)", num(crashes), "건", `크래시 화면에서 확인${anyPlatform} →`,
           { tone: "risk", href: "#/tenkey-crashes", help: "최근 24시간의 크래시·멈춤·오류 보고 (같은 오류 합산). 홈 키나 최근 앱에서 끈 것은 세지 않습니다." })
@@ -175,8 +180,8 @@
           { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
       glance("결제", num(week("purchases")), "건", `${buyWeek.note}${anyPlatform}`,
         { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외). Android와 iOS를 합친 숫자입니다." }),
-      glance("다음 날 다시 온 비율", retRate(ret.d1), Number(ret.d1?.cohort) > 0 ? "%" : "",
-        Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
+      glance("다음 날 다시 온 비율", web ? "—" : retRate(ret.d1), !web && Number(ret.d1?.cohort) > 0 ? "%" : "",
+        web ? "웹은 셀 수 없음 (방문마다 새 번호)" : Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
         { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." }),
     ].join("");
 
@@ -211,7 +216,7 @@
     byId("tenkeyOverviewMoreCharts").innerHTML = [
       `<div class="lab-facts tk-more-facts">${facts}</div>`,
       card(`새로 설치 (${state.period}일)`, key("", "bar", "처음 신호를 받은 기기"), newCols.plot, rows, true, waiting),
-      card(`플레이 (${state.period}일)`, key("", "bar", "앱이 알려준 판 수"), runCols.plot, rows, true, waiting),
+      card(`플레이 (${state.period}일)`, key("", "bar", "신호와 판 기록 중 큰 쪽"), runCols.plot, rows, true, waiting),
       distCard,
       card(`크래시 (${state.period}일)`, key("is-v2", "bar", "보고 + 반복 횟수"), crashCols.plot, rows, false, ""),
       card(`결제 완료 (${state.period}일)`, key("", "bar", "스토어 확인된 구매"), buyCols.plot, rows, false, ""),
@@ -226,6 +231,7 @@
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
       "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 날마다 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·기록을 올린 사람을 보여 줍니다. 서버의 날짜별 기록은 10월 22일(테스트 시작)부터 있습니다.",
       "최근 7일 DAU의 %는 그날 앱을 연 사람 ÷ 그날까지 가입한 플레이어 수입니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
+      "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어가지만 ‘다시 온 비율’에서는 빠집니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",
       "서버에서 신호 수집을 끄는 스위치: tenkey_private.ops_flags.ping_on (꺼지면 앱이 하루 쉽니다).",

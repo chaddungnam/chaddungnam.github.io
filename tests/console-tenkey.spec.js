@@ -68,6 +68,33 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   expect(errors).toEqual([]);
 });
 
+test("overview: the itch.io web filter shows its own visits and runs, no return rate, never the game server's people", async ({ page }) => {
+  const errors = await open(page);
+  const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
+  const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
+  await expect(today).toHaveCount(4);
+  await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveText("웹(itch)");
+  await page.locator('[data-tk-platform="web_itch"]').click();
+  await expect.poll(async () => (await calls(page, "overview.get")).at(-1)?.params.platform).toBe("web_itch");
+  await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveAttribute("aria-pressed", "true");
+  const want = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: { platform: "web_itch" } })
+    .then((r) => [r.data.active.d1, r.data.active.d7, r.data.runs.d1]));
+  // people = the web pings only (the game server's accounts are app players, 31 / 260 in the fixture would win the max)
+  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want[0]}명`);
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${want[1]}명`);
+  await expect(today.nth(2).locator(".tk-glance-value")).toHaveText(`${want[2]}판`);
+  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("—");
+  await expect(week.nth(3)).toContainText("웹은 셀 수 없음");
+  await expect(page.locator("#tenkeyOverviewNotice")).toBeVisible();
+  await expect(page.locator("#tenkeyOverviewNotice")).toContainText("방문 수");
+  await page.locator("#tenkeyOverviewMore summary").click();
+  await expect(page.locator("#tenkeyOverviewMoreCharts")).toContainText("웹 · itch.io");
+  await shot(page, "overview_web_itch");
+  await page.locator('[data-tk-platform=""]').click();
+  await expect(page.locator("#tenkeyOverviewNotice")).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
 test("overview: today and 7-day numbers first in plain words, one chart, the rest folded; period and platform switches", async ({ page }) => {
   const errors = await open(page);
   await expect(page.locator("#pageTitle")).toHaveText("한눈 요약");
