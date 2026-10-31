@@ -161,6 +161,47 @@ test("ads measurement: no Google request before consent, conversion after allow"
   await expect(page.locator(".tk-adsbar")).toBeVisible();
 });
 
+// Owner 2026-10-31: a pre-registration made before answering the bar is not lost. The bar asks again after the sign-up;
+// "Allow" then loads the tag and sends that one conversion. Nothing from Google before it.
+test("ads measurement: a sign-up before answering the bar is counted once the visitor allows", async ({ page }) => {
+  const google = [];
+  await page.route(/googletagmanager\.com|google\.com|doubleclick\.net|googleadservices\.com/, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
+  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
+  await page.goto("/10key/?lang=ko&gclid=TeSter-123");
+  const card = page.locator("#prereg");
+  await card.locator("input[name=email]").fill("player@example.com");
+  await card.locator("input[name=consent]").check();
+  await card.getByRole("button", { name: "사전예약하기" }).click();
+  await expect(card.locator("[data-prereg-status]")).toContainText("사전예약 완료!");
+  const bar = page.locator(".tk-adsbar.is-after");
+  await expect(bar).toBeVisible();
+  await expect(bar).toContainText("사전예약 완료!");
+  await page.waitForTimeout(300);
+  expect(google).toHaveLength(0);
+  await bar.getByRole("button", { name: "허용" }).click();
+  await expect.poll(() => google.length).toBeGreaterThan(0);
+  const layer = await page.evaluate(() => JSON.stringify(window.dataLayer.map((a) => Array.from(a))));
+  expect(layer).toContain('"conversion",{"send_to":"AW-18020492251/h5j8CPjd7K4dENvH65BD"}');
+  expect(layer).not.toContain("player@example.com");
+});
+
+test("ads measurement: declining after the sign-up sends nothing", async ({ page }) => {
+  const google = [];
+  await page.route(/googletagmanager\.com|googleadservices\.com|doubleclick\.net/, (route) => { google.push(route.request().url()); route.abort(); });
+  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
+  await page.goto("/10key/index_en.html?lang=en");
+  const card = page.locator("#prereg");
+  await card.locator("input[name=email]").fill("player@example.com");
+  await card.locator("input[name=consent]").check();
+  await card.getByRole("button", { name: "Pre-register" }).click();
+  const bar = page.locator(".tk-adsbar.is-after");
+  await expect(bar).toContainText("You're pre-registered!");
+  await bar.getByRole("button", { name: "Decline" }).click();
+  await expect(page.locator(".tk-adsbar")).toHaveCount(0);
+  await page.waitForTimeout(300);
+  expect(google).toHaveLength(0);
+});
+
 test("ads measurement: declining keeps Google away and the form works", async ({ page }) => {
   const google = [];
   await page.route(/googletagmanager\.com|googleadservices\.com|doubleclick\.net/, (route) => { google.push(route.request().url()); route.abort(); });

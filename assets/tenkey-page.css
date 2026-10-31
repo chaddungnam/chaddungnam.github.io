@@ -331,6 +331,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 
 /* Google Ads measurement consent bar (tenkey-ads.js, owner 2026-10-30). Nothing from Google loads before "Allow". */
 .tk-adsbar { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 60; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; width: min(720px, calc(100% - 24px)); padding: 14px 16px; border: 1px solid var(--tk-edge); border-radius: 16px; background: rgba(20, 19, 24, .96); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); color: var(--tk-text); font-size: .86rem; line-height: 1.5; backdrop-filter: blur(8px); }
+.tk-adsbar.is-after { border-color: var(--tk-duck); }
 .tk-adsbar-text { margin: 0; flex: 1; word-break: keep-all; }
 .tk-adsbar-text a { color: #fff; text-underline-offset: 3px; }
 .tk-adsbar-actions { display: flex; gap: 8px; flex: none; }
