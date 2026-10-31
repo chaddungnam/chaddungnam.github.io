@@ -5,6 +5,9 @@
 // privacy policy also has German (owner 2026-10-20), whose section 13 links the English 10KEY Terms.
 // Owner decision (22), 2026-10-20: the Android / iOS apps have a House Duck guest account (age question, nickname,
 // anonymous Supabase Auth login) and in-app purchases (gem keycaps, Revive Pass); privacy v4.3 and terms v1.1 say so.
+// 2026-10-31 (owner: bring the pages up to date): server-kept progress with a guest account (no run offline there), the age
+// question at the first SHOP visit, the Google / Apple link, problem reports, the ROBOT PACK in place of the Revive Pass,
+// modules / Rare Parts with the odds page, the GamePix web version; terms v1.2.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -43,7 +46,7 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
       /no advertising identifiers/, /no payment card data/, /not directed to children under 14/, /permission of a parent or guardian/, /human review/,
       // Android / iOS guest account and in-app purchases (2026-10-20)
       /signs in anonymously at Supabase Auth \(no email address, no password, no phone number\)/, /year and month themselves are not saved and not sent/,
-      /Under 14: the app creates no account/, /stored only in the app’s save on your device/, /one-way hash \(SHA-256\) of your login ID/,
+      /Under 14: no account is kept/, /stored only in the app’s save on your device/, /one-way hash \(SHA-256\) of your login ID/,
       /passes no account identifier to Apple/, /Art\. 6\(1\)\(c\)/, /Google and Apple process in-app purchases/, /Hold to delete account/,
       /unless another House Duck game uses the same login/, /kept without the link to your account/, /Logging out does not delete/,
       /The Android and iOS apps show no ads/, /There is no House Duck account on CrazyGames/],
@@ -55,7 +58,7 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
       /12주/, /35일/, /90일/, /6개월\(183일\)/, /플랫폼 사용자 이름/, /분석 SDK도 광고 SDK도 포함되어 있지 않으며/,
       /광고 식별자를 받지 않습니다/, /결제 카드 정보를 받지 않습니다/, /만 14세 미만/, /부모 또는 보호자의 허락/, /사람의 검토/,
       /Supabase Auth에 익명으로 로그인하고\(이메일 주소, 비밀번호, 전화번호 없음\)/, /해와 달 자체는 저장하지도, 전송하지도 않습니다/,
-      /만 14세 미만: 앱은 계정을 만들지 않습니다/, /기기의 앱 저장 데이터에만 보관/, /로그인 ID의 단방향 해시\(SHA-256\)/,
+      /만 14세 미만: 계정을 유지하지 않습니다/, /기기의 앱 저장 데이터에만 보관/, /로그인 ID의 단방향 해시\(SHA-256\)/,
       /Apple에 계정 식별자를 전달하지 않습니다/, /제6조 제1항 c호/, /Google과 Apple ?은 Android 및 iOS 앱의 인앱 구매/, /길게 눌러 계정 삭제/,
       /다른 House Duck 게임이 같은 로그인을 쓰지 않으면/, /계정과의 연결 없이 보관/, /로그아웃해도 당사 서버의 계정 데이터는 삭제되지 않습니다/,
       /Android 및 iOS 앱에는 광고가 없습니다/, /CrazyGames에는 House Duck 계정이 없습니다/],
@@ -83,7 +86,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-10-30"/, `${locale}: last updated 2026-10-30`);
+    assert.match(html, /datetime="2026-10-31"/, `${locale}: last updated 2026-10-31`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -101,7 +104,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     /6 Monate \(183 Tage\)/, /Benutzernamen auf der Plattform/, /kein Analyse-SDK und kein eigenes Werbe-SDK/, /keine Werbekennungen/,
     /keine Zahlungskartendaten/, /nicht an Kinder unter 14 Jahren/, /Erlaubnis eines Elternteils/, /menschliche Überprüfung/,
     /meldet sich dann anonym bei Supabase Auth an \(keine E-Mail-Adresse, kein Passwort, keine Telefonnummer\)/,
-    /Jahr und Monat selbst werden weder gespeichert noch gesendet/, /Unter 14: Die App legt kein Konto an/,
+    /Jahr und Monat selbst werden weder gespeichert noch gesendet/, /Unter 14: Es wird kein Konto behalten/,
     /nur im Spielstand der App auf Ihrem Gerät gespeichert/, /Einweg-Hash \(SHA-256\) Ihrer Login-ID/, /übergibt die App Apple keine Kontokennung/,
     /Art\. 6 Abs\. 1 Buchst\. c/, /Google und Apple verarbeiten In-App-Käufe/, /Hold to delete account/,
     /sofern kein anderes House-Duck-Spiel dieselbe Anmeldung verwendet/, /ohne Verbindung zu Ihrem Konto aufbewahrt/,
@@ -118,7 +121,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-10-30"/, "de: last updated 2026-10-30");
+  assert.match(html, /datetime="2026-10-31"/, "de: last updated 2026-10-31");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -136,19 +139,21 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
   };
   const required = {
     en: [/no House Duck account/, /no cash or real-world value and cannot be sold or exchanged for money/, /legitimate refund request/,
-      /may show ads \(today on CrazyGames\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
-      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /Offline play is not affected/,
+      /may show ads \(today on GamePix\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
+      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /These measures do not stop you from playing the game/,
       /creates a House Duck guest account for you, without an email address or password/, /Players under 14 play without an account/,
       /Google Play Billing on Android and the App Store on iOS/, /Restore purchases/, /Gems are consumable/,
-      /cannot be transferred to another account or player/, /Gems already spent are not taken back/, /The Android and iOS apps show no ads/,
-      /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/],
+      /cannot be transferred to another account or player/, /the gems from that purchase are taken back from your gem balance/, /The Android and iOS apps show no ads/,
+      /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/, /Effective October 31, 2026 \(v1\.2\)/, /starting a run needs an internet connection/i,
+      /a free web demo/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
     ko: [/House Duck 계정은 없습니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
-      /광고를 표시할 수 있습니다\(현재 CrazyGames\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
-      /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /오프라인 플레이에 영향을 주지 않습니다/,
+      /광고를 표시할 수 있습니다\(현재 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
+      /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /이러한 조치로 게임을 플레이하지 못하게 되지는 않습니다/,
       /이메일 주소나 비밀번호 없이 House Duck 게스트 계정을 만듭니다/, /만 14세 미만은 계정 없이 플레이합니다/,
       /Android에서는 Google Play 결제, iOS에서는 App Store/, /구매 복원/, /보석은 소모성 상품/,
-      /다른 계정이나 다른 플레이어에게 넘길 수 없고/, /이미 사용한 보석은 회수하지 않습니다/, /Android 및 iOS 앱에는 광고가 없습니다/,
-      /길게 눌러 계정 삭제/, /2026년 10월 20일 시행\(v1\.1\)/],
+      /다른 계정이나 다른 플레이어에게 넘길 수 없고/, /그 구매로 받은 보석을 보석 잔액에서 회수/, /Android 및 iOS 앱에는 광고가 없습니다/,
+      /길게 눌러 계정 삭제/, /2026년 10월 20일 시행\(v1\.1\)/, /2026년 10월 31일 시행\(v1\.2\)/, /판을 시작하려면 인터넷 연결이 필요/,
+      /무료 웹 체험판/, /GamePix가 광고/, /확률 정보 페이지/, /로봇 패키지/],
   };
   for (const locale of locales) {
     const file = `10key/terms/${locale}.html`;
@@ -162,7 +167,8 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-10-20"/, `${file}: last updated 2026-10-20 (v1.1: guest accounts and in-app purchases)`);
+    assert.match(html, /datetime="2026-10-31"/, `${file}: last updated 2026-10-31 (v1.2: platforms, server-kept progress, in-game items)`);
+    assert.doesNotMatch(text(html.replace(/<li>[^<]*\(v1\.[012]\)[^<]*/g, "")), /Revive Pass|부활 패스/, `${file}: the Revive Pass is gone (only in the history entries)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
     assert.doesNotMatch(plain, quirkyOnly, `${file}: no Quirky-Ball-only feature`);
@@ -235,4 +241,48 @@ test("section 13 covers the 10key Survival launch pre-registration in every lang
     assert.match(s13, /id="10key-prereg"/, `${locale}: pre-registration subsection`);
     for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
   }
+});
+
+// 2026-10-31 (owner: "홈페이지 확률정보랑 이용약관 개인정보 처리방침 최신화"): section 13 says what the game does today in every
+// language: server-kept progress and the run ticket for guest accounts, the age question at the first SHOP visit, the
+// Google / Apple link, problem reports (7 days), the ROBOT PACK record (no Revive Pass row), the GamePix web version
+// (nothing sent to House Duck, the GamePix policy linked); the odds page keeps the current 12-module table and announces
+// the 24-module fragment draw before it takes effect.
+test("section 13 covers server-kept progress, problem reports, the ROBOT PACK and GamePix in every language", () => {
+  const words = {
+    en: ["<td>Run tickets</td>", "<td>Problem reports</td>", "<td>ROBOT PACK</td>", "<h3>Web version on GamePix</h3>", "Starting a run needs an internet connection",
+      "at your first visit to the SHOP", "Linking Google or Apple (optional)", "Problem reports: deleted 7 days after they were sent", "House Duck receives no data from it"],
+    ko: ["<td>판 티켓</td>", "<td>문제 제보</td>", "<td>로봇 패키지</td>", "<h3>GamePix 웹 버전</h3>", "판을 시작하려면 인터넷 연결이 필요합니다",
+      "처음 상점(SHOP)에 들어갈 때", "Google 또는 Apple 계정 연동(선택)", "문제 제보: 보낸 지 7일 후 삭제", "House Duck은 이 버전에서 아무 정보도 받지 않습니다"],
+    de: ["<td>Run-Tickets</td>", "<td>Problemmeldungen</td>", "<td>ROBOT PACK</td>", "<h3>Webversion auf GamePix</h3>", "Zum Starten eines Runs ist eine Internetverbindung nötig",
+      "beim ersten Besuch im SHOP", "Verknüpfung mit Google oder Apple (optional)", "Problemmeldungen: werden 7 Tage nach dem Senden gelöscht", "House Duck erhält daher keine Daten aus ihr"],
+  };
+  for (const [locale, list] of Object.entries(words)) {
+    const s13 = section13(locale);
+    for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
+    assert.ok(s13.includes('href="https://www.gamepix.com/privacy-cookie"'), `${locale}: links the GamePix privacy policy`);
+    assert.doesNotMatch(s13, /<td>Revive Pass<\/td>|<td>부활 패스<\/td>/, `${locale}: no Revive Pass row`);
+    assert.doesNotMatch(text(s13), /Sign in with Apple|Apple로 로그인/i, `${locale}: no Quirky Ball sign-in wording`);
+  }
+});
+
+test("the odds page keeps the current 12-module table and announces the 24-module fragment draw", () => {
+  const html = read("10key/odds/index.html");
+  const ko = html.slice(html.indexOf('<h2 id="ko">'), html.indexOf('<h2 id="en">'));
+  const en = html.slice(html.indexOf('<h2 id="en">'));
+  for (const [lang, part, next] of [["ko", ko, '<h3 id="ko-next">'], ["en", en, '<h3 id="en-next">']]) {
+    const cut = part.indexOf(next);
+    assert.ok(cut > 0, `${lang}: announced-change section`);
+    const now = part.slice(0, cut);
+    const later = part.slice(cut);
+    assert.equal((now.match(/8\.333% \(1\/12\)/g) || []).length, 12, `${lang}: the current table has 12 rows at 1/12`);
+    assert.equal((later.match(/4\.167% \(1\/24\)/g) || []).length, 24, `${lang}: the announced table has 24 rows at 1/24`);
+    assert.match(text(later), lang === "ko" ? /모듈 조각 5개/ : /5 module fragments/, `${lang}: 5 fragments a draw`);
+    assert.match(text(later), lang === "ko" ? /2개 \/ 3개 \/ 5개 \/ 8개/ : /2 \/ 3 \/ 5 \/ 8/, `${lang}: the grade ladder`);
+    assert.match(text(later), lang === "ko" ? /부품 24개/ : /24 scrap/, `${lang}: scrap per fragment after UR`);
+    assert.match(text(later), lang === "ko" ? /보석 30개\(1회\), 보석 300개\(10회\)/ : /30 gems \(1 draw\), 300 gems \(10 draws\)/, `${lang}: same price`);
+    assert.ok(cut < part.indexOf(lang === "ko" ? "<h3>변경 안내</h3>" : "<h3>Changes</h3>"), `${lang}: announced before the changes rule`);
+  }
+  for (const name of ["Graphics Card", "Soldering Iron", "그래픽카드", "납땜 인두"]) assert.ok(html.includes(`<td>${name}</td>`), `odds page names ${name}`);
+  assert.match(html, /datetime="2026-10-31"/, "odds page: last updated 2026-10-31");
 });

@@ -106,7 +106,7 @@ for locale in "${locales[@]}"; do
     printf 'Missing 10key Survival terms page: %s\n' "$tenkey_terms" >&2
     failed=1
   else
-    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-20"'; do
+    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-31"'; do
       if ! rg -q "$token" "$tenkey_terms"; then
         printf '10key Survival terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
         failed=1

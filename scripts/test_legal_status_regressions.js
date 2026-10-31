@@ -9,9 +9,9 @@ const expected = {
     "10key Survival guest accounts and in-app purchases: October 20, 2026", "Effective October 20, 2026 (v4.3)"],
   "privacy/de.html": ["Inkrafttreten: 5. Oktober 2026", "Wirksam ab 5. Oktober 2026", "Ergänzungen zu 10key Survival: 19. Oktober 2026", "Wirksam ab 19. Oktober 2026 (v4.1)",
     "Gastkonten und In-App-Käufe in 10key Survival: 20. Oktober 2026", "Wirksam ab 20. Oktober 2026 (v4.3)"],
-  // 10key Survival terms v1.1 (2026-10-20): guest accounts and in-app purchases on Android / iOS; v1.0 stays in the history.
-  "10key/terms/en.html": ["Effective date: October 20, 2026", "Effective October 20, 2026 (v1.1)", "Effective October 19, 2026 (v1.0)"],
-  "10key/terms/ko.html": ["시행일: 2026년 10월 20일", "2026년 10월 20일 시행(v1.1)", "2026년 10월 19일 시행(v1.0)"],
+  // 10key Survival terms v1.2 (2026-10-31): platforms, server-kept progress, in-game items, ROBOT PACK; v1.1 and v1.0 stay in the history.
+  "10key/terms/en.html": ["Effective date: October 31, 2026", "Effective October 31, 2026 (v1.2)", "Effective October 20, 2026 (v1.1)", "Effective October 19, 2026 (v1.0)"],
+  "10key/terms/ko.html": ["시행일: 2026년 10월 31일", "2026년 10월 31일 시행(v1.2)", "2026년 10월 20일 시행(v1.1)", "2026년 10월 19일 시행(v1.0)"],
 };
 expected["privacy/ko.html"].push("딸깍 서바이벌 추가분: 2026년 10월 19일", "2026년 10월 19일 시행(v4.1)",
   "딸깍 서바이벌 게스트 계정 및 인앱 구매: 2026년 10월 20일", "2026년 10월 20일 시행(v4.3)");

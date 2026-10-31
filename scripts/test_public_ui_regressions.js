@@ -292,9 +292,9 @@ test("terms show the effective date and avoid unconfirmed business status", () =
     ["quirky-ball/terms/ko.html", /시행일:\s*2026년 10월 5일/, /영업하는 개인사업자/],
     ["quirky-ball/terms/en.html", /Effective date:\s*October 5, 2026/i, /sole proprietor/i],
     ["quirky-ball/terms/de.html", /Inkrafttreten:\s*5\. Oktober 2026/i, /Einzelunternehmer/i],
-    // 10key Survival terms v1.1 (2026-10-20: guest accounts and in-app purchases on Android / iOS).
-    ["10key/terms/ko.html", /시행일:\s*2026년 10월 20일/, /영업하는 개인사업자/],
-    ["10key/terms/en.html", /Effective date:\s*October 20, 2026/i, /sole proprietor/i],
+    // 10key Survival terms v1.2 (2026-10-31: platforms, server-kept progress, in-game items, ROBOT PACK).
+    ["10key/terms/ko.html", /시행일:\s*2026년 10월 31일/, /영업하는 개인사업자/],
+    ["10key/terms/en.html", /Effective date:\s*October 31, 2026/i, /sole proprietor/i],
   ];
   for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);
