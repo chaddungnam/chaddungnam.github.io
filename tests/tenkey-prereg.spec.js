@@ -131,90 +131,63 @@ for (const [home, locale] of Object.entries({ "/index_de.html?lang=de": "de", "/
   });
 }
 
-// Google Ads measurement (owner 2026-10-30): nothing from Google before "Allow"; after it the tag loads and a successful
-// pre-registration sends the conversion, never the email address.
-test("ads measurement: no Google request before consent, conversion after allow", async ({ page }) => {
+// Google Ads measurement, consent mode "advanced" (owner 2026-10-31). Before an answer the tag loads with every storage denied
+// (cookieless signals only) and a pre-registration is counted; "Allow" grants ad_storage; "Decline" stops the signals and
+// keeps Google away on later visits. The email address is never sent.
+const GOOGLE = /googletagmanager\.com|google\.com|doubleclick\.net|googleadservices\.com/;
+const layerOf = (page) => page.evaluate(() => JSON.stringify((window.dataLayer || []).map((a) => Array.from(a))));
+
+test("ads measurement: before an answer only cookieless signals, and the pre-registration is counted", async ({ page }) => {
   const google = [];
-  await page.route(/googletagmanager\.com|google\.com|doubleclick\.net|googleadservices\.com/, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
+  await page.route(GOOGLE, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
   await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
-  await page.goto("/10key/?lang=ko");
-  const bar = page.locator(".tk-adsbar");
-  await expect(bar).toBeVisible();
-  await page.waitForTimeout(300);
-  expect(google).toHaveLength(0);
-  await bar.getByRole("button", { name: "허용" }).click();
-  await expect(bar).toHaveCount(0);
+  await page.goto("/10key/?lang=ko&gclid=TeSter-123");
+  await expect(page.locator(".tk-adsbar")).toBeVisible();
   await expect.poll(() => google.length).toBeGreaterThan(0);
   expect(google[0]).toContain("gtag/js?id=AW-18020492251");
+  let layer = await layerOf(page);
+  expect(layer).toContain('"consent","default",{"ad_storage":"denied","ad_user_data":"denied","ad_personalization":"denied","analytics_storage":"denied"}');
+  expect(layer).toContain('"set","ads_data_redaction",false');
   const card = page.locator("#prereg");
   await card.locator("input[name=email]").fill("player@example.com");
   await card.locator("input[name=consent]").check();
   await card.getByRole("button", { name: "사전예약하기" }).click();
   await expect(card.locator("[data-prereg-status]")).toContainText("사전예약 완료!");
-  const layer = await page.evaluate(() => JSON.stringify(window.dataLayer.map((a) => Array.from(a))));
-  expect(layer).toContain('"conversion",{"send_to":"AW-18020492251/h5j8CPjd7K4dENvH65BD"}');
+  layer = await layerOf(page);
+  expect(layer.match(/"conversion",\{"send_to":"AW-18020492251\/h5j8CPjd7K4dENvH65BD"\}/g)).toHaveLength(1);
   expect(layer).not.toContain("player@example.com");
-  // the choice is remembered and can be changed from the footer
+  // "Allow" afterwards adds the cookie, without counting the pre-registration twice
+  await page.locator(".tk-adsbar").getByRole("button", { name: "허용" }).click();
+  layer = await layerOf(page);
+  expect(layer).toContain('"consent","update",{"ad_storage":"granted"}');
+  expect(layer.match(/"conversion"/g)).toHaveLength(1);
+  // remembered: the next visit starts with ad_storage granted and no bar; the footer link reopens it
   await page.reload();
   await expect(page.locator(".tk-adsbar")).toHaveCount(0);
+  expect(await layerOf(page)).toContain('"consent","default",{"ad_storage":"granted"');
   await page.locator("[data-ads-settings]").click();
   await expect(page.locator(".tk-adsbar")).toBeVisible();
 });
 
-// Owner 2026-10-31: a pre-registration made before answering the bar is not lost. The bar asks again after the sign-up;
-// "Allow" then loads the tag and sends that one conversion. Nothing from Google before it.
-test("ads measurement: a sign-up before answering the bar is counted once the visitor allows", async ({ page }) => {
+test("ads measurement: Decline stops the signals now and keeps Google away on the next visit", async ({ page }) => {
   const google = [];
-  await page.route(/googletagmanager\.com|google\.com|doubleclick\.net|googleadservices\.com/, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
-  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
-  await page.goto("/10key/?lang=ko&gclid=TeSter-123");
-  const card = page.locator("#prereg");
-  await card.locator("input[name=email]").fill("player@example.com");
-  await card.locator("input[name=consent]").check();
-  await card.getByRole("button", { name: "사전예약하기" }).click();
-  await expect(card.locator("[data-prereg-status]")).toContainText("사전예약 완료!");
-  const bar = page.locator(".tk-adsbar.is-after");
-  await expect(bar).toBeVisible();
-  await expect(bar).toContainText("사전예약 완료!");
-  await page.waitForTimeout(300);
-  expect(google).toHaveLength(0);
-  await bar.getByRole("button", { name: "허용" }).click();
-  await expect.poll(() => google.length).toBeGreaterThan(0);
-  const layer = await page.evaluate(() => JSON.stringify(window.dataLayer.map((a) => Array.from(a))));
-  expect(layer).toContain('"conversion",{"send_to":"AW-18020492251/h5j8CPjd7K4dENvH65BD"}');
-  expect(layer).not.toContain("player@example.com");
-});
-
-test("ads measurement: declining after the sign-up sends nothing", async ({ page }) => {
-  const google = [];
-  await page.route(/googletagmanager\.com|googleadservices\.com|doubleclick\.net/, (route) => { google.push(route.request().url()); route.abort(); });
-  await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
-  await page.goto("/10key/index_en.html?lang=en");
-  const card = page.locator("#prereg");
-  await card.locator("input[name=email]").fill("player@example.com");
-  await card.locator("input[name=consent]").check();
-  await card.getByRole("button", { name: "Pre-register" }).click();
-  const bar = page.locator(".tk-adsbar.is-after");
-  await expect(bar).toContainText("You're pre-registered!");
-  await bar.getByRole("button", { name: "Decline" }).click();
-  await expect(page.locator(".tk-adsbar")).toHaveCount(0);
-  await page.waitForTimeout(300);
-  expect(google).toHaveLength(0);
-});
-
-test("ads measurement: declining keeps Google away and the form works", async ({ page }) => {
-  const google = [];
-  await page.route(/googletagmanager\.com|googleadservices\.com|doubleclick\.net/, (route) => { google.push(route.request().url()); route.abort(); });
+  await page.route(GOOGLE, (route) => { google.push(route.request().url()); route.fulfill({ status: 200, contentType: "text/javascript", body: "" }); });
   await page.route(FN, (route) => route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }));
   await page.goto("/10key/index_en.html?lang=en");
   await page.locator(".tk-adsbar").getByRole("button", { name: "Decline" }).click();
+  await expect(page.locator(".tk-adsbar")).toHaveCount(0);
   const card = page.locator("#prereg");
   await card.locator("input[name=email]").fill("player@example.com");
   await card.locator("input[name=consent]").check();
   await card.getByRole("button", { name: "Pre-register" }).click();
   await expect(card.locator("[data-prereg-status]")).toContainText("You are pre-registered!");
+  const layer = await layerOf(page);
+  expect(layer).toContain('"consent","update",{"ad_storage":"denied"}');
+  expect(layer).not.toContain('"conversion"');
+  google.length = 0;
   await page.reload();
   await expect(page.locator(".tk-adsbar")).toHaveCount(0);
+  await page.waitForTimeout(300);
   expect(google).toHaveLength(0);
 });
 
