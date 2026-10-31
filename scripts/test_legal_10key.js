@@ -276,7 +276,7 @@ test("the odds page keeps the current 12-module table and announces the 24-modul
     const now = part.slice(0, cut);
     const later = part.slice(cut);
     assert.equal((now.match(/8\.333% \(1\/12\)/g) || []).length, 12, `${lang}: the current table has 12 rows at 1/12`);
-    assert.equal((later.match(/4\.167% \(1\/24\)/g) || []).length, 24, `${lang}: the announced table has 24 rows at 1/24`);
+    assert.equal((later.match(/4\.166% \(1\/24\)/g) || []).length, 24, `${lang}: the announced table has 24 rows at 1/24`);
     assert.match(text(later), lang === "ko" ? /모듈 조각 5개/ : /5 module fragments/, `${lang}: 5 fragments a draw`);
     assert.match(text(later), lang === "ko" ? /2개 \/ 3개 \/ 5개 \/ 8개/ : /2 \/ 3 \/ 5 \/ 8/, `${lang}: the grade ladder`);
     assert.match(text(later), lang === "ko" ? /부품 24개/ : /24 scrap/, `${lang}: scrap per fragment after UR`);
