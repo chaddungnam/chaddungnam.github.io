@@ -316,7 +316,7 @@ test("CrazyGames is no platform of 10key Survival any more", () => {
 test("section 13 covers season rankings, web ranking accounts, quests, the reminder and the review prompt in every language", () => {
   const words = {
     en: ["board of the current season and the board of the last season", "January 1, April 1, July 1 and October 1 at 09:00 UTC", "October 1 to December 31, 2026",
-      "all-time best, which is used for the player’s profile", "<li>Season board entries: deleted once the season is more than 12 weeks old.</li>",
+      "all-time best, which is used for the player’s profile", "<li>Season board entries: deleted once the season ended more than 12 weeks ago.</li>",
       "<strong>Sending records in the web versions (itch.io and GamePix):</strong>", "use a guest account only for the online ranking",
       "stay in your browser’s storage and are not sent", "<td>Quest rewards</td>", "the UTC day or week of the quest", "module draw tickets",
       "Quest reward records: deleted 35 days after the reward was claimed.", "<h3>Daily reminder and store review prompt (Android and iOS)</h3>",
@@ -324,7 +324,7 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
       "review sheet (Apple’s or Google’s) once", "House Duck receives nothing from it", "As on itch.io, the results of finished runs are sent to House Duck’s server",
       "Web versions (itch.io, GamePix): usage signal and run records"],
     ko: ["이번 시즌의 순위표와 지난 시즌의 순위표", "1월 1일, 4월 1일, 7월 1일, 10월 1일 09:00(UTC)", "2026년 10월 1일부터 12월 31일까지",
-      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 해당 시즌이 12주보다 오래되면 삭제됩니다.</li>",
+      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 해당 시즌이 끝난 지 12주가 지나면 삭제됩니다.</li>",
       "<strong>웹 버전(itch.io, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹에만 쓰이는 게스트 계정을 사용합니다",
       "브라우저 저장소에 남고 전송되지 않습니다", "<td>퀘스트 보상</td>", "퀘스트의 UTC 기준 날짜 또는 주", "모듈 뽑기권",
       "퀘스트 보상 기록: 보상을 받은 지 35일 후 삭제됩니다.", "<h3>일일 알림과 스토어 리뷰 창(Android 및 iOS)</h3>",
@@ -332,7 +332,7 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
       "리뷰 창(Apple 또는 Google)을 한 번 열 수 있습니다", "House Duck은 이로부터 아무것도 받지 않습니다", "itch.io와 마찬가지로 끝난 판의 결과는 온라인 랭킹을 위해 House Duck 서버로 보내지고",
       "웹 버전(itch.io, GamePix)의 이용 신호와 판 기록"],
     de: ["Rangliste der aktuellen Saison und die Rangliste der letzten Saison", "1. Januar, 1. April, 1. Juli und 1. Oktober um 09:00 Uhr UTC", "vom 1. Oktober bis zum 31. Dezember 2026",
-      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: werden gelöscht, sobald die Saison mehr als 12 Wochen zurückliegt.</li>",
+      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: werden gelöscht, sobald das Ende der Saison mehr als 12 Wochen zurückliegt.</li>",
       "<strong>Senden von Ergebnissen in den Webversionen (itch.io und GamePix):</strong>", "verwenden ein Gastkonto nur für die Online-Rangliste",
       "bleiben im Speicher Ihres Browsers und werden nicht gesendet", "<td>Quest-Belohnungen</td>", "der UTC-Tag oder die UTC-Woche der Quest", "Modulziehungs-Tickets",
       "Quest-Belohnungen: werden 35 Tage nach dem Abholen der Belohnung gelöscht.", "<h3>Tägliche Erinnerung und Bewertungsfenster des Stores (Android und iOS)</h3>",
