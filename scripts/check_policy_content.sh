@@ -106,12 +106,17 @@ for locale in "${locales[@]}"; do
     printf 'Missing 10key Survival terms page: %s\n' "$tenkey_terms" >&2
     failed=1
   else
-    for token in 'support@houseduck\.in' 'CrazyGames' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-10-31"'; do
+    for token in 'support@houseduck\.in' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-11-01"'; do
       if ! rg -q "$token" "$tenkey_terms"; then
         printf '10key Survival terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
         failed=1
       fi
     done
+    # CrazyGames is not a 10key Survival platform (2026-11-01): only the revision history (section 16) may still name it.
+    if sed -n '1,/id="section-16"/p' "$tenkey_terms" | grep -Fq 'CrazyGames'; then
+      printf '10key Survival terms page still names CrazyGames outside the revision history: %s\n' "$tenkey_terms" >&2
+      failed=1
+    fi
     # Gems (gem keycaps / 보석 키캡) are a 10key Survival mobile feature since 2026-10-20, so only Quirky Ball's 젬 stays banned.
     if rg -n -i 'AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|젬|season pass|시즌패스|subscription|구독' "$tenkey_terms"; then
       printf '10key Survival terms page contains Quirky-Ball-only or removed wording: %s\n' "$tenkey_terms" >&2
@@ -123,12 +128,16 @@ for locale in "${locales[@]}"; do
     failed=1
   fi
   tenkey_section="$(sed -n '/id="section-13">13\. /,/id="section-14"/p' "$privacy")"
-  for token in 'eu-west-1' 'CrazyGames' 'Google Play' 'Steam' '12' '35' '90' '183' 'support@houseduck\.in'; do
+  for token in 'eu-west-1' 'Google Play' 'Steam' '12' '35' '90' '183' 'support@houseduck\.in'; do
     if ! printf '%s' "$tenkey_section" | grep -Eq "$token"; then
       printf 'Privacy 10key Survival section misses %s: %s\n' "$token" "$privacy" >&2
       failed=1
     fi
   done
+  if printf '%s' "$tenkey_section" | grep -Fq 'CrazyGames'; then
+    printf 'Privacy 10key Survival section still names CrazyGames (not a platform since 2026-11-01): %s\n' "$privacy" >&2
+    failed=1
+  fi
   if printf '%s' "$tenkey_section" | grep -Eiq 'AdMob|Firebase|AppLovin|Sign in with Apple|Apple로 로그인'; then
     printf 'Privacy 10key Survival section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
