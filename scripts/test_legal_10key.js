@@ -286,7 +286,24 @@ test("the odds page keeps the current 12-module table and announces the 24-modul
     assert.ok(cut < part.indexOf(lang === "ko" ? "<h3>변경 안내</h3>" : "<h3>Changes</h3>"), `${lang}: announced before the changes rule`);
   }
   for (const name of ["Graphics Card", "Soldering Iron", "그래픽카드", "납땜 인두"]) assert.ok(html.includes(`<td>${name}</td>`), `odds page names ${name}`);
-  assert.match(html, /datetime="2026-10-31"/, "odds page: last updated 2026-10-31");
+  assert.match(html, /datetime="2026-11-02"/, "odds page: last updated 2026-11-02");
+});
+
+// 2026-11-02 (owner, game decision (86)): module unboxing odds as the game's ModuleBoxData.ODDS. Basic box: fragments 60,
+// N 25.43, R 9.5, SR 3, SSR 2, UR 0.07 %; rare box: R 62, SR 25, SSR 12, UR 1 % (was SSR 97 / UR 3); 30 / 90 gems a box.
+test("the odds page lists the module unboxing odds of both boxes", () => {
+  const html = read("10key/odds/index.html");
+  for (const id of ["ko-boxes", "en-boxes"]) {
+    const start = html.indexOf(`<h3 id="${id}">`);
+    assert.ok(start > 0, `${id}: box section`);
+    const part = html.slice(start, html.indexOf("</table>", start));
+    const rows = [...part.matchAll(/<tr><td>(?:<strong>)?[^<]+(?:<\/strong>)?<\/td><td>(?:<strong>)?([^<]+)(?:<\/strong>)?<\/td><td>(?:<strong>)?([^<]+)(?:<\/strong>)?<\/td><\/tr>/g)]
+      .map((m) => [m[1], m[2]]);
+    assert.deepEqual(rows, [["60%", "—"], ["25.43%", "—"], ["9.5%", "62%"], ["3%", "25%"], ["2%", "12%"], ["0.07%", "1%"], ["100%", "100%"]], `${id}: headline odds`);
+    assert.match(text(part), id === "ko-boxes" ? /보석 30개/ : /30 gems/, `${id}: basic price`);
+    assert.match(text(part), id === "ko-boxes" ? /보석 90개/ : /90 gems/, `${id}: rare price`);
+  }
+  assert.doesNotMatch(html, /97%|SSR 97|UR 3%/, "no old rare box odds");
 });
 
 // 2026-11-01 (owner): CrazyGames is dropped for good. Section 13 and the terms (outside the dated revision history) name no

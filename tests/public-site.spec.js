@@ -193,7 +193,7 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveAttribute("href", "10key/#prereg");
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveText("사전예약하기");
   await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
-  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("itch.io에서 미리 플레이해보기");
+  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("itch.io에서 한정무료로 플레이하기");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
   await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
