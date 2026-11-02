@@ -469,6 +469,20 @@ test("home replaces its YouTube fallback with the synced feed", async ({ page })
   await expect(page.locator("[data-youtube-feed] .hd-thumb")).toHaveCount(3);
 });
 
+// The feed bot publishes titles in any language. A long Japanese title without spaces (11-02 feed) used to stay on one line under
+// keep-all and pushed every non-Japanese home ~500px wide on phones, which also broke the phone's hero zoom and reduced-motion layout.
+test("a long feed title without spaces wraps inside its card instead of pushing the home sideways", async ({ page }) => {
+  const title = "キーボードASMR好きのキーボードオタク諸君、注目！ポチサバイバーキーボードASMR好きのキーボードオタク諸君 #shorts";
+  const videos = ["bOUGPw5Iih4", "l_t2G09Zye4", "uHgzc85Fb2k"].map((videoId) => ({ videoId, title }));
+  await page.route("**/assets/youtube-feed.json", (route) => route.fulfill({ json: { videos } }));
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const route of homeRoutes) {
+    await page.goto(route);
+    await expect(page.locator("[data-youtube-feed] strong").first()).toHaveText(title);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `${route} scrolls sideways`).toBeLessThanOrEqual(320);
+  }
+});
+
 test("home desktop keeps the normal cursor over the desk hero and its screen opens 10key Survival", async ({ page, isMobile }) => {
   test.skip(isMobile, "touch keeps the platform cursor behavior");
   await page.goto("/?lang=ko");

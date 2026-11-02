@@ -154,8 +154,11 @@ def translate_main(main, lang, badges):
     main = re.sub(r'\b(aria-label|alt|title|data-[a-z-]+)="([^"]*)"', lambda m: f'{m.group(1)}="{tr(m.group(2), i)}"', main)
     main = re.sub(r'<span class="hd-title-alt"[^>]*>[^<]*</span>', "", main)  # the Latin name is already the title
     main = main.replace('href="quirky-ball/?lang=ko"', f'href="quirky-ball/?lang={lang}"')
-    main = main.replace('href="10key/"', 'href="10key/index_en.html"')  # the 10key Survival page exists in Korean and English only
-    main = main.replace('href="10key/#prereg"', 'href="10key/index_en.html#prereg"')  # the pre-registration form, English page
+    # The 10key Survival page exists in Korean and English only; the de/ja homes add ?lang=de|ja so the 10key page (and the
+    # pre-registration mail) keeps the visitor's language (owner 2026-10-30).
+    tenkey = "10key/index_en.html" + ("" if lang == "en" else f"?lang={lang}")
+    main = main.replace('href="10key/"', f'href="{tenkey}"')
+    main = main.replace('href="10key/#prereg"', f'href="{tenkey}#prereg"')  # the pre-registration form, English page
     main = main.replace('href="10key/odds/"', 'href="10key/odds/#en"')  # one page, Korean then English
     main = re.sub(r'(assets/media/tenkey-itch/shot-[a-z]+)-ko\.webp', rf'\1-{lang}.webp', main)  # the store screenshots exist per language
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')
