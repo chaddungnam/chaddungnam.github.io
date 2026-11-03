@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-11-02T08:58:20.000Z",
+  "updated": "2026-11-03T13:05:05.000Z",
   "videos": [
+    {
+      "videoId": "QpojkdI1RNs",
+      "title": "[BGM]10key Survival_Against the Horizon",
+      "published": "2026-11-03T13:05:05.000Z"
+    },
     {
       "videoId": "7OCIJfpy8q0",
       "title": "鍵盤ASMR控注意！手遊《咔噠求生》看一下再走 #shorts",
@@ -11,11 +16,6 @@
       "videoId": "z_RwB9lTz9E",
       "title": "Keyboard ASMR nerds, listen up: 10key Survival #shorts",
       "published": "2026-10-31T13:47:28.000Z"
-    },
-    {
-      "videoId": "bxTgm99iEoo",
-      "title": "Tastatur-Nerds, aufgepasst: Klick-Survival #shorts",
-      "published": "2026-10-31T13:47:17.000Z"
     }
   ]
 }
