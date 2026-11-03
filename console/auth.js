@@ -69,7 +69,7 @@
       notify();
       return;
     }
-    // A fresh credential for the SAME admin while their 72h ticket is still valid is just a
+    // A fresh credential for the SAME admin while their 7-day ticket is still valid is just a
     // silent token refresh (e.g. another project (10key Survival) re-verifying an expiring Google ID token) —
     // keep the ticket. Any other case (first login, switched account, expired/absent ticket)
     // still clears it, same as before.

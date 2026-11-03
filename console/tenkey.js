@@ -47,7 +47,7 @@
     invalid_group: "묶는 기준을 확인해 주세요.",
     invalid_filter: "필터 값을 확인해 주세요.",
     invalid_board: "보드 이름을 확인해 주세요.",
-    admin_session_required: "Google 로그인이 만료되어 서버가 요청을 거부했습니다. 아래 버튼으로 Google에 다시 로그인해 주세요.",
+    admin_session_required: "로그인이 만료되었습니다. 다시 로그인하면 7일 동안 유지됩니다.",
     admin_required: "이 Google 계정은 관리자 목록에 없습니다. 다른 관리자 계정으로 전환해 주세요.",
     origin_not_allowed: "허용되지 않은 주소에서 접속했습니다. houseduck.in에서 다시 열어 주세요.",
     admin_check_failed: "관리자 확인 서버에 일시적으로 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.",
@@ -107,9 +107,15 @@
     if (stray?.dataset?.tenkeyAuthRecovery === "true") stray.remove();
   }
 
-  // 403: offer the Google sign-in button inline, so the admin keeps the other projects' sessions.
+  // 403 admin_session_required: since 2026-11-03 both servers check the same 7-day console ticket (and fall back to the
+  // Google ID token), so this answer means the ticket and the Google token are both gone: go back to the sign-in +
+  // question gate, which issues a fresh 7-day ticket. admin_required (not on the allow list): the inline Google button.
   function report(id, error) {
     setMessage(id, errorText(error), true);
+    if (error?.status === 403 && error.message === "admin_session_required" && root.ConsoleAuth?.requireChallenge) {
+      root.ConsoleAuth.requireChallenge();
+      return;
+    }
     if (error?.status !== 403 || !["admin_session_required", "admin_required"].includes(error.message)) return;
     const panel = document.createElement("div");
     panel.dataset.tenkeyAuthRecovery = "true";
