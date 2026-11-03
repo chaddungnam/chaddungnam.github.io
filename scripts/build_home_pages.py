@@ -38,11 +38,11 @@ TEXT = {
         "On launch day we send you one email with the iOS and Android download link.",
         "Am Starttag schicken wir dir eine E-Mail mit dem Download-Link für iOS und Android.",
         "配信日に、iOS・Androidのダウンロードリンクをメールで1通お送りします。"),
-    "사전예약하고 itch.io에서 한정무료 플레이": ("Pre-register to play free on itch.io", "Vorregistrieren und kostenlos auf itch.io spielen", "事前登録してitch.ioで期間限定無料プレイ"),
-    "사전예약을 마치면 itch.io 플레이 링크가 바로 떠요. 설치 없이 브라우저에서 시작돼요.": (
-        "Pre-register and the itch.io play link appears right away. No download.",
-        "Nach der Vorregistrierung erscheint sofort der Link zum Spielen auf itch.io. Ohne Download.",
-        "事前登録が終わると、itch.ioのプレイリンクがすぐに表示されます。インストール不要です。"),
+    "사전예약하고 itch.io에서 데모 플레이": ("Pre-register to play the demo on itch.io", "Vorregistrieren und die Demo auf itch.io spielen", "事前登録してitch.ioでデモをプレイ"),
+    "사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. 설치 없이 브라우저에서 시작돼요.": (
+        "Pre-register and the itch.io demo link (up to level 15) appears right away. No download.",
+        "Nach der Vorregistrierung erscheint sofort der Link zur Demo auf itch.io (bis Level 15). Ohne Download.",
+        "事前登録が終わると、itch.ioのデモ（レベル15まで）のリンクがすぐに表示されます。インストール不要です。"),
     "실제 플레이 화면": ("Real gameplay", "Echtes Gameplay", "実際のプレイ画面"),
     "키를 부수며 파고드는 화면, 레벨업 카드 고르기, 황금 피버": (
         "Digging through keys, picking a level-up card, Golden Fever",
@@ -159,6 +159,7 @@ def translate_main(main, lang, badges):
     tenkey = "10key/index_en.html" + ("" if lang == "en" else f"?lang={lang}")
     main = main.replace('href="10key/"', f'href="{tenkey}"')
     main = main.replace('href="10key/#prereg"', f'href="{tenkey}#prereg"')  # the pre-registration form, English page
+    main = main.replace('href="10key/#itch-demo"', f'href="{tenkey}#itch-demo"')  # the itch.io demo slot: a pre-registration popup (owner 11-03)
     main = main.replace('href="10key/odds/"', 'href="10key/odds/#en"')  # one page, Korean then English
     main = re.sub(r'(assets/media/tenkey-itch/shot-[a-z]+)-ko\.webp', rf'\1-{lang}.webp', main)  # the store screenshots exist per language
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')

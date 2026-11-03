@@ -7,8 +7,8 @@ const { test, expect } = require("@playwright/test");
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { preview: "itch.io에서 한정무료로 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 한정무료 플레이", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { preview: "Play free for a limited time on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play free on itch.io", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요", go: "사전예약하러 가기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { preview: "Play the demo on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play the demo on itch.io", popup: "Pre-register and you can play the demo (up to level 15) on itch.io", go: "Go to pre-registration", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
   test(`pre-registration is visible at once and signs up, itch.io is the free preview, the odds are text (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
@@ -32,6 +32,15 @@ for (const [url, words] of Object.entries({
     await expect(gate).toHaveAttribute("href", "#prereg");
     await expect(page.locator(".tk-nav a[data-itch-gate]")).toHaveAttribute("href", "#prereg");
     await expect(page.locator("a[href='https://houseduck.itch.io/10key-survival']:visible")).toHaveCount(0);
+    // a locked demo button opens the popup; its button goes to the form
+    await gate.click();
+    const popup = page.locator("dialog[data-itch-popup]");
+    await expect(popup).toBeVisible();
+    await expect(popup).toContainText(words.popup);
+    await popup.getByRole("button", { name: words.go }).click();
+    await expect(popup).toBeHidden();
+    await expect(card.locator("input[name=email]")).toBeFocused();
+    await expect(page).toHaveURL(/#prereg$/);
     await expect(page.locator(".tk-hero .tk-key, .tk-hero .tk-preview")).toHaveCount(2);
     await expect(page.locator(".tk-odds-table tbody tr")).toHaveCount(12);
     await expect(page.locator(".tk-odds-table tbody")).toContainText("8.333%");
@@ -215,3 +224,25 @@ test("the cancel link page works in German and Japanese", async ({ page }) => {
   await page.goto("/10key/prereg/?a=unsub&t=11111111-2222-4333-8444-555555555555&lang=ja");
   await expect(page.locator("h1")).toHaveText("事前登録を取り消しました");
 });
+
+// The in-game "get launch alerts" buttons (itch build) open these addresses: each lands on the form, and the de/ja ones
+// keep the mail language. #itch-demo (the home's demo buttons) opens the popup before sign-up.
+for (const [url, locale] of Object.entries({ "/10key/?lang=ko#prereg": "ko", "/10key/index_en.html#prereg": "en", "/10key/index_en.html?lang=de#prereg": "de", "/10key/index_en.html?lang=ja#prereg": "ja" })) {
+  test(`the game's launch-alert address lands on the form (${url})`, async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+    await page.goto(url);
+    await expect(page.locator("#prereg input[name=email]")).toBeInViewport();
+    await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
+  });
+}
+
+for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io 데모는 사전예약 특전이에요", "/10key/index_en.html#itch-demo": "The itch.io demo is a pre-registration perk", "/10key/index_en.html?lang=de#itch-demo": "Die itch.io-Demo gibt es mit der Vorregistrierung", "/10key/index_en.html?lang=ja#itch-demo": "itch.ioのデモは事前登録の特典です" })) {
+  test(`the home's demo button opens the pre-registration popup in the visitor's language (${url})`, async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+    await page.goto(url);
+    const popup = page.locator("dialog[data-itch-popup]");
+    await expect(popup).toBeVisible();
+    await expect(popup).toContainText(text);
+    await expect(popup.locator("a[href*='itch.io']")).toHaveCount(0);
+  });
+}

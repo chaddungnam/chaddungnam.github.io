@@ -190,17 +190,17 @@ assert.deepEqual(Object.keys(home).sort(), ["EASE", "applyLiveVersion", "bayerTh
 
 // ---------- the four home pages ----------
 const expectedCopy = {
-  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "출시 준비 중", "다른 장르의 게임에서 만나요", "동무와 멋진신세계", "화려한 모험, 그리고 ASMR", "사전예약하기", "사전예약하고 itch.io에서 한정무료 플레이"],
-  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Coming soon", "See you in a game of another genre", "Comrade and the Brave New World", "A dazzling adventure, and ASMR", "Pre-register", "Pre-register to play free on itch.io"],
-  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Bald verfügbar", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt", "Ein funkelndes Abenteuer – und ASMR", "Vorregistrieren", "Vorregistrieren und kostenlos auf itch.io spielen"],
-  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "近日配信予定", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World", "華やかな冒険、そしてASMR", "事前登録する", "事前登録してitch.ioで期間限定無料プレイ"],
+  "index.html": ["https://apps.apple.com/app/id6797996754", "딸깍 서바이벌", "출시 준비 중", "다른 장르의 게임에서 만나요", "동무와 멋진신세계", "화려한 모험, 그리고 ASMR", "사전예약하기", "사전예약하고 itch.io에서 데모 플레이"],
+  "index_en.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Coming soon", "See you in a game of another genre", "Comrade and the Brave New World", "A dazzling adventure, and ASMR", "Pre-register", "Pre-register to play the demo on itch.io"],
+  "index_de.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "Bald verfügbar", "Wir sehen uns in einem Spiel eines anderen Genres", "Genosse und die schöne neue Welt", "Ein funkelndes Abenteuer – und ASMR", "Vorregistrieren", "Vorregistrieren und die Demo auf itch.io spielen"],
+  "index_ja.html": ["https://apps.apple.com/app/id6797996754", "10key Survival", "近日配信予定", "別のジャンルのゲームでまた会いましょう", "Comrade and the Brave New World", "華やかな冒険、そしてASMR", "事前登録する", "事前登録してitch.ioでデモをプレイ"],
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 한정무료로 먼저 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
-  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now and play it free for a limited time on itch.io. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren und zeitlich begrenzt kostenlos auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録して、itch.ioで期間限定無料プレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
+  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now and play the demo (up to level 15) on itch.io. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren und die Demo (bis Level 15) auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録して、itch.ioでデモ（レベル15まで）をプレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
 };
 
 const expectedDescriptions = {
@@ -249,7 +249,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   const odds = lang === "ko" ? "10key/odds/" : "10key/odds/#en";
   assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [
     `<a class="hd-keycap-cta hd-tk-prereg" href="${l.tenkeyHref}#prereg" data-pressable>`,
-    `<a class="hd-tk-preview" href="${l.tenkeyHref}#prereg">`,
+    `<a class="hd-tk-preview" href="${l.tenkeyHref}#itch-demo">`,
     `<a class="hd-arrow-link hd-tk-more" href="${l.tenkeyHref}">`,
     `<a href="${odds}">`,
   ], `${file} the big pre-registration key (the form on the 10key page: Korean page in ko, the English page in en/de/ja), the itch.io preview, the 10key page and the odds`);

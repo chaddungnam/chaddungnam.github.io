@@ -92,7 +92,7 @@
   // would put the email in the address bar); a small inline script then says to reload instead.
   // itch.io play is a pre-registration perk (owner 2026-11-03): the itch.io link shows only after a successful sign-up, and
   // this browser remembers it (a re-sign-up with the same email also works: the function answers ok and mails nothing).
-  // Until then the gated links ([data-itch-gate]) jump to the form instead.
+  // Until then the gated links ([data-itch-gate]) open a pre-registration popup instead (below).
   var ITCH_URL = "https://houseduck.itch.io/10key-survival";
   var DONE_KEY = "tenkey_prereg_done";
   var unlockItch = function (fresh) {
@@ -103,7 +103,6 @@
       link.setAttribute("href", ITCH_URL);
       link.setAttribute("target", "_blank");
       link.setAttribute("rel", "noopener");
-      link.removeAttribute("data-prereg-jump");
       var label = link.querySelector("[data-gate-label]");
       if (label && label.getAttribute("data-unlocked-label")) label.textContent = label.getAttribute("data-unlocked-label");
       var lock = link.querySelector(".tk-lock-icon");
@@ -188,17 +187,57 @@
     box.setAttribute("data-ready", "");
 
     // Every "pre-register" link lands on the card and puts the cursor in the email box.
+    var jumpToForm = function () {
+      box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+      box.classList.remove("tk-flash");
+      void box.offsetWidth;
+      box.classList.add("tk-flash");
+      if (!box.classList.contains("is-done")) window.setTimeout(function () { emailInput.focus({ preventScroll: true }); }, reduceMotion ? 0 : 450);
+      try { history.replaceState(null, "", location.pathname + location.search + "#prereg"); } catch (_error) { /* ignore */ }
+    };
     document.querySelectorAll("[data-prereg-jump]").forEach(function (link) {
       link.addEventListener("click", function (event) {
-        if (!link.hasAttribute("data-prereg-jump")) return; // an unlocked itch.io link opens itch.io
         event.preventDefault();
-        box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
-        box.classList.remove("tk-flash");
-        void box.offsetWidth;
-        box.classList.add("tk-flash");
-        if (!box.classList.contains("is-done")) window.setTimeout(function () { emailInput.focus({ preventScroll: true }); }, reduceMotion ? 0 : 450);
-        try { history.replaceState(null, "", "#prereg"); } catch (_error) { /* ignore */ }
+        jumpToForm();
       });
     });
+
+    // Before sign-up the itch.io demo buttons and menu open a short popup (owner 2026-11-03, ko/en/de/ja): pre-registering
+    // unlocks the demo on itch.io; its button goes to the form. The home's demo buttons land here with #itch-demo.
+    var GATE_TEXT = {
+      ko: { title: "itch.io 데모는 사전예약 특전이에요", body: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. 이메일만 남기면 플레이 링크가 바로 떠요.", go: "사전예약하러 가기", close: "닫기" },
+      en: { title: "The itch.io demo is a pre-registration perk", body: "Pre-register and you can play the demo (up to level 15) on itch.io. Leave your email and the play link appears right away.", go: "Go to pre-registration", close: "Close" },
+      de: { title: "Die itch.io-Demo gibt es mit der Vorregistrierung", body: "Wenn du dich vorregistrierst, kannst du die Demo (bis Level 15) auf itch.io spielen. Gib deine E-Mail-Adresse ein, dann erscheint sofort der Link zum Spielen.", go: "Zur Vorregistrierung", close: "Schließen" },
+      ja: { title: "itch.ioのデモは事前登録の特典です", body: "事前登録すると、itch.ioでデモ（レベル15まで）をプレイできます。メールアドレスを登録すると、すぐにプレイリンクが表示されます。", go: "事前登録へ進む", close: "閉じる" }
+    };
+    var gate = null;
+    var openGate = function () {
+      if (!gate) {
+        var t = GATE_TEXT[mailLocale] || GATE_TEXT.en;
+        gate = document.createElement("dialog");
+        gate.className = "tk-gate";
+        gate.setAttribute("aria-labelledby", "tk-gate-title");
+        gate.setAttribute("data-itch-popup", "");
+        gate.lang = mailLocale;
+        gate.innerHTML = '<span class="tk-lock-icon" aria-hidden="true"></span><h2 id="tk-gate-title"></h2><p></p><div class="tk-gate-actions"><button class="tk-key" type="button" data-gate-go><span class="tk-key-face"></span></button><button class="tk-gate-close" type="button" data-gate-close></button></div>';
+        gate.querySelector("h2").textContent = t.title;
+        gate.querySelector("p").textContent = t.body;
+        gate.querySelector("[data-gate-go] .tk-key-face").textContent = t.go;
+        gate.querySelector("[data-gate-close]").textContent = t.close;
+        gate.querySelector("[data-gate-go]").addEventListener("click", function () { gate.close(); jumpToForm(); });
+        gate.querySelector("[data-gate-close]").addEventListener("click", function () { gate.close(); });
+        gate.addEventListener("click", function (event) { if (event.target === gate) gate.close(); });
+        document.body.appendChild(gate);
+      }
+      if (typeof gate.showModal === "function") gate.showModal(); else jumpToForm();
+    };
+    document.querySelectorAll("[data-itch-gate]").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        if (root.classList.contains("tk-itch-open")) return; // unlocked: the link opens itch.io
+        event.preventDefault();
+        openGate();
+      });
+    });
+    if (location.hash === "#itch-demo" && !root.classList.contains("tk-itch-open")) openGate();
   }
 })();

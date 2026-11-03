@@ -145,6 +145,16 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-lock-icon::before { position: absolute; left: 2px; bottom: 9px; width: 6px; height: 6px; border: 2px solid currentColor; border-bottom: 0; border-radius: 6px 6px 0 0; content: ""; }
 .tk-preview .tk-lock-icon { margin-top: 4px; }
 .tk-unlock a.tk-preview { border-color: var(--tk-duck); background: rgba(255, 210, 63, .16); animation: tk-unlock-pop 420ms var(--tk-ease) both; }
+/* the popup a locked itch.io demo button opens (owner 2026-11-03) */
+.tk-gate { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 24px 22px; border: 1px solid rgba(255, 210, 63, .5); border-radius: 18px; color: var(--tk-text); background: var(--tk-night-2); box-shadow: 0 30px 90px rgba(0, 0, 0, .6); text-align: center; }
+.tk-gate::backdrop { background: rgba(8, 8, 12, .72); }
+.tk-gate .tk-lock-icon { display: block; margin: 6px auto 14px; transform: scale(1.6); }
+.tk-gate h2 { margin: 0 0 10px; font-family: var(--tk-pixel); font-size: 20px; line-height: 1.4; word-break: keep-all; }
+.tk-gate p { margin: 0 0 20px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
+.tk-gate-actions { display: grid; gap: 10px; justify-items: center; }
+.tk-gate-actions .tk-key { width: 100%; }
+.tk-gate-close { padding: 6px 12px; border: 0; color: var(--tk-text-3); background: none; font: inherit; font-size: .88rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tk-gate-close:hover, .tk-gate-close:focus-visible { color: #fff; }
 @keyframes tk-unlock-pop { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* the play loop in a plain game frame, like the itch.io embed (portrait 9:16) */

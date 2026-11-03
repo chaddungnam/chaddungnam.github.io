@@ -193,8 +193,8 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveAttribute("href", "10key/#prereg");
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveText("사전예약하기");
   // itch.io play is a pre-registration perk (owner 11-03): the second button also goes to the form
-  await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "10key/#prereg");
-  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("사전예약하고 itch.io에서 한정무료 플레이");
+  await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "10key/#itch-demo");
+  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("사전예약하고 itch.io에서 데모 플레이");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
   await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
@@ -362,7 +362,8 @@ test("10key Survival shows its real gameplay in its game frame and the quiet Com
     await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
     await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']")).toHaveCount(0);
-    await expect(zone.locator(`a[href='${copy.tenkeyHref}#prereg']`)).toHaveCount(2);
+    await expect(zone.locator(`a[href='${copy.tenkeyHref}#prereg']`)).toHaveCount(1);
+    await expect(zone.locator(`a[href='${copy.tenkeyHref}#itch-demo']`)).toHaveCount(1);
     await expect(zone.locator("a")).toHaveCount(4);
     // the itch.io theme: light text (#ECE6D6) on the dark page (#141318), the game's own pixel font
     await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(236, 230, 214)");
