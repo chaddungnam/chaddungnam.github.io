@@ -138,6 +138,7 @@
     switch (action) {
       case "overview.get": return overview(p.platform);
       // tenkey-console-stats (separate function): pre-registration counts by Berlin day and page language.
+      case "overview.web": return overview("web_itch");
       case "prereg.get": {
         const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, de: 0 }));
         days.forEach((d) => { d.n = d.ko + d.en; });

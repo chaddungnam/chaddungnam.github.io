@@ -75,7 +75,7 @@ test("overview: the itch.io web filter shows its own visits and runs, no return 
   await expect(today).toHaveCount(5);
   await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveText("웹(itch)");
   await page.locator('[data-tk-platform="web_itch"]').click();
-  await expect.poll(async () => (await calls(page, "overview.get")).at(-1)?.params.platform).toBe("web_itch");
+  await expect.poll(async () => (await calls(page, "overview.web")).length).toBeGreaterThan(1);
   await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveAttribute("aria-pressed", "true");
   const want = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: { platform: "web_itch" } })
     .then((r) => [r.data.active.d1, r.data.active.d7, r.data.runs.d1]));
@@ -97,7 +97,7 @@ test("overview: the itch.io web filter shows its own visits and runs, no return 
 
 test("overview: today and 7-day numbers first in plain words, one chart, the rest folded; period and platform switches", async ({ page }) => {
   // Without the web numbers (and the pre-registration counts) the overview keeps its four-card layout; the split view has its own test.
-  const NO_SPLIT = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if((b.action===\"overview.get\"&&b.params&&b.params.platform===\"web_itch\"&&!window.__wantWeb)||fn===\"tenkey-console-stats\")throw Object.assign(new Error(\"blocked\"),{status:503});return real(pj,fn,b);};})();";
+  const NO_SPLIT = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\")throw Object.assign(new Error(\"blocked\"),{status:503});return real(pj,fn,b);};})();";
   const errors = await open(page, "", NO_SPLIT);
   await expect(page.locator("#pageTitle")).toHaveText("한눈 요약");
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
@@ -449,7 +449,7 @@ test("overview: 전체 keeps Android·iOS users apart from itch web visits and s
   await expect(today.nth(3).locator(".tk-glance-label")).toHaveText("사전예약");
   const want = await page.evaluate(async () => {
     const all = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })).data;
-    const web = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: { platform: "web_itch" } })).data;
+    const web = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } })).data;
     const pre = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } })).data;
     return { app: Math.max(all.active.d1 - web.active.d1, all.server.seen.d1), visits: web.active.d1, pre: pre.d1, total: pre.total };
   });

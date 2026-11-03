@@ -352,9 +352,12 @@
     T.setMessage("tenkeyOverviewMessage", "");
     byId("tenkeyOverviewStatus").textContent = "불러오는 중";
     try {
+      // The itch web numbers come from tenkey-console-stats ("overview.web"): the deployed tenkey-admin refuses platform
+      // web_itch (found 2026-11-03), which also left the 웹(itch) filter empty.
+      const webCall = () => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } });
       const [result, webResult, preResult] = await Promise.all([
-        T.call("overview.get", { days: 90, platform: state.platform || undefined }),
-        state.platform ? Promise.resolve(null) : T.call("overview.get", { days: 90, platform: "web_itch" }).catch(() => null),
+        state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
+        state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } }).catch(() => null),
       ]);
       state.data = result.data;
