@@ -462,6 +462,14 @@ test("overview: 전체 counts players by account (itch + app), keeps anonymous i
   await expect(page.locator("#tenkeyOverviewCharts")).toContainText("플레이어 (DAU) 플랫폼별");
   await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
   await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
+  // 최근 7일 compares with the 7 days ending yesterday by default; 3일 전 and 그 전 7일 switch the arrows.
+  await expect(page.locator('[data-tk-compare="d1"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(week.nth(0)).toContainText("어제까지 7일보다 1명 많음");
+  await page.locator('[data-tk-compare="d3"]').click();
+  await expect(week.nth(0)).toContainText("3일 전까지 7일보다 3명 많음");
+  await page.locator('[data-tk-compare="w"]').click();
+  await expect(week.nth(0)).toContainText("그 전 7일");
+  await page.locator('[data-tk-compare="d1"]').click();
   await shot(page, "overview_split");
   expect(errors).toEqual([]);
 });

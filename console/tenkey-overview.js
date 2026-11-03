@@ -16,7 +16,7 @@
   const T = root.ConsoleTenkey;
   const { esc, num, bytes, pct } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, period: 7, platform: "", data: null, web: null, prereg: null, dau: null, busy: false };
+  const state = { bound: false, period: 7, platform: "", data: null, web: null, prereg: null, dau: null, compare: "d1", busy: false };
   const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
 
   const dayLabel = (iso) => {
@@ -133,6 +133,21 @@
     return { note: `${up ? "▲" : "▼"} 그 전 7일보다 ${num(Math.abs(diff))}${unit} ${up ? "많음" : "적음"}`, noteTone: up === goodWhenUp ? "good" : "bad" };
   }
 
+  // 최근 7일 cards compare the 7-day window ending today with the one ending 1 or 3 days earlier (owner 2026-11-03,
+  // default 1 day), or with the 7 days before (the old view). rows: oldest first; key: a daily count to sum.
+  const COMPARE_WORD = { d1: "어제까지 7일", d3: "3일 전까지 7일", w: "그 전 7일" };
+  function rollSum(rows, key, back) {
+    const end = rows.length - back;
+    return rows.slice(Math.max(0, end - 7), Math.max(0, end)).reduce((t, r) => t + Number(r[key] || 0), 0);
+  }
+  function shifted(current, earlier, unit, goodWhenUp = true) {
+    const diff = Number(current || 0) - Number(earlier || 0);
+    const word = COMPARE_WORD[state.compare] || COMPARE_WORD.w;
+    if (!Number.isFinite(diff) || diff === 0) return { note: `${word}과 같음`, noteTone: "" };
+    const up = diff > 0;
+    return { note: `${up ? "▲" : "▼"} ${word}보다 ${num(Math.abs(diff))}${unit} ${up ? "많음" : "적음"}`, noteTone: up === goodWhenUp ? "good" : "bad" };
+  }
+
   function distribution(title, rows, total, nameOf = (k) => k) {
     if (!rows.length) return `<h4>${esc(title)}</h4><p class="overview-drill-note">아직 기록이 없어요</p>`;
     const max = Math.max(...rows.map((r) => r.n));
@@ -233,14 +248,19 @@
     const installWeek = noSignal ? versus(week("new_accounts"), weekBefore("new_accounts"), "명") : versus(fresh.d7, fresh.d7_prev, "명");
     const buyWeek = versus(week("purchases"), weekBefore("purchases"), "건");
     if (W) {
-      const visitWeek = versus(webActive("d7"), webActive("d7_prev"), "회");
-      const preWeek = P ? versus(P.d7, P.d7_prev, "명") : { note: "불러오지 못함", noteTone: "" };
+      const back = state.compare === "d3" ? 3 : state.compare === "d1" ? 1 : 0;
+      const dauRows = state.dau?.days || [];
+      const u7 = (b) => Number(dauRows[dauRows.length - 1 - b]?.u7 || 0);
+      const peopleCmp = back && dauRows.length ? shifted(u7(0), u7(back), "명") : peopleWeek;
+      const visitWeek = back ? shifted(rollSum(W.series || [], "dau", 0), rollSum(W.series || [], "dau", back), "회") : versus(webActive("d7"), webActive("d7_prev"), "회");
+      const preWeek = !P ? { note: "불러오지 못함", noteTone: "" } : back ? shifted(rollSum(P.days || [], "n", 0), rollSum(P.days || [], "n", back), "명") : versus(P.d7, P.d7_prev, "명");
+      const buyCmp = back ? shifted(rollSum(all, "purchases", 0), rollSum(all, "purchases", back), "건") : buyWeek;
       byId("tenkeyGlanceWeek").classList.add("is-5");
       byId("tenkeyGlanceWeek").innerHTML = [
-        glance("플레이어 (7일)", num(opened("d7")), "명", peopleWeek.note, { noteTone: peopleWeek.noteTone, help: "최근 7일(오늘 포함) 동안 게임 서버가 한 번이라도 본 계정 수 (itch + 앱, 한 사람 한 번)." }),
+        glance("플레이어 (7일)", num(opened("d7")), "명", peopleCmp.note, { noteTone: peopleCmp.noteTone, help: "최근 7일(오늘 포함) 동안 게임 서버가 한 번이라도 본 계정 수 (itch + 앱, 한 사람 한 번)." }),
         glance("웹 방문 (itch)", num(webActive("d7")), "회", visitWeek.note, { noteTone: visitWeek.noteTone, help: "최근 7일 itch.io 브라우저 판을 연 횟수 (사람 수 아님)." }),
         glance("사전예약", P ? num(P.d7) : "—", P ? "명" : "", preWeek.note, { noteTone: preWeek.noteTone, help: "최근 7일(오늘 포함) 사전예약 수." }),
-        glance("결제", num(week("purchases")), "건", buyWeek.note, { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외)." }),
+        glance("결제", num(week("purchases")), "건", buyCmp.note, { noteTone: buyCmp.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외)." }),
         glance("다음 날 다시 온 비율", retRate(ret.d1), Number(ret.d1?.cohort) > 0 ? "%" : "", Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명 · 앱만` : "아직 셀 수 없음",
           { help: "2~8일 전에 설치한 앱 기기 가운데 다음 날 다시 연 비율. 웹 방문은 빠집니다." }),
       ].join("");
@@ -404,7 +424,12 @@
       section.addEventListener("click", (event) => {
         const period = event.target.closest("[data-tk-period]");
         const platform = event.target.closest("[data-tk-platform]");
-        if (period) {
+        const compare = event.target.closest("[data-tk-compare]");
+        if (compare) {
+          state.compare = compare.dataset.tkCompare;
+          setPressed("[data-tk-compare]", "data-tk-compare", state.compare);
+          if (state.data) render(state.data);
+        } else if (period) {
           state.period = Number(period.dataset.tkPeriod);
           setPressed("[data-tk-period]", "data-tk-period", state.period);
           if (state.data) render(state.data);
@@ -417,6 +442,7 @@
       byId("tenkeyOverviewRefresh").addEventListener("click", load);
       setPressed("[data-tk-period]", "data-tk-period", state.period);
       setPressed("[data-tk-platform]", "data-tk-platform", state.platform);
+      setPressed("[data-tk-compare]", "data-tk-compare", state.compare);
     }
     load();
     // Owner 2026-10-24: new players show up without a reload. Every minute while the overview is on screen and the tab
