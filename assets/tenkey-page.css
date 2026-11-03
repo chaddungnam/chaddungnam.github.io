@@ -137,6 +137,15 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 }
 .tk-page a.tk-preview:hover, .tk-page a.tk-preview:focus-visible { border-color: var(--tk-duck); background: rgba(255, 210, 63, .14); }
 .tk-preview .tk-play-icon { flex: none; border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
+/* itch.io play is a pre-registration perk (owner 2026-11-03): a locked line until sign-up, then the itch.io button */
+.tk-preview-row[hidden] { display: none; }
+.tk-perk { display: flex; align-items: flex-start; gap: 12px; max-width: 34rem; margin: 0; padding: 12px 16px; border: 1px dashed rgba(255, 210, 63, .45); border-radius: 14px; color: var(--tk-text-2); font-size: .92rem; line-height: 1.6; word-break: keep-all; }
+.tk-perk strong { margin-right: 6px; color: var(--tk-duck); font-weight: 800; }
+.tk-lock-icon { position: relative; flex: none; width: 14px; height: 11px; margin-top: 8px; border-radius: 2px; background: currentColor; color: var(--tk-duck); }
+.tk-lock-icon::before { position: absolute; left: 2px; bottom: 9px; width: 6px; height: 6px; border: 2px solid currentColor; border-bottom: 0; border-radius: 6px 6px 0 0; content: ""; }
+.tk-preview .tk-lock-icon { margin-top: 4px; }
+.tk-unlock a.tk-preview { border-color: var(--tk-duck); background: rgba(255, 210, 63, .16); animation: tk-unlock-pop 420ms var(--tk-ease) both; }
+@keyframes tk-unlock-pop { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* the play loop in a plain game frame, like the itch.io embed (portrait 9:16) */
 .tk-screen { display: grid; justify-items: center; gap: 12px; margin: 0; }

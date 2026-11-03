@@ -90,6 +90,31 @@
   // On success the Google Ads conversion is sent through tenkey-ads.js, only if the visitor allowed it there.
   // The submit button ships disabled and is enabled here, so without this script the form can never submit natively (which
   // would put the email in the address bar); a small inline script then says to reload instead.
+  // itch.io play is a pre-registration perk (owner 2026-11-03): the itch.io link shows only after a successful sign-up, and
+  // this browser remembers it (a re-sign-up with the same email also works: the function answers ok and mails nothing).
+  // Until then the gated links ([data-itch-gate]) jump to the form instead.
+  var ITCH_URL = "https://houseduck.itch.io/10key-survival";
+  var DONE_KEY = "tenkey_prereg_done";
+  var unlockItch = function (fresh) {
+    root.classList.add("tk-itch-open");
+    document.querySelectorAll("[data-itch-unlock]").forEach(function (node) { node.hidden = false; });
+    document.querySelectorAll("[data-itch-locked]").forEach(function (node) { node.hidden = true; });
+    document.querySelectorAll("[data-itch-gate]").forEach(function (link) {
+      link.setAttribute("href", ITCH_URL);
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener");
+      link.removeAttribute("data-prereg-jump");
+      var label = link.querySelector("[data-gate-label]");
+      if (label && label.getAttribute("data-unlocked-label")) label.textContent = label.getAttribute("data-unlocked-label");
+      var lock = link.querySelector(".tk-lock-icon");
+      if (lock) lock.className = "tk-play-icon";
+    });
+    if (fresh) { try { window.localStorage.setItem(DONE_KEY, "1"); } catch (_error) { /* storage can be blocked */ } }
+  };
+  var remembered = false;
+  try { remembered = window.localStorage.getItem(DONE_KEY) === "1"; } catch (_error) { remembered = false; }
+  if (remembered) unlockItch(false);
+
   var box = document.querySelector("[data-prereg]");
   var form = box && box.querySelector("[data-prereg-form]");
   if (box && form) {
@@ -141,6 +166,7 @@
         if (r.status === 200 && r.data && r.data.ok) {
           box.classList.add("is-done");
           say(msgs.ok, "ok");
+          unlockItch(true);
           try { if (window.hdAds) window.hdAds.conversion(); } catch (_error) { /* measurement must never break the form */ }
           return;
         }
@@ -164,6 +190,7 @@
     // Every "pre-register" link lands on the card and puts the cursor in the email box.
     document.querySelectorAll("[data-prereg-jump]").forEach(function (link) {
       link.addEventListener("click", function (event) {
+        if (!link.hasAttribute("data-prereg-jump")) return; // an unlocked itch.io link opens itch.io
         event.preventDefault();
         box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
         box.classList.remove("tk-flash");

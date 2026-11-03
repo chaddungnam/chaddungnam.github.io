@@ -38,11 +38,11 @@ TEXT = {
         "On launch day we send you one email with the iOS and Android download link.",
         "Am Starttag schicken wir dir eine E-Mail mit dem Download-Link für iOS und Android.",
         "配信日に、iOS・Androidのダウンロードリンクをメールで1通お送りします。"),
-    "itch.io에서 한정무료로 플레이하기": ("Play free for a limited time on itch.io", "Zeitlich begrenzt kostenlos auf itch.io spielen", "itch.ioで期間限定無料プレイ"),
-    "출시 전까지 한정무료예요. 설치·가입 없이 브라우저에서 바로 시작돼요.": (
-        "Free for a limited time until launch, right in your browser. No download, no sign-up.",
-        "Bis zum Start zeitlich begrenzt kostenlos, direkt im Browser. Ohne Download, ohne Anmeldung.",
-        "配信まで期間限定無料です。インストールも登録も不要で、ブラウザですぐ始まります。"),
+    "사전예약하고 itch.io에서 한정무료 플레이": ("Pre-register to play free on itch.io", "Vorregistrieren und kostenlos auf itch.io spielen", "事前登録してitch.ioで期間限定無料プレイ"),
+    "사전예약을 마치면 itch.io 플레이 링크가 바로 떠요. 설치 없이 브라우저에서 시작돼요.": (
+        "Pre-register and the itch.io play link appears right away. No download.",
+        "Nach der Vorregistrierung erscheint sofort der Link zum Spielen auf itch.io. Ohne Download.",
+        "事前登録が終わると、itch.ioのプレイリンクがすぐに表示されます。インストール不要です。"),
     "실제 플레이 화면": ("Real gameplay", "Echtes Gameplay", "実際のプレイ画面"),
     "키를 부수며 파고드는 화면, 레벨업 카드 고르기, 황금 피버": (
         "Digging through keys, picking a level-up card, Golden Fever",

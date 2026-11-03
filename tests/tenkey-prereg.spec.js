@@ -7,8 +7,8 @@ const { test, expect } = require("@playwright/test");
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { preview: "itch.io에서 한정무료로 플레이하기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { preview: "Play free for a limited time on itch.io", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { preview: "itch.io에서 한정무료로 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 한정무료 플레이", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { preview: "Play free for a limited time on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play free on itch.io", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
   test(`pre-registration is visible at once and signs up, itch.io is the free preview, the odds are text (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
@@ -22,9 +22,16 @@ for (const [url, words] of Object.entries({
     await expect(card).toBeInViewport();
     await expect(card.getByRole("button", { name: words.submit })).toBeInViewport();
     await expect(card).not.toContainText(/유료|무료|paid|free/i);
+    // itch.io play is a pre-registration perk (owner 11-03): before sign-up the hero shows a locked line, not the link
     const preview = page.locator(".tk-hero .tk-preview");
-    await expect(preview).toHaveText(words.preview);
-    await expect(preview).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+    await expect(page.locator(".tk-hero .tk-perk")).toBeVisible();
+    await expect(page.locator(".tk-hero .tk-perk")).toContainText(words.perk);
+    await expect(preview).toBeHidden();
+    const gate = page.locator(".tk-final-links a[data-itch-gate]");
+    await expect(gate).toHaveText(words.gate);
+    await expect(gate).toHaveAttribute("href", "#prereg");
+    await expect(page.locator(".tk-nav a[data-itch-gate]")).toHaveAttribute("href", "#prereg");
+    await expect(page.locator("a[href='https://houseduck.itch.io/10key-survival']:visible")).toHaveCount(0);
     await expect(page.locator(".tk-hero .tk-key, .tk-hero .tk-preview")).toHaveCount(2);
     await expect(page.locator(".tk-odds-table tbody tr")).toHaveCount(12);
     await expect(page.locator(".tk-odds-table tbody")).toContainText("8.333%");
@@ -47,6 +54,16 @@ for (const [url, words] of Object.entries({
     const sent = JSON.parse(posts[0].body);
     expect(sent).toMatchObject({ v: 1, action: "signup", email: "player@example.com", locale: url.includes("ko") ? "ko" : "en", consent: "2026-10-30", hp: "" });
     await expect(card.locator("input[name=email]")).toBeHidden();
+    // after sign-up the itch.io link shows, the gated links open itch.io, and this browser remembers it
+    await expect(preview).toBeVisible();
+    await expect(preview).toHaveText(words.preview);
+    await expect(preview).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+    await expect(page.locator(".tk-hero .tk-perk")).toBeHidden();
+    await expect(gate).toHaveText(words.preview);
+    await expect(gate).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+    await page.reload();
+    await expect(page.locator(".tk-hero .tk-preview")).toBeVisible();
+    await expect(page.locator(".tk-nav a[data-itch-gate]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
   });
 }
 
