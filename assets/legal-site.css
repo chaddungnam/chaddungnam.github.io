@@ -401,6 +401,9 @@ body > .legal-hero { display: block; padding: 0; }
   -webkit-overflow-scrolling: touch;
 }
 
+/* QA 11-03: the 10key odds tables have two short columns, so they fit a phone without sideways scrolling */
+.legal-paper .table-scroll.is-compact table { min-width: 0; }
+
 .legal-paper table {
   width: 100%;
   min-width: 620px;

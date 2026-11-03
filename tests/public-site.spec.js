@@ -195,6 +195,8 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   // itch.io play is a pre-registration perk (owner 11-03): the second button also goes to the form
   await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "10key/#itch-demo");
   await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("사전예약하고 itch.io에서 데모 플레이");
+  await expect(tenkey.locator(".hd-tk-paid-chip")).toHaveText("유료 · 인앱 구매 있음");
+  await expect(tenkey.locator(".hd-tk-paid")).toContainText("무료 데모(레벨 15까지)");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
   await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);

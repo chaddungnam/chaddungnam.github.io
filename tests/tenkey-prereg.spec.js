@@ -7,8 +7,8 @@ const { test, expect } = require("@playwright/test");
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요", go: "사전예약하러 가기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { preview: "Play the demo on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play the demo on itch.io", popup: "Pre-register and you can play the demo (up to level 15) on itch.io", go: "Go to pre-registration", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요", paid: "유료 · 인앱 구매 있음", go: "사전예약하러 가기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { preview: "Play the demo on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play the demo on itch.io", popup: "Pre-register and you can play the demo (up to level 15) on itch.io", paid: "Paid app · In-app purchases", go: "Go to pre-registration", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
   test(`pre-registration is visible at once and signs up, itch.io is the free preview, the odds are text (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
@@ -22,6 +22,10 @@ for (const [url, words] of Object.entries({
     await expect(card).toBeInViewport();
     await expect(card.getByRole("button", { name: words.submit })).toBeInViewport();
     await expect(card).not.toContainText(/유료|무료|paid|free/i);
+    // the paid-app note sits right under the card (owner 11-03 night): paid app with in-app purchases, itch.io a free demo, no price
+    await expect(page.locator(".tk-hero .tk-paid-chip")).toHaveText(words.paid);
+    await expect(page.locator(".tk-hero .tk-paid")).toContainText("15");
+    await expect(page.locator(".tk-hero .tk-paid")).not.toContainText(/\$|USD|달러|dollar|€|円/);
     // itch.io play is a pre-registration perk (owner 11-03): before sign-up the hero shows a locked line, not the link
     const preview = page.locator(".tk-hero .tk-preview");
     await expect(page.locator(".tk-hero .tk-perk")).toBeVisible();
@@ -244,5 +248,6 @@ for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io
     await expect(popup).toBeVisible();
     await expect(popup).toContainText(text);
     await expect(popup.locator("a[href*='itch.io']")).toHaveCount(0);
+    await expect(popup.locator(".tk-gate-paid")).toContainText(/유료|paid|kostenpflichtig|有料/i);
   });
 }

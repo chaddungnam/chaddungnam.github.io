@@ -38,6 +38,11 @@ TEXT = {
         "On launch day we send you one email with the iOS and Android download link.",
         "Am Starttag schicken wir dir eine E-Mail mit dem Download-Link für iOS und Android.",
         "配信日に、iOS・Androidのダウンロードリンクをメールで1通お送りします。"),
+    "유료 · 인앱 구매 있음": ("Paid app · In-app purchases", "Kostenpflichtig · In-App-Käufe", "有料 · アプリ内課金あり"),
+    "정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 15까지)예요.": (
+        "The full game is a paid app on Google Play and the App Store, with gems to buy in the game (in-app purchases). On itch.io it is a free demo (up to level 15).",
+        "Die Vollversion ist eine kostenpflichtige App bei Google Play und im App Store, mit Gems zum Kaufen im Spiel (In-App-Käufe). Auf itch.io gibt es eine kostenlose Demo (bis Level 15).",
+        "製品版はGoogle Play・App Storeの有料アプリで、ゲーム内でジェムを購入できます（アプリ内課金）。itch.ioでは無料デモ（レベル15まで）を遊べます。"),
     "사전예약하고 itch.io에서 데모 플레이": ("Pre-register to play the demo on itch.io", "Vorregistrieren und die Demo auf itch.io spielen", "事前登録してitch.ioでデモをプレイ"),
     "사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. 설치 없이 브라우저에서 시작돼요.": (
         "Pre-register and the itch.io demo link (up to level 15) appears right away. No download.",

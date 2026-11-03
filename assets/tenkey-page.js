@@ -205,10 +205,10 @@
     // Before sign-up the itch.io demo buttons and menu open a short popup (owner 2026-11-03, ko/en/de/ja): pre-registering
     // unlocks the demo on itch.io; its button goes to the form. The home's demo buttons land here with #itch-demo.
     var GATE_TEXT = {
-      ko: { title: "itch.io 데모는 사전예약 특전이에요", body: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. 이메일만 남기면 플레이 링크가 바로 떠요.", go: "사전예약하러 가기", close: "닫기" },
-      en: { title: "The itch.io demo is a pre-registration perk", body: "Pre-register and you can play the demo (up to level 15) on itch.io. Leave your email and the play link appears right away.", go: "Go to pre-registration", close: "Close" },
-      de: { title: "Die itch.io-Demo gibt es mit der Vorregistrierung", body: "Wenn du dich vorregistrierst, kannst du die Demo (bis Level 15) auf itch.io spielen. Gib deine E-Mail-Adresse ein, dann erscheint sofort der Link zum Spielen.", go: "Zur Vorregistrierung", close: "Schließen" },
-      ja: { title: "itch.ioのデモは事前登録の特典です", body: "事前登録すると、itch.ioでデモ（レベル15まで）をプレイできます。メールアドレスを登録すると、すぐにプレイリンクが表示されます。", go: "事前登録へ進む", close: "閉じる" }
+      ko: { title: "itch.io 데모는 사전예약 특전이에요", body: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. 이메일만 남기면 플레이 링크가 바로 떠요.", go: "사전예약하러 가기", close: "닫기", paid: "정식판은 유료 앱이고 인앱 구매가 있어요. itch.io 데모는 무료예요." },
+      en: { title: "The itch.io demo is a pre-registration perk", body: "Pre-register and you can play the demo (up to level 15) on itch.io. Leave your email and the play link appears right away.", go: "Go to pre-registration", close: "Close", paid: "The full game is a paid app with in-app purchases. The itch.io demo is free." },
+      de: { title: "Die itch.io-Demo gibt es mit der Vorregistrierung", body: "Wenn du dich vorregistrierst, kannst du die Demo (bis Level 15) auf itch.io spielen. Gib deine E-Mail-Adresse ein, dann erscheint sofort der Link zum Spielen.", go: "Zur Vorregistrierung", close: "Schließen", paid: "Die Vollversion ist eine kostenpflichtige App mit In-App-Käufen. Die itch.io-Demo ist kostenlos." },
+      ja: { title: "itch.ioのデモは事前登録の特典です", body: "事前登録すると、itch.ioでデモ（レベル15まで）をプレイできます。メールアドレスを登録すると、すぐにプレイリンクが表示されます。", go: "事前登録へ進む", close: "閉じる", paid: "製品版は有料アプリ（アプリ内課金あり）です。itch.ioのデモは無料です。" }
     };
     var gate = null;
     var openGate = function () {
@@ -219,9 +219,10 @@
         gate.setAttribute("aria-labelledby", "tk-gate-title");
         gate.setAttribute("data-itch-popup", "");
         gate.lang = mailLocale;
-        gate.innerHTML = '<span class="tk-lock-icon" aria-hidden="true"></span><h2 id="tk-gate-title"></h2><p></p><div class="tk-gate-actions"><button class="tk-key" type="button" data-gate-go><span class="tk-key-face"></span></button><button class="tk-gate-close" type="button" data-gate-close></button></div>';
+        gate.innerHTML = '<span class="tk-lock-icon" aria-hidden="true"></span><h2 id="tk-gate-title"></h2><p></p><p class="tk-gate-paid"></p><div class="tk-gate-actions"><button class="tk-key" type="button" data-gate-go><span class="tk-key-face"></span></button><button class="tk-gate-close" type="button" data-gate-close></button></div>';
         gate.querySelector("h2").textContent = t.title;
         gate.querySelector("p").textContent = t.body;
+        gate.querySelector(".tk-gate-paid").textContent = t.paid;
         gate.querySelector("[data-gate-go] .tk-key-face").textContent = t.go;
         gate.querySelector("[data-gate-close]").textContent = t.close;
         gate.querySelector("[data-gate-go]").addEventListener("click", function () { gate.close(); jumpToForm(); });

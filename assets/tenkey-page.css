@@ -137,6 +137,9 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 }
 .tk-page a.tk-preview:hover, .tk-page a.tk-preview:focus-visible { border-color: var(--tk-duck); background: rgba(255, 210, 63, .14); }
 .tk-preview .tk-play-icon { flex: none; border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
+/* paid app note (owner 11-03 night): the full game is paid with in-app purchases, itch.io is a free demo; no price */
+.tk-paid { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; max-width: 36rem; margin: 18px 0 0; color: var(--tk-text-2); font-size: .9rem; line-height: 1.55; word-break: keep-all; }
+.tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(255, 210, 63, .55); border-radius: 999px; color: var(--tk-duck); background: rgba(255, 210, 63, .1); font-size: .84rem; font-weight: 800; line-height: 1.3; }
 /* itch.io play is a pre-registration perk (owner 2026-11-03): a locked line until sign-up, then the itch.io button */
 .tk-preview-row[hidden] { display: none; }
 .tk-perk { display: flex; align-items: flex-start; gap: 12px; max-width: 34rem; margin: 0; padding: 12px 16px; border: 1px dashed rgba(255, 210, 63, .45); border-radius: 14px; color: var(--tk-text-2); font-size: .92rem; line-height: 1.6; word-break: keep-all; }
@@ -147,6 +150,11 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-unlock a.tk-preview { border-color: var(--tk-duck); background: rgba(255, 210, 63, .16); animation: tk-unlock-pop 420ms var(--tk-ease) both; }
 /* the popup a locked itch.io demo button opens (owner 2026-11-03) */
 .tk-gate { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 24px 22px; border: 1px solid rgba(255, 210, 63, .5); border-radius: 18px; color: var(--tk-text); background: var(--tk-night-2); box-shadow: 0 30px 90px rgba(0, 0, 0, .6); text-align: center; }
+/* QA 11-03: keep-all never breaks Japanese (no spaces), so the ja popup title ran out of the box */
+.tk-gate { overflow-x: hidden; }
+.tk-gate h2, .tk-gate p { overflow-wrap: anywhere; }
+.tk-gate:lang(ja) h2, .tk-gate:lang(ja) p { word-break: normal; line-break: strict; }
+.tk-gate .tk-gate-paid { margin: -8px 0 20px; color: var(--tk-duck-soft); font-size: .86rem; font-weight: 700; }
 .tk-gate::backdrop { background: rgba(8, 8, 12, .72); }
 .tk-gate .tk-lock-icon { display: block; margin: 6px auto 14px; transform: scale(1.6); }
 .tk-gate h2 { margin: 0 0 10px; font-family: var(--tk-pixel); font-size: 20px; line-height: 1.4; word-break: keep-all; }

@@ -459,6 +459,9 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 }
 .hd-tk-prereg .hd-keycap-face { gap: 14px; min-width: 260px; padding: 0 36px; }
 .hd-tk-prereg .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side), 0 calc(var(--btn-depth) + 16px) 36px rgba(255, 210, 63, .22); }
+/* paid app note (owner 11-03 night): the full game is paid with in-app purchases, itch.io is a free demo; no price */
+.hd-tk-paid { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; max-width: 38rem; margin: 22px 0 0; color: var(--tk-ink-2); font-size: .9rem; line-height: 1.55; word-break: keep-all; }
+.hd-tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(255, 210, 63, .55); border-radius: 999px; color: var(--tk-gold); background: rgba(255, 210, 63, .1); font-size: .84rem; font-weight: 800; line-height: 1.3; }
 .hd-tk-note { max-width: 28ch; margin: 0; color: var(--tk-ink-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
 .hd-tk-preview {
   display: inline-flex; min-height: 52px; align-items: center; gap: 10px; padding: 0 22px; box-sizing: border-box;
