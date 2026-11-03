@@ -438,27 +438,28 @@ test("a server error is shown in Korean without breaking the page", async ({ pag
 });
 
 
-test("overview: 전체 keeps Android·iOS users apart from itch web visits and shows pre-registrations by day and language", async ({ page }) => {
+test("overview: 전체 counts players by account (itch + app), keeps anonymous itch web visits apart and shows pre-registrations by day and language", async ({ page }) => {
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
   await expect(today).toHaveCount(5);
   await expect(week).toHaveCount(5);
-  await expect(today.nth(0).locator(".tk-glance-label")).toHaveText("앱 사용자");
+  await expect(today.nth(0).locator(".tk-glance-label")).toHaveText("플레이어 (DAU)");
   await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("웹 방문 (itch)");
   await expect(today.nth(3).locator(".tk-glance-label")).toHaveText("사전예약");
   const want = await page.evaluate(async () => {
     const all = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })).data;
     const web = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } })).data;
     const pre = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } })).data;
-    return { app: Math.max(all.active.d1 - web.active.d1, all.server.seen.d1), visits: web.active.d1, pre: pre.d1, total: pre.total };
+    return { app: all.server.seen.d1, visits: web.active.d1, pre: pre.d1, total: pre.total };
   });
   await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want.app}명`);
   await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${want.visits}회`);
   await expect(today.nth(3).locator(".tk-glance-value")).toHaveText(`${want.pre}명`);
   await expect(today.nth(3)).toContainText(`총 ${want.total}명`);
-  await expect(page.locator("#tenkeyDauTitle")).toHaveText("최근 7일 앱 DAU");
-  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(2);
+  await expect(page.locator("#tenkeyDauTitle")).toHaveText("최근 7일 DAU");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(3);
+  await expect(page.locator("#tenkeyOverviewCharts")).toContainText("플레이어 (DAU) 플랫폼별");
   await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
   await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
   await shot(page, "overview_split");

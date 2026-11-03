@@ -16,7 +16,7 @@
   const T = root.ConsoleTenkey;
   const { esc, num, bytes, pct } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, period: 7, platform: "", data: null, web: null, prereg: null, busy: false };
+  const state = { bound: false, period: 7, platform: "", data: null, web: null, prereg: null, dau: null, busy: false };
   const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
 
   const dayLabel = (iso) => {
@@ -159,7 +159,9 @@
     const played = data.server?.played || {};
     const web = state.platform === "web_itch";  // itch has no accounts: the game server's people are never web visits
     const webActive = (k) => Number(state.web?.active?.[k] || 0);
-    const opened = (k) => (web ? Number(active[k] || 0) : Math.max(Number(active[k] || 0) - (!state.platform && state.web ? webActive(k) : 0), Number(seen[k] || 0)));
+    // Owner 2026-11-03: itch players sign in too, so in 전체 the people are the accounts the game server saw (app + itch,
+    // one per person); the pings stay for the Android / iOS filters. Anonymous itch page loads are shown apart as visits.
+    const opened = (k) => (web ? Number(active[k] || 0) : !state.platform && state.web ? Number(seen[k] || 0) : Math.max(Number(active[k] || 0), Number(seen[k] || 0)));
     const newToday = Number(all.at(-1)?.new_accounts || 0);
     const newYesterday = Number(all.at(-2)?.new_accounts || 0);
     const OPENED_HELP = "게임 서버가 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 앱이 하루 한 번 보내는 접속 신호 중 큰 쪽. 같은 사람은 한 번만 셉니다.";
@@ -170,12 +172,15 @@
     const W = !state.platform && state.web ? state.web : null;
     const webDays = new Map((W?.series || []).map((d) => [String(d.day), d]));
     const preDays = new Map((state.prereg?.days || []).map((d) => [String(d.day), d]));
+    const dauDays = new Map((state.dau?.days || []).map((d) => [String(d.day), d]));
     const daily = all.map((r) => {
       const srv = serverDays.get(String(r.day)) || {};
       const w = webDays.get(String(r.day)) || {};
+      const dp = dauDays.get(String(r.day)) || {};
       const appDau = Math.max(0, Number(r.dau || 0) - Number(w.dau || 0));
       const pr = preDays.get(String(r.day)) || {};
-      return { ...r, people: web ? Number(r.dau || 0) : Math.max(W ? appDau : Number(r.dau || 0), Number(srv.active || 0)), players: Number(srv.players || 0),
+      return { ...r, people: web ? Number(r.dau || 0) : W ? Number(srv.active || 0) : Math.max(Number(r.dau || 0), Number(srv.active || 0)), players: Number(srv.players || 0),
+        dau_itch: Number(dp.web_itch || 0), dau_android: Number(dp.android || 0), dau_ios: Number(dp.ios || 0), dau_other: Number(dp.other || 0),
         visits: Number(w.dau || 0), app_new: Math.max(0, Number(r.new_installs || 0) - Number(w.new_installs || 0)), web_runs: Number(w.runs || 0), app_runs: Math.max(0, Number(r.runs || 0) - Number(w.runs || 0)),
         prereg: Number(pr.n || 0), pre_ko: Number(pr.ko || 0), pre_en: Number(pr.en || 0), pre_ja: Number(pr.ja || 0), pre_de: Number(pr.de || 0) };
     });
@@ -192,10 +197,10 @@
     if (W) {
       byId("tenkeyGlanceToday").classList.add("is-5");
       byId("tenkeyGlanceToday").innerHTML = [
-        glance("앱 사용자", num(opened("d1")), "명", `어제 하루 ${num(opened("d1_prev"))}명 · Android·iOS`,
-          { help: `오늘 Android·iOS 앱에 들어온 사람. ${OPENED_HELP} 웹(itch) 방문은 빠져 있습니다.` }),
+        glance("플레이어 (DAU)", num(opened("d1")), "명", `itch ${num(todayRow.dau_itch)} · 앱 ${num(todayRow.dau_android + todayRow.dau_ios)} · 기타 ${num(todayRow.dau_other)} (어제 ${num(opened("d1_prev"))})`,
+          { help: "오늘 게임 서버가 본 계정 수 (로그인·진행 저장·기록 전송). itch와 앱을 합친 한 사람 한 번 기준입니다. 플랫폼은 그날 보낸 판의 플랫폼, 판이 없으면 평소 플랫폼, 그것도 없으면 기타." }),
         glance("웹 방문 (itch)", num(webActive("d1")), "회", `어제 하루 ${num(webActive("d1_prev"))}회 · 사람 수 아님`,
-          { help: "itch.io 브라우저 판을 연 횟수. 페이지를 열 때마다 새 익명 번호라서 같은 사람이 두 번 열면 2회로 셉니다." }),
+          { help: "itch.io 브라우저 판을 연 횟수 (약관 동의 뒤). 페이지를 열 때마다 새 익명 번호라서 같은 사람이 두 번 열면 2회입니다. 계정 없이 둘러본 사람도 여기에만 들어갑니다." }),
         glance("플레이", num(runs.d1), "판", `앱 ${num(todayRow.app_runs)} · 웹 ${num(todayRow.web_runs)} (어제 ${num(runs.d1_prev)})`,
           { help: "기기·날마다 앱이 알려준 판 수의 증가분과 판마다 오는 기록 중 큰 쪽. 웹(itch)은 판마다 오는 기록으로 셉니다." }),
         preCard || glance("사전예약", "—", "", "불러오지 못함"),
@@ -232,7 +237,7 @@
       const preWeek = P ? versus(P.d7, P.d7_prev, "명") : { note: "불러오지 못함", noteTone: "" };
       byId("tenkeyGlanceWeek").classList.add("is-5");
       byId("tenkeyGlanceWeek").innerHTML = [
-        glance("앱 사용자", num(opened("d7")), "명", peopleWeek.note, { noteTone: peopleWeek.noteTone, help: `최근 7일(오늘 포함) 동안 Android·iOS 앱에 한 번이라도 들어온 사람. ${OPENED_HELP}` }),
+        glance("플레이어 (7일)", num(opened("d7")), "명", peopleWeek.note, { noteTone: peopleWeek.noteTone, help: "최근 7일(오늘 포함) 동안 게임 서버가 한 번이라도 본 계정 수 (itch + 앱, 한 사람 한 번)." }),
         glance("웹 방문 (itch)", num(webActive("d7")), "회", visitWeek.note, { noteTone: visitWeek.noteTone, help: "최근 7일 itch.io 브라우저 판을 연 횟수 (사람 수 아님)." }),
         glance("사전예약", P ? num(P.d7) : "—", P ? "명" : "", preWeek.note, { noteTone: preWeek.noteTone, help: "최근 7일(오늘 포함) 사전예약 수." }),
         glance("결제", num(week("purchases")), "건", buyWeek.note, { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외)." }),
@@ -283,13 +288,21 @@
     const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음" })[k] || k)}</div></article>`;
     const periods = [7, 30, 90].map((d) => `<button class="overview-switch${d === state.period ? " active" : ""}" type="button" data-tk-period="${d}" aria-pressed="${d === state.period}">${d}일</button>`).join("");
     // Main chart: app users, web visits and pre-registrations day by day on one frame (each line its own colour).
-    const mainSeries = [{ key: "people", color: COLOR.app, label: W ? "앱 사용자" : "앱을 연 사람" }];
+    const mainSeries = [{ key: "people", color: COLOR.app, label: W ? "플레이어 (DAU)" : "앱을 연 사람" }];
     if (W) mainSeries.push({ key: "visits", color: COLOR.web, label: "웹 방문 (itch)" });
     if (P) mainSeries.push({ key: "prereg", color: COLOR.pre, label: "사전예약" });
     const mainTips = dailyRows.map((r) => tip(dayLabel(r.day), [[mainSeries[0].label, `${num(r.people)}명`], W ? ["웹 방문 (itch)", `${num(r.visits)}회`] : null,
+      W ? ["  itch / 앱 / 기타", `${num(r.dau_itch)} / ${num(r.dau_android + r.dau_ios)} / ${num(r.dau_other)}명`] : null,
       P ? ["사전예약", `${num(r.prereg)}명`] : null, ["플레이", `${num(r.runs)}판`], W ? ["  앱 / 웹", `${num(r.app_runs)} / ${num(r.web_runs)}판`] : null,
       ["새 플레이어", `${num(r.new_accounts)}명`]], String(r.day) === today ? "오늘은 아직 끝나지 않은 날" : ""));
     const mainLine = multiLine(dailyRows, mainSeries, mainTips);
+    let dauHtml = "";
+    if (W && state.dau) {
+      const DP = [{ key: "dau_itch", color: COLOR.web, label: "itch" }, { key: "dau_android", color: COLOR.app, label: "Android" }, { key: "dau_ios", color: COLOR.ko, label: "iOS" }, { key: "dau_other", color: COLOR.de, label: "기타" }];
+      const dauCols = stacked(dailyRows, DP, dailyRows.map((r) => tip(dayLabel(r.day), [["플레이어 (DAU)", `${num(r.people)}명`], ...DP.map((d) => [d.label, `${num(r[d.key])}명`])], "기타: 로그인·저장만 하고 판을 보내지 않은 계정")));
+      dauHtml = `<article class="ov-card is-wide"><header class="ov-card-head"><h3>플레이어 (DAU) 플랫폼별 (${state.period}일)</h3><span class="ov-legend">${DP.map((d) => swatch(d.color, d.label)).join("")}</span></header>
+        <figure class="ov-figure" tabindex="0" aria-label="플랫폼별 DAU"><div class="ov-plot has-y">${dauCols.plot}</div>${xAxis(dailyRows)}</figure></article>`;
+    }
     let preHtml = "";
     if (P) {
       const loc = P.by_locale || {};
@@ -312,7 +325,7 @@
     }
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
       <header class="ov-card-head"><h3>날마다 한눈에</h3><span class="ov-legend">${mainSeries.map((sr) => swatch(sr.color, sr.label)).join("")}</span><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
-      <figure class="ov-figure" tabindex="0" aria-label="날마다 앱 사용자, 웹 방문, 사전예약"><div class="ov-plot has-y">${mainLine.plot}</div>${xAxis(dailyRows)}</figure></article>${preHtml}`;
+      <figure class="ov-figure" tabindex="0" aria-label="날마다 플레이어, 웹 방문, 사전예약"><div class="ov-plot has-y">${mainLine.plot}</div>${xAxis(dailyRows)}</figure></article>${dauHtml}${preHtml}`;
     const facts = [
       ["30일 동안 앱을 연 사람", `${num(opened("d30"))}명`], ["지금까지 설치", W ? `${num(Math.max(0, Number(fresh.all || 0) - Number(state.web?.new_installs?.all || 0)))}명 (앱)` : `${num(fresh.all)}명`], ["전체 계정", `${num(totals.accounts)}개`],
       noSignal ? ["7일 동안 기록을 올린 사람", `${num(played.d7)}명`] : ["7일 동안 플레이", `${num(runs.d7)}판`], ["7일 뒤 다시 온 비율", retRow(ret.d7)], ["30일 뒤 다시 온 비율", retRow(ret.d30)],
@@ -334,7 +347,7 @@
     byId("tenkeyOverviewNotes").innerHTML = [
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
       "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 날마다 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·기록을 올린 사람을 보여 줍니다. 서버의 날짜별 기록은 10월 22일(테스트 시작)부터 있습니다.",
-      "‘전체’ 화면의 앱 사용자·DAU는 Android·iOS만 셉니다 (2026-11-03부터). itch 웹은 방문마다 새 번호라 사람 수가 될 수 없어서 ‘웹 방문’으로 따로 보여 줍니다. 최근 7일 앱 DAU의 %는 그날 앱 사용자 ÷ 그날까지 가입한 플레이어 수입니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
+      "‘전체’ 화면의 플레이어(DAU)는 게임 서버가 그날 본 계정 수입니다 (itch + 앱, 한 사람 한 번, 2026-11-03부터). itch 익명 신호는 페이지를 열 때마다 새 번호라 ‘웹 방문’으로 따로 보여 줍니다 (계정 없이 둘러본 사람 포함). 최근 7일 DAU의 %는 그날 플레이어 ÷ 그날까지 가입한 플레이어 수입니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
       "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어가지만 ‘다시 온 비율’에서는 빠집니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",
@@ -355,11 +368,13 @@
       // The itch web numbers come from tenkey-console-stats ("overview.web"): the deployed tenkey-admin refuses platform
       // web_itch (found 2026-11-03), which also left the 웹(itch) filter empty.
       const webCall = () => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } });
-      const [result, webResult, preResult] = await Promise.all([
+      const [result, webResult, preResult, dauResult] = await Promise.all([
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } }).catch(() => null),
+        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
       ]);
+      state.dau = dauResult?.data || null;
       state.data = result.data;
       state.web = webResult?.data || null;
       state.prereg = preResult?.data || null;
