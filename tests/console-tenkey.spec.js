@@ -11,13 +11,13 @@ test.describe.configure({ retries: 2 });
 const API = fs.readFileSync(path.join(__dirname, "fixtures/console_tenkey_api.js"), "utf8");
 const AUTH = `window.ConsoleAuth={initialize:async()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),snapshot:()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),isUnlocked:()=>true,requireChallenge:()=>{},unlock:async()=>{},logout:()=>{},headers:()=>({}),renderGoogleButton:()=>{}};`;
 
-async function open(page, hash = "") {
+async function open(page, hash = "", extra = "") {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
   await page.route("https://translate.googleapis.com/**", (route) => route.abort());
   await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
-  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API }));
+  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API + extra }));
   await page.goto("/console/");
   await page.locator("#projectTenkey").click();
   if (hash) await page.evaluate((h) => { window.location.hash = h; }, hash);
@@ -72,7 +72,7 @@ test("overview: the itch.io web filter shows its own visits and runs, no return 
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
-  await expect(today).toHaveCount(4);
+  await expect(today).toHaveCount(5);
   await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveText("웹(itch)");
   await page.locator('[data-tk-platform="web_itch"]').click();
   await expect.poll(async () => (await calls(page, "overview.get")).at(-1)?.params.platform).toBe("web_itch");
@@ -96,7 +96,9 @@ test("overview: the itch.io web filter shows its own visits and runs, no return 
 });
 
 test("overview: today and 7-day numbers first in plain words, one chart, the rest folded; period and platform switches", async ({ page }) => {
-  const errors = await open(page);
+  // Without the web numbers (and the pre-registration counts) the overview keeps its four-card layout; the split view has its own test.
+  const NO_SPLIT = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if((b.action===\"overview.get\"&&b.params&&b.params.platform===\"web_itch\"&&!window.__wantWeb)||fn===\"tenkey-console-stats\")throw Object.assign(new Error(\"blocked\"),{status:503});return real(pj,fn,b);};})();";
+  const errors = await open(page, "", NO_SPLIT);
   await expect(page.locator("#pageTitle")).toHaveText("한눈 요약");
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
@@ -119,7 +121,7 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
     .then((r) => [r.data.series.slice(-7), r.data.series.slice(-14, -7)].map((rows) => rows.reduce((n, row) => n + row.purchases, 0))));
   await expect(week.nth(2).locator(".tk-glance-value")).toHaveText(`${buys[0]}건`);
   await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(1);
-  // 최근 7일 DAU: each day's people (the larger of the ping and the game server) over the players that existed by then.
+  // 최근 7일 앱 DAU: each day's people (the larger of the ping and the game server) over the players that existed by then.
   const dauCells = page.locator("#tenkeyDauWeek .tk-dau-day");
   await expect(dauCells).toHaveCount(7);
   const dauWant = () => page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} }).then((r) => {
@@ -170,7 +172,7 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
     .then((r) => [r.data.series.at(-1).new_accounts, r.data.series.slice(-7).reduce((n, row) => n + row.new_accounts, 0)]));
   await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[0]}명`);
   await expect(week.nth(1).locator(".tk-glance-value")).toHaveText(`${fresh[1]}명`);
-  await expect(page.locator("#tenkeyOverviewCharts h3")).toHaveText("날마다 앱을 연 사람");
+  await expect(page.locator("#tenkeyOverviewCharts h3")).toHaveText("날마다 한눈에");
   expect(await dauSeen()).toEqual(await dauWant());
   await expect(page.locator("#tenkeyOverviewCharts .ov-wait")).toHaveCount(0);
   await shot(page, "overview_no_ping");
@@ -433,4 +435,32 @@ test("a server error is shown in Korean without breaking the page", async ({ pag
   await page.evaluate(() => { window.__mockFailures["crashes.groups"] = "rpc_failed"; });
   await page.locator("#tenkeyCrashFilterForm button[type=submit]").click();
   await expect(page.locator("#tenkeyCrashMessage")).toContainText("서버가 요청을 거부했습니다");
+});
+
+
+test("overview: 전체 keeps Android·iOS users apart from itch web visits and shows pre-registrations by day and language", async ({ page }) => {
+  const errors = await open(page);
+  const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
+  const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
+  await expect(today).toHaveCount(5);
+  await expect(week).toHaveCount(5);
+  await expect(today.nth(0).locator(".tk-glance-label")).toHaveText("앱 사용자");
+  await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("웹 방문 (itch)");
+  await expect(today.nth(3).locator(".tk-glance-label")).toHaveText("사전예약");
+  const want = await page.evaluate(async () => {
+    const all = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })).data;
+    const web = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: { platform: "web_itch" } })).data;
+    const pre = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } })).data;
+    return { app: Math.max(all.active.d1 - web.active.d1, all.server.seen.d1), visits: web.active.d1, pre: pre.d1, total: pre.total };
+  });
+  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want.app}명`);
+  await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${want.visits}회`);
+  await expect(today.nth(3).locator(".tk-glance-value")).toHaveText(`${want.pre}명`);
+  await expect(today.nth(3)).toContainText(`총 ${want.total}명`);
+  await expect(page.locator("#tenkeyDauTitle")).toHaveText("최근 7일 앱 DAU");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(2);
+  await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
+  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
+  await shot(page, "overview_split");
+  expect(errors).toEqual([]);
 });

@@ -137,6 +137,14 @@
   const respond = (action, p, body) => {
     switch (action) {
       case "overview.get": return overview(p.platform);
+      // tenkey-console-stats (separate function): pre-registration counts by Berlin day and page language.
+      case "prereg.get": {
+        const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, de: 0 }));
+        days.forEach((d) => { d.n = d.ko + d.en; });
+        const sumN = (rows) => rows.reduce((t, d) => t + d.n, 0);
+        return { today: days.at(-1).day, total: sumN(days), d1: days.at(-1).n, d1_prev: days.at(-2).n, d7: sumN(days.slice(-7)), d7_prev: sumN(days.slice(-14, -7)),
+          by_locale: { ko: days.reduce((t, d) => t + d.ko, 0), en: days.reduce((t, d) => t + d.en, 0) }, unsubscribed: 0, last_at: new Date().toISOString(), days };
+      }
       case "players.list": {
         const q = String(p.query || "").toLowerCase();
         const rows = PLAYERS.filter((x) => (!q || x.name.toLowerCase().includes(q) || x.id.startsWith(q)) && (!p.platform || x.platform === p.platform || (p.platform === "web" && x.provider === "crazygames")));

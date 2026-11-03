@@ -11,7 +11,7 @@ const CONSOLE_CONFIG = {
 const HOUSEDUCK_CONFIG = {
   functionBaseUrl: "https://frepunpqswciugwoyvxo.supabase.co/functions/v1",
   publishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyZXB1bnBxc3djaXVnd295dnhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDA3ODQsImV4cCI6MjEwNzgxNjc4NH0.BTfi0LS35wVbsgLkdKpvRQN8e0pw2F7-vcJ2UEnWTv4",
-  allowedFunctions: ["tenkey-admin"],
+  allowedFunctions: ["tenkey-admin", "tenkey-console-stats"],
 };
 
 const pageTitles = {
