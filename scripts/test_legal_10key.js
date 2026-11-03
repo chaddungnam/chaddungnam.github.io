@@ -169,7 +169,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-11-01"/, `${file}: last updated 2026-11-01 (v1.3: season rankings, web ranking accounts, quests, module draw tickets)`);
+    assert.match(html, /datetime="2026-11-03"/, `${file}: last updated 2026-11-03 (v1.5: module boxes, the free daily box and the 30-claims rewards)`);
     assert.doesNotMatch(text(html.replace(/<li>[^<]*\(v1\.[012]\)[^<]*/g, "")), /Revive Pass|부활 패스/, `${file}: the Revive Pass is gone (only in the history entries)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
