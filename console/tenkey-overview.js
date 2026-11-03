@@ -133,21 +133,6 @@
     return { note: `${up ? "▲" : "▼"} 그 전 7일보다 ${num(Math.abs(diff))}${unit} ${up ? "많음" : "적음"}`, noteTone: up === goodWhenUp ? "good" : "bad" };
   }
 
-  // 최근 7일 cards compare the 7-day window ending today with the one ending 1 or 3 days earlier (owner 2026-11-03,
-  // default 1 day), or with the 7 days before (the old view). rows: oldest first; key: a daily count to sum.
-  const COMPARE_WORD = { d1: "어제까지 7일", d3: "3일 전까지 7일", w: "그 전 7일" };
-  function rollSum(rows, key, back) {
-    const end = rows.length - back;
-    return rows.slice(Math.max(0, end - 7), Math.max(0, end)).reduce((t, r) => t + Number(r[key] || 0), 0);
-  }
-  function shifted(current, earlier, unit, goodWhenUp = true) {
-    const diff = Number(current || 0) - Number(earlier || 0);
-    const word = COMPARE_WORD[state.compare] || COMPARE_WORD.w;
-    if (!Number.isFinite(diff) || diff === 0) return { note: `${word}과 같음`, noteTone: "" };
-    const up = diff > 0;
-    return { note: `${up ? "▲" : "▼"} ${word}보다 ${num(Math.abs(diff))}${unit} ${up ? "많음" : "적음"}`, noteTone: up === goodWhenUp ? "good" : "bad" };
-  }
-
   function distribution(title, rows, total, nameOf = (k) => k) {
     if (!rows.length) return `<h4>${esc(title)}</h4><p class="overview-drill-note">아직 기록이 없어요</p>`;
     const max = Math.max(...rows.map((r) => r.n));
@@ -248,23 +233,49 @@
     const installWeek = noSignal ? versus(week("new_accounts"), weekBefore("new_accounts"), "명") : versus(fresh.d7, fresh.d7_prev, "명");
     const buyWeek = versus(week("purchases"), weekBefore("purchases"), "건");
     if (W) {
-      const back = state.compare === "d3" ? 3 : state.compare === "d1" ? 1 : 0;
+      // Owner 2026-11-03: 1일 / 3일 / 7일 show exactly that window (today included), each against the N days just before it.
+      const N = state.compare === "d3" ? 3 : state.compare === "w" ? 7 : 1;
       const dauRows = state.dau?.days || [];
-      const u7 = (b) => Number(dauRows[dauRows.length - 1 - b]?.u7 || 0);
-      const peopleCmp = back && dauRows.length ? shifted(u7(0), u7(back), "명") : peopleWeek;
-      const visitWeek = back ? shifted(rollSum(W.series || [], "dau", 0), rollSum(W.series || [], "dau", back), "회") : versus(webActive("d7"), webActive("d7_prev"), "회");
-      const preWeek = !P ? { note: "불러오지 못함", noteTone: "" } : back ? shifted(rollSum(P.days || [], "n", 0), rollSum(P.days || [], "n", back), "명") : versus(P.d7, P.d7_prev, "명");
-      const buyCmp = back ? shifted(rollSum(all, "purchases", 0), rollSum(all, "purchases", back), "건") : buyWeek;
+      const at = (back, key) => Number(dauRows[dauRows.length - 1 - back]?.[key] || 0);
+      const uniq = (back) => (N === 1 ? at(back, "all") : at(back, N === 3 ? "u3" : "u7"));
+      const vs = (cur, prev, unit) => {
+        const diff = Number(cur || 0) - Number(prev || 0);
+        if (!diff) return { note: `앞 ${N}일과 같음`, noteTone: "" };
+        return { note: `${diff > 0 ? "▲" : "▼"} 앞 ${N}일보다 ${num(Math.abs(diff))}${unit} ${diff > 0 ? "많음" : "적음"}`, noteTone: diff > 0 ? "good" : "bad" };
+      };
+      const sumN = (rows, key, back) => rows.slice(Math.max(0, rows.length - back - N), rows.length - back).reduce((t, r) => t + Number(r[key] || 0), 0);
+      const players = uniq(0), playersPrev = uniq(N);
+      const visits = sumN(W.series || [], "dau", 0), visitsPrev = sumN(W.series || [], "dau", N);
+      const pre = P ? sumN(P.days || [], "n", 0) : null, prePrev = P ? sumN(P.days || [], "n", N) : null;
+      const buys = sumN(all, "purchases", 0), buysPrev = sumN(all, "purchases", N);
+      // Next-day return: accounts first seen in the N days ending yesterday, and how many came back the day after.
+      const cohort = (back, grp) => {
+        let n = 0, k = 0;
+        for (let i = 1 + back; i <= N + back; i++) { n += at(i, `new_${grp}`); k += at(i, `back_${grp}`); }
+        return { n, k };
+      };
+      const grp = { itch: cohort(0, "itch"), app: cohort(0, "app"), other: cohort(0, "other") };
+      const tot = { n: grp.itch.n + grp.app.n + grp.other.n, k: grp.itch.k + grp.app.k + grp.other.k };
+      const prevC = ["itch", "app", "other"].map((g) => cohort(N, g)).reduce((t, c) => ({ n: t.n + c.n, k: t.k + c.k }), { n: 0, k: 0 });
+      const rate = (c) => (c.n > 0 ? Math.round(c.k / c.n * 1000) / 10 : null);
+      const part = (label, c) => `${label} ${c.n > 0 ? `${rate(c)}% (${num(c.k)}/${num(c.n)})` : "—"}`;
+      const span = N === 1 ? "어제" : `${N}일 동안 (어제까지)`;
+      byId("tenkeyGlanceWeekTitle").textContent = `최근 ${N}일`;
+      const sub = byId("tenkeyGlanceWeekTitle").nextElementSibling;
+      if (sub) sub.textContent = `오늘 포함 · 화살표는 바로 앞 ${N}일과 비교`;
+      const pc = vs(players, playersPrev, "명"), vc = vs(visits, visitsPrev, "회"), bc = vs(buys, buysPrev, "건");
+      const prc = P ? vs(pre, prePrev, "명") : { note: "불러오지 못함", noteTone: "" };
       byId("tenkeyGlanceWeek").classList.add("is-5");
       byId("tenkeyGlanceWeek").innerHTML = [
-        glance("플레이어 (7일)", num(opened("d7")), "명", peopleCmp.note, { noteTone: peopleCmp.noteTone, help: "최근 7일(오늘 포함) 동안 게임 서버가 한 번이라도 본 계정 수 (itch + 앱, 한 사람 한 번)." }),
-        glance("웹 방문 (itch)", num(webActive("d7")), "회", visitWeek.note, { noteTone: visitWeek.noteTone, help: "최근 7일 itch.io 브라우저 판을 연 횟수 (사람 수 아님)." }),
-        glance("사전예약", P ? num(P.d7) : "—", P ? "명" : "", preWeek.note, { noteTone: preWeek.noteTone, help: "최근 7일(오늘 포함) 사전예약 수." }),
-        glance("결제", num(week("purchases")), "건", buyCmp.note, { noteTone: buyCmp.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외)." }),
-        glance("다음 날 다시 온 비율", retRate(ret.d1), Number(ret.d1?.cohort) > 0 ? "%" : "", Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명 · 앱만` : "아직 셀 수 없음",
-          { help: "2~8일 전에 설치한 앱 기기 가운데 다음 날 다시 연 비율. 웹 방문은 빠집니다." }),
+        glance(`플레이어 (${N}일)`, num(players), "명", pc.note, { noteTone: pc.noteTone, help: `최근 ${N}일(오늘 포함) 동안 게임 서버가 본 계정 수 (itch + 앱, 한 사람 한 번). 앞 ${N}일: ${num(playersPrev)}명.` }),
+        glance("웹 방문 (itch)", num(visits), "회", vc.note, { noteTone: vc.noteTone, help: `최근 ${N}일 itch.io 브라우저 판을 연 횟수 (사람 수 아님). 앞 ${N}일: ${num(visitsPrev)}회.` }),
+        glance("사전예약", P ? num(pre) : "—", P ? "명" : "", prc.note, { noteTone: prc.noteTone, help: `최근 ${N}일(오늘 포함) 사전예약 수. 앞 ${N}일: ${P ? num(prePrev) : "—"}명.` }),
+        glance("결제", num(buys), "건", bc.note, { noteTone: bc.noteTone, help: `최근 ${N}일 스토어가 확인한 구매 (환불·테스트 결제 제외). 앞 ${N}일: ${num(buysPrev)}건.` }),
+        glance("다음 날 다시 온 비율", rate(tot) === null ? "—" : String(rate(tot)), rate(tot) === null ? "" : "%", `${part("itch", grp.itch)} · ${part("앱", grp.app)}`,
+          { help: `${span} 처음 들어온 계정 가운데 다음 날 다시 들어온 비율 (itch + 앱). 전체 ${num(tot.k)}/${num(tot.n)}명, 기타(판 기록 없는 계정) ${grp.other.n > 0 ? `${rate(grp.other)}%` : "—"}. 앞 ${N}일: ${rate(prevC) === null ? "—" : `${rate(prevC)}%`}. 오늘 다시 온 사람은 하루가 끝날 때까지 늘어납니다.` }),
       ].join("");
     } else {
+    byId("tenkeyGlanceWeekTitle").textContent = "최근 7일";
     byId("tenkeyGlanceWeek").classList.remove("is-5");
     byId("tenkeyGlanceWeek").innerHTML = [
         glance("앱을 연 사람", num(opened("d7")), "명", `${peopleWeek.note}${anyPlatform}`,

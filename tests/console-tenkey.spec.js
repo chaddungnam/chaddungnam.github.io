@@ -462,13 +462,20 @@ test("overview: 전체 counts players by account (itch + app), keeps anonymous i
   await expect(page.locator("#tenkeyOverviewCharts")).toContainText("플레이어 (DAU) 플랫폼별");
   await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
   await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
-  // 최근 7일 compares with the 7 days ending yesterday by default; 3일 전 and 그 전 7일 switch the arrows.
+  // 1일 / 3일 / 7일: each window exactly (today included) against the N days before; next-day return split itch / app.
   await expect(page.locator('[data-tk-compare="d1"]')).toHaveAttribute("aria-pressed", "true");
-  await expect(week.nth(0)).toContainText("어제까지 7일보다 1명 많음");
+  await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 1일");
+  await expect(week.nth(0).locator(".tk-glance-label")).toHaveText("플레이어 (1일)");
+  await expect(week.nth(0)).toContainText("앞 1일보다 1명 많음");
+  await expect(week.nth(4).locator(".tk-glance-value")).toHaveText("40%");
+  await expect(week.nth(4)).toContainText("itch 33.3% (1/3) · 앱 50% (1/2)");
   await page.locator('[data-tk-compare="d3"]').click();
-  await expect(week.nth(0)).toContainText("3일 전까지 7일보다 3명 많음");
+  await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 3일");
+  await expect(week.nth(0)).toContainText("앞 3일보다 3명 많음");
+  await expect(week.nth(4)).toContainText("itch 33.3% (3/9)");
   await page.locator('[data-tk-compare="w"]').click();
-  await expect(week.nth(0)).toContainText("그 전 7일");
+  await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 7일");
+  await expect(week.nth(0)).toContainText("앞 7일보다 7명 많음");
   await page.locator('[data-tk-compare="d1"]').click();
   await shot(page, "overview_split");
   expect(errors).toEqual([]);
