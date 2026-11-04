@@ -26,6 +26,10 @@ for (const [url, words] of Object.entries({
     await expect(page.locator(".tk-hero .tk-paid-chip")).toHaveText(words.paid);
     await expect(page.locator(".tk-hero .tk-paid")).toContainText("15");
     await expect(page.locator(".tk-hero .tk-paid")).not.toContainText(/\$|USD|달러|dollar|€|円/);
+    // where to play (owner 11-04): computer = itch.io demo, best on a PC; phone = Google Play / App Store, coming soon
+    await expect(page.locator(".tk-hero .tk-where li")).toHaveCount(2);
+    await expect(page.locator(".tk-hero .tk-where")).toContainText("PC");
+    await expect(page.locator(".tk-hero .tk-where")).toContainText("App Store");
     // itch.io play is a pre-registration perk (owner 11-03): before sign-up the hero shows a locked line, not the link
     const preview = page.locator(".tk-hero .tk-preview");
     await expect(page.locator(".tk-hero .tk-perk")).toBeVisible();

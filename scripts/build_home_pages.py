@@ -44,10 +44,17 @@ TEXT = {
         "Die Vollversion ist eine kostenpflichtige App bei Google Play und im App Store, mit Gems zum Kaufen im Spiel (In-App-Käufe). Auf itch.io gibt es eine kostenlose Demo (bis Level 15).",
         "製品版はGoogle Play・App Storeの有料アプリで、ゲーム内でジェムを購入できます（アプリ内課金）。itch.ioでは無料デモ（レベル15まで）を遊べます。"),
     "사전예약하고 itch.io에서 데모 플레이": ("Pre-register to play the demo on itch.io", "Vorregistrieren und die Demo auf itch.io spielen", "事前登録してitch.ioでデモをプレイ"),
-    "사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. 설치 없이 브라우저에서 시작돼요.": (
-        "Pre-register and the itch.io demo link (up to level 15) appears right away. No download.",
-        "Nach der Vorregistrierung erscheint sofort der Link zur Demo auf itch.io (bis Level 15). Ohne Download.",
-        "事前登録が終わると、itch.ioのデモ（レベル15まで）のリンクがすぐに表示されます。インストール不要です。"),
+    "사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. PC 브라우저에서 플레이를 권장해요.": (
+        "Pre-register and the itch.io demo link (up to level 15) appears right away. Best played in a browser on a PC.",
+        "Nach der Vorregistrierung erscheint sofort der Link zur Demo auf itch.io (bis Level 15). Am besten im Browser am PC spielen.",
+        "事前登録が終わると、itch.ioのデモ（レベル15まで）のリンクがすぐに表示されます。PCのブラウザでのプレイをおすすめします。"),
+    # where to play (owner 2026-11-04): computer = the itch.io demo, best on a PC; phone = Google Play / App Store, coming soon
+    "플레이 환경": ("Where to play", "Wo spielen", "プレイ環境"),
+    "컴퓨터": ("Computer", "Computer", "パソコン"),
+    "itch.io 데모 ·": ("itch.io demo ·", "itch.io-Demo ·", "itch.ioデモ・"),
+    "PC 권장": ("best on PC", "am besten am PC", "PC推奨"),
+    "휴대폰": ("Phone", "Handy", "スマホ"),
+    "Google Play · App Store (준비 중)": ("Google Play · App Store (coming soon)", "Google Play · App Store (in Vorbereitung)", "Google Play・App Store（準備中）"),
     "실제 플레이 화면": ("Real gameplay", "Echtes Gameplay", "実際のプレイ画面"),
     "키를 부수며 파고드는 화면, 레벨업 카드 고르기, 황금 피버": (
         "Digging through keys, picking a level-up card, Golden Fever",
@@ -161,7 +168,8 @@ def translate_main(main, lang, badges):
     main = main.replace('href="quirky-ball/?lang=ko"', f'href="quirky-ball/?lang={lang}"')
     # The 10key Survival page exists in Korean and English only; the de/ja homes add ?lang=de|ja so the 10key page (and the
     # pre-registration mail) keeps the visitor's language (owner 2026-10-30).
-    tenkey = "10key/index_en.html" + ("" if lang == "en" else f"?lang={lang}")
+    # Since 2026-11-04 de and ja have their own 10key pages (index_de.html, index_ja.html), so each home links its own.
+    tenkey = "10key/index_en.html" if lang == "en" else f"10key/index_{lang}.html?lang={lang}"
     main = main.replace('href="10key/"', f'href="{tenkey}"')
     main = main.replace('href="10key/#prereg"', f'href="{tenkey}#prereg"')  # the pre-registration form, English page
     main = main.replace('href="10key/#itch-demo"', f'href="{tenkey}#itch-demo"')  # the itch.io demo slot: a pre-registration popup (owner 11-03)

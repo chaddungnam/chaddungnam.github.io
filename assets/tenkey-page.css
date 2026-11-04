@@ -370,3 +370,28 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 /* Japanese page (owner 2026-11-04): keep-all never breaks Japanese (no spaces between words), so on index_ja.html every
    block lets the browser break lines the Japanese way. Korean keeps keep-all. */
 .tk-page:lang(ja) *, .tk-page:lang(ja) { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
+
+/* where to play (owner 2026-11-04): computer = the itch.io demo, best on a PC; phone = Google Play / App Store, coming soon */
+.tk-where { display: grid; gap: 6px; max-width: 36rem; margin: 14px 0 0; padding: 0; list-style: none; color: var(--tk-text-2); font-size: .9rem; line-height: 1.5; word-break: keep-all; }
+.tk-where li { display: flex; align-items: baseline; gap: 12px; }
+.tk-where-k { flex: none; min-width: 5.2rem; color: var(--tk-text-3); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+.tk-where b { color: var(--tk-duck); font-weight: 800; }
+/* small design pass (2026-11-04): the wide evolve strip keeps its own shape instead of losing both edges to the crop */
+.tk-feature img[width="1364"] { height: auto; aspect-ratio: 1364 / 520; align-self: center; }
+/* the ads-settings button sits on the same line and in the same type as the other footer links */
+.tk-footer-links button[data-ads-settings] { display: inline-flex; min-height: 44px; align-items: center; color: var(--tk-text-2); font-size: .86rem; font-weight: 600; line-height: 1.2; text-decoration: none; }
+.tk-footer-links button[data-ads-settings]:hover, .tk-footer-links button[data-ads-settings]:focus-visible { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+/* small phones (2026-11-04): the CTA stays on one line (EN "Pre-register" wrapped) and the five-language switcher fits
+   next to it (on the DE page 中文 ran off a 390px screen) */
+.tk-page .tk-nav-cta { white-space: nowrap; }
+@media (max-width: 520px) {
+  .tk-page .header-inner { gap: 10px; }
+  .tk-page .tk-nav-cta { padding: 0 10px; font-size: .82rem; }
+  .tk-lang { margin-left: 4px; padding: 2px; }
+  .tk-lang a { min-width: 34px; letter-spacing: .02em; }
+  .tk-where-k { min-width: 4.6rem; }
+}
+@media (max-width: 400px) {
+  .tk-page .tk-nav-cta { padding: 0 8px; }
+  .tk-lang a { min-width: 30px; font-size: .74rem; }
+}

@@ -796,3 +796,9 @@ html:lang(ja) body[data-page="studio"] * { word-break: normal; line-break: stric
 
 /* Long German compounds (e.g. "Entwicklungsraum") must not push narrow phones sideways. */
 html:lang(de) body[data-page="studio"] .hd-title { hyphens: auto; overflow-wrap: anywhere; }
+
+/* where to play (owner 2026-11-04): computer = the itch.io demo, best on a PC; phone = Google Play / App Store, coming soon */
+.hd-tk-where { display: grid; gap: 6px; max-width: 38rem; margin: 14px 0 0; padding: 0; list-style: none; color: var(--tk-ink-2); font-size: .9rem; line-height: 1.5; word-break: keep-all; }
+.hd-tk-where li { display: flex; align-items: baseline; gap: 12px; }
+.hd-tk-where-k { flex: none; min-width: 5.2rem; color: var(--tk-ink-3); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+.hd-tk-where b { color: var(--tk-gold); font-weight: 800; }
