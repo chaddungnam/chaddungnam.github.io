@@ -1227,6 +1227,28 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tk-section h3 { margin: 0 0 8px; font-size: 13px; }
 .tk-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .tk-section.impact-form { padding: 14px 16px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 12px; }
+.tk-retention-panel { margin-top: 14px; }
+#tenkeyRetentionView .admin-toolbar { position: static; box-shadow: none; backdrop-filter: none; }
+.tk-retention-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 10px 0 14px; }
+.tk-retention-card { display: grid; gap: 5px; min-width: 0; padding: 14px 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; }
+.tk-retention-card > span, .tk-retention-card small { color: var(--ink-soft); font-size: 10px; }
+.tk-retention-card strong { font-size: clamp(17px, 2vw, 24px); font-variant-numeric: tabular-nums; }
+.tk-retention-tabs { display: flex; gap: 6px; }
+.tk-retention-tabs button { min-height: 34px; padding: 7px 11px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 9px; font-size: 10px; font-weight: 800; }
+.tk-retention-tabs button[aria-pressed="true"] { color: white; background: var(--ink); border-color: var(--ink); }
+.tk-retention-funnel { display: grid; gap: 10px; }
+.tk-funnel-row { display: grid; grid-template-columns: minmax(150px, .65fr) minmax(130px, 1fr) minmax(130px, .55fr); align-items: center; gap: 10px; }
+.tk-funnel-copy { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; }
+.tk-funnel-copy span, .tk-funnel-row > small { color: var(--ink-soft); font-size: 9px; text-align: right; }
+.tk-funnel-track { height: 10px; overflow: hidden; background: #eee9df; border-radius: 99px; }
+.tk-funnel-track i { display: block; height: 100%; min-width: 2px; background: var(--teal); border-radius: inherit; }
+.tk-retention-panel .table-scroll { max-height: 560px; }
+@media (max-width: 760px) {
+  .tk-retention-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tk-funnel-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .tk-funnel-track { grid-column: 1 / -1; grid-row: 2; }
+  .tk-funnel-row > small { grid-column: 2; grid-row: 1; }
+}
 /* 10KEY notices (owner 10-25): Korean is typed, the seven other game languages are filled by the server and shown as the
    app's dark notice cards, Korean first. A card can be corrected by hand; old translations (the Korean changed) fade. */
 .tenkey-tr { display: grid; gap: 8px; }

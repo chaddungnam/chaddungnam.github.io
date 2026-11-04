@@ -26,6 +26,7 @@ const pageTitles = {
   notes: "메모",
   "tenkey-overview": "한눈 요약",
   "tenkey-players": "플레이어",
+  "tenkey-retention": "재방문",
   "tenkey-player": "플레이어 상세",
   "tenkey-crashes": "크래시",
   "tenkey-notices": "공지",
@@ -47,6 +48,7 @@ const pageDescriptions = {
   notes: "정한 것과 그 이유를 남겨 두고 나중에 같은 판단을 다시 찾습니다.",
   "tenkey-overview": "오늘과 최근 7일의 앱을 연 사람·새로 설치·플레이·크래시·결제를 큰 숫자로 먼저 봅니다. 자세한 그래프는 아래에 접혀 있습니다.",
   "tenkey-players": "랭킹 서버에 있는 플레이어를 찾고 기록·구매·상태를 확인합니다.",
+  "tenkey-retention": "로그인 계정의 재방문 코호트, 첫 행동 흐름과 최근 쉬기 시작한 계정의 고정 진단 신호를 확인합니다.",
   "tenkey-player": "한 플레이어의 계정, 기록, 구매와 젬 장부, 정지 여부를 확인하고 처리합니다.",
   "tenkey-crashes": "앱이 보낸 크래시·멈춤·오류 보고를 오류 내용, 버전, 기기별로 묶어 보고 로그를 확인합니다.",
   "tenkey-notices": "게임 안 공지를 한국어로 작성·예약합니다. 다른 7개 언어는 자동으로 번역돼 함께 나갑니다.",
@@ -155,6 +157,7 @@ function renderRoute() {
   if (route.page === "notes") window.ConsoleNotes.mount();
   if (route.page === "tenkey-overview") window.ConsoleTenkey.mountOverview();
   if (route.page === "tenkey-players") window.ConsoleTenkey.mountPlayers();
+  if (route.page === "tenkey-retention") window.ConsoleTenkey.mountRetention();
   if (route.page === "tenkey-player") window.ConsoleTenkey.mountPlayer(route.userId);
   if (route.page === "tenkey-crashes") window.ConsoleTenkey.mountCrashes();
   if (route.page === "tenkey-notices") window.ConsoleTenkey.mountNotices();

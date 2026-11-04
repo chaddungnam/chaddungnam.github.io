@@ -6,7 +6,7 @@
   const T = root.ConsoleTenkey;
   const { esc, num, time, duration, platformName } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, query: "", platform: "", sort: "last_seen_at", direction: "desc", detail: null };
+  const state = { bound: false, query: "", platform: "", country: "", sort: "last_seen_at", direction: "desc", detail: null };
   let pager = null;
   const AUTO_MS = 20000;
   let autoTimer = 0;
@@ -14,6 +14,8 @@
   const FLAG_NAMES = { banned: "정지 상태" };  // only a manual ban holds a run back (2026-10-24)
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
   const ageName = (band) => (band ? `${band}세 이상` : "미확인");
+  const countryName = (code) => code ? (String(code).toUpperCase() === "XX" ? "미기록" : String(code).toUpperCase()) : "—";
+  const clientPlatformName = (code) => ({ android: "Android", ios: "iOS", web_itch: "웹 · itch.io", web_gamepix: "웹 · GamePix" }[String(code || "").toLowerCase()] || platformName(code));
   const scoreText = (row) => (row.best_score == null ? "—" : `${num(row.best_score)}${row.best_level ? ` · Lv ${row.best_level}` : ""}`);
   // Where the player last played (the server: the latest stored run's platform; CrazyGames sign-ins are always that portal).
   const platformOf = (row) => platformName(row.provider === "crazygames" ? "web_crazygames" : row.platform);
@@ -23,6 +25,7 @@
     return `<tr${row.banned ? ' class="is-dim"' : ""}>
       <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a><span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
       <td data-label="플랫폼">${esc(platformOf(row))}</td>
+      <td data-label="스토어 국가">${esc(countryName(row.store_country))}</td>
       <td data-label="가입">${esc(time(row.created_at))}</td>
       <td data-label="마지막 접속">${esc(time(row.last_seen_at))}</td>
       <td data-label="최고 점수" class="tk-num">${esc(scoreText(row))}</td>
@@ -34,14 +37,14 @@
   async function loadList(page = 1, quiet = false) {
     if (!quiet) T.setMessage("tenkeyPlayersMessage", "플레이어를 불러오는 중입니다...");
     try {
-      const result = await T.call("players.list", { query: state.query, platform: state.platform || undefined, sort: state.sort, direction: state.direction, page });
+      const result = await T.call("players.list", { query: state.query, platform: state.platform || undefined, country: state.country || undefined, sort: state.sort, direction: state.direction, page });
       const data = result.data;
       pager.st.page = page;
       pager.st.total = Number(data.total || 0);
       byId("tenkeyPlayerTotal").textContent = `${num(data.total)}명`;
       byId("tenkeyPlayersTable").innerHTML = (data.rows || []).length
         ? data.rows.map(rowMarkup).join("")
-        : '<tr><td colspan="8" class="empty-panel">조건에 맞는 플레이어가 없습니다.</td></tr>';
+        : '<tr><td colspan="9" class="empty-panel">조건에 맞는 플레이어가 없습니다.</td></tr>';
       pager.draw();
       const at = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       T.setMessage("tenkeyPlayersMessage", `${at} 기준 · 20초마다 자동으로 새로 불러옵니다. 마지막 접속은 기록을 보내거나 앱이 계정을 확인한 때입니다. 6개월(183일) 오지 않은 플레이어는 자동으로 지워집니다.`);
@@ -58,6 +61,7 @@
         event.preventDefault();
         state.query = byId("tenkeyPlayerSearch").value.trim();
         state.platform = byId("tenkeyPlayerPlatform").value;
+        state.country = byId("tenkeyPlayerCountry").value.trim().toUpperCase();
         state.sort = byId("tenkeyPlayerSort").value;
         state.direction = byId("tenkeyPlayerDirection").value;
         loadList(1);
@@ -85,10 +89,28 @@
     ? `<div class="table-scroll"><table><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`
     : `<p class="empty-panel">${esc(empty)}</p>`;
   const boardName = (board) => (board === "all" ? "전체 기간" : `주간 ${String(board).slice(1)}`);
+  const balanceRuns = (runs) => (runs || []).map((r) => {
+    const skills = Array.isArray(r.skills) ? r.skills.map((s) => `${s[0]} Lv${s[1]}`).join(", ") : "—";
+    const reaches = r.lv_ms == null ? "미계측" : Array.isArray(r.lv_ms) && r.lv_ms.length
+      ? r.lv_ms.map((pair) => `Lv${pair[0]} ${duration(pair[1])}`).join(" · ") : "레벨 2 미도달";
+    return `<tr>
+      <td>${esc(time(r.played_at))}</td>
+      <td class="tk-num">${esc(r.level)}</td>
+      <td>${esc(duration(r.time_ms))}</td>
+      <td>${esc(r.cleared ? "클리어" : r.cause || "종료")}</td>
+      <td class="tk-wrap">${esc(skills)}</td>
+      <td class="tk-num">${esc(num(r.charge ?? 0))}</td>
+      <td>${esc(duration(r.drift_ms))}</td>
+      <td>${esc(duration(r.robot_ms))}</td>
+      <td>${esc(r.revive === 2 ? "부활" : r.revive === 1 ? "거절" : "없음")}</td>
+      <td class="tk-wrap">${esc(reaches)}</td></tr>`;
+  });
 
   function detailMarkup(d) {
     const p = d.player;
     const account = d.account || {};
+    const info = d.client_info || {};
+    const retention = d.retention || {};
     const mobile = (d.identities || []).some((i) => i.provider === "supabase");
     const bests = (d.bests || []).map((b) => `<tr><td>${esc(boardName(b.board))}</td><td class="tk-num">${esc(num(b.score))}</td><td class="tk-num">${esc(b.level)}</td><td>${esc(duration(b.time_ms))}</td><td>${esc(time(b.achieved_at))}</td><td class="tk-num">${esc(b.rules)}</td></tr>`);
     const runs = (d.runs || []).map((r) => `<tr${r.flag ? ' class="is-dim"' : ""}><td>${esc(time(r.created_at))}</td><td class="tk-num">${esc(num(r.score))}</td><td class="tk-num">${esc(r.level)}</td><td>${esc(duration(r.time_ms))}</td><td class="tk-num">${esc(num(r.depth))}</td><td class="tk-num">${esc(num(r.scrap))}</td><td class="tk-num">${esc(num(r.combo))}</td><td class="tk-num">${esc(r.skills)}</td><td>${esc(r.cause || "—")}</td><td>${esc(platformName(r.platform))} · ${esc(r.build)}</td><td><span class="tk-badge" data-tone="${r.flag ? "risk" : "good"}">${esc(flagName(r.flag))}</span></td></tr>`);
@@ -102,6 +124,22 @@
         ["전체 기간 순위", d.rank?.all ? `${num(d.rank.all)}위` : "—"], [`이번 주 순위`, d.rank?.week ? `${num(d.rank.week)}위` : "—"],
         ...(mobile ? [["나이대", ageName(account.age_band)], ["약관 버전", account.terms_version || "—"], ["닉네임 변경", `${num(account.rename_count)}회`]] : []),
       ])}
+      <div class="tk-section"><h3>기기 정보 · 지역</h3><p class="tk-sub">최신 기록입니다. 스토어 국가와 기기 지역은 별도 값이며, 수집 전에는 — 로 표시합니다.</p>${facts([
+        ["스토어 국가", countryName(info.store_country)], ["기기 지역", info.device_region || "—"],
+        ["플랫폼", clientPlatformName(info.platform)], ["앱 버전 · 빌드", info.platform ? `${info.app_version || "—"} · ${info.build ?? "—"}` : "—"],
+        ["기기 모델", info.device_model || "—"], ["운영체제", info.os_version || "—"],
+        ["처음 확인", time(info.first_seen_at)], ["마지막 확인", time(info.last_seen_at)],
+      ])}</div>
+      <div class="tk-section"><h3>재방문 · 첫 행동</h3><p class="tk-sub">계정 retention 수집이 시작된 뒤의 값입니다. streak는 오늘 또는 어제까지 이어진 연속 활동일입니다.</p>${facts([
+        ["현재 연속 활동일", retention.current_streak === undefined ? "—" : `${num(retention.current_streak)}일`],
+        ["첫 활동일", retention.first_day || "—"], ["마지막 활동", time(retention.last_seen_at)],
+      ])}${table(["도달한 첫 행동", "기록 시각"], (retention.milestones || []).map((m) => `<tr><td>${esc({
+        game_opened: "게임 열기", name_set: "이름 설정", first_run_started: "첫 판 시작", first_run_ended: "첫 판 종료",
+        run_2: "두 번째 판 시작", tab_tenkey: "10KEY 탭 열기", tab_shop: "상점 탭 열기", tab_modules: "모듈 탭 열기",
+        tab_upgrade: "강화 탭 열기", tab_ranking: "랭킹 탭 열기", first_module: "첫 모듈 보유", first_shop_visit: "첫 상점 방문",
+        first_purchase: "첫 구매", level_30: "Lv 30 도달",
+      }[m.id] || m.id)}</td><td>${esc(time(m.reached_at))}</td></tr>`), "아직 기록된 첫 행동이 없습니다.")}</div>
+      <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "아직 연결된 판 기록이 없습니다.")}</div>
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>
       <div class="tk-section"><h3>보드별 최고 기록</h3>${table(["보드", "점수", "레벨", "시간", "기록 시각", "점수 규칙"], bests, "기록이 없습니다.")}</div>
       <div class="tk-section"><h3>최근 서버 기록 (신기록 판만 남음, 최근 20)</h3>${table(["시각", "점수", "레벨", "시간", "깊이", "부품", "콤보", "스킬", "끝난 이유", "플랫폼 · 빌드", "판정"], runs, "남은 판이 없습니다.")}</div>
@@ -172,8 +210,11 @@
   async function loadDetail(id) {
     T.setMessage("tenkeyPlayerMessage", "플레이어를 불러오는 중입니다...");
     try {
-      const result = await T.call("players.get", { player_id: id });
-      state.detail = result.data;
+      const [result, extra] = await Promise.all([
+        T.call("players.get", { player_id: id }),
+        T.call("players.facts", { player_id: id }),
+      ]);
+      state.detail = { ...result.data, ...extra.data };
       byId("tenkeyPlayerDetail").innerHTML = detailMarkup(state.detail);
       byId("tenkeyBanForm").addEventListener("submit", submitBan);
       byId("tenkeyRenameForm")?.addEventListener("submit", submitRename);
