@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
-  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-account-returns">
+  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-titles">
   <link rel="stylesheet" href="styles.css?v=20261103-cmp">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
@@ -78,13 +78,14 @@
         <a href="#/tenkey-overview" data-page="tenkey-overview"><span class="nav-index">01</span><span class="nav-copy">한눈 요약<small>접속자·신규·플레이</small></span></a>
         <a href="#/tenkey-players" data-page="tenkey-players"><span class="nav-index">02</span><span class="nav-copy">플레이어<small>검색·상세</small></span></a>
         <a href="#/tenkey-retention" data-page="tenkey-retention"><span class="nav-index">03</span><span class="nav-copy">재방문<small>코호트·이탈 징후</small></span></a>
-        <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">04</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
-        <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">05</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
-        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">06</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
-        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">07</span><span class="nav-copy">랭킹<small>보드</small></span></a>
-        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">08</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">09</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
-        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">10</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-titles" data-page="tenkey-titles"><span class="nav-index">04</span><span class="nav-copy">칭호<small>보유자·부여 관리</small></span></a>
+        <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">05</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
+        <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">06</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
+        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">07</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
+        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">08</span><span class="nav-copy">랭킹<small>보드</small></span></a>
+        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">09</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">10</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">11</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -692,6 +693,14 @@
         <p id="tenkeyAuditMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="tenkeyTitlesView" class="route-view" data-route="tenkey-titles" hidden>
+        <p id="tenkeyTitlesMessage" class="dashboard-message" role="status"></p>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER TITLES</p><h2>칭호 보유 현황</h2><small>칭호는 플레이로 해금되거나 운영자가 부여합니다. 판매하지 않습니다. 시즌 칭호는 서버 랭킹 시즌이 끝날 때 확정됩니다.</small></div><span id="tenkeyTitleTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>칭호</th><th>획득 규칙</th><th class="tk-num">보유자</th><th>부여</th></tr></thead><tbody id="tenkeyTitlesTable"></tbody></table></div>
+        </section>
+      </section>
+
       <section id="tenkeyConfigView" class="route-view" data-route="tenkey-config" hidden>
         <p id="tenkeyConfigMessage" class="dashboard-message" role="status"></p>
         <form id="tenkeyConfigForm" class="panel admin-form impact-form impact-form-critical">
@@ -773,8 +782,9 @@
   <script src="operations.js?v=20260909-1"></script>
   <script src="tenkey.js?v=20261103-relogin"></script>
   <script src="tenkey-overview.js?v=20261103-win"></script>
-  <script src="tenkey-players.js?v=20261104-player-data"></script>
+  <script src="tenkey-players.js?v=20261104-titles"></script>
   <script src="tenkey-retention.js?v=20261104-account-returns"></script>
+  <script src="tenkey-titles.js?v=20261104-title"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261025-upd"></script>

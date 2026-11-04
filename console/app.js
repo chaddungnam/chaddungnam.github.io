@@ -35,6 +35,7 @@ const pageTitles = {
   "tenkey-balance": "밸런스",
   "tenkey-config": "강제 업데이트",
   "tenkey-audit": "감사 기록",
+  "tenkey-titles": "칭호",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -57,6 +58,7 @@ const pageDescriptions = {
   "tenkey-balance": "모든 판의 짧은 기록으로 판이 어디서 왜 끝나는지, DRIFT·로봇까지 얼마나 가는지, 어떤 카드를 고르는지 봅니다.",
   "tenkey-config": "Android·iOS 앱에서 이보다 낮은 빌드는 업데이트하기 전까지 게임을 못 하게 막습니다.",
   "tenkey-audit": "10KEY 관리자 변경(공지·정지·업데이트 번호·밸런스)을 누가 언제 왜 했는지 확인합니다.",
+  "tenkey-titles": "서버가 부여한 칭호와 보유자 수를 확인합니다. 개별 플레이어 칭호는 상세 화면에서 관리합니다.",
 };
 
 let currentProjectKey = "";
@@ -103,7 +105,7 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 }
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
-const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|notices|purchases|ranking|balance|config|audit))(?:[/?]|$)/;
+const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|notices|purchases|ranking|balance|config|audit|titles))(?:[/?]|$)/;
 
 // One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
 const PROJECTS = {
@@ -166,6 +168,7 @@ function renderRoute() {
   if (route.page === "tenkey-balance") window.ConsoleTenkey.mountBalance();
   if (route.page === "tenkey-audit") window.ConsoleTenkey.mountAudit();
   if (route.page === "tenkey-config") window.ConsoleTenkey.mountConfig();
+  if (route.page === "tenkey-titles") window.ConsoleTenkey.mountTitles();
 }
 
 function challengeErrorMessage(error) {

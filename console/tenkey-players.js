@@ -106,6 +106,70 @@
       <td class="tk-wrap">${esc(reaches)}</td></tr>`;
   });
 
+  async function loadPlayerTitles(player) {
+    const host = byId("tenkeyPlayerTitles");
+    if (!host || !player?.id) return;
+    host.innerHTML = '<h3>칭호</h3><p class="empty-panel">칭호를 불러오는 중입니다...</p>';
+    try {
+      const [ownedResult, catalog] = await Promise.all([
+        T.call("titles.player", { player_id: player.id }),
+        T.loadTitleCatalog(),
+      ]);
+      const owned = Array.isArray(ownedResult.data) ? ownedResult.data : [];
+      const rows = owned.map((title) => {
+        const info = T.titleInfo(title.id);
+        return `<tr><td><strong>${esc(info.name)}</strong><span class="tk-sub">${esc(title.id)}</span></td><td>${esc(time(title.granted_at))}</td><td>${esc(title.grant_source || "server")}</td><td>${title.equipped ? '<span class="tk-badge" data-tone="good">장착 중</span>' : "—"}</td><td><button class="warning-button" type="button" data-title-revoke="${esc(title.id)}">회수</button></td></tr>`;
+      });
+      const options = catalog.map((title) => `<option value="${esc(title.id)}">${esc(T.titleInfo(title.id).name)}${title.console_only ? " · 운영자 전용" : ""}</option>`).join("");
+      host.innerHTML = `<div class="tk-title-head"><div><h3>칭호</h3><small>플레이어가 가진 칭호를 확인하고 운영 사유를 남겨 부여하거나 회수합니다.</small></div><span class="panel-total">${num(owned.length)}개</span></div>
+        ${rows.length ? `<div class="table-scroll tk-title-owned"><table><thead><tr><th>칭호</th><th>획득 시각</th><th>부여 출처</th><th>상태</th><th>관리</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>` : '<p class="empty-panel">보유한 칭호가 없습니다.</p>'}
+        <form class="admin-form tk-title-grant"><label>부여할 칭호<select name="title_id" required><option value="" selected disabled>칭호 선택</option>${options}</select></label><label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 이벤트 우승 확인"></label><p class="dashboard-message" role="status"></p><button class="warning-button" type="submit">칭호 부여</button></form>`;
+      host.querySelector(".tk-title-grant").addEventListener("submit", submitTitleGrant);
+      host.querySelectorAll("[data-title-revoke]").forEach((button) => button.addEventListener("click", () => revokeTitle(button, player)));
+    } catch (error) {
+      host.innerHTML = '<h3>칭호</h3><p class="empty-panel">칭호 정보를 불러오지 못했습니다. 잠시 후 플레이어 상세를 새로고침해 주세요.</p>';
+      T.report("tenkeyPlayerMessage", error);
+    }
+  }
+
+  async function submitTitleGrant(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const finish = root.ConsoleUiState.beginRequest(form);
+    if (!finish) return;
+    try {
+      if (!form.reportValidity()) return;
+      const player = state.detail?.player;
+      const titleId = form.elements.title_id.value;
+      const reason = form.elements.reason.value.trim();
+      const info = T.titleInfo(titleId);
+      if (!await root.ConsoleApp.confirmChange("칭호 부여", `${player.name || player.id} · ${info.name}\n사유: ${reason}`)) return;
+      const result = await T.call("titles.grant", { player_id: player.id, title_id: titleId, reason }, form);
+      await loadPlayerTitles(player);
+      T.setMessage("tenkeyPlayerMessage", result.data?.granted ? "칭호를 부여했습니다." : "이미 보유한 칭호입니다.");
+    } catch (error) {
+      T.report("tenkeyPlayerMessage", error);
+    } finally {
+      finish();
+    }
+  }
+
+  async function revokeTitle(button, player) {
+    const titleId = button.dataset.titleRevoke;
+    const info = T.titleInfo(titleId);
+    const reason = await T.askReason("칭호 회수", `${player.name || player.id} · ${info.name}\n회수 사유를 감사 기록에 남깁니다.`);
+    if (!reason) return;
+    button.disabled = true;
+    try {
+      await T.call("titles.revoke", { player_id: player.id, title_id: titleId, reason }, button);
+      await loadPlayerTitles(player);
+      T.setMessage("tenkeyPlayerMessage", "칭호를 회수했습니다. 장착 중이었다면 함께 해제했습니다.");
+    } catch (error) {
+      T.report("tenkeyPlayerMessage", error);
+      button.disabled = false;
+    }
+  }
+
   function detailMarkup(d) {
     const p = d.player;
     const account = d.account || {};
@@ -140,6 +204,7 @@
         first_purchase: "첫 구매", level_30: "Lv 30 도달",
       }[m.id] || m.id)}</td><td>${esc(time(m.reached_at))}</td></tr>`), "아직 기록된 첫 행동이 없습니다.")}</div>
       <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "아직 연결된 판 기록이 없습니다.")}</div>
+      <section id="tenkeyPlayerTitles" class="tk-section tk-player-titles"><h3>칭호</h3><p class="empty-panel">칭호를 불러오는 중입니다...</p></section>
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>
       <div class="tk-section"><h3>보드별 최고 기록</h3>${table(["보드", "점수", "레벨", "시간", "기록 시각", "점수 규칙"], bests, "기록이 없습니다.")}</div>
       <div class="tk-section"><h3>최근 서버 기록 (신기록 판만 남음, 최근 20)</h3>${table(["시각", "점수", "레벨", "시간", "깊이", "부품", "콤보", "스킬", "끝난 이유", "플랫폼 · 빌드", "판정"], runs, "남은 판이 없습니다.")}</div>
@@ -218,6 +283,7 @@
       byId("tenkeyPlayerDetail").innerHTML = detailMarkup(state.detail);
       byId("tenkeyBanForm").addEventListener("submit", submitBan);
       byId("tenkeyRenameForm")?.addEventListener("submit", submitRename);
+      await loadPlayerTitles(state.detail.player);
       T.setMessage("tenkeyPlayerMessage", "");
     } catch (error) {
       byId("tenkeyPlayerDetail").innerHTML = "";
