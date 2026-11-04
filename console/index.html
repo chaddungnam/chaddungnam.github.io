@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
-  <link rel="stylesheet" href="../analytics/styles.css?v=20260816-1">
+  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-account-returns">
   <link rel="stylesheet" href="styles.css?v=20261103-cmp">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
@@ -502,6 +502,9 @@
           <button id="tenkeyRetentionRefresh" class="refresh-button" type="button">새로고침</button>
         </form>
         <p class="tk-sub">계정 retention 수집은 개인정보 안내와 서버 스위치가 켜진 뒤 시작됩니다. D1·D3·D7·D14·D30은 첫 활동일 뒤 해당 날짜에 돌아온 계정입니다.</p>
+        <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">RETURNING ACCOUNTS</p><h2>계정 기준 재방문 (웹 포함)</h2><small>지금 바로 보이는 기준: 같은 계정이 다른 날 다시 접속했는지입니다. 웹은 방문마다 기기 번호가 새로 생겨 계정으로만 셉니다. Dn = 첫 접속 n일 뒤 그날 다시 온 계정, "아직" = 그날이 안 지남.</small></div></div>
+          <div id="tenkeyAccountReturnsSummary" class="tk-retention-summary" aria-live="polite"></div>
+          <div id="tenkeyAccountReturns"></div></section>
         <p id="tenkeyRetentionMessage" class="dashboard-message" role="status"></p>
         <div id="tenkeyRetentionSummary" class="tk-retention-summary" aria-live="polite"></div>
         <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">COHORT RETENTION</p><h2>첫 활동 코호트</h2><small>첫 활동일 · 빌드 · 플랫폼 · 스토어 국가별 재방문 계정</small></div></div>
@@ -771,7 +774,7 @@
   <script src="tenkey.js?v=20261103-relogin"></script>
   <script src="tenkey-overview.js?v=20261103-win"></script>
   <script src="tenkey-players.js?v=20261104-player-data"></script>
-  <script src="tenkey-retention.js?v=20261104-retention"></script>
+  <script src="tenkey-retention.js?v=20261104-account-returns"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261025-upd"></script>

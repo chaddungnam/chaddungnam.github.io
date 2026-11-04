@@ -72,6 +72,31 @@
     });
   }
 
+  // Returning players by ACCOUNT on every platform, web included (owner 11-04): the server's active days, ready now.
+  const ORDER = ["web", "android", "ios", "steam", "windows", "linux", "macos", "unknown"];
+  const PLAT_LABEL = { macos: "Mac (개발 테스트)", unknown: "모름" };
+  function accounts(data) {
+    const rows = data.rows || [];
+    const plats = [...new Set(rows.map((row) => row.platform))].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+    const rate = (list, day) => {
+      const ready = list.filter((row) => row[`d${day}_rate`] != null);
+      const people = ready.reduce((n, row) => n + Number(row.players || 0), 0);
+      const back = ready.reduce((n, row) => n + Number(row[`d${day}`] || 0), 0);
+      return people ? `${(back / people * 100).toFixed(1)}%` : "—";
+    };
+    byId("tenkeyAccountReturnsSummary").innerHTML = plats.map((plat) => {
+      const list = rows.filter((row) => row.platform === plat);
+      const people = list.reduce((n, row) => n + Number(row.players || 0), 0);
+      const back = list.reduce((n, row) => n + Number(row.returned || 0), 0);
+      return `<article class="tk-retention-card"><span>${esc(PLAT_LABEL[plat] || platformName(plat))}</span><strong>D1 ${esc(rate(list, 1))} · D7 ${esc(rate(list, 7))}</strong><small>새 계정 ${esc(num(people))}명 · 한 번이라도 다시 온 계정 ${esc(num(back))}명</small></article>`;
+    }).join("");
+    const body = rows.map((row) => `<tr><td>${esc(row.first_day)}</td><td>${esc(PLAT_LABEL[row.platform] || platformName(row.platform))}</td><td class="tk-num">${esc(num(row.players))}</td>
+      ${[1, 3, 7, 14, 30].map((day) => `<td class="tk-num"><strong>${esc(row[`d${day}_rate`] == null ? "—" : `${(Number(row[`d${day}_rate`]) * 100).toFixed(1)}%`)}</strong><small>${esc(row[`d${day}_rate`] == null ? "아직" : `${num(row[`d${day}`])}명`)}</small></td>`).join("")}</tr>`).join("");
+    byId("tenkeyAccountReturns").innerHTML = rows.length
+      ? `<div class="table-scroll"><table><thead><tr><th>첫 접속일</th><th>플랫폼</th><th class="tk-num">새 계정</th><th class="tk-num">D1</th><th class="tk-num">D3</th><th class="tk-num">D7</th><th class="tk-num">D14</th><th class="tk-num">D30</th></tr></thead><tbody>${body}</tbody></table></div>`
+      : '<p class="empty-panel">이 기간에 처음 접속한 계정이 없습니다.</p>';
+  }
+
   function render(data) {
     summary(data);
     cohorts(data);
@@ -83,6 +108,10 @@
     T.setMessage("tenkeyRetentionMessage", "계정 재방문 자료를 불러오는 중입니다...");
     const days = Number(byId("tenkeyRetentionDays").value);
     const buildText = byId("tenkeyRetentionBuild").value.trim();
+    T.call("retention.accounts", { days }).then((result) => accounts(result.data || {})).catch((error) => {
+      byId("tenkeyAccountReturnsSummary").innerHTML = "";
+      byId("tenkeyAccountReturns").innerHTML = `<p class="empty-panel">계정 기준 재방문을 불러오지 못했습니다 (${esc(error && error.message ? error.message : "오류")}).</p>`;
+    });
     try {
       const result = await T.call("retention.get", { days, build: buildText || undefined });
       state.data = result.data || {};
