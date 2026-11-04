@@ -7,8 +7,8 @@ const { test, expect } = require("@playwright/test");
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
 
 for (const [url, words] of Object.entries({
-  "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요", paid: "유료 · 인앱 구매 있음", go: "사전예약하러 가기", odds: "odds/", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
-  "/10key/index_en.html?lang=en": { preview: "Play the demo on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play the demo on itch.io", popup: "Pre-register and you can play the demo (up to level 15) on itch.io", paid: "Paid app · In-app purchases", go: "Go to pre-registration", odds: "odds/#en", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
+  "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요", paid: "유료 · 인앱 구매 있음", go: "사전예약하러 가기", odds: "odds/ko.html", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
+  "/10key/index_en.html?lang=en": { preview: "Play the demo on itch.io", perk: "Pre-registration perk", gate: "Pre-register to play the demo on itch.io", popup: "Pre-register and you can play the demo (up to level 15) on itch.io", paid: "Paid app · In-app purchases", go: "Go to pre-registration", odds: "odds/en.html", submit: "Pre-register", ok: "You are pre-registered!", invalid: "Please check your email address", consent: "Please tick the consent box" },
 })) {
   test(`pre-registration is visible at once and signs up, itch.io is the free preview, the odds are text (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
@@ -50,8 +50,7 @@ for (const [url, words] of Object.entries({
     await expect(card.locator("input[name=email]")).toBeFocused();
     await expect(page).toHaveURL(/#prereg$/);
     await expect(page.locator(".tk-hero .tk-key, .tk-hero .tk-preview")).toHaveCount(2);
-    await expect(page.locator(".tk-odds-table tbody tr")).toHaveCount(12);
-    await expect(page.locator(".tk-odds-table tbody")).toContainText("8.333%");
+    await expect(page.locator(".tk-odds-table")).toHaveCount(0);
     await expect(page.locator(`#odds-info a[href='${words.odds}']`)).toHaveCount(1);
 
     await card.locator("input[name=email]").fill("not-an-email");
@@ -302,5 +301,26 @@ for (const l of ["de", "ja", "zh"]) {
   test(`old link index_en.html?lang=${l} moves to the ${l} page`, async ({ page }) => {
     await page.goto(`/10key/index_en.html?lang=${l}#prereg`);
     await expect(page).toHaveURL(new RegExp(`/10key/index_${l}[.]html[?]lang=${l}#prereg$`));
+  });
+}
+
+
+for (const [url, lang] of Object.entries({
+  "/10key/odds/ko.html": "ko",
+  "/10key/odds/en.html": "en",
+  "/10key/odds/ja.html": "ja",
+  "/10key/odds/de.html": "de",
+  "/10key/odds/zh.html": "zh-Hant",
+})) {
+  test(`localized odds page stays in sync with the client (${url})`, async ({ page }) => {
+    await page.goto(url);
+    await expect(page.locator("html")).toHaveAttribute("lang", lang);
+    await expect(page.locator(".legal-date")).toContainText("1.0.0");
+    await expect(page.locator("[data-box='basic'] tbody tr")).toHaveCount(7);
+    await expect(page.locator("[data-box='rare'] tbody tr")).toHaveCount(5);
+    await expect(page.locator("[data-box='basic']")).toContainText("0.07%");
+    await expect(page.locator("[data-box='basic']")).toContainText("60.00%");
+    await expect(page.locator("[data-box='basic']")).toContainText("25.43%");
+    await expect(page.locator("[data-box='rare']")).toContainText("62%");
   });
 }

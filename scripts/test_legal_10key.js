@@ -248,8 +248,7 @@ test("section 13 covers the 10key Survival launch pre-registration in every lang
 // 2026-10-31 (owner: "홈페이지 확률정보랑 이용약관 개인정보 처리방침 최신화"): section 13 says what the game does today in every
 // language: server-kept progress and the run ticket for guest accounts, the age question at the first SHOP visit, the
 // Google / Apple link, problem reports (7 days), the ROBOT PACK record (no Revive Pass row), the GamePix web version
-// (nothing sent to House Duck, the GamePix policy linked); the odds page keeps the current 12-module table and announces
-// the 24-module fragment draw before it takes effect.
+// (nothing sent to House Duck, the GamePix policy linked); localized odds pages mirror the current client popup.
 test("section 13 covers server-kept progress, problem reports, the ROBOT PACK and GamePix in every language", () => {
   const words = {
     en: ["<td>Run tickets</td>", "<td>Problem reports</td>", "<td>ROBOT PACK</td>", "<h3>Web version on GamePix</h3>", "Starting a run needs an internet connection",
@@ -268,42 +267,26 @@ test("section 13 covers server-kept progress, problem reports, the ROBOT PACK an
   }
 });
 
-test("the odds page keeps the current 12-module table and announces the 24-module fragment draw", () => {
+test("the odds chooser links every localized odds page", () => {
   const html = read("10key/odds/index.html");
-  const ko = html.slice(html.indexOf('<h2 id="ko">'), html.indexOf('<h2 id="en">'));
-  const en = html.slice(html.indexOf('<h2 id="en">'));
-  for (const [lang, part, next] of [["ko", ko, '<h3 id="ko-next">'], ["en", en, '<h3 id="en-next">']]) {
-    const cut = part.indexOf(next);
-    assert.ok(cut > 0, `${lang}: announced-change section`);
-    const now = part.slice(0, cut);
-    const later = part.slice(cut);
-    assert.equal((now.match(/8\.333% \(1\/12\)/g) || []).length, 12, `${lang}: the current table has 12 rows at 1/12`);
-    assert.equal((later.match(/4\.166% \(1\/24\)/g) || []).length, 24, `${lang}: the announced table has 24 rows at 1/24`);
-    assert.match(text(later), lang === "ko" ? /모듈 조각 5개/ : /5 module fragments/, `${lang}: 5 fragments a draw`);
-    assert.match(text(later), lang === "ko" ? /2개 \/ 3개 \/ 5개 \/ 8개/ : /2 \/ 3 \/ 5 \/ 8/, `${lang}: the grade ladder`);
-    assert.match(text(later), lang === "ko" ? /부품 24개/ : /24 scrap/, `${lang}: scrap per fragment after UR`);
-    assert.match(text(later), lang === "ko" ? /보석 30개\(1회\), 보석 300개\(10회\)/ : /30 gems \(1 draw\), 300 gems \(10 draws\)/, `${lang}: same price`);
-    assert.ok(cut < part.indexOf(lang === "ko" ? "<h3>변경 안내</h3>" : "<h3>Changes</h3>"), `${lang}: announced before the changes rule`);
+  for (const locale of ["ko", "en", "ja", "de", "zh"]) {
+    assert.ok(html.includes(`href="${locale}.html"`), `${locale}: language link`);
   }
-  for (const name of ["Graphics Card", "Soldering Iron", "그래픽카드", "납땜 인두"]) assert.ok(html.includes(`<td>${name}</td>`), `odds page names ${name}`);
-  assert.match(html, /datetime="2026-11-02"/, "odds page: last updated 2026-11-02");
+  assert.doesNotMatch(html, /<table\b/, "the chooser has no inline legacy odds table");
 });
 
-// 2026-11-02 (owner, game decision (86)): module unboxing odds as the game's ModuleBoxData.ODDS. Basic box: fragments 60,
-// N 25.43, R 9.5, SR 3, SSR 2, UR 0.07 %; rare box: R 62, SR 25, SSR 12, UR 1 % (was SSR 97 / UR 3); 30 / 90 gems a box.
-test("the odds page lists the module unboxing odds of both boxes", () => {
-  const html = read("10key/odds/index.html");
-  for (const id of ["ko-boxes", "en-boxes"]) {
-    const start = html.indexOf(`<h3 id="${id}">`);
-    assert.ok(start > 0, `${id}: box section`);
-    const part = html.slice(start, html.indexOf("</table>", start));
-    const rows = [...part.matchAll(/<tr><td>(?:<strong>)?[^<]+(?:<\/strong>)?<\/td><td>(?:<strong>)?([^<]+)(?:<\/strong>)?<\/td><td>(?:<strong>)?([^<]+)(?:<\/strong>)?<\/td><\/tr>/g)]
-      .map((m) => [m[1], m[2]]);
-    assert.deepEqual(rows, [["60%", "—"], ["25.43%", "—"], ["9.5%", "62%"], ["3%", "25%"], ["2%", "12%"], ["0.07%", "1%"], ["100%", "100%"]], `${id}: headline odds`);
-    assert.match(text(part), id === "ko-boxes" ? /보석 30개/ : /30 gems/, `${id}: basic price`);
-    assert.match(text(part), id === "ko-boxes" ? /보석 90개/ : /90 gems/, `${id}: rare price`);
+test("the localized odds pages list the current module box odds", () => {
+  for (const [file, lang] of [["ko", "ko"], ["en", "en"], ["ja", "ja"], ["de", "de"], ["zh", "zh-Hant"]]) {
+    const html = read(`10key/odds/${file}.html`);
+    assert.ok(html.includes(`<html lang="${lang}"`), `${file}: page language`);
+    assert.match(html, /data-box="basic" data-odds-sum="100"/);
+    assert.match(html, /data-box="rare" data-odds-sum="100"/);
+    const content = text(html);
+    for (const odds of ["60.00%", "25.43%", "9.50%", "3.00%", "2.00%", "0.07%", "62%", "25%", "12%", "1%", "100.00%"])
+      assert.ok(content.includes(odds), `${file}: ${odds}`);
+    assert.ok(content.includes("4.167%"));
+    assert.match(content, /1.0.0/);
   }
-  assert.doesNotMatch(html, /97%|SSR 97|UR 3%/, "no old rare box odds");
 });
 
 // 2026-11-01 (owner): CrazyGames is dropped for good. Section 13 and the terms (outside the dated revision history) name no

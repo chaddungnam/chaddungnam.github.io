@@ -246,7 +246,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(tenkey.includes(`<h2 class="hd-title" id="tenkey-title">${l.tenkeyTitle}</h2>`), `${file} section title is the game`);
   assert.ok(tenkey.includes(`hd-chip hd-chip-status">${copy[2]}<`), `${file} status chip says ${copy[2]}`);
   assert.ok(tenkey.includes(`<p class="hd-tk-pitch">${copy[5]}</p>`), `${file} the store subtitle is the pitch`);
-  const odds = lang === "ko" ? "10key/odds/" : "10key/odds/#en";
+  const odds = `10key/odds/${lang}.html`;  // one odds page per language from the game's own odds (owner 11-04)
   assert.deepEqual([...tenkey.matchAll(/<a\b[^>]*>/g)].map((match) => match[0]), [
     `<a class="hd-keycap-cta hd-tk-prereg" href="${l.tenkeyHref}#prereg" data-pressable>`,
     `<a class="hd-tk-preview" href="${l.tenkeyHref}#itch-demo">`,
@@ -257,7 +257,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(tenkey.includes(`<span class="hd-tk-play-icon" aria-hidden="true"></span>${copy[7]}</a>`), `${file} the itch.io link is labelled ${copy[7]}`);
   assert.ok(tenkey.includes(`">${l.more}</a>`), `${file} the 10key page link is labelled ${l.more}`);
   assert.equal((tenkey.match(/<p class="hd-tk-note">[^<]+<\/p>/g) || []).length, 2, `${file} a short note under each button`);
-  assert.match(tenkey, /<p class="hd-tk-fine">[^<]*8[.,]333[^<]*<a /, `${file} states the module odds as text`);
+  assert.match(tenkey, /<p class="hd-tk-fine">[^<]*<a href="10key\/odds\/[a-z]{2}\.html">/, `${file} links the module odds page (no copied odds, owner 11-04)`);
+  assert.doesNotMatch(tenkey, /8[.,]333|1\/12/, `${file} no legacy odds numbers`);
   assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop`);
   const video = tenkey.match(/<video\b[^>]*>/)[0];
   for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/tenkey-gameplay-poster.webp"', `aria-label="${l.videoLabel}"`]) assert.ok(video.includes(attribute), `${file} gameplay video needs ${attribute.trim()}`);

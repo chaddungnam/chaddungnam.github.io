@@ -90,11 +90,11 @@ TEXT = {
     "코드를 입력해 NUM LOCK 철창에서 탈출": (
         "Type the code to escape the NUM LOCK cage", "Den Code eingeben und aus dem NUM-LOCK-Käfig ausbrechen", "コードを入力してNUM LOCKの檻から脱出"),
     "황금 피버: 점수 2배": ("Golden Fever: double score", "Golden Fever: doppelte Punkte", "ゴールデンフィーバー：スコア2倍"),
-    "iOS·Android 앱 출시 준비 중: 유료 앱, 앱 내 구매 포함. 확률형 아이템(모듈 뽑기) 포함: 모듈 12종, 각 8.333%(1/12).": (
-        "iOS and Android apps coming soon: paid apps with in-app purchases. Includes random items (module draws): 12 modules, 8.333% (1/12) each.",
-        "iOS- und Android-Apps bald verfügbar: Bezahl-Apps mit In-App-Käufen. Enthält Zufallsobjekte (Modulziehung): 12 Module, je 8,333 % (1/12).",
-        "iOS・Android版は近日配信予定（有料アプリ・アプリ内課金あり）。確率型アイテム（モジュールの抽選）を含みます：モジュール12種、各8.333%（1/12）。"),
-    "확률 정보": ("Odds", "Wahrscheinlichkeiten (auf Englisch)", "確率情報（英語）"),
+    "iOS·Android 앱 출시 준비 중: 유료 앱, 앱 내 구매 포함. 확률형 아이템(모듈 뽑기) 포함:": (
+        "iOS and Android apps coming soon: paid apps with in-app purchases. Includes random items (module draws):",
+        "iOS- und Android-Apps bald verfügbar: Bezahl-Apps mit In-App-Käufen. Enthält Zufallsobjekte (Modulziehung):",
+        "iOS・Android版は近日配信予定（有料アプリ・アプリ内課金あり）。確率型アイテム（モジュールの抽選）を含みます："),
+    "확률 정보": ("Odds", "Wahrscheinlichkeiten", "確率情報"),
     "딸깍 서바이벌 실제 플레이": ("10key Survival gameplay", "10key Survival Gameplay", "10key Survivalのプレイ"),
     "출시작": ("Out now", "Erschienen", "配信中"),
     "버전": ("Version", "Version", "バージョン"),
@@ -173,7 +173,8 @@ def translate_main(main, lang, badges):
     main = main.replace('href="10key/"', f'href="{tenkey}"')
     main = main.replace('href="10key/#prereg"', f'href="{tenkey}#prereg"')  # the pre-registration form, English page
     main = main.replace('href="10key/#itch-demo"', f'href="{tenkey}#itch-demo"')  # the itch.io demo slot: a pre-registration popup (owner 11-03)
-    main = main.replace('href="10key/odds/"', 'href="10key/odds/#en"')  # one page, Korean then English
+    # the odds: one page per language generated from the game's own odds (owner 11-04, 10key tools/gen_odds_page.py)
+    main = main.replace('href="10key/odds/ko.html"', f'href="10key/odds/{lang}.html"')
     main = re.sub(r'(assets/media/tenkey-itch/shot-[a-z]+)-ko\.webp', rf'\1-{lang}.webp', main)  # the store screenshots exist per language
     main = main.replace('href="quirky-ball/privacy/delete_ko.html"', f'href="quirky-ball/privacy/delete_{lang}.html"')
     main = main.replace('href="privacy/ko.html"', f'href="privacy/{lang}.html"')
