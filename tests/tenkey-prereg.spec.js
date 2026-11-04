@@ -231,7 +231,7 @@ test("the cancel link page works in German and Japanese", async ({ page }) => {
 
 // The in-game "get launch alerts" buttons (itch build) open these addresses: each lands on the form, and the de/ja ones
 // keep the mail language. #itch-demo (the home's demo buttons) opens the popup before sign-up.
-for (const [url, locale] of Object.entries({ "/10key/?lang=ko#prereg": "ko", "/10key/index_en.html#prereg": "en", "/10key/index_en.html?lang=de#prereg": "de", "/10key/index_en.html?lang=ja#prereg": "ja" })) {
+for (const [url, locale] of Object.entries({ "/10key/?lang=ko#prereg": "ko", "/10key/index_en.html#prereg": "en", "/10key/index_en.html?lang=de#prereg": "de", "/10key/index_en.html?lang=ja#prereg": "ja", "/10key/index_de.html#prereg": "de", "/10key/index_ja.html#prereg": "ja" })) {
   test(`the game's launch-alert address lands on the form (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
     await page.goto(url);
@@ -240,7 +240,7 @@ for (const [url, locale] of Object.entries({ "/10key/?lang=ko#prereg": "ko", "/1
   });
 }
 
-for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io 데모는 사전예약 특전이에요", "/10key/index_en.html#itch-demo": "The itch.io demo is a pre-registration perk", "/10key/index_en.html?lang=de#itch-demo": "Die itch.io-Demo gibt es mit der Vorregistrierung", "/10key/index_en.html?lang=ja#itch-demo": "itch.ioのデモは事前登録の特典です" })) {
+for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io 데모는 사전예약 특전이에요", "/10key/index_en.html#itch-demo": "The itch.io demo is a pre-registration perk", "/10key/index_en.html?lang=de#itch-demo": "Die itch.io-Demo gibt es mit der Vorregistrierung", "/10key/index_en.html?lang=ja#itch-demo": "itch.ioのデモは事前登録の特典です", "/10key/index_de.html#itch-demo": "Die itch.io-Demo gibt es mit der Vorregistrierung", "/10key/index_ja.html#itch-demo": "itch.ioのデモは事前登録の特典です" })) {
   test(`the home's demo button opens the pre-registration popup in the visitor's language (${url})`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
     await page.goto(url);
@@ -249,5 +249,23 @@ for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io
     await expect(popup).toContainText(text);
     await expect(popup.locator("a[href*='itch.io']")).toHaveCount(0);
     await expect(popup.locator(".tk-gate-paid")).toContainText(/유료|paid|kostenpflichtig|有料/i);
+  });
+}
+
+// German and Japanese pre-registration pages (owner 2026-11-04): the form posts the page language, the consent bar speaks it.
+for (const [url, locale, bar] of [["/10key/index_de.html", "de", "Google-Ads-Messcookie"], ["/10key/index_ja.html", "ja", "Google広告の測定用Cookie"]]) {
+  test(`${url} signs up in ${locale} and shows the consent bar in ${locale}`, async ({ page }) => {
+    let body = null;
+    await page.route(FN, (route) => { body = JSON.parse(route.request().postData() || "{}"); return route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }); });
+    await page.goto(url);
+    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.locator(".tk-adsbar")).toContainText(bar);
+    await page.locator(".tk-adsbar-no").click();
+    await page.fill("#prereg input[name=email]", "test@example.com");
+    await page.check("#prereg input[name=consent]");
+    await page.click("#prereg button[type=submit]");
+    await expect(page.locator("[data-itch-unlock]").first()).toBeVisible();
+    expect(body.locale).toBe(locale);
+    await expect(page.locator(".tk-lang a[aria-current=page]")).toHaveText(locale.toUpperCase());
   });
 }
