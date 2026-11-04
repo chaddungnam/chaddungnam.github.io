@@ -856,3 +856,19 @@ body > .legal-hero { display: block; padding: 0; }
   .legal-tools, .legal-toc { display: none !important; }
   .legal-update { border-color: #777; color: #000; background: #fff; }
 }
+
+/* Summary box and folded sections (owner 2026-11-04: simpler, cleaner legal pages) */
+.legal-summary { margin: 0 0 28px; padding: 18px 22px; background: var(--legal-cream); border: 1px solid var(--legal-line); border-left: 4px solid var(--legal-teal); border-radius: 10px; }
+.legal-summary-title { margin: 0 0 6px; font-weight: 800; font-size: .95rem; letter-spacing: .02em; color: var(--legal-navy); }
+.legal-summary ul { margin: 0; padding-left: 1.1em; }
+.legal-summary li { margin: 2px 0; }
+.legal-fold { margin: 10px 0; border: 1px solid var(--legal-line); border-radius: 10px; background: var(--legal-paper); }
+.legal-fold > summary { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; list-style: none; font-weight: 700; }
+.legal-fold > summary::-webkit-details-marker { display: none; }
+.legal-fold > summary::before { content: "+"; flex: 0 0 auto; width: 22px; height: 22px; line-height: 20px; text-align: center; border: 1px solid var(--legal-line); border-radius: 50%; font-weight: 800; color: var(--legal-teal); }
+.legal-fold[open] > summary::before { content: "−"; }
+.legal-fold > summary h3 { margin: 0; font-size: 1rem; }
+.legal-fold-body { padding: 0 18px 8px; }
+.legal-fold-body > :first-child { margin-top: 0; }
+.legal-history > summary { font-size: .9rem; color: var(--legal-muted); }
+@media print { .legal-fold > summary::before { display: none; } }

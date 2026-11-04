@@ -98,4 +98,21 @@
       init(root.document);
     }
   }
+
+  // Folded sections (details.legal-fold): open the one that holds the linked anchor, and open all for printing.
+  function openFoldForHash(documentRef) {
+    var id = decodeURIComponent((documentRef.location && documentRef.location.hash || "").slice(1));
+    if (!id) return;
+    var target = documentRef.getElementById(id);
+    var fold = target && (target.matches && target.matches("details") ? target : target.closest && target.closest("details"));
+    while (fold) { fold.open = true; fold = fold.parentElement && fold.parentElement.closest("details"); }
+    if (target && target.scrollIntoView) target.scrollIntoView();
+  }
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", function () { openFoldForHash(document); });
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", function () { openFoldForHash(document); });
+      window.addEventListener("beforeprint", function () { document.querySelectorAll("details.legal-fold").forEach(function (d) { d.open = true; }); });
+    }
+  }
 })(typeof window !== "undefined" ? window : null);
