@@ -269,3 +269,14 @@ for (const [url, locale, bar] of [["/10key/index_de.html", "de", "Google-Ads-Mes
     await expect(page.locator(".tk-lang a[aria-current=page]")).toHaveText(locale.toUpperCase());
   });
 }
+
+// QA 11-04: the Japanese and German pages fit a 390px phone (the screenshot strip scrolls on its own).
+for (const url of ["/10key/index_ja.html", "/10key/index_de.html", "/10key/index_en.html", "/10key/?lang=ko"]) {
+  test(`${url} has no text running off a 390px screen`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+    await page.goto(url);
+    const off = await page.evaluate(() => [...document.querySelectorAll("main *")].filter((e) => !e.closest(".tk-shots") && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > innerWidth + 1).map((e) => e.tagName + " " + (e.textContent || "").slice(0, 30)));
+    expect(off).toEqual([]);
+  });
+}

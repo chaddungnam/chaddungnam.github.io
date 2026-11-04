@@ -366,3 +366,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-adsbar-yes { border: 0; border-bottom: 3px solid var(--tk-key-side); background: var(--tk-duck); color: #141318; }
 .tk-footer-links button[data-ads-settings] { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 @media (max-width: 560px) { .tk-adsbar { flex-direction: column; align-items: stretch; } .tk-adsbar-actions button { flex: 1; } }
+
+/* Japanese page (owner 2026-11-04): keep-all never breaks Japanese (no spaces between words), so on index_ja.html every
+   block lets the browser break lines the Japanese way. Korean keeps keep-all. */
+.tk-page:lang(ja) *, .tk-page:lang(ja) { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
