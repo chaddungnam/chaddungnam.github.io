@@ -393,9 +393,9 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
    description images and the store screenshots. It is a paid app, so the big gold key is the pre-registration (the form on
    /10key/#prereg); the browser build on itch.io is the outlined secondary "free preview" ---------- */
 .hd-tenkey {
-  --hd-hand-off: #141318; /* home-desk.js fades the zoomed screen to this colour, so the hand-off has no light flash */
-  --tk-bg: #141318;
-  --tk-bg-2: #1d1d23;
+  --hd-hand-off: #141414; /* home-desk.js fades the zoomed screen to this colour, so the hand-off has no light flash */
+  --tk-bg: #141414;
+  --tk-bg-2: #1d1d1d;
   --tk-ink: #ece6d6;
   --tk-ink-2: rgba(236, 230, 214, .72);
   --tk-ink-3: rgba(236, 230, 214, .5);
@@ -408,7 +408,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
   margin-top: -50vh; /* rises over the hero's last stretch, while the zoomed screen fades to this colour, so no blank screen sits between them */
   padding: clamp(72px, 9vw, 128px) 0 clamp(72px, 9vw, 120px);
   color: var(--tk-ink);
-  background: linear-gradient(to bottom, rgba(20, 19, 24, 0), var(--tk-bg) 240px);
+  background: linear-gradient(to bottom, rgba(20, 20, 20, 0), var(--tk-bg) 240px);
   isolation: isolate;
 }
 
@@ -421,7 +421,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
   z-index: -1;
   height: 1080px;
   content: "";
-  background: url("media/tenkey-itch/bg.webp") center top / max(1920px, 100%) auto no-repeat;
+  background: url("media/tenkey-itch/bg-n.webp") center top / max(1920px, 100%) auto no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 220px);
   mask-image: linear-gradient(to bottom, transparent, #000 220px);
   pointer-events: none;
@@ -449,7 +449,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-tk-prereg.hd-keycap-cta {
   --btn: var(--tk-gold);
   --btn-side: #a9820f;
-  --btn-ink: #141318;
+  --btn-ink: #141414;
   --btn-depth: 8px;
   min-height: 72px;
   border-radius: 16px;
@@ -510,7 +510,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
   background: #0e1020;
   box-shadow:
     inset 0 0 0 1.5px #3a3d55,
-    inset 0 0 0 5px #0b0c19,
+    inset 0 0 0 5px #0c0c0c,
     0 2px 2px rgba(255, 255, 255, .3),
     var(--hd-shadow-float);
 }
@@ -661,7 +661,7 @@ body[data-hd-motion="full"] .hd-qb-logo:not(.is-in) .hd-qb-piece { opacity: 0; }
 .hd-farewell::before { position: absolute; inset: 0; content: ""; background: radial-gradient(50% 60% at 30% 50%, rgba(42, 79, 196, .2), transparent 70%); pointer-events: none; }
 .hd-farewell-inner { position: relative; display: grid; grid-template-columns: auto minmax(0, 560px); justify-content: center; align-items: center; gap: clamp(40px, 7vw, 112px); }
 .hd-farewell-phone .hd-phone { width: clamp(220px, 20vw, 270px); }
-.hd-farewell-phone .hd-phone-shell { box-shadow: inset 0 0 0 1.5px #3a3d55, inset 0 0 0 5px #0b0c19, 0 0 0 1px rgba(255, 255, 255, .06), 0 30px 80px rgba(0, 0, 0, .5); }
+.hd-farewell-phone .hd-phone-shell { box-shadow: inset 0 0 0 1.5px #3a3d55, inset 0 0 0 5px #0c0c0c, 0 0 0 1px rgba(255, 255, 255, .06), 0 30px 80px rgba(0, 0, 0, .5); }
 .hd-farewell-text { max-width: 36ch; }
 .hd-farewell-name { margin-bottom: 14px; color: rgba(255, 255, 255, .55); text-transform: none; letter-spacing: .06em; font-size: 12.5px; }
 .hd-farewell-line { margin: 0; font-size: clamp(1.8rem, 3.4vw, 2.9rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.35; word-break: keep-all; }
@@ -723,7 +723,7 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
 
 @media (max-width: 860px) {
   .hd-tenkey { margin-top: -36vh; padding-top: 64px; }
-  .hd-tenkey::before { top: 120px; height: 540px; background-image: url("media/tenkey-itch/bg-960.webp"); background-size: 960px auto; }
+  .hd-tenkey::before { top: 120px; height: 540px; background-image: url("media/tenkey-itch/bg-n-960.webp"); background-size: 960px auto; }
   .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
   .hd-tk-screen-frame { width: min(72vw, 320px); }
   .hd-tk-features { grid-template-columns: minmax(0, 1fr); }
