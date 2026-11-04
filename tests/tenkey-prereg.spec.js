@@ -68,7 +68,7 @@ for (const [url, words] of Object.entries({
     expect(posts).toHaveLength(1);
     expect(posts[0].type).toContain("text/plain");
     const sent = JSON.parse(posts[0].body);
-    expect(sent).toMatchObject({ v: 1, action: "signup", email: "player@example.com", locale: url.includes("ko") ? "ko" : "en", consent: "2026-10-30", hp: "" });
+    expect(sent).toMatchObject({ v: 1, action: "signup", email: "player@example.com", locale: url.includes("ko") ? "ko" : "en", consent: "2026-11-04", hp: "" });
     await expect(card.locator("input[name=email]")).toBeHidden();
     // after sign-up the itch.io link shows, the gated links open itch.io, and this browser remembers it
     await expect(preview).toBeVisible();
