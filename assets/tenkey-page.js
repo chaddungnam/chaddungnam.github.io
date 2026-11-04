@@ -126,15 +126,17 @@
     try { msgs = JSON.parse(box.getAttribute("data-msgs") || "{}"); } catch (_error) { msgs = {}; }
     var sending = false;
     var mailLocale = (function () {
-      var ok = { ko: 1, en: 1, de: 1, ja: 1 };
+      var ok = { ko: 1, en: 1, de: 1, ja: 1, zh: 1 };
       var fromUrl = null;
       var saved = null;
       try { fromUrl = new URLSearchParams(location.search).get("lang"); } catch (_error) { fromUrl = null; }
       try { saved = window.localStorage.getItem("house_duck_site_language"); } catch (_error) { saved = null; }
       var pageLocale = box.getAttribute("data-locale") || "en";
       if (fromUrl && ok[fromUrl]) return fromUrl;
-      // A saved ko/en that disagrees with this page means the visitor switched pages on purpose: follow the page.
-      if (saved === "de" || saved === "ja") return pageLocale === "ko" ? "ko" : saved;
+      // The de/ja/zh pages (owner 2026-11-04) and the ko page always mail in their own language.
+      if (pageLocale !== "en") return pageLocale;
+      // On the English page a saved de/ja/zh choice still wins (the visitor picked it on the site).
+      if (saved === "de" || saved === "ja" || saved === "zh") return saved;
       return pageLocale;
     })();
 
@@ -208,6 +210,7 @@
       ko: { title: "itch.io 데모는 사전예약 특전이에요", body: "사전예약을 하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. 이메일만 남기면 플레이 링크가 바로 떠요.", go: "사전예약하러 가기", close: "닫기", paid: "정식판은 유료 앱이고 인앱 구매가 있어요. itch.io 데모는 무료예요." },
       en: { title: "The itch.io demo is a pre-registration perk", body: "Pre-register and you can play the demo (up to level 15) on itch.io. Leave your email and the play link appears right away.", go: "Go to pre-registration", close: "Close", paid: "The full game is a paid app with in-app purchases. The itch.io demo is free." },
       de: { title: "Die itch.io-Demo gibt es mit der Vorregistrierung", body: "Wenn du dich vorregistrierst, kannst du die Demo (bis Level 15) auf itch.io spielen. Gib deine E-Mail-Adresse ein, dann erscheint sofort der Link zum Spielen.", go: "Zur Vorregistrierung", close: "Schließen", paid: "Die Vollversion ist eine kostenpflichtige App mit In-App-Käufen. Die itch.io-Demo ist kostenlos." },
+      zh: { title: "itch.io 試玩版是事前預約特典", body: "完成事前預約，就能在 itch.io 試玩（最多到第 15 關）。留下電子郵件，遊玩連結馬上出現。", go: "前往事前預約", close: "關閉", paid: "正式版是付費 App，含 App 內購買。itch.io 試玩版免費。" },
       ja: { title: "itch.ioのデモは事前登録の特典です", body: "事前登録すると、itch.ioでデモ（レベル15まで）をプレイできます。メールアドレスを登録すると、すぐにプレイリンクが表示されます。", go: "事前登録へ進む", close: "閉じる", paid: "製品版は有料アプリ（アプリ内課金あり）です。itch.ioのデモは無料です。" }
     };
     var gate = null;

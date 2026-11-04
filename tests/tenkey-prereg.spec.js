@@ -143,20 +143,20 @@ test("download link page waits for launch and points to pre-registration", async
 });
 
 // Mail language follows the House Duck page language (owner 2026-10-30): the de/ja home links carry ?lang=de|ja.
-for (const [home, locale] of Object.entries({ "/index_de.html?lang=de": "de", "/index_ja.html?lang=ja": "ja" })) {
+for (const [home, locale, ok] of [["/index_de.html?lang=de", "de", "Du bist vorregistriert!"], ["/index_ja.html?lang=ja", "ja", "事前登録が完了しました！"]]) {
   test(`the ${locale} home sends visitors to the form with ?lang=${locale} and the sign-up asks for ${locale} mail`, async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
     const posts = [];
     await page.route(FN, (route) => { posts.push(JSON.parse(route.request().postData())); route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }); });
     await page.goto(home);
     const key = page.locator("#games a.hd-tk-prereg");
-    await expect(key).toHaveAttribute("href", new RegExp(`lang=${locale}#prereg$`));
-    await page.goto(`/10key/index_en.html?lang=${locale}#prereg`);
+    await expect(key).toHaveAttribute("href", `10key/index_${locale}.html?lang=${locale}#prereg`);
+    await page.goto(`/10key/index_en.html?lang=${locale}#prereg`); // old link: moves to the ${locale} page (owner 2026-11-04)
     const card = page.locator("#prereg");
     await card.locator("input[name=email]").fill("player@example.com");
     await card.locator("input[name=consent]").check();
     await card.locator("button[type=submit]").click();
-    await expect(card.locator("[data-prereg-status]")).toContainText("You are pre-registered!");
+    await expect(card.locator("[data-prereg-status]")).toContainText(ok);
     expect(posts[0].locale).toBe(locale);
   });
 }
@@ -253,12 +253,12 @@ for (const [url, text] of Object.entries({ "/10key/?lang=ko#itch-demo": "itch.io
 }
 
 // German and Japanese pre-registration pages (owner 2026-11-04): the form posts the page language, the consent bar speaks it.
-for (const [url, locale, bar] of [["/10key/index_de.html", "de", "Google-Ads-Messcookie"], ["/10key/index_ja.html", "ja", "Google広告の測定用Cookie"]]) {
+for (const [url, locale, bar] of [["/10key/index_de.html", "de", "Google-Ads-Messcookie"], ["/10key/index_ja.html", "ja", "Google広告の測定用Cookie"], ["/10key/index_zh.html", "zh", "Google Ads 成效衡量 Cookie"]]) {
   test(`${url} signs up in ${locale} and shows the consent bar in ${locale}`, async ({ page }) => {
     let body = null;
     await page.route(FN, (route) => { body = JSON.parse(route.request().postData() || "{}"); return route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"ok":true}' }); });
     await page.goto(url);
-    await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.locator("html")).toHaveAttribute("lang", locale === "zh" ? "zh-Hant" : locale);
     await expect(page.locator(".tk-adsbar")).toContainText(bar);
     await page.locator(".tk-adsbar-no").click();
     await page.fill("#prereg input[name=email]", "test@example.com");
@@ -266,17 +266,37 @@ for (const [url, locale, bar] of [["/10key/index_de.html", "de", "Google-Ads-Mes
     await page.click("#prereg button[type=submit]");
     await expect(page.locator("[data-itch-unlock]").first()).toBeVisible();
     expect(body.locale).toBe(locale);
-    await expect(page.locator(".tk-lang a[aria-current=page]")).toHaveText(locale.toUpperCase());
+    await expect(page.locator(".tk-lang a[aria-current=page]")).toHaveText(locale === "zh" ? "中文" : locale.toUpperCase());
   });
 }
 
 // QA 11-04: the Japanese and German pages fit a 390px phone (the screenshot strip scrolls on its own).
-for (const url of ["/10key/index_ja.html", "/10key/index_de.html", "/10key/index_en.html", "/10key/?lang=ko"]) {
+for (const url of ["/10key/index_zh.html", "/10key/index_ja.html", "/10key/index_de.html", "/10key/index_en.html", "/10key/?lang=ko"]) {
   test(`${url} has no text running off a 390px screen`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
     await page.goto(url);
     const off = await page.evaluate(() => [...document.querySelectorAll("main *")].filter((e) => !e.closest(".tk-shots") && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > innerWidth + 1).map((e) => e.tagName + " " + (e.textContent || "").slice(0, 30)));
     expect(off).toEqual([]);
+  });
+}
+
+// Language routing (owner 2026-11-04): without ?lang the browser's first language picks the page; ?lang=de|ja|zh on the
+// English page (old links in game builds and videos) moves to that page.
+for (const [locale, start, expected] of [["zh-TW", "/10key/", "/10key/index_zh.html"], ["zh-HK", "/10key/index_en.html", "/10key/index_zh.html"], ["ja-JP", "/10key/", "/10key/index_ja.html"], ["de-DE", "/10key/", "/10key/index_de.html"], ["zh-CN", "/10key/", "/10key/index_en.html"], ["ko-KR", "/10key/", "/10key/"], ["en-US", "/10key/index_en.html", "/10key/index_en.html"]]) {
+  test.describe(`browser language ${locale}`, () => {
+    test.use({ locale });
+    test(`${start} lands on ${expected}`, async ({ page }) => {
+      await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+      await page.goto(start + "#prereg");
+      await expect(page).toHaveURL(new RegExp(expected.replace(/[.]/g, "[.]") + "#prereg$"));
+      await expect(page.locator("#prereg input[name=email]")).toBeVisible();
+    });
+  });
+}
+for (const l of ["de", "ja", "zh"]) {
+  test(`old link index_en.html?lang=${l} moves to the ${l} page`, async ({ page }) => {
+    await page.goto(`/10key/index_en.html?lang=${l}#prereg`);
+    await expect(page).toHaveURL(new RegExp(`/10key/index_${l}[.]html[?]lang=${l}#prereg$`));
   });
 }

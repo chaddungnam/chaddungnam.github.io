@@ -1,5 +1,5 @@
 // /10key/prereg/ (confirm or unsubscribe from the pre-registration mail) and /10key/get/ (the one download link of the
-// launch mail). Owner 2026-10-24. Language: ?lang=ko|en|de|ja (de/ja since 2026-10-30, the mail language), else the
+// launch mail). Owner 2026-10-24. Language: ?lang=ko|en|de|ja|zh (de/ja since 2026-10-30, zh = Traditional Chinese since 2026-11-04, the mail language), else the
 // browser language. Elements carry data-ko/data-en only; de and ja fall back to the English text.
 (function () {
   "use strict";
@@ -13,11 +13,12 @@
 
   var params = new URLSearchParams(location.search);
   var lang = params.get("lang");
-  if (lang !== "ko" && lang !== "en" && lang !== "de" && lang !== "ja") {
-    var nav = String(navigator.language || "").toLowerCase().slice(0, 2);
-    lang = nav === "ko" || nav === "de" || nav === "ja" ? nav : "en";
+  if (lang !== "ko" && lang !== "en" && lang !== "de" && lang !== "ja" && lang !== "zh") {
+    var navFull = String(navigator.language || "").toLowerCase();
+    var nav = navFull.slice(0, 2);
+    lang = nav === "ko" || nav === "de" || nav === "ja" ? nav : /^zh-(tw|hk|mo|hant)/.test(navFull) ? "zh" : "en";
   }
-  document.documentElement.lang = lang;
+  document.documentElement.lang = lang === "zh" ? "zh-Hant" : lang;
   var ui = lang === "ko" ? "ko" : "en";
   document.querySelectorAll("[data-ko]").forEach(function (node) {
     node.textContent = node.getAttribute("data-" + lang) || node.getAttribute("data-" + ui);
@@ -63,6 +64,15 @@
       error: ["接続できませんでした", "少し待ってから、このページを再読み込みしてください。"],
       soon: ["まだリリース前です", "10key SurvivalはiOS・Android向けに準備中です。事前登録すると、リリース日にメールでお知らせします。"],
       pick: ["10key Survivalを入手", "お使いの端末のストアを選んでください。"]
+    },
+    zh: {
+      working: ["確認中…", "請稍候。"],
+      confirmed: ["事前預約完成！", "上市當天會把下載連結寄到這個信箱。"],
+      unsubscribed: ["已取消事前預約", "之後不會再寄事前預約相關信件到這個信箱。其餘資料會在 30 天內刪除。"],
+      invalid: ["這個連結無法使用", "連結已使用過或已過期。若要重新預約，請到遊戲頁面申請。"],
+      error: ["連線失敗", "請稍後重新整理這個頁面。"],
+      soon: ["尚未上市", "咔噠求生正在準備 iOS 與 Android 版本。完成事前預約，上市當天就會寄信通知你。"],
+      pick: ["取得咔噠求生", "請選擇你裝置的商店。"]
     }
   }[lang];
 

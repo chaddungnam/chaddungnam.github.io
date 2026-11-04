@@ -44,8 +44,9 @@
     ko: { text: "광고를 보고 온 방문이 사전예약으로 이어지는지 세기 위해 Google 광고 측정 쿠키를 써도 될까요? 이메일 주소는 Google에 보내지 않아요.", yes: "허용", no: "거부", more: "자세히" },
     en: { text: "May we use a Google Ads measurement cookie to count whether visits from our ads lead to pre-registrations? Your email address is never sent to Google.", yes: "Allow", no: "Decline", more: "Details" },
     de: { text: "Dürfen wir ein Google-Ads-Messcookie verwenden, um zu zählen, ob Besuche über unsere Anzeigen zu Vorregistrierungen führen? Deine E-Mail-Adresse wird nie an Google gesendet.", yes: "Erlauben", no: "Ablehnen", more: "Details" },
-    ja: { text: "広告から来た訪問が事前登録につながったかを数えるために、Google広告の測定用Cookieを使ってもよいですか？メールアドレスがGoogleに送られることはありません。", yes: "許可", no: "拒否", more: "詳細（英語）" }
-  }[lang === "ko" || lang === "de" || lang === "ja" ? lang : "en"];
+    ja: { text: "広告から来た訪問が事前登録につながったかを数えるために、Google広告の測定用Cookieを使ってもよいですか？メールアドレスがGoogleに送られることはありません。", yes: "許可", no: "拒否", more: "詳細（英語）" },
+    zh: { text: "我們可以使用 Google Ads 成效衡量 Cookie，來計算從廣告進站的訪客是否完成事前預約嗎？你的電子郵件地址絕不會傳給 Google。", yes: "允許", no: "拒絕", more: "詳細說明（英文）" }
+  }[lang === "ko" || lang === "de" || lang === "ja" || lang === "zh" ? lang : "en"];
   var privacy = lang === "ko" ? "/privacy/ko.html#10key-prereg" : lang === "de" ? "/privacy/de.html#10key-prereg" : "/privacy/en.html#10key-prereg";
 
   var bar = null;

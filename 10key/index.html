@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <script>try{if(!new URLSearchParams(location.search).has("lang")&&String(navigator.language||"").toLowerCase().indexOf("ko")!==0)location.replace("index_en.html"+location.search+location.hash);}catch(e){}</script>
+  <script>/* 10key language routing (owner 2026-11-04): ?lang=ko|en|de|ja|zh picks the page; without it the browser's first language does (Traditional Chinese zh-TW/HK/MO/Hant, Japanese, German, Korean; everything else English). */try{var q=new URLSearchParams(location.search),l=q.get("lang"),h=location.pathname.split("/").pop()||"index.html",P={ko:"index.html",en:"index_en.html",de:"index_de.html",ja:"index_ja.html",zh:"index_zh.html"};if(!l){var n=String(navigator.language||"").toLowerCase();l=n.indexOf("ko")===0?"ko":/^zh-(tw|hk|mo|hant)/.test(n)?"zh":n.indexOf("ja")===0?"ja":n.indexOf("de")===0?"de":"en";}if(P[l]&&P[l]!==h)location.replace(P[l]+location.search+location.hash);}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#141318">
   <title>딸깍 서바이벌 (10key Survival) 사전예약 · 데모 플레이 | House Duck</title>
@@ -22,6 +22,7 @@
   <link rel="alternate" hreflang="en" href="https://houseduck.in/10key/index_en.html">
   <link rel="alternate" hreflang="de" href="https://houseduck.in/10key/index_de.html">
   <link rel="alternate" hreflang="ja" href="https://houseduck.in/10key/index_ja.html">
+  <link rel="alternate" hreflang="zh-Hant" href="https://houseduck.in/10key/index_zh.html">
   <link rel="alternate" hreflang="x-default" href="https://houseduck.in/10key/index_en.html">
   <link rel="icon" type="image/png" href="/assets/house-duck-logo.png">
   <link rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -29,8 +30,8 @@
   <link rel="stylesheet" href="/assets/site-fonts.css">
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261104-ja">
-  <script src="/assets/tenkey-page.js?v=20261030-prereg3" defer></script>
-  <script src="/assets/tenkey-ads.js?v=20261104-dj" defer></script>
+  <script src="/assets/tenkey-page.js?v=20261104-zh" defer></script>
+  <script src="/assets/tenkey-ads.js?v=20261104-zh" defer></script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "딸깍 서바이벌", "alternateName": "10key Survival", "url": "https://houseduck.in/10key/", "description": "화려한 모험, 그리고 ASMR. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가는 House Duck의 신작 딸깍 서바이벌. 이메일로 사전예약하면 iOS·Android 출시 날 다운로드 링크를 보내 드려요. 사전예약을 마치면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요.", "image": "https://houseduck.in/assets/media/tenkey-og.jpg", "genre": ["Arcade", "Action"], "gamePlatform": ["Web browser", "iOS", "Android"], "inLanguage": ["ko", "en", "ja", "de", "fr", "es", "pt-BR", "zh-Hant"], "sameAs": ["https://houseduck.itch.io/10key-survival"], "publisher": {"@type": "Organization", "name": "House Duck", "url": "https://houseduck.in/"}}</script>
 </head>
 <body class="tk-page" data-page="tenkey">
@@ -42,7 +43,7 @@
       <a class="tk-nav-link" href="#prereg" data-itch-gate>데모 플레이</a>
       <a class="tk-nav-link" href="/support/">고객지원</a>
       <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump>사전예약</a>
-      <span class="tk-lang" role="group" aria-label="언어 선택"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko" aria-current="page">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en">EN</a><a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">DE</a><a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">JA</a></span>
+      <span class="tk-lang" role="group" aria-label="언어 선택"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko" aria-current="page">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en">EN</a><a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">DE</a><a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">JA</a><a href="index_zh.html?lang=zh" lang="zh-Hant" hreflang="zh-Hant" data-lang-link="zh">中文</a></span>
     </nav>
   </div></header>
 
