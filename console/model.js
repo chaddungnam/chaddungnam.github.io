@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
   const pages = new Set([
     "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
-    "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-purchases", "tenkey-ranking",
+    "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-mail", "tenkey-purchases", "tenkey-ranking",
     "tenkey-balance", "tenkey-config", "tenkey-audit", "tenkey-titles",
   ]);
 

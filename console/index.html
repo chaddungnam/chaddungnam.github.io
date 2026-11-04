@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
-  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-titles">
-  <link rel="stylesheet" href="styles.css?v=20261104-titles">
+  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-mail">
+  <link rel="stylesheet" href="styles.css?v=20261104-mail">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -81,11 +81,12 @@
         <a href="#/tenkey-titles" data-page="tenkey-titles"><span class="nav-index">04</span><span class="nav-copy">칭호<small>보유자·부여 관리</small></span></a>
         <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">05</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
         <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">06</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
-        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">07</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
-        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">08</span><span class="nav-copy">랭킹<small>보드</small></span></a>
-        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">09</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">10</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
-        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">11</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-mail" data-page="tenkey-mail"><span class="nav-index">07</span><span class="nav-copy">메일<small>보상·수령</small></span></a>
+        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">08</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
+        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">09</span><span class="nav-copy">랭킹<small>보드</small></span></a>
+        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">10</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">11</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">12</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -693,6 +694,49 @@
         <p id="tenkeyAuditMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="tenkeyMailView" class="route-view" data-route="tenkey-mail" hidden>
+        <nav class="workspace-jumps" aria-label="메일 바로가기"><button type="button" data-console-jump="tenkeyMailForm">메일 작성</button><button type="button" data-console-jump="tenkeyMailList">발송 목록</button></nav>
+        <p id="tenkeyMailMessage" class="dashboard-message" role="status"></p>
+        <form id="tenkeyMailForm" class="panel admin-form impact-form impact-form-critical">
+          <p class="eyebrow">10KEY MAIL</p><h2>보상 메일 작성</h2>
+          <p class="impact-note">공개 코드 또는 닉네임으로 계정 한 명에게 보내거나 전체 계정에 보냅니다. 한국어·영어를 입력하면 나머지 언어 기기는 영어 문구를 사용합니다. 만료는 발송 후 30일 이내여야 합니다.</p>
+          <fieldset class="mail-audience"><legend>받는 사람</legend>
+            <label class="check-label"><input name="audience" type="radio" value="player" checked> 계정 한 명</label>
+            <label class="check-label"><input name="audience" type="radio" value="all"> 전체 계정</label>
+          </fieldset>
+          <label>공개 코드 또는 닉네임<input name="target" maxlength="100" required placeholder="예: TK-2048 또는 닉네임"></label>
+          <div class="form-pair">
+            <label>제목 (한국어)<input name="titleKo" maxlength="80" required></label>
+            <label>제목 (영어)<input name="titleEn" maxlength="80" required></label>
+          </div>
+          <div class="form-pair">
+            <label>본문 (한국어)<textarea name="bodyKo" maxlength="800" rows="4" required></textarea></label>
+            <label>본문 (영어)<textarea name="bodyEn" maxlength="800" rows="4" required></textarea></label>
+          </div>
+          <section class="mail-attachments" aria-labelledby="tenkeyMailAttachmentsTitle">
+            <div class="panel-heading"><div><p class="eyebrow">ATTACHMENTS</p><h3 id="tenkeyMailAttachmentsTitle">첨부 보상</h3><small>종류마다 한 줄씩, 최대 5종류.</small></div><button id="tenkeyMailAddAttachment" class="tenkey-tr-button" type="button">보상 추가</button></div>
+            <div id="tenkeyMailAttachments">
+              <div class="mail-attachment-row" data-mail-attachment>
+                <label>보상<select name="kind"><option value="gems">젬</option><option value="parts">부품</option><option value="basic_box">기본 상자</option><option value="rare_box">고급 상자</option><option value="rename_ticket">닉네임 변경권</option></select></label>
+                <label>수량<input name="amount" type="number" min="1" max="1000000" step="1" value="25" required></label>
+                <button class="text-button" type="button" data-mail-remove>삭제</button>
+              </div>
+            </div>
+            <template id="tenkeyMailAttachmentTemplate"><div class="mail-attachment-row" data-mail-attachment>
+              <label>보상<select name="kind"><option value="gems">젬</option><option value="parts">부품</option><option value="basic_box">기본 상자</option><option value="rare_box">고급 상자</option><option value="rename_ticket">닉네임 변경권</option></select></label>
+              <label>수량<input name="amount" type="number" min="1" max="1000000" step="1" value="1" required></label>
+              <button class="text-button" type="button" data-mail-remove>삭제</button>
+            </div></template>
+          </section>
+          <label>수령 만료 (KST)<input name="expiresAt" type="datetime-local" required></label>
+          <label>발송 사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 출시 기념 보상"></label>
+          <section class="mail-preview" aria-live="polite"><p class="eyebrow">미리 보기</p><div id="tenkeyMailPreview"></div></section>
+          <p id="tenkeyMailFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+          <button class="danger-button" type="submit">메일 발송</button>
+        </form>
+        <section id="tenkeyMailList" class="panel"><div class="panel-heading"><div><p class="eyebrow">SENT MAIL</p><h2>발송 목록</h2><small>발송 후 미수령 보상은 취소할 수 있습니다.</small></div><span id="tenkeyMailTotal" class="panel-total">—</span></div><div id="tenkeyMailListing" class="audit-list"></div></section>
+      </section>
+
       <section id="tenkeyTitlesView" class="route-view" data-route="tenkey-titles" hidden>
         <p id="tenkeyTitlesMessage" class="dashboard-message" role="status"></p>
         <section class="panel">
@@ -770,7 +814,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261104-titles"></script>
+  <script src="model.js?v=20261104-mail"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261103-7d"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -780,12 +824,13 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20261028-caret"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261104-titles"></script>
+  <script src="tenkey.js?v=20261104-mail"></script>
   <script src="tenkey-overview.js?v=20261103-win"></script>
   <script src="tenkey-players.js?v=20261104-titles"></script>
   <script src="tenkey-retention.js?v=20261104-account-returns"></script>
   <script src="tenkey-titles.js?v=20261104-title"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
+  <script src="tenkey-mail.js?v=20261104-mail"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261025-upd"></script>
   <script src="tenkey-balance.js?v=20261025-knob"></script>
@@ -800,6 +845,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261104-titles" defer></script>
+  <script src="app.js?v=20261104-mail" defer></script>
 </body>
 </html>

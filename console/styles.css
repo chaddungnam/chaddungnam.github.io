@@ -1278,6 +1278,23 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tk-balance-pair .table-scroll { margin-top: 8px; }
 .console-main .tk-balance-pair .table-scroll table { min-width: 0; }
 .tk-balance .tk-num { text-align: right; }
+.mail-audience { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 12px; }
+.mail-audience legend { padding-inline: 6px; color: var(--ink-soft); font-size: 11px; font-weight: 800; }
+.mail-audience .check-label { display: flex; align-items: center; gap: 8px; }
+.mail-audience input { width: auto; min-height: 0; }
+.mail-attachments { display: grid; gap: 10px; }
+.mail-attachment-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(110px, .45fr) auto; align-items: end; gap: 10px; padding: 10px; background: var(--surface-soft, #f4f5f8); border-radius: 12px; }
+.mail-attachment-row label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 11px; font-weight: 800; }
+.mail-attachment-row input, .mail-attachment-row select { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--ink); }
+.mail-attachment-row button { min-height: 42px; }
+.mail-preview { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #f7f8fa; }
+.mail-preview .eyebrow { margin: 0; }
+.mail-preview-card { display: grid; gap: 4px; padding: 10px 12px; color: #f3f4f8; background: #1a1d2b; border-radius: 10px; }
+.mail-preview-card small { color: #b9c0d0; }
+.mail-sent-card { display: grid; gap: 8px; padding: 14px; border-bottom: 1px solid var(--line); }
+.mail-sent-head, .mail-sent-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: center; }
+.mail-sent-meta { color: var(--ink-soft); font-size: 12px; }
+@media (max-width: 600px) { .mail-attachment-row { grid-template-columns: minmax(0, 1fr) minmax(90px, .6fr); } .mail-attachment-row button { grid-column: 1 / -1; justify-self: end; } }
 .tk-balance-avg { display: block; margin-top: 6px; color: var(--ink); font-size: 12px; font-weight: 800; }
 @media (max-width: 600px) {
   .tk-balance .tk-stack { overflow: visible; }
