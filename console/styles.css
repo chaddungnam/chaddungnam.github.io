@@ -1213,6 +1213,7 @@ body::before { opacity: .18; background-size: 22px 22px; }
 .tk-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tk-wrap { max-width: 360px; white-space: normal; overflow-wrap: anywhere; }
 .tk-sub { display: block; margin-top: 2px; color: var(--ink-soft); font-size: 9px; font-weight: 500; }
+.tk-report-body { min-width: 240px; max-width: 520px; white-space: pre-wrap; word-break: break-word; }
 tr.is-dim td { opacity: .55; }
 tr[data-tk-group] { cursor: pointer; }
 tr[data-tk-group]:hover td, tr[data-tk-group]:focus-visible td { background: var(--teal-soft); }

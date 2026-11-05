@@ -29,6 +29,7 @@ const pageTitles = {
   "tenkey-retention": "재방문",
   "tenkey-player": "플레이어 상세",
   "tenkey-crashes": "크래시",
+  "tenkey-reports": "문제 제보",
   "tenkey-notices": "공지",
   "tenkey-mail": "메일",
   "tenkey-purchases": "구매 · 젬",
@@ -53,6 +54,7 @@ const pageDescriptions = {
   "tenkey-retention": "로그인 계정의 재방문 코호트, 첫 행동 흐름과 최근 쉬기 시작한 계정의 고정 진단 신호를 확인합니다.",
   "tenkey-player": "한 플레이어의 계정, 기록, 구매와 젬 장부, 정지 여부를 확인하고 처리합니다.",
   "tenkey-crashes": "앱이 보낸 크래시·멈춤·오류 보고를 오류 내용, 버전, 기기별로 묶어 보고 로그를 확인합니다.",
+  "tenkey-reports": "플레이어가 게임 설정의 문제 제보로 보낸 글을 최신순으로 봅니다. 서버는 7일만 보관합니다.",
   "tenkey-mail": "계정 한 명 또는 전체에 보상을 보내고 수령 상태를 확인합니다.",
   "tenkey-notices": "게임 안 공지를 한국어로 작성·예약합니다. 다른 7개 언어는 자동으로 번역돼 함께 나갑니다.",
   "tenkey-purchases": "스토어 구매·환불 기록과 젬·리바이브 패스 장부를 확인합니다.",
@@ -107,7 +109,7 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 }
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
-const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|notices|mail|purchases|ranking|balance|config|audit|titles))(?:[/?]|$)/;
+const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|reports|retention|notices|mail|purchases|ranking|balance|config|audit|titles))(?:[/?]|$)/;
 
 // One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
 const PROJECTS = {
@@ -164,6 +166,7 @@ function renderRoute() {
   if (route.page === "tenkey-retention") window.ConsoleTenkey.mountRetention();
   if (route.page === "tenkey-player") window.ConsoleTenkey.mountPlayer(route.userId);
   if (route.page === "tenkey-crashes") window.ConsoleTenkey.mountCrashes();
+  if (route.page === "tenkey-reports") window.ConsoleTenkey.mountReports();
   if (route.page === "tenkey-notices") window.ConsoleTenkey.mountNotices();
   if (route.page === "tenkey-mail") window.ConsoleTenkey.mountMail();
   if (route.page === "tenkey-purchases") window.ConsoleTenkey.mountPurchases();

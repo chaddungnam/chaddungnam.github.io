@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20261104-mail">
-  <link rel="stylesheet" href="styles.css?v=20261104-mail">
+  <link rel="stylesheet" href="styles.css?v=20261105-rep">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -80,13 +80,14 @@
         <a href="#/tenkey-retention" data-page="tenkey-retention"><span class="nav-index">03</span><span class="nav-copy">재방문<small>코호트·이탈 징후</small></span></a>
         <a href="#/tenkey-titles" data-page="tenkey-titles"><span class="nav-index">04</span><span class="nav-copy">칭호<small>보유자·부여 관리</small></span></a>
         <a href="#/tenkey-crashes" data-page="tenkey-crashes"><span class="nav-index">05</span><span class="nav-copy">크래시<small>묶음·로그</small></span></a>
-        <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">06</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
-        <a href="#/tenkey-mail" data-page="tenkey-mail"><span class="nav-index">07</span><span class="nav-copy">메일<small>보상·수령</small></span></a>
-        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">08</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
-        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">09</span><span class="nav-copy">랭킹<small>보드</small></span></a>
-        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">10</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">11</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
-        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">12</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-reports" data-page="tenkey-reports"><span class="nav-index">06</span><span class="nav-copy">제보<small>플레이어가 보낸 글</small></span></a>
+        <a href="#/tenkey-notices" data-page="tenkey-notices"><span class="nav-index">07</span><span class="nav-copy">공지<small>작성·예약·종료</small></span></a>
+        <a href="#/tenkey-mail" data-page="tenkey-mail"><span class="nav-index">08</span><span class="nav-copy">메일<small>보상·수령</small></span></a>
+        <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">09</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
+        <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">10</span><span class="nav-copy">랭킹<small>보드</small></span></a>
+        <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">11</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">12</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">13</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -685,6 +686,18 @@
         <p id="tenkeyBalanceMessage" class="dashboard-message" role="status"></p>
       </section>
 
+      <section id="tenkeyReportsView" class="route-view" data-route="tenkey-reports" hidden>
+        <form id="tenkeyReportFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyReportDays"><option value="1">최근 1일</option><option value="3">최근 3일</option><option value="7" selected>최근 7일</option></select></label>
+          <button class="primary-button" type="submit">새로고침</button>
+        </form>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER REPORTS</p><h2>문제 제보</h2><small>게임 설정의 「문제 제보」로 들어온 글입니다. 서버는 7일 동안만 보관하고 그 뒤 자동으로 지웁니다. 접수 번호는 플레이어가 보낸 뒤 본 번호와 같습니다.</small></div><span id="tenkeyReportTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>내용</th><th>앱 · 기기</th><th>언어</th><th>접수 번호</th></tr></thead><tbody id="tenkeyReportTable"></tbody></table></div>
+        </section>
+        <p id="tenkeyReportMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
         <form id="tenkeyAuditFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>표시 개수<select id="tenkeyAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
@@ -814,7 +827,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261104-mail"></script>
+  <script src="model.js?v=20261105-rep"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261103-7d"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -830,6 +843,7 @@
   <script src="tenkey-retention.js?v=20261104-account-returns"></script>
   <script src="tenkey-titles.js?v=20261104-title"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
+  <script src="tenkey-reports.js?v=20261105-rep"></script>
   <script src="tenkey-mail.js?v=20261104-mail"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261025-upd"></script>
@@ -845,6 +859,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261104-mail" defer></script>
+  <script src="app.js?v=20261105-rep" defer></script>
 </body>
 </html>

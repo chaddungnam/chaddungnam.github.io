@@ -49,7 +49,7 @@ async function fakeGoogle(page, how) {
   });
 }
 
-test("the project picker has no Comrade card; 10key Survival opens on the overview with its nine pages", async ({ page }) => {
+test("the project picker has no Comrade card; 10key Survival opens on the overview with its thirteen pages", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
@@ -63,7 +63,7 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   await page.locator("#projectTenkey").click();
   await expect(page.locator("#currentProject")).toHaveText("10key Survival");
   await expect(page).toHaveURL(/#\/tenkey-overview$/);
-  await expect(page.locator("#tenkeyNav a")).toHaveCount(9);
+  await expect(page.locator("#tenkeyNav a")).toHaveCount(13);
   await expect(page.locator("#hexaworldNav")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -480,5 +480,31 @@ test("overview: 전체 counts players by account (itch + app), keeps anonymous i
   await expect(week.nth(0)).toContainText("앞 7일보다 7명 많음");
   await page.locator('[data-tk-compare="d1"]').click();
   await shot(page, "overview_split");
+  expect(errors).toEqual([]);
+});
+
+test("제보 page: the players' REPORT A PROBLEM texts, newest first, read only; 재방문 opens its own page", async ({ page }) => {
+  const MOCK = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\"&&b.action===\"reports.list\"){window.__reportCalls=(window.__reportCalls||[]).concat([b.params]);return {ok:true,data:b.params.days===1?{total:0,rows:[]}:{total:2,rows:[{receipt:\"a1b2c3d4\",submitted_at:\"2026-11-05T11:00:00Z\",body:\"<b>보스</b>에서 멈춤\\n두 줄\",meta:{version:\"1.0.3\",build:\"41\",platform:\"android\",device:\"SM-S918B\",locale:\"ko\"},status:\"open\",player_id:\"11111111-1111-4111-8111-111111111111\",display_name:\"딸깍왕\",public_id:\"TK7Q2\"},{receipt:\"ffff0000\",submitted_at:\"2026-11-04T09:00:00Z\",body:\"text\",meta:{locale:\"ja\"},status:\"open\",player_id:null}]}};}return real(pj,fn,b);};})();";
+  const errors = await open(page, "#/tenkey-reports", MOCK);
+  await expect(page.locator("#tenkeyReportsView")).toBeVisible();
+  await expect(page.locator("#pageTitle")).toHaveText("문제 제보");
+  const rows = page.locator("#tenkeyReportTable tr");
+  await expect(rows).toHaveCount(2);
+  await expect(page.locator("#tenkeyReportTotal")).toHaveText("2건");
+  await expect(rows.nth(0)).toContainText("<b>보스</b>에서 멈춤");
+  await expect(rows.nth(0).locator("b")).toHaveCount(0);
+  await expect(rows.nth(0)).toContainText("v1.0.3 · 빌드 41");
+  await expect(rows.nth(0)).toContainText("Android · SM-S918B");
+  await expect(rows.nth(0)).toContainText("a1b2c3d4");
+  await expect(rows.nth(0).locator('a[href="#/tenkey-players/11111111-1111-4111-8111-111111111111"]')).toHaveText("딸깍왕");
+  await expect(rows.nth(1)).toContainText("일본어");
+  await expect(rows.nth(1)).toContainText("플레이어 기록 없음");
+  await page.locator("#tenkeyReportDays").selectOption("1");
+  await expect(page.locator("#tenkeyReportTable")).toContainText("최근 1일 동안 들어온 제보가 없습니다.");
+  expect(await page.evaluate(() => window.__reportCalls.map((p) => p.days))).toEqual([7, 1]);
+  await shot(page, "reports");
+  await page.evaluate(() => { window.location.hash = "#/tenkey-retention"; });
+  await expect(page.locator('[data-route="tenkey-retention"]')).toBeVisible();
+  await expect(page.locator("#pageTitle")).toHaveText("재방문");
   expect(errors).toEqual([]);
 });
