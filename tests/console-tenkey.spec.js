@@ -508,3 +508,27 @@ test("제보 page: the players' REPORT A PROBLEM texts, newest first, read only;
   await expect(page.locator("#pageTitle")).toHaveText("재방문");
   expect(errors).toEqual([]);
 });
+
+test("the 13-page menu scrolls when the window is short: desktop sidebar up and down, phone bar sideways; log out stays visible", async ({ page }) => {
+  const phone = test.info().project.name.startsWith("mobile");
+  if (!phone) await page.setViewportSize({ width: 1280, height: 620 });
+  const errors = await open(page);
+  const nav = page.locator("#tenkeyNav");
+  const last = page.locator('#tenkeyNav a[data-page="tenkey-audit"]');
+  const size = await nav.evaluate((el) => ({ sh: el.scrollHeight, ch: el.clientHeight, sw: el.scrollWidth, cw: el.clientWidth }));
+  if (phone) {
+    expect(size.sw).toBeGreaterThan(size.cw);
+    const box = await nav.boundingBox();
+    expect(box.height).toBeLessThan(80);
+  } else {
+    expect(size.sh).toBeGreaterThan(size.ch);
+    await expect(page.locator("#logoutButton")).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1 || getComputedStyle(document.querySelector(".console-sidebar")).position === "sticky")).toBe(true);
+  }
+  await last.scrollIntoViewIfNeeded();
+  await expect(last).toBeInViewport();
+  await shot(page, "nav-scrolled");
+  await last.click();
+  await expect(page.locator("#pageTitle")).toHaveText("감사 기록");
+  expect(errors).toEqual([]);
+});

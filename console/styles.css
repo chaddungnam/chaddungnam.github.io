@@ -1692,3 +1692,16 @@ a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-of
 @media (max-width: 720px) { .tk-glance-row.is-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .tk-glance-head .tk-compare { margin-left: auto; }
 .tk-glance-head .tk-compare .overview-switch { min-height: 30px; padding: 0 10px; font-size: 12px; }
+/* The sidebar menu scrolls on its own when it is taller than the window (owner 2026-11-05: 10key has 13 pages); the brand,
+   project switch and log out stay put. Phones: the bottom bar scrolls sideways in one row instead of wrapping. */
+@media (min-width: 761px) {
+  .console-sidebar { overflow-y: auto; overscroll-behavior: contain; }
+  .console-sidebar > nav:not([hidden]) { flex: 1 1 auto; min-height: 160px; overflow-y: auto; overscroll-behavior: contain; margin-inline: -6px; padding-inline: 6px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.22) transparent; }
+  .console-sidebar > nav:not([hidden])::-webkit-scrollbar { width: 6px; }
+  .console-sidebar > nav:not([hidden])::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 99px; }
+}
+@media (max-width: 760px) {
+  #tenkeyNav { display: flex; gap: 2px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  #tenkeyNav::-webkit-scrollbar { display: none; }
+  #tenkeyNav a { flex: 0 0 58px; }
+}
