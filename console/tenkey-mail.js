@@ -4,8 +4,8 @@
   const { esc, num } = T.fmt;
   const state = { bound: false, rows: [] };
   const byId = (id) => document.getElementById(id);
-  const LABELS = { gems: "젬", parts: "고급부품", basic_box: "기본 상자", rare_box: "고급 상자", rename_ticket: "닉네임 변경권" };
-  const LIMITS = { gems: 1_000_000, parts: 100_000, basic_box: 100, rare_box: 100, rename_ticket: 50 };
+  const LABELS = { gems: "젬", scrap: "부품", parts: "고급부품", basic_box: "기본 상자", rare_box: "고급 상자", rename_ticket: "닉네임 변경권" };
+  const LIMITS = { gems: 1_000_000, scrap: 1_000_000, parts: 100_000, basic_box: 100, rare_box: 100, rename_ticket: 50 };
   const pad = (n) => String(n).padStart(2, "0");
   function timeKst(value) {
     const date = value ? new Date(value) : null;
