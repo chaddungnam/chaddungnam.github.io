@@ -109,8 +109,8 @@
     return { max, plot: `${yTicks(max)}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${GRID}</svg><div class="ov-cols">${cols}</div></div>` };
   }
   const swatch = (color, text) => `<span class="ov-legend-item"><span class="ov-key" data-kind="bar" style="background:${color}" aria-hidden="true"></span>${esc(text)}</span>`;
-  const COLOR = { app: "#5b6b8c", web: "#e0864a", pre: "#21aa9b", ko: "#4c5fd5", en: "#21aa9b", ja: "#e0864a", de: "#9aa3b5" };
-  const LANG = { ko: "한국어", en: "영어", ja: "일본어", de: "독일어" };
+  const COLOR = { app: "#5b6b8c", web: "#e0864a", pre: "#21aa9b", ko: "#4c5fd5", en: "#21aa9b", ja: "#e0864a", de: "#9aa3b5", zh: "#c94f7c" };
+  const LANG = { ko: "한국어", en: "영어", ja: "일본어", zh: "중국어(번체)", de: "독일어" };
 
   const card = (title, legend, body, rows, wide, wait) => `<article class="ov-card${wide ? " is-wide" : ""}">
     <header class="ov-card-head"><h3>${esc(title)}</h3><span class="ov-legend">${legend || ""}</span></header>
@@ -182,7 +182,7 @@
       return { ...r, people: web ? Number(r.dau || 0) : W ? Number(srv.active || 0) : Math.max(Number(r.dau || 0), Number(srv.active || 0)), players: Number(srv.players || 0),
         dau_itch: Number(dp.web_itch || 0), dau_android: Number(dp.android || 0), dau_ios: Number(dp.ios || 0), dau_other: Number(dp.other || 0),
         visits: Number(w.dau || 0), app_new: Math.max(0, Number(r.new_installs || 0) - Number(w.new_installs || 0)), web_runs: Number(w.runs || 0), app_runs: Math.max(0, Number(r.runs || 0) - Number(w.runs || 0)),
-        prereg: Number(pr.n || 0), pre_ko: Number(pr.ko || 0), pre_en: Number(pr.en || 0), pre_ja: Number(pr.ja || 0), pre_de: Number(pr.de || 0) };
+        prereg: Number(pr.n || 0), pre_ko: Number(pr.ko || 0), pre_en: Number(pr.en || 0), pre_ja: Number(pr.ja || 0), pre_zh: Number(pr.zh || 0), pre_de: Number(pr.de || 0) };
     });
     const share = (r) => (r.players > 0 ? Math.round(Math.min(r.people, r.players) / r.players * 100) : null);
 
@@ -338,8 +338,8 @@
     if (P) {
       const loc = P.by_locale || {};
       const locRows = Object.keys(LANG).map((k) => ({ key: k, n: Number(loc[k] || 0) })).filter((r) => r.n > 0).sort((x, y) => y.n - x.n);
-      const parts = ["ko", "en", "ja", "de"].map((k) => ({ key: `pre_${k}`, color: COLOR[k] }));
-      const preTips = dailyRows.map((r) => tip(dayLabel(r.day), [["사전예약", `${num(r.prereg)}명`], ...["ko", "en", "ja", "de"].filter((k) => r[`pre_${k}`] > 0).map((k) => [LANG[k], `${num(r[`pre_${k}`])}명`]),
+      const parts = ["ko", "en", "ja", "zh", "de"].map((k) => ({ key: `pre_${k}`, color: COLOR[k] }));
+      const preTips = dailyRows.map((r) => tip(dayLabel(r.day), [["사전예약", `${num(r.prereg)}명`], ...["ko", "en", "ja", "zh", "de"].filter((k) => r[`pre_${k}`] > 0).map((k) => [LANG[k], `${num(r[`pre_${k}`])}명`]),
         W && r.visits > 0 ? ["웹 방문 100회당", `${(r.prereg / r.visits * 100).toFixed(1)}명`] : null]));
       const preCols = stacked(dailyRows, parts, preTips);
       const last = P.last_at ? new Date(P.last_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
@@ -348,11 +348,11 @@
         W ? ["웹 방문 100회당 (7일, 참고)", visit7 > 0 ? `${(P.d7 / visit7 * 100).toFixed(1)}명` : "—"] : null, ["수신 거부", `${num(P.unsubscribed)}명`]]
         .filter(Boolean).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
       preHtml = `<article class="ov-card is-wide tk-prereg-card">
-        <header class="ov-card-head"><h3>사전예약 (${state.period}일)</h3><span class="ov-legend">${["ko", "en", "ja", "de"].map((k) => swatch(COLOR[k], LANG[k])).join("")}</span></header>
+        <header class="ov-card-head"><h3>사전예약 (${state.period}일)</h3><span class="ov-legend">${["ko", "en", "ja", "zh", "de"].map((k) => swatch(COLOR[k], LANG[k])).join("")}</span></header>
         <div class="lab-facts tk-more-facts">${facts}</div>
         <figure class="ov-figure" tabindex="0" aria-label="날마다 사전예약"><div class="ov-plot has-y">${preCols.plot}</div>${xAxis(dailyRows)}</figure>
         <div class="overview-drill-body" style="padding:0">${distribution("가입한 페이지 언어 (전체)", locRows, Number(P.total || 0), (k) => LANG[k] || k)}</div>
-        <p class="overview-drill-note">‘웹 방문 100회당’은 사전예약 전체(광고·SNS·웹 포함)를 itch 방문 수로 나눈 참고값입니다. 나라는 저장하지 않아 대만·홍콩 가입은 영어에 들어갑니다.</p></article>`;
+        <p class="overview-drill-note">‘웹 방문 100회당’은 사전예약 전체(광고·SNS·웹 포함)를 itch 방문 수로 나눈 참고값입니다. 언어는 가입한 페이지 기준입니다. 중국어(번체) 페이지는 11-04에 생겼고, 그 전 대만·홍콩 가입은 영어 페이지에서 받아 영어로 남아 있습니다(나라는 저장하지 않음).</p></article>`;
     }
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
       <header class="ov-card-head"><h3>날마다 한눈에</h3><span class="ov-legend">${mainSeries.map((sr) => swatch(sr.color, sr.label)).join("")}</span><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>

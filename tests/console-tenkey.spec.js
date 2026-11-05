@@ -462,6 +462,8 @@ test("overview: 전체 counts players by account (itch + app), keeps anonymous i
   await expect(page.locator("#tenkeyOverviewCharts")).toContainText("플레이어 (DAU) 플랫폼별");
   await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
   await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
+  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card .ov-legend")).toContainText("중국어(번체)"); // zh page since 11-04 (owner 11-05)
+  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card .overview-drill-body")).toContainText("중국어(번체)");
   // 1일 / 3일 / 7일: each window exactly (today included) against the N days before; next-day return split itch / app.
   await expect(page.locator('[data-tk-compare="d1"]')).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 1일");

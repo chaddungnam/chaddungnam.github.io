@@ -141,11 +141,11 @@
       case "overview.web": return overview("web_itch");
       case "dau.get": return { days: overview().series.map((r, i) => ({ day: r.day, all: 20 + i, web_itch: 12 + i, android: 5, ios: 2, other: 1, u7: 50 + i, u3: 30 + i, new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 })) };
       case "prereg.get": {
-        const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, de: 0 }));
-        days.forEach((d) => { d.n = d.ko + d.en; });
+        const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, zh: i % 3 === 0 ? 1 : 0, de: 0 }));
+        days.forEach((d) => { d.n = d.ko + d.en + d.zh; });
         const sumN = (rows) => rows.reduce((t, d) => t + d.n, 0);
         return { today: days.at(-1).day, total: sumN(days), d1: days.at(-1).n, d1_prev: days.at(-2).n, d7: sumN(days.slice(-7)), d7_prev: sumN(days.slice(-14, -7)),
-          by_locale: { ko: days.reduce((t, d) => t + d.ko, 0), en: days.reduce((t, d) => t + d.en, 0) }, unsubscribed: 0, last_at: new Date().toISOString(), days };
+          by_locale: { ko: days.reduce((t, d) => t + d.ko, 0), en: days.reduce((t, d) => t + d.en, 0), zh: days.reduce((t, d) => t + d.zh, 0) }, unsubscribed: 0, last_at: new Date().toISOString(), days };
       }
       case "players.list": {
         const q = String(p.query || "").toLowerCase();
