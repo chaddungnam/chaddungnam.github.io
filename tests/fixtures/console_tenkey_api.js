@@ -153,6 +153,8 @@
         return { ok: true, total: rows.length, rows };
       }
       case "players.get": return detailFor(p.player_id);
+      // the player page also asks for the latest device facts and the last 10 balance runs (console 11-04, 8ddf341)
+      case "players.facts": return { client_info: { platform: "android", app_version: "1.0.0", build: 2, device_model: "SM-S918N", os_version: "14", store_country: "KR", device_region: "KR", first_seen_at: "2026-10-20T10:00:00+00:00", last_seen_at: "2026-10-23T10:00:00+00:00" }, retention: { current_streak: 2, first_day: "2026-10-20", milestones: [] }, balance_runs: [] };
       case "players.ban": { const x = PLAYERS.find((r) => r.id === p.player_id); if (x) x.banned = p.banned; audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action: action, params: p, result: { ok: true } }); return { ok: true, banned: p.banned }; }
       case "crashes.list": return { ok: true, total: crashes.length, rows: crashes.filter((c) => (!p.kind || c.kind === p.kind) && (!p.query || c.message.includes(p.query) || c.device_model.includes(p.query) || c.app_version.includes(p.query))) };
       case "crashes.groups": return groups(p.by);
