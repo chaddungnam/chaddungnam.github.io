@@ -136,7 +136,7 @@
     if (!("IntersectionObserver" in window)) return;
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting) entry.target.play().catch(() => {});
+        if (entry.isIntersecting) { entry.target.autoplay = true; entry.target.play().catch(() => {}); }
         else entry.target.pause();
       }
     }, { threshold: .15 });

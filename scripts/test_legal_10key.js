@@ -146,7 +146,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /cannot be transferred to another account or player/, /the gems from that purchase are taken back from your gem balance/, /The Android and iOS apps show no ads/,
       /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/, /Effective October 31, 2026 \(v1\.2\)/, /Effective November 1, 2026 \(v1\.3\)/, /starting a run needs an internet connection/i,
       /module draw tickets are an in-game item that the apps give as a quest reward/, /daily and weekly quests/, /board of the current season and of the last season/,
-      /a free web demo of 10key Survival \(up to level 15\)/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
+      /a free web demo of 10key Survival \(up to level 8\)/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
     ko: [/게스트 계정을 온라인 랭킹에만 사용합니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
       /광고를 표시할 수 있습니다\(현재 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
       /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /이러한 조치로 게임을 플레이하지 못하게 되지는 않습니다/,
@@ -155,7 +155,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /다른 계정이나 다른 플레이어에게 넘길 수 없고/, /그 구매로 받은 보석을 보석 잔액에서 회수/, /Android 및 iOS 앱에는 광고가 없습니다/,
       /길게 눌러 계정 삭제/, /2026년 10월 20일 시행\(v1\.1\)/, /2026년 10월 31일 시행\(v1\.2\)/, /2026년 11월 1일 시행\(v1\.3\)/, /판을 시작하려면 인터넷 연결이 필요/,
       /모듈 뽑기권은 앱이 퀘스트 보상으로 주는 게임 내 아이템/, /일일 퀘스트와 주간 퀘스트/, /이번 시즌의 순위표와 지난 시즌의 순위표/,
-      /무료 웹 데모\(레벨 15까지\)/, /GamePix가 광고/, /확률 정보 페이지/, /로봇 패키지/],
+      /무료 웹 데모\(레벨 8까지\)/, /GamePix가 광고/, /확률 정보 페이지/, /로봇 패키지/],
   };
   for (const locale of locales) {
     const file = `10key/terms/${locale}.html`;

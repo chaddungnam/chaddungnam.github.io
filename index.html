@@ -9,15 +9,7 @@
   <meta name="theme-color" content="#f5f4ef">
   <title>House Duck — 독일의 1인 인디 게임 스튜디오</title>
   <meta name="description" content="한국 출신 개발자가 독일에서 딸깍 서바이벌(10key Survival)과 Quirky Ball을 만드는 1인 인디 게임 스튜디오입니다.">
-  <meta property="og:title" content="House Duck — 독일의 1인 인디 게임 스튜디오">
-  <meta property="og:description" content="신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://houseduck.in/">
-  <meta property="og:image" content="https://houseduck.in/assets/media/tenkey-og.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:title" content="House Duck — 독일의 1인 인디 게임 스튜디오"><meta property="og:description" content="신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 8까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요."><meta property="og:type" content="website"><meta property="og:site_name" content="House Duck"><meta property="og:locale" content="ko_KR"><meta property="og:url" content="https://houseduck.in/"><meta property="og:image" content="https://houseduck.in/assets/media/share/house-duck-share.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="House Duck: 밤의 PC 책상과 노란 오리의 뒷모습"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image:alt" content="House Duck: 밤의 PC 책상과 노란 오리의 뒷모습">
   <link rel="canonical" href="https://houseduck.in/">
   <link rel="alternate" hreflang="ko" href="https://houseduck.in/?lang=ko">
   <link rel="alternate" hreflang="en" href="https://houseduck.in/index_en.html">
@@ -25,15 +17,19 @@
   <link rel="alternate" hreflang="ja" href="https://houseduck.in/index_ja.html">
   <link rel="alternate" hreflang="x-default" href="https://houseduck.in/index_en.html">
   <link rel="icon" type="image/png" href="assets/house-duck-logo.png">
-  <link rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/site-fonts.css">
+  <link rel="preload" href="assets/media/home/desk-landscape.json" as="fetch" crossorigin media="(min-aspect-ratio: 4/5)"><link rel="preload" href="assets/media/home/desk-landscape.webp" as="image" type="image/webp" media="(min-aspect-ratio: 4/5)">
+  <link rel="preload" href="assets/media/home/desk-portrait.json" as="fetch" crossorigin media="(max-aspect-ratio: 4/5)"><link rel="preload" href="assets/media/home/desk-portrait.webp" as="image" type="image/webp" media="(max-aspect-ratio: 4/5)">
+  <link rel="preload" href="/assets/fonts/Montserrat-Variable-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/site-fonts.css">
   <link rel="stylesheet" href="assets/brand-site.css">
   <link rel="stylesheet" href="assets/home.css?v=20261104-gray">
   <link rel="stylesheet" href="assets/home-desk.css?v=20261028-prereg">
+  <link rel="stylesheet" href="assets/share-sheet.css?v=20261106">
   <link rel="stylesheet" href="assets/studio-music.css?v=20260907-icons">
   <script src="assets/brand-site.js?v=20260907-no-blog" defer></script>
   <script src="assets/home.js?v=20261028-prereg" defer></script>
   <script src="assets/home-desk.js?v=20261028-prereg" defer></script>
   <script src="assets/community-stats.js?v=20261006" defer></script>
+  <script src="assets/share-sheet.js?v=20261106" defer></script>
   <script src="assets/studio-music.js?v=20260907" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://houseduck.in/#organization","name":"House Duck","url":"https://houseduck.in/","logo":"https://houseduck.in/assets/house-duck-logo.png","description":"딸깍 서바이벌(10key Survival)과 Quirky Ball을 만드는 1인 인디 게임 스튜디오입니다.","sameAs":["https://www.youtube.com/@houseduck_in"]},{"@type":"WebSite","@id":"https://houseduck.in/#website","url":"https://houseduck.in/","name":"House Duck","publisher":{"@id":"https://houseduck.in/#organization"},"inLanguage":["ko","en","de","ja"]}]}</script>
 </head>
@@ -48,17 +44,18 @@
   <main id="main-content">
     <section class="hd-hero" id="studio" data-theme="night" aria-labelledby="studio-title">
       <div class="hd-hero-sticky">
-        <div class="hd-desk" data-desk data-desk-tenkey="assets/media/tenkey-gameplay.mp4" data-desk-quirky="quirky-ball/v2/loop.mp4">
+        <div class="hd-desk" data-desk data-desk-tenkey="assets/media/home/desk-tenkey.mp4" data-desk-quirky="assets/media/home/desk-quirky.mp4">
           <a class="hd-desk-screen-link" href="#games" aria-label="딸깍 서바이벌 보러 가기"></a>
         </div>
         <h1 class="hd-visually-hidden" id="studio-title">House Duck</h1>
+          <button class="hd-scroll-cue" type="button" aria-label="아래로 스크롤: 딸깍 서바이벌 보기" data-scroll-cue><svg class="hd-scroll-cue-tri" viewBox="0 0 9 5" width="45" height="25" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path d="M0 0H9V1H8V2H7V3H6V4H5V5H4V4H3V3H2V2H1V1H0Z"/></svg></button>
       </div>
     </section>
 
     <section class="hd-tenkey" id="games" data-theme="night" data-tenkey aria-labelledby="tenkey-title">
       <div class="container hd-tenkey-grid">
         <div class="hd-tk-copy">
-          <picture class="hd-tk-logo"><source media="(max-width: 600px)" srcset="assets/media/tenkey-itch/cover.webp" width="630" height="500"><img src="assets/media/tenkey-itch/banner.webp" width="960" height="300" alt="10key Survival 로고와 3D 키보드 위의 텐키, 마우스" decoding="async"></picture>
+          <picture class="hd-tk-logo"><source media="(max-width: 600px)" srcset="assets/media/tenkey-itch/cover.webp" width="630" height="500"><img src="assets/media/tenkey-itch/banner.webp" width="960" height="300" alt="10key Survival 로고와 3D 키보드 위의 텐키, 마우스" loading="lazy" decoding="async"></picture>
           <p class="hd-eyebrow-row"><span class="hd-eyebrow">신작</span><span class="hd-chip hd-chip-status">출시 준비 중</span></p>
           <h2 class="hd-title" id="tenkey-title">딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span></h2>
           <p class="hd-tk-pitch">화려한 모험, 그리고 ASMR</p>
@@ -67,16 +64,17 @@
             <a class="hd-keycap-cta hd-tk-prereg" href="10key/#prereg" data-pressable><span class="hd-keycap-face">사전예약하기</span></a>
             <p class="hd-tk-note">출시 날 iOS·Android 다운로드 링크를 메일 한 통으로 보내 드려요.</p>
           </div>
-          <p class="hd-tk-paid"><span class="hd-tk-paid-chip">유료 · 인앱 구매 있음</span><span class="hd-tk-paid-text">정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 15까지)예요.</span></p>
+          <p class="hd-tk-paid"><span class="hd-tk-paid-chip">유료 · 인앱 구매 있음</span><span class="hd-tk-paid-text">정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 8까지)예요.</span></p>
           <ul class="hd-tk-where" aria-label="플레이 환경"><li><span class="hd-tk-where-k">컴퓨터</span><span>itch.io 데모 · <b>PC 권장</b></span></li><li><span class="hd-tk-where-k">휴대폰</span><span>Google Play · App Store (준비 중)</span></li></ul>
           <div class="hd-tk-cta-row hd-tk-preview-row">
             <a class="hd-tk-preview" href="10key/#itch-demo"><span class="hd-tk-play-icon" aria-hidden="true"></span>사전예약하고 itch.io에서 데모 플레이</a>
-            <p class="hd-tk-note">사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. PC 브라우저에서 플레이를 권장해요.</p>
+            <p class="hd-tk-note">사전예약을 마치면 itch.io 데모(레벨 8까지) 링크가 바로 떠요. PC 브라우저에서 플레이를 권장해요.</p>
           </div>
+          <div class="hd-share-row" role="group" aria-label="이 페이지를 친구에게 공유하거나 주소를 복사해요" data-share-row hidden><button class="hd-share-key" type="button" data-share-open>공유하기</button><button class="hd-share-key" type="button" data-share-copy>링크 복사</button><span class="hd-share-note" role="status" aria-live="polite" data-share-status></span></div>
           <a class="hd-arrow-link hd-tk-more" href="10key/">자세히 보기</a>
         </div>
         <figure class="hd-tk-screen">
-          <span class="hd-tk-screen-frame"><video class="hd-tk-video" data-hero-gameplay autoplay muted loop playsinline preload="none" width="540" height="960" poster="assets/media/tenkey-gameplay-poster.webp" aria-label="딸깍 서바이벌 실제 플레이"><source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm"></video></span>
+          <span class="hd-tk-screen-frame"><video class="hd-tk-video" data-hero-gameplay muted loop playsinline preload="none" width="540" height="960" poster="assets/media/tenkey-gameplay-poster.webp" aria-label="딸깍 서바이벌 실제 플레이"><source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm"></video></span>
           <figcaption class="hd-micro">실제 플레이 화면</figcaption>
         </figure>
       </div>
@@ -117,7 +115,7 @@
           <div class="hd-phone" role="group" aria-label="Quirky Ball 실제 플레이 영상">
             <span class="hd-phone-shell">
               <span class="hd-phone-island" aria-hidden="true"></span>
-              <video class="hd-phone-video" data-hero-gameplay autoplay muted loop playsinline preload="none" poster="quirky-ball/v2/loop-poster.webp" aria-label="Quirky Ball 2.0 실제 플레이"><source src="quirky-ball/v2/loop.mp4" type="video/mp4"><source src="quirky-ball/v2/loop.webm" type="video/webm"></video>
+              <video class="hd-phone-video" data-hero-gameplay muted loop playsinline preload="none" poster="quirky-ball/v2/loop-poster.webp" aria-label="Quirky Ball 2.0 실제 플레이"><source src="quirky-ball/v2/loop.mp4" type="video/mp4"><source src="quirky-ball/v2/loop.webm" type="video/webm"></video>
               <span class="hd-phone-home" aria-hidden="true"></span>
             </span>
             <span class="hd-phone-button hd-phone-button-a" aria-hidden="true"></span>
@@ -133,7 +131,7 @@
         <div class="hd-phone" role="group" aria-label="동무와 멋진신세계 실제 플레이 영상">
           <span class="hd-phone-shell">
             <span class="hd-phone-island" aria-hidden="true"></span>
-            <video class="hd-phone-video" data-hero-gameplay autoplay muted loop playsinline preload="none" poster="assets/media/comrade-gameplay-poster.jpg" aria-label="동무와 멋진신세계 실제 플레이"><source src="assets/media/comrade-gameplay.mp4" type="video/mp4"></video>
+            <video class="hd-phone-video" data-hero-gameplay muted loop playsinline preload="none" poster="assets/media/comrade-gameplay-poster.jpg" aria-label="동무와 멋진신세계 실제 플레이"><source src="assets/media/comrade-gameplay.mp4" type="video/mp4"></video>
             <span class="hd-phone-home" aria-hidden="true"></span>
           </span>
           <span class="hd-phone-button hd-phone-button-a" aria-hidden="true"></span>

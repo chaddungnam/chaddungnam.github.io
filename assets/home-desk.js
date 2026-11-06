@@ -80,15 +80,26 @@
   function loadImage(src) {
     return new Promise(function (res, rej) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = rej; i.src = src; });
   }
+  // pixel art ships as lossless WebP (about a third of the PNG); the PNG stays as the fallback
+  function loadArt(src) {
+    return loadImage(src.replace(/\.png$/, '.webp')).catch(function () { return loadImage(src); });
+  }
+  // second-priority downloads (the other orientation, the second monitor's video) wait for the first scroll/touch/key, or 8 s
+  function whenSettled(fn) {
+    var done = false;
+    function go() { if (done) return; done = true; ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (t) { window.removeEventListener(t, go); }); fn(); }
+    ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (t) { window.addEventListener(t, go, { passive: true, once: true }); });
+    setTimeout(go, 8000);
+  }
 
   function loadSet(name) {
     if (sets[name]) return sets[name];
     sets[name] = fetch(ASSETS + 'desk-' + name + '.json').then(function (r) { return r.json(); }).then(function (m) {
       return Promise.all([
-        loadImage(ASSETS + 'desk-' + name + '.png'),
-        loadImage(ASSETS + m.duck.file),
-        m.blink ? loadImage(ASSETS + m.blink.file) : null,
-        m.pad ? loadImage(ASSETS + m.pad.file).catch(function () { return null; }) : null
+        loadArt(ASSETS + 'desk-' + name + '.png'),
+        loadArt(ASSETS + m.duck.file),
+        m.blink ? loadArt(ASSETS + m.blink.file) : null,
+        m.pad ? loadArt(ASSETS + m.pad.file).catch(function () { return null; }) : null
       ]).then(function (imgs) { return { meta: m, base: imgs[0], duck: imgs[1], blink: imgs[2], pad: imgs[3] }; });
     });
     return sets[name];
@@ -502,7 +513,13 @@
     vidQuirky = makeVideo(desk.getAttribute('data-desk-quirky'), 'none');
     if (vidTenkey) desk.appendChild(vidTenkey);
     if (vidQuirky) desk.appendChild(vidQuirky);
-    if (vidQuirky) setTimeout(function () { vidQuirky.preload = 'auto'; vidQuirky.load(); }, 2500);
+    if (vidQuirky) whenSettled(function () { vidQuirky.preload = 'auto'; vidQuirky.load(); });
+
+    var cue = document.querySelector('[data-scroll-cue]');   // the blinking triangle: tap = down to the 10key section
+    if (cue) cue.addEventListener('click', function () {
+      var target = document.getElementById('games');
+      if (target) target.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+    });
 
     var io = new IntersectionObserver(function (entries) {
       onScreen = entries[0].isIntersecting;
@@ -513,7 +530,7 @@
     window.addEventListener('resize', resize);
     reduceMotion.addEventListener && reduceMotion.addEventListener('change', function () { lastP = -1; resize(); });
     resize();
-    loadSet(orientationFor(vw, vh) === 'portrait' ? 'landscape' : 'portrait').catch(function () {});
+    whenSettled(function () { loadSet(orientationFor(vw, vh) === 'portrait' ? 'landscape' : 'portrait').catch(function () {}); });
   }
 
   window.HouseDuckDesk = {

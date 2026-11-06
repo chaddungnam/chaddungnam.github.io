@@ -20,6 +20,10 @@ LANGS = ("en", "de", "ja")
 # Korean -> (English, German, Japanese). Matched against whole text nodes and attribute values.
 TEXT = {
     "딸깍 서바이벌 보러 가기": ("See 10key Survival", "10key Survival ansehen", "10key Survivalを見る"),
+    "아래로 스크롤: 딸깍 서바이벌 보기": ("Scroll down: see 10key Survival", "Nach unten scrollen: 10key Survival ansehen", "下へスクロール：10key Survivalを見る"),
+    "이 페이지를 친구에게 공유하거나 주소를 복사해요": ("Share this page with a friend or copy its address", "Diese Seite mit einem Freund teilen oder die Adresse kopieren", "このページを友だちにシェアするか、アドレスをコピーします"),
+    "공유하기": ("Share", "Teilen", "シェア"),
+    "링크 복사": ("Copy link", "Link kopieren", "リンクをコピー"),
     "신작": ("New game", "Neues Spiel", "新作"),
     "딸깍 서바이벌": ("10key Survival", "10key Survival", "10key Survival"),
     "자세히 보기": ("Learn more", "Mehr erfahren", "詳しく見る"),
@@ -39,15 +43,15 @@ TEXT = {
         "Am Starttag schicken wir dir eine E-Mail mit dem Download-Link für iOS und Android.",
         "配信日に、iOS・Androidのダウンロードリンクをメールで1通お送りします。"),
     "유료 · 인앱 구매 있음": ("Paid app · In-app purchases", "Kostenpflichtig · In-App-Käufe", "有料 · アプリ内課金あり"),
-    "정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 15까지)예요.": (
-        "The full game is a paid app on Google Play and the App Store, with gems to buy in the game (in-app purchases). On itch.io it is a free demo (up to level 15).",
-        "Die Vollversion ist eine kostenpflichtige App bei Google Play und im App Store, mit Gems zum Kaufen im Spiel (In-App-Käufe). Auf itch.io gibt es eine kostenlose Demo (bis Level 15).",
-        "製品版はGoogle Play・App Storeの有料アプリで、ゲーム内でジェムを購入できます（アプリ内課金）。itch.ioでは無料デモ（レベル15まで）を遊べます。"),
+    "정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 8까지)예요.": (
+        "The full game is a paid app on Google Play and the App Store, with gems to buy in the game (in-app purchases). On itch.io it is a free demo (up to level 8).",
+        "Die Vollversion ist eine kostenpflichtige App bei Google Play und im App Store, mit Gems zum Kaufen im Spiel (In-App-Käufe). Auf itch.io gibt es eine kostenlose Demo (bis Level 8).",
+        "製品版はGoogle Play・App Storeの有料アプリで、ゲーム内でジェムを購入できます（アプリ内課金）。itch.ioでは無料デモ（レベル8まで）を遊べます。"),
     "사전예약하고 itch.io에서 데모 플레이": ("Pre-register to play the demo on itch.io", "Vorregistrieren und die Demo auf itch.io spielen", "事前登録してitch.ioでデモをプレイ"),
-    "사전예약을 마치면 itch.io 데모(레벨 15까지) 링크가 바로 떠요. PC 브라우저에서 플레이를 권장해요.": (
-        "Pre-register and the itch.io demo link (up to level 15) appears right away. Best played in a browser on a PC.",
-        "Nach der Vorregistrierung erscheint sofort der Link zur Demo auf itch.io (bis Level 15). Am besten im Browser am PC spielen.",
-        "事前登録が終わると、itch.ioのデモ（レベル15まで）のリンクがすぐに表示されます。PCのブラウザでのプレイをおすすめします。"),
+    "사전예약을 마치면 itch.io 데모(레벨 8까지) 링크가 바로 떠요. PC 브라우저에서 플레이를 권장해요.": (
+        "Pre-register and the itch.io demo link (up to level 8) appears right away. Best played in a browser on a PC.",
+        "Nach der Vorregistrierung erscheint sofort der Link zur Demo auf itch.io (bis Level 8). Am besten im Browser am PC spielen.",
+        "事前登録が終わると、itch.ioのデモ（レベル8まで）のリンクがすぐに表示されます。PCのブラウザでのプレイをおすすめします。"),
     # where to play (owner 2026-11-04): computer = the itch.io demo, best on a PC; phone = Google Play / App Store, coming soon
     "플레이 환경": ("Where to play", "Wo spielen", "プレイ環境"),
     "컴퓨터": ("Computer", "Computer", "パソコン"),
@@ -195,8 +199,8 @@ def badge_block(html):
 
 
 def home_tags(ko):
-    css = re.findall(r'<link rel="stylesheet" href="assets/home(?:-desk)?\.css[^"]*">', ko)
-    js = re.findall(r'<script src="assets/home(?:-desk)?\.js[^"]*" defer></script>', ko)
+    css = re.findall(r'<link rel="stylesheet" href="assets/(?:home(?:-desk)?|share-sheet)\.css[^"]*">', ko)
+    js = re.findall(r'<script src="assets/(?:home(?:-desk)?|share-sheet)\.js[^"]*" defer></script>', ko)
     return "".join(css), "".join(js)
 
 
@@ -204,8 +208,8 @@ def align_head(page, css, js):
     """Swap the old home tags (studio-home.*) or earlier home.* tags for the Korean page's current ones."""
     page = re.sub(r'<link rel="stylesheet" href="assets/(?:studio-home|home-desk)\.css[^"]*">', "", page)
     page = re.sub(r'<script src="assets/(?:studio-home|home-desk)\.js[^"]*" defer></script>', "", page)
-    page = re.sub(r'<link rel="stylesheet" href="assets/home\.css[^"]*">', "", page)
-    page = re.sub(r'<script src="assets/home\.js[^"]*" defer></script>', "", page)
+    page = re.sub(r'<link rel="stylesheet" href="assets/(?:home|share-sheet)\.css[^"]*">', "", page)
+    page = re.sub(r'<script src="assets/(?:home|share-sheet)\.js[^"]*" defer></script>', "", page)
     brand_css = re.search(r'<link rel="stylesheet" href="assets/brand-site\.css[^"]*">', page).group(0)
     brand_js = re.search(r'<script src="assets/brand-site\.js[^"]*" defer></script>', page).group(0)
     page = page.replace(brand_css, brand_css + css, 1).replace(brand_js, brand_js + js, 1)

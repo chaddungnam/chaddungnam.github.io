@@ -197,10 +197,10 @@ const expectedCopy = {
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 15까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "딸깍 서바이벌(10key Survival) 대표 이미지. 3D 키보드 위의 텐키와 마우스"],
-  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now and play the demo (up to level 15) on itch.io. Quirky Ball is out on iOS and Android.", "10key Survival key art: a living numpad and a mouse on a 3D keyboard"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren und die Demo (bis Level 15) auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "Key Art von 10key Survival: ein lebendiger Ziffernblock und eine Maus auf einer 3D-Tastatur"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録して、itch.ioでデモ（レベル15まで）をプレイ。Quirky BallはiOSとAndroidで遊べます。", "10key Survivalのキーアート：3Dキーボードの上の生きたテンキとマウス"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 8까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "House Duck: 밤의 PC 책상과 노란 오리의 뒷모습"],
+  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now and play the demo (up to level 8) on itch.io. Quirky Ball is out on iOS and Android.", "House Duck: a night desk with a PC and the back of a yellow duck"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren und die Demo (bis Level 8) auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "House Duck: ein nächtlicher PC-Schreibtisch und ein gelber Entenrücken"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録して、itch.ioでデモ（レベル8まで）をプレイ。Quirky BallはiOSとAndroidで遊べます。", "House Duck：夜のPCデスクと黄色いアヒルの後ろ姿"],
 };
 
 const expectedDescriptions = {
@@ -232,12 +232,12 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
 
   // --- hero: the pixel desk scene, no overlay copy, the h1 is for search and screen readers ---
   assert.match(hero, /^<section class="hd-hero" id="studio" data-theme="night" aria-labelledby="studio-title">/, `${file} night hero`);
-  assert.match(hero, /<div class="hd-desk" data-desk data-desk-tenkey="assets\/media\/tenkey-gameplay\.mp4" data-desk-quirky="quirky-ball\/v2\/loop\.mp4">/, `${file} desk plays the 10key Survival loop and the Quirky Ball 2.0 loop on its CRT`);
+  assert.match(hero, /<div class="hd-desk" data-desk data-desk-tenkey="assets\/media\/home\/desk-tenkey\.mp4" data-desk-quirky="assets\/media\/home\/desk-quirky\.mp4">/, `${file} desk plays the 10key Survival loop and the Quirky Ball 2.0 loop on its CRT`);
   assert.match(hero, /<a class="hd-desk-screen-link" href="#games" aria-label="[^"]+"><\/a>/, `${file} the CRT screen links down to 10key Survival`);
   assert.equal((html.match(/<h1\b/g) || []).length, 1, `${file} needs exactly one h1`);
   assert.match(hero, /<h1 class="hd-visually-hidden" id="studio-title">House Duck<\/h1>/, `${file} h1 names the studio`);
   assert.equal(hero.replace(/<[^>]*>/g, "").trim(), "House Duck", `${file} the desk scene carries no overlay copy`);
-  assert.doesNotMatch(hero, /Quirky|google-play|apps\.apple|<video|<img|<button/, `${file} hero is the scene only`);
+  assert.doesNotMatch(hero, /Quirky|google-play|apps\.apple|<video|<img|<button(?![^>]*data-scroll-cue)/, `${file} hero is the scene only`);
 
   // --- 10key Survival (owner 10-28: the itch.io page's look; a paid app, so the big gold key is the pre-registration and the
   //     itch.io browser build is the outlined free preview under it; no store links yet) ---
@@ -261,7 +261,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.doesNotMatch(tenkey, /8[.,]333|1\/12/, `${file} no legacy odds numbers`);
   assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop`);
   const video = tenkey.match(/<video\b[^>]*>/)[0];
-  for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/tenkey-gameplay-poster.webp"', `aria-label="${l.videoLabel}"`]) assert.ok(video.includes(attribute), `${file} gameplay video needs ${attribute.trim()}`);
+  for (const attribute of ["data-hero-gameplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/tenkey-gameplay-poster.webp"', `aria-label="${l.videoLabel}"`]) assert.ok(video.includes(attribute), `${file} gameplay video needs ${attribute.trim()}`);
+  assert.ok(!/\sautoplay[\s>=]/.test(video), `${file} the gameplay video has no autoplay attribute (it forces the download before it scrolls into view; home.js starts it)`);
   assert.ok(tenkey.includes('<source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm">'), `${file} gameplay video has mp4 and webm sources`);
   assert.match(tenkey, /<figcaption class="hd-micro">[^<]+<\/figcaption>/, `${file} captions the footage`);
   assert.ok(tenkey.includes('<source media="(max-width: 600px)" srcset="assets/media/tenkey-itch/cover.webp" width="630" height="500"><img src="assets/media/tenkey-itch/banner.webp" width="960" height="300"'), `${file} itch.io banner (cover on phones)`);
@@ -324,7 +325,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(quirky, /<figure class="hd-phone-figure hd-qb-phone">/, `${file} Quirky Ball phone figure`);
   assert.ok(quirky.includes(`role="group" aria-label="${l.qbGroup}"`), `${file} Quirky Ball phone is a labelled group`);
   const qbVideo = quirky.match(/<video\b[^>]*>/)[0];
-  for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="quirky-ball/v2/loop-poster.webp"', `aria-label="${l.qbVideo}"`]) assert.ok(qbVideo.includes(attribute), `${file} Quirky Ball video needs ${attribute.trim()}`);
+  for (const attribute of ["data-hero-gameplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="quirky-ball/v2/loop-poster.webp"', `aria-label="${l.qbVideo}"`]) assert.ok(qbVideo.includes(attribute), `${file} Quirky Ball video needs ${attribute.trim()}`);
+  assert.ok(!/\sautoplay[\s>=]/.test(qbVideo), `${file} the gameplay video has no autoplay attribute (it forces the download before it scrolls into view; home.js starts it)`);
   assert.ok(quirky.includes('<source src="quirky-ball/v2/loop.mp4" type="video/mp4"><source src="quirky-ball/v2/loop.webm" type="video/webm">'), `${file} Quirky Ball video has mp4 and webm sources`);
   assert.equal((quirky.match(/class="hd-phone-button /g) || []).length, 3, `${file} Quirky Ball phone shows its three side buttons`);
 
@@ -356,7 +358,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.ok(farewell.includes(`role="group" aria-label="${l.comradeGroup}"`), `${file} farewell phone is a labelled group`);
   assert.equal((farewell.match(/<video\b/g) || []).length, 1, `${file} one old play loop in the farewell phone`);
   const comradeVideo = farewell.match(/<video\b[^>]*>/)[0];
-  for (const attribute of ["data-hero-gameplay", " autoplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/comrade-gameplay-poster.jpg"', `aria-label="${l.comradeVideo}"`]) assert.ok(comradeVideo.includes(attribute), `${file} farewell video needs ${attribute.trim()}`);
+  for (const attribute of ["data-hero-gameplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/comrade-gameplay-poster.jpg"', `aria-label="${l.comradeVideo}"`]) assert.ok(comradeVideo.includes(attribute), `${file} farewell video needs ${attribute.trim()}`);
+  assert.ok(!/\sautoplay[\s>=]/.test(comradeVideo), `${file} the gameplay video has no autoplay attribute (it forces the download before it scrolls into view; home.js starts it)`);
   assert.ok(farewell.includes('<source src="assets/media/comrade-gameplay.mp4" type="video/mp4"></video>'), `${file} farewell video plays the Comrade mp4`);
   assert.equal((farewell.match(/class="hd-phone-button /g) || []).length, 3, `${file} farewell phone shows its three side buttons`);
   assert.doesNotMatch(html, /hd-ghost|data-ghost|hd-ghost-canvas/, `${file} the ASCII ghost is gone`);
@@ -382,8 +385,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
 
   // --- head: description, social card, fonts, scripts and styles ---
   assert.ok(html.match(/name="description" content="([^"]*)"/)[1].includes(expectedDescriptions[file]), `${file} description names 10key Survival and Quirky Ball`);
-  assert.ok(html.includes('property="og:image" content="https://houseduck.in/assets/media/tenkey-og.jpg"'), `${file} social image is the 10key Survival key art`);
-  assert.ok(html.includes('rel="preload" href="/assets/fonts/Montserrat-Variable.woff2" as="font" type="font/woff2" crossorigin'), `${file} must preload the hero font`);
+  assert.ok(html.includes('property="og:image" content="https://houseduck.in/assets/media/share/house-duck-share.png"'), `${file} social image is the House Duck studio card (the 10key pages have their own)`);
+  assert.ok(html.includes('rel="preload" href="/assets/fonts/Montserrat-Variable-latin.woff2" as="font" type="font/woff2" crossorigin'), `${file} must preload the hero font`);
   assert.match(html, /<script src="assets\/brand-site\.js(?:\?[^\"]+)?" defer><\/script>/, `${file} must not render-block on shared JavaScript`);
   const css = [...html.matchAll(/<link rel="stylesheet" href="assets\/(home|home-desk)\.css\?v=([\w.-]+)">/g)].map((match) => `${match[1]}@${match[2]}`);
   const js = [...html.matchAll(/<script src="assets\/(home|home-desk)\.js\?v=([\w.-]+)" defer><\/script>/g)].map((match) => `${match[1]}@${match[2]}`);
@@ -398,7 +401,8 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.equal((html.match(/house-duck-logo-96\.webp/g) || []).length, 2, `${file} needs optimized header and footer duck images`);
   assert.equal((html.match(/house-duck-wordmark-360\.webp/g) || []).length, 2, `${file} needs optimized header and footer wordmarks`);
-  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 2, `${file} Quirky Ball 2.0 loop is wired twice: on the desk CRT and in the Quirky Ball phone`);
+  assert.equal((html.match(/quirky-ball\/v2\/loop\.mp4"/g) || []).length, 1, `${file} Quirky Ball 2.0 loop plays in the Quirky Ball phone`);
+  assert.equal((html.match(/media\/home\/desk-quirky\.mp4"/g) || []).length, 1, `${file} the desk CRT plays the small desk copy of the Quirky Ball loop`);
   const [title, description, imageAlt] = expectedOpenGraph[file];
   assert.ok(html.includes(`property="og:title" content="${title}"`), `${file} needs a localized Open Graph title`);
   assert.ok(html.includes(`property="og:description" content="${description}"`), `${file} needs a localized Open Graph description`);

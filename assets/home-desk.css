@@ -77,3 +77,24 @@
 @media (prefers-reduced-motion: reduce) {
   .hd-hero { height: 100vh; height: 100svh; }
 }
+
+/* Scroll cue (owner 2026-11-06): the first screen is only a dark desk and a duck, so a small pixel triangle blinks under it and taps down to the 10key section. */
+.hd-scroll-cue {
+  position: absolute; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 3;
+  display: grid; place-items: center; width: 56px; height: 56px; transform: translateX(-50%);
+  padding: 0; border: 0; background: none; font: inherit; cursor: pointer;
+  color: #ffd23f; -webkit-tap-highlight-color: transparent;
+}
+.hd-scroll-cue-tri { display: block; fill: currentColor; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .55)); animation: hd-cue-blink 1s steps(1, end) infinite; }
+.hd-scroll-cue:hover .hd-scroll-cue-tri { color: #ffe07a; }
+.hd-scroll-cue:focus-visible { outline: 3px solid #ece6d6; outline-offset: -6px; border-radius: 10px; }
+@keyframes hd-cue-blink { 0% { opacity: 1; } 50% { opacity: .2; } }
+/* gone once the visitor starts scrolling: driven by the scroll position on the compositor, no script */
+@supports (animation-timeline: scroll()) and (not (prefers-reduced-motion: reduce)) {
+  .hd-scroll-cue { animation: hd-cue-away linear both; animation-timeline: scroll(root); animation-range: 0px 140px; }
+  @keyframes hd-cue-away { to { opacity: 0; visibility: hidden; } }
+}
+/* reduced motion: the triangle stays, steady */
+@media (prefers-reduced-motion: reduce) {
+  .hd-scroll-cue-tri { animation: none; }
+}

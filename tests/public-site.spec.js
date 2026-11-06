@@ -177,8 +177,8 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   expect(await hero.locator(".hd-desk video").evaluateAll((nodes) => nodes.map((node) => ({
     source: node.getAttribute("src"), muted: node.muted, loop: node.loop, playsInline: node.playsInline,
   })))).toEqual([
-    { source: "assets/media/tenkey-gameplay.mp4", muted: true, loop: true, playsInline: true },
-    { source: "quirky-ball/v2/loop.mp4", muted: true, loop: true, playsInline: true },
+    { source: "assets/media/home/desk-tenkey.mp4", muted: true, loop: true, playsInline: true },
+    { source: "assets/media/home/desk-quirky.mp4", muted: true, loop: true, playsInline: true },
   ]);
 
   // 10key Survival: the first game, free in the browser on itch.io; the apps are unreleased, so no store links yet.
@@ -196,11 +196,12 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "10key/#itch-demo");
   await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("사전예약하고 itch.io에서 데모 플레이");
   await expect(tenkey.locator(".hd-tk-paid-chip")).toHaveText("유료 · 인앱 구매 있음");
-  await expect(tenkey.locator(".hd-tk-paid")).toContainText("무료 데모(레벨 15까지)");
+  await expect(tenkey.locator(".hd-tk-paid")).toContainText("무료 데모(레벨 8까지)");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
-  await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/");
+  await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/ko.html");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
   await expect(video).toBeVisible();
+  await expect.poll(() => video.evaluate((node) => node.autoplay)).toBe(true); // home.js sets it when the video scrolls into view
   expect(await video.evaluate((node) => ({
     autoplay: node.autoplay,
     muted: node.muted,
@@ -393,6 +394,7 @@ test("10key Survival shows its real gameplay in its game frame and the quiet Com
     const farewellVideo = block.locator("video[data-hero-gameplay]");
     await expect(farewellVideo).toHaveCount(1);
     await expect(farewellVideo).toBeVisible();
+    await expect.poll(() => farewellVideo.evaluate((node) => node.autoplay)).toBe(true);
     expect(await farewellVideo.evaluate((node) => ({ poster: node.getAttribute("poster"), sources: [...node.querySelectorAll("source")].map((source) => source.getAttribute("src")), autoplay: node.autoplay, muted: node.muted, loop: node.loop, playsInline: node.playsInline, preload: node.preload }))).toEqual({
       poster: "assets/media/comrade-gameplay-poster.jpg", sources: ["assets/media/comrade-gameplay.mp4"], autoplay: true, muted: true, loop: true, playsInline: true, preload: "none",
     });
@@ -665,7 +667,7 @@ test("home reduced motion keeps a still desk, a finished logo, no hero glide and
   // The hero is one still screen: no scroll track, no CSS animation, no zoom however far the visitor scrolls.
   const track = await heroTrack(page);
   expect(track.height).toBe(track.viewport);
-  expect(await page.locator("#studio").evaluate((hero) => hero.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await page.locator("#studio").evaluate((hero) => hero.getAnimations({ subtree: true }).filter((a) => !a.effect.target.closest(".hd-scroll-cue")).length)).toBe(0); // the scroll cue's own blink is allowed
   await jumpTo(page, Math.floor(track.viewport / 2));
   await page.waitForTimeout(250);
   await expect(page.locator("#studio")).not.toHaveClass(/is-zooming/);
@@ -754,7 +756,7 @@ test("localized homes keep the 10key Survival copy, game frame and sections read
         flow,
         supportHeight: support.height,
         copyClipped,
-        homeAssets: [...document.querySelectorAll('link[href*="home"], script[src*="home"], link[href*="studio-home"], script[src*="studio-home"]')].map((node) => node.href || node.src),
+        homeAssets: [...document.querySelectorAll('link[href*="home"]:not([rel="preload"]), script[src*="home"], link[href*="studio-home"], script[src*="studio-home"]')].map((node) => node.href || node.src),
       };
     });
     // On a phone the copy and PLAY come first and the game frame follows, whole and centred.
@@ -793,7 +795,7 @@ test("hero zoom follows the scroll into the CRT and hands over to 10key Survival
   expect(track.height, "the hero is a tall scroll track").toBeGreaterThan(track.viewport * 1.5);
 
   // At rest nothing runs on the CSS side; the canvas is the only moving part and the camera has not moved.
-  expect(await hero.evaluate((node) => node.getAnimations({ subtree: true }).length)).toBe(0);
+  expect(await hero.evaluate((node) => node.getAnimations({ subtree: true }).filter((a) => !a.effect.target.closest(".hd-scroll-cue")).length)).toBe(0); // the scroll cue's own blink is allowed
   await expect.poll(progress).toBe(0);
   await expect(hero).not.toHaveClass(/is-zooming/);
   await expect(hero).not.toHaveClass(/is-entered/);
