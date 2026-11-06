@@ -10,6 +10,7 @@
   let purchasePager = null;
 
   const STATE_NAMES = { granted: ["결제 완료", "good"], sandbox: ["테스트 결제", "quiet"], refunded: ["환불", "risk"] };
+  const cubesUsd = (cubes) => "USD " + (Number(cubes || 0) / 100).toFixed(2);  // Nekoland: 1 cube = USD 0.01 (owner 11-06)
   const playerLink = (id, name) => (id ? `<a class="player-identity-link" href="#/tenkey-players/${esc(id)}"><span class="player-identity-name">${esc(name || "(이름 없음)")}</span></a>` : esc(name || "—"));
 
   // ── 구매 · 젬 ──
@@ -17,7 +18,7 @@
     const [label, tone] = STATE_NAMES[p.state] || [p.state, "quiet"];
     return `<tr><td data-label="시각">${esc(time(p.created_at))}</td>
       <td data-label="플레이어">${p.player_id ? playerLink(p.player_id, p.name) : `<span class="tk-sub">탈퇴한 계정 · ${esc(p.login_short || "—")}</span>`}</td>
-      <td data-label="상품">${esc(p.product_id)}</td><td data-label="스토어">${esc(platformName(p.platform))}</td>
+      <td data-label="상품">${esc(p.product_id)}${p.platform === "nekoland" && p.price_cents != null ? `<span class="tk-sub">${esc(num(p.price_cents))} 큐브 (${esc(cubesUsd(p.price_cents))})</span>` : ""}</td><td data-label="스토어">${esc(platformName(p.platform))}</td>
       <td data-label="상태"><span class="tk-badge" data-tone="${tone}">${esc(label)}</span></td>
       <td data-label="주문 번호 끝"><code>${esc(p.order_tail || "—")}</code></td>
       <td data-label="환불">${esc(p.refunded_at ? `${time(p.refunded_at)}${p.refund_reason_category ? ` · ${p.refund_reason_category}` : ""}` : "—")}</td></tr>`;
@@ -42,6 +43,7 @@
         ["장부 합계 (받음 − 씀)", num(Number(g.granted_all || 0) - Number(g.spent_all || 0))], ["장부가 있는 계정", num(g.wallets)],
         ["리바이브 패스 보유", num(g.revive_pass_owners)],
         ["상품별 결제", (s.by_product || []).map((x) => `${x.product} ${x.n}`).join(" · ") || "—"],
+        ["네코랜드 결제 (1 큐브 = 1 센트)", `${num(s.nekoland)}건 · ${num(s.nekoland_cubes)} 큐브 (${cubesUsd(s.nekoland_cubes)})`],
       ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
       byId("tenkeyPurchaseTotal").textContent = `${num(d.total)}건`;
       byId("tenkeyPurchasesTable").innerHTML = (d.rows || []).length ? d.rows.map(purchaseRow).join("") : '<tr><td colspan="7" class="empty-panel">조건에 맞는 구매 기록이 없습니다. 아직 스토어 결제가 없을 수 있습니다.</td></tr>';
