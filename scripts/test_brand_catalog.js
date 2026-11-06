@@ -141,8 +141,8 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   const farewellBlock = (html.match(/<section class="hd-farewell home-farewell"[\s\S]*?<\/section>/) || [""])[0];
   const quirkyBlock = (html.match(/<section class="hd-quirky"[\s\S]*?<\/section>/) || [""])[0];
   assert.match(html, /href="[^"]*quirky-ball\//, `${file} Quirky Ball link`);
-  const tenkeyHref = { ko: "10key/", en: "10key/index_en.html" }[locale] || `10key/index_en.html?lang=${locale}`;
-  assert.ok(html.includes(`href="${tenkeyHref}"`), `${file} 10key Survival details link (the Korean page in ko, the English page in en/de/ja; de/ja keep ?lang= so the visitor's language follows)`);
+  const tenkeyHref = { ko: "10key/", en: "10key/index_en.html" }[locale] || `10key/index_${locale}.html?lang=${locale}`;
+  assert.ok(html.includes(`href="${tenkeyHref}"`), `${file} 10key Survival details link (the Korean page in ko, the English page in en; de/ja have their own pages and keep ?lang= so the visitor's language follows)`);
   assert.doesNotMatch(html, /href="[^"]*hexaworld1984\//, `${file} must not link the dropped Comrade project`);
   assert.doesNotMatch(html, /European Restroom Map/, `${file} must not reveal non-game projects`);
   assert.doesNotMatch(html, /project-k\/|\bproject k\b/i, `${file} must not reference the retired project`);

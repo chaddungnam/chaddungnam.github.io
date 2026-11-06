@@ -82,12 +82,12 @@
 .hd-scroll-cue {
   position: absolute; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 3;
   display: grid; place-items: center; width: 56px; height: 44px; transform: translateX(-50%);
-  border: 2px solid #ffd23f; border-radius: 12px; background: rgba(11, 15, 42, .88);
+  border: 2px solid rgba(236, 230, 214, .3); border-radius: 12px; background: rgba(11, 15, 42, .88);
   padding: 0; font: inherit; cursor: pointer;
-  color: #ffd23f; -webkit-tap-highlight-color: transparent;
+  color: #ece6d6; -webkit-tap-highlight-color: transparent;
 }
 .hd-scroll-cue-tri { display: block; fill: currentColor; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .55)); animation: hd-cue-blink 1s steps(1, end) infinite; }
-.hd-scroll-cue:hover .hd-scroll-cue-tri { color: #ffe07a; }
+.hd-scroll-cue:hover .hd-scroll-cue-tri { color: #fff; }
 .hd-scroll-cue:focus-visible { outline: 3px solid #ece6d6; outline-offset: 3px; }
 @keyframes hd-cue-blink { 0% { opacity: 1; } 50% { opacity: .35; } }
 /* gone once the visitor starts scrolling: driven by the scroll position on the compositor, no script */

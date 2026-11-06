@@ -88,7 +88,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-11-01"/, `${locale}: last updated 2026-11-01`);
+    assert.match(html, /datetime="2026-11-04"/, `${locale}: last updated 2026-11-04`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -121,7 +121,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-11-01"/, "de: last updated 2026-11-01");
+  assert.match(html, /datetime="2026-11-04"/, "de: last updated 2026-11-04");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -130,11 +130,11 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
 test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
   const titles = {
     en: ["Overview and Acceptance", "The Service", "Accounts and Platforms", "Minors", "Purchases and Refunds", "Ads", "Online Rankings",
-      "Fair Play and Prohibited Conduct", "Intellectual Property and Licence", "Statutory Conformity and Rights",
+      "Fair Play and Prohibited Conduct", "Intellectual Property, Licence and Software Protection", "Statutory Conformity and Rights",
       "Availability and Changes to the Service", "Limitation of Liability", "Termination and Your Data", "Changes to These Terms",
       "Governing Law, Severability and Contact", "Effective Date and Revision History"],
     ko: ["개요 및 동의", "서비스", "계정 및 플랫폼", "미성년자", "구매 및 환불", "광고", "온라인 랭킹", "공정한 플레이 및 금지 행위",
-      "지식재산권 및 이용 허락", "법정 적합성 및 권리", "서비스 제공 및 변경", "책임의 제한", "이용 종료 및 데이터", "본 약관의 변경",
+      "지식재산권, 이용 허락 및 소프트웨어 보호", "법정 적합성 및 권리", "서비스 제공 및 변경", "책임의 제한", "이용 종료 및 데이터", "본 약관의 변경",
       "준거법, 분리 가능성 및 연락처", "시행일 및 개정 이력"],
   };
   const required = {
@@ -169,7 +169,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-11-03"/, `${file}: last updated 2026-11-03 (v1.5: module boxes, the free daily box and the 30-claims rewards)`);
+    assert.match(html, /datetime="2026-11-04"/, `${file}: last updated 2026-11-04 (v1.6: section 9 widened; v1.5 module boxes before it)`);
     assert.doesNotMatch(text(html.replace(/<li>[^<]*\(v1\.[012]\)[^<]*/g, "")), /Revive Pass|부활 패스/, `${file}: the Revive Pass is gone (only in the history entries)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);

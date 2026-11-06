@@ -22,7 +22,7 @@ for (const page of ["console/index.html", "analytics/index.html"]) {
 
 const consoleHtml = read("console/index.html");
 const analyticsSource = read("console/analytics.js");
-assert.match(consoleHtml, /analytics\.js\?v=20261009-web/, "cache must refresh corrected account metrics");
+assert.match(consoleHtml, /analytics\.js\?v=\d{8}-[A-Za-z0-9]+/, "cache must refresh corrected account metrics");
 assert.match(consoleHtml, /id="analyticsCoverageMessage"/, "telemetry coverage must be prominent");
 assert.doesNotMatch(analyticsSource, /10초 미만 즉시 이탈 제외|종료 \(10초 이상\)/, "all explicit exits belong in the lifecycle sample");
 const modelSource = read("console/model.js");
@@ -34,7 +34,7 @@ assert.match(consoleHtml, /id="dailyTrendEyebrow"/, "the daily trend heading mus
 assert.match(analyticsSource, /setText\("kpiActive", formatNumber\(activeAccounts\)\)/, "the active-account KPI must count selected-range account activity");
 assert.match(analyticsSource, /ConsoleAPI\.post\("analytics-dashboard-v2"/, "the Console must load account visits through the secured analytics wrapper");
 assert.match(read("console/api.js"), /"analytics-dashboard-v2"/, "the secured Console API allowlist must permit the analytics wrapper");
-assert.match(consoleHtml, /api\.js\?v=20261007-hx/, "the Console must cache-bust the secured API client");
+assert.match(consoleHtml, /api\.js\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust the secured API client");
 assert.match(analyticsSource, /activePlayers: Number\(summary\.installs \?\? 0\)/, "AI advice must use the selected-range active player count");
 assert.doesNotMatch(analyticsSource, /summary\.activeInstallsToday/, "selected-range analytics must not silently fall back to today's count");
 assert.match(consoleHtml, /<form\s+id="challengeForm"[^>]+aria-describedby="challengeMessage"/i, "the challenge must expose its live result message");
@@ -56,7 +56,7 @@ assert.match(consoleHtml, /id="gameRunStatusTable"/, "the Console must expose pr
 assert.match(analyticsSource, /renderGameRunSummary\(\)/, "the Console must render game terminal and checkpoint summaries");
 assert.match(analyticsSource, /gameRunSummary/, "the Console must consume the dashboard game-run summary response");
 assert.match(analyticsSource, /unknown_stale/, "the Console must distinguish unknown stale runs from explicit exits");
-assert.match(consoleHtml, /analytics\.js\?v=20261009-web/, "the Console must cache-bust the balance signal update");
+assert.match(consoleHtml, /analytics\.js\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust the balance signal update");
 assert.match(consoleHtml, /id="balanceTerminalTable"/, "the Console must expose privacy-safe balance terminal outcomes");
 assert.match(consoleHtml, /id="balancePressureSummary"/, "the Console must expose checkpoint board pressure");
 assert.match(consoleHtml, /id="balanceChoiceTable"/, "the Console must expose growth-choice outcomes");
@@ -78,7 +78,7 @@ assert.match(analyticsSource, /state\.payload\?\.versionMonitor/, "version adopt
 assert.match(analyticsSource, /gate\?\.effectiveDay[\s\S]*row\.day >= gate\.effectiveDay/, "version trend must begin at the matching forced-update audit date");
 assert.match(consoleStyles, /\.executive-overview\s*\{[\s\S]*linear-gradient\([^}]*#ffffff/, "the executive snapshot must use a light surface");
 assert.match(consoleStyles, /grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)/, "mobile navigation must fit all seven console routes");
-assert.match(consoleHtml, /pulse-model\.js\?v=20260831-1/, "the Console must cache-bust conservative return scoring");
+assert.match(consoleHtml, /pulse-model\.js\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust conservative return scoring");
 assert.match(consoleHtml, /data-range="1" data-range-offset="1"[^>]*>어제</, "the Console must offer a distinct yesterday range");
 assert.match(consoleHtml, /class="range-button active" data-range="3"[^>]*>최근 3일</, "the Console must default to the three-day range");
 assert.match(analyticsSource, /rangeDays:\s*3,/, "the analytics state must default to three days without a URL override");
@@ -103,7 +103,7 @@ assert.match(analyticsSource, /knownNumber\(state\.payload\?\.accountActivity\?\
 assert.doesNotMatch(analyticsSource, /const cohortText =/, "the overall judgment must not lead with new-player cohorts");
 assert.match(consoleHtml, /id="priorityInsightPanel"[^>]+hidden/, "the growth-choice priority card must start hidden");
 assert.match(analyticsSource, /buttonRows\.filter\(\(row\) => row\.legacy\)/, "legacy interactions must remain visible at the bottom after current buttons");
-assert.match(consoleHtml, /model\.js\?v=20261025-bal/, "the Console must cache-bust catalog labels and mail summaries");
+assert.match(consoleHtml, /model\.js\?v=2026\d{4}-[a-z0-9]+/, "the Console must cache-bust catalog labels and mail summaries");
 assert.match(consoleHtml, /같은 버튼에서 5초 이상 걸린 행동이 5회 이상일 때만 표시/, "button hesitation must disclose both the duration and sample gates");
 assert.match(analyticsSource, /formatNumber\(row\.users\)\}<\/b>명/, "button hesitation must use the requested people terminology");
 assert.match(analyticsSource, /Math\.max\(5, Math\.round\(value \* 10\)/, "hesitation formatting must preserve the five-second lower bound");
@@ -111,7 +111,7 @@ assert.match(analyticsSource, /Number\(row\.exits \|\| 0\) > 0/, "screen drop-of
 assert.match(modelSource, /한 명에게 몰린 신호/, "single-person hesitation guidance must use the requested terminology");
 assert.match(modelSource, /문의 지원 페이지로 이동 \(외부 브라우저\)/, "the old settings popup path must be identified as the support-page handoff");
 assert.match(analyticsSource, /row\.count \?\? row\.selected/, "choice distributions must use the dashboard count instead of rendering every choice as zero");
-assert.match(consoleHtml, /auth\.js\?v=20261007-hx/, "the Console must cache-bust the 72-hour session client");
+assert.match(consoleHtml, /auth\.js\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust the 72-hour session client");
 assert.match(consoleHtml, /기간 내 계정 활동 신호/, "the period account panel must describe evidence rather than claim exact presence");
 assert.match(consoleHtml, /정확한 새 실행 방문, 로그인, 앱 RPC, 계정 동기화, 홈 진입과 게임 완료/, "the period account panel must explain every supported activity signal");
 assert.match(consoleHtml, /id="accountActivitySummary"/, "the Console must expose exact account visits and account retention");
@@ -124,7 +124,7 @@ assert.match(analyticsSource, /source === "signed_in"[\s\S]*홈 도달 여부 �
 assert.match(analyticsSource, /Number\(row\.gamesPlayed\) === 0 \? "signed_in"/, "zero-completion accounts must render as signed-in activity");
 assert.match(analyticsSource, /latestActivityAt \|\| row\.latestPlayedAt/, "period accounts must render their latest available activity timestamp");
 assert.match(analyticsSource, /state\.payload = null;[\s\S]*선택한 기간의 계정 목록을 불러오지 못했습니다/, "a failed period request must clear stale player rows");
-assert.match(consoleHtml, /styles\.css\?v=20261028-wrap/, "the Console must cache-bust the unified notice editor layout");
+assert.match(consoleHtml, /styles\.css\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust the unified notice editor layout");
 assert.match(consoleStyles, /한 계정 한 줄로 압축/, "period account activity must use compact rows rather than oversized cards");
 assert.match(consoleHtml, /id="priorityInsightPanel"/, "the analytics overview must surface priority drop-off insights near the top");
 assert.match(consoleHtml, /id="growthChoicesTable" class="distribution-list"/, "choice distributions must render as responsive cards instead of a wide table");

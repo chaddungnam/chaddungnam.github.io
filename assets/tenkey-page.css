@@ -44,7 +44,7 @@ body.tk-page {
 }
 body.tk-page::before { display: none; }
 body.tk-page main { position: relative; z-index: 1; }
-body.tk-page :focus-visible { outline: 3px solid var(--tk-duck); outline-offset: 3px; }
+body.tk-page :focus-visible { outline: 3px solid var(--tk-cream); outline-offset: 3px; }
 [id] { scroll-margin-top: calc(var(--tk-bar) + 16px); }
 .tk-wrap { width: min(1160px, 100% - 2 * var(--tk-gutter)); margin-inline: auto; }
 .tk-page a { color: inherit; }
@@ -131,30 +131,30 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-preview-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 22px; }
 .tk-page a.tk-preview {
   display: inline-flex; min-height: 52px; align-items: center; gap: 10px; padding: 0 22px; box-sizing: border-box;
-  border: 2px solid rgba(255, 210, 63, .55); border-radius: 14px; color: var(--tk-duck); background: rgba(255, 210, 63, .06);
+  border: 2px solid rgba(236, 230, 214, .3); border-radius: 14px; color: var(--tk-cream); background: rgba(236, 230, 214, .06);
   font-size: .98rem; font-weight: 800; line-height: 1.25; text-decoration: none; word-break: keep-all;
   transition: background-color 160ms var(--tk-ease), border-color 160ms var(--tk-ease);
 }
-.tk-page a.tk-preview:hover, .tk-page a.tk-preview:focus-visible { border-color: var(--tk-duck); background: rgba(255, 210, 63, .14); }
+.tk-page a.tk-preview:hover, .tk-page a.tk-preview:focus-visible { border-color: var(--tk-cream); background: rgba(236, 230, 214, .12); }
 .tk-preview .tk-play-icon { flex: none; border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
 /* paid app note (owner 11-03 night): the full game is paid with in-app purchases, itch.io is a free demo; no price */
 .tk-paid { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; max-width: 36rem; margin: 18px 0 0; color: var(--tk-text-2); font-size: .9rem; line-height: 1.55; word-break: keep-all; }
-.tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(255, 210, 63, .55); border-radius: 999px; color: var(--tk-duck); background: rgba(255, 210, 63, .1); font-size: .84rem; font-weight: 800; line-height: 1.3; }
+.tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(236, 230, 214, .3); border-radius: 999px; color: var(--tk-cream); background: rgba(236, 230, 214, .06); font-size: .84rem; font-weight: 800; line-height: 1.3; }
 /* itch.io play is a pre-registration perk (owner 2026-11-03): a locked line until sign-up, then the itch.io button */
 .tk-preview-row[hidden] { display: none; }
-.tk-perk { display: flex; align-items: flex-start; gap: 12px; max-width: 34rem; margin: 0; padding: 12px 16px; border: 1px dashed rgba(255, 210, 63, .45); border-radius: 14px; color: var(--tk-text-2); font-size: .92rem; line-height: 1.6; word-break: keep-all; }
-.tk-perk strong { margin-right: 6px; color: var(--tk-duck); font-weight: 800; }
-.tk-lock-icon { position: relative; flex: none; width: 14px; height: 11px; margin-top: 8px; border-radius: 2px; background: currentColor; color: var(--tk-duck); }
+.tk-perk { display: flex; align-items: flex-start; gap: 12px; max-width: 34rem; margin: 0; padding: 12px 16px; border: 1px dashed rgba(236, 230, 214, .3); border-radius: 14px; color: var(--tk-text-2); font-size: .92rem; line-height: 1.6; word-break: keep-all; }
+.tk-perk strong { margin-right: 6px; color: var(--tk-cream); font-weight: 800; }
+.tk-lock-icon { position: relative; flex: none; width: 14px; height: 11px; margin-top: 8px; border-radius: 2px; background: currentColor; color: var(--tk-cream); }
 .tk-lock-icon::before { position: absolute; left: 2px; bottom: 9px; width: 6px; height: 6px; border: 2px solid currentColor; border-bottom: 0; border-radius: 6px 6px 0 0; content: ""; }
 .tk-preview .tk-lock-icon { margin-top: 4px; }
-.tk-unlock a.tk-preview { border-color: var(--tk-duck); background: rgba(255, 210, 63, .16); animation: tk-unlock-pop 420ms var(--tk-ease) both; }
+.tk-unlock a.tk-preview { border-color: var(--tk-cream); background: rgba(236, 230, 214, .14); animation: tk-unlock-pop 420ms var(--tk-ease) both; }
 /* the popup a locked itch.io demo button opens (owner 2026-11-03) */
-.tk-gate { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 24px 22px; border: 1px solid rgba(255, 210, 63, .5); border-radius: 18px; color: var(--tk-text); background: var(--tk-night-2); box-shadow: 0 30px 90px rgba(0, 0, 0, .6); text-align: center; }
+.tk-gate { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 24px 22px; border: 1px solid rgba(236, 230, 214, .3); border-radius: 18px; color: var(--tk-text); background: var(--tk-night-2); box-shadow: 0 30px 90px rgba(0, 0, 0, .6); text-align: center; }
 /* QA 11-03: keep-all never breaks Japanese (no spaces), so the ja popup title ran out of the box */
 .tk-gate { overflow-x: hidden; }
 .tk-gate h2, .tk-gate p { overflow-wrap: anywhere; }
 .tk-gate:lang(ja) h2, .tk-gate:lang(ja) p { word-break: normal; line-break: strict; }
-.tk-gate .tk-gate-paid { margin: -8px 0 20px; color: var(--tk-duck-soft); font-size: .86rem; font-weight: 700; }
+.tk-gate .tk-gate-paid { margin: -8px 0 20px; color: var(--tk-cream); font-size: .86rem; font-weight: 700; }
 .tk-gate::backdrop { background: rgba(9, 9, 9, .72); }
 .tk-gate .tk-lock-icon { display: block; margin: 6px auto 14px; transform: scale(1.6); }
 .tk-gate h2 { margin: 0 0 10px; font-family: var(--tk-pixel); font-size: 20px; line-height: 1.4; word-break: keep-all; }
@@ -174,13 +174,13 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 /* the pre-registration card */
 .tk-prereg {
   margin-top: 28px; padding: clamp(20px, 2.6vw, 28px);
-  border: 1px solid rgba(255, 210, 63, .38); border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 210, 63, .08), rgba(255, 210, 63, .02) 60%), var(--tk-night-2);
+  border: 1px solid rgba(236, 230, 214, .3); border-radius: 16px;
+  background: var(--tk-night-2);
   box-shadow: 0 30px 70px rgba(0, 0, 0, .35);
 }
 .tk-prereg-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
 .tk-prereg h2 { margin: 0; color: var(--tk-text); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
-.tk-prereg-free { margin: 0; color: var(--tk-duck-soft); font-size: .84rem; font-weight: 700; }
+.tk-prereg-free { margin: 0; color: var(--tk-cream); font-size: .84rem; font-weight: 700; }
 .tk-prereg-sub { margin: 8px 0 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
 .tk-form-row { display: flex; gap: 10px; }
 .tk-field { position: relative; flex: 1 1 auto; min-width: 0; }
@@ -191,11 +191,11 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
   transition: border-color 160ms var(--tk-ease), box-shadow 160ms var(--tk-ease);
 }
 .tk-input::placeholder { color: var(--tk-text-3); }
-.tk-input:focus { border-color: var(--tk-duck); box-shadow: 0 0 0 3px rgba(255, 210, 63, .25); }
+.tk-input:focus { border-color: var(--tk-cream); box-shadow: 0 0 0 3px rgba(236, 230, 214, .2); }
 .tk-input[aria-invalid="true"] { border-color: var(--tk-err); }
 .tk-form-row .tk-key { flex: none; }
 .tk-consent { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; color: var(--tk-text-2); font-size: .85rem; line-height: 1.55; word-break: keep-all; cursor: pointer; }
-.tk-consent input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--tk-duck); cursor: pointer; }
+.tk-consent input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--tk-cream); cursor: pointer; }
 .tk-consent a { color: #fff; text-underline-offset: 3px; }
 .tk-hp { position: absolute !important; left: -10000px !important; width: 1px; height: 1px; overflow: hidden; }
 .tk-status { min-height: 0; margin: 0; font-size: .92rem; font-weight: 600; line-height: 1.55; word-break: keep-all; }
@@ -205,7 +205,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-prereg.is-done .tk-form-body { display: none; }
 .tk-facts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 0; padding: 16px 0 0; border-top: 1px solid var(--tk-edge); list-style: none; color: var(--tk-text-2); font-size: .86rem; }
 .tk-facts li { display: inline-flex; align-items: center; gap: 8px; }
-.tk-facts li::before { width: 6px; height: 6px; border-radius: 2px; content: ""; background: var(--tk-duck); }
+.tk-facts li::before { width: 6px; height: 6px; border-radius: 2px; content: ""; background: rgba(236, 230, 214, .5); }
 .tk-facts b { color: #fff; font-weight: 700; }
 
 .tk-video-toggle {
@@ -230,10 +230,10 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-feature { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; overflow: hidden; border: 1px solid var(--tk-edge); border-radius: 16px; background: var(--tk-night-2); }
 .tk-feature img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; aspect-ratio: 959 / 520; }
 .tk-feature > div { padding: clamp(22px, 3vw, 36px); }
-.tk-feature h3 { margin: 0 0 14px; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
+.tk-feature h3 { margin: 0 0 14px; color: var(--tk-cream); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
 .tk-feature ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .tk-feature li { position: relative; padding-left: 18px; color: var(--tk-text-2); font-size: .95rem; line-height: 1.65; word-break: keep-all; text-wrap: pretty; }
-.tk-feature li::before { position: absolute; top: .62em; left: 0; width: 6px; height: 6px; border-radius: 1px; content: ""; background: var(--tk-duck); }
+.tk-feature li::before { position: absolute; top: .62em; left: 0; width: 6px; height: 6px; border-radius: 1px; content: ""; background: rgba(236, 230, 214, .5); }
 
 /* the store screenshots, in the visitor's language */
 .tk-shots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); margin: 0; padding: 0; list-style: none; }
@@ -267,8 +267,8 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-sheet dt { margin: 0 0 6px; color: var(--tk-text-3); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
 .tk-sheet dd { margin: 0; color: #fff; font-size: 1.02rem; font-weight: 700; line-height: 1.5; word-break: keep-all; }
 .tk-sheet dd span { display: block; margin-top: 2px; color: var(--tk-text-2); font-size: .88rem; font-weight: 500; }
-.tk-sheet .is-key { background: rgba(255, 210, 63, .08); }
-.tk-sheet .is-key dd { color: var(--tk-duck-soft); }
+.tk-sheet .is-key { background: rgba(236, 230, 214, .06); }
+.tk-sheet .is-key dd { color: var(--tk-cream); }
 
 /* questions */
 .tk-faq { display: grid; gap: 10px; max-width: 52rem; }
@@ -311,7 +311,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-js .tk-reveal { opacity: 0; transform: translateY(22px); transition: opacity 600ms var(--tk-ease), transform 600ms var(--tk-ease); transition-delay: calc(var(--i, 0) * 80ms); }
 .tk-js .tk-reveal.is-in { opacity: 1; transform: none; }
 .tk-flash { animation: tk-flash 1.2s var(--tk-ease); }
-@keyframes tk-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 210, 63, .7), 0 30px 70px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 18px rgba(255, 210, 63, 0), 0 30px 70px rgba(0, 0, 0, .35); } }
+@keyframes tk-flash { 0% { box-shadow: 0 0 0 0 rgba(236, 230, 214, .3), 0 30px 70px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 18px rgba(236, 230, 214, 0), 0 30px 70px rgba(0, 0, 0, .35); } }
 
 /* ---------- responsive ---------- */
 @media (max-width: 960px) {
@@ -375,7 +375,7 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
 .tk-where { display: grid; gap: 6px; max-width: 36rem; margin: 14px 0 0; padding: 0; list-style: none; color: var(--tk-text-2); font-size: .9rem; line-height: 1.5; word-break: keep-all; }
 .tk-where li { display: flex; align-items: baseline; gap: 12px; }
 .tk-where-k { flex: none; min-width: 5.2rem; color: var(--tk-text-3); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
-.tk-where b { color: var(--tk-duck); font-weight: 800; }
+.tk-where b { color: var(--tk-cream); font-weight: 800; }
 /* small design pass (2026-11-04): the wide evolve strip keeps its own shape instead of losing both edges to the crop */
 .tk-feature img[width="1364"] { height: auto; aspect-ratio: 1364 / 520; align-self: center; }
 /* the ads-settings button sits on the same line and in the same type as the other footer links */

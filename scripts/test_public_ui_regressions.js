@@ -289,12 +289,12 @@ test("public UI CSS preserves contrast, brand visibility, and mobile readability
 
 test("terms show the effective date and avoid unconfirmed business status", () => {
   const expectations = [
-    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 10월 5일/, /영업하는 개인사업자/],
-    ["quirky-ball/terms/en.html", /Effective date:\s*October 5, 2026/i, /sole proprietor/i],
-    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*5\. Oktober 2026/i, /Einzelunternehmer/i],
+    ["quirky-ball/terms/ko.html", /시행일:\s*2026년 11월 4일/, /영업하는 개인사업자/],
+    ["quirky-ball/terms/en.html", /Effective date:\s*November 4, 2026/i, /sole proprietor/i],
+    ["quirky-ball/terms/de.html", /Inkrafttreten:\s*4\. November 2026/i, /Einzelunternehmer/i],
     // 10key Survival terms v1.5 (2026-11-03: module boxes; the itch.io version is a free demo up to level 8).
-    ["10key/terms/ko.html", /시행일:\s*2026년 11월 3일/, /영업하는 개인사업자/],
-    ["10key/terms/en.html", /Effective date:\s*November 3, 2026/i, /sole proprietor/i],
+    ["10key/terms/ko.html", /시행일:\s*2026년 11월 4일/, /영업하는 개인사업자/],
+    ["10key/terms/en.html", /Effective date:\s*November 4, 2026/i, /sole proprietor/i],
   ];
   for (const [file, effectiveDate, settledBusiness] of expectations) {
     const html = read(file);

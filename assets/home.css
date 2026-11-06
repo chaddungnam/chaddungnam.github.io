@@ -438,7 +438,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-tk-logo { display: block; margin: 0 0 clamp(28px, 3.4vw, 40px); }
 .hd-tk-logo img { display: block; width: 100%; max-width: 640px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-line), 0 24px 60px rgba(0, 0, 0, .45); }
 .hd-tenkey .hd-eyebrow { color: var(--tk-ink-2); }
-.hd-tenkey .hd-chip-status { border-color: rgba(255, 210, 63, .4); color: var(--tk-gold); background: rgba(255, 210, 63, .1); }
+.hd-tenkey .hd-chip-status { border-color: rgba(236, 230, 214, .3); color: var(--tk-ink); background: rgba(236, 230, 214, .06); }
 .hd-tenkey .hd-title { color: var(--tk-ink); font-family: var(--tk-pixel); font-size: 48px; font-weight: 700; letter-spacing: 0; line-height: 1.25; }
 .hd-tenkey .hd-title-alt { color: var(--tk-ink-3); font-family: var(--hd-font); }
 .hd-tk-pitch { margin: 18px 0 0; color: var(--tk-gold); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.5; text-wrap: balance; word-break: keep-all; }
@@ -458,18 +458,18 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
   font-weight: 700;
 }
 .hd-tk-prereg .hd-keycap-face { gap: 14px; min-width: 260px; padding: 0 36px; }
-.hd-tk-prereg .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side), 0 calc(var(--btn-depth) + 16px) 36px rgba(255, 210, 63, .22); }
+.hd-tk-prereg .hd-keycap-face { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .08), 0 var(--btn-depth) 0 var(--btn-side); }
 /* paid app note (owner 11-03 night): the full game is paid with in-app purchases, itch.io is a free demo; no price */
 .hd-tk-paid { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; max-width: 38rem; margin: 22px 0 0; color: var(--tk-ink-2); font-size: .9rem; line-height: 1.55; word-break: keep-all; }
-.hd-tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(255, 210, 63, .55); border-radius: 999px; color: var(--tk-gold); background: rgba(255, 210, 63, .1); font-size: .84rem; font-weight: 800; line-height: 1.3; }
+.hd-tk-paid-chip { flex: none; padding: 4px 10px; border: 1px solid rgba(236, 230, 214, .3); border-radius: 999px; color: var(--tk-ink); background: rgba(236, 230, 214, .06); font-size: .84rem; font-weight: 800; line-height: 1.3; }
 .hd-tk-note { max-width: 28ch; margin: 0; color: var(--tk-ink-2); font-size: .86rem; line-height: 1.55; word-break: keep-all; }
 .hd-tk-preview {
   display: inline-flex; min-height: 52px; align-items: center; gap: 10px; padding: 0 22px; box-sizing: border-box;
-  border: 2px solid rgba(255, 210, 63, .55); border-radius: 14px; color: var(--tk-gold); background: rgba(255, 210, 63, .06);
+  border: 2px solid rgba(236, 230, 214, .3); border-radius: 14px; color: var(--tk-ink); background: rgba(236, 230, 214, .06);
   font-size: .98rem; font-weight: 800; line-height: 1.25; text-decoration: none; word-break: keep-all;
   transition: background-color 160ms var(--hd-ease), border-color 160ms var(--hd-ease);
 }
-.hd-tk-preview:hover, .hd-tk-preview:focus-visible { border-color: var(--tk-gold); background: rgba(255, 210, 63, .14); }
+.hd-tk-preview:hover, .hd-tk-preview:focus-visible { border-color: var(--tk-ink); background: rgba(236, 230, 214, .12); }
 .hd-tk-play-icon { flex: none; width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 11px solid currentColor; }
 .hd-tenkey .hd-tk-more { margin-top: 26px; border-color: var(--tk-line); color: var(--tk-ink); }
 .hd-tenkey .hd-tk-more::after { content: "→"; }
@@ -485,16 +485,16 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-tk-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); margin: clamp(72px, 9vw, 112px) 0 0; padding: 0; list-style: none; }
 .hd-tk-features li { display: grid; grid-template-rows: auto auto 1fr; overflow: hidden; border: 1px solid var(--tk-line); border-radius: 14px; background: var(--tk-bg-2); }
 .hd-tk-features img { display: block; width: 100%; height: auto; aspect-ratio: 959 / 520; object-fit: cover; object-position: center top; }
-.hd-tk-features h3 { margin: 20px 22px 0; color: var(--tk-gold); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
+.hd-tk-features h3 { margin: 20px 22px 0; color: var(--tk-ink); font-family: var(--tk-pixel); font-size: 24px; font-weight: 700; line-height: 1.3; }
 .hd-tk-features p { margin: 10px 22px 24px; color: var(--tk-ink-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
 
 .hd-tk-shots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); margin: clamp(28px, 3.4vw, 40px) 0 0; padding: 0; list-style: none; }
 .hd-tk-shots img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-line), 0 16px 40px rgba(0, 0, 0, .4); }
-.hd-tk-shots:focus-visible { outline: 3px solid var(--tk-gold); outline-offset: 6px; }
+.hd-tk-shots:focus-visible { outline: 3px solid var(--tk-ink); outline-offset: 6px; }
 .hd-tk-fine { margin: 28px 0 0; color: var(--tk-ink-3); font-size: .8rem; line-height: 1.6; word-break: keep-all; }
 .hd-tk-fine a { color: var(--tk-ink-2); text-decoration: underline; text-underline-offset: 3px; }
 .hd-tk-fine a:hover { color: var(--tk-ink); }
-.hd-tenkey :focus-visible { outline-color: var(--tk-gold); }
+.hd-tenkey :focus-visible { outline-color: var(--tk-ink); }
 
 /* phone shells used by the Quirky Ball and farewell sections */
 .hd-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 30px; }
@@ -801,4 +801,4 @@ html:lang(de) body[data-page="studio"] .hd-title { hyphens: auto; overflow-wrap:
 .hd-tk-where { display: grid; gap: 6px; max-width: 38rem; margin: 14px 0 0; padding: 0; list-style: none; color: var(--tk-ink-2); font-size: .9rem; line-height: 1.5; word-break: keep-all; }
 .hd-tk-where li { display: flex; align-items: baseline; gap: 12px; }
 .hd-tk-where-k { flex: none; min-width: 5.2rem; color: var(--tk-ink-3); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
-.hd-tk-where b { color: var(--tk-gold); font-weight: 800; }
+.hd-tk-where b { color: var(--tk-ink); font-weight: 800; }

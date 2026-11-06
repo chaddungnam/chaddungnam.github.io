@@ -89,8 +89,8 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   # Rebuilt home (owner 2026-10-23): night pixel-desk hero, 10key Survival, Quirky Ball, Comrade farewell, lab notes, support.
   require_token "$page" 'class="hd-hero"'
   require_token "$page" 'data-desk '
-  require_token "$page" 'data-desk-tenkey="assets/media/tenkey-gameplay.mp4"'
-  require_token "$page" 'data-desk-quirky="quirky-ball/v2/loop.mp4"'
+  require_token "$page" 'data-desk-tenkey="assets/media/home/desk-tenkey.mp4"'
+  require_token "$page" 'data-desk-quirky="assets/media/home/desk-quirky.mp4"'
   require_token "$page" 'data-tenkey'
   require_token "$page" 'data-youtube-feed'
   require_token "$page" 'data-community-stats'
@@ -102,7 +102,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'assets/home-desk.js'
   reject_token "$page" 'assets/studio-home.css'
   reject_token "$page" 'assets/studio-home.js'
-  require_token "$page" 'assets/media/tenkey-og.jpg'
+  require_token "$page" 'assets/media/share/house-duck-share.png'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
   require_token "$page" "assets/media/tenkey-gameplay.mp4"
