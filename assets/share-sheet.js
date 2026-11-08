@@ -9,17 +9,27 @@
  * Share key: the phone's own share sheet with the picture + text + link when the browser can send files, else text + link,
  * else this page's own sheet (X, Threads, copy text and link, save the picture, the phone share key when there is one).
  * In the KakaoTalk / Instagram / Facebook in-app browsers the sheet opens first with "copy" in front and a long-press hint
- * on the picture. KakaoTalk's own share button needs a Kakao JS app key and is not used: on phones Kakao is one entry of
- * the phone share sheet. The row stays hidden until this script runs, so no key is ever dead. */
+ * on the picture. KakaoTalk share (owner 2026-11-08): Korean pages only, a "카카오톡으로 공유" key in the row and in the sheet,
+ * through Kakao's own JavaScript SDK. The SDK is fetched from Kakao's CDN (pinned version + integrity hash) only when the visitor
+ * reaches for it (hover / touch / focus on that key, or the sheet opening), never at page load. No key set, or the SDK fails to
+ * load: the Kakao key is not there / goes away and the sheet opens instead. The row stays hidden until this script runs, so no key
+ * is ever dead. */
 (function () {
   "use strict";
+  /* Kakao app "딸깍 서바이벌": its JavaScript key (developers.kakao.com > 앱 > 플랫폼 키 > JavaScript 키). A public client key that
+     Kakao accepts only from the domains registered there (houseduck.in). Empty = no KakaoTalk key anywhere. Never put the REST,
+     Admin or native keys here. */
+  var KAKAO_JS_KEY = "cc6a61ebc793ae6d6f4548989bd29a5c";
+  var KAKAO_SDK = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js";
+  var KAKAO_SRI = "sha384-BGX7Wb16GmRFagri4bLJV2DgipVZaU2AI812GZtHtHzzDQJnfHasDXN5houxv45w"; // from Kakao's download page for 2.8.4
   var ORIGIN = "https://houseduck.in";
   var LANG = String(document.documentElement.lang || "en").slice(0, 2).toLowerCase();
+  var KAKAO_ON = LANG === "ko" && !!KAKAO_JS_KEY;
   var PATH = { ko: "/10key/", en: "/10key/index_en.html", de: "/10key/index_de.html", ja: "/10key/index_ja.html", zh: "/10key/index_zh.html" };
   var IMAGE = {};
   ["ko", "en", "de", "ja", "zh"].forEach(function (l) { IMAGE[l] = "/assets/media/share/tenkey-share-" + l + ".png"; });
   var STR = {
-    ko: { title: "공유하기", intro: "딸깍 서바이벌을 친구에게 알려 주세요.", phone: "휴대폰 공유창", x: "X에 올리기", threads: "Threads에 올리기", copyAll: "글과 링크 복사", copyLink: "링크 복사", save: "그림 저장", hint: "그림을 길게 눌러 저장하세요.", inapp: "이 앱 안에서는 복사가 가장 확실해요. 복사한 뒤 카카오톡이나 인스타그램에 붙여 넣으세요.", copied: "복사됨", copiedMsg: "복사했어요.", fail: "복사하지 못했어요. 위 주소를 길게 눌러 복사해 주세요.", close: "닫기", imgAlt: "딸깍 서바이벌 공유 그림: 3D 키보드 위의 텐키와 마우스", text: "딸깍 서바이벌: 살아 있는 텐키가 되어 끝없는 키보드를 파고 내려가는 게임이에요. 지금 사전예약 중!" },
+    ko: { title: "공유하기", intro: "딸깍 서바이벌을 친구에게 알려 주세요.", phone: "휴대폰 공유창", x: "X에 올리기", threads: "Threads에 올리기", copyAll: "글과 링크 복사", copyLink: "링크 복사", save: "그림 저장", hint: "그림을 길게 눌러 저장하세요.", inapp: "이 앱 안에서는 복사가 가장 확실해요. 복사한 뒤 카카오톡이나 인스타그램에 붙여 넣으세요.", copied: "복사됨", copiedMsg: "복사했어요.", fail: "복사하지 못했어요. 위 주소를 길게 눌러 복사해 주세요.", close: "닫기", kakao: "카카오톡으로 공유", kakaoMore: "자세히 보기", imgAlt: "딸깍 서바이벌 공유 그림: 3D 키보드 위의 텐키와 마우스", text: "딸깍 서바이벌: 살아 있는 텐키가 되어 끝없는 키보드를 파고 내려가는 게임이에요. 지금 사전예약 중!" },
     en: { title: "Share", intro: "Tell a friend about 10key Survival.", phone: "Phone share sheet", x: "Post on X", threads: "Post on Threads", copyAll: "Copy text and link", copyLink: "Copy link", save: "Save picture", hint: "Press and hold the picture to save it.", inapp: "Copying works best inside this app. Copy, then paste it into KakaoTalk or Instagram.", copied: "Copied", copiedMsg: "Copied.", fail: "Could not copy. Press and hold the address above to copy it.", close: "Close", imgAlt: "10key Survival share picture: the numpad and the mouse on a 3D keyboard", text: "10key Survival: a game where you dig down an endless keyboard as a living numpad. Pre-registration is open!" },
     de: { title: "Teilen", intro: "Erzähl einem Freund von 10key Survival.", phone: "Teilen-Menü des Handys", x: "Auf X posten", threads: "Auf Threads posten", copyAll: "Text und Link kopieren", copyLink: "Link kopieren", save: "Bild speichern", hint: "Bild lange drücken, um es zu speichern.", inapp: "In dieser App klappt Kopieren am besten. Kopieren und dann in KakaoTalk oder Instagram einfügen.", copied: "Kopiert", copiedMsg: "Kopiert.", fail: "Kopieren hat nicht geklappt. Die Adresse oben lange drücken und kopieren.", close: "Schließen", imgAlt: "10key-Survival-Teilen-Bild: der Ziffernblock und die Maus auf einer 3D-Tastatur", text: "10key Survival: Du gräbst dich als lebendiger Ziffernblock durch eine endlose Tastatur. Die Vorregistrierung läuft!" },
     ja: { title: "シェア", intro: "10key Survivalを友だちに教えよう。", phone: "スマホの共有メニュー", x: "Xに投稿", threads: "Threadsに投稿", copyAll: "文とリンクをコピー", copyLink: "リンクをコピー", save: "画像を保存", hint: "画像を長押しして保存してください。", inapp: "このアプリ内ではコピーが確実です。コピーして、KakaoTalkやInstagramに貼り付けてください。", copied: "コピーしました", copiedMsg: "コピーしました。", fail: "コピーできませんでした。上のアドレスを長押ししてコピーしてください。", close: "閉じる", imgAlt: "10key Survivalのシェア画像：3Dキーボードの上のテンキとマウス", text: "10key Survival：生きたテンキになって、終わりのないキーボードを掘り進むゲーム。事前登録受付中！" },
@@ -87,6 +97,55 @@
     });
   }
 
+  /* KakaoTalk: the SDK once (Kakao's CDN, integrity-checked), then Kakao.init with the JavaScript key */
+  var kakaoP = null;
+  function kakaoReady() { var K = window.Kakao; return !!(K && K.Share && K.isInitialized && K.isInitialized()); }
+  function loadKakao() {
+    if (!kakaoP) {
+      kakaoP = new Promise(function (ok, no) {
+        if (window.Kakao && window.Kakao.init) { ok(); return; }
+        var s = el("script", { src: KAKAO_SDK, integrity: KAKAO_SRI, crossorigin: "anonymous", referrerpolicy: "strict-origin" });
+        s.async = true; s.onload = ok; s.onerror = function () { no(new Error("kakao-sdk")); };
+        document.head.appendChild(s);
+      }).then(function () {
+        var K = window.Kakao;                // Kakao.Share only exists after Kakao.init
+        if (!K || !K.init) throw new Error("kakao-sdk");
+        if (!K.isInitialized()) K.init(KAKAO_JS_KEY);
+        if (!K.Share || !K.Share.sendDefault) throw new Error("kakao-share");
+        return K;
+      }).catch(function (err) { kakaoOff(); throw err; });
+    }
+    return kakaoP;
+  }
+  /* the SDK did not load or start: take every Kakao key away, so none is left that does nothing */
+  function kakaoOff() {
+    KAKAO_ON = false;
+    document.querySelectorAll("[data-share-kakao]").forEach(function (b) { (b.closest("li") || b).remove(); });
+  }
+  function kakaoSend() {
+    var link = { webUrl: URL_, mobileWebUrl: URL_ };
+    var cut = T.text.indexOf(": ");          // "딸깍 서바이벌: ..." -> title + description
+    window.Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: { title: cut > 0 ? T.text.slice(0, cut) : document.title, description: cut > 0 ? T.text.slice(cut + 2) : T.text, imageUrl: ORIGIN + IMG_URL, imageWidth: 1200, imageHeight: 630, link: link },
+      buttons: [{ title: T.kakaoMore, link: link }]
+    });
+  }
+  function shareKakao(btn) {
+    var go = function () { try { kakaoSend(); } catch (e) { kakaoOff(); opener = btn; openSheet(); } };
+    if (kakaoReady()) go();                  // already warm: straight from the click
+    else loadKakao().then(go, function () { opener = btn; openSheet(); });
+  }
+  function warmKakao(node) {
+    ["pointerenter", "touchstart", "focus"].forEach(function (t) { node.addEventListener(t, function () { loadKakao().catch(function () {}); }, { once: true, passive: true }); });
+  }
+  function kakaoKey(cls) {
+    var b = el("button", { type: "button", class: cls, "data-share-kakao": "" }, T.kakao);
+    b.addEventListener("click", function () { shareKakao(b); });
+    warmKakao(b);
+    return b;
+  }
+
   function openFrom(btn) {
     opener = btn;
     if (!IN_APP && navigator.share) {
@@ -126,6 +185,7 @@
     var status = el("p", { class: "hd-share-status", role: "status", "aria-live": "polite" });
 
     add("copyAll", btn(T.copyAll, function (b) { copyText(p.text + "\n" + p.url).then(function (ok) { flash(b, status, ok); if (!ok) addr.select(); }); }, "is-primary"));
+    if (KAKAO_ON) add("kakao", kakaoKey("hd-share-item"));
     add("copyLink", btn(T.copyLink, function (b) { copyText(p.url).then(function (ok) { flash(b, status, ok); if (!ok) addr.select(); }); }));
     if (navigator.share) add("phone", btn(T.phone, function () { nativeShare().catch(function () {}); }));
     var ax = el("a", { class: "hd-share-item", href: "https://twitter.com/intent/tweet?text=" + encodeURIComponent(p.text) + "&url=" + encodeURIComponent(p.url), target: "_blank", rel: "noopener noreferrer" }, T.x);
@@ -154,6 +214,7 @@
 
   function openSheet() {
     if (!dlg) dlg = buildSheet();
+    if (KAKAO_ON) loadKakao().catch(function () {});
     if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute("open", "");
     var first = dlg.querySelector(".hd-share-item"); if (first) first.focus();
   }
@@ -171,6 +232,7 @@
         ["pointerenter", "touchstart", "focus"].forEach(function (t) { open.addEventListener(t, function () { if (navigator.share && !IN_APP) loadFile(); }, { once: true, passive: true }); });
       }
       if (copy) copy.addEventListener("click", function () { copyText(URL_).then(function (ok) { flash(copy, status, ok); }); });
+      if (KAKAO_ON && (copy || open)) (copy || open).insertAdjacentElement("afterend", kakaoKey("hd-share-key"));
       row.hidden = false;
     });
   }
