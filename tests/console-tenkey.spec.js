@@ -184,10 +184,12 @@ test("players: [버그유저] label only on an account whose day-cap hit does no
   await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
   await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toHaveCount(1);
   await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toContainText("의심스러운덕");
+  await shot(page, "players_bug_user");
   await page.locator("#tenkeyPlayersTable tr", { hasText: "의심스러운덕" }).locator("a.player-identity-link").click();
   await expect(page.locator("#tenkeyPlayerDetail")).toContainText("[버그유저]");
   await expect(page.locator("#tenkeyPlayerDetail")).toContainText("하루 부품 상한 도달");
   await expect(page.locator("#tenkeyPlayerDetail")).toContainText("말이 안 됨");
+  await shot(page, "player_detail_bug_user");
   expect(errors).toEqual([]);
 });
 
