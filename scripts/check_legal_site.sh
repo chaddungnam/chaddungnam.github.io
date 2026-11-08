@@ -22,6 +22,15 @@ reject_token() {
   fi
 }
 
+# No page resource (src/href) from a CDN. Text may name a CDN host: the privacy policy names t1.kakaocdn.net, where the
+# Korean share sheet loads the Kakao SDK (2026-11-08).
+reject_cdn_resource() {
+  local file="$1"
+  if grep -Eiq '(src|href)="[^"]*cdn\.' "$repo_dir/$file"; then
+    fail "$file loads a resource from a CDN"
+  fi
+}
+
 test -s "$repo_dir/assets/legal-site.css" || fail "assets/legal-site.css does not exist"
 test -s "$repo_dir/assets/legal-site.js" || fail "assets/legal-site.js does not exist"
 require_token "assets/legal-site.css" 'color-scheme: light'
@@ -68,7 +77,7 @@ for page in "${localized_pages[@]}" "${selector_pages[@]}" "support/index.html";
   require_token "$page" "data-current-year"
   reject_token "$page" "<style"
   reject_token "$page" "fonts.googleapis.com"
-  reject_token "$page" "cdn."
+  reject_cdn_resource "$page"
   reject_token "$page" "tailwind"
   reject_token "$page" "iconify"
 done
@@ -289,7 +298,7 @@ for page in "${hexaworld_localized_pages[@]}" "${hexaworld_selector_pages[@]}"; 
   require_token "$page" "data-current-year"
   reject_token "$page" "<style"
   reject_token "$page" "fonts.googleapis.com"
-  reject_token "$page" "cdn."
+  reject_cdn_resource "$page"
   reject_token "$page" "tailwind"
   reject_token "$page" "iconify"
 done
@@ -328,7 +337,7 @@ for page in 10key/index.html 10key/index_en.html; do
   require_token "$page" 'href="/support/'
   reject_token "$page" "<style"
   reject_token "$page" "fonts.googleapis.com"
-  reject_token "$page" "cdn."
+  reject_cdn_resource "$page"
   reject_token "$page" "tailwind"
   reject_token "$page" "iconify"
 done
