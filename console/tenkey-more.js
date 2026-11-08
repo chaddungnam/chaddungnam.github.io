@@ -111,11 +111,14 @@
   }
 
   // ── 감사 기록 ──
-  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경" };
+  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경" };
   function auditSummary(a) {
     const p = a.params || {};
     if (a.action === "notices.save") return p.notice?.title_en ? `${p.notice?.title_ko || ""} / ${p.notice.title_en}` : `${p.notice?.title_ko || ""}${p.notice?.translations ? " (자동 번역 포함)" : ""}`;
     if (a.action === "players.ban") return `${p.banned ? "정지" : "정지 해제"} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "unlocks.set") return `${p.step} → ${{ auto: "자동", on: "켜짐", off: "꺼짐" }[p.state] || p.state} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "unlocks.upto") return `1~${p.step} 켜짐 · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "god.set") return `무적 ${p.on ? "켜짐" : "꺼짐"} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "config.set") return JSON.stringify(p.config || {});
     if (a.action === "knobs.set") return JSON.stringify(p.knobs || {});
     return `공지 #${p.id ?? "?"}`;

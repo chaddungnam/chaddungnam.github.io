@@ -58,11 +58,17 @@
     { id: "f6666666-6666-4666-8666-666666666666", name: "창문덕", nickname: "창문덕", provider: "supabase", platform: "windows", created_at: "2026-10-24T10:00:00+00:00", last_seen_at: "2026-10-24T12:00:00+00:00", best_score: 30500, best_level: 7, banned: false, age_band: 18, runs_stored: 2 },
     { id: "a7777777-7777-4777-8777-777777777777", name: "사과덕", nickname: "사과덕", provider: "supabase", platform: "macos", created_at: "2026-10-24T11:00:00+00:00", last_seen_at: "2026-10-24T13:00:00+00:00", best_score: 12000, best_level: 5, banned: false, age_band: 18, runs_stored: 1 },
   ];
+  // Hard-mode round (2026-11-08): the v2 answer of players.get carries unlocks {step: 'on'|'off'} (missing = auto), god_mode, hard_ready,
+  // best_hard_level; unlocks.set / unlocks.upto / god.set change them for the page's life (steps in the order of hard_mode.md section 1).
+  const UNLOCK_STEPS = ["tab_research", "tab_ranking", "quests", "tab_shop", "tab_modules", "home_friends", "home_mailbox", "purchase", "discount", "upgrade_robot", "hard_card", "hard_play", "hard_upgrade", "hard_pack", "hard_ranking", "hard_sale"];
+  const unlockState = {};  // player id -> { unlocks, god }
+  const unlockOf = (id) => (unlockState[id] = unlockState[id] || { unlocks: {}, god: false });
   const detailFor = (id) => {
     const p = PLAYERS.find((x) => x.id === id) || PLAYERS[0];
     const mobile = p.provider === "supabase";
     return {
       ok: true,
+      unlocks: { ...unlockOf(p.id).unlocks }, god_mode: unlockOf(p.id).god, hard_ready: !!p.best_level && p.best_level >= 14, best_hard_level: p.best_level >= 14 ? 3 : 0,
       player: { id: p.id, name: p.name, avatar_url: "", created_at: p.created_at, last_seen_at: p.last_seen_at, banned: p.banned, bug_user: !!p.bug_user, cap_hits: p.cap_hits || [] },
       identities: [{ provider: p.provider, subject: mobile ? p.id.replace(/^./, "f") : "cg-user-77", login: mobile ? p.id.replace(/^./, "f") : null, created_at: p.created_at }],
       account: mobile ? { nickname: p.nickname, age_band: p.age_band, terms_version: "2026-10-20", consented_at: p.created_at, created_at: p.created_at, renamed_at: null, rename_count: 1 } : null,
@@ -134,6 +140,7 @@
 
   window.__mockCalls = [];
   window.__mockFailures = {};
+  const logAudit = (action, p) => audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } });
   const respond = (action, p, body) => {
     switch (action) {
       case "overview.get": return overview(p.platform);
@@ -150,12 +157,28 @@
       case "players.list": {
         const q = String(p.query || "").toLowerCase();
         const rows = PLAYERS.filter((x) => (!q || x.name.toLowerCase().includes(q) || x.id.startsWith(q)) && (!p.platform || x.platform === p.platform || (p.platform === "web" && x.provider === "crazygames")));
-        return { ok: true, total: rows.length, rows };
+        return { ok: true, total: rows.length, rows: rows.map((x) => ({ ...x, god_mode: unlockOf(x.id).god })) };
       }
       case "players.get": return detailFor(p.player_id);
       // the player page also asks for the latest device facts and the last 10 balance runs (console 11-04, 8ddf341)
       case "players.facts": return { client_info: { platform: "android", app_version: "1.0.0", build: 2, device_model: "SM-S918N", os_version: "14", store_country: "KR", device_region: "KR", first_seen_at: "2026-10-20T10:00:00+00:00", last_seen_at: "2026-10-23T10:00:00+00:00" }, retention: { current_streak: 2, first_day: "2026-10-20", milestones: [] }, balance_runs: [] };
       case "players.ban": { const x = PLAYERS.find((r) => r.id === p.player_id); if (x) x.banned = p.banned; audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action: action, params: p, result: { ok: true } }); return { ok: true, banned: p.banned }; }
+      case "unlocks.set": {
+        if (!UNLOCK_STEPS.includes(p.step) || !["auto", "on", "off"].includes(p.state) || !p.reason) return { ok: false, error: "invalid_request" };
+        const u = unlockOf(p.player_id).unlocks, before = u[p.step] || "auto";
+        if (p.state === "auto") delete u[p.step]; else u[p.step] = p.state;
+        logAudit(action, p);
+        return { ok: true, changed: before !== p.state };
+      }
+      case "unlocks.upto": {
+        const at = UNLOCK_STEPS.indexOf(p.step);
+        if (at < 0 || !p.reason) return { ok: false, error: "invalid_request" };
+        const u = unlockOf(p.player_id).unlocks;
+        UNLOCK_STEPS.slice(0, at + 1).forEach((step) => { u[step] = "on"; });
+        logAudit(action, p);
+        return { ok: true, changed: true };
+      }
+      case "god.set": { const g = unlockOf(p.player_id); const changed = g.god !== !!p.on; g.god = !!p.on; logAudit(action, p); return { ok: true, changed }; }
       case "crashes.list": return { ok: true, total: crashes.length, rows: crashes.filter((c) => (!p.kind || c.kind === p.kind) && (!p.query || c.message.includes(p.query) || c.device_model.includes(p.query) || c.app_version.includes(p.query))) };
       case "crashes.groups": return groups(p.by);
       case "crashes.get": return crashDetail(p.id);
