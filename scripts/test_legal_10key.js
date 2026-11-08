@@ -139,7 +139,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
   };
   const required = {
     en: [/guest account only for the online rankings/, /no cash or real-world value and cannot be sold or exchanged for money/, /legitimate refund request/,
-      /may show ads \(today on GamePix\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
+      /may show ads \(on GamePix, once its version is released\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
       /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /These measures do not stop you from playing the game/,
       /creates a House Duck guest account for you, without an email address or password/, /Players under 14 play without an account/,
       /Google Play Billing on Android and the App Store on iOS/, /Restore purchases/, /Gems are consumable/,
@@ -148,7 +148,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /Module draw tickets: in the apps, given as quest rewards/, /module draw tickets are not sold/, /daily and weekly quests/, /board of the current season and of the last season/,
       /a free web demo of 10key Survival \(up to level 8\)/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
     ko: [/게스트 계정을 온라인 랭킹에만 사용합니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
-      /광고를 표시할 수 있습니다\(현재 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
+      /광고를 표시할 수 있습니다\(GamePix 버전이 출시되면 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
       /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /이러한 조치로 게임을 플레이하지 못하게 되지는 않습니다/,
       /이메일 주소나 비밀번호 없이 House Duck 게스트 계정을 만듭니다/, /만 14세 미만은 계정 없이 플레이합니다/,
       /Android에서는 Google Play 결제, iOS에서는 App Store/, /구매 복원/, /보석은 소모성 상품/,
@@ -224,9 +224,9 @@ test("public pages use the store names; the old name 10KEY appears only in the d
 
 // 2026-10-25: section 13 lists the run record (every finished run, store apps, install ID, 90 days) in every language.
 test("section 13 covers the 10key Survival run records in every language", () => {
-  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 90 days", "do not send these three"],
-    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 90일 후 삭제됩니다", "이 셋을 보내지 않으며"],
-    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 90 Tagen gelöscht", "diese drei nicht"] })) {
+  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 90 days", "Desktop versions and test builds send none of them"],
+    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 90일 후 삭제됩니다", "데스크톱 버전과 테스트 빌드는 이 신호를 하나도 보내지 않습니다"],
+    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 90 Tagen gelöscht", "Desktop-Versionen und Testversionen senden keines davon"] })) {
     const html = fs.readFileSync(path.join(repoDir, "privacy", `${locale}.html`), "utf8");
     const s13 = html.slice(html.indexOf('id="section-13"'), html.indexOf('id="section-14"'));
     for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
@@ -264,6 +264,40 @@ test("section 13 covers server-kept progress, problem reports, the ROBOT PACK an
     assert.ok(s13.includes('href="https://www.gamepix.com/privacy-cookie"'), `${locale}: links the GamePix privacy policy`);
     assert.doesNotMatch(s13, /<td>Revive Pass<\/td>|<td>부활 패스<\/td>/, `${locale}: no Revive Pass row`);
     assert.doesNotMatch(text(s13), /Sign in with Apple|Apple로 로그인/i, `${locale}: no Quirky Ball sign-in wording`);
+  }
+});
+
+// 2026-11-08 (owner via lead): section 13 says what the web stores and the new signals really do. GamePix is still in review
+// (not live) and, like Nekoland (live, the Lv 8 demo), may call only the ranking / guest-account requests (NetGuard GAMEPIX_RPCS);
+// Nekoland's own cloud save and SDK events are left to Nekoland's terms; app issue reports carry the install ID only for 14+ players
+// with an account (IssueReport.id_ok), 30 days; run timelines and first-time steps (TraceUplink) are kept 60 days.
+test("section 13 covers Nekoland, GamePix in review, app issue reports and run timelines in every language", () => {
+  const words = {
+    en: ["<h3>Web version on Nekoland</h3>", "the GamePix version is still in review and not yet released", "the Nekoland version sends House Duck nothing",
+      "the GamePix version sends House Duck nothing", "Nekoland’s own platform keeps a cloud save of the game", "<td>App issue reports (Android and iOS apps, itch.io)</td>",
+      "added only for players with a guest account who have accepted the Terms and are not under 14", "App issue reports: deleted after 30 days.",
+      "<td>Run timelines and first-time steps (Android and iOS apps with a guest account, itch.io)</td>", "Run timelines and first-time steps: deleted after 60 days.",
+      "only the basic crash report and the app issue reports described under"],
+    ko: ["<h3>Nekoland 웹 버전</h3>", "GamePix 버전은 아직 심사 중이며 출시되지 않았습니다", "Nekoland 버전은 House Duck에 아무것도 보내지 않습니다",
+      "GamePix 버전은 House Duck에 아무것도 보내지 않습니다", "Nekoland 자체 플랫폼은 게임의 클라우드 저장 데이터를 보관하고", "<td>앱 이상 보고(Android 및 iOS 앱, itch.io)</td>",
+      "만 14세 미만이 아닌 플레이어에게만 설치 ID(아래 참조)를 붙이고", "앱 이상 보고: 30일 후 삭제됩니다.",
+      "<td>판 진행 기록과 첫 이용 단계(게스트 계정이 있는 Android 및 iOS 앱, itch.io)</td>", "판 진행 기록과 첫 이용 단계: 60일 후 삭제됩니다.",
+      "기본 충돌 보고서와 앱 이상 보고(\"충돌 보고서, 일일 이용 횟수와 판 기록\" 참조)만 식별자 없이 계속 보냅니다"],
+    de: ["<h3>Webversion auf Nekoland</h3>", "die GamePix-Version wird noch geprüft und ist noch nicht veröffentlicht", "sendet die Nekoland-Version House Duck nichts",
+      "sendet die GamePix-Version House Duck nichts", "Die Plattform von Nekoland selbst bewahrt einen Cloud-Spielstand", "<td>App-Störungsberichte (Android- und iOS-Apps, itch.io)</td>",
+      "nur bei Spielern mit Gastkonto angefügt, die die Nutzungsbedingungen akzeptiert haben und nicht unter 14 sind", "App-Störungsberichte: werden nach 30 Tagen gelöscht.",
+      "<td>Run-Verläufe und erste Schritte (Android- und iOS-Apps mit Gastkonto, itch.io)</td>", "Run-Verläufe und erste Schritte: werden nach 60 Tagen gelöscht.",
+      "nur der einfache Absturzbericht und die App-Störungsberichte"],
+  };
+  for (const [locale, list] of Object.entries(words)) {
+    const s13 = section13(locale);
+    for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
+    assert.doesNotMatch(text(s13), /today: GamePix|derzeit: GamePix|현재 GamePix|GamePix version sends the same|GamePix-Version sendet dieselben|GamePix 버전도 같은 항목/, `${locale}: GamePix is not described as live`);
+  }
+  const terms = { en: ["itch.io and Nekoland offer a free web demo", "(it is still in review)"], ko: ["itch.io와 Nekoland에서는", "아직 심사 중인 GamePix 버전이 출시되면"] };
+  for (const [locale, list] of Object.entries(terms)) {
+    const html = read(`10key/terms/${locale}.html`);
+    for (const w of list) assert.ok(html.includes(w), `${locale} terms: ${w}`);
   }
 });
 
@@ -317,28 +351,28 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
   const words = {
     en: ["board of the current season and the board of the last season", "January 1, April 1, July 1 and October 1 at 09:00 UTC", "October 1 to December 31, 2026",
       "all-time best, which is used for the player’s profile", "<li>Season board entries: deleted once the season ended more than 12 weeks ago.</li>",
-      "<strong>Sending records in the web versions (itch.io and GamePix):</strong>", "use a guest account only for the online ranking",
+      "<strong>Sending records in the web versions (itch.io, Nekoland and GamePix):</strong>", "use a guest account only for the online ranking",
       "stay in your browser’s storage and are not sent", "<td>Quest rewards</td>", "the UTC day or week of the quest", "module draw tickets",
       "Quest reward records: deleted 35 days after the reward was claimed.", "<h3>Daily reminder and store review prompt (Android and iOS)</h3>",
       "at 20:00 on your device’s clock", "no push service is used, and nothing about it is sent to House Duck", "<strong>SETTINGS</strong> or in your device’s settings",
       "review sheet (Apple’s or Google’s) once", "House Duck receives nothing from it", "As on itch.io, the results of finished runs are sent to House Duck’s server",
-      "Web versions (itch.io, GamePix): usage signal and run records"],
+      "Web version on itch.io: usage signal, run records, run timelines and first-time steps"],
     ko: ["이번 시즌의 순위표와 지난 시즌의 순위표", "1월 1일, 4월 1일, 7월 1일, 10월 1일 09:00(UTC)", "2026년 10월 1일부터 12월 31일까지",
       "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 해당 시즌이 끝난 지 12주가 지나면 삭제됩니다.</li>",
-      "<strong>웹 버전(itch.io, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹에만 쓰이는 게스트 계정을 사용합니다",
-      "브라우저 저장소에 남고 전송되지 않습니다", "<td>퀘스트 보상</td>", "퀘스트의 UTC 기준 날짜 또는 주", "모듈 뽑기권",
+      "<strong>웹 버전(itch.io, Nekoland, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹에만 쓰이는 게스트 계정을 사용합니다",
+      "브라우저 저장소에 남고 House Duck으로 전송되지 않습니다", "<td>퀘스트 보상</td>", "퀘스트의 UTC 기준 날짜 또는 주", "모듈 뽑기권",
       "퀘스트 보상 기록: 보상을 받은 지 35일 후 삭제됩니다.", "<h3>일일 알림과 스토어 리뷰 창(Android 및 iOS)</h3>",
       "기기 시계 기준 20:00", "푸시 서비스를 쓰지 않고, 알림에 관한 정보는 House Duck이나 다른 누구에게도 전송되지 않습니다", "앱의 <strong>설정</strong>이나 기기 설정에서 끌 수 있습니다",
       "리뷰 창(Apple 또는 Google)을 한 번 열 수 있습니다", "House Duck은 이로부터 아무것도 받지 않습니다", "itch.io와 마찬가지로 끝난 판의 결과는 온라인 랭킹을 위해 House Duck 서버로 보내지고",
-      "웹 버전(itch.io, GamePix)의 이용 신호와 판 기록"],
+      "itch.io 웹 버전의 이용 신호, 판 기록, 판 진행 기록과 첫 이용 단계"],
     de: ["Rangliste der aktuellen Saison und die Rangliste der letzten Saison", "1. Januar, 1. April, 1. Juli und 1. Oktober um 09:00 Uhr UTC", "vom 1. Oktober bis zum 31. Dezember 2026",
       "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: werden gelöscht, sobald das Ende der Saison mehr als 12 Wochen zurückliegt.</li>",
-      "<strong>Senden von Ergebnissen in den Webversionen (itch.io und GamePix):</strong>", "verwenden ein Gastkonto nur für die Online-Rangliste",
-      "bleiben im Speicher Ihres Browsers und werden nicht gesendet", "<td>Quest-Belohnungen</td>", "der UTC-Tag oder die UTC-Woche der Quest", "Modulziehungs-Tickets",
+      "<strong>Senden von Ergebnissen in den Webversionen (itch.io, Nekoland und GamePix):</strong>", "verwenden ein Gastkonto nur für die Online-Rangliste",
+      "bleiben im Speicher Ihres Browsers und werden nicht an House Duck gesendet", "<td>Quest-Belohnungen</td>", "der UTC-Tag oder die UTC-Woche der Quest", "Modulziehungs-Tickets",
       "Quest-Belohnungen: werden 35 Tage nach dem Abholen der Belohnung gelöscht.", "<h3>Tägliche Erinnerung und Bewertungsfenster des Stores (Android und iOS)</h3>",
       "um 20:00 Uhr nach der Uhr Ihres Geräts", "Es wird kein Push-Dienst verwendet, und nichts darüber wird an House Duck oder an andere gesendet", "<strong>SETTINGS</strong> der App oder in den Einstellungen Ihres Geräts",
       "Bewertungsfenster des Stores (von Apple oder Google) öffnen", "House Duck erhält davon nichts", "Wie auf itch.io werden die Ergebnisse beendeter Runs für die Online-Rangliste an den Server von House Duck gesendet",
-      "Webversionen (itch.io, GamePix): Nutzungssignal und Run-Protokolle"],
+      "Webversion auf itch.io: Nutzungssignal, Run-Protokolle, Run-Verläufe und erste Schritte"],
   };
   for (const [locale, list] of Object.entries(words)) {
     const s13 = section13(locale);
