@@ -179,6 +179,18 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
   expect(errors).toEqual([]);
 });
 
+test("players: [버그유저] label only on an account whose day-cap hit does not fit its play time (owner 11-02)", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-players");
+  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
+  await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toHaveCount(1);
+  await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toContainText("의심스러운덕");
+  await page.locator("#tenkeyPlayersTable tr", { hasText: "의심스러운덕" }).locator("a.player-identity-link").click();
+  await expect(page.locator("#tenkeyPlayerDetail")).toContainText("[버그유저]");
+  await expect(page.locator("#tenkeyPlayerDetail")).toContainText("하루 부품 상한 도달");
+  await expect(page.locator("#tenkeyPlayerDetail")).toContainText("말이 안 됨");
+  expect(errors).toEqual([]);
+});
+
 test("players: search, open one, ban with a reason through the confirm dialog", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players");
   await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);

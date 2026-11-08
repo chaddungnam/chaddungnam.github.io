@@ -53,7 +53,7 @@
     { id: "a1111111-1111-4111-8111-111111111111", name: "딸깍덕", nickname: "딸깍덕", provider: "supabase", platform: "android", created_at: "2026-10-12T09:10:00+00:00", last_seen_at: "2026-10-23T11:02:00+00:00", best_score: 184200, best_level: 14, banned: false, age_band: 18, runs_stored: 11 },
     { id: "b2222222-2222-4222-8222-222222222222", name: "KeyMaster", nickname: "KeyMaster", provider: "supabase", platform: "ios", created_at: "2026-10-15T15:44:00+00:00", last_seen_at: "2026-10-23T08:30:00+00:00", best_score: 96100, best_level: 11, banned: false, age_band: 14, runs_stored: 6 },
     { id: "c3333333-3333-4333-8333-333333333333", name: "cg_player_77", nickname: null, provider: "crazygames", platform: "web", created_at: "2026-10-18T19:00:00+00:00", last_seen_at: "2026-10-22T20:15:00+00:00", best_score: 51200, best_level: 9, banned: false, age_band: null, runs_stored: 4 },
-    { id: "d4444444-4444-4444-8444-444444444444", name: "의심스러운덕", nickname: "의심스러운덕", provider: "supabase", platform: "android", created_at: "2026-10-20T01:00:00+00:00", last_seen_at: "2026-10-22T23:59:00+00:00", best_score: 9990000, best_level: 40, banned: true, age_band: 18, runs_stored: 9 },
+    { id: "d4444444-4444-4444-8444-444444444444", bug_user: true, cap_hits: [{ day: "2026-10-22", scrap: 40000000, runs: 12, play_min: 95, odd: true }], name: "의심스러운덕", nickname: "의심스러운덕", provider: "supabase", platform: "android", created_at: "2026-10-20T01:00:00+00:00", last_seen_at: "2026-10-22T23:59:00+00:00", best_score: 9990000, best_level: 40, banned: true, age_band: 18, runs_stored: 9 },
     { id: "e5555555-5555-4555-8555-555555555555", name: "초보오리", nickname: "초보오리", provider: "supabase", platform: "mobile", created_at: "2026-10-23T06:20:00+00:00", last_seen_at: "2026-10-23T06:20:00+00:00", best_score: null, best_level: null, banned: false, age_band: 18, runs_stored: 0 },
     { id: "f6666666-6666-4666-8666-666666666666", name: "창문덕", nickname: "창문덕", provider: "supabase", platform: "windows", created_at: "2026-10-24T10:00:00+00:00", last_seen_at: "2026-10-24T12:00:00+00:00", best_score: 30500, best_level: 7, banned: false, age_band: 18, runs_stored: 2 },
     { id: "a7777777-7777-4777-8777-777777777777", name: "사과덕", nickname: "사과덕", provider: "supabase", platform: "macos", created_at: "2026-10-24T11:00:00+00:00", last_seen_at: "2026-10-24T13:00:00+00:00", best_score: 12000, best_level: 5, banned: false, age_band: 18, runs_stored: 1 },
@@ -63,7 +63,7 @@
     const mobile = p.provider === "supabase";
     return {
       ok: true,
-      player: { id: p.id, name: p.name, avatar_url: "", created_at: p.created_at, last_seen_at: p.last_seen_at, banned: p.banned },
+      player: { id: p.id, name: p.name, avatar_url: "", created_at: p.created_at, last_seen_at: p.last_seen_at, banned: p.banned, bug_user: !!p.bug_user, cap_hits: p.cap_hits || [] },
       identities: [{ provider: p.provider, subject: mobile ? p.id.replace(/^./, "f") : "cg-user-77", login: mobile ? p.id.replace(/^./, "f") : null, created_at: p.created_at }],
       account: mobile ? { nickname: p.nickname, age_band: p.age_band, terms_version: "2026-10-20", consented_at: p.created_at, created_at: p.created_at, renamed_at: null, rename_count: 1 } : null,
       rank: { week_board: "w2026-10-19", all: p.banned || !p.best_score ? null : 3, week: p.banned || !p.best_score ? null : 2 },
