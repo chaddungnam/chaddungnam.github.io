@@ -78,14 +78,16 @@ test("age and combined analytics controls match the 2.0.0 client", () => {
       const text = html.replace(/<[^>]+>/g, " ");
       assert.match(text, checks.noRetro, `${locale} ${name}: no retroactive expansion of Firebase consent`);
       assert.match(text, checks.age, `${locale} ${name}: explain teen use`);
-      // The shared policy was last updated on 2026-11-08 (KakaoTalk share on Korean website pages; earlier: 2026-11-04 and 2026-11-01, section 13, 10key Survival season rankings, web ranking accounts, quests, reminder and review prompt); the Quirky Ball terms on 2026-10-05.
+      // The shared policy was last updated on 2026-11-08 (KakaoTalk share on Korean website pages, then corrections to match the products; earlier: 2026-11-04 and 2026-11-01, section 13, 10key Survival season rankings, web ranking accounts, quests, reminder and review prompt); the Quirky Ball terms on 2026-10-05.
       assert.match(html, name === "privacy" ? /datetime="2026-11-08"/ : /datetime="2026-11-04"/, `${locale} ${name}: current update date`);
     }
     assert.match(privacy, checks.ttl, `${locale}: disclose app-managed pending-event expiry`);
     assert.match(privacy, /0[^<]*14[^<]*18/, `${locale}: disclose local age-band codes`);
     assert.match(privacy, /tutorial|튜토리얼|Tutorial|チュートリアル/, `${locale}: disclose tutorial-completion event`);
     assert.match(privacy, /Google Ads/, `${locale}: disclose Google Ads conversion measurement`);
-    assert.match(privacy, /Gemini/, `${locale}: disclose redacted support summaries`);
+    // The console's AI summary is off since 2026-10-20 (console/cs.js AI_SUMMARY = false): no current section may say support
+    // messages or reports are summarised with Gemini; only the dated revision history (section 15) still names it.
+    assert.doesNotMatch(privacy.slice(0, privacy.indexOf('id="section-15"')), /Gemini/, `${locale}: no Gemini support summaries outside the history`);
   }
 });
 
