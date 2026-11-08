@@ -145,7 +145,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /Google Play Billing on Android and the App Store on iOS/, /Restore purchases/, /Gems are consumable/,
       /cannot be transferred to another account or player/, /the gems from that purchase are taken back from your gem balance/, /The Android and iOS apps show no ads/,
       /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/, /Effective October 31, 2026 \(v1\.2\)/, /Effective November 1, 2026 \(v1\.3\)/, /starting a run needs an internet connection/i,
-      /module draw tickets are an in-game item that the apps give as a quest reward/, /daily and weekly quests/, /board of the current season and of the last season/,
+      /Module draw tickets: in the apps, given as quest rewards/, /module draw tickets are not sold/, /daily and weekly quests/, /board of the current season and of the last season/,
       /a free web demo of 10key Survival \(up to level 8\)/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
     ko: [/게스트 계정을 온라인 랭킹에만 사용합니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
       /광고를 표시할 수 있습니다\(현재 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
@@ -154,7 +154,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /Android에서는 Google Play 결제, iOS에서는 App Store/, /구매 복원/, /보석은 소모성 상품/,
       /다른 계정이나 다른 플레이어에게 넘길 수 없고/, /그 구매로 받은 보석을 보석 잔액에서 회수/, /Android 및 iOS 앱에는 광고가 없습니다/,
       /길게 눌러 계정 삭제/, /2026년 10월 20일 시행\(v1\.1\)/, /2026년 10월 31일 시행\(v1\.2\)/, /2026년 11월 1일 시행\(v1\.3\)/, /판을 시작하려면 인터넷 연결이 필요/,
-      /모듈 뽑기권은 앱이 퀘스트 보상으로 주는 게임 내 아이템/, /일일 퀘스트와 주간 퀘스트/, /이번 시즌의 순위표와 지난 시즌의 순위표/,
+      /모듈 뽑기권: 앱에서 퀘스트 보상으로 받으며/, /모듈 뽑기권은 판매하지 않습니다/, /일일 퀘스트와 주간 퀘스트/, /이번 시즌의 순위표와 지난 시즌의 순위표/,
       /무료 웹 데모\(레벨 8까지\)/, /GamePix가 광고/, /확률 정보 페이지/, /로봇 패키지/],
   };
   for (const locale of locales) {
@@ -169,7 +169,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-11-04"/, `${file}: last updated 2026-11-04 (v1.6: section 9 widened; v1.5 module boxes before it)`);
+    assert.match(html, /datetime="2026-11-08"/, `${file}: last updated 2026-11-08 (editorial cleanup, still v1.6: section 9 widened; v1.5 module boxes before it)`);
     assert.doesNotMatch(text(html.replace(/<li>[^<]*\(v1\.[012]\)[^<]*/g, "")), /Revive Pass|부활 패스/, `${file}: the Revive Pass is gone (only in the history entries)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
@@ -348,9 +348,9 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
   }
   // the terms: season boards, the web ranking account, quests and module draw tickets (v1.3), en + ko
   const terms = {
-    en: ["<strong>Module draw tickets:</strong>", "cannot be transferred to another account or player", "the game uses a House Duck guest account only for the online rankings",
+    en: ["<strong>Module draw tickets:</strong>", "module draw tickets, modules and the ROBOT PACK cannot be transferred to another account or player", "the game uses a House Duck guest account only for the online rankings",
       "Season boards are deleted once the season is more than 12 weeks old", "November 1, 2026"],
-    ko: ["<strong>모듈 뽑기권:</strong>", "다른 계정이나 다른 플레이어에게 넘길 수 없습니다", "게임은 House Duck 게스트 계정을 온라인 랭킹에만 사용합니다",
+    ko: ["<strong>모듈 뽑기권:</strong>", "모듈 뽑기권, 모듈과 로봇 패키지는 다른 계정이나 다른 플레이어에게 넘길 수 없고", "게임은 House Duck 게스트 계정을 온라인 랭킹에만 사용합니다",
       "시즌 순위표는 해당 시즌이 12주보다 오래되면 삭제됩니다", "2026년 11월 1일"],
   };
   for (const [locale, list] of Object.entries(terms)) {
