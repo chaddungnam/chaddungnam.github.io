@@ -497,11 +497,11 @@ test("overview: 전체 counts players by account (itch + app), keeps anonymous i
   expect(errors).toEqual([]);
 });
 
-test("제보 page: the players' REPORT A PROBLEM texts, newest first, read only; 재방문 opens its own page", async ({ page }) => {
-  const MOCK = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\"&&b.action===\"reports.list\"){window.__reportCalls=(window.__reportCalls||[]).concat([b.params]);return {ok:true,data:b.params.days===1?{total:0,rows:[]}:{total:2,rows:[{receipt:\"a1b2c3d4\",submitted_at:\"2026-11-05T11:00:00Z\",body:\"<b>보스</b>에서 멈춤\\n두 줄\",meta:{version:\"1.0.3\",build:\"41\",platform:\"android\",device:\"SM-S918B\",locale:\"ko\"},status:\"open\",player_id:\"11111111-1111-4111-8111-111111111111\",display_name:\"딸깍왕\",public_id:\"TK7Q2\"},{receipt:\"ffff0000\",submitted_at:\"2026-11-04T09:00:00Z\",body:\"text\",meta:{locale:\"ja\"},status:\"open\",player_id:null}]}};}return real(pj,fn,b);};})();";
+test("제보 page: the players' 1:1 inquiry texts with their reply email, newest first; the YouTube link form; 재방문 opens its own page", async ({ page }) => {
+  const MOCK = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\"&&b.action===\"reports.list\"){window.__reportCalls=(window.__reportCalls||[]).concat([b.params]);return {ok:true,data:b.params.days===1?{total:0,rows:[]}:{total:2,rows:[{receipt:\"a1b2c3d4\",submitted_at:\"2026-11-05T11:00:00Z\",body:\"<b>보스</b>에서 멈춤\\n두 줄\",meta:{version:\"1.0.3\",build:\"41\",platform:\"android\",device:\"SM-S918B\",locale:\"ko\"},email:\"fan+tk@example.com\",status:\"open\",player_id:\"11111111-1111-4111-8111-111111111111\",display_name:\"딸깍왕\",public_id:\"TK7Q2\"},{receipt:\"ffff0000\",submitted_at:\"2026-11-04T09:00:00Z\",body:\"text\",meta:{locale:\"ja\"},status:\"open\",player_id:null}]}};}return real(pj,fn,b);};})();";
   const errors = await open(page, "#/tenkey-reports", MOCK);
   await expect(page.locator("#tenkeyReportsView")).toBeVisible();
-  await expect(page.locator("#pageTitle")).toHaveText("문제 제보");
+  await expect(page.locator("#pageTitle")).toHaveText("1대1 문의");
   const rows = page.locator("#tenkeyReportTable tr");
   await expect(rows).toHaveCount(2);
   await expect(page.locator("#tenkeyReportTotal")).toHaveText("2건");
@@ -511,6 +511,9 @@ test("제보 page: the players' REPORT A PROBLEM texts, newest first, read only;
   await expect(rows.nth(0)).toContainText("Android · SM-S918B");
   await expect(rows.nth(0)).toContainText("a1b2c3d4");
   await expect(rows.nth(0).locator('a[href="#/tenkey-players/11111111-1111-4111-8111-111111111111"]')).toHaveText("딸깍왕");
+  await expect(rows.nth(0).locator('a[href="mailto:fan+tk@example.com"]')).toHaveText("fan+tk@example.com");
+  await expect(rows.nth(0).locator("[data-copy-email]")).toHaveText("복사");
+  await expect(rows.nth(1)).toContainText("없음 (이전 빌드)");
   await expect(rows.nth(1)).toContainText("일본어");
   await expect(rows.nth(1)).toContainText("플레이어 기록 없음");
   await page.locator("#tenkeyReportDays").selectOption("1");
@@ -520,6 +523,38 @@ test("제보 page: the players' REPORT A PROBLEM texts, newest first, read only;
   await page.evaluate(() => { window.location.hash = "#/tenkey-retention"; });
   await expect(page.locator('[data-route="tenkey-retention"]')).toBeVisible();
   await expect(page.locator("#pageTitle")).toHaveText("재방문");
+  expect(errors).toEqual([]);
+});
+
+test("제보 page: the YouTube link form shows the current value, refuses a non-YouTube link, saves a Short with a reason, and '' resets", async ({ page }) => {
+  const MOCK = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\"&&b.action===\"reports.list\")return {ok:true,data:{total:0,rows:[]}};return real(pj,fn,b);};})();";
+  const errors = await open(page, "#/tenkey-reports", MOCK);
+  const form = page.locator("#tenkeyCommunityForm");
+  await expect(form).toBeVisible();
+  await expect(page.locator("#tenkeyCommunityCurrent")).toHaveText("https://www.youtube.com/@Sergeant_Houseduck");
+  await expect(page.locator("#tenkeyCommunityNote")).toContainText("기본값");
+  await form.locator("[name=url]").fill("https://evil.example/watch?v=1");
+  await form.locator("[name=reason]").fill("test");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#tenkeyCommunityFormMessage")).toContainText("유튜브 주소");
+  expect(await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "community.set").length)).toBe(0);
+  await form.locator("[name=url]").fill("https://www.youtube.com/shorts/abc123");
+  await form.locator("[name=reason]").fill("출시 쇼츠");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toContainText("https://www.youtube.com/shorts/abc123");
+  await expect(page.locator("#confirmDialog")).toContainText("출시 쇼츠");
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyCommunityCurrent")).toHaveText("https://www.youtube.com/shorts/abc123");
+  const saved = await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "community.set"));
+  expect(saved.length).toBe(1);
+  expect(saved[0].params).toEqual({ url: "https://www.youtube.com/shorts/abc123", reason: "출시 쇼츠" });
+  expect(saved[0].request_id).toMatch(/^[0-9a-f-]{36}$/);
+  await form.locator("[name=url]").fill("");
+  await form.locator("[name=reason]").fill("기본으로");
+  await form.locator("button[type=submit]").click();
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyCommunityNote")).toContainText("기본값");
+  await shot(page, "reports_youtube");
   expect(errors).toEqual([]);
 });
 

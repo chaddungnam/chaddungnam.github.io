@@ -133,7 +133,7 @@
     { id: 2, at: "2026-10-22T21:10:00+00:00", admin_email: "ops@houseduck.in", action: "players.ban", params: { reason: "점수 조작 의심 (의심 기록 3건)", player_id: PLAYERS[3].id, banned: true }, result: { ok: true } },
     { id: 1, at: "2026-10-22T09:00:00+00:00", admin_email: "ops@houseduck.in", action: "config.set", params: { reason: "1.0.0 배포", config: { min_version_code: 1, latest_version_code: 2 } }, result: { ok: true } },
   ];
-  let config = { min_version_code: 1, latest_version_code: 2, min_build_ios: 0, latest_build_ios: 0, store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "https://testflight.apple.com/join/RqNJg7Dp", updated_at: "2026-10-22T09:00:00+00:00",
+  let config = { min_version_code: 1, latest_version_code: 2, min_build_ios: 0, latest_build_ios: 0, store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "https://testflight.apple.com/join/RqNJg7Dp", updated_at: "2026-10-22T09:00:00+00:00", community_url: "",
     links: { android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", ios: "https://testflight.apple.com/join/RqNJg7Dp", ios_official: false, ios_checked_at: "2026-10-25T17:58:00+00:00" },
     builds: [{ platform: "android", build: 3, players: 0, installs: 4 }, { platform: "android", build: 2, players: 8, installs: 0 }, { platform: "ios", build: 3, players: 0, installs: 2 }, { platform: "ios", build: 2, players: 1, installs: 0 }],
     balance: { ver: 0, xp_scale: 1, mouse_pace: 1, battery_drain_scale: 1, robot_power_scale: 1, updated_at: "2026-10-25T15:34:00+00:00", updated_by: "" } };
@@ -232,6 +232,14 @@
         return { ok: true, balance: config.balance };
       }
       case "config.set": config = { ...config, ...p.config, updated_at: new Date().toISOString() }; audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } }); return { ok: true, config };
+      case "community.set": {  // the server's rule (tenkey.admin_community_set_v1): "" resets, else a YouTube https link
+        const u = String(p.url || "").trim();
+        if (u && !/^https:\/\/(((www|m)\.)?youtube\.com|youtu\.be)\/[^\s]+$/.test(u)) throw Object.assign(new Error("invalid_url"), { status: 400 });
+        const changed = config.community_url !== u;
+        config = { ...config, community_url: u };
+        if (changed) audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } });
+        return { ok: true, changed, community_url: u };
+      }
       default: throw Object.assign(new Error("unknown_action"), { status: 400 });
     }
   };

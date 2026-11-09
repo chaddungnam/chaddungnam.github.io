@@ -18,6 +18,7 @@
     min_above_latest_android: "Android 최소 versionCode는 최신 versionCode보다 클 수 없습니다.",
     min_above_latest_ios: "iOS 최소 빌드 번호는 최신 빌드 번호보다 클 수 없습니다.",
     invalid_store_url: "스토어 링크는 비우거나 https://로 시작해야 합니다.",
+    invalid_url: "유튜브 주소(https://youtube.com · www.youtube.com · m.youtube.com · youtu.be)만 넣을 수 있습니다. 비우면 기본 채널로 돌아갑니다.",
     reason_required: "변경 이유를 입력해 주세요.",
     invalid_knobs: "바꿀 밸런스 조정값이 없습니다.",
     invalid_knob_value: "밸런스 조정값은 0.70 ~ 1.30 사이의 숫자로 입력해 주세요.",
