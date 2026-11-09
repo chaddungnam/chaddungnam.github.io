@@ -120,6 +120,13 @@
     if (preview === "android") { isIOS = false; isAndroid = true; }
     if (preview === "pc") { isIOS = false; isAndroid = false; }
     var isLive = function (key) { return STORES[key].live || !!preview; };
+    // Store links carry where the visit came from (?src=, e.g. ads_kr, mail, shorts; default "get"), so App Store Connect
+    // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.
+    var src = String(params.get("src") || "get").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "get";
+    var storeUrl = function (key) {
+      if (key === "ios") return "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=" + src + "&mt=8";
+      return STORES.android.url + "&referrer=" + encodeURIComponent("utm_source=houseduck&utm_medium=get&utm_campaign=" + src);
+    };
     var mineKey = isIOS ? "ios" : (isAndroid ? "android" : null);
     if (mineKey && isLive(mineKey)) {
       var name = mineKey === "ios" ? "App Store" : "Google Play";
@@ -127,21 +134,21 @@
       text.textContent = T.opening[1];
       document.title = name + " | 10key Survival";
       var btn = document.querySelector("[data-store='" + mineKey + "']");
-      if (btn) { btn.href = STORES[mineKey].url; btn.hidden = false; }
-      if (!preview) location.replace(STORES[mineKey].url);
+      if (btn) { btn.href = storeUrl(mineKey); btn.hidden = false; }
+      if (!preview) location.replace(storeUrl(mineKey));
       return;
     }
     if (!isLive("ios") && !isLive("android")) { show(T.soon); reveal("[data-show-prereg]"); return; }
     // Computer (or a phone whose store is not live yet): the full choice page.
     document.querySelectorAll("[data-get-link='ios'], [data-get-link='android']").forEach(function (a) {
       var key = a.getAttribute("data-get-link");
-      a.href = STORES[key].url;
+      a.href = storeUrl(key);
       if (!isLive(key)) a.hidden = true;
     });
     var card = document.querySelector("[data-get-card]");
     if (card) card.hidden = true;
     reveal("[data-get-pc]");
-    document.title = (document.querySelector("[data-get-pc] h1") || {}).textContent + " | House Duck";
+    document.title = (document.querySelector(".tk-get-title") || {}).textContent + " | House Duck";
     document.querySelectorAll("[data-copy-link]").forEach(function (b) {
       b.addEventListener("click", function () {
         var url = b.getAttribute("data-copy-link");

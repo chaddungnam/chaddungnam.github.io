@@ -324,3 +324,31 @@ for (const [url, lang] of Object.entries({
     await expect(page.locator("[data-box='rare']")).toContainText("62%");
   });
 }
+
+// /10key/get/ after-launch page, deployed ahead of launch (owner 2026-11-09). Until STORES.*.live is flipped, visitors
+// still get the "not out yet" card; ?preview=pc|ios|android shows the after-launch view without leaving the page.
+test("/10key/get/ before launch still shows the not-yet card and the pre-registration key", async ({ page }) => {
+  await page.goto("/10key/get/?lang=ko");
+  await expect(page.locator("[data-title]")).toHaveText("아직 출시 전이에요");
+  await expect(page.locator("[data-show-prereg]")).toBeVisible();
+  await expect(page.locator("[data-get-pc]")).toBeHidden();
+});
+test("/10key/get/?preview=pc shows phone stores with QR and copy link, the itch.io demo and Steam coming soon", async ({ page }) => {
+  await page.goto("/10key/get/?preview=pc&lang=en&src=ads_kr");
+  const pc = page.locator("[data-get-pc]");
+  await expect(pc).toBeVisible();
+  await expect(pc.locator(".tk-get-title")).toHaveText("Get 10key Survival");
+  await expect(pc.locator("[data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=ads_kr&mt=8");
+  await expect(pc.locator("[data-get-link=android]")).toHaveAttribute("href", /id=com\.houseduck\.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dget%26utm_campaign%3Dads_kr$/);
+  await expect(pc.locator("[data-get-link=itch]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(pc.locator(".tk-store.is-soon")).toContainText("Steam");
+  // the QR code is for a computer screen; phones (under 760px) hide it
+  if ((page.viewportSize() || { width: 1440 }).width > 760) await expect(pc.locator(".tk-get-qr img")).toBeVisible();
+  else await expect(pc.locator(".tk-get-qr img")).toBeHidden();
+});
+test("/10key/get/?preview=ios shows the App Store opening card without leaving", async ({ page }) => {
+  await page.goto("/10key/get/?preview=ios&lang=ja");
+  await expect(page.locator("[data-title]")).toHaveText("App Storeを開いています…");
+  await expect(page.locator("[data-store=ios]")).toHaveAttribute("href", /pt=129265473&ct=get&mt=8$/);
+  await expect(page).toHaveURL(/\/10key\/get\/\?preview=ios/);
+});

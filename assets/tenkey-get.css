@@ -7,7 +7,7 @@
 .tk-get-inner { width: min(940px, 100% - 2 * var(--tk-gutter)); margin-inline: auto; }
 .tk-get-head { display: grid; justify-items: center; text-align: center; }
 .tk-get-head .tk-logo { margin: 0 0 22px; width: min(440px, 100%); }
-.tk-get-head h1 { margin: 0; color: #fff; font-family: var(--tk-pixel); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.3; word-break: keep-all; }
+.tk-get-head .tk-get-title { margin: 0; color: #fff; font-family: var(--tk-pixel); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.3; word-break: keep-all; }
 .tk-get-head p { max-width: 36rem; margin: 12px 0 0; color: var(--tk-text-2); font-size: 1.02rem; line-height: 1.7; word-break: keep-all; }
 .tk-get-paid { display: inline-block; margin-top: 14px; padding: 5px 12px; border: 1px solid var(--tk-edge-2); border-radius: 999px; color: var(--tk-text-3); font-size: .78rem; font-weight: 700; letter-spacing: .02em; }
 
@@ -54,5 +54,5 @@
   .tk-get-qr-wrap { display: none; }
   .tk-get-stores { width: 100%; }
 }
-:lang(ja) .tk-get-head h1, :lang(ja) .tk-get-box h2, :lang(ja) .tk-get-head p, :lang(ja) .tk-get-pc-note,
-:lang(zh-Hant) .tk-get-head h1, :lang(zh-Hant) .tk-get-head p { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
+:lang(ja) .tk-get-head .tk-get-title, :lang(ja) .tk-get-box h2, :lang(ja) .tk-get-head p, :lang(ja) .tk-get-pc-note,
+:lang(zh-Hant) .tk-get-head .tk-get-title, :lang(zh-Hant) .tk-get-head p { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
