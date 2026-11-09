@@ -18,7 +18,7 @@
     { id: "tab_research", name: "강화 탭", opens: "UPGRADE 탭이 열려 부품으로 능력을 올릴 수 있음", rule: "1판을 마치면 열림" },
     { id: "tab_ranking", name: "랭킹 탭", opens: "RANKING 탭이 열려 순위표를 볼 수 있음", rule: "2판을 마치면 열림" },
     { id: "quests", name: "퀘스트", opens: "퀘스트 상자와 퀘스트 창이 보임", rule: "2판을 마치고 계정이 있으면 열림" },
-    { id: "tab_shop", name: "상점 탭", opens: "SHOP 탭이 열림", rule: "3판을 마치면 열림" },
+    { id: "tab_shop", name: "상점 탭", opens: "SHOP 탭이 열림", rule: "첫 판을 마치고 하단 탭이 보이면 바로 열림 (1.0.0 빌드 20부터; 그 전 빌드는 3판)" },
     { id: "tab_modules", name: "모듈 탭", opens: "MODULES 탭이 열려 모듈을 모으고 볼 수 있음", rule: "4판을 마치면 열림 (별도 차단 사유가 있으면 그게 우선)" },
     { id: "home_friends", name: "친구", opens: "홈의 FRIENDS 버튼이 열림", rule: "4판을 마치면 열림" },
     { id: "home_mailbox", name: "우편함", opens: "홈의 MAILBOX 버튼이 열려 보상 우편을 받을 수 있음", rule: "4판을 마치면 열림" },
@@ -34,6 +34,7 @@
       answer: (i) => (i.bestHard == null ? "" : i.bestHard >= HARD_PACK_LEVEL ? `지금: 레벨 조건 채움 (하드 최고 Lv ${i.bestHard})` : `지금: 레벨 조건 미충족 (하드 최고 Lv ${i.bestHard})`) },
     { id: "hard_ranking", name: "하드 랭킹", opens: "RANKING의 하드 탭이 열림 (순위표 자체는 나중에 생김)", rule: "하드 플레이가 열려 있으면 열림" },
     { id: "hard_sale", name: "하드 구매 카드", opens: "하드 모드 구매 카드가 보임 (아직 만들지 않음, 지금은 켜도 안 보임)", rule: "서버 하드 판매 스위치가 켜지면 보임 (지금 꺼짐)" },
+    { id: "shop_test", name: "상점 테스트", opens: "판매 중인 팩 카드(로봇 팩 등)가 레벨과 상관없이 보이고, 할인 짝이 있는 팩은 정가 키와 할인가 키가 둘 다 보임 (정가 구매 테스트용, 앱 전용; 하드 모드 상품은 하드 스위치를 따름)", rule: "꺼둠이 기본. 심사 중인 빌드(서버 review_build_ios / _android)는 모든 계정이 자동으로 켜짐" },
   ];
   const STEP_IDS = STEPS.map((s) => s.id);
   const stateName = (s) => (STATES.find((x) => x[0] === s) || STATES[0])[1];

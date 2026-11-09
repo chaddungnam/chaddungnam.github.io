@@ -60,7 +60,7 @@
   ];
   // Hard-mode round (2026-11-08): the v2 answer of players.get carries unlocks {step: 'on'|'off'} (missing = auto), god_mode, hard_ready,
   // best_hard_level; unlocks.set / unlocks.upto / god.set change them for the page's life (steps in the order of hard_mode.md section 1).
-  const UNLOCK_STEPS = ["tab_research", "tab_ranking", "quests", "tab_shop", "tab_modules", "home_friends", "home_mailbox", "purchase", "discount", "upgrade_robot", "hard_card", "hard_play", "hard_upgrade", "hard_pack", "hard_ranking", "hard_sale"];
+  const UNLOCK_STEPS = ["tab_research", "tab_ranking", "quests", "tab_shop", "tab_modules", "home_friends", "home_mailbox", "purchase", "discount", "upgrade_robot", "hard_card", "hard_play", "hard_upgrade", "hard_pack", "hard_ranking", "hard_sale", "shop_test"];
   const unlockState = {};  // player id -> { unlocks, god }
   const unlockOf = (id) => (unlockState[id] = unlockState[id] || { unlocks: {}, god: false });
   const detailFor = (id) => {
