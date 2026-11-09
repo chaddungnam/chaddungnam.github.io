@@ -1,0 +1,58 @@
+/* /10key/get/ — the one link in ads, the launch mail and the Shorts (owner 2026-11-09).
+   Phones jump straight to their store (tenkey-small.js). A computer sees this page: the phone stores with a QR code and
+   a copy-link key, and the computer options (itch.io demo now, Steam later). Look follows the 10key page (tenkey-page.css). */
+.tk-get { min-height: 100vh; min-height: 100svh; padding: calc(var(--tk-bar) + clamp(28px, 5vw, 56px)) 0 56px; box-sizing: border-box;
+  background: url("media/tenkey-itch/bg-n.webp") center top / max(1920px, 100%) auto no-repeat, var(--tk-night); }
+.tk-get[hidden] { display: none; }
+.tk-get-inner { width: min(940px, 100% - 2 * var(--tk-gutter)); margin-inline: auto; }
+.tk-get-head { display: grid; justify-items: center; text-align: center; }
+.tk-get-head .tk-logo { margin: 0 0 22px; width: min(440px, 100%); }
+.tk-get-head h1 { margin: 0; color: #fff; font-family: var(--tk-pixel); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.3; word-break: keep-all; }
+.tk-get-head p { max-width: 36rem; margin: 12px 0 0; color: var(--tk-text-2); font-size: 1.02rem; line-height: 1.7; word-break: keep-all; }
+.tk-get-paid { display: inline-block; margin-top: 14px; padding: 5px 12px; border: 1px solid var(--tk-edge-2); border-radius: 999px; color: var(--tk-text-3); font-size: .78rem; font-weight: 700; letter-spacing: .02em; }
+
+.tk-get-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; margin-top: clamp(28px, 4vw, 40px); }
+.tk-get-box { display: flex; flex-direction: column; padding: clamp(22px, 3vw, 30px); border: 1px solid var(--tk-edge); border-radius: 16px; background: rgba(29, 29, 29, .94); box-shadow: 0 30px 70px rgba(0, 0, 0, .35); }
+.tk-get-label { margin: 0; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.tk-get-box h2 { margin: 6px 0 4px; color: #fff; font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; word-break: keep-all; }
+.tk-get-box .tk-get-sub { margin: 0 0 18px; color: var(--tk-text-3); font-size: .86rem; }
+
+.tk-get-phone { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; }
+.tk-get-qr { display: block; width: 156px; height: 156px; padding: 8px; box-sizing: border-box; border-radius: 12px; background: var(--tk-cream); }
+.tk-get-qr img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.tk-get-qr-note { margin: 10px 0 0; color: var(--tk-text-3); font-size: .78rem; line-height: 1.5; word-break: keep-all; max-width: 156px; }
+.tk-get-stores { display: grid; gap: 10px; }
+
+.tk-store { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 18px 0 14px; box-sizing: border-box; border: 1px solid var(--tk-edge-2); border-radius: 12px; color: var(--tk-text); background: rgba(236, 230, 214, .06); text-decoration: none; transition: border-color 160ms var(--tk-ease), background-color 160ms var(--tk-ease), transform 160ms var(--tk-ease); }
+.tk-page a.tk-store { color: var(--tk-text); }
+.tk-store:hover, .tk-store:focus-visible { border-color: var(--tk-cream); background: rgba(236, 230, 214, .12); transform: translateY(-1px); }
+.tk-store svg { flex: none; width: 24px; height: 26px; }
+.tk-store-copy { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.tk-store-copy small { color: var(--tk-text-3); font-size: .72rem; font-weight: 600; }
+.tk-store-copy strong { font-size: 1.02rem; font-weight: 800; letter-spacing: -.01em; }
+.tk-store.is-soon { cursor: default; opacity: .55; border-style: dashed; }
+.tk-store.is-soon:hover { transform: none; border-color: var(--tk-edge-2); background: rgba(236, 230, 214, .06); }
+.tk-soon-chip { margin-left: auto; padding: 3px 9px; border-radius: 999px; color: var(--tk-night); background: var(--tk-text-3); font-size: .7rem; font-weight: 800; }
+
+.tk-get-copy { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--tk-edge); }
+.tk-get-copy code { flex: 1; min-width: 0; overflow: hidden; color: var(--tk-text-2); font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
+.tk-get-copy .tk-key { --depth: 4px; min-height: 42px; flex: none; }
+.tk-get-copy .tk-key-face { padding: 0 16px; font-size: .9rem; }
+
+.tk-get-pc { display: grid; gap: 10px; }
+.tk-get-pc .tk-key { width: 100%; }
+.tk-get-pc .tk-play-icon { border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
+.tk-get-pc-note { margin: 4px 0 0; color: var(--tk-text-3); font-size: .82rem; line-height: 1.55; word-break: keep-all; }
+.tk-get-back { margin-top: 26px; text-align: center; }
+
+/* phone, store opening: the small card from tenkey-page.css keeps a manual button in case the jump is blocked */
+.tk-card .tk-store { justify-content: center; margin-top: 18px; }
+
+@media (max-width: 760px) {
+  .tk-get-grid { grid-template-columns: minmax(0, 1fr); }
+  .tk-get-phone { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .tk-get-qr-wrap { display: none; }
+  .tk-get-stores { width: 100%; }
+}
+:lang(ja) .tk-get-head h1, :lang(ja) .tk-get-box h2, :lang(ja) .tk-get-head p, :lang(ja) .tk-get-pc-note,
+:lang(zh-Hant) .tk-get-head h1, :lang(zh-Hant) .tk-get-head p { word-break: normal; line-break: strict; overflow-wrap: anywhere; }

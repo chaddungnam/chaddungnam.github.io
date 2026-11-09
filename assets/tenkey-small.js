@@ -30,6 +30,7 @@
 
   var T = {
     ko: {
+      opening: ["{store} 여는 중…", "자동으로 안 열리면 아래 버튼을 눌러 주세요."],
       working: ["확인하는 중…", "잠시만 기다려 주세요."],
       confirmed: ["사전예약 완료!", "출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요."],
       unsubscribed: ["수신 거부했어요", "이 주소로는 더 이상 사전예약 메일을 보내지 않아요. 남은 정보는 30일 안에 삭제돼요."],
@@ -39,6 +40,7 @@
       pick: ["딸깍 서바이벌 받기", "내 기기의 스토어를 골라 주세요."]
     },
     en: {
+      opening: ["Opening {store}…", "If nothing happens, tap the button below."],
       working: ["Checking…", "One moment."],
       confirmed: ["You are pre-registered!", "We will send the download link to this address on launch day."],
       unsubscribed: ["You are unsubscribed", "We will not send pre-registration email to this address again. What is left is deleted within 30 days."],
@@ -48,6 +50,7 @@
       pick: ["Get 10key Survival", "Pick the store for your device."]
     },
     de: {
+      opening: ["{store} wird geöffnet…", "Falls nichts passiert, tippe unten auf den Button."],
       working: ["Wird geprüft…", "Einen Moment bitte."],
       confirmed: ["Sie sind vorregistriert!", "Am Starttag senden wir den Download-Link an diese Adresse."],
       unsubscribed: ["Vorregistrierung storniert", "Wir senden keine Vorregistrierungs-E-Mails mehr an diese Adresse. Die übrigen Daten werden innerhalb von 30 Tagen gelöscht."],
@@ -57,6 +60,7 @@
       pick: ["10key Survival holen", "Wählen Sie den Store für Ihr Gerät."]
     },
     ja: {
+      opening: ["{store}を開いています…", "自動で開かない場合は、下のボタンを押してください。"],
       working: ["確認しています…", "少々お待ちください。"],
       confirmed: ["事前登録が完了しました！", "リリース日にこのアドレスへダウンロードリンクをお送りします。"],
       unsubscribed: ["事前登録を取り消しました", "このアドレスには事前登録のメールをお送りしません。残りの情報は30日以内に削除します。"],
@@ -66,6 +70,7 @@
       pick: ["10key Survivalを入手", "お使いの端末のストアを選んでください。"]
     },
     zh: {
+      opening: ["正在開啟 {store}…", "如果沒有自動開啟，請點下方按鈕。"],
       working: ["確認中…", "請稍候。"],
       confirmed: ["事前預約完成！", "上市當天會把下載連結寄到這個信箱。"],
       unsubscribed: ["已取消事前預約", "之後不會再寄事前預約相關信件到這個信箱。其餘資料會在 30 天內刪除。"],
@@ -104,17 +109,51 @@
   }
 
   if (page === "get") {
+    // One link for ads, the launch mail and the Shorts (owner 2026-11-09). Phones go straight to their store once it is
+    // live; a computer gets the store choice (QR code, copy link) and the computer options (itch.io demo, Steam soon).
+    // ?preview=pc|ios|android shows the after-launch view without redirecting (local review only).
+    var preview = params.get("preview");
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     var isAndroid = /Android/i.test(ua);
-    var mine = isIOS ? STORES.ios : (isAndroid ? STORES.android : null);
-    if (mine && mine.live) { location.replace(mine.url); return; }
-    var any = false;
-    ["ios", "android"].forEach(function (key) {
-      var link = document.querySelector("[data-store='" + key + "']");
-      if (link && STORES[key].live) { link.href = STORES[key].url; link.hidden = false; any = true; }
+    if (preview === "ios") { isIOS = true; isAndroid = false; }
+    if (preview === "android") { isIOS = false; isAndroid = true; }
+    if (preview === "pc") { isIOS = false; isAndroid = false; }
+    var isLive = function (key) { return STORES[key].live || !!preview; };
+    var mineKey = isIOS ? "ios" : (isAndroid ? "android" : null);
+    if (mineKey && isLive(mineKey)) {
+      var name = mineKey === "ios" ? "App Store" : "Google Play";
+      title.textContent = T.opening[0].replace("{store}", name);
+      text.textContent = T.opening[1];
+      document.title = name + " | 10key Survival";
+      var btn = document.querySelector("[data-store='" + mineKey + "']");
+      if (btn) { btn.href = STORES[mineKey].url; btn.hidden = false; }
+      if (!preview) location.replace(STORES[mineKey].url);
+      return;
+    }
+    if (!isLive("ios") && !isLive("android")) { show(T.soon); reveal("[data-show-prereg]"); return; }
+    // Computer (or a phone whose store is not live yet): the full choice page.
+    document.querySelectorAll("[data-get-link='ios'], [data-get-link='android']").forEach(function (a) {
+      var key = a.getAttribute("data-get-link");
+      a.href = STORES[key].url;
+      if (!isLive(key)) a.hidden = true;
     });
-    if (any) show(T.pick);
-    else { show(T.soon); reveal("[data-show-prereg]"); }
+    var card = document.querySelector("[data-get-card]");
+    if (card) card.hidden = true;
+    reveal("[data-get-pc]");
+    document.title = (document.querySelector("[data-get-pc] h1") || {}).textContent + " | House Duck";
+    document.querySelectorAll("[data-copy-link]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var url = b.getAttribute("data-copy-link");
+        var face = b.querySelector(".tk-key-face");
+        var before = face.textContent;
+        var done = function () {
+          face.textContent = b.getAttribute("data-done-" + lang) || b.getAttribute("data-done-en");
+          window.setTimeout(function () { face.textContent = before; }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt("", url); });
+        else window.prompt("", url);
+      });
+    });
   }
 })();
