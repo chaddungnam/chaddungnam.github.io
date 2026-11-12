@@ -1,6 +1,6 @@
 // 10key Survival: the "해금 · 테스트" panel of the player detail (hard-mode round, 2026-11-08, docs/design/hard_mode.md §1 / §12 / §13).
 // 1) INVINCIBLE (god mode): one red switch + reason + confirm, like the ranking ban.
-// 2) The 16 unlock steps in the order a player meets them; each is a three-way switch (자동 / 켜짐 / 꺼짐):
+// 2) The 17 unlock steps in the order a player meets them; each is a three-way switch (자동 / 켜짐 / 꺼짐):
 //    자동 = the game's own rule (default for everyone), 켜짐 = forced open, 꺼짐 = forced shut. "여기까지 켜기" turns this
 //    row and every row above it on; "모두 자동" clears every override. Legal, age, region, demo and build blocks still win.
 // Calls (tenkey-admin): unlocks.set {player_id, step, state, reason}, unlocks.upto {player_id, step, reason}, god.set {player_id, on, reason}.
@@ -9,7 +9,7 @@
   const T = root.ConsoleTenkey;
   const { esc } = T.fmt;
 
-  const HARD_SHOW_LEVEL = 20;  // HardMode.SHOW_LEVEL in the game
+  const HARD_SHOW_LEVEL = 8;   // HardMode.PEEK_LEVEL in the game (was 20 here until 2026-11-12: the card shows once the normal best level passed Lv 7)
   const HARD_PACK_LEVEL = 5;   // best hard level that shows the breakthrough pack
   const STATES = [["auto", "자동"], ["on", "켜짐"], ["off", "꺼짐"]];
 
@@ -25,7 +25,7 @@
     { id: "purchase", name: "구매", opens: "젬 창과 팩에서 키를 살 수 있음 (켜짐 = 서버 결제가 닫혀 있어도 이 계정은 구매 가능, 테스트 구매자)", rule: "스토어 결제가 가능한 앱이고 서버 결제 스위치가 켜져 있으면 열림" },
     { id: "discount", name: "할인", opens: "돌파 팩의 72시간 -40% 할인 창이 열림 (켜짐 = 지금 바로 창을 엶)", rule: "서버가 할인 창을 열어 준 동안만 열림" },
     { id: "upgrade_robot", name: "강화 · 로봇 탭", opens: "UPGRADE 안의 ROBOT 탭이 열림", rule: "로봇을 맛보았거나 영구 해금되면 열림" },
-    { id: "hard_card", name: "하드 카드 보임", opens: "홈 2쪽 · UPGRADE · SHOP에 하드 모드 카드가 보임 (보이기만 하고 시작은 못 함)", rule: `일반 모드 최고 레벨이 ${HARD_SHOW_LEVEL} 이상이면 보임`,
+    { id: "hard_card", name: "하드 카드 보임", opens: "홈 2쪽 · UPGRADE · SHOP에 하드 모드 카드가 보임 (보이기만 하고 시작은 못 함)", rule: `일반 모드 최고 레벨이 ${HARD_SHOW_LEVEL} 이상이면 보임 (앱만)`,
       answer: (i) => (i.bestLevel == null ? "" : i.bestLevel >= HARD_SHOW_LEVEL ? `지금: 보임 (최고 Lv ${i.bestLevel})` : `지금: 숨김 (최고 Lv ${i.bestLevel})`) },
     { id: "hard_play", name: "하드 플레이", opens: "하드 모드 판을 시작할 수 있음 (앱 전용)", rule: "서버 하드 공개 스위치가 켜져 있고 조건을 채워야 열림 (지금은 서버가 닫혀 있어 콘솔로 연 계정만 플레이)",
       answer: (i) => (i.hardReady == null ? "" : i.hardReady ? "지금: 플레이 조건은 채움 (서버 공개는 닫힘)" : "지금: 플레이 조건 미충족") },

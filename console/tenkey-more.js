@@ -4,7 +4,7 @@
 // of the admin writes (notices, bans, force-update settings).
 (function attachConsoleTenkeyMore(root) {
   const T = root.ConsoleTenkey;
-  const { esc, num, time, duration, pct, platformName } = T.fmt;
+  const { esc, num, time, duration, pct, platformName, productName, boardName } = T.fmt;
   const byId = (id) => document.getElementById(id);
   const state = { purchases: { bound: false, q: {} }, ranking: { bound: false }, audit: { bound: false } };
   let purchasePager = null;
@@ -18,7 +18,7 @@
     const [label, tone] = STATE_NAMES[p.state] || [p.state, "quiet"];
     return `<tr><td data-label="시각">${esc(time(p.created_at))}</td>
       <td data-label="플레이어">${p.player_id ? playerLink(p.player_id, p.name) : `<span class="tk-sub">탈퇴한 계정 · ${esc(p.login_short || "—")}</span>`}</td>
-      <td data-label="상품">${esc(p.product_id)}${p.platform === "nekoland" && p.price_cents != null ? `<span class="tk-sub">${esc(num(p.price_cents))} 큐브 (${esc(cubesUsd(p.price_cents))})</span>` : ""}</td><td data-label="스토어">${esc(platformName(p.platform))}</td>
+      <td data-label="상품">${esc(productName(p.product_id))}<span class="tk-sub">${esc(p.product_id)}</span>${p.platform === "nekoland" && p.price_cents != null ? `<span class="tk-sub">${esc(num(p.price_cents))} 큐브 (${esc(cubesUsd(p.price_cents))})</span>` : ""}</td><td data-label="스토어">${esc(platformName(p.platform))}</td>
       <td data-label="상태"><span class="tk-badge" data-tone="${tone}">${esc(label)}</span></td>
       <td data-label="주문 번호 끝"><code>${esc(p.order_tail || "—")}</code></td>
       <td data-label="환불">${esc(p.refunded_at ? `${time(p.refunded_at)}${p.refund_reason_category ? ` · ${p.refund_reason_category}` : ""}` : "—")}</td></tr>`;
@@ -42,7 +42,7 @@
         ["지금까지 받은 젬", num(g.granted_all)], ["지금까지 쓴 젬", num(g.spent_all)],
         ["장부 합계 (받음 − 씀)", num(Number(g.granted_all || 0) - Number(g.spent_all || 0))], ["장부가 있는 계정", num(g.wallets)],
         ["리바이브 패스 보유", num(g.revive_pass_owners)],
-        ["상품별 결제", (s.by_product || []).map((x) => `${x.product} ${x.n}`).join(" · ") || "—"],
+        ["상품별 결제", (s.by_product || []).map((x) => `${productName(x.product)} ${x.n}건`).join(" · ") || "—"],
         ["네코랜드 결제 (1 큐브 = 1 센트)", `${num(s.nekoland)}건 · ${num(s.nekoland_cubes)} 큐브 (${cubesUsd(s.nekoland_cubes)})`],
       ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
       byId("tenkeyPurchaseTotal").textContent = `${num(d.total)}건`;
@@ -69,7 +69,7 @@
   }
 
   // ── 랭킹 ──
-  const boardLabel = (board) => (board === "week" ? "이번 주" : board === "all" ? "전체 기간" : `${String(board).slice(1)} 시작 주`);
+  const boardLabel = boardName;
 
   function boardRow(r) {
     const hidden = !r.eligible;
@@ -89,12 +89,12 @@
       const result = await T.call("ranking.board", { board, limit: Number(byId("tenkeyBoardLimit").value) });
       const d = result.data;
       const keep = select.value;
-      select.innerHTML = ['<option value="week">이번 주</option>', '<option value="all">전체 기간</option>',
-        ...(d.boards || []).filter((b) => b !== "all").map((b) => `<option value="${esc(b)}">${esc(boardLabel(b))}</option>`)].join("");
+      select.innerHTML = ['<option value="week">이번 시즌</option>', '<option value="all">전체 기간</option>',
+        ...(d.boards || []).filter((b) => b !== "all" && !(board === "week" && b === d.board)).map((b) => `<option value="${esc(b)}">${esc(boardLabel(b))}</option>`)].join("");
       select.value = keep;
-      byId("tenkeyBoardTitle").textContent = `랭킹 보드 · ${boardLabel(board)}`;
+      byId("tenkeyBoardTitle").textContent = `랭킹 보드 · ${boardLabel(board === "week" && d.board ? d.board : board)}`;
       byId("tenkeyBoardTotal").textContent = `순위 반영 ${num(d.total)}명`;
-      byId("tenkeyBoardMeta").textContent = `보드 ${d.board} · 점수 규칙 ${d.current_rules}${d.ends ? ` · 주 끝 ${time(d.ends)}` : ""}. 앱에 보이는 순위 그대로입니다. 정지된 플레이어와 옛 점수 규칙의 기록은 순위 없이 흐리게 보입니다.`;
+      byId("tenkeyBoardMeta").textContent = `보드 ${d.board} · 점수 규칙 ${d.current_rules}${d.ends ? ` · 시즌 끝 ${time(d.ends)}` : ""}. 앱에 보이는 순위 그대로입니다. 정지된 플레이어와 옛 점수 규칙의 기록은 순위 없이 흐리게 보입니다.`;
       byId("tenkeyBoardTable").innerHTML = (d.rows || []).length ? d.rows.map(boardRow).join("") : '<tr><td colspan="7" class="empty-panel">이 보드에는 아직 기록이 없습니다.</td></tr>';
       T.setMessage("tenkeyBoardMessage", "");
     } catch (error) {
@@ -111,7 +111,7 @@
   }
 
   // ── 감사 기록 ──
-  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경" };
+  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경", "community.set": "유튜브 소통 링크 변경", "players.rename": "닉네임 변경", "mail.send": "메일 보내기", "mail.cancel": "미수령 메일 취소", "titles.grant": "칭호 부여", "titles.revoke": "칭호 회수" };
   function auditSummary(a) {
     const p = a.params || {};
     if (a.action === "notices.save") return p.notice?.title_en ? `${p.notice?.title_ko || ""} / ${p.notice.title_en}` : `${p.notice?.title_ko || ""}${p.notice?.translations ? " (자동 번역 포함)" : ""}`;
@@ -121,7 +121,13 @@
     if (a.action === "god.set") return `무적 ${p.on ? "켜짐" : "꺼짐"} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "config.set") return JSON.stringify(p.config || {});
     if (a.action === "knobs.set") return JSON.stringify(p.knobs || {});
-    return `공지 #${p.id ?? "?"}`;
+    if (a.action === "community.set") return p.url || "(비움: 기본 하우스덕 채널)";
+    if (a.action === "players.rename") return `${p.nickname || ""} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "mail.send") return `${p.all ? "전체 계정" : `대상 ${p.target || "?"}`} · ${p.title_i18n?.ko || ""}`;
+    if (a.action === "mail.cancel") return `메일 #${p.id ?? "?"}`;
+    if (a.action === "titles.grant" || a.action === "titles.revoke") return `${p.title_id || ""} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (String(a.action).startsWith("notices.")) return `공지 #${p.id ?? "?"}`;
+    return JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k]) => k !== "reason")));
   }
   function auditRow(a) {
     return `<article class="audit-item"><div><strong>${esc(ACTION_NAMES[a.action] || a.action)}</strong><small>${esc(time(a.at))} · ${esc(a.admin_email)}</small></div>

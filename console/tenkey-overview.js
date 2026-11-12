@@ -187,13 +187,31 @@
     const share = (r) => (r.players > 0 ? Math.round(Math.min(r.people, r.players) / r.players * 100) : null);
 
     byId("tenkeyOverviewNotice").hidden = !noSignal && !web;
-    byId("tenkeyOverviewNotice").textContent = web ? "웹(itch)은 게임 페이지를 열 때마다 새 익명 번호를 씁니다. 그래서 ‘앱을 연 사람’은 방문 수, ‘새로 설치’는 새 방문 수이고, 다시 온 비율은 셀 수 없습니다. 판 수는 판마다 오는 기록으로 셉니다."
+    byId("tenkeyOverviewNotice").textContent = web ? "웹(itch)은 게임 페이지를 열 때마다 새 익명 번호를 씁니다. 그래서 ‘앱을 연 사람’은 방문 수, ‘새로 설치’는 새 방문 수입니다. ‘다음 날 다시 온 비율’만은 게임 서버에 로그인한 itch 계정으로 셉니다. 판 수는 판마다 오는 기록으로 셉니다."
       : noSignal ? "지금 테스트 빌드는 하루 접속 신호를 보내지 않아요. 그래서 사람 수는 게임 서버 기록(로그인·진행 저장·기록 전송)으로 셉니다. 설치 수와 판 수는 신호를 보내는 새 빌드가 나가면 채워집니다." : "";
     const P = state.prereg;
     const todayRow = daily.at(-1) || {};
     const yRow = daily.at(-2) || {};
     const preCard = P ? glance("사전예약", num(P.d1), "명", `어제 하루 ${num(P.d1_prev)}명 · 총 ${num(P.total)}명`,
       { tone: "good", help: "houseduck.in/10key에서 사전예약을 마친 사람 (테스트 주소 제외). 언어는 가입한 페이지 언어입니다. 나라는 저장하지 않습니다." }) : "";
+    // 다음 날 다시 온 비율 without a "전체" frame (a platform filter, or the itch numbers failed to load). Owner 2026-11-12: the install
+    // ping's id is new on every itch page load, so it read 0 %. The accounts the game server saw are used instead: of the accounts first
+    // seen in the 7 days up to yesterday, how many came back the next day (server admin_dau: new_* / back_*; android / ios split from v2).
+    function returnCard() {
+      const help = "처음 들어온 계정 가운데 바로 다음 날 다시 들어온 비율 (게임 서버 로그인 기록 기준, 어제까지 7일). 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다.";
+      const days = state.dau?.days || [];
+      if (days.length) {
+        const split = Object.hasOwn(days[days.length - 1], "new_android");
+        const groups = state.platform === "web_itch" ? ["itch"] : state.platform === "android" ? [split ? "android" : "app"] : state.platform === "ios" ? [split ? "ios" : "app"] : ["itch", "app", "other"];
+        let n = 0, k = 0;
+        for (let back = 1; back <= 7; back++) for (const g of groups) { n += Number(days[days.length - 1 - back]?.[`new_${g}`] || 0); k += Number(days[days.length - 1 - back]?.[`back_${g}`] || 0); }
+        const tail = !split && (state.platform === "android" || state.platform === "ios") ? " · Android+iOS 합계" : "";
+        return glance("다음 날 다시 온 비율", n > 0 ? String(Math.round(k / n * 1000) / 10) : "—", n > 0 ? "%" : "", n > 0 ? `어제까지 7일 새 계정 ${num(n)}명 중 ${num(k)}명${tail}` : "어제까지 7일 동안 처음 들어온 계정이 없음", { help });
+      }
+      return glance("다음 날 다시 온 비율", web ? "—" : retRate(ret.d1), !web && Number(ret.d1?.cohort) > 0 ? "%" : "",
+        web ? "계정 기록을 불러오지 못함 (익명 번호는 방문마다 바뀌어 셀 수 없음)" : Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
+        { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." });
+    }
     if (W) {
       byId("tenkeyGlanceToday").classList.add("is-5");
       byId("tenkeyGlanceToday").innerHTML = [
@@ -287,9 +305,7 @@
             { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
         glance("결제", num(week("purchases")), "건", `${buyWeek.note}${anyPlatform}`,
           { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외). Android와 iOS를 합친 숫자입니다." }),
-        glance("다음 날 다시 온 비율", web ? "—" : retRate(ret.d1), !web && Number(ret.d1?.cohort) > 0 ? "%" : "",
-          web ? "웹은 셀 수 없음 (방문마다 새 번호)" : Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
-          { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." }),
+        returnCard(),
       ].join("");
     }
 
@@ -316,7 +332,7 @@
     const crashCols = columns(rows.map((r) => Number(r.crashes || 0)), rows.map((r) => tip(dayLabel(r.day), [["크래시", `${num(r.crashes)}건`]])), "is-v2");
     const buyCols = columns(rows.map((r) => Number(r.purchases || 0)), rows.map((r) => tip(dayLabel(r.day), [["결제 완료", `${num(r.purchases)}건`]])));
     const activeTotal = (data.platforms || []).reduce((s, r) => s + r.n, 0);
-    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음" })[k] || k)}</div></article>`;
+    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음 (웹)" })[k] || k)}<p class="overview-drill-note">언어는 앱(Android·iOS)만 보냅니다. 웹(itch) 판은 언어를 보내지 않아 ‘기록 없음 (웹)’으로 모이므로, 이 숫자는 앱 사용자의 언어와 따로 봐야 합니다.</p></div></article>`;
     const periods = [7, 30, 90].map((d) => `<button class="overview-switch${d === state.period ? " active" : ""}" type="button" data-tk-period="${d}" aria-pressed="${d === state.period}">${d}일</button>`).join("");
     // Main chart: app users, web visits and pre-registrations day by day on one frame (each line its own colour).
     const mainSeries = [{ key: "people", color: COLOR.app, label: W ? "플레이어 (DAU)" : "앱을 연 사람" }];
@@ -379,7 +395,7 @@
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
       "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 날마다 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·기록을 올린 사람을 보여 줍니다. 서버의 날짜별 기록은 10월 22일(테스트 시작)부터 있습니다.",
       "‘전체’ 화면의 플레이어(DAU)는 게임 서버가 그날 본 계정 수입니다 (itch + 앱, 한 사람 한 번, 2026-11-03부터). itch 익명 신호는 페이지를 열 때마다 새 번호라 ‘웹 방문’으로 따로 보여 줍니다 (계정 없이 둘러본 사람 포함). 최근 7일 DAU의 %는 그날 플레이어 ÷ 그날까지 가입한 플레이어 수입니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
-      "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어가지만 ‘다시 온 비율’에서는 빠집니다.",
+      "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어갑니다. ‘다시 온 비율’은 익명 번호로는 셀 수 없어 로그인한 계정 기준으로 셉니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",
       "사전예약 숫자는 tenkey-console-stats 함수가 사전예약 표에서 개수만 읽어 옵니다 (주소는 받지 않음, 테스트 주소 제외). 날짜는 베를린 기준이라 다른 보고서와 하루 경계가 다를 수 있습니다.",
@@ -403,7 +419,7 @@
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } }).catch(() => null),
-        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
+        root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
       ]);
       state.dau = dauResult?.data || null;
       state.data = result.data;

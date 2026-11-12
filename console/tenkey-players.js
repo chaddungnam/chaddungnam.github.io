@@ -103,7 +103,7 @@
   const table = (head, rows, empty) => rows.length
     ? `<div class="table-scroll"><table><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`
     : `<p class="empty-panel">${esc(empty)}</p>`;
-  const boardName = (board) => (board === "all" ? "전체 기간" : `주간 ${String(board).slice(1)}`);
+  const boardName = T.fmt.boardName;
   const balanceRuns = (runs) => (runs || []).map((r) => {
     const skills = Array.isArray(r.skills) ? r.skills.map((s) => `${s[0]} Lv${s[1]}`).join(", ") : "—";
     const reaches = r.lv_ms == null ? "미계측" : Array.isArray(r.lv_ms) && r.lv_ms.length
@@ -193,7 +193,7 @@
     const mobile = (d.identities || []).some((i) => i.provider === "supabase");
     const bests = (d.bests || []).map((b) => `<tr><td>${esc(boardName(b.board))}</td><td class="tk-num">${esc(num(b.score))}</td><td class="tk-num">${esc(b.level)}</td><td>${esc(duration(b.time_ms))}</td><td>${esc(time(b.achieved_at))}</td><td class="tk-num">${esc(b.rules)}</td></tr>`);
     const runs = (d.runs || []).map((r) => `<tr${r.flag ? ' class="is-dim"' : ""}><td>${esc(time(r.created_at))}</td><td class="tk-num">${esc(num(r.score))}</td><td class="tk-num">${esc(r.level)}</td><td>${esc(duration(r.time_ms))}</td><td class="tk-num">${esc(num(r.depth))}</td><td class="tk-num">${esc(num(r.scrap))}</td><td class="tk-num">${esc(num(r.combo))}</td><td class="tk-num">${esc(r.skills)}</td><td>${esc(r.cause || "—")}</td><td>${esc(platformName(r.platform))} · ${esc(r.build)}</td><td><span class="tk-badge" data-tone="${r.flag ? "risk" : "good"}">${esc(flagName(r.flag))}</span></td></tr>`);
-    const buys = (d.purchases || []).map((b) => `<tr><td>${esc(time(b.created_at))}</td><td>${esc(b.product_id)}</td><td>${esc(platformName(b.platform))}</td><td><span class="tk-badge" data-tone="${b.state === "refunded" ? "risk" : b.state === "sandbox" ? "quiet" : "good"}">${esc({ granted: "결제 완료", sandbox: "테스트", refunded: "환불" }[b.state] || b.state)}</span></td><td>${esc(b.order_tail || "—")}</td><td>${esc(b.refunded_at ? `${time(b.refunded_at)} · ${b.refund_reason_category || ""}` : "—")}</td></tr>`);
+    const buys = (d.purchases || []).map((b) => `<tr><td>${esc(time(b.created_at))}</td><td>${esc(T.fmt.productName(b.product_id))}</td><td>${esc(platformName(b.platform))}</td><td><span class="tk-badge" data-tone="${b.state === "refunded" ? "risk" : b.state === "sandbox" ? "quiet" : "good"}">${esc({ granted: "결제 완료", sandbox: "테스트", refunded: "환불" }[b.state] || b.state)}</span></td><td>${esc(b.order_tail || "—")}</td><td>${esc(b.refunded_at ? `${time(b.refunded_at)} · ${b.refund_reason_category || ""}` : "—")}</td></tr>`);
     const ledger = ((d.wallet || {}).ledger || []).map((g) => `<tr><td>${esc(time(g.at))}</td><td>${esc(g.kind === "grant" ? "받음" : "씀")}</td><td class="tk-num">${esc(num(g.amount))}</td><td>${esc(g.reason || "—")}</td><td>${esc(g.source === "server" ? "서버(구매)" : "앱 보고")}</td></tr>`);
     const ids = (d.identities || []).map((i) => `<tr><td>${esc(i.provider === "crazygames" ? "CrazyGames" : "게스트 로그인")}</td><td><code>${esc(i.subject)}</code></td><td><code>${esc(i.login || "—")}</code></td><td>${esc(time(i.created_at))}</td></tr>`);
     return `<section class="panel">
@@ -201,12 +201,12 @@
       ${(p.cap_hits || []).length ? `<div class="tk-section"><h3>하루 부품 상한 도달</h3><p class="tk-sub">24시간 판 부품이 상한(정상 플레이로는 거의 못 닿는 값)에 닿은 날입니다. 정상 최고 속도(초당 733)보다 빠르거나 24시간 중 16시간 넘게 플레이한 것으로 나오면 [버그유저]로 표시합니다. 표시만 하며 제재는 하지 않습니다.</p>${table(["날짜", "24시간 부품", "판 수", "플레이 시간", "판정"], p.cap_hits.map((h) => `<tr><td>${esc(h.day)}</td><td class="tk-num">${esc(num(h.scrap))}</td><td class="tk-num">${esc(num(h.runs))}</td><td>${esc(`${num(h.play_min)}분`)}</td><td><span class="tk-badge" data-tone="${h.odd ? "risk" : "quiet"}">${h.odd ? "말이 안 됨" : "가능"}</span></td></tr>`))}</div>` : ""}
       ${facts([
         ["가입", time(p.created_at)], ["마지막 접속", time(p.last_seen_at)],
-        ["전체 기간 순위", d.rank?.all ? `${num(d.rank.all)}위` : "—"], [`이번 주 순위`, d.rank?.week ? `${num(d.rank.week)}위` : "—"],
+        ["전체 기간 순위", d.rank?.all ? `${num(d.rank.all)}위` : "—"], [`이번 시즌 순위`, d.rank?.week ? `${num(d.rank.week)}위` : "—"],
         ["플랫폼", d.platform ? `${platformName(d.platform.value)} (${SOURCE_WHY[d.platform.source] || "—"})` : "—"],
         ["나이대", d.age_state && d.age_state !== "given" ? AGE_STATE[d.age_state].join(" · ") : ageName(account.age_band)],
         ...(mobile ? [["약관 버전", account.terms_version || "—"], ["닉네임 변경", `${num(account.rename_count)}회`]] : []),
       ])}
-      <div class="tk-section"><h3>기기 정보 · 지역</h3><p class="tk-sub">최신 기록입니다. 스토어 국가와 기기 지역은 별도 값이며, 수집 전에는 — 로 표시합니다.</p>${facts([
+      <div class="tk-section"><h3>기기 정보 · 지역</h3><p class="tk-sub">최신 기록입니다. 스토어 국가와 기기 지역은 별도 값이며, 지금은 개인정보 방침에 이 항목이 올라가기 전이라 앱이 보내지 않아 모두 — 입니다 (방침에 올린 뒤 나오는 앱 빌드부터 채워집니다).</p>${facts([
         ["스토어 국가", countryName(info.store_country)], ["기기 지역", info.device_region || "—"],
         ["플랫폼", clientPlatformName(info.platform)], ["앱 버전 · 빌드", info.platform ? `${info.app_version || "—"} · ${info.build ?? "—"}` : "—"],
         ["기기 모델", info.device_model || "—"], ["운영체제", info.os_version || "—"],
@@ -217,7 +217,7 @@
         ["접속한 날 수", retention.active_days === undefined ? "—" : `${num(retention.active_days)}일`],
         ["첫 활동일", retention.first_day || "—"], ["마지막 활동", time(retention.last_seen_at)],
       ])}${table(["도달한 첫 행동", "기록 시각"], (retention.milestones || []).map((m) => `<tr><td>${esc((T.milestoneName || ((id) => id))(m.id))}</td><td>${esc(time(m.reached_at))}</td></tr>`), "이 플레이어는 서버에 남은 첫 행동 기록이 없습니다.")}</div>
-      <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "아직 연결된 판 기록이 없습니다.")}</div>
+      <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "판 기록을 플레이어에 연결하는 기능이 개인정보 방침 반영 전이라 꺼져 있어 항상 비어 있습니다 (전체 숫자는 밸런스 화면에서 봅니다).")}</div>
       <section id="tenkeyPlayerTitles" class="tk-section tk-player-titles"><h3>칭호</h3><p class="empty-panel">칭호를 불러오는 중입니다...</p></section>
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>
       <div class="tk-section"><h3>보드별 최고 기록</h3>${table(["보드", "점수", "레벨", "시간", "기록 시각", "점수 규칙"], bests, "기록이 없습니다.")}</div>
