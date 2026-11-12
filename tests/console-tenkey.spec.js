@@ -68,7 +68,7 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   expect(errors).toEqual([]);
 });
 
-test("overview: the itch.io web filter shows its own visits and runs, no return rate, never the game server's people", async ({ page }) => {
+test("overview: the itch.io web filter shows its own visits and runs, the return rate by itch account, never the game server's people", async ({ page }) => {
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
@@ -83,8 +83,9 @@ test("overview: the itch.io web filter shows its own visits and runs, no return 
   await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want[0]}명`);
   await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${want[1]}명`);
   await expect(today.nth(2).locator(".tk-glance-value")).toHaveText(`${want[2]}판`);
-  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("—");
-  await expect(week.nth(3)).toContainText("웹은 셀 수 없음");
+  // 2026-11-12: the anonymous itch id cannot be followed, so the rate is counted over the itch ACCOUNTS the game server saw
+  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("33.3%");
+  await expect(week.nth(3)).toContainText("새 계정");
   await expect(page.locator("#tenkeyOverviewNotice")).toBeVisible();
   await expect(page.locator("#tenkeyOverviewNotice")).toContainText("방문 수");
   await page.locator("#tenkeyOverviewMore summary").click();
