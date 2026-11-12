@@ -483,14 +483,14 @@
       <section id="tenkeyPlayersView" class="route-view" data-route="tenkey-players" hidden>
         <form id="tenkeyPlayerSearchForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>플레이어 검색<input id="tenkeyPlayerSearch" type="search" maxlength="100" placeholder="닉네임 · 플레이어 ID · 로그인 ID"></label>
-          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 · CrazyGames</option><option value="android">Android</option><option value="ios">iOS</option></select></label>
+          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 (itch · CrazyGames 등)</option><option value="android">Android</option><option value="ios">iOS</option><option value="unknown">모름</option></select></label>
           <label>스토어 국가<input id="tenkeyPlayerCountry" type="text" maxlength="2" placeholder="전체 · KR · XX 미기록" autocomplete="off" spellcheck="false"></label>
           <label>정렬<select id="tenkeyPlayerSort"><option value="last_seen_at">마지막 접속</option><option value="created_at">가입</option><option value="best">최고 점수</option><option value="name">이름</option><option value="store_country">스토어 국가</option></select></label>
           <label>방향<select id="tenkeyPlayerDirection"><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
           <button class="primary-button" type="submit">검색</button>
         </form>
         <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 플레이어입니다. 스토어 국가는 앱 계정에 연결된 최신 기록이며, XX는 아직 받은 국가 코드가 없는 계정입니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 플레이어입니다. 스토어 국가는 앱 계정에 연결된 최신 기록이며, XX는 아직 받은 국가 코드가 없는 계정입니다. 플랫폼은 판 기록, 로그인 기록, 결제 기록 순으로 찾아 아래에 근거를 적습니다. 나이대는 입력한 나이 / 미등록(앱이 상점에서 묻는데 답이 없음) / 수집 안 함(웹은 묻지 않음)으로 나눕니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>플랫폼</th><th>스토어 국가</th><th>가입</th><th>마지막 접속</th><th class="tk-num">최고 점수</th><th>나이대</th><th>상태</th><th>처리</th></tr></thead><tbody id="tenkeyPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="tenkeyPlayersPrevious" type="button">이전</button><span id="tenkeyPlayersPage">1 / 1</span><button id="tenkeyPlayersNext" type="button">다음</button></div>
         </section>
@@ -504,7 +504,7 @@
           <button class="primary-button" type="submit">조회</button>
           <button id="tenkeyRetentionRefresh" class="refresh-button" type="button">새로고침</button>
         </form>
-        <p class="tk-sub">계정 retention 수집은 개인정보 안내와 서버 스위치가 켜진 뒤 시작됩니다. D1·D3·D7·D14·D30은 첫 활동일 뒤 해당 날짜에 돌아온 계정입니다.</p>
+        <p class="tk-sub">서버가 이미 가진 접속 기록으로 셉니다. D1·D3·D7·D14·D30은 첫 활동일 뒤 해당 날짜에 돌아온 계정입니다.</p>
         <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">RETURNING ACCOUNTS</p><h2>계정 기준 재방문 (웹 포함)</h2><small>지금 바로 보이는 기준: 같은 계정이 다른 날 다시 접속했는지입니다. 웹은 방문마다 기기 번호가 새로 생겨 계정으로만 셉니다. Dn = 첫 접속 n일 뒤 그날 다시 온 계정, "아직" = 그날이 안 지남.</small></div></div>
           <div id="tenkeyAccountReturnsSummary" class="tk-retention-summary" aria-live="polite"></div>
           <div id="tenkeyAccountReturns"></div></section>
@@ -512,9 +512,9 @@
         <div id="tenkeyRetentionSummary" class="tk-retention-summary" aria-live="polite"></div>
         <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">COHORT RETENTION</p><h2>첫 활동 코호트</h2><small>첫 활동일 · 빌드 · 플랫폼 · 스토어 국가별 재방문 계정</small></div></div>
           <div id="tenkeyRetentionCohorts"></div></section>
-        <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">FIRST-TIME MILESTONES</p><h2>첫 행동 흐름</h2><small>고정 마일스톤에 도달한 계정 수입니다. 탭·상점 행동은 별도 갈래입니다.</small></div></div>
+        <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">FIRST-TIME MILESTONES</p><h2>첫 행동 흐름</h2><small>이 기간에 처음 접속한 계정이 각 단계에 닿은 수입니다. 단계마다 따로 센 값이라 서로 겹칠 수 있습니다.</small></div></div>
           <div id="tenkeyRetentionFunnel" class="tk-retention-funnel"></div></section>
-        <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">CHURN FACTORS</p><h2>쉬기 시작한 계정</h2><small>마지막 화면·판·세션·첫날 시간으로 재방문 전 이탈 징후를 확인합니다.</small></div><div class="tk-retention-tabs" role="group" aria-label="마지막 활동 기간"><button type="button" data-retention-churn-days="3" aria-pressed="true">3일 이상</button><button type="button" data-retention-churn-days="7" aria-pressed="false">7일 이상</button></div></div>
+        <section class="panel tk-retention-panel"><div class="panel-heading"><div><p class="eyebrow">CHURN FACTORS</p><h2>쉬기 시작한 계정</h2><small>마지막으로 접속한 지 3일 또는 7일이 넘은 계정입니다. 마지막 판 레벨과 그 전 일주일 활동을 봅니다.</small></div><div class="tk-retention-tabs" role="group" aria-label="마지막 활동 기간"><button type="button" data-retention-churn-days="3" aria-pressed="true">3일 이상</button><button type="button" data-retention-churn-days="7" aria-pressed="false">7일 이상</button></div></div>
           <div id="tenkeyRetentionChurn"></div></section>
       </section>
 
@@ -878,11 +878,11 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20261028-caret"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261104-mail"></script>
+  <script src="tenkey.js?v=20261112-audit"></script>
   <script src="tenkey-overview.js?v=20261105-zh"></script>
   <script src="tenkey-unlocks.js?v=20261108-hard"></script>
-  <script src="tenkey-players.js?v=20261108-hard"></script>
-  <script src="tenkey-retention.js?v=20261104-account-returns"></script>
+  <script src="tenkey-players.js?v=20261112-audit"></script>
+  <script src="tenkey-retention.js?v=20261112-audit"></script>
   <script src="tenkey-titles.js?v=20261104-title"></script>
   <script src="tenkey-crashes.js?v=20261023-tk"></script>
   <script src="tenkey-reports.js?v=20261109-contact"></script>

@@ -663,3 +663,89 @@ test("the 13-page menu scrolls when the window is short: desktop sidebar up and 
   await expect(page.locator("#pageTitle")).toHaveText("감사 기록");
   expect(errors).toEqual([]);
 });
+
+// con-audit 2026-11-12: the shapes below are what the live server answers (admin_retention_v2 / admin_players_list_v2 /
+// admin_player_data_v2, drafts 20261112190000). The old page showed "아직 기록된 첫 행동이 없습니다" and an empty churn list
+// because the app-sent tables are empty until the privacy-gated collection is switched on.
+const stub = (fn) => `\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn==="tenkey-admin"){const r=(${fn})(b);if(r!==undefined)return {ok:true,data:r};}return real(pj,fn,b);};})();`;
+
+test("재방문 page: first actions and resting accounts come from the server's own records; steps only the app can report say so", async ({ page }) => {
+  const MOCK = stub(`(b)=>{
+    if(b.action==="retention.accounts")return {ok:true,days:30,today:"2026-11-12",rows:[]};
+    if(b.action!=="retention.get")return undefined;
+    const step=(milestone,players,extra)=>({milestone,players,rate:players==null?null:players/100,drop_from_previous:null,pending:players==null,...extra});
+    return {ok:true,days:30,build:null,source:"server",client_on:false,client_rows:0,cohorts:[{first_day:"2026-11-10",build:null,platform:"web_itch",store_country:null,players:100,d1:20,d1_rate:0.2,d3:10,d3_rate:0.1,d7:null,d7_rate:null,d14:0,d14_rate:null,d30:0,d30_rate:null}],
+      funnel:[step("game_opened",100),step("name_set",100,{drop_from_previous:0}),step("first_run_started",null),step("first_run_ended",72,{drop_from_previous:28}),step("run_2",40,{drop_from_previous:32}),step("level_5",12),step("first_robot",3),step("ranking_entry",8),step("tab_shop",null)],
+      churn_3:[{player_id:"a1111111-1111-4111-8111-111111111111",last_seen_at:"2026-11-05T10:00:00+00:00",last_day:"2026-11-05",current_streak:3,last_screen:null,last_run_level:6,last_run_cause:"battery",runs_7d:4,sessions_7d:3,active_days:3,crashes_30d:null,hitches_30d:null,first_day_minutes:null}],
+      churn_7:[],churn_3_total:287,churn_7_total:250};
+  }`);
+  const errors = await open(page, "#/tenkey-retention", MOCK);
+  const funnel = page.locator("#tenkeyRetentionFunnel");
+  await expect(funnel).toContainText("서버가 이미 가진 기록");
+  await expect(funnel).not.toContainText("아직 기록된 첫 행동이 없습니다");
+  await expect(funnel.locator(".tk-funnel-row")).toHaveCount(9);
+  await expect(funnel.locator(".tk-funnel-row").nth(3)).toContainText("72명");
+  await expect(funnel.locator(".tk-funnel-row").nth(3)).toContainText("첫 판 종료");
+  await expect(funnel.locator(".tk-funnel-row").nth(6)).toContainText("첫 로봇 변신");
+  await expect(funnel.locator(".tk-funnel-row.is-pending")).toHaveCount(2);
+  await expect(funnel.locator(".tk-funnel-row.is-pending").first()).toContainText("앱이 보내야 알 수 있음");
+  const churn = page.locator("#tenkeyRetentionChurn");
+  await expect(churn.locator("tbody tr")).toHaveCount(1);
+  await expect(churn).toContainText("전체 287명");
+  await expect(churn).toContainText("앱 수집이 켜진 뒤부터");
+  await expect(churn.locator("tbody tr")).toContainText("Lv 6");
+  await expect(page.locator("#tenkeyRetentionCohorts")).toContainText("미기록");
+  await page.locator('[data-retention-churn-days="7"]').click();
+  await expect(churn).toContainText("7일 넘은 계정이 없습니다");
+  await shot(page, "retention_audit");
+  expect(errors).toEqual([]);
+});
+
+test("플레이어 page: platform says where it was read from, 모름 only when unknown, and the age band has three plain states", async ({ page }) => {
+  const MOCK = stub(`(b)=>{
+    if(b.action!=="players.list")return undefined;
+    const row=(id,name,platform,platform_source,age_state,age_band,provider="supabase")=>({id,name,nickname:name,provider,platform,platform_source,age_state,age_band,created_at:"2026-11-01T09:00:00+00:00",last_seen_at:"2026-11-11T09:00:00+00:00",best_score:100,best_level:6,banned:false,runs_stored:1,store_country:"",god_mode:false});
+    return {ok:true,total:5,rows:[
+      row("a1111111-1111-4111-8111-111111111111","앱18","android","run","given",18),
+      row("b2222222-2222-4222-8222-222222222222","앱미등록","ios","login","unregistered",null),
+      row("c3333333-3333-4333-8333-333333333333","웹손님","web_itch","run","not_asked",null),
+      row("d4444444-4444-4444-8444-444444444444","포털","web_crazygames","login","not_asked",null,"crazygames"),
+      row("e5555555-5555-4555-8555-555555555555","모름씨","unknown","none","unknown",null)]};
+  }`);
+  const errors = await open(page, "#/tenkey-players", MOCK);
+  const rows = page.locator("#tenkeyPlayersTable tr");
+  await expect(rows).toHaveCount(5);
+  await expect(rows.nth(0).locator('td[data-label="플랫폼"]')).toContainText("Android");
+  await expect(rows.nth(0).locator('td[data-label="플랫폼"]')).toContainText("판 기록 기준");
+  await expect(rows.nth(0).locator('td[data-label="나이대"]')).toHaveText("18세 이상");
+  await expect(rows.nth(1).locator('td[data-label="나이대"]')).toContainText("미등록");
+  await expect(rows.nth(1).locator('td[data-label="나이대"]')).toContainText("앱이 상점에서 묻는데 답이 없음");
+  await expect(rows.nth(2).locator('td[data-label="플랫폼"]')).toContainText("웹 · itch.io");
+  await expect(rows.nth(2).locator('td[data-label="나이대"]')).toContainText("수집 안 함");
+  await expect(rows.nth(3).locator('td[data-label="나이대"]')).toContainText("웹은 나이를 묻지 않음");
+  await expect(rows.nth(4).locator('td[data-label="플랫폼"]')).toContainText("모름");
+  await expect(rows.nth(4).locator('td[data-label="플랫폼"]')).toContainText("판·로그인 기록이 없어 알 수 없음");
+  await expect(rows.nth(4).locator('td[data-label="나이대"]')).toContainText("플랫폼을 몰라 구분 못 함");
+  await expect(page.locator("#tenkeyPlayerPlatform option[value=unknown]")).toHaveText("모름");
+  await shot(page, "players_platform_age");
+  expect(errors).toEqual([]);
+});
+
+test("플레이어 상세: first actions from the server list, platform with its source, age state", async ({ page }) => {
+  const MOCK = stub(`(b)=>{
+    if(b.action!=="players.facts")return undefined;
+    return {ok:true,platform:{value:"web_itch",source:"run"},age_state:"not_asked",client_info:null,balance_runs:[],
+      retention:{source:"server",first_day:"2026-11-01",last_seen_at:"2026-11-10T08:00:00+00:00",current_streak:2,active_days:3,
+        milestones:[{id:"game_opened",reached_at:"2026-11-01T09:00:00+00:00"},{id:"first_run_ended",reached_at:"2026-11-01T09:20:00+00:00"},{id:"level_5",reached_at:"2026-11-02T09:20:00+00:00"}]}};
+  }`);
+  const errors = await open(page, "#/tenkey-players/a1111111-1111-4111-8111-111111111111", MOCK);
+  const detail = page.locator("#tenkeyPlayerDetail");
+  await expect(detail).toContainText("서버가 가진 기록");
+  await expect(detail).toContainText("Lv 5 도달");
+  await expect(detail).toContainText("첫 판 종료");
+  await expect(detail).not.toContainText("아직 기록된 첫 행동이 없습니다");
+  await expect(detail).toContainText("접속한 날 수");
+  await expect(detail).toContainText("웹 · itch.io (판 기록 기준)");
+  await expect(detail).toContainText("수집 안 함 · 웹은 나이를 묻지 않음");
+  expect(errors).toEqual([]);
+});
