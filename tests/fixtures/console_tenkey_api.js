@@ -214,11 +214,27 @@
           forms: [{ form: "tenkey", n: 156 }, { form: "drift", n: 63 }, { form: "robot", n: 21 }],
           drift_levels: [{ lv: 10, n: 50 }, { lv: 11, n: 34 }], robot_levels: [{ lv: 20, n: 22 }, { lv: 22, n: 8 }],
           skills: [{ skill: "laser", kind: "n", picks: 190, runs: 170, avg_pick_level: 4.2, avg_end_level: 20.8 }, { skill: "drift", kind: "d", picks: 90, runs: 84, avg_pick_level: 10, avg_end_level: 24.1 },
-            { skill: "laser", kind: "u", picks: 120, runs: 80, avg_pick_level: 9.5, avg_end_level: 22 }, { skill: "nitro", kind: "p", picks: 40, runs: 38, avg_pick_level: 12.3, avg_end_level: 25.5 }],
+            { skill: "laser", kind: "u", picks: 120, runs: 80, avg_pick_level: 9.5, avg_end_level: 22 }, { skill: "nitro", kind: "p", picks: 40, runs: 38, avg_pick_level: 12.3, avg_end_level: 25.5 }, { skill: "fever", kind: "f", picks: 30, runs: 24, avg_pick_level: 6, avg_end_level: 15 }],
           encounters: [{ id: "mouse", met: 260, won: 190, runs: 200 }, { id: "wheel_mouse", met: 30, won: 14, runs: 28 }, { id: "spacebar", met: 0, won: 0, runs: 0 }],
           daily: Array.from({ length: 7 }, (_, i) => ({ day: dayAt(6 - i), runs: 20 + i * 6, installs: 8 + i, avg_level: 18 + i / 2 })),
           builds: [{ build: 5, version: "1.0.1", runs: 200, avg_level: 20.1 }, { build: 2, version: "1.0.0", runs: 40, avg_level: 17.3 }],
-          knobs: [{ kv: 0, runs: 240, avg_level: 19.6 }] };
+          knobs: [{ kv: 0, runs: 240, avg_level: 19.6 }],
+          // admin_balance_v3 (2026-11-12): window.__mockBalanceV1 = the older server without these keys; window.__mockHard = hard runs exist.
+          ...(window.__mockBalanceV1 ? {} : {
+            platform: p.platform ?? null,
+            platforms: [{ platform: "android", runs: 140, installs: 20, drift: 0, avg_level: 6.1 }, { platform: "ios", runs: 30, installs: 5, drift: 0, avg_level: 5.2 }, { platform: "web_itch", runs: 70, installs: 40, drift: 8, avg_level: 9.4 }],
+            modes: window.__mockHard ? [{ mode: "classic", runs: 230, installs: 31 }, { mode: "hard", runs: 10, installs: 2 }] : [{ mode: "classic", runs: 240, installs: 31 }],
+            reach: window.__mockReach ? [{ lv: 2, n: 20, median_ms: 31000, p90_ms: 60000 }, { lv: 5, n: 18, median_ms: 150000, p90_ms: 260000 }] : [],
+            times: { n: window.__mockReach ? 20 : 0, drift_ms: window.__mockReach ? 90000 : 0, robot_ms: 0 },
+            trace: { runs: 60, installs: 25, with_form: 40,
+              crises: [{ id: "numlock", runs: 55, n: 120 }, { id: "mouse", runs: 40, n: 66 }, { id: "spacebar", runs: 5, n: 5 }],
+              cards: [{ kind: "d", offered: 12, won: 7, runs: 12 }, { kind: "f", offered: 20, won: 9, runs: 20 }, { kind: "t", offered: 4, won: 1, runs: 4 }],
+              form_s: { drift: 21.5, robot: 3, fever: 7.5 } },
+            hard: window.__mockHard
+              ? { runs: 10, installs: 2, with_meter: window.__mockHardNoMeter ? 0 : 8,
+                  bosses: [{ lv: 10, met: 6, won: 2, sec: 480 }, { lv: 20, met: 1, won: 0, sec: 90 }, { lv: 30, met: 0, won: 0, sec: 0 }],
+                  meter: window.__mockHardNoMeter ? {} : { lb: [40, 10, 5, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0], ld: [0, 0, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0], rb: [10, 4, 0, 0, 0, 0, 0, 0, 0, 0], rd: [0, 0, 0, 0, 0, 6], dm: [30, 0, 12], cl: [4, 3, 20, 40, 18] } }
+              : { runs: 0, installs: 0, with_meter: 0, bosses: [], meter: {} } }) };
       }
       case "audit.list": return audit.slice(0, p.limit || 50);
       case "config.get": return config;
