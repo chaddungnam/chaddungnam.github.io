@@ -194,6 +194,24 @@
     const yRow = daily.at(-2) || {};
     const preCard = P ? glance("사전예약", num(P.d1), "명", `어제 하루 ${num(P.d1_prev)}명 · 총 ${num(P.total)}명`,
       { tone: "good", help: "houseduck.in/10key에서 사전예약을 마친 사람 (테스트 주소 제외). 언어는 가입한 페이지 언어입니다. 나라는 저장하지 않습니다." }) : "";
+    // 다음 날 다시 온 비율 without a "전체" frame (a platform filter, or the itch numbers failed to load). Owner 2026-11-12: the install
+    // ping's id is new on every itch page load, so it read 0 %. The accounts the game server saw are used instead: of the accounts first
+    // seen in the 7 days up to yesterday, how many came back the next day (server admin_dau: new_* / back_*; android / ios split from v2).
+    function returnCard() {
+      const help = "처음 들어온 계정 가운데 바로 다음 날 다시 들어온 비율 (게임 서버 로그인 기록 기준, 어제까지 7일). 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다.";
+      const days = state.dau?.days || [];
+      if (days.length) {
+        const split = Object.hasOwn(days[days.length - 1], "new_android");
+        const groups = state.platform === "web_itch" ? ["itch"] : state.platform === "android" ? [split ? "android" : "app"] : state.platform === "ios" ? [split ? "ios" : "app"] : ["itch", "app", "other"];
+        let n = 0, k = 0;
+        for (let back = 1; back <= 7; back++) for (const g of groups) { n += Number(days[days.length - 1 - back]?.[`new_${g}`] || 0); k += Number(days[days.length - 1 - back]?.[`back_${g}`] || 0); }
+        const tail = !split && (state.platform === "android" || state.platform === "ios") ? " · Android+iOS 합계" : "";
+        return glance("다음 날 다시 온 비율", n > 0 ? String(Math.round(k / n * 1000) / 10) : "—", n > 0 ? "%" : "", n > 0 ? `어제까지 7일 새 계정 ${num(n)}명 중 ${num(k)}명${tail}` : "어제까지 7일 동안 처음 들어온 계정이 없음", { help });
+      }
+      return glance("다음 날 다시 온 비율", web ? "—" : retRate(ret.d1), !web && Number(ret.d1?.cohort) > 0 ? "%" : "",
+        web ? "계정 기록을 불러오지 못함 (익명 번호는 방문마다 바뀌어 셀 수 없음)" : Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
+        { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." });
+    }
     if (W) {
       byId("tenkeyGlanceToday").classList.add("is-5");
       byId("tenkeyGlanceToday").innerHTML = [
@@ -287,9 +305,7 @@
             { noteTone: installWeek.noteTone, help: "최근 7일(오늘 포함) 동안 처음 신호를 보낸 기기 수." }),
         glance("결제", num(week("purchases")), "건", `${buyWeek.note}${anyPlatform}`,
           { noteTone: buyWeek.noteTone, help: "스토어가 확인한 구매 (환불·테스트 결제 제외). Android와 iOS를 합친 숫자입니다." }),
-        glance("다음 날 다시 온 비율", web ? "—" : retRate(ret.d1), !web && Number(ret.d1?.cohort) > 0 ? "%" : "",
-          web ? "웹은 셀 수 없음 (방문마다 새 번호)" : Number(ret.d1?.cohort) > 0 ? `설치한 ${num(ret.d1.cohort)}명 중 ${num(ret.d1.back)}명` : noSignal ? "새 빌드부터 셈" : "아직 셀 수 없음 (설치 이틀 뒤부터)",
-          { help: "2~8일 전에 설치한 기기 가운데 설치한 다음 날 앱을 다시 연 비율. 7일 뒤·30일 뒤 비율은 ‘그래프 더 보기’에 있습니다." }),
+        returnCard(),
       ].join("");
     }
 
@@ -316,7 +332,7 @@
     const crashCols = columns(rows.map((r) => Number(r.crashes || 0)), rows.map((r) => tip(dayLabel(r.day), [["크래시", `${num(r.crashes)}건`]])), "is-v2");
     const buyCols = columns(rows.map((r) => Number(r.purchases || 0)), rows.map((r) => tip(dayLabel(r.day), [["결제 완료", `${num(r.purchases)}건`]])));
     const activeTotal = (data.platforms || []).reduce((s, r) => s + r.n, 0);
-    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음" })[k] || k)}</div></article>`;
+    const distCard = `<article class="ov-card"><header class="ov-card-head"><h3>누가 쓰나 (7일 동안 앱을 연 기기)</h3></header><div class="overview-drill-body" style="padding:0">${distribution("플랫폼", data.platforms || [], activeTotal, T.fmt.platformName)}${distribution("앱 버전", data.versions || [], activeTotal)}${distribution("언어 (30일)", data.langs || [], 0, (k) => ({ ko: "한국어", en: "영어", ja: "일본어", de: "독일어", zh_TW: "중국어(번체)", fr: "프랑스어", es: "스페인어", pt: "포르투갈어", "?": "기록 없음 (웹)" })[k] || k)}<p class="overview-drill-note">언어는 앱(Android·iOS)만 보냅니다. 웹(itch) 판은 언어를 보내지 않아 ‘기록 없음 (웹)’으로 모이므로, 이 숫자는 앱 사용자의 언어와 따로 봐야 합니다.</p></div></article>`;
     const periods = [7, 30, 90].map((d) => `<button class="overview-switch${d === state.period ? " active" : ""}" type="button" data-tk-period="${d}" aria-pressed="${d === state.period}">${d}일</button>`).join("");
     // Main chart: app users, web visits and pre-registrations day by day on one frame (each line its own colour).
     const mainSeries = [{ key: "people", color: COLOR.app, label: W ? "플레이어 (DAU)" : "앱을 연 사람" }];
@@ -403,7 +419,7 @@
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } }).catch(() => null),
-        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
+        root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
       ]);
       state.dau = dauResult?.data || null;
       state.data = result.data;

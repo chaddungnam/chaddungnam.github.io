@@ -106,6 +106,11 @@
     android: "Android", ios: "iOS", windows: "Windows", macos: "Mac", linux: "Linux", steam: "Steam (PC)",
     web: "웹 (공통)", web_nekoland: "웹 · 네코랜드", web_gamepix: "웹 · GamePix", web_crazygames: "웹 · CrazyGames", crazygames: "웹 · CrazyGames", web_itch: "웹 · itch.io",
     mobile: "모름", unknown: "모름", supabase: "앱 계정", nekoland: "네코랜드" };
+  // Store product ids as the owner knows them (owner 2026-11-12: raw ids like tk_gems_450 told nothing). Unknown ids stay as they are.
+  const PRODUCT_NAMES = { tk_transformer: "로봇 팩", tk_transformer_offer: "로봇 팩 (할인)", tk_starter_pack: "초반 돌파 패키지", tk_hard_mode: "하드 모드 해금", tk_hard_pack: "하드 팩", tk_hard_pack_offer: "하드 팩 (첫 주 할인)" };
+  const productName = (id) => { const g = /^tk_gems_(\d+)$/.exec(String(id || "")); return g ? `젬 ${g[1]}개` : PRODUCT_NAMES[id] || String(id || "—"); };
+  // Board keys: "all", "week" (= the running season) and "q2026-4" (a quarter season; the server key still says week). Owner 2026-11-12.
+  const boardName = (board) => { const q = /^q(\d{4})-(\d)$/.exec(String(board || "")); return board === "all" ? "전체 기간" : board === "week" ? "이번 시즌" : q ? `${q[1]}년 ${q[2]}분기 시즌` : /^w\d/.test(String(board)) ? `${String(board).slice(1)} 시작 주` : String(board || "—"); };
   const platformName = (value) => PLATFORM_NAMES[String(value || "").toLowerCase()] || String(value || "—");
 
   function setMessage(id, value, error = false) {
@@ -316,6 +321,6 @@
   root.ConsoleTenkey = {
     mountConfig, validate,
     call, report, setMessage, errorText, pager, askReason,
-    fmt: { esc, num, time, shortTime, dayText, duration, bytes, pct, platformName },
+    fmt: { esc, num, time, shortTime, dayText, duration, bytes, pct, platformName, productName, boardName },
   };
 })(window);

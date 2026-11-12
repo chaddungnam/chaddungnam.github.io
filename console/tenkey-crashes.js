@@ -31,7 +31,7 @@
     return `<tr data-tk-group="${esc(g.key)}" tabindex="0" aria-selected="${selected}">
       <td class="tk-wrap" data-label="묶음"><strong>${esc(state.groupBy === "kind" ? kindName(g.key) : g.key)}</strong>${g.said && state.groupBy === "message" ? `<span class="tk-sub">${esc(g.said)}</span>` : ""}<span class="tk-sub">${esc((g.kinds || []).map(kindName).join(" · "))} · ${esc((g.platforms || []).map((p) => platformName(String(p).toLowerCase())).join(", "))}</span></td>
       <td class="tk-num" data-label="횟수"><strong>${esc(num(g.times))}</strong></td><td class="tk-num" data-label="보고">${esc(num(g.rows))}</td>
-      <td class="tk-num" data-label="설치 수">${esc(g.installs ? num(g.installs) : "—")}</td><td class="tk-num" data-label="기기">${esc(num(g.devices))}</td><td class="tk-num" data-label="버전">${esc(num(g.versions))}</td>
+      <td class="tk-num" data-label="설치 수" title="설치 번호를 보낸 보고만 셉니다. 웹과 옛 빌드는 번호를 보내지 않아 —">${esc(g.installs ? num(g.installs) : "—")}</td><td class="tk-num" data-label="기기">${esc(num(g.devices))}</td><td class="tk-num" data-label="버전">${esc(num(g.versions))}</td>
       <td data-label="처음">${esc(time(g.first_at))}</td><td data-label="마지막">${esc(time(g.last_at))}</td></tr>`;
   }
 
