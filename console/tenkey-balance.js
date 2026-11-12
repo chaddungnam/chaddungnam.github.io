@@ -1,5 +1,5 @@
 // 10key Survival: 밸런스. Every finished run's short anonymous record (tenkey.run_stats_v1, owner 2026-10-25), read through
-// tenkey-admin "balance.get" (tenkey.admin_balance_v1): where and why runs end, how far DRIFT and the robot go, which level-up
+// tenkey-admin "balance.get" (tenkey.admin_balance_v3 since 2026-11-12: the device is a filter, not a hidden rule): where and why runs end, how far DRIFT and the robot go, which level-up
 // cards are taken and when, the mobs met, per day / build / balance-knob version. Store apps only, keyed by a random install id.
 // Below it the four server balance values (tenkey-admin config.get "balance" / knobs.set): store apps take them at launch
 // and use them from the next run; each save is a new version the runs above are split by.
@@ -7,12 +7,21 @@
   const T = root.ConsoleTenkey;
   const { esc, num, duration, pct, time } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, q: { days: 7, build: "", mode: "" } };
+  const state = { bound: false, q: { days: 7, build: "", mode: "", platform: "" } };
   const KNOBS = ["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"];
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
-  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", clear: "노멀 모드 완주" };
+  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
+  // owner 2026-11-12: "드리프트가 된적이있는데 기록되지 않았고": the web demo's runs are counted too now, and every row says where it was played.
+  const PLATFORMS = { android: "Android", ios: "iOS", web_itch: "웹 체험판 (itch)", web_gamepix: "웹 (GamePix)", windows: "PC (Windows)", macos: "PC (Mac)", linux: "PC (Linux)" };
+  const CRISES = { numlock: "NUM LOCK 철창", mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바" };
+  const CHANCE = { f: "골든 피버", d: "DRIFT", t: "로봇 변신" };
+  const NOT_YET = "아직 받은 기록 없음 · 앱 다음 빌드부터 집계";
+  // Hard mode meter slots, in the order of scripts/data/hard_meter_data.gd (SRC_NAMES / REF_NAMES / DMG_NAMES).
+  const LOST = ["시간 소모", "칸 이동", "집게 조임", "키보드 내려치기", "보스 충격파", "거인 주먹", "DEL 다이너마이트", "트랜지스터", "로봇 텐키 던지기", "고양이 앞발", "NUM LOCK 철창 시간 초과", "임플란트 대가", "기타"];
+  const REFILL = ["건전지", "상자", "카드", "탈출 보상", "클립", "수리 키트", "완충", "저장", "부활", "기타"];
+  const DEALT = ["클릭", "스크롤", "레이저", "더블클릭", "커서 자국", "우클릭 메뉴", "로봇 펀치", "로봇 쿵 밟기", "폭발", "기타"];
   const FORMS = { tenkey: "텐키 그대로", drift: "DRIFT", robot: "로봇" };
   const MOBS = { mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바" };
   const CARDS = {
@@ -43,11 +52,70 @@
   const rowsOf = (list, heads, cells) => list.map((r) => `<tr>${cells(r).map(([v, numeric], i) => `<td data-label="${esc(heads[i])}"${numeric ? ' class="tk-num"' : ""}>${esc(v)}</td>`).join("")}</tr>`).join("");
   const avgLv = (v) => (v === null || v === undefined ? "—" : `Lv ${v}`);
 
+  const lineRows = (arr, names) => (arr || []).map((v, i) => ({ n: Number(v), label: names[i] || `#${i}` })).filter((r) => r.n > 0);
+  const sumOf = (rows) => rows.reduce((a, r) => a + r.n, 0);
+  const emptyRow = (cols) => `<tr><td colspan="${cols}" class="empty-panel">이 기간에 기록이 없습니다.</td></tr>`;
+  const topCard = (d, kind) => (d.skills || []).filter((x) => x.kind === kind).sort((a, b) => Number(b.runs) - Number(a.runs))[0];
+
+  // Which device the runs were played on, and whether a hard run exists at all (these ignore the device / mode filters).
+  function renderWhere(d) {
+    byId("tenkeyBalanceWhere").hidden = !d.platforms;
+    if (!d.platforms) return;
+    byId("tenkeyBalancePlatforms").innerHTML = d.platforms.length ? rowsOf(d.platforms, ["기기", "판", "기기 수", "DRIFT까지 간 판", "평균 끝 레벨"], (p) => [[name(PLATFORMS, p.platform)], [num(p.runs), true], [num(p.installs), true], [`${num(p.drift)} · ${pct(p.drift, p.runs)}`, true], [avgLv(p.avg_level), true]]) : emptyRow(5);
+    const mode = (m) => (d.modes || []).find((x) => x.mode === m);
+    byId("tenkeyBalanceModes").textContent = `노멀 모드 ${num(mode("classic")?.runs || 0)}판 · ${mode("hard") ? `하드 모드 ${num(mode("hard").runs)}판` : "하드모드 판 없음"}`;
+  }
+
+  // Crises met and the chance cards (GOLDEN FEVER / DRIFT / robot), from the run timeline the apps and the web demo send.
+  function renderTrace(d) {
+    const tr = d.trace;
+    byId("tenkeyBalanceTrace").hidden = !tr;
+    if (!tr) return;
+    const n = Number(tr.runs);
+    byId("tenkeyBalanceTraceNote").textContent = n ? `상세 기록(판의 시간 흐름)을 보낸 ${num(n)}판 기준 · 위 판 기록과는 따로 모입니다.` : "이 조건에서 상세 기록을 보낸 판이 아직 없습니다.";
+    byId("tenkeyBalanceCrises").innerHTML = bars((tr.crises || []).map((c) => ({ n: c.runs, id: c.id, times: c.n })), n, (r) => name(CRISES, r.id), (r) => ` · 모두 ${num(r.times)}번`);
+    const cards = (tr.cards || []).filter((c) => CHANCE[c.kind]);
+    byId("tenkeyBalanceChance").innerHTML = cards.length ? rowsOf(cards, ["카드", "나온 횟수", "성공 횟수", "성공 비율", "고를 때 평균 레벨"], (c) => [[CHANCE[c.kind]], [num(c.offered), true], [num(c.won), true], [pct(c.won, c.offered), true], [avgLv(topCard(d, c.kind)?.avg_pick_level), true]]) : emptyRow(5);
+    const f = tr.form_s || {};
+    byId("tenkeyBalanceFormTime").textContent = n ? `한 판에서 평균 DRIFT ${num(f.drift)}초 · 로봇 ${num(f.robot)}초 · 골든 피버 ${num(f.fever)}초` : "";
+  }
+
+  // How long a level takes to reach and how long a run stays DRIFT / robot: only the builds that send level times.
+  function renderReach(d) {
+    byId("tenkeyBalanceReach").hidden = !d.reach;
+    if (!d.reach) return;
+    const has = d.reach.length > 0;
+    byId("tenkeyBalanceReachNote").textContent = has ? `레벨 시간을 보낸 ${num(d.times?.n)}판 기준 · DRIFT 평균 ${duration(d.times?.drift_ms)} · 로봇 평균 ${duration(d.times?.robot_ms)}` : NOT_YET;
+    byId("tenkeyBalanceReachRows").innerHTML = has ? rowsOf(d.reach.filter((r) => Number(r.lv) % 5 === 0 || Number(r.lv) <= 3), ["레벨", "도착한 판", "가운데 값", "느린 쪽 10%"], (r) => [[`Lv ${r.lv}`], [num(r.n), true], [duration(r.median_ms), true], [duration(r.p90_ms), true]]) : emptyRow(4);
+  }
+
+  // Hard mode (apps only): its own run records and the meter every hard run carries.
+  function renderHard(d) {
+    const h = d.hard;
+    byId("tenkeyBalanceHard").hidden = !h;
+    if (!h) return;
+    const stored = Number((d.modes || []).find((m) => m.mode === "hard")?.runs || 0);
+    const none = Number(h.runs) === 0 && stored === 0;
+    byId("tenkeyBalanceHardEmpty").hidden = !none;
+    byId("tenkeyBalanceHardBody").hidden = none;
+    if (none) return;
+    byId("tenkeyBalanceHardNote").textContent = `하드 모드 ${num(stored)}판 기록 · 상세 기록을 보낸 ${num(h.runs)}판 (기기 ${num(h.installs)}) · 그중 측정값이 있는 판 ${num(h.with_meter)}`;
+    byId("tenkeyBalanceBosses").innerHTML = rowsOf(h.bosses || [], ["보스", "만난 횟수", "이긴 횟수", "이긴 비율", "한 번에 걸린 시간"], (b) => [[`Lv ${b.lv} 보스`], [num(b.met), true], [num(b.won), true], [pct(b.won, b.met), true], [Number(b.met) > 0 ? duration(Number(b.sec) / Number(b.met) * 1000) : "—", true]]);
+    const m = h.meter || {};
+    const meter = (id, arr, names) => { const rows = lineRows(arr, names); byId(id).innerHTML = Number(h.with_meter) ? bars(rows, sumOf(rows), (r) => r.label) : `<p class="overview-drill-note">${NOT_YET}</p>`; };
+    meter("tenkeyBalanceLostBat", m.lb, LOST); meter("tenkeyBalanceLostDur", m.ld, LOST);
+    meter("tenkeyBalanceRefillBat", m.rb, REFILL); meter("tenkeyBalanceRefillDur", m.rd, REFILL); meter("tenkeyBalanceDealt", m.dm, DEALT);
+    const cl = m.cl || [];
+    byId("tenkeyBalanceClamp").textContent = Number(cl[0]) > 0 ? `집게에 잡힌 ${num(cl[0])}번 중 ${num(cl[1])}번 스스로 빠져나옴 · 한 번에 평균 ${num(Math.round(Number(cl[4]) / Number(cl[0]) * 10) / 10)}초 잡혀 있음` : "";
+  }
+
   function render(d) {
+    renderWhere(d); renderHard(d);
     const t = d.total || {};
     const runs = Number(t.runs || 0);
     byId("tenkeyBalanceEmpty").hidden = runs > 0;
     byId("tenkeyBalanceBody").hidden = runs === 0;
+    const fever = topCard(d, "f");
     const builds = byId("tenkeyBalanceBuild");
     builds.innerHTML = ['<option value="">전체</option>', ...(d.builds || []).map((b) => `<option value="${esc(b.build)}">빌드 ${esc(b.build)}${b.version ? ` (${esc(b.version)})` : ""}</option>`)].join("");
     builds.value = state.q.build;
@@ -56,7 +124,9 @@
     set("level", runs ? `Lv ${t.median_level}` : "—"); set("drift", pct(t.drift, runs)); set("robot", pct(t.robot, runs));
     set("back", num(t.robot_returned)); set("clear", pct(t.cleared, runs));
     set("revive", runs ? `${num(t.revived)} / ${num(t.revive_offered)}` : "—"); set("owned", pct(t.transformer_owned, runs));
+    set("fever", runs ? pct(fever?.runs || 0, runs) : "—");
     if (!runs) return;
+    renderTrace(d); renderReach(d);
     byId("tenkeyBalanceLevels").innerHTML = bars(levelSteps(d.levels || []), runs, (r) => r.label);
     byId("tenkeyBalanceCauses").innerHTML = bars(d.causes || [], runs, (r) => name(CAUSES, r.cause), (r) => ` · 평균 Lv ${r.avg_level}`);
     byId("tenkeyBalanceForms").innerHTML = bars(d.forms || [], runs, (r) => name(FORMS, r.form));
@@ -80,7 +150,7 @@
     T.setMessage("tenkeyBalanceMessage", "판 기록을 불러오는 중입니다...");
     try {
       const q = state.q;
-      const result = await T.call("balance.get", { days: q.days, build: q.build === "" ? undefined : Number(q.build), mode: q.mode || undefined });
+      const result = await T.call("balance.get", { days: q.days, build: q.build === "" ? undefined : Number(q.build), mode: q.mode || undefined, platform: q.platform || undefined });
       render(result.data || {});
       T.setMessage("tenkeyBalanceMessage", "");
     } catch (error) {
@@ -142,7 +212,7 @@
       byId("tenkeyKnobDefaults").addEventListener("click", () => { for (const k of KNOBS) byId("tenkeyKnobForm").elements[k].value = "1.00"; });
       byId("tenkeyBalanceForm").addEventListener("submit", (event) => {
         event.preventDefault();
-        state.q = { days: Number(byId("tenkeyBalanceDays").value), build: byId("tenkeyBalanceBuild").value, mode: byId("tenkeyBalanceMode").value };
+        state.q = { days: Number(byId("tenkeyBalanceDays").value), build: byId("tenkeyBalanceBuild").value, mode: byId("tenkeyBalanceMode").value, platform: byId("tenkeyBalancePlatform").value };
         load();
       });
     }

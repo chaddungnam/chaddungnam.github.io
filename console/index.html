@@ -628,9 +628,14 @@
           <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="90">최근 90일</option></select></label>
           <label>빌드<select id="tenkeyBalanceBuild"><option value="">전체</option></select></label>
           <label>모드<select id="tenkeyBalanceMode"><option value="">전체</option><option value="classic">노멀 모드</option><option value="hard">하드 모드</option></select></label>
+          <label>기기<select id="tenkeyBalancePlatform"><option value="">전체</option><option value="app">앱 (Android·iOS)</option><option value="web">웹 체험판</option></select></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
-        <p class="impact-note">스토어 앱(Android·iOS)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 90일 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다.</p>
+        <p class="impact-note">스토어 앱(Android·iOS)과 웹 체험판(itch)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 90일 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다. 웹 체험판은 레벨이 일찍 끝나므로 노멀 모드 수치는 "기기"를 앱으로 좁혀 보세요. 내 컴퓨터(에디터·PC)에서 한 판은 보내지 않습니다.</p>
+        <section id="tenkeyBalanceWhere" class="panel" hidden>
+          <p class="eyebrow">WHERE PLAYED</p><h2>어느 기기에서 한 판인가</h2><small id="tenkeyBalanceModes">—</small>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>기기</th><th class="tk-num">판</th><th class="tk-num">기기 수</th><th class="tk-num">DRIFT까지 간 판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalancePlatforms"></tbody></table></div>
+        </section>
         <section id="tenkeyBalanceSummary" class="purchase-summary tenkey-summary" aria-label="밸런스 요약">
           <article data-tone="neutral"><span>기록된 판</span><strong data-tk-summary="runs">—</strong></article>
           <article data-tone="neutral"><span>판을 한 기기</span><strong data-tk-summary="installs">—</strong></article>
@@ -642,8 +647,9 @@
           <article data-tone="good"><span>노멀 모드 완주</span><strong data-tk-summary="clear">—</strong></article>
           <article data-tone="neutral"><span>부활한 판 / 부활 창이 뜬 판</span><strong data-tk-summary="revive">—</strong></article>
           <article data-tone="neutral"><span>변신 모드를 산 기기의 판</span><strong data-tk-summary="owned">—</strong></article>
+          <article data-tone="watch"><span>골든 피버 카드를 고른 판</span><strong data-tk-summary="fever">—</strong></article>
         </section>
-        <section id="tenkeyBalanceEmpty" class="panel" hidden><p class="empty-panel">아직 기록된 판이 없습니다. 판 기록은 이 기능이 들어간 다음 스토어 빌드부터 쌓입니다 (웹·PC 판은 보내지 않음).</p></section>
+        <section id="tenkeyBalanceEmpty" class="panel" hidden><p class="empty-panel">이 기간·조건에 기록된 판이 없습니다. 판 기록은 스토어 앱과 웹 체험판(itch)에서만 오고, 이 기능이 들어간 다음 스토어 빌드부터 쌓입니다. 위 "기기"를 전체로 바꿔 보세요.</p></section>
         <div id="tenkeyBalanceBody">
           <section class="panel tk-balance-pair">
             <div><p class="eyebrow">WHERE RUNS END</p><h2>판이 끝난 레벨</h2><small>막대 = 그 레벨 구간에서 끝난 판 수 · 전체 판 중 비율</small><div id="tenkeyBalanceLevels"></div></div>
@@ -661,12 +667,38 @@
             <div class="panel-heading"><div><p class="eyebrow">MOBS</p><h2>만난 적</h2><small>이긴 횟수 = 그 적을 물리치거나 버텨 낸 횟수</small></div></div>
             <div class="table-scroll tk-stack"><table><thead><tr><th>적</th><th class="tk-num">만난 판 · 비율</th><th class="tk-num">만난 횟수</th><th class="tk-num">이긴 횟수</th><th class="tk-num">이긴 비율</th></tr></thead><tbody id="tenkeyBalanceMobs"></tbody></table></div>
           </section>
+          <section id="tenkeyBalanceTrace" class="panel tk-balance-pair" hidden>
+            <div><p class="eyebrow">CRISES</p><h2>만난 위기</h2><small id="tenkeyBalanceTraceNote">—</small><div id="tenkeyBalanceCrises"></div></div>
+            <div><p class="eyebrow">CHANCE CARDS</p><h2>골든 피버 · DRIFT · 로봇 변신 카드</h2><small>나온 횟수 중 룰렛에 성공한 횟수 (카드는 50% 확률)</small>
+              <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th class="tk-num">나온 횟수</th><th class="tk-num">성공 횟수</th><th class="tk-num">성공 비율</th><th class="tk-num">고를 때 평균 레벨</th></tr></thead><tbody id="tenkeyBalanceChance"></tbody></table></div>
+              <small id="tenkeyBalanceFormTime"></small></div>
+          </section>
+          <section id="tenkeyBalanceReach" class="panel" hidden>
+            <div class="panel-heading"><div><p class="eyebrow">LEVEL PACE</p><h2>레벨에 도착한 시간</h2><small id="tenkeyBalanceReachNote">—</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>레벨</th><th class="tk-num">도착한 판</th><th class="tk-num">가운데 값</th><th class="tk-num">느린 쪽 10%</th></tr></thead><tbody id="tenkeyBalanceReachRows"></tbody></table></div>
+          </section>
           <section class="panel tk-balance-pair">
             <div><p class="eyebrow">PER DAY</p><h2>날마다</h2><div class="table-scroll"><table><thead><tr><th>날짜</th><th class="tk-num">판</th><th class="tk-num">기기</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceDaily"></tbody></table></div></div>
             <div><p class="eyebrow">PER BUILD</p><h2>빌드별</h2><small>새 빌드에서 판이 길어졌는지 비교합니다 (빌드 필터와 상관없이 전부 보임)</small><div class="table-scroll"><table><thead><tr><th>빌드</th><th>버전</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceBuilds"></tbody></table></div>
               <div id="tenkeyBalanceKnobPanel" hidden><h2>밸런스 조정값별</h2><small>서버에서 바꾼 밸런스 수치 묶음의 번호 (게임 기본값 = 바꾸지 않음)</small><div class="table-scroll"><table><thead><tr><th>조정값</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceKnobs"></tbody></table></div></div></div>
           </section>
         </div>
+        <section id="tenkeyBalanceHard" class="panel" hidden>
+          <p class="eyebrow">HARD MODE</p><h2>하드 모드 측정</h2>
+          <p id="tenkeyBalanceHardEmpty" class="empty-panel" hidden>하드모드 판 없음: 하드 모드는 앱에서만 열리고, 이 기간에는 기록된 하드 판이 없습니다. 판이 쌓이면 이 자리에 보스 전투·잃은 곳·준 피해가 나옵니다.</p>
+          <div id="tenkeyBalanceHardBody" hidden>
+            <small id="tenkeyBalanceHardNote">—</small>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>보스</th><th class="tk-num">만난 횟수</th><th class="tk-num">이긴 횟수</th><th class="tk-num">이긴 비율</th><th class="tk-num">한 번에 걸린 시간</th></tr></thead><tbody id="tenkeyBalanceBosses"></tbody></table></div>
+            <div class="tk-balance-pair">
+              <div><h2>배터리를 잃은 곳</h2><small>잃은 양의 비율</small><div id="tenkeyBalanceLostBat"></div></div>
+              <div><h2>내구도를 잃은 곳</h2><small>잃은 양의 비율</small><div id="tenkeyBalanceLostDur"></div></div>
+              <div><h2>배터리가 돌아온 곳</h2><small>채워진 양의 비율</small><div id="tenkeyBalanceRefillBat"></div></div>
+              <div><h2>내구도가 돌아온 곳</h2><small>채워진 양의 비율</small><div id="tenkeyBalanceRefillDur"></div></div>
+              <div><h2>준 피해</h2><small>피해량의 비율</small><div id="tenkeyBalanceDealt"></div></div>
+            </div>
+            <small id="tenkeyBalanceClamp"></small>
+          </div>
+        </section>
         <form id="tenkeyKnobForm" class="panel admin-form impact-form impact-form-critical">
           <p class="eyebrow">BALANCE VALUES</p><h2>서버 밸런스 조정값</h2>
           <p class="impact-note">빌드 없이 바꾸는 게임 수치 4개입니다. 스토어 앱(Android·iOS)이 켤 때 한 번 받아 그다음 판부터 씁니다 (하던 판은 그대로). 1.00 = 게임에 들어 있는 값이고 0.70~1.30까지 고를 수 있습니다. 웹·PC 판은 늘 1.00입니다. 저장할 때마다 번호가 하나 올라가고 판 기록에 그 번호가 남아, 위 "밸런스 조정값별" 표에서 바꾸기 전후를 비교합니다.</p>
@@ -857,7 +889,7 @@
   <script src="tenkey-mail.js?v=20261104-mail"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261108-hard"></script>
-  <script src="tenkey-balance.js?v=20261025-knob"></script>
+  <script src="tenkey-balance.js?v=20261112-bal"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
