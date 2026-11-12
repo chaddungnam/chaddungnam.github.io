@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-11-04T08:53:53.000Z",
+  "updated": "2026-11-12T14:01:24.000Z",
   "videos": [
+    {
+      "videoId": "yJj_1nWMpM4",
+      "title": "'딸깍 서바이벌' 게임 개발과정, 그리고...",
+      "published": "2026-11-12T14:01:24.000Z"
+    },
     {
       "videoId": "Yir1vAvPL94",
       "title": "[BGM] ターミナル追撃戦(Terminal Pursuit)_10key Survival",
@@ -11,11 +16,6 @@
       "videoId": "rwdTvKur46Y",
       "title": "[BGM] めちゃくちゃロボット変身(메차쿠차 로봇 변신)_10key Survival",
       "published": "2026-11-04T08:53:45.000Z"
-    },
-    {
-      "videoId": "QpojkdI1RNs",
-      "title": "[BGM] 地平線を背景に (Against the Horizon)_10key Survival",
-      "published": "2026-11-03T13:05:05.000Z"
     }
   ]
 }
