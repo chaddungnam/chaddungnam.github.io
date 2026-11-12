@@ -251,11 +251,11 @@ test("section 13 covers the 10key Survival launch pre-registration in every lang
 // (nothing sent to House Duck, the GamePix policy linked); localized odds pages mirror the current client popup.
 test("section 13 covers server-kept progress, problem reports, the ROBOT PACK and GamePix in every language", () => {
   const words = {
-    en: ["<td>Run tickets</td>", "<td>Problem reports</td>", "<td>ROBOT PACK</td>", "<h3>Web version on GamePix</h3>", "Starting a run needs an internet connection",
+    en: ["<td>Run tickets</td>", "<td>1:1 inquiries (problem reports)</td>", "<td>ROBOT PACK</td>", "<h3>Web version on GamePix</h3>", "Starting a run needs an internet connection",
       "at your first visit to the SHOP", "Linking Google or Apple (optional)", "Problem reports: deleted 7 days after they were sent", "the only third-party SDK in it is the GamePix SDK"],
-    ko: ["<td>판 티켓</td>", "<td>문제 제보</td>", "<td>로봇 패키지</td>", "<h3>GamePix 웹 버전</h3>", "판을 시작하려면 인터넷 연결이 필요합니다",
+    ko: ["<td>판 티켓</td>", "<td>1대1 문의(문제 제보)</td>", "<td>로봇 패키지</td>", "<h3>GamePix 웹 버전</h3>", "판을 시작하려면 인터넷 연결이 필요합니다",
       "처음 상점(SHOP)에 들어갈 때", "Google 또는 Apple 계정 연동(선택)", "문제 제보: 보낸 지 7일 후 삭제", "게임 안의 제3자 SDK는 GamePix SDK뿐입니다"],
-    de: ["<td>Run-Tickets</td>", "<td>Problemmeldungen</td>", "<td>ROBOT PACK</td>", "<h3>Webversion auf GamePix</h3>", "Zum Starten eines Runs ist eine Internetverbindung nötig",
+    de: ["<td>Run-Tickets</td>", "<td>1:1-Anfragen (Problemmeldungen)</td>", "<td>ROBOT PACK</td>", "<h3>Webversion auf GamePix</h3>", "Zum Starten eines Runs ist eine Internetverbindung nötig",
       "beim ersten Besuch im SHOP", "Verknüpfung mit Google oder Apple (optional)", "Problemmeldungen: werden 7 Tage nach dem Senden gelöscht", "das einzige SDK eines Dritten darin ist das GamePix SDK"],
   };
   for (const [locale, list] of Object.entries(words)) {
