@@ -14,22 +14,37 @@
   const FLAG_NAMES = { banned: "정지 상태" };  // only a manual ban holds a run back (2026-10-24)
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
   const ageName = (band) => (band ? `${band}세 이상` : "미확인");
+  // Three plain states (owner 2026-11-12: "미지원스펙인건지 혹은 미등록한건지"): the band given / this build asks and nothing is stored /
+  // this build never asks (web portals and web builds, owner 11-01). "unknown" = the platform itself is unknown.
+  const AGE_STATE = {
+    unregistered: ["미등록", "앱이 상점에서 묻는데 답이 없음"],
+    not_asked: ["수집 안 함", "웹은 나이를 묻지 않음"],
+    unknown: ["모름", "플랫폼을 몰라 구분 못 함"],
+  };
+  const ageCell = (row) => {
+    if (row.age_state === "given" || (!row.age_state && row.age_band)) return esc(ageName(row.age_band));
+    if (!row.age_state) return esc(row.provider === "crazygames" ? "수집 안 함" : ageName(row.age_band));
+    const [text, why] = AGE_STATE[row.age_state] || [row.age_state, ""];
+    return `${esc(text)}<span class="tk-sub">${esc(why)}</span>`;
+  };
+  const SOURCE_WHY = { login: "로그인 기록 기준", run: "판 기록 기준", device: "기기 정보 기준", purchase: "결제 기록 기준", none: "판·로그인 기록이 없어 알 수 없음" };
   const countryName = (code) => code ? (String(code).toUpperCase() === "XX" ? "미기록" : String(code).toUpperCase()) : "—";
   const clientPlatformName = (code) => ({ android: "Android", ios: "iOS", web_itch: "웹 · itch.io", web_gamepix: "웹 · GamePix" }[String(code || "").toLowerCase()] || platformName(code));
   const scoreText = (row) => (row.best_score == null ? "—" : `${num(row.best_score)}${row.best_level ? ` · Lv ${row.best_level}` : ""}`);
   // Where the player last played (the server: the latest stored run's platform; CrazyGames sign-ins are always that portal).
   const platformOf = (row) => platformName(row.provider === "crazygames" ? "web_crazygames" : row.platform);
+  const platformCell = (row) => `${esc(platformOf(row))}${row.platform_source ? `<span class="tk-sub">${esc(SOURCE_WHY[row.platform_source] || "")}</span>` : ""}`;
 
   function rowMarkup(row) {
     const name = row.name || row.nickname || "(이름 없음)";
     return `<tr${row.banned ? ' class="is-dim"' : ""}>
       <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a>${row.bug_user ? ' <span class="tk-badge" data-tone="risk" title="하루 부품 상한에 닿았는데 그날 플레이 시간과 맞지 않음 (표시만, 제재 아님)">[버그유저]</span>' : ""}${T.unlocks.godBadge(row.god_mode)}<span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
-      <td data-label="플랫폼">${esc(platformOf(row))}</td>
+      <td data-label="플랫폼">${platformCell(row)}</td>
       <td data-label="스토어 국가">${esc(countryName(row.store_country))}</td>
       <td data-label="가입">${esc(time(row.created_at))}</td>
       <td data-label="마지막 접속">${esc(time(row.last_seen_at))}</td>
       <td data-label="최고 점수" class="tk-num">${esc(scoreText(row))}</td>
-      <td data-label="나이대">${esc(row.provider === "crazygames" ? "—" : ageName(row.age_band))}</td>
+      <td data-label="나이대">${ageCell(row)}</td>
       <td data-label="상태"><span class="tk-badge" data-tone="${row.banned ? "risk" : "good"}">${row.banned ? "정지" : "정상"}</span></td>
       <td data-label="처리"><a class="player-open-link" href="#/tenkey-players/${esc(row.id)}">상세</a></td></tr>`;
   }
@@ -187,7 +202,9 @@
       ${facts([
         ["가입", time(p.created_at)], ["마지막 접속", time(p.last_seen_at)],
         ["전체 기간 순위", d.rank?.all ? `${num(d.rank.all)}위` : "—"], [`이번 주 순위`, d.rank?.week ? `${num(d.rank.week)}위` : "—"],
-        ...(mobile ? [["나이대", ageName(account.age_band)], ["약관 버전", account.terms_version || "—"], ["닉네임 변경", `${num(account.rename_count)}회`]] : []),
+        ["플랫폼", d.platform ? `${platformName(d.platform.value)} (${SOURCE_WHY[d.platform.source] || "—"})` : "—"],
+        ["나이대", d.age_state && d.age_state !== "given" ? AGE_STATE[d.age_state].join(" · ") : ageName(account.age_band)],
+        ...(mobile ? [["약관 버전", account.terms_version || "—"], ["닉네임 변경", `${num(account.rename_count)}회`]] : []),
       ])}
       <div class="tk-section"><h3>기기 정보 · 지역</h3><p class="tk-sub">최신 기록입니다. 스토어 국가와 기기 지역은 별도 값이며, 수집 전에는 — 로 표시합니다.</p>${facts([
         ["스토어 국가", countryName(info.store_country)], ["기기 지역", info.device_region || "—"],
@@ -195,15 +212,11 @@
         ["기기 모델", info.device_model || "—"], ["운영체제", info.os_version || "—"],
         ["처음 확인", time(info.first_seen_at)], ["마지막 확인", time(info.last_seen_at)],
       ])}</div>
-      <div class="tk-section"><h3>재방문 · 첫 행동</h3><p class="tk-sub">계정 retention 수집이 시작된 뒤의 값입니다. streak는 오늘 또는 어제까지 이어진 연속 활동일입니다.</p>${facts([
-        ["현재 연속 활동일", retention.current_streak === undefined ? "—" : `${num(retention.current_streak)}일`],
+      <div class="tk-section"><h3>재방문 · 첫 행동</h3><p class="tk-sub">서버가 가진 기록(로그인, 판, 점수, 구매)으로 계산합니다. 첫 판 시작·상점·탭 열기 같은 앱이 직접 보내는 행동은 앱 수집이 켜진 뒤부터 더해집니다.</p>${facts([
+        ["마지막으로 이어진 연속 활동일", retention.current_streak === undefined ? "—" : `${num(retention.current_streak)}일`],
+        ["접속한 날 수", retention.active_days === undefined ? "—" : `${num(retention.active_days)}일`],
         ["첫 활동일", retention.first_day || "—"], ["마지막 활동", time(retention.last_seen_at)],
-      ])}${table(["도달한 첫 행동", "기록 시각"], (retention.milestones || []).map((m) => `<tr><td>${esc({
-        game_opened: "게임 열기", name_set: "이름 설정", first_run_started: "첫 판 시작", first_run_ended: "첫 판 종료",
-        run_2: "두 번째 판 시작", tab_tenkey: "10KEY 탭 열기", tab_shop: "상점 탭 열기", tab_modules: "모듈 탭 열기",
-        tab_upgrade: "강화 탭 열기", tab_ranking: "랭킹 탭 열기", first_module: "첫 모듈 보유", first_shop_visit: "첫 상점 방문",
-        first_purchase: "첫 구매", level_30: "Lv 30 도달",
-      }[m.id] || m.id)}</td><td>${esc(time(m.reached_at))}</td></tr>`), "아직 기록된 첫 행동이 없습니다.")}</div>
+      ])}${table(["도달한 첫 행동", "기록 시각"], (retention.milestones || []).map((m) => `<tr><td>${esc((T.milestoneName || ((id) => id))(m.id))}</td><td>${esc(time(m.reached_at))}</td></tr>`), "이 플레이어는 서버에 남은 첫 행동 기록이 없습니다.")}</div>
       <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "아직 연결된 판 기록이 없습니다.")}</div>
       <section id="tenkeyPlayerTitles" class="tk-section tk-player-titles"><h3>칭호</h3><p class="empty-panel">칭호를 불러오는 중입니다...</p></section>
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>

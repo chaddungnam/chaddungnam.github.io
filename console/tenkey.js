@@ -104,8 +104,8 @@
   // account the server cannot place (no stored run, no sign-in from the game's own HTTP client).
   const PLATFORM_NAMES = {
     android: "Android", ios: "iOS", windows: "Windows", macos: "Mac", linux: "Linux", steam: "Steam (PC)",
-    web: "웹 (공통)", web_crazygames: "웹 · CrazyGames", crazygames: "웹 · CrazyGames", web_itch: "웹 · itch.io",
-    mobile: "모름", supabase: "앱 계정", nekoland: "네코랜드" };
+    web: "웹 (공통)", web_nekoland: "웹 · 네코랜드", web_gamepix: "웹 · GamePix", web_crazygames: "웹 · CrazyGames", crazygames: "웹 · CrazyGames", web_itch: "웹 · itch.io",
+    mobile: "모름", unknown: "모름", supabase: "앱 계정", nekoland: "네코랜드" };
   const platformName = (value) => PLATFORM_NAMES[String(value || "").toLowerCase()] || String(value || "—");
 
   function setMessage(id, value, error = false) {
