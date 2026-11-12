@@ -388,13 +388,14 @@ test("밸런스 page: where and why runs end, evolution, cards and mobs in the g
   await expect(page.locator("#tenkeyBalanceCauses")).toContainText("마우스 포획");
   await expect(page.locator("#tenkeyBalanceCauses")).toContainText("평균 Lv 21.4");
   await expect(page.locator("#tenkeyBalanceForms")).toContainText("텐키 그대로");
-  await expect(page.locator("#tenkeyBalanceCards tr")).toHaveCount(4);
+  await expect(page.locator("#tenkeyBalanceCards tr")).toHaveCount(5);
   await expect(page.locator("#tenkeyBalanceCards tr").first()).toContainText("레이저");
   await expect(page.locator("#tenkeyBalanceCards")).toContainText("DRIFT 카드");
   await expect(page.locator("#tenkeyBalanceMobs tr")).toHaveCount(2);  // a mob nobody met is left out
   await expect(page.locator("#tenkeyBalanceMobs")).toContainText("휠 마우스");
   await expect(page.locator("#tenkeyBalanceDaily tr")).toHaveCount(7);
   await expect(page.locator("#tenkeyBalanceBuild option")).toHaveCount(3);
+  await expect(card("fever")).toHaveText("10%");  // 24 of 240 runs took the GOLDEN FEVER card
   await expect(page.locator("#tenkeyBalanceKnobPanel")).toBeHidden();  // no server-side balance values yet
   await expect(page.locator("#tenkeyBalanceEmpty")).toBeHidden();
   await shot(page, "balance");
@@ -402,15 +403,96 @@ test("밸런스 page: where and why runs end, evolution, cards and mobs in the g
   await page.locator("#tenkeyBalanceBuild").selectOption("5");
   await page.locator("#tenkeyBalanceMode").selectOption("classic");
   await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 30, build: 5, mode: "classic" });
+  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 30, build: 5, mode: "classic" });  // the device filter stays out of the call while it reads 전체
   await expect(page.locator("#tenkeyBalanceBuild")).toHaveValue("5");
   await page.evaluate(() => { window.__mockBalanceEmpty = true; });
   await page.locator("#tenkeyBalanceDays").selectOption("1");
   await page.locator("#tenkeyBalanceForm button[type=submit]").click();
   await expect(page.locator("#tenkeyBalanceEmpty")).toBeVisible();
   await expect(page.locator("#tenkeyBalanceEmpty")).toContainText("다음 스토어 빌드부터");
+  await expect(page.locator("#tenkeyBalanceEmpty")).toContainText("웹 체험판");
   await expect(page.locator("#tenkeyBalanceBody")).toBeHidden();
   await expect(card("runs")).toHaveText("0");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: DRIFT runs from the web demo are no longer hidden (owner 11-12); the device list says where they were played; the device filter goes to the server", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  await expect(page.locator("#tenkeyBalancePlatforms tr")).toHaveCount(3);
+  await expect(page.locator("#tenkeyBalancePlatforms")).toContainText("웹 체험판 (itch)");
+  const web = page.locator("#tenkeyBalancePlatforms tr", { hasText: "웹 체험판" });
+  await expect(web.locator('td[data-label="DRIFT까지 간 판"]')).toHaveText("8 · 11.4%");
+  const app = page.locator("#tenkeyBalancePlatforms tr", { hasText: "Android" });
+  await expect(app.locator('td[data-label="DRIFT까지 간 판"]')).toHaveText("0 · 0%");
+  await expect(page.locator("#tenkeyBalanceModes")).toHaveText("노멀 모드 240판 · 하드모드 판 없음");
+  await page.locator("#tenkeyBalancePlatform").selectOption("web");
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 7, platform: "web" });
+  await page.locator("#tenkeyBalancePlatform").selectOption("app");
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 7, platform: "app" });
+  await shot(page, "balance_where", "#tenkeyBalanceWhere");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: the causes of an end are named, NUM LOCK / mouse crises and the three chance cards are listed from the run timeline", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  await expect(page.locator("#tenkeyBalanceCrises")).toContainText("NUM LOCK 철창");
+  await expect(page.locator("#tenkeyBalanceCrises li").first()).toContainText("91.7%");  // 55 of 60 timelines
+  await expect(page.locator("#tenkeyBalanceTraceNote")).toContainText("60판");
+  const row = (k) => page.locator("#tenkeyBalanceChance tr", { hasText: k });
+  await expect(row("골든 피버").locator('td[data-label="성공 비율"]')).toHaveText("45%");
+  await expect(row("DRIFT").locator('td[data-label="성공 횟수"]')).toHaveText("7");
+  await expect(row("골든 피버").locator('td[data-label="고를 때 평균 레벨"]')).toHaveText("Lv 6");
+  await expect(page.locator("#tenkeyBalanceFormTime")).toContainText("골든 피버 7.5초");
+  await shot(page, "balance_trace", "#tenkeyBalanceTrace");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: level times and the DRIFT / robot time say \"앱 다음 빌드부터\" until a build sends them, then fill in", async ({ page }) => {
+  let errors = await open(page, "#/tenkey-balance");
+  await expect(page.locator("#tenkeyBalanceReachNote")).toContainText("앱 다음 빌드부터");
+  await expect(page.locator("#tenkeyBalanceReachRows")).toContainText("이 기간에 기록이 없습니다");
+  await page.evaluate(() => { window.__mockReach = true; });
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect(page.locator("#tenkeyBalanceReachNote")).toContainText("DRIFT 평균 1분 30초");
+  await expect(page.locator("#tenkeyBalanceReachRows tr")).toHaveCount(2);
+  await expect(page.locator("#tenkeyBalanceReachRows")).toContainText("Lv 5");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: hard mode says \"하드모드 판 없음\" when there is none, shows boss fights and the meter when there are runs, and says when the meter is not sent yet", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  await expect(page.locator("#tenkeyBalanceHardEmpty")).toBeVisible();
+  await expect(page.locator("#tenkeyBalanceHardEmpty")).toContainText("하드모드 판 없음");
+  await expect(page.locator("#tenkeyBalanceHardBody")).toBeHidden();
+  await page.evaluate(() => { window.__mockHard = true; });
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect(page.locator("#tenkeyBalanceHardBody")).toBeVisible();
+  await expect(page.locator("#tenkeyBalanceModes")).toHaveText("노멀 모드 230판 · 하드 모드 10판");
+  await expect(page.locator("#tenkeyBalanceBosses tr")).toHaveCount(3);
+  const boss = page.locator("#tenkeyBalanceBosses tr", { hasText: "Lv 10 보스" });
+  await expect(boss.locator('td[data-label="이긴 비율"]')).toHaveText("33.3%");
+  await expect(boss.locator('td[data-label="한 번에 걸린 시간"]')).toHaveText("1분 20초");
+  await expect(page.locator("#tenkeyBalanceLostBat")).toContainText("시간 소모");
+  await expect(page.locator("#tenkeyBalanceLostDur")).toContainText("키보드 내려치기");
+  await expect(page.locator("#tenkeyBalanceRefillDur")).toContainText("수리 키트");
+  await expect(page.locator("#tenkeyBalanceDealt")).toContainText("레이저");
+  await expect(page.locator("#tenkeyBalanceClamp")).toContainText("4번 중 3번 스스로 빠져나옴");
+  await shot(page, "balance_hard", "#tenkeyBalanceHard");
+  await page.evaluate(() => { window.__mockHardNoMeter = true; });
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect(page.locator("#tenkeyBalanceLostBat")).toContainText("앱 다음 빌드부터");
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: an older server answer without the new lists leaves the new panels out instead of breaking", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance", "window.__mockBalanceV1 = true;");
+  await expect(page.locator("#tenkeyBalanceSummary [data-tk-summary=\"runs\"]")).toHaveText("240");
+  await expect(page.locator("#tenkeyBalanceWhere")).toBeHidden();
+  await expect(page.locator("#tenkeyBalanceHard")).toBeHidden();
+  await expect(page.locator("#tenkeyBalanceTrace")).toBeHidden();
+  await expect(page.locator("#tenkeyBalanceReach")).toBeHidden();
   expect(errors).toEqual([]);
 });
 
