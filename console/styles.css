@@ -1738,3 +1738,14 @@ a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-of
 .tk-seg:disabled, .tk-upto:disabled { cursor: not-allowed; opacity: .5; }
 .tk-upto { min-height: 34px; padding: 0 10px; font-size: 11px; white-space: nowrap; }
 @media(max-width:700px) { .tk-unlock-row { grid-template-columns: 24px minmax(0, 1fr); } .tk-unlock-ctl { grid-column: 1 / -1; justify-content: flex-start; } }
+
+/* 감시 (owner 2026-11-15): tags and the watch page */
+.tk-badge[data-tone="review"] { color: #4a3f9a; background: #e6e3fa; }
+.tk-watch-tag { margin-left: 4px; }
+.tk-review-form { border-left-color: #6a5acd; }
+.tk-retention-tabs { flex-wrap: wrap; align-items: center; margin: 10px 0; }
+.tk-retention-tabs button b { margin-left: 4px; }
+.tk-watch-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tk-mini { min-height: 30px; padding: 5px 9px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+.tk-mini.is-danger { color: #a93f34; border-color: rgba(169,63,52,.4); }
+.tk-watch-runs > td { background: var(--paper); }

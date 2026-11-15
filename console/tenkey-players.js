@@ -38,7 +38,7 @@
   function rowMarkup(row) {
     const name = row.name || row.nickname || "(이름 없음)";
     return `<tr${row.banned ? ' class="is-dim"' : ""}>
-      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a>${row.bug_user ? ' <span class="tk-badge" data-tone="risk" title="하루 부품 상한에 닿았는데 그날 플레이 시간과 맞지 않음 (표시만, 제재 아님)">[버그유저]</span>' : ""}${T.unlocks.godBadge(row.god_mode)}<span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
+      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a>${row.bug_user ? ' <span class="tk-badge" data-tone="risk" title="하루 부품 상한에 닿았는데 그날 플레이 시간과 맞지 않음 (표시만, 제재 아님)">[버그유저]</span>' : ""}${T.watch.tagsFor(row.id, row)}<span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
       <td data-label="플랫폼">${platformCell(row)}</td>
       <td data-label="스토어 국가">${esc(countryName(row.store_country))}</td>
       <td data-label="가입">${esc(time(row.created_at))}</td>
@@ -54,6 +54,7 @@
     try {
       const result = await T.call("players.list", { query: state.query, platform: state.platform || undefined, country: state.country || undefined, sort: state.sort, direction: state.direction, page });
       const data = result.data;
+      await T.watch.load();
       pager.st.page = page;
       pager.st.total = Number(data.total || 0);
       byId("tenkeyPlayerTotal").textContent = `${num(data.total)}명`;
@@ -197,7 +198,7 @@
     const ledger = ((d.wallet || {}).ledger || []).map((g) => `<tr><td>${esc(time(g.at))}</td><td>${esc(g.kind === "grant" ? "받음" : "씀")}</td><td class="tk-num">${esc(num(g.amount))}</td><td>${esc(g.reason || "—")}</td><td>${esc(g.source === "server" ? "서버(구매)" : "앱 보고")}</td></tr>`);
     const ids = (d.identities || []).map((i) => `<tr><td>${esc(i.provider === "crazygames" ? "CrazyGames" : "게스트 로그인")}</td><td><code>${esc(i.subject)}</code></td><td><code>${esc(i.login || "—")}</code></td><td>${esc(time(i.created_at))}</td></tr>`);
     return `<section class="panel">
-      <div class="player-detail-head"><div><p class="eyebrow">PLAYER</p><h2>${esc(p.name || "(이름 없음)")} <span class="tk-badge" data-tone="${p.banned ? "risk" : "good"}">${p.banned ? "정지" : "정상"}</span>${p.bug_user ? ' <span class="tk-badge" data-tone="risk">[버그유저]</span>' : ""}${T.unlocks.godBadge(d.god_mode ?? p.god_mode)}</h2><code>${esc(p.id)}</code></div></div>
+      <div class="player-detail-head"><div><p class="eyebrow">PLAYER</p><h2>${esc(p.name || "(이름 없음)")} <span class="tk-badge" data-tone="${p.banned ? "risk" : "good"}">${p.banned ? "정지" : "정상"}</span>${p.bug_user ? ' <span class="tk-badge" data-tone="risk">[버그유저]</span>' : ""}${T.watch.tagsFor(p.id, { god_mode: d.god_mode ?? p.god_mode })}</h2><code>${esc(p.id)}</code></div></div>
       ${(p.cap_hits || []).length ? `<div class="tk-section"><h3>하루 부품 상한 도달</h3><p class="tk-sub">24시간 판 부품이 상한(정상 플레이로는 거의 못 닿는 값)에 닿은 날입니다. 정상 최고 속도(초당 733)보다 빠르거나 24시간 중 16시간 넘게 플레이한 것으로 나오면 [버그유저]로 표시합니다. 표시만 하며 제재는 하지 않습니다.</p>${table(["날짜", "24시간 부품", "판 수", "플레이 시간", "판정"], p.cap_hits.map((h) => `<tr><td>${esc(h.day)}</td><td class="tk-num">${esc(num(h.scrap))}</td><td class="tk-num">${esc(num(h.runs))}</td><td>${esc(`${num(h.play_min)}분`)}</td><td><span class="tk-badge" data-tone="${h.odd ? "risk" : "quiet"}">${h.odd ? "말이 안 됨" : "가능"}</span></td></tr>`))}</div>` : ""}
       ${facts([
         ["가입", time(p.created_at)], ["마지막 접속", time(p.last_seen_at)],
@@ -293,6 +294,7 @@
       const [result, extra] = await Promise.all([
         T.call("players.get", { player_id: id }),
         T.call("players.facts", { player_id: id }),
+        T.watch.load(true),
       ]);
       state.detail = { ...result.data, ...extra.data };
       byId("tenkeyPlayerDetail").innerHTML = detailMarkup(state.detail);

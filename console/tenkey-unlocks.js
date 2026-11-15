@@ -86,6 +86,7 @@
         <p id="tenkeyGodMessage" class="dashboard-message" role="status" aria-live="polite"></p>
         <div class="tk-actions"><button class="danger-button" type="submit" id="tenkeyGodApply" disabled>${info.god ? "무적 모드 끄기" : "무적 모드 켜기"}</button></div>
       </form>
+      ${T.watch.reviewPanelMarkup(player)}
       <h4 class="tk-unlock-head">해금 단계 (플레이어가 만나는 순서) <span class="tk-sub">${esc(hardFacts)}</span></h4>
       <p class="tk-sub">자동 = 게임의 원래 규칙을 따름 (기본값). 켜짐 = 조건과 상관없이 엶. 꺼짐 = 조건을 채웠어도 닫음. 회색 글씨는 게임 규칙입니다.</p>
       <ol class="tk-unlock-list">${STEPS.map((s, i) => stepRow(s, i, info)).join("")}</ol>
@@ -147,6 +148,7 @@
       });
     });
 
+    T.watch.bindReview(ctx);
     const form = document.getElementById("tenkeyGodForm");
     const sync = () => {
       const want = form.elements.on.checked;

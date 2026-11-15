@@ -6,7 +6,7 @@
   const pages = new Set([
     "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
     "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-mail", "tenkey-purchases", "tenkey-ranking",
-    "tenkey-balance", "tenkey-config", "tenkey-audit", "tenkey-titles", "tenkey-retention", "tenkey-reports",
+    "tenkey-balance", "tenkey-config", "tenkey-audit", "tenkey-titles", "tenkey-retention", "tenkey-reports", "tenkey-watch",
   ]);
 
   function routeFromHash(hash) {

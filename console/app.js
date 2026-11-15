@@ -38,6 +38,7 @@ const pageTitles = {
   "tenkey-config": "강제 업데이트",
   "tenkey-audit": "감사 기록",
   "tenkey-titles": "칭호",
+  "tenkey-watch": "감시",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -173,7 +174,8 @@ function renderRoute() {
   if (route.page === "tenkey-ranking") window.ConsoleTenkey.mountRanking();
   if (route.page === "tenkey-balance") window.ConsoleTenkey.mountBalance();
   if (route.page === "tenkey-audit") window.ConsoleTenkey.mountAudit();
-  if (route.page === "tenkey-config") window.ConsoleTenkey.mountConfig();
+  if (route.page === "tenkey-config") { window.ConsoleTenkey.mountConfig(); window.ConsoleTenkey.mountReviewCode(); }
+  if (route.page === "tenkey-watch") window.ConsoleTenkey.mountWatch();
   if (route.page === "tenkey-titles") window.ConsoleTenkey.mountTitles();
 }
 

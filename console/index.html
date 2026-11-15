@@ -88,6 +88,7 @@
         <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">11</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
         <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">12</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
         <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">13</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-watch" data-page="tenkey-watch"><span class="nav-index">14</span><span class="nav-copy">감시<small>검수·무적·TOP10</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -518,6 +519,21 @@
           <div id="tenkeyRetentionChurn"></div></section>
       </section>
 
+      <section id="tenkeyWatchView" class="route-view" data-route="tenkey-watch" hidden>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">WATCH LIST</p><h2>감시 대상</h2><small>태그가 달린 계정만 모았습니다. [검수] = iOS 심사관용 검수 모드 계정, [무적] = 개발자 테스트 계정, [TOP10] = 이번 시즌 일반 또는 하드 랭킹 10위 안. 이상한 판이 보이면 여기서 바로 랭킹 정지하거나 검수·무적을 끌 수 있고, 모든 처리는 사유와 함께 감사 기록에 남습니다.</small></div><span id="tenkeyWatchTotal" class="panel-total">—</span></div>
+          <div class="tk-retention-tabs" role="group" aria-label="감시 대상 종류">
+            <button type="button" data-watch-filter="all" aria-pressed="true">전체 <b>0</b></button>
+            <button type="button" data-watch-filter="review" aria-pressed="false">검수 <b>0</b></button>
+            <button type="button" data-watch-filter="god" aria-pressed="false">무적 <b>0</b></button>
+            <button type="button" data-watch-filter="top" aria-pressed="false">TOP10 <b>0</b></button>
+            <button id="tenkeyWatchRefresh" class="refresh-button" type="button">새로고침</button>
+          </div>
+          <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>마지막 접속</th><th class="tk-num">오늘 시작한 판</th><th class="tk-num">최고 점수 (일반)</th><th class="tk-num">최고 점수 (하드)</th><th>이번 시즌 순위</th><th>처리</th></tr></thead><tbody id="tenkeyWatchTable"></tbody></table></div>
+        </section>
+        <p id="tenkeyWatchMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="tenkeyPlayerView" class="route-view" data-route="tenkey-player" hidden>
         <a class="text-button" href="#/tenkey-players">← 목록으로</a>
         <p id="tenkeyPlayerMessage" class="dashboard-message" role="status"></p>
@@ -824,6 +840,11 @@
           <p id="tenkeyConfigFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
           <button class="danger-button" type="submit">강제 업데이트 번호 저장</button>
         </form>
+        <section class="panel" id="tenkeyReviewCodeCard">
+          <p class="eyebrow">REVIEW CODE</p><h2>검수 코드 받기</h2>
+          <p class="tk-sub">앱의 설정 &gt; 계정에서 [관리자 실험 모드]에 코드를 넣을 수 있는지입니다. <span id="tenkeyReviewCodeState" class="tk-badge" data-tone="quiet">—</span></p>
+          <p class="tk-sub">보기만 합니다. 켜고 끄는 것은 서버 설정(코드 해시)이라 사이트에서는 바꿀 수 없고, 심사가 끝나면 서버에서 끕니다.</p>
+        </section>
       </section>
 
       <section id="playerView" class="route-view" data-route="player" hidden>
@@ -881,6 +902,7 @@
   <script src="tenkey.js?v=20261112-aud2"></script>
   <script src="tenkey-overview.js?v=20261112-aud2"></script>
   <script src="tenkey-unlocks.js?v=20261112-aud2"></script>
+  <script src="tenkey-watch.js?v=20261115-watch"></script>
   <script src="tenkey-players.js?v=20261112-aud2"></script>
   <script src="tenkey-retention.js?v=20261112-audit"></script>
   <script src="tenkey-titles.js?v=20261104-title"></script>

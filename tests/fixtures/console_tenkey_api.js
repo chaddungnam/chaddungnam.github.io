@@ -63,6 +63,8 @@
   const UNLOCK_STEPS = ["tab_research", "tab_ranking", "quests", "tab_shop", "tab_modules", "home_friends", "home_mailbox", "purchase", "discount", "upgrade_robot", "hard_card", "hard_play", "hard_upgrade", "hard_pack", "hard_ranking", "hard_sale", "shop_test"];
   const unlockState = {};  // player id -> { unlocks, god }
   const unlockOf = (id) => (unlockState[id] = unlockState[id] || { unlocks: {}, god: false });
+  const reviewState = { "a1111111-1111-4111-8111-111111111111": { on: true, granted: true }, "b2222222-2222-4222-8222-222222222222": { on: false, granted: true } };
+  const reviewOf = (id) => (reviewState[id] = reviewState[id] || { on: false, granted: false });
   const detailFor = (id) => {
     const p = PLAYERS.find((x) => x.id === id) || PLAYERS[0];
     const mobile = p.provider === "supabase";
@@ -179,6 +181,25 @@
         return { ok: true, changed: true };
       }
       case "god.set": { const g = unlockOf(p.player_id); const changed = g.god !== !!p.on; g.god = !!p.on; logAudit(action, p); return { ok: true, changed }; }
+      // Watch round (2026-11-15): tagged accounts. 딸깍덕 = review ON, KeyMaster = review granted but off, god = whoever god.set turned on, TOP10 by rank.
+      case "watch.list": {
+        if (window.__mockNoWatch) return { ok: false, error: "unknown_action" };
+        const runs = (mode, start) => [1, 2, 3].map((i) => ({ id: `w${i}${mode}`, score: 90000 - i * 1000, level: 12 - i, time_ms: 300000 + i * 1000, mode, cause: "battery", platform: "ios", build: "1.0.0 (22)", flag: "", created_at: `2026-11-15T0${i}:00:00+00:00`, start_level: start }));
+        const rows = PLAYERS.filter((x) => x.provider === "supabase").map((x) => ({
+          id: x.id, name: x.name, nickname: x.nickname, banned: x.banned, created_at: x.created_at, last_seen_at: x.last_seen_at, platform: x.platform,
+          god_mode: unlockOf(x.id).god, review_mode: reviewOf(x.id).on, review_granted: reviewOf(x.id).granted,
+          rank_normal: x.id.startsWith("b2") ? 3 : null, rank_hard: x.id.startsWith("b2") ? 1 : null, runs_today: 4,
+          best_normal: x.best_score ? { score: x.best_score, level: x.best_level } : null, best_hard: x.id.startsWith("b2") ? { score: 5200, level: 6 } : null,
+          runs: x.id.startsWith("a1") ? runs("classic", 8) : x.id.startsWith("b2") ? runs("hard", 15) : [],
+        })).filter((r) => r.god_mode || r.review_mode || r.review_granted || r.rank_normal || r.rank_hard);
+        return { ok: true, season_board: "q2026-4", total: rows.length, rows };
+      }
+      case "review.code_state": return { ok: true, on: window.__mockReviewCode !== false };
+      case "review.set": {
+        const r = reviewOf(p.player_id); const changed = r.on || r.granted;
+        if (p.on !== false || !p.reason) return { ok: false, error: "invalid_request" };
+        r.on = false; r.granted = false; logAudit(action, p); return { ok: true, changed, review_mode: false };
+      }
       case "crashes.list": return { ok: true, total: crashes.length, rows: crashes.filter((c) => (!p.kind || c.kind === p.kind) && (!p.query || c.message.includes(p.query) || c.device_model.includes(p.query) || c.app_version.includes(p.query))) };
       case "crashes.groups": return groups(p.by);
       case "crashes.get": return crashDetail(p.id);

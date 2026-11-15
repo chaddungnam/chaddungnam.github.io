@@ -36,6 +36,8 @@
     player_not_found: "플레이어를 찾지 못했습니다. 공개 코드·닉네임을 확인하거나 목록을 새로고침해 주세요.",
     invalid_title_id: "칭호를 선택해 주세요.",
     title_not_found: "칭호 목록이 바뀌었습니다. 새로고침해 주세요.",
+    invalid_on: "켜기 / 끄기 값 형식이 맞지 않습니다.",
+    no_review_account: "이 계정은 검수 모드를 쓴 적이 없습니다.",
     invalid_banned: "정지 값 형식이 맞지 않습니다.",
     invalid_nickname: "새 닉네임을 입력해 주세요.",
     invalid_length: "닉네임은 2~10자여야 합니다.",
