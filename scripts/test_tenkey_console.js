@@ -176,7 +176,7 @@ function appFixture() {
     ConsoleAnalytics: { mount() { mounted.push("qb"); } },
     ConsoleLab: undefined,
     ConsoleTenkey: {
-      mountConfig() { mounted.push("config"); }, mountOverview() { mounted.push("overview"); },
+      mountConfig() { mounted.push("config"); }, mountReviewCode() {}, mountOverview() { mounted.push("overview"); },
       mountPlayers() { mounted.push("players"); }, mountPlayer(id) { mounted.push(`player:${id}`); },
     },
     GmailAPI: { initialize() {} },
