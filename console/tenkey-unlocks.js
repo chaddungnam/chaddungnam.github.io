@@ -9,7 +9,7 @@
   const T = root.ConsoleTenkey;
   const { esc } = T.fmt;
 
-  const HARD_SHOW_LEVEL = 8;   // HardMode.PEEK_LEVEL in the game (was 20 here until 2026-11-12: the card shows once the normal best level passed Lv 7)
+  const HARD_SHOW_LEVEL = 7;   // HardMode.PEEK_LEVEL in the game (8 until 2026-11-16: the locked card shows once the normal best level REACHED Lv 7)
   const HARD_PACK_LEVEL = 5;   // best hard level that shows the breakthrough pack
   const STATES = [["auto", "자동"], ["on", "켜짐"], ["off", "꺼짐"]];
 
@@ -27,13 +27,13 @@
     { id: "upgrade_robot", name: "강화 · 로봇 탭", opens: "UPGRADE 안의 ROBOT 탭이 열림", rule: "로봇을 맛보았거나 영구 해금되면 열림" },
     { id: "hard_card", name: "하드 카드 보임", opens: "홈 2쪽 · UPGRADE · SHOP에 하드 모드 카드가 보임 (보이기만 하고 시작은 못 함)", rule: `일반 모드 최고 레벨이 ${HARD_SHOW_LEVEL} 이상이면 보임 (앱만)`,
       answer: (i) => (i.bestLevel == null ? "" : i.bestLevel >= HARD_SHOW_LEVEL ? `지금: 보임 (최고 Lv ${i.bestLevel})` : `지금: 숨김 (최고 Lv ${i.bestLevel})`) },
-    { id: "hard_play", name: "하드 플레이", opens: "하드 모드 판을 시작할 수 있음 (앱 전용)", rule: "서버 하드 공개 스위치가 켜져 있고 조건을 채워야 열림 (지금은 서버가 닫혀 있어 콘솔로 연 계정만 플레이)",
-      answer: (i) => (i.hardReady == null ? "" : i.hardReady ? "지금: 플레이 조건은 채움 (서버 공개는 닫힘)" : "지금: 플레이 조건 미충족") },
+    { id: "hard_play", name: "하드 플레이", opens: "하드 모드 판을 시작할 수 있음 (앱 전용)", rule: "하드 모드를 산 계정은 바로 플레이 (결제는 레벨과 상관없이 즉시, 보석 구매는 일반 30레벨 달성 후에만 가능). 지금은 준비중이라 판매가 닫혀 있어, 여기서 켠 계정만 플레이 (테스트용: 하드 카드 보임 + 하드 플레이를 켬)",
+      answer: (i) => (i.hardReady == null ? "" : i.hardReady ? "지금: 일반 30레벨 달성 (보석 구매 가능 조건)" : "지금: 일반 30레벨 미달성 (보석 구매 잠김, 결제는 가능)") },
     { id: "hard_upgrade", name: "하드 강화", opens: "하드 전용 강화 탭에서 부품으로 구매할 수 있음", rule: "하드 플레이가 열려 있으면 열림" },
     { id: "hard_pack", name: "하드 돌파 팩", opens: "하드 돌파 팩 카드가 보임", rule: `하드 최고 레벨 ${HARD_PACK_LEVEL} 이상이고 하드 플레이가 열려 있으면 보임`,
       answer: (i) => (i.bestHard == null ? "" : i.bestHard >= HARD_PACK_LEVEL ? `지금: 레벨 조건 채움 (하드 최고 Lv ${i.bestHard})` : `지금: 레벨 조건 미충족 (하드 최고 Lv ${i.bestHard})`) },
     { id: "hard_ranking", name: "하드 랭킹", opens: "RANKING의 하드 탭이 열림 (순위표 자체는 나중에 생김)", rule: "하드 플레이가 열려 있으면 열림" },
-    { id: "hard_sale", name: "하드 구매 카드", opens: "하드 모드 구매 카드가 보임 (아직 만들지 않음, 지금은 켜도 안 보임)", rule: "서버 하드 판매 스위치가 켜지면 보임 (지금 꺼짐)" },
+    { id: "hard_sale", name: "하드 구매 카드", opens: "SHOP에 하드모드 해금 카드가 보임 (누르면 소개 화면과 보석 299 / 결제 키; 켜짐 = 판매가 닫혀 있어도 이 계정은 보임, 테스트용)", rule: "서버 하드 판매 스위치가 켜지면 보임 (지금 꺼짐 = 준비중)" },
     { id: "shop_test", name: "상점 테스트", opens: "판매 중인 팩 카드(로봇 팩 등)가 레벨과 상관없이 보이고, 할인 짝이 있는 팩은 정가 키와 할인가 키가 둘 다 보임 (정가 구매 테스트용, 앱 전용; 하드 모드 상품은 하드 스위치를 따름)", rule: "꺼둠이 기본. 심사 중인 빌드(서버 review_build_ios / _android)는 모든 계정이 자동으로 켜짐" },
   ];
   const STEP_IDS = STEPS.map((s) => s.id);
