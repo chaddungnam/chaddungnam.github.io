@@ -332,22 +332,22 @@ test("section 13 lists what newer versions add to reports, the 1:1 inquiry and t
 // 2026-11-17 review (live server since 14:10): who can send the 1:1 inquiry (TenkeyReport.can_send: not GamePix / Nekoland, a
 // signed-in House Duck login, so the itch.io ranking guest account too; submit_issue_report_v1/v2 = authenticated), what staff
 // can link in the console (admin_issue_get_v1 same_sid; admin_device_timeline_v1: same install id, +/- up to 120 minutes:
-// crash / app / run_trace / telemetry), the performance report gate (TenkeyTelemetry.may_send: consented and not a known
+// crash / app / run_trace / telemetry; the run ID a report names -> its run_trace row), the performance report gate (TenkeyTelemetry.may_send: consented and not a known
 // under-14 band; an unknown age is not under 14) and the season boards (retention() since 20261116120000: current + last
-// season whole, the season before last cut to the top 100, older deleted; the 12-week cut is gone).
+// season whole, the season before last cut to the top 100 except rows of banned players, older deleted; the 12-week cut is gone).
 test("section 13 says who sends the 1:1 inquiry, what staff can link, the performance report gate and the season boards", () => {
   const words = {
     en: ["or in the web version on itch.io while you are signed in with its ranking guest account", "the Nekoland and GamePix versions cannot send one",
       "Only House Duck staff can put these records together, only inside the operations console (section 14) and only to find the cause of a crash or problem",
-      "from up to 2 hours before to 2 hours after it", "have not answered the age question as under 14 (until the age question is answered, a player is not treated as under 14)",
+      "from up to 2 hours before to 2 hours after it", "from the run ID of a report to the run timeline of that run", "have not answered the age question as under 14 (until the age question is answered, a player is not treated as under 14)",
       "the entries below the top 100 places of each board are deleted", "newer versions also the board of the season before last"],
     ko: ["랭킹용 게스트 계정으로 로그인한 itch.io 웹 버전에서 1대1 문의를 보낸 경우", "Nekoland와 GamePix 버전에서는 보낼 수 없고",
       "이 기록들을 서로 이어 볼 수 있는 사람은 House Duck 직원뿐이며, 운영 콘솔(제14항) 안에서 충돌이나 문제의 원인을 찾을 때만 그렇게 합니다",
-      "그 보고 전 최대 2시간부터 후 최대 2시간까지", "연령 질문에 만 14세 미만으로 답하지 않은 플레이어만 보냅니다(연령 질문에 답하기 전에는 만 14세 미만으로 보지 않습니다)",
+      "그 보고 전 최대 2시간부터 후 최대 2시간까지", "보고의 판 ID로는 그 판의 판 진행 기록을 찾고", "연령 질문에 만 14세 미만으로 답하지 않은 플레이어만 보냅니다(연령 질문에 답하기 전에는 만 14세 미만으로 보지 않습니다)",
       "지지난 시즌은 순위표마다 상위 100위 밖의 항목이 삭제되며", "새 버전은 지지난 시즌의 순위표도 보여 줍니다"],
     de: ["oder in der Webversion auf itch.io, während Sie mit deren Ranglisten-Gastkonto angemeldet sind", "die Versionen auf Nekoland und GamePix können keine senden",
       "Zusammenführen können diese Aufzeichnungen nur Mitarbeitende von House Duck, nur in der Betriebskonsole (Abschnitt 14)",
-      "von bis zu 2 Stunden vor bis 2 Stunden nach dem Bericht", "die Altersfrage nicht mit unter 14 beantwortet haben (solange die Altersfrage nicht beantwortet ist, gilt ein Spieler nicht als unter 14)",
+      "von bis zu 2 Stunden vor bis 2 Stunden nach dem Bericht", "von der Run-ID eines Berichts zum Run-Verlauf dieses Runs", "die Altersfrage nicht mit unter 14 beantwortet haben (solange die Altersfrage nicht beantwortet ist, gilt ein Spieler nicht als unter 14)",
       "die Einträge unterhalb der ersten 100 Plätze jeder Rangliste gelöscht", "neuere Versionen auch die Rangliste der vorletzten Saison"],
   };
   const gone = {
@@ -411,7 +411,7 @@ test("CrazyGames is no platform of 10key Survival any more", () => {
 test("section 13 covers season rankings, web ranking accounts, quests, the reminder and the review prompt in every language", () => {
   const words = {
     en: ["board of the current season and the board of the last season", "January 1, April 1, July 1 and October 1 at 09:00 UTC", "October 1 to December 31, 2026",
-      "all-time best, which is used for the player’s profile", "<li>Season board entries: the boards of the current and the last season are kept in full; of the season before last, the entries below the top 100 places of each board are deleted, and all entries of older seasons are deleted.</li>",
+      "all-time best, which is used for the player’s profile", "<li>Season board entries: the boards of the current and the last season are kept in full; of the season before last, the entries below the top 100 places of each board are deleted (the entries of players excluded from the rankings stay until that season is deleted, so that an exclusion can be lifted), and all entries of older seasons are deleted.</li>",
       "<strong>Sending records in the web versions (itch.io, Nekoland and GamePix):</strong>", "use a guest account only for the online ranking",
       "stay in your browser’s storage and are not sent", "<td>Quest rewards</td>", "the UTC day or week of the quest", "module draw tickets",
       "Quest reward records: deleted 35 days after the reward was claimed.", "<h3>Daily reminder and store review prompt (Android and iOS)</h3>",
@@ -419,15 +419,15 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
       "review sheet (Apple’s or Google’s) once", "House Duck receives nothing from it", "As on itch.io, the results of finished runs are sent to House Duck’s server",
       "Web version on itch.io: usage signal, run records, run timelines and first-time steps"],
     ko: ["이번 시즌의 순위표와 지난 시즌의 순위표", "1월 1일, 4월 1일, 7월 1일, 10월 1일 09:00(UTC)", "2026년 10월 1일부터 12월 31일까지",
-      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 이번 시즌과 지난 시즌의 순위표는 그대로 보관되고, 지지난 시즌은 순위표마다 상위 100위 밖의 항목이 삭제되며, 그보다 오래된 시즌의 항목은 모두 삭제됩니다.</li>",
-      "<strong>웹 버전(itch.io, Nekoland, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹용 게스트 계정을 사용하며, itch.io에서는 이 계정으로 1대1 문의도 보낼 수 있습니다",
+      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 이번 시즌과 지난 시즌의 순위표는 그대로 보관되고, 지지난 시즌은 순위표마다 상위 100위 밖의 항목이 삭제되며(랭킹에서 제외된 플레이어의 항목은 제외를 풀 수 있도록 그 시즌이 삭제될 때까지 남습니다), 그보다 오래된 시즌의 항목은 모두 삭제됩니다.</li>",
+      "<strong>웹 버전(itch.io, Nekoland, GamePix)에서 기록 보내기:</strong>", "게스트 계정을 온라인 랭킹과 itch.io의 1대1 문의에만 사용합니다",
       "브라우저 저장소에 남고 House Duck으로 전송되지 않습니다", "<td>퀘스트 보상</td>", "퀘스트의 UTC 기준 날짜 또는 주", "모듈 뽑기권",
       "퀘스트 보상 기록: 보상을 받은 지 35일 후 삭제됩니다.", "<h3>일일 알림과 스토어 리뷰 창(Android 및 iOS)</h3>",
       "기기 시계 기준 20:00", "푸시 서비스를 쓰지 않고, 알림에 관한 정보는 House Duck이나 다른 누구에게도 전송되지 않습니다", "앱의 <strong>설정</strong>이나 기기 설정에서 끌 수 있습니다",
       "리뷰 창(Apple 또는 Google)을 한 번 열 수 있습니다", "House Duck은 이로부터 아무것도 받지 않습니다", "itch.io와 마찬가지로 끝난 판의 결과는 온라인 랭킹을 위해 House Duck 서버로 보내지고",
       "itch.io 웹 버전의 이용 신호, 판 기록, 판 진행 기록과 첫 이용 단계"],
     de: ["Rangliste der aktuellen Saison und die Rangliste der letzten Saison", "1. Januar, 1. April, 1. Juli und 1. Oktober um 09:00 Uhr UTC", "vom 1. Oktober bis zum 31. Dezember 2026",
-      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: Die Ranglisten der aktuellen und der letzten Saison bleiben vollständig erhalten; in der vorletzten Saison werden die Einträge unterhalb der ersten 100 Plätze jeder Rangliste gelöscht, die Einträge älterer Saisons vollständig.</li>",
+      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: Die Ranglisten der aktuellen und der letzten Saison bleiben vollständig erhalten; in der vorletzten Saison werden die Einträge unterhalb der ersten 100 Plätze jeder Rangliste gelöscht (die Einträge von Spielern, die von den Ranglisten ausgeschlossen sind, bleiben bis zur Löschung dieser Saison erhalten, damit ein Ausschluss aufgehoben werden kann), die Einträge älterer Saisons vollständig.</li>",
       "<strong>Senden von Ergebnissen in den Webversionen (itch.io, Nekoland und GamePix):</strong>", "verwenden ein Gastkonto nur für die Online-Rangliste",
       "bleiben im Speicher Ihres Browsers und werden nicht an House Duck gesendet", "<td>Quest-Belohnungen</td>", "der UTC-Tag oder die UTC-Woche der Quest", "Modulziehungs-Tickets",
       "Quest-Belohnungen: werden 35 Tage nach dem Abholen der Belohnung gelöscht.", "<h3>Tägliche Erinnerung und Bewertungsfenster des Stores (Android und iOS)</h3>",
