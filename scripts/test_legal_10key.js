@@ -147,7 +147,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       /Hold to delete account/, /Effective October 20, 2026 \(v1\.1\)/, /Effective October 31, 2026 \(v1\.2\)/, /Effective November 1, 2026 \(v1\.3\)/, /starting a run needs an internet connection/i,
       /Module draw tickets: in the apps, given as quest rewards/, /module draw tickets are not sold/, /daily and weekly quests/, /board of the current season and of the last season/,
       /a free web demo of 10key Survival \(up to level 8\)/, /full game free on the web with ads shown by GamePix/, /odds page/, /ROBOT PACK/],
-    ko: [/게스트 계정을 온라인 랭킹에만 사용합니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
+    ko: [/게스트 계정을 온라인 랭킹에만 사용하고, itch.io에서는 로그인한 상태로 게임에서 1대1 문의를 보낼 때도 사용합니다/, /현금 또는 현실 세계의 가치가 없으며, 판매하거나 돈으로 교환할 수 없습니다/, /정당한 환불 요청/,
       /광고를 표시할 수 있습니다\(GamePix 버전이 출시되면 GamePix\)/, /기록을 삭제하거나 받지 않고, 해당 플레이어를 랭킹에서 제외/, /제327r조/,
       /독일법/, /나머지 조항은 계속 효력/, /온라인 기능 없이 계속 플레이할 수 있습니다/, /이러한 조치로 게임을 플레이하지 못하게 되지는 않습니다/,
       /이메일 주소나 비밀번호 없이 House Duck 게스트 계정을 만듭니다/, /만 14세 미만은 계정 없이 플레이합니다/,
@@ -169,7 +169,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
       assert.ok(html.includes(marker), `${file}: ${marker}`);
     }
     assert.ok(html.indexOf("문서 메타데이터 끝") < html.indexOf("문서 본문 시작"), `${file}: metadata before body`);
-    assert.match(html, /datetime="2026-11-08"/, `${file}: last updated 2026-11-08 (editorial cleanup, still v1.6: section 9 widened; v1.5 module boxes before it)`);
+    assert.match(html, /datetime="2026-11-17"/, `${file}: last updated 2026-11-17 (sections 3 / 7 corrected: itch.io 1:1 inquiry, season boards as the server keeps them; still v1.6, no re-acceptance)`);
     assert.doesNotMatch(text(html.replace(/<li>[^<]*\(v1\.[012]\)[^<]*/g, "")), /Revive Pass|부활 패스/, `${file}: the Revive Pass is gone (only in the history entries)`);
     for (const platform of platforms) assert.ok(plain.includes(platform), `${file} names ${platform} as an example platform`);
     for (const fact of required[locale]) assert.match(plain, fact, `${file}: ${fact}`);
@@ -443,10 +443,10 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
   }
   // the terms: season boards, the web ranking account, quests and module draw tickets (v1.3), en + ko
   const terms = {
-    en: ["<strong>Module draw tickets:</strong>", "module draw tickets, modules and the ROBOT PACK cannot be transferred to another account or player", "the game uses a House Duck guest account only for the online rankings",
-      "Season boards are deleted once the season is more than 12 weeks old", "November 1, 2026"],
-    ko: ["<strong>모듈 뽑기권:</strong>", "모듈 뽑기권, 모듈과 로봇 패키지는 다른 계정이나 다른 플레이어에게 넘길 수 없고", "게임은 House Duck 게스트 계정을 온라인 랭킹에만 사용합니다",
-      "시즌 순위표는 해당 시즌이 12주보다 오래되면 삭제됩니다", "2026년 11월 1일"],
+    en: ["<strong>Module draw tickets:</strong>", "module draw tickets, modules and the ROBOT PACK cannot be transferred to another account or player", "the game uses a House Duck guest account only for the online rankings and, on itch.io while signed in, for sending a 1:1 inquiry",
+      "of the season before last, only the top 100 places of each board are kept", "November 1, 2026"],
+    ko: ["<strong>모듈 뽑기권:</strong>", "모듈 뽑기권, 모듈과 로봇 패키지는 다른 계정이나 다른 플레이어에게 넘길 수 없고", "게임은 House Duck 게스트 계정을 온라인 랭킹에만 사용하고, itch.io에서는",
+      "지지난 시즌은 순위표마다 상위 100위까지만 남으며", "2026년 11월 1일"],
   };
   for (const [locale, list] of Object.entries(terms)) {
     const html = read(`10key/terms/${locale}.html`);
