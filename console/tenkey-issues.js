@@ -265,7 +265,9 @@
     box.hidden = false;
     bindTriage(box, {
       what: `${dash(g.where)} · ${kindName(g.kind)} · ${platformName(g.platform)}`, was: g.triage?.status || "open",
-      params: { source: state.tab, kind: g.kind, where: g.where || "", platform: g.platform || "" },
+      // The group's own source (the server's group carries it): a group still on screen from the tab being left (a pick while the
+      // new tab loads) must not be marked under the new tab's source (script_error is a crash kind and an app kind).
+      params: { source: g.source || state.tab, kind: g.kind, where: g.where || "", platform: g.platform || "" },
       save: (t) => { g.triage = t; renderList(); renderTriage(); },
     });
   }

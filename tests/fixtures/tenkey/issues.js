@@ -4,7 +4,7 @@
 //   issues.timeline {source, id, minutes} -> {by, rows:[{t, source, self}]}  issues.asks {days} -> {rows} (inquiries, ctx on new rows)
 // Shapes as tenkey.admin_issue_*_v1 answers them (hexaworld 20261117130100): groups {n = times}, rows {count, device_model}, one
 // report {install_short (8 characters, never the whole install id), detail}, timeline rows {t, source, ...per source}.
-// fw8 처리 상태 (admin_issue_list_v2 / admin_issue_reports_v3, hexaworld 20261117140000): every crash / app group carries {sig, triage}
+// fw8 처리 상태 (admin_issue_list_v2 / admin_issue_reports_v3, hexaworld 20261117160000): every crash / app group carries {sig, triage}
 // (null = never marked), every inquiry row {triage}; tenkey-admin "issues.mark" changes them for the page's life. One fixed group
 // came back (anr_suspect, fixed in build 2, a build-2 report after it), one app group is 확인함, the rest are 열림.
 (function () {
