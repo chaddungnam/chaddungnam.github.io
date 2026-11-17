@@ -1,6 +1,6 @@
 // 10key Survival: 성능 (owner 2026-11-17: "극한 최적화"). What the phone apps measure each time they are opened (Telemetry, store
 // builds during the test period; tenkey-console-stats "telemetry.get" {days, build} -> tenkey.admin_telemetry_v1): time to the first
-// frame, the slowest frames per loading stage, the places frames went over 100 ms, the first-use hitches, the 5 s stalls and the
+// frame, the slowest frames per loading stage, the places frames went over 100 ms, the first-use hitches, the 2 s stalls (TelemetryData.STALL_MS: one frame of 2 s or more; the crash watchdog's 5 s is a separate thing) and the
 // peak memory, by device model and by build. The web demo sends no telemetry: its hitches and stalls come as app_issues groups
 // ("issues.list" {source: "app", kind: "hitch" | "stall"}). Review and INVINCIBLE sessions are never counted by the server.
 (function attachConsoleTenkeyPerf(root) {
@@ -34,7 +34,7 @@
     table("tenkeyPerfFirstUse", d.first_use || [], ["처음 쓸 때 걸린 곳", "횟수", "평균", "가장 길게", "셰이더 준비 뒤"],
       (r) => [[r.where || "—"], [num(r.times), true], [ms(r.avg_ms), true], [ms(r.max_ms), true], [num(r.after_pipeline_compile), true]], "처음 쓸 때 걸린 곳이 없습니다.");
     table("tenkeyPerfStalls", d.stalls || [], ["시각", "멈춘 시간", "단계", "곳", "기기", "앱 버전"],
-      (r) => [[time(r.at)], [ms(r.ms), true], [r.stage || "—"], [r.where || "—"], [r.device_model || "—"], [r.app_version || "—"]], "이 기간에 5초 넘게 멈춘 세션이 없습니다.");
+      (r) => [[time(r.at)], [ms(r.ms), true], [r.stage || "—"], [r.where || "—"], [r.device_model || "—"], [r.app_version || "—"]], "이 기간에 2초 넘게 멈춘 세션이 없습니다.");
     table("tenkeyPerfBuilds", d.builds || [], ["빌드", "버전", "플랫폼", "세션"], (r) => [[`빌드 ${r.build}`], [r.version || "—"], [platformName(r.platform)], [num(r.sessions), true]], NONE);
     const builds = [...new Set((d.builds || []).map((b) => String(b.build)))];
     byId("tenkeyPerfBuild").innerHTML = ['<option value="">전체</option>', ...builds.map((b) => `<option value="${esc(b)}">빌드 ${esc(b)}</option>`)].join("");

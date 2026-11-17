@@ -59,7 +59,7 @@ test("성능: a week without sessions shows '—' and says why in each table ins
   await expect(card("sessions")).toHaveText("0");
   for (const k of ["first", "stall", "mem", "peak"]) await expect(card(k)).toHaveText("—");
   await expect(page.locator("#tenkeyPerfDevices")).toContainText("이 기간에 받은 성능 보고가 없습니다.");
-  await expect(page.locator("#tenkeyPerfStalls")).toContainText("이 기간에 5초 넘게 멈춘 세션이 없습니다.");
+  await expect(page.locator("#tenkeyPerfStalls")).toContainText("이 기간에 2초 넘게 멈춘 세션이 없습니다.");
   await expect(page.locator("#tenkeyPerfFirstUse")).toContainText("처음 쓸 때 걸린 곳이 없습니다.");
   await expect(page.locator("#tenkeyPerfBuild option")).toHaveCount(1);
   expect(errors).toEqual([]);

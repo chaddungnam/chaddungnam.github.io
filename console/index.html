@@ -821,7 +821,7 @@
           <article data-tone="neutral"><span>보고한 세션</span><strong data-perf-summary="sessions">—</strong></article>
           <article data-tone="neutral"><span>기기 수</span><strong data-perf-summary="installs">—</strong></article>
           <article data-tone="neutral"><span>첫 화면까지 (가운데 / 느린 쪽 10%)</span><strong data-perf-summary="first">—</strong></article>
-          <article data-tone="risk"><span>5초 넘게 멈춘 세션</span><strong data-perf-summary="stall">—</strong></article>
+          <article data-tone="risk"><span>2초 넘게 멈춘 세션</span><strong data-perf-summary="stall">—</strong></article>
           <article data-tone="watch"><span>메모리 경고가 난 세션</span><strong data-perf-summary="mem">—</strong></article>
           <article data-tone="neutral"><span>가장 많이 쓴 메모리 (가운데 / 많은 쪽 10%)</span><strong data-perf-summary="peak">—</strong></article>
         </section>
@@ -839,7 +839,7 @@
         </section>
         <section class="panel tk-balance-pair">
           <div><p class="eyebrow">FIRST USE</p><h2>처음 쓸 때 걸린 곳</h2><small>효과·화면을 처음 그릴 때 한 번 걸린 시간</small><div class="table-scroll tk-stack"><table><thead><tr><th>처음 쓸 때 걸린 곳</th><th class="tk-num">횟수</th><th class="tk-num">평균</th><th class="tk-num">가장 길게</th><th class="tk-num">셰이더 준비 뒤</th></tr></thead><tbody id="tenkeyPerfFirstUse"></tbody></table></div></div>
-          <div><p class="eyebrow">STALLS</p><h2>5초 넘게 멈춘 세션 (최근 20)</h2><div class="table-scroll tk-stack"><table><thead><tr><th>시각</th><th class="tk-num">멈춘 시간</th><th>단계</th><th>곳</th><th>기기</th><th>앱 버전</th></tr></thead><tbody id="tenkeyPerfStalls"></tbody></table></div></div>
+          <div><p class="eyebrow">STALLS</p><h2>2초 넘게 멈춘 세션 (한 프레임이 2초 이상) (최근 20)</h2><div class="table-scroll tk-stack"><table><thead><tr><th>시각</th><th class="tk-num">멈춘 시간</th><th>단계</th><th>곳</th><th>기기</th><th>앱 버전</th></tr></thead><tbody id="tenkeyPerfStalls"></tbody></table></div></div>
         </section>
         <section class="panel tk-balance-pair">
           <div><p class="eyebrow">WEB · APP ISSUES</p><h2>버벅임 보고 (곳별)</h2><small>웹 체험판과 앱이 앱 이상 보고로 보낸 버벅임</small><div class="table-scroll tk-stack"><table><thead><tr><th>곳</th><th>플랫폼</th><th class="tk-num">횟수</th><th>버전</th><th>마지막</th></tr></thead><tbody id="tenkeyPerfWebHitch"></tbody></table></div></div>
@@ -1011,7 +1011,7 @@
   <script src="tenkey-balance.js?v=20261117-keep"></script>
   <script src="tenkey-keep.js?v=20261117-keep"></script>
   <script src="tenkey-issues.js?v=20261117-keep"></script>
-  <script src="tenkey-perf.js?v=20261117-keep"></script>
+  <script src="tenkey-perf.js?v=20261117-stall2"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
