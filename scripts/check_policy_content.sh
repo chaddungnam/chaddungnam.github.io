@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# A section goes to grep as a here-string, never printf | grep -q: grep -q stops at the first match, printf then dies of
+# SIGPIPE and pipefail turns a found token into "misses" (red CI on 11-17 5fc7a85, passed locally).
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 failed=0
@@ -29,7 +31,7 @@ for locale in "${locales[@]}"; do
   ops_section="$(sed -n '/id="section-14"/,/id="section-15"/p' "$privacy")"
   for token in 'Google Workspace' 'houseduck\.in/console/' 'https://www\.googleapis\.com/auth/gmail\.modify' \
     'https://developers\.google\.com/terms/api-services-user-data-policy' 'Limited Use' '72' 'business@houseduck\.in'; do
-    if ! printf '%s' "$ops_section" | grep -Eq "$token"; then
+    if ! grep -Eq "$token" <<<"$ops_section"; then
       printf 'Privacy section 14 (support and operations tools) misses %s: %s\n' "$token" "$privacy" >&2
       failed=1
     fi
@@ -129,16 +131,16 @@ for locale in "${locales[@]}"; do
   fi
   tenkey_section="$(sed -n '/id="section-13">13\. /,/id="section-14"/p' "$privacy")"
   for token in 'eu-west-1' 'Google Play' 'Steam' '12' '35' '90' '183' 'support@houseduck\.in'; do
-    if ! printf '%s' "$tenkey_section" | grep -Eq "$token"; then
+    if ! grep -Eq "$token" <<<"$tenkey_section"; then
       printf 'Privacy 10key Survival section misses %s: %s\n' "$token" "$privacy" >&2
       failed=1
     fi
   done
-  if printf '%s' "$tenkey_section" | grep -Fq 'CrazyGames'; then
+  if grep -Fq 'CrazyGames' <<<"$tenkey_section"; then
     printf 'Privacy 10key Survival section still names CrazyGames (not a platform since 2026-11-01): %s\n' "$privacy" >&2
     failed=1
   fi
-  if printf '%s' "$tenkey_section" | grep -Eiq 'AdMob|Firebase|AppLovin|Sign in with Apple|Apple로 로그인'; then
+  if grep -Eiq 'AdMob|Firebase|AppLovin|Sign in with Apple|Apple로 로그인' <<<"$tenkey_section"; then
     printf 'Privacy 10key Survival section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
   fi
