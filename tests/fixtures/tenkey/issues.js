@@ -4,6 +4,9 @@
 //   issues.timeline {source, id, minutes} -> {by, rows:[{t, source, self}]}  issues.asks {days} -> {rows} (inquiries, ctx on new rows)
 // Shapes as tenkey.admin_issue_*_v1 answers them (hexaworld 20261117130100): groups {n = times}, rows {count, device_model}, one
 // report {install_short (8 characters, never the whole install id), detail}, timeline rows {t, source, ...per source}.
+// fw8 처리 상태 (admin_issue_list_v2 / admin_issue_reports_v3, hexaworld 20261117140000): every crash / app group carries {sig, triage}
+// (null = never marked), every inquiry row {triage}; tenkey-admin "issues.mark" changes them for the page's life. One fixed group
+// came back (anr_suspect, fixed in build 2, a build-2 report after it), one app group is 확인함, the rest are 열림.
 (function () {
   const INSTALL = "9f31a0c2-0000-4000-8000-000000000001";
   const RUN = { seed: 918273, mode: "classic", lv: 12, t: 245, start_lv: 1, form: "drift", demo: false };
@@ -21,11 +24,18 @@
       { source: "app", id: 500, at: "2026-10-21T08:00:00+00:00", kind: "script_error", platform: "ios", app_version: "1.0.0", build: 2, where: "res://scripts/dig/dig_run.gd:212", said: "Invalid get index 'x'", count: 1, device_model: null, has_run: false },
     ],
   };
+  const sigOf = (source, kind, platform, where) => `${source}:${kind}:${platform || ""}:${where || ""}`;   // the server's is md5 hex
+  const MARK_AT = "2026-10-22T08:00:00+00:00";
+  const marks = {
+    [sigOf("crash", "anr_suspect", "android", "")]: { status: "fixed", fixed_in_build: 2, note: "부팅 대기 줄임", by: "ops@houseduck.in", at: MARK_AT, rows_after: 1, rows_fixed_build: 1, back: true },
+    [sigOf("app", "stall", "web_itch", "home_load")]: { status: "seen", fixed_in_build: null, note: "", by: "ops@houseduck.in", at: MARK_AT, rows_after: 1, rows_fixed_build: null, back: false },
+  };
   const groupsOf = (list) => {
     const out = new Map();
     for (const r of list) {
       const key = `${r.kind}|${r.where || ""}`;
-      const g = out.get(key) || { source: r.source, kind: r.kind, where: r.where, platform: r.platform, n: 0, last_at: r.at, versions: [] };
+      const sig = sigOf(r.source, r.kind, r.platform, r.where);
+      const g = out.get(key) || { source: r.source, kind: r.kind, where: r.where, platform: r.platform, n: 0, last_at: r.at, versions: [], sig, triage: marks[sig] || null };
       g.n += r.count || 1;
       g.times = g.n;
       if (!g.versions.includes(r.app_version)) g.versions.push(r.app_version);
@@ -47,6 +57,30 @@
       ctx: { sid: "s-7f3a", steps: ["30 scene DigScene", "40 lvup 2", "41 pick laser", "60 pop+ contact"], run: RUN, save: SAVE } },
     { receipt: "c0ffee00", submitted_at: "2026-10-20T09:00:00+00:00", body: "old build text", meta: { locale: "ja" }, status: "open", player_id: null },
   ];
+  for (const a of asks) a.triage = null;
+  // tenkey-admin issues.mark: the same checks the edge function makes first (source, status, build, note, reason, a request id).
+  const mark = (p, body, fn) => {
+    if (fn !== "tenkey-admin") throw Object.assign(new Error("unknown_action"), { status: 400 });
+    if (!/^[0-9a-f-]{36}$/.test(String(body.request_id || ""))) throw Object.assign(new Error("invalid_request_id"), { status: 400 });
+    if (!String(p.reason || "").trim()) throw Object.assign(new Error("reason_required"), { status: 400 });
+    if (!["open", "seen", "fixed"].includes(p.status)) throw Object.assign(new Error("invalid_status"), { status: 400 });
+    if (p.build !== null && p.build !== undefined && !(Number.isInteger(p.build) && p.build >= 1 && p.build <= 999999999)) throw Object.assign(new Error("invalid_build"), { status: 400 });
+    const next = { status: p.status, fixed_in_build: p.status === "fixed" ? p.build ?? null : null, note: String(p.note || "").trim() };
+    const same = (t) => (t?.status || "open") === next.status && (t?.fixed_in_build ?? null) === next.fixed_in_build && (t?.note || "") === next.note;
+    if (p.source === "ask") {
+      const a = asks.find((x) => x.receipt === p.receipt);
+      if (!a) return { ok: false, error: "not_found" };
+      if (same(a.triage)) return { ok: true, changed: false, triage: a.triage };
+      a.triage = { ...next, by: "qa@houseduck.in", at: new Date().toISOString() };
+      a.status = p.status === "fixed" ? "done" : p.status;
+      return { ok: true, changed: true, source: "ask", triage: a.triage };
+    }
+    const sig = sigOf(p.source, p.kind, p.platform, p.where);
+    if (!(rows[p.source] || []).some((r) => sigOf(r.source, r.kind, r.platform, r.where) === sig)) return { ok: false, error: "not_found" };
+    if (same(marks[sig])) return { ok: true, changed: false, triage: marks[sig] };
+    marks[sig] = { ...next, by: "qa@houseduck.in", at: new Date().toISOString(), rows_after: 0, rows_fixed_build: next.fixed_in_build ? 0 : null, back: false };
+    return { ok: true, changed: true, source: p.source, signature: sig, triage: marks[sig] };
+  };
   const stats = (fn) => { if (fn !== "tenkey-console-stats") throw Object.assign(new Error("unknown_action"), { status: 400 }); };
   Object.assign(window.__tkPages = window.__tkPages || {}, {
     "issues.list": (p, body, fn) => {
@@ -75,5 +109,6 @@
       ] };
     },
     "issues.asks": (p, body, fn) => { stats(fn); return { ok: true, total: asks.length, rows: asks }; },
+    "issues.mark": mark,
   });
 })();

@@ -5,6 +5,11 @@
 // in as "이 판 다시 만들기: seed … (QA_WORLD_SEED)", the save it had, and on request the same device's other records from ten
 // minutes before to ten after ("issues.timeline" {source, id, minutes}: the server finds the device or the launch itself and
 // answers {by, rows:[{t, source, self, ...}]}). Reports from builds before these fields read '—'.
+// 처리 상태 (fw8): a crash / app group (kind + platform + place, as the server groups them) or one inquiry is 열림 / 확인함 / 고침
+// (+ the build that fixed it, a note). tenkey-admin "issues.mark" {source, kind, where, platform | receipt, status, build, note,
+// reason} writes it after the confirm dialog, audited like a ban. issues.list groups carry {sig, triage} and issues.asks rows
+// {triage} from the fw8 server (admin_issue_list_v2 / admin_issue_reports_v3); without them (the server before fw8) the state
+// column reads '—', no mark form shows, and the rest of the page works as before.
 (function attachConsoleTenkeyIssues(root) {
   const T = root.ConsoleTenkey;
   const { esc, num, time, duration, platformName } = T.fmt;
@@ -27,10 +32,22 @@
     app: "버벅임·멈춤·스크립트 오류를 같은 곳끼리 묶어 보냅니다 (스토어 앱과 웹 체험판). 버벅임과 멈춤은 「성능」 화면에도 나옵니다.",
     ask: "로그인한 앱·itch 계정만 보냅니다 (GamePix·Nekoland 웹, 14세 미만, 약관 미동의는 보내지 않음). 이 빌드부터 보낼 때의 앱 순서와 판·저장 상태가 붙습니다.",
   };
-  const state = { bound: false, tab: "crash", groups: [], rows: [], group: null, open: null };
+  const STATUS = { open: "열림", seen: "확인함", fixed: "고침" };
+  const STATUS_LONG = { open: "열림 (아직 안 봄)", seen: "확인함 (보는 중)", fixed: "고침" };
+  const ASK_STATUS = { open: "open", seen: "seen", done: "fixed" };   // issue_reports.status -> the mark's word (고침 = done)
+  const state = { bound: false, tab: "crash", groups: [], rows: [], pick: null, open: null };
   const dash = (v) => (v === null || v === undefined || v === "" ? "—" : String(v));
   const kindName = (k) => KINDS[k] || dash(k);
   const groupKey = (g) => `${g.kind || ""}|${g.where || ""}`;
+  const picked = () => (state.tab !== "ask" && state.pick !== null ? state.groups[state.pick] || null : null);
+  // One state badge: 열림 (gold: nobody looked yet), 확인함 (grey), 고침 (teal, with its build), and a red "고친 뒤 다시 N건" when a
+  // fixed group came back (rows from the fixed build or later; rows after the mark when the fix named no build).
+  function stateBadge(t, base = "open") {
+    const s = t?.status || base;
+    const label = s === "fixed" && t?.fixed_in_build ? `고침 · 빌드 ${t.fixed_in_build}` : STATUS[s] || dash(s);
+    const back = t?.back ? ` <span class="tk-badge" data-tone="risk">고친 뒤 다시 ${esc(num(t.fixed_in_build ? t.rows_fixed_build : t.rows_after))}건</span>` : "";
+    return `<span class="tk-badge" data-tone="${s === "fixed" ? "good" : s === "seen" ? "quiet" : "watch"}">${esc(label)}</span>${back}`;
+  }
   const facts = (items) => `<dl class="tk-detail-grid">${items.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(dash(v))}</dd></div>`).join("")}</dl>`;
   const appText = (version, build) => [version ? `v${version}` : "", build ? `빌드 ${build}` : ""].filter(Boolean).join(" · ") || "—";
 
@@ -84,18 +101,19 @@
     byId("tenkeyIssueGroupsPanel").hidden = ask;
     byId("tenkeyIssueListTitle").textContent = ask ? "1대1 문의 목록" : `${SOURCES[state.tab]} 목록`;
     byId("tenkeyIssueHead").innerHTML = ask
-      ? "<tr><th>시각</th><th>플레이어</th><th>내용</th><th>앱 · 기기</th><th class=\"tk-num\">앱 순서</th></tr>"
+      ? "<tr><th>시각</th><th>플레이어</th><th>내용</th><th>앱 · 기기</th><th class=\"tk-num\">앱 순서</th><th>상태</th></tr>"
       : "<tr><th>시각</th><th>종류</th><th>어디서</th><th>앱 · 기기</th><th class=\"tk-num\">횟수</th><th>판 다시 만들기</th></tr>";
     byId("tenkeyIssueKeepNote").innerHTML = `${esc(WHO[state.tab])} 서버는 ${KEEP[state.tab]}.`;
     T.fillKeep(byId("tenkeyIssueKeepNote"));
     for (const b of byId("tenkeyIssueTabs").querySelectorAll("[data-issue-tab]")) b.setAttribute("aria-pressed", String(b.dataset.issueTab === state.tab));
   }
 
-  function groupRow(g) {
-    return `<tr data-tk-issue-group="${esc(groupKey(g))}" tabindex="0" aria-selected="${state.group === groupKey(g)}">
+  function groupRow(g, i) {
+    return `<tr data-tk-issue-group="${esc(groupKey(g))}" data-tk-index="${i}"${typeof g.sig === "string" ? ` data-tk-sig="${esc(g.sig)}"` : ""} tabindex="0" aria-selected="${state.pick === i}">
       <td class="tk-wrap" data-label="어디서"><strong>${esc(dash(g.where))}</strong></td><td data-label="종류">${esc(kindName(g.kind))}</td>
       <td class="tk-num" data-label="횟수"><strong>${esc(num(g.n))}</strong></td><td data-label="플랫폼">${esc(platformName(g.platform))}</td>
-      <td data-label="버전">${esc(Array.isArray(g.versions) ? g.versions.join(", ") || "—" : dash(g.versions))}</td><td data-label="마지막">${esc(time(g.last_at))}</td></tr>`;
+      <td data-label="버전">${esc(Array.isArray(g.versions) ? g.versions.join(", ") || "—" : dash(g.versions))}</td><td data-label="마지막">${esc(time(g.last_at))}</td>
+      <td data-label="상태">${typeof g.sig === "string" ? stateBadge(g.triage) : "—"}</td></tr>`;
   }
   function issueRow(r) {
     return `<tr data-tk-issue="${esc(r.id)}" tabindex="0" style="cursor:pointer"><td data-label="시각">${esc(time(r.at))}</td>
@@ -110,17 +128,18 @@
     const n = Array.isArray(a.ctx?.steps) ? a.ctx.steps.length : null;
     return `<tr data-tk-ask="${esc(a.receipt)}" tabindex="0" style="cursor:pointer"><td data-label="시각">${esc(time(a.submitted_at))}</td><td data-label="플레이어">${who}</td>
       <td class="tk-wrap tk-report-body" data-label="내용">${esc(a.body)}</td><td data-label="앱 · 기기">${esc(appText(meta.version, meta.build))}<span class="tk-sub">${esc(platformName(meta.platform))} · ${esc(dash(meta.device))}</span></td>
-      <td class="tk-num" data-label="앱 순서">${n === null ? "—" : `${num(n)}단계`}</td></tr>`;
+      <td class="tk-num" data-label="앱 순서">${n === null ? "—" : `${num(n)}단계`}</td><td data-label="상태">${stateBadge(a.triage, ASK_STATUS[a.status] || "open")}</td></tr>`;
   }
 
   function renderList() {
     const ask = state.tab === "ask";
-    const [kind, where] = (state.group || "|").split("|");
-    const rows = ask ? state.rows : state.rows.filter((r) => !state.group || (String(r.kind || "") === kind && String(r.where || "") === where));
-    byId("tenkeyIssueTotal").textContent = `${num(rows.length)}건${state.group ? " (묶음 선택됨)" : ""}`;
+    const g = picked();
+    const rows = ask || !g ? state.rows : state.rows.filter((r) => String(r.kind || "") === String(g.kind || "") && String(r.where || "") === String(g.where || "")
+      && (!g.platform || !r.platform || r.platform === g.platform));
+    byId("tenkeyIssueTotal").textContent = `${num(rows.length)}건${g ? " (묶음 선택됨)" : ""}`;
     byId("tenkeyIssueTable").innerHTML = rows.length ? rows.map(ask ? askRow : issueRow).join("") : '<tr><td colspan="6" class="empty-panel">이 기간에 들어온 보고가 없습니다.</td></tr>';
     if (!ask) {
-      byId("tenkeyIssueGroups").innerHTML = state.groups.length ? state.groups.map(groupRow).join("") : '<tr><td colspan="6" class="empty-panel">이 기간에 묶음이 없습니다.</td></tr>';
+      byId("tenkeyIssueGroups").innerHTML = state.groups.length ? state.groups.map(groupRow).join("") : '<tr><td colspan="7" class="empty-panel">이 기간에 묶음이 없습니다.</td></tr>';
       byId("tenkeyIssueGroupsTotal").textContent = `${num(state.groups.length)}묶음`;
     }
   }
@@ -128,7 +147,8 @@
   async function load() {
     T.setMessage("tenkeyIssueMessage", "불러오는 중입니다...");
     byId("tenkeyIssueDetail").hidden = true;
-    state.group = null;
+    state.pick = null;
+    renderTriage();
     renderHead();
     const days = Number(byId("tenkeyIssueDays").value) || 7;
     try {
@@ -179,8 +199,75 @@
     const ctx = a.ctx && typeof a.ctx === "object" ? a.ctx : {};
     show(`${head(`1대1 문의 ${dash(a.receipt)}`, a.display_name || "플레이어 기록 없음", time(a.submitted_at))}
       <div class="tk-section"><h3>보낸 글</h3><p class="tk-report-body tk-wrap">${esc(a.body)}</p></div>
-      ${facts([["답장 이메일", a.email || "없음 (이전 빌드)"], ["앱", appText(meta.version, meta.build)], ["플랫폼", platformName(meta.platform)], ["기기", meta.device], ["언어", meta.locale], ["세션 번호", ctx.sid], ["상태", a.status]])}
-      ${runBox(ctx.run)}${steps(ctx.steps, "보내기 전 앱 순서")}${saveBox(ctx.save)}`, null);
+      ${facts([["답장 이메일", a.email || "없음 (이전 빌드)"], ["앱", appText(meta.version, meta.build)], ["플랫폼", platformName(meta.platform)], ["기기", meta.device], ["언어", meta.locale], ["세션 번호", ctx.sid], ["상태", STATUS[ASK_STATUS[a.status]] || a.status]])}
+      ${runBox(ctx.run)}${steps(ctx.steps, "보내기 전 앱 순서")}${saveBox(ctx.save)}
+      ${"triage" in a ? triageForm(a.triage, ASK_STATUS[a.status] || "open") : ""}`, null);
+    if (!("triage" in a)) return;
+    bindTriage(byId("tenkeyIssueDetail"), {
+      what: `1대1 문의 ${a.receipt} · ${a.display_name || "플레이어 기록 없음"}`, was: a.triage?.status || ASK_STATUS[a.status] || "open",
+      params: { source: "ask", receipt: a.receipt },
+      save: (t, status) => { a.triage = t; a.status = status === "fixed" ? "done" : status; renderList(); openAsk(a.receipt); },
+    });
+  }
+
+  // The mark form, under the picked group or inside an inquiry. 고침 takes the build that fixed it (blank = a server-side fix).
+  function triageForm(t, base) {
+    const s = t?.status || base;
+    const now = t ? `지금: ${STATUS[t.status]}${t.fixed_in_build ? ` (빌드 ${t.fixed_in_build})` : ""} · ${time(t.at)} · ${t.by || "—"}${t.note ? ` · 메모: ${t.note}` : ""}`
+      : `지금: ${STATUS[s]} (콘솔에서 아직 아무도 표시하지 않음)`;
+    return `<form id="tenkeyTriageForm" class="admin-form tk-section impact-form">
+      <p class="eyebrow">ISSUE STATE</p><h3>처리 상태 바꾸기</h3>
+      <p class="tk-triage-now tk-wrap">${esc(now)}</p>
+      <p class="impact-note">콘솔 기록용입니다. 게임과 플레이어에게는 아무것도 바뀌지 않습니다. 고친 빌드 번호를 적어 두면 그 빌드 이상에서 같은 보고가 다시 들어올 때 「고친 뒤 다시」가 붙습니다. 서버 쪽에서 고쳤으면 비워 두고, 그때는 표시한 뒤에 들어온 보고로 셉니다. 바꾼 사람·시각·사유는 감사 기록에 남습니다.</p>
+      <fieldset class="mail-audience"><legend>상태</legend>${Object.keys(STATUS).map((k) => `<label class="check-label"><input name="status" type="radio" value="${k}"${k === s ? " checked" : ""}> ${esc(STATUS_LONG[k])}</label>`).join("")}</fieldset>
+      <label>고친 빌드 번호 (고침일 때)<input name="build" type="number" min="1" max="999999999" step="1" inputmode="numeric" value="${esc(t?.fixed_in_build ?? "")}" placeholder="예: 31"></label>
+      <label>메모 (선택)<input name="note" maxlength="300" value="${esc(t?.note || "")}" placeholder="예: dig_main 경계 검사 추가"></label>
+      <label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 빌드 31에서 고친 것 확인"></label>
+      <p id="tenkeyTriageMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+      <div class="tk-actions"><button class="warning-button" type="submit">상태 저장</button></div>
+    </form>`;
+  }
+  function bindTriage(box, target) {
+    const form = box.querySelector("#tenkeyTriageForm");
+    const sync = () => { form.elements.build.disabled = form.elements.status.value !== "fixed"; };
+    form.addEventListener("change", sync);
+    sync();
+    form.addEventListener("submit", (event) => submitTriage(event, target));
+  }
+  async function submitTriage(event, target) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const finish = root.ConsoleUiState.beginRequest(form);
+    if (!finish) return;
+    try {
+      if (!form.reportValidity()) return;
+      const status = form.elements.status.value;
+      const raw = form.elements.build.value.trim();
+      const build = status === "fixed" && raw ? Number(raw) : null;
+      const note = form.elements.note.value.trim(), reason = form.elements.reason.value.trim();
+      if (!await root.ConsoleApp.confirmChange("이슈 처리 상태 바꾸기", `${target.what}\n${STATUS[target.was]} → ${STATUS[status]}${build ? ` (빌드 ${build})` : status === "fixed" ? " (빌드 없음: 서버 쪽 수정)" : ""}\n메모: ${note || "없음"}\n사유: ${reason}`)) return;
+      T.setMessage("tenkeyTriageMessage", "처리하는 중입니다...");
+      const out = (await T.call("issues.mark", { ...target.params, status, build, note, reason }, form))?.data || {};
+      target.save(out.triage || null, status);
+      T.setMessage("tenkeyTriageMessage", out.changed === false ? "이미 그 상태라 바꾸지 않았습니다 (감사 기록 없음)." : "저장했습니다. 감사 기록에 남았습니다.");
+    } catch (error) {
+      T.report("tenkeyTriageMessage", error);
+    } finally {
+      finish();
+    }
+  }
+  // The form under the groups for the picked group (crash / app); hidden with no pick or a server before fw8 (no sig).
+  function renderTriage() {
+    const box = byId("tenkeyIssueTriage");
+    const g = picked();
+    if (!g || typeof g.sig !== "string") { box.hidden = true; box.innerHTML = ""; return; }
+    box.innerHTML = triageForm(g.triage, "open");
+    box.hidden = false;
+    bindTriage(box, {
+      what: `${dash(g.where)} · ${kindName(g.kind)} · ${platformName(g.platform)}`, was: g.triage?.status || "open",
+      params: { source: state.tab, kind: g.kind, where: g.where || "", platform: g.platform || "" },
+      save: (t) => { g.triage = t; renderList(); renderTriage(); },
+    });
   }
 
   async function loadTimeline(ref) {
@@ -216,9 +303,12 @@
         load();
       });
       bindOpen("tenkeyIssueGroups", (row) => {
-        const key = row.dataset.tkIssueGroup;
-        state.group = state.group === key ? null : key;
+        const i = Number(row.dataset.tkIndex);
+        state.pick = state.pick === i ? null : i;
         renderList();
+        renderTriage();
+        // On a phone the form sits under every group card: bring it up to the picked group's view.
+        if (state.pick !== null && !byId("tenkeyIssueTriage").hidden) byId("tenkeyIssueTriage").scrollIntoView({ block: "nearest", behavior: "auto" });
       });
       bindOpen("tenkeyIssueTable", (row) => (row.dataset.tkAsk !== undefined ? openAsk(row.dataset.tkAsk) : openIssue(row.dataset.tkIssue)));
     }

@@ -111,7 +111,7 @@
   }
 
   // ── 감사 기록 ──
-  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "review.set": "검수 모드 끄기 / 권한 회수", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경", "community.set": "유튜브 소통 링크 변경", "players.rename": "닉네임 변경", "mail.send": "메일 보내기", "mail.cancel": "미수령 메일 취소", "titles.grant": "칭호 부여", "titles.revoke": "칭호 회수" };
+  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "review.set": "검수 모드 끄기 / 권한 회수", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경", "community.set": "유튜브 소통 링크 변경", "players.rename": "닉네임 변경", "mail.send": "메일 보내기", "mail.cancel": "미수령 메일 취소", "titles.grant": "칭호 부여", "titles.revoke": "칭호 회수", "issues.mark": "이슈 처리 상태 변경" };
   function auditSummary(a) {
     const p = a.params || {};
     if (a.action === "notices.save") return p.notice?.title_en ? `${p.notice?.title_ko || ""} / ${p.notice.title_en}` : `${p.notice?.title_ko || ""}${p.notice?.translations ? " (자동 번역 포함)" : ""}`;
@@ -127,6 +127,11 @@
     if (a.action === "mail.send") return `${p.all ? "전체 계정" : `대상 ${p.target || "?"}`} · ${p.title_i18n?.ko || ""}`;
     if (a.action === "mail.cancel") return `메일 #${p.id ?? "?"}`;
     if (a.action === "titles.grant" || a.action === "titles.revoke") return `${p.title_id || ""} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "issues.mark") {
+      const state = { open: "열림", seen: "확인함", fixed: "고침" }[p.status] || p.status;
+      const what = p.source === "ask" ? `1대1 문의 ${p.receipt || "?"}` : `${{ crash: "크래시", app: "앱 이상" }[p.source] || p.source} ${p.kind || ""} · ${p.where || "—"} · ${p.platform || "—"}`;
+      return `${what} → ${state}${p.status === "fixed" && p.build ? ` (빌드 ${p.build})` : ""}${p.note ? ` · 메모: ${p.note}` : ""}`;
+    }
     if (String(a.action).startsWith("notices.")) return `공지 #${p.id ?? "?"}`;
     return JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k]) => k !== "reason")));
   }

@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20261104-mail">
-  <link rel="stylesheet" href="styles.css?v=20261117-keep">
+  <link rel="stylesheet" href="styles.css?v=20261117-triage">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -785,8 +785,9 @@
         </form>
         <p id="tenkeyIssueKeepNote" class="impact-note">—</p>
         <section id="tenkeyIssueGroupsPanel" class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">ISSUE GROUPS</p><h2>묶음</h2><small>같은 곳에서 난 같은 종류를 묶습니다. 묶음을 누르면 아래 목록이 그 묶음만 보이고, 한 번 더 누르면 풀립니다.</small></div><span id="tenkeyIssueGroupsTotal" class="panel-total">—</span></div>
-          <div class="table-scroll tk-stack"><table><thead><tr><th>어디서</th><th>종류</th><th class="tk-num">횟수</th><th>플랫폼</th><th>버전</th><th>마지막</th></tr></thead><tbody id="tenkeyIssueGroups"></tbody></table></div>
+          <div class="panel-heading"><div><p class="eyebrow">ISSUE GROUPS</p><h2>묶음</h2><small>같은 곳에서 난 같은 종류를 플랫폼별로 묶습니다. 묶음을 누르면 아래 목록이 그 묶음만 보이고 처리 상태(열림·확인함·고침)를 바꿀 수 있으며, 한 번 더 누르면 풀립니다.</small></div><span id="tenkeyIssueGroupsTotal" class="panel-total">—</span></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>어디서</th><th>종류</th><th class="tk-num">횟수</th><th>플랫폼</th><th>버전</th><th>마지막</th><th>상태</th></tr></thead><tbody id="tenkeyIssueGroups"></tbody></table></div>
+          <div id="tenkeyIssueTriage" hidden></div>
         </section>
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">REPORTS</p><h2 id="tenkeyIssueListTitle">크래시 목록</h2><small>줄을 누르면 보고 하나가 열립니다: 앱이 남긴 순서, 그 판을 다시 만드는 번호, 같은 기기의 앞뒤 기록.</small></div><span id="tenkeyIssueTotal" class="panel-total">—</span></div>
@@ -996,7 +997,7 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20261028-caret"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261117-keep"></script>
+  <script src="tenkey.js?v=20261117-triage"></script>
   <script src="tenkey-overview.js?v=20261112-aud2"></script>
   <script src="tenkey-unlocks.js?v=20261112-aud2"></script>
   <script src="tenkey-watch.js?v=20261115-watch"></script>
@@ -1007,10 +1008,10 @@
   <script src="tenkey-reports.js?v=20261117-keep"></script>
   <script src="tenkey-mail.js?v=20261104-mail"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
-  <script src="tenkey-more.js?v=20261112-aud2"></script>
+  <script src="tenkey-more.js?v=20261117-triage"></script>
   <script src="tenkey-balance.js?v=20261117-keep"></script>
   <script src="tenkey-keep.js?v=20261117-keep"></script>
-  <script src="tenkey-issues.js?v=20261117-keep"></script>
+  <script src="tenkey-issues.js?v=20261117-triage"></script>
   <script src="tenkey-perf.js?v=20261117-stall2"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
