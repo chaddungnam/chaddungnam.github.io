@@ -1306,6 +1306,9 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
   :is(.tk-balance, .tk-page) .tk-stack td::before { content: attr(data-label); color: var(--ink-soft); font-weight: 700; }
   :is(.tk-balance, .tk-page) .tk-stack td.empty-panel { display: block; }
   :is(.tk-balance, .tk-page) .tk-stack td.empty-panel::before { content: none; }
+  /* A full-width row (colspan: the 감시 page's open run list) has no label column. */
+  :is(.tk-balance, .tk-page) .tk-stack td[colspan] { display: block; }
+  :is(.tk-balance, .tk-page) .tk-stack td[colspan]::before { content: none; }
   /* A cell with a name plus a sub line / code / badge keeps all of them in the value column, never under the label. */
   :is(.tk-balance, .tk-page) .tk-stack td > * { grid-column: 2; }
 }

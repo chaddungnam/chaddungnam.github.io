@@ -377,7 +377,8 @@ function runApp({ initialize, unlock, logout = () => {} }) {
       isUnlocked: () => false,
       logout,
     },
-    ConsoleModel: { routeFromHash: () => ({ page: "analytics" }) },
+    // app.js builds its 10KEY route pattern from the real page list (fw7 11-17), so the stub carries it.
+    ConsoleModel: { routeFromHash: () => ({ page: "analytics" }), tenkeyPages: require("../console/model.js").tenkeyPages },
     ConsoleAnalytics: { mount() {} },
     ConsolePlayers: { mountList() {}, mountDetail() {} },
     ConsoleOperations: { mount() {} },
