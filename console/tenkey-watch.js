@@ -65,9 +65,9 @@
     const runs = r.runs || [];
     if (!runs.length) return '<p class="empty-panel">서버에 남은 판이 없습니다. 새 최고 기록을 세운 판만 남으므로, 검수·무적 계정의 판은 비어 있을 수 있습니다.</p>';
     return `<div class="table-scroll"><table><thead><tr><th>시각</th><th>모드</th><th class="tk-num">점수</th><th class="tk-num">레벨</th><th class="tk-num">시작 레벨</th><th>시간</th><th>플랫폼 · 빌드</th><th>판정</th></tr></thead><tbody>${runs.map((x) => `<tr${x.flag ? ' class="is-dim"' : ""}>
-      <td>${esc(time(x.created_at))}</td><td>${esc(modeName(x.mode))}</td><td class="tk-num">${esc(num(x.score))}</td><td class="tk-num">${esc(x.level)}</td>
-      <td class="tk-num">${esc(x.start_level == null ? "—" : x.start_level)}</td><td>${esc(duration(x.time_ms))}</td><td>${esc(platformName(x.platform))} · ${esc(x.build || "—")}</td>
-      <td><span class="tk-badge" data-tone="${x.flag ? "risk" : "good"}">${x.flag ? esc(x.flag) : "정상"}</span></td></tr>`).join("")}</tbody></table></div>`;
+      <td data-label="시각">${esc(time(x.created_at))}</td><td data-label="모드">${esc(modeName(x.mode))}</td><td data-label="점수" class="tk-num">${esc(num(x.score))}</td><td data-label="레벨" class="tk-num">${esc(x.level)}</td>
+      <td data-label="시작 레벨" class="tk-num">${esc(x.start_level == null ? "—" : x.start_level)}</td><td data-label="시간">${esc(duration(x.time_ms))}</td><td data-label="플랫폼 · 빌드">${esc(platformName(x.platform))} · ${esc(x.build || "—")}</td>
+      <td data-label="판정"><span class="tk-badge" data-tone="${x.flag ? "risk" : "good"}">${x.flag ? esc(x.flag) : "정상"}</span></td></tr>`).join("")}</tbody></table></div>`;
   }
 
   function rowMarkup(r) {

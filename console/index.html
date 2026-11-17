@@ -522,7 +522,7 @@
           <div id="tenkeyRetentionChurn"></div></section>
       </section>
 
-      <section id="tenkeyWatchView" class="route-view" data-route="tenkey-watch" hidden>
+      <section id="tenkeyWatchView" class="route-view tk-page" data-route="tenkey-watch" hidden>
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">WATCH LIST</p><h2>감시 대상</h2><small>태그가 달린 계정만 모았습니다. [검수] = iOS 심사관용 검수 모드 계정, [무적] = 개발자 테스트 계정, [TOP10] = 이번 시즌 일반 또는 하드 랭킹 10위 안. 이상한 판이 보이면 여기서 바로 랭킹 정지하거나 검수·무적을 끌 수 있고, 모든 처리는 사유와 함께 감사 기록에 남습니다.</small></div><span id="tenkeyWatchTotal" class="panel-total">—</span></div>
           <div class="tk-retention-tabs" role="group" aria-label="감시 대상 종류">
@@ -532,7 +532,7 @@
             <button type="button" data-watch-filter="top" aria-pressed="false">TOP10 <b>0</b></button>
             <button id="tenkeyWatchRefresh" class="refresh-button" type="button">새로고침</button>
           </div>
-          <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>마지막 접속</th><th class="tk-num">오늘 시작한 판</th><th class="tk-num">최고 점수 (일반)</th><th class="tk-num">최고 점수 (하드)</th><th>이번 시즌 순위</th><th>처리</th></tr></thead><tbody id="tenkeyWatchTable"></tbody></table></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>플레이어</th><th>마지막 접속</th><th class="tk-num">오늘 시작한 판</th><th class="tk-num">최고 점수 (일반)</th><th class="tk-num">최고 점수 (하드)</th><th>이번 시즌 순위</th><th>처리</th></tr></thead><tbody id="tenkeyWatchTable"></tbody></table></div>
         </section>
         <p id="tenkeyWatchMessage" class="dashboard-message" role="status"></p>
       </section>
