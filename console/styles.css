@@ -1227,6 +1227,8 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 .tk-section { margin-top: 18px; }
 .tk-section h3 { margin: 0 0 8px; font-size: 13px; }
 .tk-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+/* 이슈함 처리 상태 (fw8): the current state line of the mark form */
+.tk-triage-now { margin: 0; color: var(--ink); font-size: 12px; font-weight: 800; line-height: 1.5; }
 .tk-section.impact-form { padding: 14px 16px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 12px; }
 .tk-retention-panel { margin-top: 14px; }
 #tenkeyRetentionView .admin-toolbar { position: static; box-shadow: none; backdrop-filter: none; }
