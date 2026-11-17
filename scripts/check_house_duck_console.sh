@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js tenkey.js tenkey-overview.js tenkey-players.js tenkey-unlocks.js tenkey-crashes.js tenkey-notices.js tenkey-more.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js tenkey.js tenkey-overview.js tenkey-players.js tenkey-unlocks.js tenkey-crashes.js tenkey-notices.js tenkey-more.js tenkey-balance.js tenkey-reports.js tenkey-keep.js tenkey-issues.js tenkey-perf.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -43,6 +43,18 @@ rg -q 'data-route="tenkey-overview"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-crashes"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-notices"' "$console_dir/index.html"
 rg -F -q 'postProject("houseduck", "tenkey-admin"' "$console_dir/tenkey.js"
+# 11-17: 이슈함 / 데이터 보관 / 성능 pages; every retention number comes from keep.get (data-tk-keep), none is written in a page.
+rg -q 'data-route="tenkey-issues"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-keep"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-perf"' "$console_dir/index.html"
+rg -F -q '"tenkey-console-stats", { action, params }' "$console_dir/tenkey.js"
+rg -F -q '"keep.get"' "$console_dir/tenkey-keep.js"
+rg -F -q '"issues.list"' "$console_dir/tenkey-issues.js"
+rg -F -q '"telemetry.get"' "$console_dir/tenkey-perf.js"
+rg -F -q '"balance.v4"' "$console_dir/tenkey-balance.js"
+rg -F -q 'QA_WORLD_SEED' "$console_dir/tenkey-issues.js"
+rg -q 'data-tk-keep="issue_reports"' "$console_dir/index.html"
+! rg -q '7일만|7일 보관|service_role|기록 삭제|계정 삭제' "$console_dir"/index.html "$console_dir"/tenkey*.js
 rg -q 'id="projectTenkey"' "$console_dir/index.html"
 rg -q '자동 동기화 미연동' "$console_dir/index.html"
 rg -q 'sessionStorage' "$console_dir/auth.js"
@@ -72,7 +84,7 @@ rg -q 'action: "audit.revert"' "$console_dir/audit.js"
 rg -q 'id="tenkeyNav"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-config"' "$console_dir/index.html"
 rg -q 'id="tenkeyConfigForm"' "$console_dir/index.html"
-rg -F -q 'window.ConsoleTenkey.mountConfig()' "$console_dir/app.js"
+rg -F -q '"tenkey-config": ["mountConfig", "mountReviewCode"]' "$console_dir/app.js"  # TENKEY_MOUNTS (11-17)
 rg -F -q '"config.get"' "$console_dir/tenkey.js"
 rg -F -q '"config.set"' "$console_dir/tenkey.js"
 for action in reward_mail.broadcast min_version.update qa_access.set; do

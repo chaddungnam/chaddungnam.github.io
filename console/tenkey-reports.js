@@ -1,5 +1,6 @@
 // 10key Survival: the players' "1대1 문의" texts (game SETTINGS -> CONTACT -> 1:1 INQUIRY, formerly "문제 제보"; owner 2026-11-05:
-// "10key 클라에 제보하기 기능이 있는데 콘솔에서 그런게 안보이는거같아서 보이게"). The server keeps a report 7 days (tenkey.issue_reports);
+// "10key 클라에 제보하기 기능이 있는데 콘솔에서 그런게 안보이는거같아서 보이게"). How long the server keeps a report (tenkey.issue_reports)
+// is the server's number (keep.get, filled into the data-tk-keep span of the table note);
 // tenkey-console-stats "reports.list" -> tenkey.admin_issue_reports_v1 returns them newest first, each with the email the player
 // gave for the reply (owner 2026-11-09; shown with a copy key and a mailto link, never stored here). Reading is the only thing the
 // table does. The small form under it writes the YouTube link behind the game's "유튜브에서 공개 소통하기" key (tenkey-admin
@@ -37,6 +38,7 @@
     const days = Number(byId("tenkeyReportDays").value) || 7;
     byId("tenkeyReportTable").innerHTML = '<tr><td colspan="7" class="empty-panel">불러오는 중입니다...</td></tr>';
     T.setMessage("tenkeyReportMessage", "");
+    T.fillKeep(byId("tenkeyReportsView"));
     try {
       const result = await root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "reports.list", params: { days, limit: 200 } });
       const data = result?.data;

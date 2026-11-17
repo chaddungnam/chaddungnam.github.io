@@ -1,35 +1,11 @@
-const fs = require("node:fs");
-const path = require("node:path");
 const { test, expect } = require("@playwright/test");
+// The shared stand-in API, auth stub, open() and shot() (tests/fixtures/tenkey_console.cjs).
+const { open, shot } = require("./fixtures/tenkey_console.cjs");
 
 // 10key console audit 2 (owner 2026-11-12): every panel that showed nothing, a constant or a raw id now shows a real value or says why.
 // Each test fails on the page before this round. TENKEY_SHOTS=<dir> writes captures of the changed panels.
-const SHOTS = process.env.TENKEY_SHOTS || "";
 test.describe.configure({ retries: 2 });
-const API = fs.readFileSync(path.join(__dirname, "fixtures/console_tenkey_api.js"), "utf8");
-const AUTH = fs.readFileSync(path.join(__dirname, "console-tenkey.spec.js"), "utf8").match(/const AUTH = `([^`]*)`/)[1];
 const stub = (fn) => `\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn==="tenkey-admin"){const r=(${fn})(b);if(r!==undefined)return {ok:true,data:r};}return real(pj,fn,b);};})();`;
-
-async function open(page, hash = "", extra = "") {
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.route("https://accounts.google.com/**", (route) => route.abort());
-  await page.route("https://translate.googleapis.com/**", (route) => route.abort());
-  await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
-  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API + extra }));
-  await page.goto("/console/");
-  await page.locator("#projectTenkey").click();
-  if (hash) await page.evaluate((h) => { window.location.hash = h; }, hash);
-  return errors;
-}
-async function shot(page, name, selector) {
-  if (!SHOTS) return;
-  fs.mkdirSync(SHOTS, { recursive: true });
-  const project = test.info().project.name.startsWith("mobile") ? "phone" : "desktop";
-  const file = path.join(SHOTS, `${project}_${name}.png`);
-  if (selector) await page.locator(selector).screenshot({ path: file });
-  else await page.screenshot({ path: file, fullPage: true });
-}
 
 test("overview: 다음 날 다시 온 비율 on the itch filter counts accounts (no more 0 % / '—'); the Android filter says it is the app total until the server splits it", async ({ page }) => {
   const errors = await open(page);
@@ -128,10 +104,11 @@ test("player detail: the device block and the balance runs say why they are empt
   expect(errors).toEqual([]);
 });
 
-test("unlock panel: the hard card rule uses the game's level (8, apps only), not the stale 20", async ({ page }) => {
+// The locked hard card shows from Lv 7 since the 11-16 rule (949f75c changed the page; this test still said 8).
+test("unlock panel: the hard card rule uses the game's level (7, apps only), not the stale 20", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players/a1111111-1111-4111-8111-111111111111");
   const row = page.locator('.tk-unlock-row[data-step="hard_card"]');
-  await expect(row).toContainText("최고 레벨이 8 이상이면 보임 (앱만)");
+  await expect(row).toContainText("최고 레벨이 7 이상이면 보임 (앱만)");
   await expect(row).not.toContainText("20 이상");
   expect(errors).toEqual([]);
 });

@@ -1,36 +1,12 @@
-const fs = require("node:fs");
-const path = require("node:path");
 const { test, expect } = require("@playwright/test");
+// The shared stand-in API, auth stub, open(), shot() and calls() (tests/fixtures/tenkey_console.cjs).
+const { open, shot, calls } = require("./fixtures/tenkey_console.cjs");
 
 // 10key console watch (owner 2026-11-15): tags in the players list and the player page, the 감시 page, the review switch, the review code line.
 // TENKEY_SHOTS=<dir> writes captures there.
-const SHOTS = process.env.TENKEY_SHOTS || "";
 test.describe.configure({ retries: 2 });
-const API = fs.readFileSync(path.join(__dirname, "fixtures/console_tenkey_api.js"), "utf8");
-const AUTH = `window.ConsoleAuth={initialize:async()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),snapshot:()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),isUnlocked:()=>true,requireChallenge:()=>{},unlock:async()=>{},logout:()=>{},headers:()=>({}),renderGoogleButton:()=>{}};`;
 const A1 = "a1111111-1111-4111-8111-111111111111";
 const B2 = "b2222222-2222-4222-8222-222222222222";
-
-async function open(page, hash, extra = "") {
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.route("https://accounts.google.com/**", (route) => route.abort());
-  await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
-  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API + extra }));
-  await page.goto("/console/");
-  await page.locator("#projectTenkey").click();
-  await page.evaluate((h) => { window.location.hash = h; }, hash);
-  return errors;
-}
-async function shot(page, name, selector) {
-  if (!SHOTS) return;
-  fs.mkdirSync(SHOTS, { recursive: true });
-  const project = test.info().project.name.startsWith("mobile") ? "phone" : "desktop";
-  const file = path.join(SHOTS, `${project}_${name}.png`);
-  if (selector) await page.locator(selector).screenshot({ path: file });
-  else await page.screenshot({ path: file, fullPage: true });
-}
-const calls = (page, action) => page.evaluate((a) => window.__mockCalls.filter((c) => c.action === a), action);
 
 test("players list shows [검수], [무적], [TOP10] tags and the old server only loses the extra tags", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players", "window.__mockCalls0=1;");

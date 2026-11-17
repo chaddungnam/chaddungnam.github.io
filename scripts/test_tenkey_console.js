@@ -157,7 +157,8 @@ test("server error codes map to Korean text; a retry of the same payload reuses 
   assert.notEqual(writes()[2], writes()[0], "a changed payload gets a new request_id");
 });
 
-function appFixture() {
+// `tail` = script run after app.js in the same context; its value comes back as `boot` (the drift test reads app.js consts this way).
+function appFixture(tail = "") {
   const elements = new Map();
   const byId = (id) => {
     if (!elements.has(id)) elements.set(id, node());
@@ -191,7 +192,7 @@ function appFixture() {
       return selector.includes("#tenkeyNav a") ? links : [];
     },
   };
-  const boot = vm.runInNewContext(source("app.js"), { console, document, window }, { filename: "console/app.js" });
+  const boot = vm.runInNewContext(source("app.js") + tail, { console, document, window }, { filename: "console/app.js" });
   return { boot, byId, links, views, selectors, mounted, window };
 }
 
@@ -243,6 +244,30 @@ test("every 10KEY page is a known console route; a player id after tenkey-player
   }
   assert.deepEqual(plain(model.routeFromHash("#/tenkey-players/abc-1")), { page: "tenkey-player", userId: "abc-1" });
   assert.equal(model.routeFromHash("#/tenkey-players/%E0%A4%A").page, "tenkey-players", "a broken escape falls back to the list");
+});
+
+// Drift guard (11-17): the page list in model.js drives the route pattern; a page in it without a menu link, a view, a title, a
+// description or a mount opened blank or fell back to the overview. Every entry must be wired in all of them.
+test("every page in model.tenkeyPages has a menu link, a view, a title, a description and a mount defined in a tenkey script", () => {
+  const consts = appFixture("\n;({ pageTitles, pageDescriptions, TENKEY_MOUNTS })").boot;
+  const html = source("index.html");
+  const at = html.indexOf('id="tenkeyNav"');
+  const nav = html.slice(at, html.indexOf("</nav>", at));
+  const scripts = fs.readdirSync(path.join(__dirname, "../console")).filter((f) => /^tenkey.*\.js$/.test(f)).map(source).join("\n");
+  assert.equal(model.tenkeyPages.length, 17);
+  for (const page of model.tenkeyPages) {
+    assert.match(nav, new RegExp(`data-page="${page}"`), `${page}: menu link`);
+    assert.match(html, new RegExp(`data-route="${page}"`), `${page}: view`);
+    assert.ok(consts.pageTitles[page], `${page}: title`);
+    assert.ok(consts.pageDescriptions[page], `${page}: description`);
+    const mounts = consts.TENKEY_MOUNTS[page];
+    assert.ok(mounts?.length, `${page}: mount`);
+    for (const name of mounts) assert.match(scripts, new RegExp(`\\b${name}\\b`), `${page}: ${name} is defined in a console/tenkey*.js`);
+    assert.equal(model.routeFromHash(`#/${page}`).page, page);
+    assert.equal(model.routeFromHash(`#/${page}?x=1`).page, page);
+  }
+  assert.equal((nav.match(/data-page="tenkey-/g) || []).length, model.tenkeyPages.length, "no menu link outside the list");
+  assert.equal(Object.keys(plain(consts.TENKEY_MOUNTS)).filter((page) => !model.tenkeyPages.includes(page)).length, 0, "no mount outside the list");
 });
 
 test("tenkey-config is a known console route", () => {

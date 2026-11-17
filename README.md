@@ -32,11 +32,11 @@ node scripts/test_gmail_model.js
 
 프로젝트 선택 화면의 `10key Survival` 카드는 House Duck 게임 서버(Supabase `frepunpqswciugwoyvxo`, `console/app.js`의 `HOUSEDUCK_CONFIG`)의 `tenkey-admin` Edge Function만 `ConsoleAPI.postProject("houseduck", "tenkey-admin", ...)`로 부른다. Quirky Ball 클라이언트(`ConsoleAPI.post`)는 그대로다. Comrade(동무와 멋진신세계)는 2026-10-23에 콘솔에서 뺐다(화면만 제거, 서버 데이터·함수는 그대로).
 
-- 화면(왼쪽 메뉴 8개): 한눈 요약(접속자 DAU·신규 설치·플레이 횟수·신규 계정·크래시·복귀율, 7·30·90일, 플랫폼별), 플레이어(검색·목록·상세·랭킹 정지), 크래시(오류 내용·버전·기기·종류로 묶기, 목록, 로그 끝부분), 공지(한·영 필수, 예약·종료·삭제, 앱 안 미리보기), 구매·젬, 랭킹(보드 + 서버가 거른 의심 기록), 앱 설정(강제 업데이트), 감사 기록. 코드는 `console/tenkey*.js`.
+- 화면(왼쪽 메뉴 17개, 목록은 `console/model.js`의 `tenkeyPages` 하나에서 메뉴 경로가 만들어진다): 2026-11-17에 이슈함(크래시·앱 이상·1대1 문의, 보고 하나마다 앱 순서·판 다시 만들기 seed·저장 상태·같은 기기 앞뒤 기록), 데이터 보관(서버가 받는 데이터마다 내용·보내는 빌드·보관 일수·줄 수·마지막 정리, 다른 화면의 「보관 N일」도 모두 여기 값), 성능(앱 성능 보고, 웹 체험판 버벅임·멈춤)을 더했다. 처음 8개: 한눈 요약(접속자 DAU·신규 설치·플레이 횟수·신규 계정·크래시·복귀율, 7·30·90일, 플랫폼별), 플레이어(검색·목록·상세·랭킹 정지), 크래시(오류 내용·버전·기기·종류로 묶기, 목록, 로그 끝부분), 공지(한·영 필수, 예약·종료·삭제, 앱 안 미리보기), 구매·젬, 랭킹(보드 + 서버가 거른 의심 기록), 앱 설정(강제 업데이트), 감사 기록. 코드는 `console/tenkey*.js`.
 - 인증은 Quirky Ball 로그인과 같은 7일 세션 티켓(2026-11-03부터, House Duck 서버에도 같은 ADMIN_SESSION_SECRET). 함수는 `ADMIN_SESSION_SECRET`(티켓) 또는 Google ID 토큰을 확인한 뒤 `tenkey.admin_check_v1`(관리자 목록 `hx_admins`)을 통과해야 한다. 서비스 키는 함수 안에만 있고 브라우저에 오지 않는다. 쓰기(정지·공지·앱 설정)는 사유 + `request_id`를 보내고 `tenkey_private.admin_audit`에 남는다.
 - 서버 설계: 게임 저장소 `docs/server/tenkey_server.md` §15. 접속자 숫자는 Android·iOS 앱이 하루 한 번 보내는 신호(무작위 설치 번호)로 센다. 웹(CrazyGames)은 식별 번호를 만들지 않는 규칙이라 빠진다.
-- 로컬에서 보기: `python3 -m http.server 4173` 후 `tests/console-tenkey.spec.js`가 가짜 서버 응답(`tests/fixtures/console_tenkey_api.js`, 실제 플레이어 아님)으로 모든 화면을 걷는다. `TENKEY_SHOTS=<폴더>`를 주면 화면별 캡처를 남긴다.
-- 검사: `scripts/check_house_duck_console.sh`(내부에서 `node scripts/test_tenkey_console.js`), `npx playwright test tests/console-tenkey.spec.js`.
+- 로컬에서 보기: `python3 -m http.server 4173` 후 `tests/console-tenkey*.spec.js`가 가짜 서버 응답(실제 플레이어 아님)으로 모든 화면을 걷는다. 가짜 서버는 공통 `tests/fixtures/console_tenkey_api.js` + 화면별 `tests/fixtures/tenkey/<화면>.js`이고, 스펙은 `tests/fixtures/tenkey_console.cjs`의 `open`·`shot`·`calls`를 같이 쓴다. `TENKEY_SHOTS=<폴더>`를 주면 화면별 캡처를 남긴다.
+- 검사: `scripts/check_house_duck_console.sh`(내부에서 `node scripts/test_tenkey_console.js`, 메뉴·화면·제목·마운트가 페이지 목록과 맞는지 포함), `npx playwright test tests/console-tenkey*.spec.js`.
 
 ## 법적 문서 문구 수정 방법
 

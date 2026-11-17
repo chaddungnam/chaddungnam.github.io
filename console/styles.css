@@ -1298,15 +1298,27 @@ tr[data-tk-group][aria-selected="true"] td { background: var(--gold-soft); }
 @media (max-width: 600px) { .mail-attachment-row { grid-template-columns: minmax(0, 1fr) minmax(90px, .6fr); } .mail-attachment-row button { grid-column: 1 / -1; justify-self: end; } }
 .tk-balance-avg { display: block; margin-top: 6px; color: var(--ink); font-size: 12px; font-weight: 800; }
 @media (max-width: 600px) {
-  .tk-balance .tk-stack { overflow: visible; }
-  .tk-balance .tk-stack table, .tk-balance .tk-stack tbody, .tk-balance .tk-stack tr, .tk-balance .tk-stack td { display: block; width: 100%; min-width: 0; }
-  .tk-balance .tk-stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  .tk-balance .tk-stack tbody tr { padding-block: 8px; border-bottom: 1px solid var(--line); }
-  .tk-balance .tk-stack td { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px; padding-block: 3px; text-align: left; }
-  .tk-balance .tk-stack td::before { content: attr(data-label); color: var(--ink-soft); font-weight: 700; }
-  .tk-balance .tk-stack td.empty-panel { display: block; }
-  .tk-balance .tk-stack td.empty-panel::before { content: none; }
+  :is(.tk-balance, .tk-page) .tk-stack { overflow: visible; }
+  :is(.tk-balance, .tk-page) .tk-stack table, :is(.tk-balance, .tk-page) .tk-stack tbody, :is(.tk-balance, .tk-page) .tk-stack tr, :is(.tk-balance, .tk-page) .tk-stack td { display: block; width: 100%; min-width: 0; }
+  :is(.tk-balance, .tk-page) .tk-stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  :is(.tk-balance, .tk-page) .tk-stack tbody tr { padding-block: 8px; border-bottom: 1px solid var(--line); }
+  :is(.tk-balance, .tk-page) .tk-stack td { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px; padding-block: 3px; text-align: left; }
+  :is(.tk-balance, .tk-page) .tk-stack td::before { content: attr(data-label); color: var(--ink-soft); font-weight: 700; }
+  :is(.tk-balance, .tk-page) .tk-stack td.empty-panel { display: block; }
+  :is(.tk-balance, .tk-page) .tk-stack td.empty-panel::before { content: none; }
+  /* A cell with a name plus a sub line / code / badge keeps all of them in the value column, never under the label. */
+  :is(.tk-balance, .tk-page) .tk-stack td > * { grid-column: 2; }
 }
+/* 10KEY 이슈함 · 데이터 보관 · 성능 (2026-11-17) and the retention line every balance panel carries. */
+.tk-keep-line { margin: 10px 0 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; }
+.tk-keep-miss { margin-left: 4px; }
+.tk-balance-pair > .tk-keep-line { grid-column: 1 / -1; }
+.tk-issue-tabs { margin-bottom: 12px; }
+.tk-steps li { margin-bottom: 3px; }
+.tk-step-at { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.tk-repro { margin: 6px 0 10px; color: var(--ink); font-weight: 800; }
+.tk-repro code { padding: 2px 6px; background: #f1ede4; border-radius: 6px; user-select: all; }
+.tk-look { margin-left: 6px; vertical-align: middle; }
 .tenkey-previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .tenkey-notice-card { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 12px 14px; color: #f3f4f8; background: #1a1d2b; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
 .tenkey-notice-card:first-child { border-color: rgba(231,185,67,.7); }

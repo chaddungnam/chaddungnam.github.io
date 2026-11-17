@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="stylesheet" href="../analytics/styles.css?v=20261104-mail">
-  <link rel="stylesheet" href="styles.css?v=20261105-nav">
+  <link rel="stylesheet" href="styles.css?v=20261117-keep">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
 </head>
 <body>
@@ -89,6 +89,9 @@
         <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">12</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
         <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">13</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
         <a href="#/tenkey-watch" data-page="tenkey-watch"><span class="nav-index">14</span><span class="nav-copy">감시<small>검수·무적·TOP10</small></span></a>
+        <a href="#/tenkey-issues" data-page="tenkey-issues"><span class="nav-index">15</span><span class="nav-copy">이슈함<small>크래시·앱 이상·문의의 순서</small></span></a>
+        <a href="#/tenkey-keep" data-page="tenkey-keep"><span class="nav-index">16</span><span class="nav-copy">데이터 보관<small>받는 것·보관 기간·정리</small></span></a>
+        <a href="#/tenkey-perf" data-page="tenkey-perf"><span class="nav-index">17</span><span class="nav-copy">성능<small>첫 화면·버벅임·메모리</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -644,13 +647,15 @@
           <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="90">최근 90일</option></select></label>
           <label>빌드<select id="tenkeyBalanceBuild"><option value="">전체</option></select></label>
           <label>모드<select id="tenkeyBalanceMode"><option value="">전체</option><option value="classic">노멀 모드</option><option value="hard">하드 모드</option></select></label>
-          <label>기기<select id="tenkeyBalancePlatform"><option value="">전체</option><option value="app">앱 (Android·iOS)</option><option value="web">웹 체험판</option></select></label>
+          <label>기기<select id="tenkeyBalancePlatform"><option value="app" selected>앱 (Android·iOS)</option><option value="">전체 (앱 + 웹 체험판)</option><option value="web">웹 체험판 (itch)</option></select></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
-        <p class="impact-note">스토어 앱(Android·iOS)과 웹 체험판(itch)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 90일 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다. 웹 체험판은 레벨이 일찍 끝나므로 노멀 모드 수치는 "기기"를 앱으로 좁혀 보세요. 내 컴퓨터(에디터·PC)에서 한 판은 보내지 않습니다.</p>
+        <p class="impact-note">스토어 앱(Android·iOS)과 웹 체험판(itch)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 판 기록은 <span data-tk-keep="run_stats">—</span>, 판 흐름 기록은 <span data-tk-keep="run_trace">—</span> 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다. 웹 체험판은 Lv 8에서 끝나므로 "기기"는 처음부터 앱으로 좁혀 두었고, 체험판 판은 아래 "어느 기기에서 한 판인가"에 따로 나옵니다. 내 컴퓨터(에디터·PC)에서 한 판은 보내지 않습니다.</p>
+        <p id="tenkeyBalanceFresh" class="tk-keep-line" hidden></p>
         <section id="tenkeyBalanceWhere" class="panel" hidden>
           <p class="eyebrow">WHERE PLAYED</p><h2>어느 기기에서 한 판인가</h2><small id="tenkeyBalanceModes">—</small>
           <div class="table-scroll tk-stack"><table><thead><tr><th>기기</th><th class="tk-num">판</th><th class="tk-num">기기 수</th><th class="tk-num">DRIFT까지 간 판</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalancePlatforms"></tbody></table></div>
+          <small id="tenkeyBalanceWebApart"></small>
         </section>
         <section id="tenkeyBalanceSummary" class="purchase-summary tenkey-summary" aria-label="밸런스 요약">
           <article data-tone="neutral"><span>기록된 판</span><strong data-tk-summary="runs">—</strong></article>
@@ -691,7 +696,24 @@
           </section>
           <section id="tenkeyBalanceReach" class="panel" hidden>
             <div class="panel-heading"><div><p class="eyebrow">LEVEL PACE</p><h2>레벨에 도착한 시간</h2><small id="tenkeyBalanceReachNote">—</small></div></div>
-            <div class="table-scroll tk-stack"><table><thead><tr><th>레벨</th><th class="tk-num">도착한 판</th><th class="tk-num">가운데 값</th><th class="tk-num">느린 쪽 10%</th></tr></thead><tbody id="tenkeyBalanceReachRows"></tbody></table></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>레벨</th><th class="tk-num">도착한 판</th><th class="tk-num">가운데 값</th><th class="tk-num">느린 쪽 10%</th><th class="tk-num">다음 레벨까지</th></tr></thead><tbody id="tenkeyBalanceReachRows"></tbody></table></div>
+          </section>
+          <section id="tenkeyBalanceAcct" class="panel" hidden>
+            <div class="panel-heading"><div><p class="eyebrow">ACCOUNT GROWTH</p><h2>계정 강화 정도별</h2><small>판을 시작할 때 그 계정의 업그레이드 합으로 나눕니다. 처음 하는 계정과 많이 강화한 계정을 섞으면 판 길이가 틀려 보이므로, 곡선은 같은 줄끼리 비교합니다.</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>강화 정도</th><th class="tk-num">판</th><th class="tk-num">기기</th><th class="tk-num">끝난 레벨 (가운데)</th><th class="tk-num">평균 끝 레벨</th><th class="tk-num">한 판 길이 (가운데)</th></tr></thead><tbody id="tenkeyBalanceAcctRows"></tbody></table></div>
+          </section>
+          <section id="tenkeyBalanceBands" class="panel" hidden>
+            <div class="panel-heading"><div><p class="eyebrow">LEVEL BANDS</p><h2>레벨 구간마다</h2><small>그 구간을 지나간 판 기준: 머문 시간, 부순 키, 받은 피해(생명줄 %), 부활 횟수</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>구간</th><th class="tk-num">지나간 판</th><th class="tk-num">머문 시간 (가운데)</th><th class="tk-num">부순 키 (판당)</th><th class="tk-num">받은 피해 (판당)</th><th class="tk-num">부활</th></tr></thead><tbody id="tenkeyBalanceBandRows"></tbody></table></div>
+          </section>
+          <section id="tenkeyBalanceOffersPanel" class="panel tk-balance-pair" hidden>
+            <div><p class="eyebrow">OFFERED VS PICKED</p><h2>나온 카드와 고른 카드</h2><small>레벨업 때 3장 중 1장을 고르므로 고른 비율은 보통 1/3 근처입니다. 한참 낮으면 그 카드가 덜 끌린다는 뜻입니다.</small>
+              <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th>종류</th><th class="tk-num">나온 횟수</th><th class="tk-num">고른 횟수</th><th class="tk-num">고른 비율</th></tr></thead><tbody id="tenkeyBalanceOffers"></tbody></table></div></div>
+            <div><p class="eyebrow">IDLE</p><h2>손을 놓은 시간</h2><small>8초 넘게 캐지도 카드를 고르지도 않은 시간</small><div id="tenkeyBalanceIdle"></div></div>
+          </section>
+          <section id="tenkeyBalanceCountersPanel" class="panel" hidden>
+            <div class="panel-heading"><div><p class="eyebrow">COUNTERS</p><h2>판 안에서 센 것</h2><small>게임이 판마다 세어 보내는 숫자 (부순 키, 철창에 갇힌 횟수, 생명줄이 닳은 이유 등)</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>센 것</th><th class="tk-num">센 판</th><th class="tk-num">모두</th><th class="tk-num">판당</th></tr></thead><tbody id="tenkeyBalanceCounters"></tbody></table></div>
           </section>
           <section class="panel tk-balance-pair">
             <div><p class="eyebrow">PER DAY</p><h2>날마다</h2><div class="table-scroll"><table><thead><tr><th>날짜</th><th class="tk-num">판</th><th class="tk-num">기기</th><th class="tk-num">평균 끝 레벨</th></tr></thead><tbody id="tenkeyBalanceDaily"></tbody></table></div></div>
@@ -740,7 +762,7 @@
           <button class="primary-button" type="submit">새로고침</button>
         </form>
         <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">PLAYER REPORTS</p><h2>1대1 문의</h2><small>게임 설정 「문의하기」의 「1대1 문의하기」로 들어온 글입니다. 답장 이메일은 플레이어가 답변을 받으려고 직접 적은 주소입니다 (이전 빌드가 보낸 글에는 없습니다). 서버는 글과 이메일을 7일 동안만 보관하고 그 뒤 자동으로 지웁니다. 접수 번호는 플레이어가 보낸 뒤 본 번호와 같습니다.</small></div><span id="tenkeyReportTotal" class="panel-total">—</span></div>
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER REPORTS</p><h2>1대1 문의</h2><small>게임 설정 「문의하기」의 「1대1 문의하기」로 들어온 글입니다. 답장 이메일은 플레이어가 답변을 받으려고 직접 적은 주소입니다 (이전 빌드가 보낸 글에는 없습니다). 서버는 글과 이메일을 <span data-tk-keep="issue_reports">—</span> 동안 보관하고 그 뒤 자동으로 지웁니다. 접수 번호는 플레이어가 보낸 뒤 본 번호와 같습니다.</small></div><span id="tenkeyReportTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>내용</th><th>답장 이메일</th><th>앱 · 기기</th><th>언어</th><th>접수 번호</th></tr></thead><tbody id="tenkeyReportTable"></tbody></table></div>
         </section>
         <p id="tenkeyReportMessage" class="dashboard-message" role="status"></p>
@@ -753,6 +775,81 @@
           <p id="tenkeyCommunityFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
           <button class="primary-button" type="submit">유튜브 소통 링크 저장</button>
         </form>
+      </section>
+
+      <section id="tenkeyIssuesView" class="route-view tk-page" data-route="tenkey-issues" hidden>
+        <div id="tenkeyIssueTabs" class="tk-retention-tabs tk-issue-tabs" role="group" aria-label="이슈 종류"><button type="button" data-issue-tab="crash" aria-pressed="true">크래시</button><button type="button" data-issue-tab="app" aria-pressed="false">앱 이상</button><button type="button" data-issue-tab="ask" aria-pressed="false">1대1 문의</button></div>
+        <form id="tenkeyIssueForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyIssueDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <p id="tenkeyIssueKeepNote" class="impact-note">—</p>
+        <section id="tenkeyIssueGroupsPanel" class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">ISSUE GROUPS</p><h2>묶음</h2><small>같은 곳에서 난 같은 종류를 묶습니다. 묶음을 누르면 아래 목록이 그 묶음만 보이고, 한 번 더 누르면 풀립니다.</small></div><span id="tenkeyIssueGroupsTotal" class="panel-total">—</span></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>어디서</th><th>종류</th><th class="tk-num">횟수</th><th>플랫폼</th><th>버전</th><th>마지막</th></tr></thead><tbody id="tenkeyIssueGroups"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">REPORTS</p><h2 id="tenkeyIssueListTitle">크래시 목록</h2><small>줄을 누르면 보고 하나가 열립니다: 앱이 남긴 순서, 그 판을 다시 만드는 번호, 같은 기기의 앞뒤 기록.</small></div><span id="tenkeyIssueTotal" class="panel-total">—</span></div>
+          <div class="table-scroll tk-stack"><table><thead id="tenkeyIssueHead"></thead><tbody id="tenkeyIssueTable"></tbody></table></div>
+        </section>
+        <section id="tenkeyIssueDetail" class="panel" hidden></section>
+        <p id="tenkeyIssueMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="tenkeyKeepView" class="route-view tk-page" data-route="tenkey-keep" hidden>
+        <section id="tenkeyKeepSummary" class="purchase-summary tenkey-summary" aria-label="데이터 보관 요약">
+          <article data-tone="neutral"><span>서버가 받는 데이터</span><strong data-keep-summary="sets">—</strong></article>
+          <article data-tone="neutral"><span>지금 있는 줄 (모두)</span><strong data-keep-summary="rows">—</strong></article>
+          <article data-tone="neutral"><span>차지한 크기 (모두)</span><strong data-keep-summary="bytes">—</strong></article>
+          <article data-tone="watch"><span>마지막 정리</span><strong data-keep-summary="purge">—</strong></article>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">DATA KEPT</p><h2>데이터별 보관</h2><small>게임 서버가 받는 데이터마다 무엇이 들어 있는지, 어느 빌드가 보내는지, 며칠 두는지를 서버 값 그대로 보여 줍니다. 보관 기간이 지난 줄은 서버가 매일 정리하고, 마지막 정리에서 지운 줄 수도 함께 나옵니다.</small></div><span id="tenkeyKeepTotal" class="panel-total">—</span></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>데이터</th><th>보내는 곳</th><th class="tk-num">보관</th><th class="tk-num">줄 수</th><th class="tk-num">크기</th><th>가장 오래된 줄</th><th>마지막 정리</th><th class="tk-num">지운 줄</th></tr></thead><tbody id="tenkeyKeepTable"></tbody></table></div>
+        </section>
+        <p id="tenkeyKeepMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="tenkeyPerfView" class="route-view tk-page" data-route="tenkey-perf" hidden>
+        <form id="tenkeyPerfForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyPerfDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
+          <label>빌드<select id="tenkeyPerfBuild"><option value="">전체</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <p class="impact-note">폰 앱(Android·iOS) 정식 빌드가 테스트 기간 동안 켤 때마다 보내는 성능 보고입니다: 첫 화면까지 시간, 불러오는 단계마다 가장 느린 프레임, 100ms 넘게 걸린 프레임이 난 곳, 메모리. 검수 모드·무적 모드 세션은 세지 않습니다. 서버는 <span data-tk-keep="telemetry">—</span> 보관합니다. 웹 체험판은 성능 보고를 보내지 않고, 버벅임과 멈춤만 아래 앱 이상 보고로 옵니다 (<span data-tk-keep="app_issues">—</span> 보관).</p>
+        <section id="tenkeyPerfSummary" class="purchase-summary tenkey-summary" aria-label="성능 요약">
+          <article data-tone="neutral"><span>보고한 세션</span><strong data-perf-summary="sessions">—</strong></article>
+          <article data-tone="neutral"><span>기기 수</span><strong data-perf-summary="installs">—</strong></article>
+          <article data-tone="neutral"><span>첫 화면까지 (가운데 / 느린 쪽 10%)</span><strong data-perf-summary="first">—</strong></article>
+          <article data-tone="risk"><span>5초 넘게 멈춘 세션</span><strong data-perf-summary="stall">—</strong></article>
+          <article data-tone="watch"><span>메모리 경고가 난 세션</span><strong data-perf-summary="mem">—</strong></article>
+          <article data-tone="neutral"><span>가장 많이 쓴 메모리 (가운데 / 많은 쪽 10%)</span><strong data-perf-summary="peak">—</strong></article>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">BY DEVICE</p><h2>기기별</h2><small>세션이 많은 기기부터 30개까지</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>기기</th><th>플랫폼</th><th class="tk-num">세션</th><th class="tk-num">첫 화면 (가운데)</th><th class="tk-num">첫 화면 (느린 쪽 10%)</th><th class="tk-num">세션당 100ms 넘은 프레임</th><th class="tk-num">멈춘 세션</th><th class="tk-num">메모리 경고 세션</th></tr></thead><tbody id="tenkeyPerfDevices"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">LOADING STAGES</p><h2>불러오는 단계</h2><small>앱을 켠 뒤 각 단계에 도착한 시간과 그 단계의 가장 느린 프레임</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>불러오는 단계</th><th class="tk-num">세션</th><th class="tk-num">켠 뒤 도착 (가운데)</th><th class="tk-num">머문 시간 (가운데)</th><th class="tk-num">가장 느린 프레임 (느린 쪽 10%)</th><th class="tk-num">가장 느린 프레임</th></tr></thead><tbody id="tenkeyPerfStages"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">HITCH AREAS</p><h2>버벅인 곳</h2><small>100ms 넘게 걸린 프레임이 많은 곳부터</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>곳</th><th class="tk-num">세션</th><th class="tk-num">머문 시간</th><th class="tk-num">프레임</th><th class="tk-num">100ms 넘음</th><th class="tk-num">250ms 넘음</th><th class="tk-num">1초 넘음</th><th class="tk-num">가장 느린 프레임</th></tr></thead><tbody id="tenkeyPerfAreas"></tbody></table></div>
+        </section>
+        <section class="panel tk-balance-pair">
+          <div><p class="eyebrow">FIRST USE</p><h2>처음 쓸 때 걸린 곳</h2><small>효과·화면을 처음 그릴 때 한 번 걸린 시간</small><div class="table-scroll tk-stack"><table><thead><tr><th>처음 쓸 때 걸린 곳</th><th class="tk-num">횟수</th><th class="tk-num">평균</th><th class="tk-num">가장 길게</th><th class="tk-num">셰이더 준비 뒤</th></tr></thead><tbody id="tenkeyPerfFirstUse"></tbody></table></div></div>
+          <div><p class="eyebrow">STALLS</p><h2>5초 넘게 멈춘 세션 (최근 20)</h2><div class="table-scroll tk-stack"><table><thead><tr><th>시각</th><th class="tk-num">멈춘 시간</th><th>단계</th><th>곳</th><th>기기</th><th>앱 버전</th></tr></thead><tbody id="tenkeyPerfStalls"></tbody></table></div></div>
+        </section>
+        <section class="panel tk-balance-pair">
+          <div><p class="eyebrow">WEB · APP ISSUES</p><h2>버벅임 보고 (곳별)</h2><small>웹 체험판과 앱이 앱 이상 보고로 보낸 버벅임</small><div class="table-scroll tk-stack"><table><thead><tr><th>곳</th><th>플랫폼</th><th class="tk-num">횟수</th><th>버전</th><th>마지막</th></tr></thead><tbody id="tenkeyPerfWebHitch"></tbody></table></div></div>
+          <div><p class="eyebrow">WEB · APP ISSUES</p><h2>멈춤 보고 (곳별)</h2><small>웹 체험판과 앱이 앱 이상 보고로 보낸 멈춤</small><div class="table-scroll tk-stack"><table><thead><tr><th>곳</th><th>플랫폼</th><th class="tk-num">횟수</th><th>버전</th><th>마지막</th></tr></thead><tbody id="tenkeyPerfWebStall"></tbody></table></div></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">BY BUILD</p><h2>빌드별 세션</h2><small>빌드를 고르면 위 표가 그 빌드만 셉니다</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>빌드</th><th>버전</th><th>플랫폼</th><th class="tk-num">세션</th></tr></thead><tbody id="tenkeyPerfBuilds"></tbody></table></div>
+        </section>
+        <p id="tenkeyPerfMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
@@ -889,7 +986,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261105-rep"></script>
+  <script src="model.js?v=20261117-keep"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261103-7d"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -899,19 +996,22 @@
   <script src="../assets/notice-links.js?v=20261007-hx"></script>
   <script src="announcement-editor.js?v=20261028-caret"></script>
   <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261112-aud2"></script>
+  <script src="tenkey.js?v=20261117-keep"></script>
   <script src="tenkey-overview.js?v=20261112-aud2"></script>
   <script src="tenkey-unlocks.js?v=20261112-aud2"></script>
   <script src="tenkey-watch.js?v=20261115-watch"></script>
   <script src="tenkey-players.js?v=20261112-aud2"></script>
   <script src="tenkey-retention.js?v=20261112-audit"></script>
   <script src="tenkey-titles.js?v=20261104-title"></script>
-  <script src="tenkey-crashes.js?v=20261112-aud2"></script>
-  <script src="tenkey-reports.js?v=20261109-contact"></script>
+  <script src="tenkey-crashes.js?v=20261117-keep"></script>
+  <script src="tenkey-reports.js?v=20261117-keep"></script>
   <script src="tenkey-mail.js?v=20261104-mail"></script>
   <script src="tenkey-notices.js?v=20261025-tr2"></script>
   <script src="tenkey-more.js?v=20261112-aud2"></script>
-  <script src="tenkey-balance.js?v=20261112-bal"></script>
+  <script src="tenkey-balance.js?v=20261117-keep"></script>
+  <script src="tenkey-keep.js?v=20261117-keep"></script>
+  <script src="tenkey-issues.js?v=20261117-keep"></script>
+  <script src="tenkey-perf.js?v=20261117-keep"></script>
   <script src="purchases-model.js?v=20260927-2x"></script>
   <script src="purchases.js?v=20260927-2x"></script>
   <script src="audit.js?v=20260907-2"></script>
@@ -923,6 +1023,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261105-rep" defer></script>
+  <script src="app.js?v=20261117-keep" defer></script>
 </body>
 </html>

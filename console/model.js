@@ -3,11 +3,14 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.ConsoleModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createConsoleModel() {
-  const pages = new Set([
-    "analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes",
+  // The 10KEY pages: the one list app.js builds its route pattern from (fw7 2026-11-17: the pattern was typed by hand and missed
+  // "watch"); scripts/test_tenkey_console.js checks each one has a menu link, a view, a title, a mount and a script.
+  const tenkeyPages = Object.freeze([
     "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-mail", "tenkey-purchases", "tenkey-ranking",
     "tenkey-balance", "tenkey-config", "tenkey-audit", "tenkey-titles", "tenkey-retention", "tenkey-reports", "tenkey-watch",
+    "tenkey-issues", "tenkey-keep", "tenkey-perf",
   ]);
+  const pages = new Set(["analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes", ...tenkeyPages]);
 
   function routeFromHash(hash) {
     const path = String(hash || "").replace(/^#\/?/, "").split("?")[0];
@@ -761,6 +764,7 @@
   }
 
   return {
+    tenkeyPages,
     normalizeOverviewFilters,
     formatOverviewValue,
     overviewNowLabel,

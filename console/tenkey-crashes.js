@@ -85,7 +85,10 @@
     try {
       await loadGroups();
       await loadList(1);
-      T.setMessage("tenkeyCrashMessage", "크래시 보고는 30일, 로그는 7일 보관합니다. 로그가 없는 줄은 앱이 로그 없이 보낸 보고이거나 7일이 지난 것입니다.");
+      // The retention numbers are the server's (keep.get, 데이터 보관 page), never written here.
+      const [kept, log] = await Promise.all([T.keepText("crash_reports"), T.keepText(T.KEEP_LOG)]);
+      T.setMessage("tenkeyCrashMessage", kept === null ? "보관 기간은 「데이터 보관」 화면에서 봅니다. 로그가 없는 줄은 앱이 로그 없이 보낸 보고이거나 로그 보관 기간이 지난 것입니다."
+        : `크래시 보고는 ${kept}, 로그는 ${log} 보관합니다 (서버 값). 로그가 없는 줄은 앱이 로그 없이 보낸 보고이거나 로그 보관 기간이 지난 것입니다.`);
     } catch (error) {
       T.report("tenkeyCrashMessage", error);
     }
@@ -105,7 +108,7 @@
       ])}
       ${extra.length ? `<div class="tk-section"><h3>상세 값</h3>${facts(extra)}</div>` : ""}
       ${trail.length ? `<div class="tk-section"><h3>앱이 남긴 흔적 (오래된 것부터, 마지막 ${trail.length}줄)</h3><ol class="tk-trail">${trail.map((line) => `<li>${esc(line)}</li>`).join("")}</ol></div>` : ""}
-      <div class="tk-section"><h3>Godot 로그 끝부분 (앞 세션)</h3>${c.log_tail ? `<pre class="tk-log">${esc(c.log_tail)}</pre>` : '<p class="empty-panel">로그가 없습니다 (앱이 로그 없이 보냈거나 7일이 지나 지워졌습니다).</p>'}</div>`;
+      <div class="tk-section"><h3>Godot 로그 끝부분 (앞 세션)</h3>${c.log_tail ? `<pre class="tk-log">${esc(c.log_tail)}</pre>` : '<p class="empty-panel">로그가 없습니다 (앱이 로그 없이 보냈거나 로그 보관 기간이 지나 지워졌습니다).</p>'}</div>`;
   }
 
   async function openCrash(id) {

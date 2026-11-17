@@ -39,6 +39,9 @@ const pageTitles = {
   "tenkey-audit": "감사 기록",
   "tenkey-titles": "칭호",
   "tenkey-watch": "감시",
+  "tenkey-issues": "이슈함",
+  "tenkey-keep": "데이터 보관",
+  "tenkey-perf": "성능",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -55,7 +58,7 @@ const pageDescriptions = {
   "tenkey-retention": "로그인 계정의 재방문 코호트, 첫 행동 흐름과 최근 쉬기 시작한 계정의 고정 진단 신호를 확인합니다.",
   "tenkey-player": "한 플레이어의 계정, 기록, 구매와 젬 장부, 정지 여부를 확인하고 처리합니다.",
   "tenkey-crashes": "앱이 보낸 크래시·멈춤·오류 보고를 오류 내용, 버전, 기기별로 묶어 보고 로그를 확인합니다.",
-  "tenkey-reports": "플레이어가 게임 설정의 문의하기 > 1대1 문의하기로 보낸 글과 답장 이메일을 최신순으로 봅니다. 서버는 7일만 보관합니다. 아래에서 「유튜브에서 공개 소통하기」가 여는 링크를 정합니다.",
+  "tenkey-reports": "플레이어가 게임 설정의 문의하기 > 1대1 문의하기로 보낸 글과 답장 이메일을 최신순으로 봅니다. 보관 기간은 아래 표 설명에 서버 값으로 나옵니다. 아래에서 「유튜브에서 공개 소통하기」가 여는 링크를 정합니다.",
   "tenkey-mail": "계정 한 명 또는 전체에 보상을 보내고 수령 상태를 확인합니다.",
   "tenkey-notices": "게임 안 공지를 한국어로 작성·예약합니다. 다른 7개 언어는 자동으로 번역돼 함께 나갑니다.",
   "tenkey-purchases": "스토어 구매·환불 기록과 젬·리바이브 패스 장부를 확인합니다.",
@@ -64,6 +67,10 @@ const pageDescriptions = {
   "tenkey-config": "Android·iOS 앱에서 이보다 낮은 빌드는 업데이트하기 전까지 게임을 못 하게 막습니다.",
   "tenkey-audit": "10KEY 관리자 변경(공지·정지·업데이트 번호·밸런스)을 누가 언제 왜 했는지 확인합니다.",
   "tenkey-titles": "서버가 부여한 칭호와 보유자 수를 확인합니다. 개별 플레이어 칭호는 상세 화면에서 관리합니다.",
+  "tenkey-watch": "검수 모드·무적 모드 계정과 이번 시즌 TOP10 계정을 모아 보고, 이상한 판이 보이면 바로 처리합니다.",
+  "tenkey-issues": "크래시·앱 이상·1대1 문의를 한곳에서 봅니다. 보고 하나를 열면 앱이 남긴 순서, 그 판을 다시 만드는 번호, 같은 기기의 앞뒤 기록이 나옵니다.",
+  "tenkey-keep": "서버가 받는 데이터마다 무엇이 들어 있는지, 어느 빌드가 보내는지, 며칠 두는지, 지금 몇 줄인지, 마지막 정리에서 몇 줄을 지웠는지 봅니다.",
+  "tenkey-perf": "폰 앱이 보낸 성능 보고(첫 화면까지 시간, 가장 느린 프레임, 메모리)를 기기·빌드별로, 웹 체험판의 버벅임 보고를 장소별로 봅니다.",
 };
 
 let currentProjectKey = "";
@@ -110,7 +117,15 @@ function renderAuth(authState = window.ConsoleAuth.snapshot()) {
 }
 
 const QB_ROUTE_PATTERN = /^#\/(analytics(?:-exclusions)?|players|operations|purchases|cs|audit|notes)(?:[/?]|$)/;
-const TENKEY_ROUTE_PATTERN = /^#\/(tenkey-(?:overview|players|player|crashes|reports|retention|notices|mail|purchases|ranking|balance|config|audit|titles))(?:[/?]|$)/;
+// Built from model.js's page list (tenkey-player = a player id under tenkey-players/, so the list covers it).
+const TENKEY_ROUTE_PATTERN = new RegExp(`^#\\/(${window.ConsoleModel.tenkeyPages.join("|")})(?:[/?]|$)`);
+// Each 10KEY page's mount functions on window.ConsoleTenkey (console/tenkey*.js), one row per page of model.js's list.
+const TENKEY_MOUNTS = {
+  "tenkey-overview": ["mountOverview"], "tenkey-players": ["mountPlayers"], "tenkey-retention": ["mountRetention"], "tenkey-crashes": ["mountCrashes"],
+  "tenkey-reports": ["mountReports"], "tenkey-notices": ["mountNotices"], "tenkey-mail": ["mountMail"], "tenkey-purchases": ["mountPurchases"],
+  "tenkey-ranking": ["mountRanking"], "tenkey-balance": ["mountBalance"], "tenkey-audit": ["mountAudit"], "tenkey-config": ["mountConfig", "mountReviewCode"],
+  "tenkey-watch": ["mountWatch"], "tenkey-titles": ["mountTitles"], "tenkey-issues": ["mountIssues"], "tenkey-keep": ["mountKeep"], "tenkey-perf": ["mountPerf"],
+};
 
 // One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
 const PROJECTS = {
@@ -162,21 +177,8 @@ function renderRoute() {
   if (route.page === "cs") { window.ConsoleCs.mount(); window.ConsoleLab?.loadReports(); }
   if (route.page === "audit") window.ConsoleAudit.mount();
   if (route.page === "notes") window.ConsoleNotes.mount();
-  if (route.page === "tenkey-overview") window.ConsoleTenkey.mountOverview();
-  if (route.page === "tenkey-players") window.ConsoleTenkey.mountPlayers();
-  if (route.page === "tenkey-retention") window.ConsoleTenkey.mountRetention();
   if (route.page === "tenkey-player") window.ConsoleTenkey.mountPlayer(route.userId);
-  if (route.page === "tenkey-crashes") window.ConsoleTenkey.mountCrashes();
-  if (route.page === "tenkey-reports") window.ConsoleTenkey.mountReports();
-  if (route.page === "tenkey-notices") window.ConsoleTenkey.mountNotices();
-  if (route.page === "tenkey-mail") window.ConsoleTenkey.mountMail();
-  if (route.page === "tenkey-purchases") window.ConsoleTenkey.mountPurchases();
-  if (route.page === "tenkey-ranking") window.ConsoleTenkey.mountRanking();
-  if (route.page === "tenkey-balance") window.ConsoleTenkey.mountBalance();
-  if (route.page === "tenkey-audit") window.ConsoleTenkey.mountAudit();
-  if (route.page === "tenkey-config") { window.ConsoleTenkey.mountConfig(); window.ConsoleTenkey.mountReviewCode(); }
-  if (route.page === "tenkey-watch") window.ConsoleTenkey.mountWatch();
-  if (route.page === "tenkey-titles") window.ConsoleTenkey.mountTitles();
+  (TENKEY_MOUNTS[route.page] || []).forEach((name) => window.ConsoleTenkey[name]?.());
 }
 
 function challengeErrorMessage(error) {

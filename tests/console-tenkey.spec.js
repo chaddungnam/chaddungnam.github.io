@@ -1,39 +1,12 @@
-const fs = require("node:fs");
-const path = require("node:path");
 const { test, expect } = require("@playwright/test");
+// The stand-in API (core + one module per page, tests/fixtures/tenkey/), the signed-in auth stub, open(), shot() and calls().
+const { API, AUTH, open, shot, calls } = require("./fixtures/tenkey_console.cjs");
 
-// 10key Survival pages of the console, walked through with the synthetic stand-in API (tests/fixtures/console_tenkey_api.js).
-// TENKEY_SHOTS=<dir> also writes a full-page capture of each page there.
-const SHOTS = process.env.TENKEY_SHOTS || "";
+// 10key Survival pages of the console, walked through with the synthetic stand-in API. The 밸런스, 이슈함, 데이터 보관 and 성능 pages
+// have their own specs (console-tenkey-<page>.spec.js). TENKEY_SHOTS=<dir> also writes a full-page capture of each page there.
 // The dev static server (python http.server) sometimes resets one of the ~30 script requests of a cold page load, which only
 // shows as a missing project picker; a retry is the fix for that test-infrastructure flake, not for the console.
 test.describe.configure({ retries: 2 });
-const API = fs.readFileSync(path.join(__dirname, "fixtures/console_tenkey_api.js"), "utf8");
-const AUTH = `window.ConsoleAuth={initialize:async()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),snapshot:()=>({signedIn:true,unlocked:true,email:"qa@houseduck.in"}),isUnlocked:()=>true,requireChallenge:()=>{},unlock:async()=>{},logout:()=>{},headers:()=>({}),renderGoogleButton:()=>{}};`;
-
-async function open(page, hash = "", extra = "") {
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.route("https://accounts.google.com/**", (route) => route.abort());
-  await page.route("https://translate.googleapis.com/**", (route) => route.abort());
-  await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
-  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API + extra }));
-  await page.goto("/console/");
-  await page.locator("#projectTenkey").click();
-  if (hash) await page.evaluate((h) => { window.location.hash = h; }, hash);
-  return errors;
-}
-
-async function shot(page, name, selector) {
-  if (!SHOTS) return;
-  fs.mkdirSync(SHOTS, { recursive: true });
-  const project = test.info().project.name.startsWith("mobile") ? "phone" : "desktop";
-  const file = path.join(SHOTS, `${project}_${name}.png`);
-  if (selector) await page.locator(selector).screenshot({ path: file });
-  else await page.screenshot({ path: file, fullPage: true });
-}
-
-const calls = (page, action) => page.evaluate((a) => window.__mockCalls.filter((c) => c.action === a), action);
 
 // Google's keyless web translation as the console's browser sees it: "[lang] line" for every text line. how(lang) = "ok",
 // "fail" (no answer) or "flat" (the lines run together, which the console must refuse).
@@ -49,7 +22,7 @@ async function fakeGoogle(page, how) {
   });
 }
 
-test("the project picker has no Comrade card; 10key Survival opens on the overview with its fourteen pages", async ({ page }) => {
+test("the project picker has no Comrade card; 10key Survival opens on the overview with its seventeen pages", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
@@ -63,8 +36,27 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   await page.locator("#projectTenkey").click();
   await expect(page.locator("#currentProject")).toHaveText("10key Survival");
   await expect(page).toHaveURL(/#\/tenkey-overview$/);
-  await expect(page.locator("#tenkeyNav a")).toHaveCount(14);
+  await expect(page.locator("#tenkeyNav a")).toHaveCount(17);
   await expect(page.locator("#hexaworldNav")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+// The route pattern is built from model.js's page list (11-17): a page missing from it used to fall back to the overview when the
+// project was picked with its link open (감시 did, until this test).
+test("every 10KEY page opens straight from its link when the project is picked, the new 감시 / 이슈함 / 데이터 보관 / 성능 included", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("https://accounts.google.com/**", (route) => route.abort());
+  await page.route("**/console/auth.js*", (route) => route.fulfill({ contentType: "application/javascript", body: AUTH }));
+  await page.route("**/console/api.js*", (route) => route.fulfill({ contentType: "application/javascript", body: API }));
+  for (const [hash, title] of [["#/tenkey-watch", "감시"], ["#/tenkey-issues", "이슈함"], ["#/tenkey-keep", "데이터 보관"], ["#/tenkey-perf", "성능"]]) {
+    await page.goto("about:blank");  // a hash-only goto would stay in the same document, past the project picker
+    await page.goto(`/console/${hash}`);
+    await page.locator("#projectTenkey").click();
+    await expect(page).toHaveURL(new RegExp(`${hash}$`));
+    await expect(page.locator("#pageTitle")).toHaveText(title);
+    await expect(page.locator(`#tenkeyNav a[data-page="${hash.slice(2)}"]`)).toHaveAttribute("aria-current", "page");
+  }
   expect(errors).toEqual([]);
 });
 
@@ -376,157 +368,6 @@ test("purchases, ranking and audit pages render from the server shapes", async (
   expect(errors).toEqual([]);
 });
 
-test("밸런스 page: where and why runs end, evolution, cards and mobs in the game's words; filters go to the server; an empty week says why", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance");
-  await expect(page.locator("#pageTitle")).toHaveText("밸런스");
-  const card = (k) => page.locator(`#tenkeyBalanceSummary [data-tk-summary="${k}"]`);
-  await expect(card("runs")).toHaveText("240");
-  await expect(card("time")).toHaveText("4분 12초");
-  await expect(card("drift")).toHaveText("35%");
-  await expect(card("revive")).toHaveText("18 / 40");
-  await expect(page.locator("#tenkeyBalanceLevels li")).toHaveCount(5);
-  await expect(page.locator("#tenkeyBalanceLevels")).toContainText("Lv 11–15");
-  await expect(page.locator("#tenkeyBalanceCauses")).toContainText("마우스 포획");
-  await expect(page.locator("#tenkeyBalanceCauses")).toContainText("평균 Lv 21.4");
-  await expect(page.locator("#tenkeyBalanceForms")).toContainText("텐키 그대로");
-  await expect(page.locator("#tenkeyBalanceCards tr")).toHaveCount(5);
-  await expect(page.locator("#tenkeyBalanceCards tr").first()).toContainText("레이저");
-  await expect(page.locator("#tenkeyBalanceCards")).toContainText("DRIFT 카드");
-  await expect(page.locator("#tenkeyBalanceMobs tr")).toHaveCount(2);  // a mob nobody met is left out
-  await expect(page.locator("#tenkeyBalanceMobs")).toContainText("휠 마우스");
-  await expect(page.locator("#tenkeyBalanceDaily tr")).toHaveCount(7);
-  await expect(page.locator("#tenkeyBalanceBuild option")).toHaveCount(3);
-  await expect(card("fever")).toHaveText("10%");  // 24 of 240 runs took the GOLDEN FEVER card
-  await expect(page.locator("#tenkeyBalanceKnobPanel")).toBeHidden();  // no server-side balance values yet
-  await expect(page.locator("#tenkeyBalanceEmpty")).toBeHidden();
-  await shot(page, "balance");
-  await page.locator("#tenkeyBalanceDays").selectOption("30");
-  await page.locator("#tenkeyBalanceBuild").selectOption("5");
-  await page.locator("#tenkeyBalanceMode").selectOption("classic");
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 30, build: 5, mode: "classic" });  // the device filter stays out of the call while it reads 전체
-  await expect(page.locator("#tenkeyBalanceBuild")).toHaveValue("5");
-  await page.evaluate(() => { window.__mockBalanceEmpty = true; });
-  await page.locator("#tenkeyBalanceDays").selectOption("1");
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect(page.locator("#tenkeyBalanceEmpty")).toBeVisible();
-  await expect(page.locator("#tenkeyBalanceEmpty")).toContainText("다음 스토어 빌드부터");
-  await expect(page.locator("#tenkeyBalanceEmpty")).toContainText("웹 체험판");
-  await expect(page.locator("#tenkeyBalanceBody")).toBeHidden();
-  await expect(card("runs")).toHaveText("0");
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: DRIFT runs from the web demo are no longer hidden (owner 11-12); the device list says where they were played; the device filter goes to the server", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance");
-  await expect(page.locator("#tenkeyBalancePlatforms tr")).toHaveCount(3);
-  await expect(page.locator("#tenkeyBalancePlatforms")).toContainText("웹 체험판 (itch)");
-  const web = page.locator("#tenkeyBalancePlatforms tr", { hasText: "웹 체험판" });
-  await expect(web.locator('td[data-label="DRIFT까지 간 판"]')).toHaveText("8 · 11.4%");
-  const app = page.locator("#tenkeyBalancePlatforms tr", { hasText: "Android" });
-  await expect(app.locator('td[data-label="DRIFT까지 간 판"]')).toHaveText("0 · 0%");
-  await expect(page.locator("#tenkeyBalanceModes")).toHaveText("노멀 모드 240판 · 하드모드 판 없음");
-  await page.locator("#tenkeyBalancePlatform").selectOption("web");
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 7, platform: "web" });
-  await page.locator("#tenkeyBalancePlatform").selectOption("app");
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect.poll(async () => (await calls(page, "balance.get")).at(-1).params).toEqual({ days: 7, platform: "app" });
-  await shot(page, "balance_where", "#tenkeyBalanceWhere");
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: the causes of an end are named, NUM LOCK / mouse crises and the three chance cards are listed from the run timeline", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance");
-  await expect(page.locator("#tenkeyBalanceCrises")).toContainText("NUM LOCK 철창");
-  await expect(page.locator("#tenkeyBalanceCrises li").first()).toContainText("91.7%");  // 55 of 60 timelines
-  await expect(page.locator("#tenkeyBalanceTraceNote")).toContainText("60판");
-  const row = (k) => page.locator("#tenkeyBalanceChance tr", { hasText: k });
-  await expect(row("골든 피버").locator('td[data-label="성공 비율"]')).toHaveText("45%");
-  await expect(row("DRIFT").locator('td[data-label="성공 횟수"]')).toHaveText("7");
-  await expect(row("골든 피버").locator('td[data-label="고를 때 평균 레벨"]')).toHaveText("Lv 6");
-  await expect(page.locator("#tenkeyBalanceFormTime")).toContainText("골든 피버 7.5초");
-  await shot(page, "balance_trace", "#tenkeyBalanceTrace");
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: level times and the DRIFT / robot time say \"앱 다음 빌드부터\" until a build sends them, then fill in", async ({ page }) => {
-  let errors = await open(page, "#/tenkey-balance");
-  await expect(page.locator("#tenkeyBalanceReachNote")).toContainText("앱 다음 빌드부터");
-  await expect(page.locator("#tenkeyBalanceReachRows")).toContainText("이 기간에 기록이 없습니다");
-  await page.evaluate(() => { window.__mockReach = true; });
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect(page.locator("#tenkeyBalanceReachNote")).toContainText("DRIFT 평균 1분 30초");
-  await expect(page.locator("#tenkeyBalanceReachRows tr")).toHaveCount(2);
-  await expect(page.locator("#tenkeyBalanceReachRows")).toContainText("Lv 5");
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: hard mode says \"하드모드 판 없음\" when there is none, shows boss fights and the meter when there are runs, and says when the meter is not sent yet", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance");
-  await expect(page.locator("#tenkeyBalanceHardEmpty")).toBeVisible();
-  await expect(page.locator("#tenkeyBalanceHardEmpty")).toContainText("하드모드 판 없음");
-  await expect(page.locator("#tenkeyBalanceHardBody")).toBeHidden();
-  await page.evaluate(() => { window.__mockHard = true; });
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect(page.locator("#tenkeyBalanceHardBody")).toBeVisible();
-  await expect(page.locator("#tenkeyBalanceModes")).toHaveText("노멀 모드 230판 · 하드 모드 10판");
-  await expect(page.locator("#tenkeyBalanceBosses tr")).toHaveCount(3);
-  const boss = page.locator("#tenkeyBalanceBosses tr", { hasText: "Lv 10 보스" });
-  await expect(boss.locator('td[data-label="이긴 비율"]')).toHaveText("33.3%");
-  await expect(boss.locator('td[data-label="한 번에 걸린 시간"]')).toHaveText("1분 20초");
-  await expect(page.locator("#tenkeyBalanceLostBat")).toContainText("시간 소모");
-  await expect(page.locator("#tenkeyBalanceLostDur")).toContainText("키보드 내려치기");
-  await expect(page.locator("#tenkeyBalanceRefillDur")).toContainText("수리 키트");
-  await expect(page.locator("#tenkeyBalanceDealt")).toContainText("레이저");
-  await expect(page.locator("#tenkeyBalanceClamp")).toContainText("4번 중 3번 스스로 빠져나옴");
-  await shot(page, "balance_hard", "#tenkeyBalanceHard");
-  await page.evaluate(() => { window.__mockHardNoMeter = true; });
-  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
-  await expect(page.locator("#tenkeyBalanceLostBat")).toContainText("앱 다음 빌드부터");
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: an older server answer without the new lists leaves the new panels out instead of breaking", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance", "window.__mockBalanceV1 = true;");
-  await expect(page.locator("#tenkeyBalanceSummary [data-tk-summary=\"runs\"]")).toHaveText("240");
-  await expect(page.locator("#tenkeyBalanceWhere")).toBeHidden();
-  await expect(page.locator("#tenkeyBalanceHard")).toBeHidden();
-  await expect(page.locator("#tenkeyBalanceTrace")).toBeHidden();
-  await expect(page.locator("#tenkeyBalanceReach")).toBeHidden();
-  expect(errors).toEqual([]);
-});
-
-test("밸런스 page: the four server balance values load, save with a reason through the confirm dialog, bump the version; out of range is refused", async ({ page }) => {
-  const errors = await open(page, "#/tenkey-balance");
-  const form = page.locator("#tenkeyKnobForm");
-  await expect(form.locator('[name="xp_scale"]')).toHaveValue("1.00");
-  await expect(page.locator("#tenkeyKnobVersion")).toContainText("아직 바꾼 적 없음");
-  await form.locator('[name="xp_scale"]').fill("1.2");
-  await form.locator('[name="mouse_pace"]').fill("0.9");
-  await form.locator('[name="reason"]').fill("first runs end too early");
-  await form.locator("button[type=submit]").click();
-  await expect(page.locator("#confirmDialog")).toContainText("경험치 배율 1.20");
-  await expect(page.locator("#confirmDialog")).toContainText("마우스 속도 0.90");
-  await page.locator("#confirmDialog button[value=confirm]").click();
-  await expect(page.locator("#tenkeyKnobMessage")).toContainText("조정값 1번으로 저장했습니다");
-  await expect(page.locator("#tenkeyKnobVersion")).toContainText("지금 조정값 1번");
-  const sent = (await calls(page, "knobs.set")).at(-1);
-  expect(sent.params).toEqual({ knobs: { xp_scale: 1.2, mouse_pace: 0.9, battery_drain_scale: 1, robot_power_scale: 1 }, reason: "first runs end too early" });
-  expect(sent.request_id).toMatch(/^[0-9a-f-]{36}$/);
-  await page.locator("#tenkeyKnobDefaults").click();
-  await expect(form.locator('[name="xp_scale"]')).toHaveValue("1.00");
-  await form.locator('[name="robot_power_scale"]').fill("1.5");
-  await form.locator('[name="reason"]').fill("too strong");
-  await form.locator("button[type=submit]").click();
-  await expect(page.locator("#confirmDialog")).toBeHidden();
-  expect((await calls(page, "knobs.set")).length).toBe(1);
-  await shot(page, "balance_knobs", "#tenkeyKnobForm");
-  await page.evaluate(() => { window.location.hash = "#/tenkey-audit"; });
-  await expect(page.locator("#tenkeyAuditList")).toContainText("밸런스 조정값 변경");
-  expect(errors).toEqual([]);
-});
-
 test("a server error is shown in Korean without breaking the page", async ({ page }) => {
   await open(page, "#/tenkey-crashes");
   await page.evaluate(() => { window.__mockFailures["crashes.groups"] = "rpc_failed"; });
@@ -641,7 +482,7 @@ test("제보 page: the YouTube link form shows the current value, refuses a non-
   expect(errors).toEqual([]);
 });
 
-test("the 13-page menu scrolls when the window is short: desktop sidebar up and down, phone bar sideways; log out stays visible", async ({ page }) => {
+test("the long 10KEY menu scrolls when the window is short: desktop sidebar up and down, phone bar sideways; log out stays visible", async ({ page }) => {
   const phone = test.info().project.name.startsWith("mobile");
   if (!phone) await page.setViewportSize({ width: 1280, height: 620 });
   const errors = await open(page);

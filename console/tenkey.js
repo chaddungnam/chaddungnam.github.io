@@ -166,6 +166,12 @@
     }
   }
 
+  // A read from the tenkey-console-stats function (deployed on its own, so new read pages need no tenkey-admin redeploy): the
+  // edge answers {ok, data: <rpc result>}; an RPC refusal ({ok:false, error}) is thrown like call() does. Returns the data.
+  async function stats(action, params = {}) {
+    return unwrap(await root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action, params })).data;
+  }
+
   // A small dialog that asks for the reason a list action (end / delete) is audited with; resolves with the text or null.
   function askReason(title, body) {
     const dialog = byId("tenkeyReasonDialog");
@@ -322,7 +328,7 @@
 
   root.ConsoleTenkey = {
     mountConfig, validate,
-    call, report, setMessage, errorText, pager, askReason,
+    call, stats, report, setMessage, errorText, pager, askReason,
     fmt: { esc, num, time, shortTime, dayText, duration, bytes, pct, platformName, productName, boardName },
   };
 })(window);

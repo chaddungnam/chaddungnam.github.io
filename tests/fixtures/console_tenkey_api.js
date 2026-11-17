@@ -1,5 +1,5 @@
 // Local synthetic data only (never real players): a stand-in for window.ConsoleAPI that answers the tenkey-admin actions the
-// "10key Survival" console pages call, with the same shapes the server's admin RPCs return. State changes (notice saves, ends,
+// "10key Survival" console pages call, with the same shapes the server's admin RPCs return (the per-page actions are in tenkey/*.js). State changes (notice saves, ends,
 // deletes, bans, config) stick for the page's life so the flows can be walked through. Calls are kept in window.__mockCalls.
 (function () {
   const DAYS = 90;
@@ -86,26 +86,6 @@
     };
   };
 
-  const crashes = [
-    { id: 41, received_at: "2026-10-23T10:12:00+00:00", last_at: "2026-10-23T12:40:00+00:00", repeats: 3, kind: "unclean_exit", platform: "Android", app_version: "1.0.0 a2 i2", os_version: "14", device_model: "SM-S918N", locale: "ko_KR", message: "handle_crash: Program crashed with signal 11", has_log: true, install_short: "9f31a0c2" },
-    { id: 40, received_at: "2026-10-23T08:01:00+00:00", last_at: "2026-10-23T08:01:00+00:00", repeats: 0, kind: "script_error", platform: "iOS", app_version: "1.0.0 a2 i2", os_version: "17.6", device_model: "iPhone14,5", locale: "en_US", message: "res://scripts/dig/dig_run.gd:212", has_log: false, install_short: null },
-    { id: 39, received_at: "2026-10-22T19:30:00+00:00", last_at: "2026-10-22T19:30:00+00:00", repeats: 0, kind: "anr_suspect", platform: "Android", app_version: "1.0.0 a1 i1", os_version: "13", device_model: "Pixel 6a", locale: "ko_KR", message: "anr_suspect", has_log: false, install_short: null },
-  ];
-  const groups = (by) => ({
-    ok: true, by, days: 7,
-    rows: by === "kind"
-      ? [{ key: "unclean_exit", rows: 3, times: 6, installs: 2, devices: 2, versions: 2, first_at: "2026-10-21T10:00:00+00:00", last_at: "2026-10-23T12:40:00+00:00", sample_id: 41, kinds: ["unclean_exit"], platforms: ["Android"], said: null }, { key: "script_error", rows: 1, times: 1, installs: 0, devices: 1, versions: 1, first_at: "2026-10-23T08:01:00+00:00", last_at: "2026-10-23T08:01:00+00:00", sample_id: 40, kinds: ["script_error"], platforms: ["iOS"], said: "Invalid get index 'x'" }]
-      : [{ key: crashes[0].message, rows: 3, times: 6, installs: 2, devices: 2, versions: 2, first_at: "2026-10-21T10:00:00+00:00", last_at: "2026-10-23T12:40:00+00:00", sample_id: 41, kinds: ["unclean_exit"], platforms: ["Android"], said: null },
-        { key: crashes[1].message, rows: 1, times: 1, installs: 0, devices: 1, versions: 1, first_at: "2026-10-23T08:01:00+00:00", last_at: "2026-10-23T08:01:00+00:00", sample_id: 40, kinds: ["script_error"], platforms: ["iOS"], said: "Invalid get index 'x' (on base: 'Dictionary')." },
-        { key: "anr_suspect", rows: 1, times: 1, installs: 0, devices: 1, versions: 1, first_at: "2026-10-22T19:30:00+00:00", last_at: "2026-10-22T19:30:00+00:00", sample_id: 39, kinds: ["anr_suspect"], platforms: ["Android"], said: null }],
-  });
-  const crashDetail = (id) => {
-    const c = crashes.find((x) => x.id === id) || crashes[0];
-    return { ok: true, crash: { ...c, build: 2, signature: "9a0b3f", enriched_at: c.has_log ? "2026-10-23T10:12:06+00:00" : null, same_signature_rows: 3,
-      detail: { uptime_s: 412, trail: ["start Android 1.0.0 a2 i2", "scene BootScene", "scene TitleScene", "scene DigScene", "bg", "fg"] },
-      log_tail: c.has_log ? "Godot Engine v4.7.2.stable.official\nOpenGL API OpenGL ES 3.2\n...\nERROR: Condition \"!is_inside_tree()\" is true.\n   at: get_global_transform (scene/3d/node_3d.cpp:412)\n================================================================\nhandle_crash: Program crashed with signal 11\nEngine version: Godot Engine v4.7.2.stable.official\nDumping the backtrace. Please include this when reporting the bug to the project developer.\n[1] 0x1a2b3c4d" : "" } };
-  };
-
   // notices.translate stand-in: "[lang] text" per line, unless a test sets window.__mockTranslate(title, body) -> {lang: {title, body}}.
   const TR_LANGS = ["en", "ja", "de", "zh_TW", "fr", "es", "pt"];
   const fakeTranslations = (title, body) => (window.__mockTranslate ? window.__mockTranslate(title, body)
@@ -143,7 +123,12 @@
   window.__mockCalls = [];
   window.__mockFailures = {};
   const logAudit = (action, p) => audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } });
-  const respond = (action, p, body) => {
+  // The pages' own actions live in tests/fixtures/tenkey/<page>.js (window.__tkPages[action] = (params, body, fn) => answer); this
+  // core keeps the shared players, notices, purchases, ranking, audit and config. tests/fixtures/tenkey_console.cjs joins them.
+  window.__tkFx = { TODAY, dayAt, PLAYERS };
+  window.__tkPages = window.__tkPages || {};
+  const respond = (action, p, body, fn) => {
+    if (window.__tkPages[action]) return window.__tkPages[action](p, body, fn);
     switch (action) {
       case "overview.get": return overview(p.platform);
       // tenkey-console-stats (separate function): pre-registration counts by Berlin day and page language.
@@ -200,9 +185,6 @@
         if (p.on !== false || !p.reason) return { ok: false, error: "invalid_request" };
         r.on = false; r.granted = false; logAudit(action, p); return { ok: true, changed, review_mode: false };
       }
-      case "crashes.list": return { ok: true, total: crashes.length, rows: crashes.filter((c) => (!p.kind || c.kind === p.kind) && (!p.query || c.message.includes(p.query) || c.device_model.includes(p.query) || c.app_version.includes(p.query))) };
-      case "crashes.groups": return groups(p.by);
-      case "crashes.get": return crashDetail(p.id);
       case "notices.list": notices.forEach((n) => { n.status = statusOf(n); }); return notices.slice().sort((a, b) => b.id - a.id);
       case "notices.translate": return { translations: fakeTranslations(p.notice.title_ko, p.notice.body_ko) };
       case "notices.save": {
@@ -226,37 +208,6 @@
       case "ranking.flagged": return { ok: true, rows: [
         { id: "f1", created_at: "2026-10-21T10:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 9990000, level: 40, time_ms: 4000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "score" },
         { id: "f2", created_at: "2026-10-21T09:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 120000, level: 30, time_ms: 9000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "level" }] };
-      case "balance.get": {
-        if (window.__mockBalanceEmpty) return { ok: true, days: p.days, total: { runs: 0, installs: 0 }, levels: [], causes: [], forms: [], drift_levels: [], robot_levels: [], skills: [], encounters: [], daily: [], builds: [], knobs: [] };
-        return { ok: true, days: p.days ?? 7, from: dayAt(6), today: TODAY, build: p.build ?? null, mode: p.mode ?? null,
-          total: { runs: 240, installs: 31, median_ms: 252000, median_level: 18, avg_level: 19.6, drift: 84, robot: 30, robot_returned: 9, cleared: 4, revive_offered: 40, revived: 18, transformer_owned: 12 },
-          levels: [{ lv: 3, n: 20 }, { lv: 8, n: 34 }, { lv: 12, n: 60 }, { lv: 14, n: 22 }, { lv: 18, n: 70 }, { lv: 26, n: 34 }],
-          causes: [{ cause: "battery", n: 150, avg_level: 17.2 }, { cause: "mouse", n: 70, avg_level: 21.4 }, { cause: "wheel_mouse", n: 16, avg_level: 27 }, { cause: "clear", n: 4, avg_level: 40 }],
-          forms: [{ form: "tenkey", n: 156 }, { form: "drift", n: 63 }, { form: "robot", n: 21 }],
-          drift_levels: [{ lv: 10, n: 50 }, { lv: 11, n: 34 }], robot_levels: [{ lv: 20, n: 22 }, { lv: 22, n: 8 }],
-          skills: [{ skill: "laser", kind: "n", picks: 190, runs: 170, avg_pick_level: 4.2, avg_end_level: 20.8 }, { skill: "drift", kind: "d", picks: 90, runs: 84, avg_pick_level: 10, avg_end_level: 24.1 },
-            { skill: "laser", kind: "u", picks: 120, runs: 80, avg_pick_level: 9.5, avg_end_level: 22 }, { skill: "nitro", kind: "p", picks: 40, runs: 38, avg_pick_level: 12.3, avg_end_level: 25.5 }, { skill: "fever", kind: "f", picks: 30, runs: 24, avg_pick_level: 6, avg_end_level: 15 }],
-          encounters: [{ id: "mouse", met: 260, won: 190, runs: 200 }, { id: "wheel_mouse", met: 30, won: 14, runs: 28 }, { id: "spacebar", met: 0, won: 0, runs: 0 }],
-          daily: Array.from({ length: 7 }, (_, i) => ({ day: dayAt(6 - i), runs: 20 + i * 6, installs: 8 + i, avg_level: 18 + i / 2 })),
-          builds: [{ build: 5, version: "1.0.1", runs: 200, avg_level: 20.1 }, { build: 2, version: "1.0.0", runs: 40, avg_level: 17.3 }],
-          knobs: [{ kv: 0, runs: 240, avg_level: 19.6 }],
-          // admin_balance_v3 (2026-11-12): window.__mockBalanceV1 = the older server without these keys; window.__mockHard = hard runs exist.
-          ...(window.__mockBalanceV1 ? {} : {
-            platform: p.platform ?? null,
-            platforms: [{ platform: "android", runs: 140, installs: 20, drift: 0, avg_level: 6.1 }, { platform: "ios", runs: 30, installs: 5, drift: 0, avg_level: 5.2 }, { platform: "web_itch", runs: 70, installs: 40, drift: 8, avg_level: 9.4 }],
-            modes: window.__mockHard ? [{ mode: "classic", runs: 230, installs: 31 }, { mode: "hard", runs: 10, installs: 2 }] : [{ mode: "classic", runs: 240, installs: 31 }],
-            reach: window.__mockReach ? [{ lv: 2, n: 20, median_ms: 31000, p90_ms: 60000 }, { lv: 5, n: 18, median_ms: 150000, p90_ms: 260000 }] : [],
-            times: { n: window.__mockReach ? 20 : 0, drift_ms: window.__mockReach ? 90000 : 0, robot_ms: 0 },
-            trace: { runs: 60, installs: 25, with_form: 40,
-              crises: [{ id: "numlock", runs: 55, n: 120 }, { id: "mouse", runs: 40, n: 66 }, { id: "spacebar", runs: 5, n: 5 }],
-              cards: [{ kind: "d", offered: 12, won: 7, runs: 12 }, { kind: "f", offered: 20, won: 9, runs: 20 }, { kind: "t", offered: 4, won: 1, runs: 4 }],
-              form_s: { drift: 21.5, robot: 3, fever: 7.5 } },
-            hard: window.__mockHard
-              ? { runs: 10, installs: 2, with_meter: window.__mockHardNoMeter ? 0 : 8,
-                  bosses: [{ lv: 10, met: 6, won: 2, sec: 480 }, { lv: 20, met: 1, won: 0, sec: 90 }, { lv: 30, met: 0, won: 0, sec: 0 }],
-                  meter: window.__mockHardNoMeter ? {} : { lb: [40, 10, 5, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0], ld: [0, 0, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0], rb: [10, 4, 0, 0, 0, 0, 0, 0, 0, 0], rd: [0, 0, 0, 0, 0, 6], dm: [30, 0, 12], cl: [4, 3, 20, 40, 18] } }
-              : { runs: 0, installs: 0, with_meter: 0, bosses: [], meter: {} } }) };
-      }
       case "audit.list": return audit.slice(0, p.limit || 50);
       case "config.get": return config;
       case "knobs.set": {
@@ -286,7 +237,7 @@
     postProject: async (project, fn, body) => {
       window.__mockCalls.push({ project, fn, ...JSON.parse(JSON.stringify(body)) });
       if (window.__mockFailures[body.action]) throw Object.assign(new Error(window.__mockFailures[body.action]), { status: 400 });
-      const data = respond(body.action, body.params || {}, body);
+      const data = respond(body.action, body.params || {}, body, fn);
       return { ok: true, data: JSON.parse(JSON.stringify(data)), auth_mode: "console_ticket" };
     },
   };
