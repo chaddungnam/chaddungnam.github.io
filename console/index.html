@@ -702,6 +702,10 @@
             <div class="panel-heading"><div><p class="eyebrow">ACCOUNT GROWTH</p><h2>계정 강화 정도별</h2><small>판을 시작할 때 그 계정의 업그레이드 합으로 나눕니다. 처음 하는 계정과 많이 강화한 계정을 섞으면 판 길이가 틀려 보이므로, 곡선은 같은 줄끼리 비교합니다.</small></div></div>
             <div class="table-scroll tk-stack"><table><thead><tr><th>강화 정도</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th><th class="tk-num">한 판 길이 (가운데)</th></tr></thead><tbody id="tenkeyBalanceAcctRows"></tbody></table></div>
           </section>
+          <section id="tenkeyBalanceStart" class="panel" hidden>
+            <div class="panel-heading"><div><p class="eyebrow">START LEVEL</p><h2>시작 레벨별</h2><small>Lv 8 · Lv 15에서 시작한 판은 Lv 1부터 한 판과 따로 봅니다. 섞으면 Lv 15에서 시작해 곧 끝난 판이 "Lv 15까지 간 판"으로 읽힙니다.</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>시작 레벨</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th><th class="tk-num">한 판 길이 (가운데)</th><th class="tk-num">끝까지 깬 판</th></tr></thead><tbody id="tenkeyBalanceStartRows"></tbody></table></div>
+          </section>
           <section id="tenkeyBalanceBands" class="panel" hidden>
             <div class="panel-heading"><div><p class="eyebrow">LEVEL BANDS</p><h2>레벨 구간마다</h2><small>그 구간을 지나간 판의 평균: 머문 시간, 부순 키, 받은 피해(생명줄 %). 부활은 모두 더한 횟수</small></div></div>
             <div class="table-scroll tk-stack"><table><thead><tr><th>구간</th><th class="tk-num">지나간 판</th><th class="tk-num">머문 시간 (평균)</th><th class="tk-num">부순 키 (판당)</th><th class="tk-num">받은 피해 (판당)</th><th class="tk-num">부활</th></tr></thead><tbody id="tenkeyBalanceBandRows"></tbody></table></div>

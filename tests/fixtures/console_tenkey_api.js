@@ -175,7 +175,7 @@
           god_mode: unlockOf(x.id).god, review_mode: reviewOf(x.id).on, review_granted: reviewOf(x.id).granted,
           rank_normal: x.id.startsWith("b2") ? 3 : null, rank_hard: x.id.startsWith("b2") ? 1 : null, runs_today: 4,
           best_normal: x.best_score ? { score: x.best_score, level: x.best_level } : null, best_hard: x.id.startsWith("b2") ? { score: 5200, level: 6 } : null,
-          runs: x.id.startsWith("a1") ? runs("classic", 8) : x.id.startsWith("b2") ? runs("hard", 15) : [],
+          runs: x.id.startsWith("a1") ? runs("classic", 8) : x.id.startsWith("b2") ? runs("hard", null) : []  /* null = what admin_watch_v1 sends today (tenkey.runs stores no start) */,
         })).filter((r) => r.god_mode || r.review_mode || r.review_granted || r.rank_normal || r.rank_hard);
         return { ok: true, season_board: "q2026-4", total: rows.length, rows };
       }

@@ -149,6 +149,12 @@
     const acct = panel("tenkeyBalanceAcct", d.acct);
     byId("tenkeyBalanceAcctRows").innerHTML = acct.some((r) => r.band !== "none") ? rowsOf(acct, ["강화 정도", "판", "평균 끝 레벨", "한 판 길이 (가운데)"],
       (r) => [[ACCT[r.band] || String(r.band ?? "—")], [num(r.runs), true], [avgLv(r.avg_lv), true], [r.median_ms == null ? "—" : duration(r.median_ms), true]]) : `<tr><td colspan="4" class="empty-panel">${NOT_YET}</td></tr>`;
+    // start = runs by the level they began at (tenkey.admin_balance_v5, hexaworld draft 20261117170000, cqa1117): hidden while the
+    // server sends no list, and while every run began at Lv 1 (nothing to tell apart yet)
+    const start = panel("tenkeyBalanceStart", d.start);
+    if (!start.some((r) => Number(r.start) > 1)) byId("tenkeyBalanceStart").hidden = true;
+    byId("tenkeyBalanceStartRows").innerHTML = rowsOf(start, ["시작 레벨", "판", "평균 끝 레벨", "한 판 길이 (가운데)", "끝까지 깬 판"],
+      (r) => [[Number(r.start) > 1 ? `Lv ${r.start}에서 시작` : "Lv 1부터"], [num(r.runs), true], [avgLv(r.avg_lv), true], [r.median_ms == null ? "—" : duration(r.median_ms), true], [num(r.cleared), true]]);
     const bands = panel("tenkeyBalanceBands", d.bands);
     byId("tenkeyBalanceBandRows").innerHTML = bands.length ? rowsOf(bands, ["구간", "지나간 판", "머문 시간 (평균)", "부순 키 (판당)", "받은 피해 (판당)", "부활"],
       (r) => [[BANDS[r.band] || `구간 ${r.band}`], [num(r.runs), true], [r.secs == null ? "—" : duration(Number(r.secs) * 1000), true], [r.keys == null ? "—" : num(r.keys), true], [r.dmg == null ? "—" : `${num(r.dmg)}%`, true], [num(r.revives), true]]) : emptyRow(6);

@@ -39,6 +39,10 @@ test("감시 page: filters, runs with start level, quick ban and review off", as
   await page.locator(`[data-watch-runs="${A1}"]`).click();
   await expect(page.locator(`[data-watch-detail="${A1}"]`)).toContainText("시작 레벨");
   await expect(page.locator(`[data-watch-detail="${A1}"] tbody tr`)).toHaveCount(3);
+  // runs without a start level (what the server sends today): no column of "—" (cqa1117)
+  await page.locator(`[data-watch-runs="${B2}"]`).click();
+  await expect(page.locator(`[data-watch-detail="${B2}"] tbody tr`)).toHaveCount(3);
+  await expect(page.locator(`[data-watch-detail="${B2}"]`)).not.toContainText("시작 레벨");
   await shot(page, "watch_page", "#tenkeyWatchView");
   // quick review off: reason dialog, then the audited call, then the row loses [검수]
   await page.locator(`[data-watch-review="${A1}"]`).click();
