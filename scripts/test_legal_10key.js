@@ -45,7 +45,7 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
       /separate part \(schema\)/, /without sending an account or player identifier/, /IP address and HTTP request metadata/,
       /depth, scrap, combo, number of skills, how the run ended, game build, platform name and an anti-cheat flag/,
       /Art\. 6\(1\)\(b\)/, /Art\. 6\(1\)\(f\)/, /eu-west-1/, /independent controller/,
-      /12 weeks/, /35 days/, /90 days/, /6 months \(183 days\)/, /no analytics SDK and no advertising SDK of its own/,
+      /top 100 places of each board/, /35 days/, /90 days/, /6 months \(183 days\)/, /no analytics SDK and no advertising SDK of its own/,
       /no advertising identifiers/, /no payment card data/, /not directed to children under 14/, /permission of a parent or guardian/, /human review/,
       // Android / iOS guest account and in-app purchases (2026-10-20)
       /signs in anonymously at Supabase Auth \(no email address, no password, no phone number\)/, /year and month themselves are not saved and not sent/,
@@ -57,7 +57,7 @@ test("the shared privacy policy describes 10KEY in section 13 with the confirmed
       /별도 영역\(스키마\)/, /계정이나 플레이어 식별자를 보내지 않습니다/, /IP 주소와 HTTP 요청 메타데이터/,
       /깊이, 스크랩, 콤보, 스킬 수, 플레이가 끝난 원인, 게임 빌드, 플랫폼 이름, 부정행위 방지 표시/,
       /제6조 제1항 b호/, /제6조 제1항 f호/, /eu-west-1/, /독립된 개인정보처리자/,
-      /12주/, /35일/, /90일/, /6개월\(183일\)/, /분석 SDK도 광고 SDK도 포함되어 있지 않으며/,
+      /상위 100위/, /35일/, /90일/, /6개월\(183일\)/, /분석 SDK도 광고 SDK도 포함되어 있지 않으며/,
       /광고 식별자를 받지 않습니다/, /결제 카드 정보를 받지 않습니다/, /만 14세 미만/, /부모 또는 보호자의 허락/, /사람의 검토/,
       /Supabase Auth에 익명으로 로그인하고\(이메일 주소, 비밀번호, 전화번호 없음\)/, /해와 달 자체는 저장하지도, 전송하지도 않습니다/,
       /만 14세 미만: 계정을 유지하지 않습니다/, /기기의 앱 저장 데이터에만 보관/, /로그인 ID의 단방향 해시\(SHA-256\)/,
@@ -101,7 +101,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     /IP-Adresse und HTTP-Anfrage-Metadaten/,
     /Tiefe, Scrap, Combo, Anzahl der Fähigkeiten, wie der Run endete, Spielversion \(Build\), Name der Plattform und ein Anti-Cheat-Kennzeichen/,
     /Art\. 6 Abs\. 1 Buchst\. b/, /Art\. 6 Abs\. 1 Buchst\. f/, /eu-west-1/, /eigenständig Verantwortliche/,
-    /12 Wochen/, /35 Tagen/, /90 Tagen/,
+    /ersten 100 Plätze jeder Rangliste/, /35 Tagen/, /90 Tagen/,
     /6 Monate \(183 Tage\)/, /kein Analyse-SDK und kein eigenes Werbe-SDK/, /keine Werbekennungen/,
     /keine Zahlungskartendaten/, /nicht an Kinder unter 14 Jahren/, /Erlaubnis eines Elternteils/, /menschliche Überprüfung/,
     /meldet sich dann anonym bei Supabase Auth an \(keine E-Mail-Adresse, kein Passwort, keine Telefonnummer\)/,
@@ -329,6 +329,39 @@ test("section 13 lists what newer versions add to reports, the 1:1 inquiry and t
   }
 });
 
+// 2026-11-17 review (live server since 14:10): who can send the 1:1 inquiry (TenkeyReport.can_send: not GamePix / Nekoland, a
+// signed-in House Duck login, so the itch.io ranking guest account too; submit_issue_report_v1/v2 = authenticated), what staff
+// can link in the console (admin_issue_get_v1 same_sid; admin_device_timeline_v1: same install id, +/- up to 120 minutes:
+// crash / app / run_trace / telemetry), the performance report gate (TenkeyTelemetry.may_send: consented and not a known
+// under-14 band; an unknown age is not under 14) and the season boards (retention() since 20261116120000: current + last
+// season whole, the season before last cut to the top 100, older deleted; the 12-week cut is gone).
+test("section 13 says who sends the 1:1 inquiry, what staff can link, the performance report gate and the season boards", () => {
+  const words = {
+    en: ["or in the web version on itch.io while you are signed in with its ranking guest account", "the Nekoland and GamePix versions cannot send one",
+      "Only House Duck staff can put these records together, only inside the operations console (section 14) and only to find the cause of a crash or problem",
+      "from up to 2 hours before to 2 hours after it", "have not answered the age question as under 14 (until the age question is answered, a player is not treated as under 14)",
+      "the entries below the top 100 places of each board are deleted", "newer versions also the board of the season before last"],
+    ko: ["랭킹용 게스트 계정으로 로그인한 itch.io 웹 버전에서 1대1 문의를 보낸 경우", "Nekoland와 GamePix 버전에서는 보낼 수 없고",
+      "이 기록들을 서로 이어 볼 수 있는 사람은 House Duck 직원뿐이며, 운영 콘솔(제14항) 안에서 충돌이나 문제의 원인을 찾을 때만 그렇게 합니다",
+      "그 보고 전 최대 2시간부터 후 최대 2시간까지", "연령 질문에 만 14세 미만으로 답하지 않은 플레이어만 보냅니다(연령 질문에 답하기 전에는 만 14세 미만으로 보지 않습니다)",
+      "지지난 시즌은 순위표마다 상위 100위 밖의 항목이 삭제되며", "새 버전은 지지난 시즌의 순위표도 보여 줍니다"],
+    de: ["oder in der Webversion auf itch.io, während Sie mit deren Ranglisten-Gastkonto angemeldet sind", "die Versionen auf Nekoland und GamePix können keine senden",
+      "Zusammenführen können diese Aufzeichnungen nur Mitarbeitende von House Duck, nur in der Betriebskonsole (Abschnitt 14)",
+      "von bis zu 2 Stunden vor bis 2 Stunden nach dem Bericht", "die Altersfrage nicht mit unter 14 beantwortet haben (solange die Altersfrage nicht beantwortet ist, gilt ein Spieler nicht als unter 14)",
+      "die Einträge unterhalb der ersten 100 Plätze jeder Rangliste gelöscht", "neuere Versionen auch die Rangliste der vorletzten Saison"],
+  };
+  const gone = {
+    en: /If you send a 1:1 inquiry in the app|Players under 14 send no performance reports|deleted once the season ended more than 12 weeks ago|exists only for the online ranking/,
+    ko: /앱에서 1대1 문의를 보낸 경우|만 14세 미만 플레이어는 성능 보고를 보내지 않습니다|해당 시즌이 끝난 지 12주가 지나면|온라인 랭킹에만 쓰이는 게스트 계정/,
+    de: /Wenn Sie in der App eine 1:1-Anfrage senden|Spieler unter 14 Jahren senden keine Leistungsberichte|mehr als 12 Wochen zurückliegt|das nur für die Online-Rangliste besteht/,
+  };
+  for (const [locale, list] of Object.entries(words)) {
+    const s13 = section13(locale);
+    for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
+    assert.doesNotMatch(s13, gone[locale], `${locale}: the old inquiry / performance / season wording is gone`);
+  }
+});
+
 test("the odds chooser links every localized odds page", () => {
   const html = read("10key/odds/index.html");
   for (const locale of ["ko", "en", "ja", "de", "zh"]) {
@@ -378,7 +411,7 @@ test("CrazyGames is no platform of 10key Survival any more", () => {
 test("section 13 covers season rankings, web ranking accounts, quests, the reminder and the review prompt in every language", () => {
   const words = {
     en: ["board of the current season and the board of the last season", "January 1, April 1, July 1 and October 1 at 09:00 UTC", "October 1 to December 31, 2026",
-      "all-time best, which is used for the player’s profile", "<li>Season board entries: deleted once the season ended more than 12 weeks ago.</li>",
+      "all-time best, which is used for the player’s profile", "<li>Season board entries: the boards of the current and the last season are kept in full; of the season before last, the entries below the top 100 places of each board are deleted, and all entries of older seasons are deleted.</li>",
       "<strong>Sending records in the web versions (itch.io, Nekoland and GamePix):</strong>", "use a guest account only for the online ranking",
       "stay in your browser’s storage and are not sent", "<td>Quest rewards</td>", "the UTC day or week of the quest", "module draw tickets",
       "Quest reward records: deleted 35 days after the reward was claimed.", "<h3>Daily reminder and store review prompt (Android and iOS)</h3>",
@@ -386,15 +419,15 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
       "review sheet (Apple’s or Google’s) once", "House Duck receives nothing from it", "As on itch.io, the results of finished runs are sent to House Duck’s server",
       "Web version on itch.io: usage signal, run records, run timelines and first-time steps"],
     ko: ["이번 시즌의 순위표와 지난 시즌의 순위표", "1월 1일, 4월 1일, 7월 1일, 10월 1일 09:00(UTC)", "2026년 10월 1일부터 12월 31일까지",
-      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 해당 시즌이 끝난 지 12주가 지나면 삭제됩니다.</li>",
-      "<strong>웹 버전(itch.io, Nekoland, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹에만 쓰이는 게스트 계정을 사용합니다",
+      "전체 기간 최고 기록도 보관하며, 이는 플레이어의 프로필에 쓰입니다", "<li>시즌 순위표 항목: 이번 시즌과 지난 시즌의 순위표는 그대로 보관되고, 지지난 시즌은 순위표마다 상위 100위 밖의 항목이 삭제되며, 그보다 오래된 시즌의 항목은 모두 삭제됩니다.</li>",
+      "<strong>웹 버전(itch.io, Nekoland, GamePix)에서 기록 보내기:</strong>", "온라인 랭킹용 게스트 계정을 사용하며, itch.io에서는 이 계정으로 1대1 문의도 보낼 수 있습니다",
       "브라우저 저장소에 남고 House Duck으로 전송되지 않습니다", "<td>퀘스트 보상</td>", "퀘스트의 UTC 기준 날짜 또는 주", "모듈 뽑기권",
       "퀘스트 보상 기록: 보상을 받은 지 35일 후 삭제됩니다.", "<h3>일일 알림과 스토어 리뷰 창(Android 및 iOS)</h3>",
       "기기 시계 기준 20:00", "푸시 서비스를 쓰지 않고, 알림에 관한 정보는 House Duck이나 다른 누구에게도 전송되지 않습니다", "앱의 <strong>설정</strong>이나 기기 설정에서 끌 수 있습니다",
       "리뷰 창(Apple 또는 Google)을 한 번 열 수 있습니다", "House Duck은 이로부터 아무것도 받지 않습니다", "itch.io와 마찬가지로 끝난 판의 결과는 온라인 랭킹을 위해 House Duck 서버로 보내지고",
       "itch.io 웹 버전의 이용 신호, 판 기록, 판 진행 기록과 첫 이용 단계"],
     de: ["Rangliste der aktuellen Saison und die Rangliste der letzten Saison", "1. Januar, 1. April, 1. Juli und 1. Oktober um 09:00 Uhr UTC", "vom 1. Oktober bis zum 31. Dezember 2026",
-      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: werden gelöscht, sobald das Ende der Saison mehr als 12 Wochen zurückliegt.</li>",
+      "Bestwert aller Zeiten, der für das Profil des Spielers verwendet wird", "<li>Einträge der Saisonranglisten: Die Ranglisten der aktuellen und der letzten Saison bleiben vollständig erhalten; in der vorletzten Saison werden die Einträge unterhalb der ersten 100 Plätze jeder Rangliste gelöscht, die Einträge älterer Saisons vollständig.</li>",
       "<strong>Senden von Ergebnissen in den Webversionen (itch.io, Nekoland und GamePix):</strong>", "verwenden ein Gastkonto nur für die Online-Rangliste",
       "bleiben im Speicher Ihres Browsers und werden nicht an House Duck gesendet", "<td>Quest-Belohnungen</td>", "der UTC-Tag oder die UTC-Woche der Quest", "Modulziehungs-Tickets",
       "Quest-Belohnungen: werden 35 Tage nach dem Abholen der Belohnung gelöscht.", "<h3>Tägliche Erinnerung und Bewertungsfenster des Stores (Android und iOS)</h3>",
