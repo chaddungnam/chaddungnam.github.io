@@ -4,7 +4,7 @@
   const answer = (p) => (window.__mockPerfEmpty
     ? { ok: true, days: p.days, build: p.build ?? null, total: { sessions: 0, installs: 0 }, devices: [], stages: [], areas: [], first_use: [], stalls: [], net: [], buy: [], builds: [] }
     : { ok: true, days: p.days ?? 7, from: "2026-10-17", build: p.build ?? null,
-      total: { sessions: 140, installs: 38, median_up_s: 610, p50_first_frame_ms: 2100, p90_first_frame_ms: 4800, sessions_with_stall: 6, sessions_with_mem_warn: 3, p50_peak_mb: 410, p90_peak_mb: 690 },
+      total: { sessions: 140, installs: 38, median_up_s: 610, p50_first_frame_ms: 2100, p90_first_frame_ms: 4800, sessions_with_stall: 6, sessions_with_mem_warn: 3, p50_peak_mb: 410, p90_peak_mb: 690, peak_sessions: 96 },
       devices: [{ device_model: "SM-S918N", platform: "android", sessions: 60, p50_first_frame_ms: 1700, p90_first_frame_ms: 2600, frames_over_100_per_session: 1.4, stall_sessions: 1, mem_warn_sessions: 0 },
         { device_model: "SM-A135F", platform: "android", sessions: 30, p50_first_frame_ms: 3900, p90_first_frame_ms: 6100, frames_over_100_per_session: 9.2, stall_sessions: 4, mem_warn_sessions: 3 },
         { device_model: "iPhone14,5", platform: "ios", sessions: 50, p50_first_frame_ms: 1500, p90_first_frame_ms: 2200, frames_over_100_per_session: 0.6, stall_sessions: 1, mem_warn_sessions: 0 }],

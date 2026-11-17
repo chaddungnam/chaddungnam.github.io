@@ -16,7 +16,7 @@ test("성능: summary, devices, stages, hitch places, first use, stalls and buil
   await expect(card("first")).toHaveText("2,100ms / 4,800ms");
   await expect(card("stall")).toHaveText("6 · 4.3%");
   await expect(card("mem")).toHaveText("3 · 2.1%");
-  await expect(card("peak")).toHaveText("410MB / 690MB");
+  await expect(card("peak")).toHaveText("410MB / 690MB · 96개 세션 기준");  // 96 of the 140 sessions sent a memory figure
   await expect(page.locator("#tenkeyPerfDevices tr")).toHaveCount(3);
   const slow = page.locator("#tenkeyPerfDevices tr", { hasText: "SM-A135F" });
   await expect(slow.locator('td[data-label="세션당 100ms 넘은 프레임"]')).toHaveText("9.2");

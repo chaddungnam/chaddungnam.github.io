@@ -24,7 +24,10 @@
     set("first", n ? `${ms(t.p50_first_frame_ms)} / ${ms(t.p90_first_frame_ms)}` : "—");
     set("stall", n ? `${num(t.sessions_with_stall)} · ${T.fmt.pct(t.sessions_with_stall, n)}` : "—");
     set("mem", n ? `${num(t.sessions_with_mem_warn)} · ${T.fmt.pct(t.sessions_with_mem_warn, n)}` : "—");
-    set("peak", n ? `${mb(t.p50_peak_mb)} / ${mb(t.p90_peak_mb)}` : "—");
+    // Only the sessions that sent a memory figure are in the two numbers (a build that can read none sends -1, older ones 0:
+    // server 20261117170500); the count says how many, so a median of a few sessions is not read as one of all (cqa1117).
+    const peakOf = Number(t.peak_sessions || 0) > 0 ? ` · ${num(t.peak_sessions)}개 세션 기준` : "";
+    set("peak", n ? `${mb(t.p50_peak_mb)} / ${mb(t.p90_peak_mb)}${peakOf}` : "—");
     table("tenkeyPerfDevices", d.devices || [], ["기기", "플랫폼", "세션", "첫 화면 (가운데)", "첫 화면 (느린 쪽 10%)", "세션당 100ms 넘은 프레임", "멈춘 세션", "메모리 경고 세션"],
       (r) => [[r.device_model || "—"], [platformName(r.platform)], [num(r.sessions), true], [ms(r.p50_first_frame_ms), true], [ms(r.p90_first_frame_ms), true], [num(r.frames_over_100_per_session), true], [num(r.stall_sessions), true], [num(r.mem_warn_sessions), true]], NONE);
     table("tenkeyPerfStages", d.stages || [], ["불러오는 단계", "세션", "켠 뒤 도착 (가운데)", "머문 시간 (가운데)", "가장 느린 프레임 (느린 쪽 10%)", "가장 느린 프레임"],
