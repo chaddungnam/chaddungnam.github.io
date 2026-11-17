@@ -88,7 +88,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-11-08"/, `${locale}: last updated 2026-11-08`);
+    assert.match(html, /datetime="2026-11-17"/, `${locale}: last updated 2026-11-17`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -121,7 +121,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-11-08"/, "de: last updated 2026-11-08");
+  assert.match(html, /datetime="2026-11-17"/, "de: last updated 2026-11-17");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -222,11 +222,12 @@ test("public pages use the store names; the old name 10KEY appears only in the d
   assert.match(home, /<h1 id="game-title">.*10key Survival.*딸깍 서바이벌.*<\/h1>/, "/10key/ shows both store names");
 });
 
-// 2026-10-25: section 13 lists the run record (every finished run, store apps, install ID, 90 days) in every language.
+// 2026-10-25: section 13 lists the run record (every finished run, store apps, install ID) in every language; kept 60 days since
+// 2026-11-17 (was 90; server run_stats_retention + the tenkey_data_keep list).
 test("section 13 covers the 10key Survival run records in every language", () => {
-  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 90 days", "Desktop versions and test builds send none of them"],
-    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 90일 후 삭제됩니다", "데스크톱 버전과 테스트 빌드는 이 신호를 하나도 보내지 않습니다"],
-    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 90 Tagen gelöscht", "Desktop-Versionen und Testversionen senden keines davon"] })) {
+  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 60 days", "Desktop versions and test builds send none of them"],
+    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 60일 후 삭제됩니다", "데스크톱 버전과 테스트 빌드는 이 신호를 하나도 보내지 않습니다"],
+    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 60 Tagen gelöscht", "Desktop-Versionen und Testversionen senden keines davon"] })) {
     const html = fs.readFileSync(path.join(repoDir, "privacy", `${locale}.html`), "utf8");
     const s13 = html.slice(html.indexOf('id="section-13"'), html.indexOf('id="section-14"'));
     for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
@@ -298,6 +299,33 @@ test("section 13 covers Nekoland, GamePix in review, app issue reports and run t
   for (const [locale, list] of Object.entries(terms)) {
     const html = read(`10key/terms/${locale}.html`);
     for (const w of list) assert.ok(html.includes(w), `${locale} terms: ${w}`);
+  }
+});
+
+// 2026-11-17 (wave fw7): the client fields behind ReproData.RUN_LISTED / ID_LISTED (run state, save counts, action codes on the
+// trail; session code + run ID only under IssueReport.id_ok) and RunTraceData.ACCT_LISTED (progress at the run start) are listed
+// as what NEWER versions add, so the page stays true for iOS 1.0.0 (22) and GamePix 1.0.0-52, which send none of them. The 1:1
+// inquiry's ctx (<= 2 KB, deleted with the inquiry) is in its row. The durability-by-cause counters (DigBalCount life_*) ship
+// without a switch and are listed with the run timeline's balance counters. Flip a switch only while these rows say so.
+test("section 13 lists what newer versions add to reports, the 1:1 inquiry and the run timeline in every language", () => {
+  const words = {
+    en: ["<td>Situation at the time of a report (newer versions: Android and iOS apps, itch.io)</td>", "older versions send them without it",
+      "the world seed", "A summary of the save in counts only", "a random session code that the app makes new at every start",
+      "None of this contains your nickname, your login ID or anything you typed.", "Newer versions also add, at most 2 KB in all",
+      "These items are deleted together with the inquiry.", "the durability lost to each cause", "how far your progress was when the run started"],
+    ko: ["<td>보고 시점의 상황(새 버전: Android 및 iOS 앱, itch.io)</td>", "이전 버전은 이 항목 없이 보냅니다", "월드 시드",
+      "저장 데이터의 요약(숫자만)", "새로 만드는 무작위 세션 코드", "이 항목에는 닉네임, 로그인 ID, 이용자가 입력한 내용이 들어가지 않습니다.",
+      "모두 합쳐 최대 2KB로 덧붙입니다", "이 항목은 문의와 함께 삭제됩니다.", "원인별로 잃은 내구도", "판을 시작할 때의 성장 정도"],
+    de: ["<td>Situation zum Zeitpunkt eines Berichts (neuere Versionen: Android- und iOS-Apps, itch.io)</td>", "ältere Versionen senden sie ohne diese Angaben",
+      "der Welt-Seed", "Eine Zusammenfassung des Spielstands nur in Zahlen", "einen zufälligen Sitzungscode, den die App bei jedem Start neu",
+      "Nichts davon enthält Ihren Spitznamen, Ihre Login-ID oder etwas, das Sie eingegeben haben.", "insgesamt höchstens 2 KB",
+      "Diese Angaben werden zusammen mit der Anfrage gelöscht.", "die je Ursache verlorene Haltbarkeit", "Ihren Fortschritt zu Beginn des Runs"],
+  };
+  const old = { en: "run records 90 days", ko: "판 기록은 90일", de: "Run-Protokolle 90 Tage" };
+  for (const [locale, list] of Object.entries(words)) {
+    const s13 = section13(locale);
+    for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
+    assert.ok(!s13.includes(old[locale]), `${locale}: technical run records are kept 60 days, not 90`);
   }
 });
 
