@@ -5,7 +5,7 @@
   const ago = (d) => new Date(Date.now() - d * 86400000).toISOString();
   const rows = () => [
     { tbl: "tenkey.crash_reports", days: 60, note: "crash reports", rows: 412, bytes: 1835008, oldest: ago(58), last_purge_at: ago(0.4), last_removed: 37 },
-    { tbl: "tenkey.crash_log_tail", days: 7, note: "log tails", rows: 51, bytes: 409600, oldest: ago(6), last_purge_at: ago(0.4), last_removed: 12 },
+    { tbl: "tenkey.crash_reports.log_tail", days: 7, note: "log tails", rows: 51, bytes: 409600, oldest: ago(6), last_purge_at: ago(0.4), last_removed: 12 },
     { tbl: "tenkey.app_issues", days: 60, note: "app issues", rows: 230, bytes: 655360, oldest: ago(75), last_purge_at: null, last_removed: null },
     { tbl: "tenkey.issue_reports", days: 60, note: "inquiries", rows: 9, bytes: 24576, oldest: ago(20), last_purge_at: ago(0.4), last_removed: 0 },
     { tbl: "tenkey_private.telemetry", days: 60, note: "telemetry", rows: 3120, bytes: 7340032, oldest: ago(59), last_purge_at: ago(0.4), last_removed: 140 },

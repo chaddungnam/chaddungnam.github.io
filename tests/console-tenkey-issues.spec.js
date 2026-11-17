@@ -6,7 +6,6 @@ const { open, shot, calls } = require("./fixtures/tenkey_console.cjs");
 // each opening one report with the app's own steps before it, the run's seed to rebuild it in QA, the save it had and the same
 // device's records around it. Reports from builds before these fields show '—'. TENKEY_SHOTS=<dir> writes captures.
 test.describe.configure({ retries: 2 });
-const INSTALL = "9f31a0c2-0000-4000-8000-000000000001";  // tests/fixtures/tenkey/issues.js
 
 test("이슈함 크래시: groups narrow the list, one report shows how to rebuild the run, the numbered steps in words, the save, the log and the same device's records", async ({ page }) => {
   const errors = await open(page, "#/tenkey-issues");
@@ -47,10 +46,15 @@ test("이슈함 크래시: groups narrow the list, one report shows how to rebui
   await shot(page, "issues_crash_detail", "#tenkeyIssueDetail");
 
   await page.locator("#tenkeyIssueTimelineButton").click();
-  await expect(page.locator("#tenkeyIssueTimeline li")).toHaveCount(3);
-  await expect(page.locator("#tenkeyIssueTimeline")).toContainText("성능 보고");
-  await expect(page.locator("#tenkeyIssueTimeline")).toContainText("판 흐름");
-  expect((await calls(page, "issues.timeline")).at(-1).params).toEqual({ install: INSTALL, at: "2026-10-23T10:12:00+00:00", minutes: 10 });
+  const line = page.locator("#tenkeyIssueTimeline li");
+  await expect(line).toHaveCount(3);
+  await expect(line.nth(0)).toContainText("성능 보고 · 가장 긴 한 프레임 480ms · 버벅임 2");
+  await expect(line.nth(1)).toContainText("판 흐름 · 노멀 모드 · Lv 12 · 게임 오버 (텐키 파손) · 4분 5초 판");
+  await expect(line.nth(2)).toContainText("크래시 · 화면을 켠 채 꺼짐 · DigScene · signal 11");
+  await expect(line.nth(2).locator(".tk-badge")).toHaveText("이 보고");
+  await expect(line.nth(0)).not.toContainText("undefined");
+  // the server finds the device from the report itself: the page sends the report, never an install id
+  expect((await calls(page, "issues.timeline")).at(-1).params).toEqual({ source: "crash", id: 41, minutes: 10 });
   await page.locator("#tenkeyIssueClose").click();
   await expect(detail).toBeHidden();
   expect(errors).toEqual([]);
@@ -64,9 +68,9 @@ test("이슈함 크래시: a report from an older build reads '—' for the run,
   await expect(detail).toContainText("멈춤 (5초 이상)");
   await expect(detail).toContainText("— (판 밖에서 났거나, 판 번호를 보내지 않은 빌드입니다)");
   await expect(detail).toContainText("— (이 보고를 보낸 빌드는 앱 순서를 보내지 않았습니다)");
-  await expect(detail).toContainText("— (이 보고에는 기기 번호가 없어 묶어 볼 수 없습니다)");
   await expect(detail.locator(".tk-repro")).toHaveCount(0);
-  await expect(detail.locator("#tenkeyIssueTimelineButton")).toHaveCount(0);
+  await detail.locator("#tenkeyIssueTimelineButton").click();
+  await expect(detail.locator("#tenkeyIssueTimeline")).toHaveText("— (이 보고에는 기기 번호도 세션 번호도 없어 묶어 볼 수 없습니다)");
   await expect(page.locator('#tenkeyIssueTable tr[data-tk-issue="39"] td[data-label="판 다시 만들기"]')).toHaveText("—");
   await expect(page.locator('#tenkeyIssueTable tr[data-tk-issue="41"] td[data-label="판 다시 만들기"]')).toHaveText("있음");
   expect(errors).toEqual([]);

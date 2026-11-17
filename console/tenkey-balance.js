@@ -137,40 +137,47 @@
     byId("tenkeyBalanceClamp").textContent = Number(cl[0]) > 0 ? `집게에 잡힌 ${num(cl[0])}번 중 ${num(cl[1])}번 스스로 빠져나옴 · 한 번에 평균 ${num(Math.round(Number(cl[4]) / Number(cl[0]) * 10) / 10)}초 잡혀 있음` : "";
   }
 
-  // balance.v4 only: each panel stays hidden while the server does not send its list ([] = sent, nothing yet = NOT_YET).
+  // balance.v4 only (tenkey.admin_balance_v4, hexaworld 20261117130200): each panel stays hidden while the server does not send its
+  // list ([] = sent, nothing yet = NOT_YET). acct band = the sum of the account's upgrade tiers (160 = UpgradeStageData.TOTAL_TIERS,
+  // all done; 'none' = a build before acct); bands 0..4 = Lv 1-6 / 7-13 / 14-19 / 20-29 / 30+, each an average over the runs that
+  // reached it; counters = {name: sum} over counter_runs runs (the runs that sent them).
+  const ACCT = { none: "모름 (강화 정도를 보내기 전 빌드)", 0: "강화 안 한 계정 (강화 합 0)", "1-9": "강화 합 1–9", "10-24": "강화 합 10–24", "25-39": "강화 합 25–39",
+    "40-159": "강화 합 40–159", "160+": "모두 강화한 계정 (강화 합 160)" };
+  const BANDS = ["Lv 1–6", "Lv 7–13", "Lv 14–19", "Lv 20–29", "Lv 30 이상"];
   function renderV4(d) {
     const panel = (id, list) => { byId(id).hidden = list === undefined || list === null; return Array.isArray(list) ? list : []; };
     const acct = panel("tenkeyBalanceAcct", d.acct);
-    const band = (r) => r.label || (r.up_to == null ? `강화 합 ${r.up_from} 이상` : Number(r.up_to) === 0 ? "강화 안 한 계정 (강화 합 0)" : `강화 합 ${r.up_from}–${r.up_to}`);  // null = open top band (Number(null) is 0)
-    byId("tenkeyBalanceAcctRows").innerHTML = acct.length ? rowsOf(acct, ["강화 정도", "판", "기기", "끝난 레벨 (가운데)", "평균 끝 레벨", "한 판 길이 (가운데)"],
-      (r) => [[band(r)], [num(r.runs), true], [num(r.installs), true], [avgLv(r.median_level), true], [avgLv(r.avg_level), true], [r.median_ms == null ? "—" : duration(r.median_ms), true]]) : `<tr><td colspan="6" class="empty-panel">${NOT_YET}</td></tr>`;
+    byId("tenkeyBalanceAcctRows").innerHTML = acct.some((r) => r.band !== "none") ? rowsOf(acct, ["강화 정도", "판", "평균 끝 레벨", "한 판 길이 (가운데)"],
+      (r) => [[ACCT[r.band] || String(r.band ?? "—")], [num(r.runs), true], [avgLv(r.avg_lv), true], [r.median_ms == null ? "—" : duration(r.median_ms), true]]) : `<tr><td colspan="4" class="empty-panel">${NOT_YET}</td></tr>`;
     const bands = panel("tenkeyBalanceBands", d.bands);
-    byId("tenkeyBalanceBandRows").innerHTML = bands.length ? rowsOf(bands, ["구간", "지나간 판", "머문 시간 (가운데)", "부순 키 (판당)", "받은 피해 (판당)", "부활"],
-      (r) => [[r.to == null ? `Lv ${r.from} 이상` : `Lv ${r.from}–${r.to}`], [num(r.runs), true], [r.sec_p50 == null ? "—" : duration(Number(r.sec_p50) * 1000), true], [num(r.keys_avg), true], [r.dmg_avg == null ? "—" : `${num(r.dmg_avg)}%`, true], [num(r.revives), true]]) : emptyRow(6);
+    byId("tenkeyBalanceBandRows").innerHTML = bands.length ? rowsOf(bands, ["구간", "지나간 판", "머문 시간 (평균)", "부순 키 (판당)", "받은 피해 (판당)", "부활"],
+      (r) => [[BANDS[r.band] || `구간 ${r.band}`], [num(r.runs), true], [r.secs == null ? "—" : duration(Number(r.secs) * 1000), true], [r.keys == null ? "—" : num(r.keys), true], [r.dmg == null ? "—" : `${num(r.dmg)}%`, true], [num(r.revives), true]]) : emptyRow(6);
     const offers = d.offers === undefined && d.idle === undefined ? null : d.offers || [];
     const shown = panel("tenkeyBalanceOffersPanel", offers);
-    byId("tenkeyBalanceOffers").innerHTML = shown.length ? rowsOf([...shown].sort((a, b) => Number(b.offered) - Number(a.offered)), ["카드", "종류", "나온 횟수", "고른 횟수", "고른 비율"], (r) => {
+    byId("tenkeyBalanceOffers").innerHTML = shown.length ? rowsOf([...shown].sort((a, b) => Number(b.offered) - Number(a.offered)), ["카드", "나온 횟수", "고른 횟수", "고른 비율"], (r) => {
       const low = Number(r.offered) >= 10 && Number(r.picked) / Number(r.offered) < 0.15;
-      return [[name(CARDS, r.skill)], [KINDS[r.kind] || r.kind || "—"], [num(r.offered), true], [num(r.picked), true], [pct(r.picked, r.offered), true, low ? look("1/3보다 한참 낮음") : ""]];
-    }) : emptyRow(5);
+      return [[name(CARDS, r.skill)], [num(r.offered), true], [num(r.picked), true], [pct(r.picked, r.offered), true, low ? look("1/3보다 한참 낮음") : ""]];
+    }) : emptyRow(4);
     const idle = d.idle || null;
     const n = Number(idle?.runs || 0);
     byId("tenkeyBalanceIdle").innerHTML = n ? `<dl class="tk-detail-grid">${[
       ["상세 기록을 보낸 판", num(n), ""], ["판 시간 중 손 놓은 비율", `${num(idle.idle_share_pct)}%`, Number(idle.idle_share_pct) > 10 ? look("10%를 넘음") : ""],
       ["30초 넘게 손 놓은 판", `${num(idle.long_idle_runs)} · ${pct(idle.long_idle_runs, n)}`, Number(idle.long_idle_runs) / n > 0.25 ? look("네 판에 한 판 넘게") : ""],
-      ["가장 길게 손 놓은 시간 (가운데)", idle.longest_p50_s == null ? "—" : duration(Number(idle.longest_p50_s) * 1000), ""],
+      ["가장 길게 손 놓은 시간 (가운데)", idle.p50_longest_s == null ? "—" : duration(Number(idle.p50_longest_s) * 1000), ""],
     ].map(([k, v, extra]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}${extra}</dd></div>`).join("")}</dl>` : `<p class="overview-drill-note">${NOT_YET}</p>`;
-    const counters = panel("tenkeyBalanceCountersPanel", d.counters);
+    const list = d.counters && typeof d.counters === "object" ? Object.entries(d.counters).map(([key, sum]) => ({ key, sum })).sort((a, b) => Number(b.sum) - Number(a.sum)) : d.counters;
+    const counters = panel("tenkeyBalanceCountersPanel", list);
+    const runs = Number(d.counter_runs || 0);
     byId("tenkeyBalanceCounters").innerHTML = counters.length ? rowsOf(counters, ["센 것", "센 판", "모두", "판당"],
-      (r) => [[name(COUNTERS, r.key)], [num(r.runs), true], [num(r.sum), true], [Number(r.runs) > 0 ? num(Math.round(Number(r.sum) / Number(r.runs) * 10) / 10) : "—", true]]) : emptyRow(4);
+      (r) => [[name(COUNTERS, r.key)], [num(runs), true], [num(r.sum), true], [runs > 0 ? num(Math.round(Number(r.sum) / runs * 10) / 10) : "—", true]]) : emptyRow(4);
   }
 
-  // Where the numbers came from: the newest record of each table and its rows under this filter (v4), or which server answered.
+  // Where the numbers came from: the newest record of each table and how many rows the server holds in all (v4 tables: the whole
+  // table, not this filter), or which server answered.
   function renderFresh(d) {
     const parts = [];
-    const last = d.last_received_at || {};
-    const rows = d.rows && typeof d.rows === "object" ? d.rows : {};
-    if (d.last_received_at || d.rows) parts.push(`마지막으로 받은 판 기록 ${time(last.run_stats)} · 판 흐름 기록 ${time(last.run_trace)} · 이 조건의 줄 수: 판 기록 ${num(rows.run_stats)}, 판 흐름 기록 ${num(rows.run_trace)}.`);
+    const t = d.tables && typeof d.tables === "object" ? d.tables : null;
+    if (t) parts.push(`마지막으로 받은 판 기록 ${time(t.run_stats?.last_received_at)} · 판 흐름 기록 ${time(t.run_trace?.last_received_at)} · 서버에 남아 있는 줄 (기간·조건과 상관없이 모두): 판 기록 ${num(t.run_stats?.rows)}, 판 흐름 기록 ${num(t.run_trace?.rows)}.`);
     if (d._src === "v4+v3") parts.push("계정 강화 정도·레벨 구간·나온 카드·손 놓은 시간·센 것 표는 아직 빌드·모드를 가리지 않은 값입니다.");
     if (d._src === "v3") parts.push("서버가 아직 이전 버전이라 계정 강화 정도·레벨 구간·나온 카드·손 놓은 시간·센 것 표는 빠졌습니다.");
     byId("tenkeyBalanceFresh").hidden = !parts.length;

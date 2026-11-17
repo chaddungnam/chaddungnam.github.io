@@ -644,7 +644,7 @@
 
       <section id="tenkeyBalanceView" class="route-view tk-balance" data-route="tenkey-balance" hidden>
         <form id="tenkeyBalanceForm" class="panel admin-toolbar tenkey-toolbar" role="search">
-          <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="90">최근 90일</option></select></label>
+          <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
           <label>빌드<select id="tenkeyBalanceBuild"><option value="">전체</option></select></label>
           <label>모드<select id="tenkeyBalanceMode"><option value="">전체</option><option value="classic">노멀 모드</option><option value="hard">하드 모드</option></select></label>
           <label>기기<select id="tenkeyBalancePlatform"><option value="app" selected>앱 (Android·iOS)</option><option value="">전체 (앱 + 웹 체험판)</option><option value="web">웹 체험판 (itch)</option></select></label>
@@ -700,15 +700,15 @@
           </section>
           <section id="tenkeyBalanceAcct" class="panel" hidden>
             <div class="panel-heading"><div><p class="eyebrow">ACCOUNT GROWTH</p><h2>계정 강화 정도별</h2><small>판을 시작할 때 그 계정의 업그레이드 합으로 나눕니다. 처음 하는 계정과 많이 강화한 계정을 섞으면 판 길이가 틀려 보이므로, 곡선은 같은 줄끼리 비교합니다.</small></div></div>
-            <div class="table-scroll tk-stack"><table><thead><tr><th>강화 정도</th><th class="tk-num">판</th><th class="tk-num">기기</th><th class="tk-num">끝난 레벨 (가운데)</th><th class="tk-num">평균 끝 레벨</th><th class="tk-num">한 판 길이 (가운데)</th></tr></thead><tbody id="tenkeyBalanceAcctRows"></tbody></table></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>강화 정도</th><th class="tk-num">판</th><th class="tk-num">평균 끝 레벨</th><th class="tk-num">한 판 길이 (가운데)</th></tr></thead><tbody id="tenkeyBalanceAcctRows"></tbody></table></div>
           </section>
           <section id="tenkeyBalanceBands" class="panel" hidden>
-            <div class="panel-heading"><div><p class="eyebrow">LEVEL BANDS</p><h2>레벨 구간마다</h2><small>그 구간을 지나간 판 기준: 머문 시간, 부순 키, 받은 피해(생명줄 %), 부활 횟수</small></div></div>
-            <div class="table-scroll tk-stack"><table><thead><tr><th>구간</th><th class="tk-num">지나간 판</th><th class="tk-num">머문 시간 (가운데)</th><th class="tk-num">부순 키 (판당)</th><th class="tk-num">받은 피해 (판당)</th><th class="tk-num">부활</th></tr></thead><tbody id="tenkeyBalanceBandRows"></tbody></table></div>
+            <div class="panel-heading"><div><p class="eyebrow">LEVEL BANDS</p><h2>레벨 구간마다</h2><small>그 구간을 지나간 판의 평균: 머문 시간, 부순 키, 받은 피해(생명줄 %). 부활은 모두 더한 횟수</small></div></div>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>구간</th><th class="tk-num">지나간 판</th><th class="tk-num">머문 시간 (평균)</th><th class="tk-num">부순 키 (판당)</th><th class="tk-num">받은 피해 (판당)</th><th class="tk-num">부활</th></tr></thead><tbody id="tenkeyBalanceBandRows"></tbody></table></div>
           </section>
           <section id="tenkeyBalanceOffersPanel" class="panel tk-balance-pair" hidden>
             <div><p class="eyebrow">OFFERED VS PICKED</p><h2>나온 카드와 고른 카드</h2><small>레벨업 때 3장 중 1장을 고르므로 고른 비율은 보통 1/3 근처입니다. 한참 낮으면 그 카드가 덜 끌린다는 뜻입니다.</small>
-              <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th>종류</th><th class="tk-num">나온 횟수</th><th class="tk-num">고른 횟수</th><th class="tk-num">고른 비율</th></tr></thead><tbody id="tenkeyBalanceOffers"></tbody></table></div></div>
+              <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th class="tk-num">나온 횟수</th><th class="tk-num">고른 횟수</th><th class="tk-num">고른 비율</th></tr></thead><tbody id="tenkeyBalanceOffers"></tbody></table></div></div>
             <div><p class="eyebrow">IDLE</p><h2>손을 놓은 시간</h2><small>8초 넘게 캐지도 카드를 고르지도 않은 시간</small><div id="tenkeyBalanceIdle"></div></div>
           </section>
           <section id="tenkeyBalanceCountersPanel" class="panel" hidden>
@@ -780,7 +780,7 @@
       <section id="tenkeyIssuesView" class="route-view tk-page" data-route="tenkey-issues" hidden>
         <div id="tenkeyIssueTabs" class="tk-retention-tabs tk-issue-tabs" role="group" aria-label="이슈 종류"><button type="button" data-issue-tab="crash" aria-pressed="true">크래시</button><button type="button" data-issue-tab="app" aria-pressed="false">앱 이상</button><button type="button" data-issue-tab="ask" aria-pressed="false">1대1 문의</button></div>
         <form id="tenkeyIssueForm" class="panel admin-toolbar tenkey-toolbar" role="search">
-          <label>기간<select id="tenkeyIssueDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
+          <label>기간<select id="tenkeyIssueDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option></select></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
         <p id="tenkeyIssueKeepNote" class="impact-note">—</p>
@@ -812,7 +812,7 @@
 
       <section id="tenkeyPerfView" class="route-view tk-page" data-route="tenkey-perf" hidden>
         <form id="tenkeyPerfForm" class="panel admin-toolbar tenkey-toolbar" role="search">
-          <label>기간<select id="tenkeyPerfDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
+          <label>기간<select id="tenkeyPerfDays"><option value="1">최근 1일</option><option value="7" selected>최근 7일</option><option value="30">최근 30일</option></select></label>
           <label>빌드<select id="tenkeyPerfBuild"><option value="">전체</option></select></label>
           <button class="primary-button" type="submit">조회</button>
         </form>

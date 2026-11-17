@@ -44,14 +44,17 @@
     if (window.__mockBalanceEmpty) return base;
     const reach = window.__mockV4Reach ? [[1, 0], [2, 20], [3, 45], [4, 70], [5, 100], [6, 400], [7, 430], [8, 470], [10, 560]].map(([lv, s], i) => ({ lv, n: 60 - i * 5, median_ms: s * 1000, p90_ms: s * 1500 })) : base.reach;
     return { ...base, reach, reach_src: window.__mockV4Reach ? "trace" : "stats",
-      last_received_at: { run_stats: "2026-10-23T12:58:00+00:00", run_trace: "2026-10-23T12:40:00+00:00" }, rows: { run_stats: 240, run_trace: 60 },
-      acct: window.__mockNoAcct ? [] : [{ up_from: 0, up_to: 0, runs: 90, installs: 20, median_level: 9, avg_level: 10.2, median_ms: 150000 },
-        { up_from: 1, up_to: 20, runs: 100, installs: 12, median_level: 18, avg_level: 19, median_ms: 260000 }, { up_from: 21, up_to: null, runs: 50, installs: 5, median_level: 27, avg_level: 28.4, median_ms: 420000 }],
-      bands: [{ from: 1, to: 6, runs: 60, sec_p50: 95, keys_avg: 42, dmg_avg: 31, revives: 2 }, { from: 7, to: 13, runs: 48, sec_p50: 160, keys_avg: 80, dmg_avg: 45, revives: 6 },
-        { from: 14, to: 19, runs: 30, sec_p50: 140, keys_avg: 70, dmg_avg: 52, revives: 5 }, { from: 20, to: 29, runs: 12, sec_p50: 260, keys_avg: 120, dmg_avg: 60, revives: 3 }, { from: 30, to: null, runs: 4, sec_p50: 80, keys_avg: 30, dmg_avg: 70, revives: 0 }],
-      offers: [{ skill: "laser", kind: "n", offered: 300, picked: 190 }, { skill: "eco", kind: "n", offered: 120, picked: 9 }, { skill: "bomb", kind: "n", offered: 6, picked: 0 }],
-      idle: { runs: 60, idle_share_pct: 12.5, long_idle_runs: 9, longest_p50_s: 14 },
-      counters: [{ key: "keys_broken", runs: 60, sum: 9000 }, { key: "numlock_caught", runs: 40, sum: 66 }, { key: "life_hurt", runs: 55, sum: 1200 }, { key: "mystery_x", runs: 2, sum: 3 }] };
+      // the shapes tenkey.admin_balance_v4 answers (hexaworld 20261117130200): tables = whole tables, not this filter
+      last_received_at: "2026-10-23T12:58:00+00:00",
+      tables: { run_stats: { rows: 240, oldest: "2026-09-01", last_received_at: "2026-10-23T12:58:00+00:00" }, run_trace: { rows: 60, oldest: "2026-09-02", last_received_at: "2026-10-23T12:40:00+00:00" },
+        funnel: { rows: 30, oldest: "2026-09-01", last_received_at: "2026-10-23T12:00:00+00:00" } },
+      acct: window.__mockNoAcct ? [{ band: "none", runs: 60, avg_lv: 9.1, median_ms: 180000 }] : [{ band: "none", runs: 12, avg_lv: 7, median_ms: 120000 },
+        { band: "0", runs: 90, avg_lv: 10.2, median_ms: 150000 }, { band: "10-24", runs: 100, avg_lv: 19, median_ms: 260000 }, { band: "160+", runs: 50, avg_lv: 28.4, median_ms: 420000 }],
+      bands: [{ band: 0, runs: 60, secs: 95, keys: 42, dmg: 31, revives: 2 }, { band: 1, runs: 48, secs: 160, keys: 80, dmg: 45, revives: 6 },
+        { band: 2, runs: 30, secs: 140, keys: 70, dmg: 52, revives: 5 }, { band: 3, runs: 12, secs: 260, keys: 120, dmg: 60, revives: 3 }, { band: 4, runs: 4, secs: 80, keys: 30, dmg: 70, revives: 0 }],
+      offers: [{ skill: "laser", offered: 300, picked: 190, pick_rate: 0.633 }, { skill: "eco", offered: 120, picked: 9, pick_rate: 0.075 }, { skill: "bomb", offered: 6, picked: 0, pick_rate: 0 }],
+      idle: { runs: 60, with_idle: 40, avg_n: 1.4, p50_longest_s: 14, p90_longest_s: 40, avg_total_s: 22, idle_share_pct: 12.5, long_idle_runs: 9 },
+      counters: { keys_broken: 9000, numlock_caught: 66, life_hurt: 1200, mystery_x: 3 }, counter_runs: 60 };
   };
   Object.assign(window.__tkPages = window.__tkPages || {}, { "balance.get": (p) => v3(p), "balance.v4": v4 });
 })();

@@ -14,13 +14,13 @@ test("데이터 보관: every dataset in plain words with who sends it, days kep
   await expect(rows).toHaveCount(8);
   const card = (k) => page.locator(`#tenkeyKeepSummary [data-keep-summary="${k}"]`);
   await expect(card("sets")).toHaveText("8");
-  await expect(card("rows")).toHaveText("29,425");
-  await expect(card("bytes")).toHaveText("38.8 MB");
+  await expect(card("rows")).toHaveText("29,374");   // the log row (51, its bytes) lives inside crash_reports: not counted twice
+  await expect(card("bytes")).toHaveText("38.4 MB");
   await expect(card("purge")).not.toHaveText(/—|아직 없음/);
   // One row by its table name (the code line under the plain name).
   const row = (tbl) => page.locator("#tenkeyKeepTable tr", { has: page.locator("code", { hasText: new RegExp(`\\.${tbl}$`) }) });
   await expect(row("crash_reports").locator('td[data-label="보관"]')).toHaveText("60일");
-  await expect(row("crash_log_tail").locator('td[data-label="보관"]')).toHaveText("7일");
+  await expect(row("log_tail").locator('td[data-label="보관"]')).toHaveText("7일");   // the server's name: tenkey.crash_reports.log_tail
   await expect(row("crash_reports").locator('td[data-label="데이터"] strong')).toHaveText("크래시 보고");
   await expect(row("crash_reports").locator('td[data-label="보내는 곳"]')).toContainText("GamePix·네코랜드·에디터·디버그 빌드는 보내지 않음");
   await expect(row("issue_reports").locator('td[data-label="보내는 곳"]')).toContainText("14세 미만");

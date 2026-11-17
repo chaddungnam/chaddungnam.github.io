@@ -3,12 +3,17 @@
 // {groups, rows} and "issues.get" {source, id} -> {row}; 1대1 문의 reads "issues.asks" {days} -> {rows} (inquiry rows with ctx).
 // One report shows the app's own steps before it as numbered lines ("<seconds> <what>", the game's CrashTrail), the run it was
 // in as "이 판 다시 만들기: seed … (QA_WORLD_SEED)", the save it had, and on request the same device's other records from ten
-// minutes before to ten after ("issues.timeline" {install, at, minutes}). Reports from builds before these fields read '—'.
+// minutes before to ten after ("issues.timeline" {source, id, minutes}: the server finds the device or the launch itself and
+// answers {by, rows:[{t, source, self, ...}]}). Reports from builds before these fields read '—'.
 (function attachConsoleTenkeyIssues(root) {
   const T = root.ConsoleTenkey;
-  const { esc, num, time, shortTime, platformName } = T.fmt;
+  const { esc, num, time, duration, platformName } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const KINDS = { unclean_exit: "화면을 켠 채 꺼짐", anr_suspect: "멈춤 (5초 이상)", script_error: "스크립트 오류", stall: "멈춤", hitch: "버벅임" };
+  const KINDS = { unclean_exit: "화면을 켠 채 꺼짐", anr_suspect: "멈춤 (5초 이상)", script_error: "스크립트 오류", stall: "멈춤", hitch: "버벅임",
+    server_error: "서버 응답 오류", save_issue: "저장 문제", native_missing: "빠른 계산 부품 없음 (느린 예비 코드로 돌아감)", memory_warning: "메모리 부족 경고",
+    suspect: "저장값 이상 (음수가 된 값)" };
+  const ENDS = { death: "게임 오버", quit: "스스로 그만둠", app_closed: "앱을 닫음", demo_end: "체험판 끝", clear: "노멀 모드 완주" };  // the 밸런스 page's words
+  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임" };
   const SOURCES = { crash: "크래시", app: "앱 이상", ask: "1대1 문의", trace: "판 흐름", telemetry: "성능 보고" };
   const MODES = { classic: "노멀 모드", normal: "노멀 모드", hard: "하드 모드" };
   const FORMS = { tenkey: "텐키 그대로", drift: "DRIFT", robot: "로봇" };
@@ -20,7 +25,7 @@
   const WHO = {
     crash: "스토어 앱과 웹 체험판(itch) 정식 빌드가 보냅니다. 같은 오류는 하루 5건까지만 줄로 남고 그 뒤는 횟수만 늘어납니다.",
     app: "버벅임·멈춤·스크립트 오류를 같은 곳끼리 묶어 보냅니다 (스토어 앱과 웹 체험판). 버벅임과 멈춤은 「성능」 화면에도 나옵니다.",
-    ask: "앱 계정만 보냅니다 (웹, 14세 미만, 약관 미동의는 보내지 않음). 이 빌드부터 보낼 때의 앱 순서와 판·저장 상태가 붙습니다.",
+    ask: "로그인한 앱·itch 계정만 보냅니다 (GamePix·Nekoland 웹, 14세 미만, 약관 미동의는 보내지 않음). 이 빌드부터 보낼 때의 앱 순서와 판·저장 상태가 붙습니다.",
   };
   const state = { bound: false, tab: "crash", groups: [], rows: [], group: null, open: null };
   const dash = (v) => (v === null || v === undefined || v === "" ? "—" : String(v));
@@ -65,9 +70,14 @@
     return `<div class="tk-section"><h3>저장 상태</h3>${facts([["저장 형식", save.schema], ["끝낸 판", num(save.runs)], ["최고 레벨", save.best_lv != null ? `Lv ${save.best_lv}` : null],
       ["강화 합", num(save.up_sum)], ["모듈", Array.isArray(save.mods) ? save.mods.join(", ") || "없음" : save.mods]])}</div>`;
   }
-  const timelineBox = (install) => `<div class="tk-section"><h3>같은 기기의 앞뒤 기록 (10분 전 ~ 10분 뒤)</h3>${install
-    ? '<button id="tenkeyIssueTimelineButton" class="text-button" type="button">같은 기기 기록 불러오기</button><div id="tenkeyIssueTimeline"></div>'
-    : '<p class="empty-panel">— (이 보고에는 기기 번호가 없어 묶어 볼 수 없습니다)</p>'}</div>`;
+  const timelineBox = () => '<div class="tk-section"><h3>같은 기기의 앞뒤 기록 (10분 전 ~ 10분 뒤)</h3><button id="tenkeyIssueTimelineButton" class="text-button" type="button">같은 기기 기록 불러오기</button><div id="tenkeyIssueTimeline"></div></div>';
+  // One timeline line in words: a report (what / where), a run (mode, level, how it ended, length) or a performance report.
+  function lineText(r) {
+    if (r.source === "trace") return [MODES[r.mode] || r.mode, r.lv != null ? `Lv ${r.lv}` : "", `${ENDS[r.end_kind] || dash(r.end_kind)}${CAUSES[r.cause] ? ` (${CAUSES[r.cause]})` : ""}`, r.ms != null ? `${duration(r.ms)} 판` : ""].filter(Boolean).join(" · ");
+    if (r.source === "telemetry") return `가장 긴 한 프레임 ${num(r.max_frame_ms)}ms · 버벅임 ${num(r.hitch_n)} · 멈춤 ${num(r.stall_n)} · 통신 실패 ${num(r.net_fail_n)} · 메모리 경고 ${num(r.mem_warn_n)}`;
+    return [kindName(r.kind), r.where, r.said].filter(Boolean).join(" · ");
+  }
+  const clock = (v) => { const d = v ? new Date(v) : null; return d && !Number.isNaN(d.getTime()) ? d.toLocaleTimeString("ko-KR", { hour12: false }) : "—"; };
 
   function renderHead() {
     const ask = state.tab === "ask";
@@ -134,12 +144,12 @@
     }
   }
 
-  function show(html, install, at) {
+  function show(html, ref) {
     const box = byId("tenkeyIssueDetail");
     box.innerHTML = html;
     box.hidden = false;
     byId("tenkeyIssueClose").addEventListener("click", () => { box.hidden = true; });
-    byId("tenkeyIssueTimelineButton")?.addEventListener("click", () => loadTimeline(install, at));
+    byId("tenkeyIssueTimelineButton")?.addEventListener("click", () => loadTimeline(ref));
     box.scrollIntoView({ block: "start", behavior: "auto" });
   }
   const head = (eyebrow, title, sub) => `<div class="panel-heading"><div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2>${sub ? `<small class="tk-wrap">${esc(sub)}</small>` : ""}</div><button id="tenkeyIssueClose" class="text-button" type="button">닫기</button></div>`;
@@ -150,14 +160,13 @@
       const r = data?.row || {};
       const d = r.detail && typeof r.detail === "object" ? r.detail : {};
       const extra = Object.entries(d).filter(([k]) => !["trail", "run", "save", "sid", "trace"].includes(k)).map(([k, v]) => [k, typeof v === "object" ? JSON.stringify(v) : v]);
-      const install = r.install_id || r.install || null;
       show(`${head(`${SOURCES[state.tab]} #${dash(r.id ?? id)}`, kindName(r.kind), [r.where, r.said || r.message].filter(Boolean).join(" · "))}
         ${facts([["받은 시각", time(r.at || r.received_at)], ["앱", appText(r.app_version, r.build)], ["플랫폼 · OS", `${platformName(r.platform)} ${r.os_version || ""}`.trim()], ["기기", r.device_model],
-          ["언어", r.locale], ["횟수", num(r.count ?? (r.repeats != null ? 1 + Number(r.repeats) : null))], ["세션 번호", d.sid], ["판 흐름 번호", d.trace], ["기기 번호 (앞 8자)", install ? String(install).slice(0, 8) : r.install_short]])}
+          ["언어", r.locale], ["횟수", num(r.count ?? (r.repeats != null ? 1 + Number(r.repeats) : null))], ["세션 번호", d.sid], ["판 흐름 번호", d.trace], ["기기 번호 (앞 8자)", r.install_short]])}
         ${runBox(d.run)}${steps(d.trail, "앱이 남긴 순서")}${saveBox(d.save)}
         ${extra.length ? `<div class="tk-section"><h3>그 밖의 값</h3>${facts(extra)}</div>` : ""}
         ${r.log_tail ? `<div class="tk-section"><h3>Godot 로그 끝부분</h3><pre class="tk-log">${esc(r.log_tail)}</pre></div>` : ""}
-        ${timelineBox(install)}`, install, r.at || r.received_at);
+        ${timelineBox()}`, { source: state.tab, id: r.id ?? id });
     } catch (error) {
       T.report("tenkeyIssueMessage", error);
     }
@@ -171,17 +180,18 @@
     show(`${head(`1대1 문의 ${dash(a.receipt)}`, a.display_name || "플레이어 기록 없음", time(a.submitted_at))}
       <div class="tk-section"><h3>보낸 글</h3><p class="tk-report-body tk-wrap">${esc(a.body)}</p></div>
       ${facts([["답장 이메일", a.email || "없음 (이전 빌드)"], ["앱", appText(meta.version, meta.build)], ["플랫폼", platformName(meta.platform)], ["기기", meta.device], ["언어", meta.locale], ["세션 번호", ctx.sid], ["상태", a.status]])}
-      ${runBox(ctx.run)}${steps(ctx.steps, "보내기 전 앱 순서")}${saveBox(ctx.save)}`, null, a.submitted_at);
+      ${runBox(ctx.run)}${steps(ctx.steps, "보내기 전 앱 순서")}${saveBox(ctx.save)}`, null);
   }
 
-  async function loadTimeline(install, at) {
+  async function loadTimeline(ref) {
     const box = byId("tenkeyIssueTimeline");
     box.innerHTML = '<p class="empty-panel">불러오는 중입니다...</p>';
     try {
-      const data = await T.stats("issues.timeline", { install, at, minutes: 10 });
+      const data = await T.stats("issues.timeline", { source: ref.source, id: ref.id, minutes: 10 });
       const rows = Array.isArray(data?.rows) ? data.rows : [];
-      box.innerHTML = rows.length
-        ? `<ol class="tk-trail tk-steps">${rows.map((r) => `<li><span class="tk-step-at">${esc(shortTime(r.at))}</span> <strong>${esc(SOURCES[r.source] || dash(r.source))}</strong> · ${esc(kindName(r.kind))}${r.summary ? ` · ${esc(r.summary)}` : ""}</li>`).join("")}</ol>`
+      const others = rows.filter((r) => !r.self).length;
+      box.innerHTML = data?.by === "none" ? '<p class="empty-panel">— (이 보고에는 기기 번호도 세션 번호도 없어 묶어 볼 수 없습니다)</p>'
+        : others ? `<ol class="tk-trail tk-steps">${rows.map((r) => `<li><span class="tk-step-at">${esc(clock(r.t ?? r.at))}</span> <strong>${esc(SOURCES[r.source] || dash(r.source))}</strong> · ${esc(lineText(r))}${r.self ? ' <span class="tk-badge" data-tone="watch">이 보고</span>' : ""}</li>`).join("")}</ol>`
         : '<p class="empty-panel">앞뒤 10분 안에 같은 기기의 다른 기록이 없습니다.</p>';
     } catch (error) {
       box.innerHTML = `<p class="empty-panel">${esc(T.errorText(error))}</p>`;

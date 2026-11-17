@@ -1,7 +1,9 @@
 // Local synthetic data only (never real players or devices): the 이슈함 page's reads on tenkey-console-stats, with both shapes the
 // server holds: rows from builds that send the run / save / steps (new) and rows from older builds that do not (old, '—').
 //   issues.list {days, source: crash|app, kind?, limit} -> {groups, rows}   issues.get {source, id} -> {row}
-//   issues.timeline {install, at, minutes} -> {rows}                       issues.asks {days} -> {rows} (inquiries, ctx on new rows)
+//   issues.timeline {source, id, minutes} -> {by, rows:[{t, source, self}]}  issues.asks {days} -> {rows} (inquiries, ctx on new rows)
+// Shapes as tenkey.admin_issue_*_v1 answers them (hexaworld 20261117130100): groups {n = times}, rows {count, device_model}, one
+// report {install_short (8 characters, never the whole install id), detail}, timeline rows {t, source, ...per source}.
 (function () {
   const INSTALL = "9f31a0c2-0000-4000-8000-000000000001";
   const RUN = { seed: 918273, mode: "classic", lv: 12, t: 245, start_lv: 1, form: "drift", demo: false };
@@ -25,16 +27,17 @@
       const key = `${r.kind}|${r.where || ""}`;
       const g = out.get(key) || { source: r.source, kind: r.kind, where: r.where, platform: r.platform, n: 0, last_at: r.at, versions: [] };
       g.n += r.count || 1;
+      g.times = g.n;
       if (!g.versions.includes(r.app_version)) g.versions.push(r.app_version);
       out.set(key, g);
     }
     return [...out.values()];
   };
   const details = {
-    "crash:41": { ...rows.crash[0], os_version: "14", locale: "ko_KR", install_id: INSTALL, log_tail: "Godot Engine v4.7.2.stable.official\nhandle_crash: Program crashed with signal 11",
+    "crash:41": { ...rows.crash[0], os_version: "14", locale: "ko_KR", install_short: INSTALL.slice(0, 8), log_tail: "Godot Engine v4.7.2.stable.official\nhandle_crash: Program crashed with signal 11",
       detail: { run: RUN, save: SAVE, sid: "s-7f3a", trace: "tr-91c2", trail: TRAIL, uptime_s: 245 } },
     "crash:39": { ...rows.crash[1], os_version: "13", locale: "ko_KR", detail: {} },
-    "app:501": { ...rows.app[0], install_id: "web-page-load-0001", detail: { run: { seed: 4455, mode: "classic", lv: 6, t: 88, start_lv: 1, form: "tenkey", demo: true }, trail: ["0 start Web 1.0.3", "12 scene DigScene", "80 lvup 6", "88 pop+ level_up"] } },
+    "app:501": { ...rows.app[0], install_short: null, detail: { run: { seed: 4455, mode: "classic", lv: 6, t: 88, start_lv: 1, form: "tenkey", demo: true }, trail: ["0 start Web 1.0.3", "12 scene DigScene", "80 lvup 6", "88 pop+ level_up"] } },
     "app:502": { ...rows.app[1], detail: {} },
     "app:500": { ...rows.app[2], detail: { trail: ["0 start iOS 1.0.0", "5 scene DigScene"] } },
   };
@@ -59,11 +62,16 @@
     },
     "issues.timeline": (p, body, fn) => {
       stats(fn);
-      if (p.install !== INSTALL) return { ok: true, rows: [] };
-      return { ok: true, rows: [
-        { source: "telemetry", at: "2026-10-23T10:03:00+00:00", kind: "session", summary: "첫 화면 2.1초" },
-        { source: "trace", at: "2026-10-23T10:08:00+00:00", kind: "run", summary: "Lv 12 · 245초" },
-        { source: "crash", at: "2026-10-23T10:12:00+00:00", kind: "unclean_exit", summary: "signal 11" },
+      const r = details[`${p.source}:${p.id}`];
+      if (!r) return { ok: false, error: "not_found" };
+      const self = { t: r.at, source: p.source, id: r.id, kind: r.kind, where: r.where, said: r.said, app_version: r.app_version, self: true };
+      if (!r.install_short) return { ok: true, source: p.source, id: r.id, at: r.at, minutes: p.minutes, by: "none", rows: [self] };
+      return { ok: true, source: p.source, id: r.id, at: r.at, minutes: p.minutes, by: "install", rows: [
+        { t: "2026-10-23T10:05:00+00:00", source: "telemetry", id: "f6666666-6666-4666-8666-666666666666", start: "2026-10-23T10:01:00+00:00", seq: 3, up_s: 240,
+          max_frame_ms: 480, hitch_n: 2, stall_n: 0, net_fail_n: 0, mem_warn_n: 0, app_version: "1.0.3 a41" },
+        { t: "2026-10-23T10:11:30+00:00", source: "trace", id: "c3333333-3333-4333-8333-333333333333", start: "2026-10-23T10:07:25+00:00", mode: "classic",
+          end_kind: "death", cause: "durability", lv: 12, ms: 245000, app_version: "1.0.3 a41" },
+        self,
       ] };
     },
     "issues.asks": (p, body, fn) => { stats(fn); return { ok: true, total: asks.length, rows: asks }; },

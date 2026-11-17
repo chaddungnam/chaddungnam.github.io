@@ -172,24 +172,30 @@ test("밸런스 page: the four server balance values load, save with a reason th
 test("밸런스 page (v4): account growth, level bands, offered vs picked cards, idle time and the run counters; \"여기 보기\" only where the reading guide says", async ({ page }) => {
   const errors = await open(page, "#/tenkey-balance");
   const acct = page.locator("#tenkeyBalanceAcctRows tr");
-  await expect(acct).toHaveCount(3);
-  await expect(acct.nth(0)).toContainText("강화 안 한 계정 (강화 합 0)");
-  await expect(acct.nth(2)).toContainText("강화 합 21 이상");
-  await expect(acct.nth(1).locator('td[data-label="끝난 레벨 (가운데)"]')).toHaveText("Lv 18");
+  await expect(acct).toHaveCount(4);
+  await expect(acct.nth(0)).toContainText("모름 (강화 정도를 보내기 전 빌드)");
+  await expect(acct.nth(1)).toContainText("강화 안 한 계정 (강화 합 0)");
+  await expect(acct.nth(3)).toContainText("모두 강화한 계정 (강화 합 160)");
+  await expect(acct.nth(2).locator('td[data-label="평균 끝 레벨"]')).toHaveText("Lv 19");
+  await expect(page.locator("#tenkeyBalanceAcct")).not.toContainText("undefined");
   await expect(page.locator("#tenkeyBalanceBandRows tr")).toHaveCount(5);
   await expect(page.locator("#tenkeyBalanceBandRows tr").last()).toContainText("Lv 30 이상");
   await expect(page.locator("#tenkeyBalanceBandRows tr").first().locator('td[data-label="받은 피해 (판당)"]')).toHaveText("31%");
+  await expect(page.locator("#tenkeyBalanceBandRows tr").first()).toContainText("Lv 1–6");
+  await expect(page.locator("#tenkeyBalanceBandRows tr").first().locator('td[data-label="머문 시간 (평균)"]')).toHaveText("1분 35초");
   const offer = (card) => page.locator("#tenkeyBalanceOffers tr", { hasText: card });
   await expect(page.locator("#tenkeyBalanceOffers tr").first()).toContainText("레이저");  // most offered first
   await expect(offer("절전").locator(".tk-look")).toHaveCount(1);  // 9 of 120 offers picked
   await expect(offer("폭탄").locator(".tk-look")).toHaveCount(0);  // 6 offers are too few to judge
   await expect(offer("레이저").locator(".tk-look")).toHaveCount(0);
   await expect(page.locator("#tenkeyBalanceIdle")).toContainText("12.5%");
+  await expect(page.locator("#tenkeyBalanceIdle")).toContainText("14초");
   await expect(page.locator("#tenkeyBalanceIdle .tk-look")).toHaveCount(1);  // idle share over 10 %; 9 of 60 long idle runs is not over a quarter
   await expect(page.locator("#tenkeyBalanceCounters")).toContainText("부순 키");
   await expect(page.locator("#tenkeyBalanceCounters tr", { hasText: "부순 키" }).locator('td[data-label="판당"]')).toHaveText("150");
   await expect(page.locator("#tenkeyBalanceCounters")).toContainText("mystery_x");  // a counter the page has no name for shows as the game wrote it
-  await expect(page.locator("#tenkeyBalanceFresh")).toContainText("이 조건의 줄 수: 판 기록 240, 판 흐름 기록 60");
+  await expect(page.locator("#tenkeyBalanceFresh")).toContainText("서버에 남아 있는 줄 (기간·조건과 상관없이 모두): 판 기록 240, 판 흐름 기록 60");
+  await expect(page.locator("#tenkeyBalanceFresh")).not.toContainText("—");
   await shot(page, "balance_v4", "#tenkeyBalanceBody");
   await page.evaluate(() => { window.__mockNoAcct = true; });
   await page.locator("#tenkeyBalanceForm button[type=submit]").click();
