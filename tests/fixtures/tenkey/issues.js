@@ -22,6 +22,8 @@
       { source: "app", id: 501, at: "2026-10-23T09:00:00+00:00", kind: "hitch", platform: "web_itch", app_version: "1.0.3", build: 52, where: "level_up_cards", said: "frame 640 ms", count: 7, device_model: "Chrome 141", has_run: true },
       { source: "app", id: 502, at: "2026-10-23T08:30:00+00:00", kind: "stall", platform: "web_itch", app_version: "1.0.3", build: 52, where: "home_load", said: "5.4 s", count: 2, device_model: "Chrome 141", has_run: false },
       { source: "app", id: 500, at: "2026-10-21T08:00:00+00:00", kind: "script_error", platform: "ios", app_version: "1.0.0", build: 2, where: "res://scripts/dig/dig_run.gd:212", said: "Invalid get index 'x'", count: 1, device_model: null, has_run: false },
+      // repro1118 (TK-498): a failure line the player saw with no server row (the 11-18 web double tap on the free gems)
+      { source: "app", id: 503, at: "2026-11-18T09:10:00+00:00", kind: "ux_fail", platform: "web_itch", app_version: "1.0.4", build: 54, where: "shop.daily_gems used", said: "shop.daily.used", count: 2, device_model: "Chrome 142", has_run: false },
     ],
   };
   const sigOf = (source, kind, platform, where) => `${source}:${kind}:${platform || ""}:${where || ""}`;   // the server's is md5 hex
@@ -50,6 +52,9 @@
     "app:501": { ...rows.app[0], install_short: null, detail: { run: { seed: 4455, mode: "classic", lv: 6, t: 88, start_lv: 1, form: "tenkey", demo: true }, trail: ["0 start Web 1.0.3", "12 scene DigScene", "80 lvup 6", "88 pop+ level_up"] } },
     "app:502": { ...rows.app[1], detail: {} },
     "app:500": { ...rows.app[2], detail: { trail: ["0 start iOS 1.0.0", "5 scene DigScene"] } },
+    "app:503": { ...rows.app[3], detail: { trail: ["0 start Web 1.0.4", "40 pop+ shop", "41 ask rpc/web_daily_mark_v1", "41 ask rpc/web_daily_mark_v1 +180ms",
+      "41 ans rpc/web_daily_mark_v1 200 ok 80ms", "41 ans rpc/web_daily_mark_v1 200 used 60ms"],
+      answer: "rpc/web_daily_mark_v1 200 ok 80ms > rpc/web_daily_mark_v1 +180ms 200 used 60ms", press_ms: 240, ctx: "ShellShop" } },
   };
   const asks = [
     { receipt: "c0ffee01", submitted_at: "2026-10-23T11:00:00+00:00", body: "보스 앞에서 화면이 멈췄어요", meta: { version: "1.0.3", build: "41", platform: "android", device: "SM-S918N", locale: "ko" },

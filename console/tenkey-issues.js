@@ -16,7 +16,9 @@
   const byId = (id) => document.getElementById(id);
   const KINDS = { unclean_exit: "화면을 켠 채 꺼짐", anr_suspect: "멈춤 (5초 이상)", script_error: "스크립트 오류", stall: "멈춤", hitch: "버벅임",
     server_error: "서버 응답 오류", save_issue: "저장 문제", native_missing: "빠른 계산 부품 없음 (느린 예비 코드로 돌아감)", memory_warning: "메모리 부족 경고",
-    suspect: "저장값 이상 (음수가 된 값)" };
+    suspect: "저장값 이상 (음수가 된 값)", ux_fail: "실패 문구가 뜸 (서버 기록 없이 플레이어 화면에)" };
+  // A ux_fail's own facts (repro1118, owner TK-498): the server asks before the line, and how long after the last ask it showed.
+  const EXTRA = { answer: "서버 요청 → 응답 (오래된 것부터, > 로 구분)", press_ms: "마지막 요청부터 문구까지 (ms)" };
   const ENDS = { death: "게임 오버", quit: "스스로 그만둠", app_closed: "앱을 닫음", demo_end: "체험판 끝", clear: "노멀 모드 완주" };  // the 밸런스 page's words
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임" };
   const SOURCES = { crash: "크래시", app: "앱 이상", ask: "1대1 문의", trace: "판 흐름", telemetry: "성능 보고" };
@@ -29,7 +31,7 @@
   };
   const WHO = {
     crash: "스토어 앱과 웹 체험판(itch) 정식 빌드가 보냅니다. 같은 오류는 하루 5건까지만 줄로 남고 그 뒤는 횟수만 늘어납니다.",
-    app: "버벅임·멈춤·스크립트 오류를 같은 곳끼리 묶어 보냅니다 (스토어 앱과 웹 체험판). 버벅임과 멈춤은 「성능」 화면에도 나옵니다.",
+    app: "버벅임·멈춤·스크립트 오류, 그리고 서버 기록 없이 플레이어 화면에 뜬 실패 문구를 같은 곳끼리 묶어 보냅니다 (스토어 앱과 웹 체험판). 버벅임과 멈춤은 「성능」 화면에도 나옵니다.",
     ask: "로그인한 앱·itch 계정만 보냅니다 (GamePix·Nekoland 웹, 14세 미만, 약관 미동의는 보내지 않음). 이 빌드부터 보낼 때의 앱 순서와 판·저장 상태가 붙습니다.",
   };
   const STATUS = { open: "열림", seen: "확인함", fixed: "고침" };
@@ -60,8 +62,20 @@
       pick: () => `레벨업 카드 고름: ${names.cards?.[arg] || arg}`, lvup: () => `레벨 ${arg} 도달`, revive: () => "부활", cage: () => "NUM LOCK 철창에 갇힘",
       crisis: () => `위기 시작: ${names.crises?.[arg] || arg}`, "pop+": () => `팝업 열림: ${arg}`, "pop-": () => `팝업 닫힘: ${arg}`,
       scene: () => `화면: ${arg}`, start: () => `앱 시작: ${arg}`, bg: () => "앱이 뒤로 감", fg: () => "앱으로 돌아옴",
+      ask: () => askText(rest), ans: () => ansText(rest),
     };
     return words[code] ? words[code]() : null;
+  }
+  // "ask <call> [+<gap>ms]" = a press sent this server request (the gap = since the same request before: a double tap);
+  // "ans <call> <code> <word> <ms>ms" = its answer (word "ok", the error word, or "offline" with no answer).
+  function askText([call, gap]) {
+    const g = /^\+(\d+)ms$/.exec(gap || "");
+    return `서버에 요청: ${call || "—"}${g ? ` · 같은 요청 ${num(Number(g[1]))}ms 만에 다시 (연타)` : ""}`;
+  }
+  function ansText([call, code, word, ms]) {
+    const took = /^(\d+)ms$/.exec(ms || "");
+    const said = word === "ok" ? "성공" : word === "offline" ? "응답 없음 (오프라인)" : dash(word);
+    return `서버 응답: ${call || "—"} → ${dash(code)} ${said}${took ? ` (${num(Number(took[1]))}ms)` : ""}`;
   }
   function steps(lines, title) {
     if (!Array.isArray(lines) || !lines.length) return `<div class="tk-section"><h3>${esc(title)}</h3><p class="empty-panel">— (이 보고를 보낸 빌드는 앱 순서를 보내지 않았습니다)</p></div>`;
@@ -179,7 +193,7 @@
       const data = await T.stats("issues.get", { source: state.tab, id: Number.isFinite(Number(id)) ? Number(id) : id });
       const r = data?.row || {};
       const d = r.detail && typeof r.detail === "object" ? r.detail : {};
-      const extra = Object.entries(d).filter(([k]) => !["trail", "run", "save", "sid", "trace"].includes(k)).map(([k, v]) => [k, typeof v === "object" ? JSON.stringify(v) : v]);
+      const extra = Object.entries(d).filter(([k]) => !["trail", "run", "save", "sid", "trace"].includes(k)).map(([k, v]) => [EXTRA[k] || k, typeof v === "object" ? JSON.stringify(v) : v]);
       show(`${head(`${SOURCES[state.tab]} #${dash(r.id ?? id)}`, kindName(r.kind), [r.where, r.said || r.message].filter(Boolean).join(" · "))}
         ${facts([["받은 시각", time(r.at || r.received_at)], ["앱", appText(r.app_version, r.build)], ["플랫폼 · OS", `${platformName(r.platform)} ${r.os_version || ""}`.trim()], ["기기", r.device_model],
           ["언어", r.locale], ["횟수", num(r.count ?? (r.repeats != null ? 1 + Number(r.repeats) : null))], ["세션 번호", d.sid], ["판 흐름 번호", d.trace], ["기기 번호 (앞 8자)", r.install_short]])}
