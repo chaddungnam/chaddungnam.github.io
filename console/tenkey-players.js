@@ -1,6 +1,7 @@
 // 10key Survival: 플레이어 (user pool) and 플레이어 상세. The pool is tenkey.players: CrazyGames web players who signed in
 // there and mobile guest accounts. Search by name / player id / login id; the detail shows the account, ranks, bests, recent
 // stored runs, purchases + gem ledger, the nickname change and the ranking ban (reason + confirm, audited).
+// 웹 기록 (link1118): a signed-in web player's crash / issue reports, runs, run timelines, first steps and pings (tenkey-signals.js).
 // The list refreshes itself every AUTO_MS while it is on screen (owner 2026-10-24: new nicknames show up without a reload).
 (function attachConsoleTenkeyPlayers(root) {
   const T = root.ConsoleTenkey;
@@ -29,7 +30,7 @@
   };
   const SOURCE_WHY = { login: "로그인 기록 기준", run: "판 기록 기준", device: "기기 정보 기준", purchase: "결제 기록 기준", none: "판·로그인 기록이 없어 알 수 없음" };
   const countryName = (code) => code ? (String(code).toUpperCase() === "XX" ? "미기록" : String(code).toUpperCase()) : "—";
-  const clientPlatformName = (code) => ({ android: "Android", ios: "iOS", web_itch: "웹 · itch.io", web_gamepix: "웹 · GamePix" }[String(code || "").toLowerCase()] || platformName(code));
+  const clientPlatformName = (code) => ({ android: "Android", ios: "iOS", web_itch: "웹 · itch.io", web_gamepix: "웹 · GamePix", web_nekoland: "웹 · 네코랜드" }[String(code || "").toLowerCase()] || platformName(code));
   const scoreText = (row) => (row.best_score == null ? "—" : `${num(row.best_score)}${row.best_level ? ` · Lv ${row.best_level}` : ""}`);
   // Where the player last played (the server: the latest stored run's platform; CrazyGames sign-ins are always that portal).
   const platformOf = (row) => platformName(row.provider === "crazygames" ? "web_crazygames" : row.platform);
@@ -218,7 +219,8 @@
         ["접속한 날 수", retention.active_days === undefined ? "—" : `${num(retention.active_days)}일`],
         ["첫 활동일", retention.first_day || "—"], ["마지막 활동", time(retention.last_seen_at)],
       ])}${table(["도달한 첫 행동", "기록 시각"], (retention.milestones || []).map((m) => `<tr><td>${esc((T.milestoneName || ((id) => id))(m.id))}</td><td>${esc(time(m.reached_at))}</td></tr>`), "이 플레이어는 서버에 남은 첫 행동 기록이 없습니다.")}</div>
-      <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "판 기록을 플레이어에 연결하는 기능이 개인정보 방침 반영 전이라 꺼져 있어 항상 비어 있습니다 (전체 숫자는 밸런스 화면에서 봅니다).")}</div>
+      <div class="tk-section"><h3>최근 밸런스 기록 (최근 10판)</h3>${table(["시각", "레벨", "시간", "끝", "고른 스킬", "차지", "DRIFT", "로봇", "부활", "레벨 도달"], balanceRuns(d.balance_runs), "이 플레이어에 연결된 판이 없습니다. 웹(itch.io · 네코랜드)에서 로그인한 판은 웹 기록 연결을 켠 뒤부터, 앱 판은 개인정보 방침에 오른 뒤부터 연결됩니다 (전체 숫자는 밸런스 화면에서 봅니다).")}</div>
+      <section id="tenkeyPlayerSignals" class="tk-section"><h3>웹 기록</h3><p class="empty-panel">웹 기록을 불러오는 중입니다...</p></section>
       <section id="tenkeyPlayerTitles" class="tk-section tk-player-titles"><h3>칭호</h3><p class="empty-panel">칭호를 불러오는 중입니다...</p></section>
       <div class="tk-section"><h3>로그인 · 식별</h3>${table(["종류", "식별 값", "로그인 번호", "만든 시각"], ids, "식별 정보가 없습니다.")}</div>
       <div class="tk-section"><h3>보드별 최고 기록</h3>${table(["보드", "점수", "레벨", "시간", "기록 시각", "점수 규칙"], bests, "기록이 없습니다.")}</div>
@@ -301,7 +303,7 @@
       byId("tenkeyBanForm").addEventListener("submit", submitBan);
       byId("tenkeyRenameForm")?.addEventListener("submit", submitRename);
       if (byId("tenkeyPlayerUnlocks")) T.unlocks.bind({ player: state.detail.player, data: () => state.detail, reload: reloadKeepScroll });
-      await loadPlayerTitles(state.detail.player);
+      await Promise.all([loadPlayerTitles(state.detail.player), T.signals?.load(state.detail.player)]);
       T.setMessage("tenkeyPlayerMessage", "");
     } catch (error) {
       byId("tenkeyPlayerDetail").innerHTML = "";
