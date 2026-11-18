@@ -3,8 +3,11 @@
 //   version right away (18:00 Berlin, = 17:00 UTC) because pre-registration is closed. From then on the pages show the
 //   download version ([data-launch]) instead of the pre-registration version ([data-prelaunch]), and the itch.io demo
 //   is open to everyone (no pre-registration gate).
-// - stores: set live:true for each store once its page is public (the owner sends the links on 11-19 evening). A store
-//   that is not live shows "coming soon"; /10key/get/ uses the same flags. While no store is live yet, html gets
+// - stores: a store shows its badge (and /10key/get/ sends phones to it) when live:true and from has passed. Owner
+//   2026-11-18: the App Store link is final (https://apps.apple.com/app/10key-survival/id6824972492) and Google Play is
+//   the package's page; both go on at the launch moment, 2026-11-20 00:00 Berlin. A routine checks on 11-19 23:30 and
+//   after that the stores' public pages and turns a store off (live:false) while its page is not public yet, back on once
+//   it is. A store that is not on shows "coming soon". While no store is live yet, html gets
 //   tk-stores-wait: [data-store-wait] ("coming soon" headings) replaces [data-store-out] ("out now").
 // - saleFrom/saleTo: the launch sale ($4.99 -> $2.99, 11-20 to 11-27 Berlin); [data-sale] shows only inside it.
 // ?launch=preview shows the launch version now, with both stores and the sale, for review. Loaded without defer in
@@ -16,8 +19,8 @@
     saleFrom: Date.UTC(2026, 10, 19, 23, 0, 0),
     saleTo: Date.UTC(2026, 10, 27, 23, 0, 0),
     stores: {
-      ios: { live: false, url: "https://apps.apple.com/app/id6824972492" },
-      android: { live: false, url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
+      ios: { live: true, from: Date.UTC(2026, 10, 19, 23, 0, 0), url: "https://apps.apple.com/app/10key-survival/id6824972492" },
+      android: { live: true, from: Date.UTC(2026, 10, 19, 23, 0, 0), url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
     },
     itch: "https://houseduck.itch.io/10key-survival"
   };
@@ -27,13 +30,13 @@
   C.preview = mode === "preview";
   C.on = C.preview || now >= C.at;
   C.sale = C.preview || (now >= C.saleFrom && now < C.saleTo);
-  C.live = function (key) { return !!C.stores[key] && (C.preview || (C.on && C.stores[key].live)); };
+  C.live = function (key) { var st = C.stores[key]; return !!st && (C.preview || (C.on && st.live && now >= (st.from || 0))); };
   C.wait = C.on && !C.live("ios") && !C.live("android");
   // Store links say where the visit came from: an App Store campaign link (pt = House Duck provider id, ct = source)
   // and a Google Play utm referrer, so App Store Connect and Play Console can count downloads per source.
   C.storeUrl = function (key, src, medium) {
     src = String(src || "site").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "site";
-    if (key === "ios") return "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=" + src + "&mt=8";
+    if (key === "ios") return C.stores.ios.url + "?pt=129265473&ct=" + src + "&mt=8";
     return C.stores.android.url + "&referrer=" + encodeURIComponent("utm_source=houseduck&utm_medium=" + (medium || "site") + "&utm_campaign=" + src);
   };
 

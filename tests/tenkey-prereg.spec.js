@@ -344,7 +344,7 @@ test("/10key/get/?preview=pc shows phone stores with QR and copy link, the itch.
   const pc = page.locator("[data-get-pc]");
   await expect(pc).toBeVisible();
   await expect(pc.locator(".tk-get-title")).toHaveText("Get 10key Survival");
-  await expect(pc.locator("[data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=ads_kr&mt=8");
+  await expect(pc.locator("[data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=ads_kr&mt=8");
   await expect(pc.locator("[data-get-link=android]")).toHaveAttribute("href", /id=com\.houseduck\.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dget%26utm_campaign%3Dads_kr$/);
   await expect(pc.locator("[data-get-link=itch]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
   await expect(pc.locator(".tk-steam-soon")).toContainText("Steam");
@@ -383,7 +383,7 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await page.goto(url + "&launch=preview");
     await expect(page.locator("#download h2")).toHaveText(title, { useInnerText: true });
     await expect(page.locator("#prereg")).toBeHidden();
-    await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", `https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=site_${lang}&mt=8`);
+    await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", `https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=site_${lang}&mt=8`);
     await expect(page.locator("#download [data-launch-store=ios] img")).toHaveAttribute("src", `/assets/store-badges/app-store-${lang}.svg`);
     await expect(page.locator("#download [data-launch-store=android] img")).toHaveAttribute("src", lang === "zh" ? "/assets/store-badges/google-play-zh.png" : `/assets/store-badges/google-play-${lang}.svg`);
     await expect(page.locator("#download [data-launch-store=android]")).toHaveAttribute("href", new RegExp(`utm_campaign%3Dsite_${lang}$`));
@@ -394,7 +394,7 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
   });
 }
-test("the launch version is on from 2026-11-18 18:00 Berlin; with no store live it says coming soon; the sale shows 11-20 to 11-27", async ({ page }) => {
+test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until the stores go on at 11-20 00:00; the sale shows 11-20 to 11-27", async ({ page, isMobile }) => {
   await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
   await page.clock.setFixedTime(new Date("2026-11-18T17:55:00+01:00"));
   await page.goto("/10key/?lang=ko");
@@ -419,9 +419,25 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; with no store live 
   await expect(page.locator("[data-title]")).toHaveText("아직 출시 전이에요");
   await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/?lang=ko");
   await expect(page.locator("[data-show-prereg]")).toHaveText("게임 소개 보기");
+  // 11-20 00:00 Berlin: both stores on (owner 2026-11-18: App Store link final, Google Play = the package page), official
+  // badges with the source, "out now" headings, the sale line
   await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
   await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#download h2")).toHaveText("지금 출시!", { useInnerText: true });
+  await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=site_ko&mt=8");
+  await expect(page.locator("#download [data-launch-store=android]")).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dsite%26utm_campaign%3Dsite_ko");
+  await expect(page.locator("#download [data-launch-store=ios]")).toBeVisible();
+  await expect(page.locator("#download [data-launch-store=android]")).toBeVisible();
+  await expect(page.locator("#download .tk-badge-soon:visible")).toHaveCount(0);
   await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+  await page.goto("/?lang=ko");
+  await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("지금 출시");
+  if (!isMobile) {
+    await page.goto("/10key/get/?lang=en&src=mail");
+    await expect(page.locator("[data-get-pc]")).toBeVisible();
+    await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=mail&mt=8");
+    await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
+  }
   await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download")).toBeVisible();

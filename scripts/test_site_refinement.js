@@ -75,7 +75,17 @@ async function main() {
     'support-de-title','ko-ranking','korean','english','german','japanese']) {
     assert.equal((html.match(new RegExp(`id="${id}"`, 'g')) || []).length, 1, id);
   }
-  assert.doesNotMatch(read('assets/support-site.js'), /fetch\(|XMLHttpRequest|\.innerHTML|localStorage|sessionStorage/);
+  const supportJs = read('assets/support-site.js');
+  assert.doesNotMatch(supportJs, /XMLHttpRequest|\.innerHTML|localStorage|sessionStorage/);
+  // one request only (owner 2026-11-18): 10key Survival's public settings for the YouTube public-question link, after a
+  // visitor picks 10key Survival (privacy policy section 2); the page's CSP allows that one host and nothing else
+  assert.equal((supportJs.match(/fetch\(/g) || []).length, 1);
+  assert.match(supportJs, /"https:\/\/frepunpqswciugwoyvxo\.supabase\.co\/rest\/v1\/rpc\/app_config_v1"/);
+  assert.match(html, /connect-src https:\/\/frepunpqswciugwoyvxo\.supabase\.co;/);
+  assert.equal(support.communityUrl('https://www.youtube.com/watch?v=yJj_1nWMpM4'), 'https://www.youtube.com/watch?v=yJj_1nWMpM4');
+  assert.equal(support.communityUrl('https://youtu.be/abc'), 'https://youtu.be/abc');
+  assert.equal(support.communityUrl(''), 'https://www.youtube.com/@Sergeant_Houseduck');
+  for (const bad of ['http://www.youtube.com/x', 'https://evil.example/x', 'https://www.youtube.com.evil.example/x', 'https://www.youtube.com', 'https://user@youtube.com/x', 'javascript:alert(1)', ' https://youtu.be/a', null, 3]) assert.equal(support.communityUrl(bad), '', String(bad));
 
   for (const [lang, hash] of [['ko','korean'],['en','english'],['de','german'],['ja','japanese']]) {
     assert.equal(support.localeFromHash('#' + hash), lang);

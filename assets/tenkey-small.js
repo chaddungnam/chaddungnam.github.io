@@ -8,7 +8,7 @@
   // Fallback only: the launch flags live in assets/tenkey-launch.js (window.TENKEY_LAUNCH). Until a store is live there,
   // /10key/get/ shows the pre-registration page link.
   var STORES = {
-    ios: { live: false, url: "https://apps.apple.com/app/id6824972492" },
+    ios: { live: false, url: "https://apps.apple.com/app/10key-survival/id6824972492" },
     android: { live: false, url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
   };
 
@@ -149,7 +149,7 @@
     // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.
     var src = String(params.get("src") || "get").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "get";
     var storeUrl = function (key) {
-      if (key === "ios") return "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=" + src + "&mt=8";
+      if (key === "ios") return "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=" + src + "&mt=8";
       return STORES.android.url + "&referrer=" + encodeURIComponent("utm_source=houseduck&utm_medium=get&utm_campaign=" + src);
     };
     var mineKey = isIOS ? "ios" : (isAndroid ? "android" : null);

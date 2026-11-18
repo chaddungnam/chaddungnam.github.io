@@ -213,11 +213,15 @@ for(const [lang] of locales){
  });
 }
 
-// 10key Survival (owner 2026-11-18): a 1:1 inquiry by email and a public question on YouTube (the console's community_url)
+// 10key Survival (owner 2026-11-18): a 1:1 inquiry by email and a public question on YouTube. The YouTube link is the
+// console's community_url from the game's public settings, asked once after 10key Survival is picked (privacy section 2);
+// the link in the page stays when the answer is missing or not a YouTube page. Quirky Ball visitors send no request.
+const CONFIG = 'https://frepunpqswciugwoyvxo.supabase.co/rest/v1/rpc/app_config_v1';
 for (const [lang] of locales) {
-  test(`support ${lang}: 10key Survival offers the 1:1 inquiry and the public YouTube question`, async ({page,baseURL}) => {
-    const external=[];
+  test(`support ${lang}: 10key Survival offers the 1:1 inquiry and the public YouTube question from the console`, async ({page,baseURL}) => {
+    const external=[]; const asked=[];
     page.on('request',r=>{if(!r.url().startsWith(new URL('/',baseURL).href))external.push(r.url());});
+    await page.route(CONFIG, route => { asked.push(route.request().headers()); route.fulfill({status:200, contentType:'application/json', headers:{'access-control-allow-origin':'*'}, body:JSON.stringify({community_url:'https://www.youtube.com/shorts/TESTshort1', store_url_ios:'x'})}); });
     await page.goto(`/support/?game=tenkey&lang=${lang}`);
     await expect(page.locator('[data-game-pick="tenkey"]')).toHaveAttribute('aria-pressed','true');
     await expect(page.locator('.support-locale:visible')).toHaveCount(0);
@@ -225,10 +229,30 @@ for (const [lang] of locales) {
     await expect(panel).toHaveCount(1);
     await expect(panel.locator('.support-tenkey-option')).toHaveCount(2);
     await expect(panel.locator('.support-tenkey-option').first()).toHaveAttribute('href', /^mailto:support@houseduck\.in\?subject=/);
-    await expect(panel.locator('[data-community-link]')).toHaveAttribute('href', 'https://www.youtube.com/watch?v=yJj_1nWMpM4');
+    await expect(panel.locator('[data-community-link]')).toHaveAttribute('href', 'https://www.youtube.com/shorts/TESTshort1');
+    expect(asked).toHaveLength(1);
+    expect(asked[0]['accept-profile']).toBe('tenkey');
+    expect(asked[0].cookie).toBeUndefined();
     await page.locator('[data-game-pick="quirky"]').click();
     await expect(page.locator('.support-tenkey:visible')).toHaveCount(0);
     await expect(page.locator('.support-locale:visible .support-card')).toHaveCount(6);
-    expect(external).toEqual([]);
+    await page.locator('[data-game-pick="tenkey"]').click();
+    expect(asked).toHaveLength(1);
+    expect(external).toEqual([CONFIG]);
   });
 }
+test('support: a missing or non-YouTube answer keeps the link written in the page; Quirky Ball asks nothing', async ({page,baseURL}) => {
+  const external=[];
+  page.on('request',r=>{if(!r.url().startsWith(new URL('/',baseURL).href))external.push(r.url());});
+  await page.route(CONFIG, route => route.fulfill({status:200, contentType:'application/json', headers:{'access-control-allow-origin':'*'}, body:JSON.stringify({community_url:'https://evil.example/x'})}));
+  await page.goto('/support/?game=quirky&lang=ko');
+  await expect(page.locator('.support-locale:visible')).toHaveCount(1);
+  expect(external).toEqual([]);
+  await page.locator('[data-game-pick="tenkey"]').click();
+  await expect.poll(() => external.length).toBe(1);
+  await expect(page.locator('.support-tenkey:visible [data-community-link]')).toHaveAttribute('href', 'https://www.youtube.com/watch?v=yJj_1nWMpM4');
+  await page.unroute(CONFIG);
+  await page.route(CONFIG, route => route.abort());
+  await page.goto('/support/?game=tenkey&lang=en');
+  await expect(page.locator('.support-tenkey:visible [data-community-link]')).toHaveAttribute('href', 'https://www.youtube.com/watch?v=yJj_1nWMpM4');
+});
