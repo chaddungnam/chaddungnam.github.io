@@ -88,7 +88,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-11-17"/, `${locale}: last updated 2026-11-17`);
+    assert.match(html, /datetime="2026-11-18"/, `${locale}: last updated 2026-11-18`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -121,7 +121,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-11-17"/, "de: last updated 2026-11-17");
+  assert.match(html, /datetime="2026-11-18"/, "de: last updated 2026-11-18");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -326,6 +326,35 @@ test("section 13 lists what newer versions add to reports, the 1:1 inquiry and t
     const s13 = section13(locale);
     for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
     assert.ok(!s13.includes(old[locale]), `${locale}: technical run records are kept 60 days, not 90`);
+  }
+});
+
+// 2026-11-18 (repro1118, owner TK-498): the client's ux_fail app issue report (IssueReport.ux_fail: the message's string key,
+// the answer path of the last server asks, press_ms, UX_MAX 6 a session) and the server-ask trail steps ("ask" / "ans":
+// IssueServer.asked / answered) ship behind ReproData.UX_LISTED; they are listed as what NEWER versions add, so the page stays
+// true for every build already out. Flip UX_LISTED only while these rows say so.
+test("section 13 lists the failure-message report and the server-request steps; section 15 has the 11-18 entry", () => {
+  const words = {
+    en: ["a failure message the game showed you that no such report explains", "the fixed code of the message (not the text on your screen)",
+      "the order of the game’s last requests to our server with their answers", "at most 6 such reports a session",
+      "a request to our server that a button press started and its answer", "this is how a double tap shows"],
+    ko: ["이런 보고로 설명되지 않는데 게임 화면에 뜬 실패 문구", "그 문구의 정해진 코드(화면에 보인 글 자체는 아님)",
+      "게임이 당사 서버에 보낸 마지막 요청들과 그 응답의 순서", "이런 보고는 한 세션에 최대 6건입니다",
+      "버튼을 눌러 당사 서버에 보낸 요청과 그 응답", "두 번 연달아 누른 경우가 이렇게 보임"],
+    de: ["eine Fehlermeldung, die Ihnen das Spiel angezeigt hat und die kein solcher Bericht erklärt", "der feste Code der Meldung (nicht der Text auf Ihrem Bildschirm)",
+      "die Reihenfolge der letzten Anfragen des Spiels an unseren Server mit ihren Antworten", "höchstens 6 solche Berichte pro Sitzung",
+      "eine Anfrage an unseren Server, die ein Tastendruck ausgelöst hat, mit ihrer Antwort", "so zeigt sich ein doppeltes Tippen"],
+  };
+  const entry = { en: "<li>November 18, 2026 notice revision — 10key Survival (section 13)", ko: "<li>2026년 11월 18일 고지 개정 — 딸깍 서바이벌(제13항)",
+    de: "<li>Hinweisänderung vom 18. November 2026 — 10key Survival (Abschnitt 13)" };
+  const before = { en: "<li>November 17, 2026 notice revision", ko: "<li>2026년 11월 17일 고지 개정", de: "<li>Hinweisänderung vom 17. November 2026" };
+  for (const [locale, list] of Object.entries(words)) {
+    const s13 = section13(locale);
+    for (const w of list) assert.ok(s13.includes(w), `${locale}: ${w}`);
+    const html = read(`privacy/${locale}.html`);
+    const changes = html.slice(html.indexOf('<h2 id="section-15">'));
+    assert.ok(changes.includes(entry[locale]), `${locale}: the 11-18 change entry`);
+    assert.ok(changes.indexOf(entry[locale]) < changes.indexOf(before[locale]), `${locale}: the 11-18 entry is above the 11-17 one`);
   }
 });
 

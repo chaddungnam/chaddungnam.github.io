@@ -82,7 +82,7 @@ test("이슈함 앱 이상: hitches, stalls and script errors grouped by place; 
   await expect(page.locator('#tenkeyIssueTabs [data-issue-tab="app"]')).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#tenkeyIssueListTitle")).toHaveText("앱 이상 목록");
   await expect.poll(async () => (await calls(page, "issues.list")).at(-1).params).toEqual({ days: 7, source: "app", limit: 200 });
-  await expect(page.locator("#tenkeyIssueGroups tr")).toHaveCount(3);
+  await expect(page.locator("#tenkeyIssueGroups tr")).toHaveCount(4);
   await expect(page.locator("#tenkeyIssueGroups tr", { hasText: "level_up_cards" })).toContainText("버벅임");
   await expect(page.locator("#tenkeyIssueKeepNote")).toContainText("app_issues에 60일 보관");
   await page.locator('#tenkeyIssueTable tr[data-tk-issue="501"]').click();
@@ -95,6 +95,33 @@ test("이슈함 앱 이상: hitches, stalls and script errors grouped by place; 
   await page.locator("#tenkeyIssueForm button[type=submit]").click();
   await expect.poll(async () => (await calls(page, "issues.list")).at(-1).params).toEqual({ days: 30, source: "app", limit: 200 });
   await expect(detail).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+// repro1118 (owner 2026-11-18 TK-498: "서버에서 정확한 원인 로그가 누적안되었다면 서버에 관련 재현스텝 인입이 되게"): a failure line the
+// player saw (ux_fail) is a group of its own, and its report shows the server requests a press started, their answers and the gap
+// of a double tap in words, with the answer path and the time since the last request under 그 밖의 값.
+test("이슈함 앱 이상: a ux_fail (a failure line on the player's screen) shows the double tap's two requests and their answers in words", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-issues");
+  await page.locator('#tenkeyIssueTabs [data-issue-tab="app"]').click();
+  const group = page.locator('#tenkeyIssueGroups tr[data-tk-issue-group="ux_fail|shop.daily_gems used"]');
+  await expect(group).toContainText("실패 문구가 뜸");
+  await page.locator('#tenkeyIssueTable tr[data-tk-issue="503"]').click();
+  const detail = page.locator("#tenkeyIssueDetail");
+  await expect(detail).toContainText("실패 문구가 뜸 (서버 기록 없이 플레이어 화면에)");
+  await expect(detail).toContainText("shop.daily_gems used · shop.daily.used");
+  const steps = detail.locator(".tk-steps li");
+  await expect(steps).toHaveCount(6);
+  await expect(steps.nth(2)).toContainText("41초 서버에 요청: rpc/web_daily_mark_v1");
+  await expect(steps.nth(3)).toContainText("서버에 요청: rpc/web_daily_mark_v1 · 같은 요청 180ms 만에 다시 (연타)");
+  await expect(steps.nth(3).locator("code")).toHaveText("ask rpc/web_daily_mark_v1 +180ms");
+  await expect(steps.nth(4)).toContainText("서버 응답: rpc/web_daily_mark_v1 → 200 성공 (80ms)");
+  await expect(steps.nth(5)).toContainText("서버 응답: rpc/web_daily_mark_v1 → 200 used (60ms)");
+  await expect(detail).toContainText("서버 요청 → 응답 (오래된 것부터, > 로 구분)");
+  await expect(detail).toContainText("rpc/web_daily_mark_v1 200 ok 80ms > rpc/web_daily_mark_v1 +180ms 200 used 60ms");
+  await expect(detail).toContainText("마지막 요청부터 문구까지 (ms)");
+  await expect(detail).not.toContainText("undefined");
+  await shot(page, "issues_ux_fail_detail", "#tenkeyIssueDetail");
   expect(errors).toEqual([]);
 });
 
