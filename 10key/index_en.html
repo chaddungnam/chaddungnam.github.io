@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261106-neutral">
   <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261106-neutral">
+  <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261118-badge">
+  <script src="/assets/tenkey-launch.js?v=20261118-badge"></script>
   <script src="/assets/share-sheet.js?v=20261108-kakao" defer></script>
   <script src="/assets/tenkey-page.js?v=20261104-pc" defer></script>
   <script src="/assets/tenkey-ads.js?v=20261104-zh" defer></script>
@@ -35,7 +37,7 @@
       <a class="tk-nav-link" href="../?lang=en#games">Games</a>
       <a class="tk-nav-link" href="#prereg" data-itch-gate>Play the demo</a>
       <a class="tk-nav-link" href="/support/">Support</a>
-      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump>Pre-register</a>
+      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump data-prelaunch>Pre-register</a><a class="tk-nav-link tk-nav-cta" href="#download" data-launch>Download</a>
       <span class="tk-lang" role="group" aria-label="Language"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en" aria-current="page">EN</a><a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">DE</a><a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">JA</a><a href="index_zh.html?lang=zh" lang="zh-Hant" hreflang="zh-Hant" data-lang-link="zh">中文</a></span>
     </nav>
   </div></header>
@@ -48,7 +50,14 @@
           <h1 id="game-title"><span class="tk-title-main">10key Survival</span> <span class="tk-title-alt" lang="ko">딸깍 서바이벌</span></h1>
           <p class="tk-pitch">A dazzling adventure, and ASMR</p>
           <p class="tk-lede">Every key you break clicks, clacks and shatters with real recorded keyboard sounds. Dig through an endless 3D keyboard as a living numpad.</p>
-          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="en" data-consent-version="2026-11-04b" data-msgs='{"sending": "Sending…", "ok": "You are pre-registered! We will send the download link to this address on launch day. A short receipt is on its way. Your itch.io demo link is just below.", "invalid": "Please check your email address.", "consent": "Please tick the consent box.", "busy": "Too many sign-ups right now. Please try again shortly.", "mail": "We could not send the confirmation email. Please try again shortly.", "error": "Connection failed. Please try again shortly.", "offline": "The pre-registration could not load. Please reload the page in a moment and try again."}'>
+          <section class="tk-dl" id="download" aria-labelledby="download-title" data-launch>
+            <h2 id="download-title">Out now!</h2>
+            <p class="tk-dl-sale" data-sale><strong>Launch sale</strong><s>$4.99</s><span aria-hidden="true">→</span><b>$2.99</b><span>until November 27</span></p>
+            <div class="tk-dl-stores"><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="ios" data-ct="site_en" hidden><img src="/assets/store-badges/app-store-en.svg" width="144" height="48" alt="Download on the App Store"></a><span class="tk-badge-soon">App Store: coming soon</span></span><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="android" data-ct="site_en" hidden><img src="/assets/store-badges/google-play-en.svg" width="162" height="48" alt="Get it on Google Play"></a><span class="tk-badge-soon">Google Play: coming soon</span></span></div>
+            <p class="tk-dl-sub">Get it on the App Store for iPhone and iPad, or on Google Play for Android.</p>
+            <div class="tk-dl-pc"><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>On a computer: play the itch.io demo (up to level 8)</a><a class="tk-text-link" href="/10key/get/?src=site_en&amp;lang=en">Send it to your phone (QR code) →</a></div>
+          </section>
+          <section class="tk-prereg" id="prereg" data-prelaunch aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="en" data-consent-version="2026-11-04b" data-msgs='{"sending": "Sending…", "ok": "You are pre-registered! We will send the download link to this address on launch day. A short receipt is on its way. Your itch.io demo link is just below.", "invalid": "Please check your email address.", "consent": "Please tick the consent box.", "busy": "Too many sign-ups right now. Please try again shortly.", "mail": "We could not send the confirmation email. Please try again shortly.", "error": "Connection failed. Please try again shortly.", "offline": "The pre-registration could not load. Please reload the page in a moment and try again."}'>
             <h2 id="prereg-title">Pre-register for launch news</h2>
             <p class="tk-prereg-sub">Leave your email and we send you one email on launch day with the iOS and Android download link.</p>
             <form class="tk-form-body" method="post" novalidate data-prereg-form>
@@ -66,8 +75,8 @@
           </section>
           <div class="hd-share-row" role="group" aria-label="Share this page with a friend or copy its address" data-share-row hidden><button class="hd-share-key" type="button" data-share-open>Share</button><button class="hd-share-key" type="button" data-share-copy>Copy link</button><span class="hd-share-note" role="status" aria-live="polite" data-share-status></span></div>
           <p class="tk-paid"><span class="tk-paid-chip">Paid app · In-app purchases</span><span class="tk-paid-text">The full game is a paid app on Google Play and the App Store, with gems to buy in the game (in-app purchases). On itch.io it is a free demo (up to level 8).</span></p>
-          <ul class="tk-where" aria-label="Where to play"><li><span class="tk-where-k">Computer</span><span>itch.io demo · <b>best on PC</b></span></li><li><span class="tk-where-k">Phone</span><span>Google Play · App Store (coming soon)</span></li></ul>
-          <div class="tk-itch-slot" id="itch-demo">
+          <ul class="tk-where" aria-label="Where to play"><li><span class="tk-where-k">Computer</span><span>itch.io demo · <b>best on PC</b></span></li><li data-prelaunch><span class="tk-where-k">Phone</span><span>Google Play · App Store (coming soon)</span></li><li data-launch><span class="tk-where-k">Phone</span><span>Google Play · App Store</span></li></ul>
+          <div class="tk-itch-slot" id="itch-demo" data-prelaunch>
           <div class="tk-preview-row" data-itch-locked>
             <p class="tk-perk"><span class="tk-lock-icon" aria-hidden="true"></span><span><strong>Pre-registration perk</strong> Pre-register and a link to the demo (up to level 8) on itch.io appears right away. Best played on a PC.</span></p>
           </div>
@@ -147,7 +156,7 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="facts-title">Good to know</h2>
         <dl class="tk-sheet tk-reveal">
-          <div class="is-key"><dt>Platforms</dt><dd>iOS · Android coming soon<span>A paid app for under 5 US dollars (with in-app purchases). At launch it will sell at a discount, much cheaper. No release date yet.</span></dd></div>
+          <div class="is-key" data-prelaunch><dt>Platforms</dt><dd>iOS · Android coming soon<span>A paid app for under 5 US dollars (with in-app purchases). At launch it will sell at a discount, much cheaper. No release date yet.</span></dd></div><div class="is-key" data-launch><dt>Platforms</dt><dd>iOS · Android out now<span>A paid app (with in-app purchases). Regular price $4.99, launch price $2.99 until November 27. Your local price is shown in the store.</span></dd></div>
           <div><dt>Demo</dt><dd>Up to level 8<span>A pre-registration perk: pre-register and the itch.io link appears. Best played in a browser on a PC. No download, nothing to buy.</span></dd></div>
           <div><dt>Ads</dt><dd>None<span>Not a free game stuffed with ads. No ads during play.</span></dd></div>
           <div><dt>Sound</dt><dd>Real keyboard clicks<span>Recorded from real keyboards. Put your headphones on.</span></dd></div>
@@ -171,12 +180,12 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="faq-title">Questions</h2>
         <div class="tk-faq tk-reveal">
-          <details><summary>How much will it cost?</summary><p>Instead of a free game stuffed with ads, it launches as a paid game for under 5 US dollars. At launch it will sell at a discount, much cheaper. The exact price will be shown in the store at launch.</p></details>
-          <details><summary>Can I play before launch?</summary><p>Yes, the demo (up to level 8), as a pre-registration perk. Modules come with the full version. Once you pre-register, the page shows the itch.io demo link. We recommend playing the itch.io demo on a computer (PC). The phone version is coming to Google Play and the App Store. Already pre-registered? Enter the same email again and the link shows up again. No second email is sent.</p></details>
+          <details data-launch><summary>How much does it cost?</summary><p>The regular price is $4.99. For the launch it is $2.99 from November 20 to 27 (German time). Your local price is shown in the store. It is a paid game with no ads, not a free game stuffed with ads.</p></details><details data-prelaunch><summary>How much will it cost?</summary><p>Instead of a free game stuffed with ads, it launches as a paid game for under 5 US dollars. At launch it will sell at a discount, much cheaper. The exact price will be shown in the store at launch.</p></details>
+          <details data-launch><summary>Can I play on a computer?</summary><p>Yes. The demo (up to level 8) runs right in your browser on itch.io, with no install and no sign-up. A Steam version is in the works.</p></details><details data-prelaunch><summary>Can I play before launch?</summary><p>Yes, the demo (up to level 8), as a pre-registration perk. Modules come with the full version. Once you pre-register, the page shows the itch.io demo link. We recommend playing the itch.io demo on a computer (PC). The phone version is coming to Google Play and the App Store. Already pre-registered? Enter the same email again and the link shows up again. No second email is sent.</p></details>
           <details><summary>Where is my browser-version progress saved?</summary><p>In the browser version you play as a guest, and your progress is saved in that browser only. Clearing site data deletes it, and it does not move to other devices. The ranking tab shows the online board, but your own runs stay on that device.</p></details>
-          <details><summary>What do I get for pre-registering?</summary><p>One email on launch day with the download link. The same link opens the App Store on iPhone and Google Play on Android. No other marketing email.</p></details>
-          <details><summary>The receipt email did not arrive.</summary><p>Your pre-registration is done the moment you press Pre-register. If the receipt from support@houseduck.in is not in your inbox, check your spam folder. You will get the launch email either way.</p></details>
-          <details><summary>How do I cancel?</summary><p>Use the cancel link in the receipt email, or write to support@houseduck.in. Cancelled addresses are deleted within 30 days.</p></details>
+          <details data-prelaunch><summary>What do I get for pre-registering?</summary><p>One email on launch day with the download link. The same link opens the App Store on iPhone and Google Play on Android. No other marketing email.</p></details>
+          <details data-prelaunch><summary>The receipt email did not arrive.</summary><p>Your pre-registration is done the moment you press Pre-register. If the receipt from support@houseduck.in is not in your inbox, check your spam folder. You will get the launch email either way.</p></details>
+          <details data-prelaunch><summary>How do I cancel?</summary><p>Use the cancel link in the receipt email, or write to support@houseduck.in. Cancelled addresses are deleted within 30 days.</p></details>
         </div>
       </div>
     </section>
@@ -184,8 +193,8 @@
     <section class="tk-section" aria-labelledby="final-title">
       <div class="tk-wrap tk-final">
         <div class="tk-reveal">
-          <h2 class="tk-h2" id="final-title">We will email you on launch day<small>One email address is all it takes.</small></h2>
-          <div class="tk-final-links"><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">Go to pre-registration</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="Play the demo on itch.io">Pre-register to play the demo on itch.io</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">Watch dev videos ↗</a></div>
+          <h2 class="tk-h2" id="final-title" data-prelaunch>We will email you on launch day<small>One email address is all it takes.</small></h2><h2 class="tk-h2" id="final-title-launch" data-launch>Download it now<small>iPhone · iPad · Android</small></h2>
+          <div class="tk-final-links" data-launch><a class="tk-key" href="/10key/get/?src=site_en_final&amp;lang=en"><span class="tk-key-face">Download</span></a><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>Play the demo on itch.io</a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">Watch dev videos ↗</a></div><div class="tk-final-links" data-prelaunch><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">Go to pre-registration</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="Play the demo on itch.io">Pre-register to play the demo on itch.io</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">Watch dev videos ↗</a></div>
         </div>
         <figure class="tk-keyart tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/keyart-en.webp" width="960" height="469" alt="10key Survival key art. 10key and the mouse on a 3D keyboard" loading="lazy" decoding="async"></figure>
       </div>

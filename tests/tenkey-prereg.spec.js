@@ -27,11 +27,11 @@ for (const [url, words] of Object.entries({
     await expect(page.locator(".tk-hero .tk-paid")).toContainText("8");
     await expect(page.locator(".tk-hero .tk-paid")).not.toContainText(/\$|USD|달러|dollar|€|円/);
     // where to play (owner 11-04): computer = itch.io demo, best on a PC; phone = Google Play / App Store, coming soon
-    await expect(page.locator(".tk-hero .tk-where li")).toHaveCount(2);
+    await expect(page.locator(".tk-hero .tk-where li:visible")).toHaveCount(2);
     await expect(page.locator(".tk-hero .tk-where")).toContainText("PC");
     await expect(page.locator(".tk-hero .tk-where")).toContainText("App Store");
     // itch.io play is a pre-registration perk (owner 11-03): before sign-up the hero shows a locked line, not the link
-    const preview = page.locator(".tk-hero .tk-preview");
+    const preview = page.locator(".tk-hero [data-itch-unlock] .tk-preview");
     await expect(page.locator(".tk-hero .tk-perk")).toBeVisible();
     await expect(page.locator(".tk-hero .tk-perk")).toContainText(words.perk);
     await expect(preview).toBeHidden();
@@ -49,7 +49,7 @@ for (const [url, words] of Object.entries({
     await expect(popup).toBeHidden();
     await expect(card.locator("input[name=email]")).toBeFocused();
     await expect(page).toHaveURL(/#prereg$/);
-    await expect(page.locator(".tk-hero .tk-key, .tk-hero .tk-preview")).toHaveCount(2);
+    await expect(page.locator(".tk-hero .tk-key, .tk-hero .tk-preview:not(#download .tk-preview)")).toHaveCount(2);
     await expect(page.locator(".tk-odds-table")).toHaveCount(0);
     await expect(page.locator(`#odds-info a[href='${words.odds}']`)).toHaveCount(1);
 
@@ -78,7 +78,7 @@ for (const [url, words] of Object.entries({
     await expect(gate).toHaveText(words.preview);
     await expect(gate).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
     await page.reload();
-    await expect(page.locator(".tk-hero .tk-preview")).toBeVisible();
+    await expect(page.locator(".tk-hero [data-itch-unlock] .tk-preview")).toBeVisible();
     await expect(page.locator(".tk-nav a[data-itch-gate]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
   });
 }
@@ -341,7 +341,8 @@ test("/10key/get/?preview=pc shows phone stores with QR and copy link, the itch.
   await expect(pc.locator("[data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=ads_kr&mt=8");
   await expect(pc.locator("[data-get-link=android]")).toHaveAttribute("href", /id=com\.houseduck\.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dget%26utm_campaign%3Dads_kr$/);
   await expect(pc.locator("[data-get-link=itch]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
-  await expect(pc.locator(".tk-store.is-soon")).toContainText("Steam");
+  await expect(pc.locator(".tk-steam-soon")).toContainText("Steam");
+  await expect(pc.locator("[data-get-link=ios] img")).toHaveAttribute("src", "/assets/store-badges/app-store-en.svg");
   // the QR code is for a computer screen; phones (under 760px) hide it
   if ((page.viewportSize() || { width: 1440 }).width > 760) await expect(pc.locator(".tk-get-qr img")).toBeVisible();
   else await expect(pc.locator(".tk-get-qr img")).toBeHidden();
@@ -361,4 +362,62 @@ test("/10key/get/ on a phone whose store is not live yet says coming soon and of
   await expect(page.locator("[data-get-pc]")).toBeHidden();
   await page.goto("/10key/get/?preview=ios-soon&lang=en");
   await expect(page.locator("[data-title]")).toHaveText("App Store is coming soon");
+});
+
+// Launch switch (owner 2026-11-18): assets/tenkey-launch.js flips the 10key pages, the home pages and /10key/get/ from
+// pre-registration to download at 2026-11-20 00:00 Berlin; ?launch=preview shows it earlier. Stores stay "coming soon"
+// until their live flag is set; the sale line shows only 11-20 to 11-27.
+const LAUNCH_PAGES = [["/10key/?lang=ko", "ko", "지금 출시!"], ["/10key/index_en.html?lang=en", "en", "Out now!"], ["/10key/index_de.html?lang=de", "de", "Jetzt erhältlich!"], ["/10key/index_ja.html?lang=ja", "ja", "配信開始！"], ["/10key/index_zh.html?lang=zh", "zh", "現已上市！"]];
+for (const [url, lang, title] of LAUNCH_PAGES) {
+  test(`${url} before launch keeps pre-registration; ?launch=preview shows the download block`, async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+    await page.goto(url);
+    await expect(page.locator("#download")).toBeHidden();
+    await expect(page.locator("#prereg")).toBeVisible();
+    await page.goto(url + "&launch=preview");
+    await expect(page.locator("#download h2")).toHaveText(title);
+    await expect(page.locator("#prereg")).toBeHidden();
+    await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", `https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=site_${lang}&mt=8`);
+    await expect(page.locator("#download [data-launch-store=ios] img")).toHaveAttribute("src", `/assets/store-badges/app-store-${lang}.svg`);
+    await expect(page.locator("#download [data-launch-store=android] img")).toHaveAttribute("src", lang === "zh" ? "/assets/store-badges/google-play-zh.png" : `/assets/store-badges/google-play-${lang}.svg`);
+    await expect(page.locator("#download [data-launch-store=android]")).toHaveAttribute("href", new RegExp(`utm_campaign%3Dsite_${lang}$`));
+    await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+    await expect(page.locator("#faq details:visible")).toHaveCount(3);
+    await expect(page.locator(".tk-nav-cta:visible")).toHaveAttribute("href", "#download");
+    for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+    await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
+  });
+}
+test("the launch switches itself on at 2026-11-20 00:00 Berlin, stores not live yet show coming soon, the sale ends after 11-27", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+  await page.clock.setFixedTime(new Date("2026-11-19T23:30:00+01:00"));
+  await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#prereg")).toBeVisible();
+  await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
+  await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#download")).toBeVisible();
+  // a store whose flag is not live yet shows no badge, only "coming soon" text (official badge rules)
+  await expect(page.locator("#download [data-launch-store=ios]")).toBeHidden();
+  await expect(page.locator("#download .tk-badge-item.is-soon .tk-badge-soon").first()).toBeVisible();
+  await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+  await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
+  await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#download")).toBeVisible();
+  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
+});
+test("home 10key section: pre-registration before launch, download key to /10key/get/ after", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  await expect(page.locator("#games a.hd-tk-prereg")).toBeVisible();
+  await expect(page.locator("#games a.hd-tk-get")).toBeHidden();
+  await page.goto("/?lang=ko&launch=preview");
+  await expect(page.locator("#games a.hd-tk-get")).toHaveAttribute("href", "10key/get/?src=home_ko&lang=ko");
+  await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
+  await expect(page.locator("#games .hd-tk-preview:visible")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+});
+test("/10key/get/?launch=preview shows the after-launch page without leaving for a store", async ({ page }) => {
+  await page.goto("/10key/get/?launch=preview&lang=en");
+  const android = await page.evaluate(() => /Android/i.test(navigator.userAgent));
+  if (android) await expect(page.locator("[data-title]")).toHaveText("Opening Google Play…");
+  else await expect(page.locator("[data-get-pc]")).toBeVisible();
+  await expect(page).toHaveURL(/launch=preview/);
 });

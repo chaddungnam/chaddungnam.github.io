@@ -5,7 +5,8 @@
   "use strict";
 
   var ENDPOINT = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
-  // Flip "live" to true for each store on launch day. Until then /10key/get/ shows the pre-registration page link.
+  // Fallback only: the launch flags live in assets/tenkey-launch.js (window.TENKEY_LAUNCH). Until a store is live there,
+  // /10key/get/ shows the pre-registration page link.
   var STORES = {
     ios: { live: false, url: "https://apps.apple.com/app/id6824972492" },
     android: { live: false, url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
@@ -22,6 +23,12 @@
   var ui = lang === "ko" ? "ko" : "en";
   document.querySelectorAll("[data-ko]").forEach(function (node) {
     node.textContent = node.getAttribute("data-" + lang) || node.getAttribute("data-" + ui);
+  });
+  // Official store badges per language (assets/store-badges): src and alt follow the page language.
+  document.querySelectorAll("[data-img-ko]").forEach(function (img) {
+    img.src = img.getAttribute("data-img-" + lang) || img.getAttribute("data-img-en");
+    img.alt = img.getAttribute("data-alt-" + lang) || img.getAttribute("data-alt-en");
+    if (lang === "zh" && img.hasAttribute("data-padded-zh")) img.classList.add("is-padded");
   });
   document.querySelectorAll("[data-href-ko]").forEach(function (node) {
     node.setAttribute("href", node.getAttribute("data-href-" + lang) || node.getAttribute("data-href-" + ui));
@@ -128,10 +135,15 @@
     // ?preview=android-soon / ios-soon: only the other store is live (one store launches first).
     if (preview === "android-soon") { isIOS = false; isAndroid = true; }
     if (preview === "ios-soon") { isIOS = true; isAndroid = false; }
+    // Launch flags come from assets/tenkey-launch.js (one switch for the 10key pages, the home pages and this page);
+    // ?launch=preview there shows this page as after launch, without leaving for a store.
+    var LAUNCH = window.TENKEY_LAUNCH;
+    if (!preview && LAUNCH && LAUNCH.preview) preview = isIOS ? "ios" : (isAndroid ? "android" : "pc");
     var isLive = function (key) {
       if (preview === "android-soon") return key === "ios";
       if (preview === "ios-soon") return key === "android";
-      return STORES[key].live || !!preview;
+      if (preview) return true;
+      return LAUNCH ? LAUNCH.live(key) : STORES[key].live;
     };
     // Store links carry where the visit came from (?src=, e.g. ads_kr, mail, shorts; default "get"), so App Store Connect
     // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.
@@ -166,7 +178,8 @@
     document.querySelectorAll("[data-get-link='ios'], [data-get-link='android']").forEach(function (a) {
       var key = a.getAttribute("data-get-link");
       a.href = storeUrl(key);
-      if (!isLive(key)) a.hidden = true;
+      var item = a.closest(".tk-badge-item");
+      if (!isLive(key)) { a.hidden = true; if (item) item.classList.add("is-soon"); }
     });
     var card = document.querySelector("[data-get-card]");
     if (card) card.hidden = true;

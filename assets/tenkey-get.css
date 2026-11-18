@@ -21,18 +21,9 @@
 .tk-get-qr { display: block; width: 156px; height: 156px; padding: 8px; box-sizing: border-box; border-radius: 12px; background: var(--tk-cream); }
 .tk-get-qr img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .tk-get-qr-note { margin: 10px 0 0; color: var(--tk-text-3); font-size: .78rem; line-height: 1.5; word-break: keep-all; max-width: 156px; }
-.tk-get-stores { display: grid; gap: 10px; }
+.tk-get-stores { display: grid; justify-items: start; gap: 14px; }
+.tk-steam-soon { display: inline-block; justify-self: start; }
 
-.tk-store { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 18px 0 14px; box-sizing: border-box; border: 1px solid var(--tk-edge-2); border-radius: 12px; color: var(--tk-text); background: rgba(236, 230, 214, .06); text-decoration: none; transition: border-color 160ms var(--tk-ease), background-color 160ms var(--tk-ease), transform 160ms var(--tk-ease); }
-.tk-page a.tk-store { color: var(--tk-text); }
-.tk-store:hover, .tk-store:focus-visible { border-color: var(--tk-cream); background: rgba(236, 230, 214, .12); transform: translateY(-1px); }
-.tk-store svg { flex: none; width: 24px; height: 26px; }
-.tk-store-copy { display: flex; flex-direction: column; gap: 2px; text-align: left; }
-.tk-store-copy small { color: var(--tk-text-3); font-size: .72rem; font-weight: 600; }
-.tk-store-copy strong { font-size: 1.02rem; font-weight: 800; letter-spacing: -.01em; }
-.tk-store.is-soon { cursor: default; opacity: .55; border-style: dashed; }
-.tk-store.is-soon:hover { transform: none; border-color: var(--tk-edge-2); background: rgba(236, 230, 214, .06); }
-.tk-soon-chip { margin-left: auto; padding: 3px 9px; border-radius: 999px; color: var(--tk-night); background: var(--tk-text-3); font-size: .7rem; font-weight: 800; }
 
 .tk-get-copy { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--tk-edge); }
 .tk-get-copy code { flex: 1; min-width: 0; overflow: hidden; color: var(--tk-text-2); font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
@@ -45,8 +36,8 @@
 .tk-get-pc-note { margin: 4px 0 0; color: var(--tk-text-3); font-size: .82rem; line-height: 1.55; word-break: keep-all; }
 .tk-get-back { margin-top: 26px; text-align: center; }
 
-/* phone, store opening: the small card from tenkey-page.css keeps a manual button in case the jump is blocked */
-.tk-card .tk-store { justify-content: center; margin-top: 18px; }
+/* phone, store opening: the small card keeps the official badge as a manual button in case the jump is blocked */
+.tk-card .tk-actions .tk-badge { margin-top: 4px; }
 
 @media (max-width: 760px) {
   .tk-get-grid { grid-template-columns: minmax(0, 1fr); }

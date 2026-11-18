@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261106-neutral">
   <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261106-neutral">
+  <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261118-badge">
+  <script src="/assets/tenkey-launch.js?v=20261118-badge"></script>
   <script src="/assets/share-sheet.js?v=20261108-kakao" defer></script>
   <script src="/assets/tenkey-page.js?v=20261104-pc" defer></script>
   <script src="/assets/tenkey-ads.js?v=20261104-zh" defer></script>
@@ -35,7 +37,7 @@
       <a class="tk-nav-link" href="../?lang=ko#games">게임</a>
       <a class="tk-nav-link" href="#prereg" data-itch-gate>데모 플레이</a>
       <a class="tk-nav-link" href="/support/">고객지원</a>
-      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump>사전예약</a>
+      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump data-prelaunch>사전예약</a><a class="tk-nav-link tk-nav-cta" href="#download" data-launch>다운로드</a>
       <span class="tk-lang" role="group" aria-label="언어 선택"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko" aria-current="page">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en">EN</a><a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">DE</a><a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">JA</a><a href="index_zh.html?lang=zh" lang="zh-Hant" hreflang="zh-Hant" data-lang-link="zh">中文</a></span>
     </nav>
   </div></header>
@@ -48,7 +50,14 @@
           <h1 id="game-title"><span class="tk-title-alt" lang="en">10key Survival</span> <span class="tk-title-main">딸깍 서바이벌</span></h1>
           <p class="tk-pitch">화려한 모험, 그리고 ASMR</p>
           <p class="tk-lede">부수는 키마다 실제로 녹음한 키보드 소리가 딸깍, 와장창 울려요. 살아 있는 텐키가 되어 끝없는 3D 키보드를 파고 내려가세요.</p>
-          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="ko" data-consent-version="2026-11-04b" data-msgs='{"sending": "보내는 중…", "ok": "사전예약 완료! 출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요. 완료 안내 메일도 보냈어요. 바로 아래 링크로 itch.io에서 데모를 플레이해 보세요.", "invalid": "이메일 주소를 다시 확인해 주세요.", "consent": "동의 항목에 체크해 주세요.", "busy": "신청이 많아 잠시 뒤에 다시 시도해 주세요.", "mail": "확인 메일을 보내지 못했어요. 잠시 뒤에 다시 시도해 주세요.", "error": "연결에 실패했어요. 잠시 뒤에 다시 시도해 주세요.", "offline": "사전예약 기능을 불러오지 못했어요. 잠시 후 페이지를 새로 고쳐 다시 시도해 주세요."}'>
+          <section class="tk-dl" id="download" aria-labelledby="download-title" data-launch>
+            <h2 id="download-title">지금 출시!</h2>
+            <p class="tk-dl-sale" data-sale><strong>출시 기념 할인</strong><s>$4.99</s><span aria-hidden="true">→</span><b>$2.99</b><span>11월 27일까지</span></p>
+            <div class="tk-dl-stores"><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="ios" data-ct="site_ko" hidden><img src="/assets/store-badges/app-store-ko.svg" width="144" height="48" alt="App Store에서 다운로드"></a><span class="tk-badge-soon">App Store 준비 중</span></span><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="android" data-ct="site_ko" hidden><img src="/assets/store-badges/google-play-ko.svg" width="162" height="48" alt="Google Play에서 다운로드"></a><span class="tk-badge-soon">Google Play 준비 중</span></span></div>
+            <p class="tk-dl-sub">iPhone·iPad는 App Store, Android는 Google Play에서 받아요.</p>
+            <div class="tk-dl-pc"><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>컴퓨터에서는 itch.io 데모 (레벨 8까지)</a><a class="tk-text-link" href="/10key/get/?src=site_ko&amp;lang=ko">휴대폰으로 받기 (QR 코드) →</a></div>
+          </section>
+          <section class="tk-prereg" id="prereg" data-prelaunch aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="ko" data-consent-version="2026-11-04b" data-msgs='{"sending": "보내는 중…", "ok": "사전예약 완료! 출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요. 완료 안내 메일도 보냈어요. 바로 아래 링크로 itch.io에서 데모를 플레이해 보세요.", "invalid": "이메일 주소를 다시 확인해 주세요.", "consent": "동의 항목에 체크해 주세요.", "busy": "신청이 많아 잠시 뒤에 다시 시도해 주세요.", "mail": "확인 메일을 보내지 못했어요. 잠시 뒤에 다시 시도해 주세요.", "error": "연결에 실패했어요. 잠시 뒤에 다시 시도해 주세요.", "offline": "사전예약 기능을 불러오지 못했어요. 잠시 후 페이지를 새로 고쳐 다시 시도해 주세요."}'>
             <h2 id="prereg-title">출시 알림 사전예약</h2>
             <p class="tk-prereg-sub">이메일을 남기면 출시되는 날 iOS·Android 다운로드 링크를 메일 한 통으로 보내 드려요.</p>
             <form class="tk-form-body" method="post" novalidate data-prereg-form>
@@ -66,8 +75,8 @@
           </section>
           <div class="hd-share-row" role="group" aria-label="이 페이지를 친구에게 공유하거나 주소를 복사해요" data-share-row hidden><button class="hd-share-key" type="button" data-share-open>공유하기</button><button class="hd-share-key" type="button" data-share-copy>링크 복사</button><span class="hd-share-note" role="status" aria-live="polite" data-share-status></span></div>
           <p class="tk-paid"><span class="tk-paid-chip">유료 · 인앱 구매 있음</span><span class="tk-paid-text">정식판은 Google Play·App Store 유료 앱이고, 게임 안에서 보석을 살 수 있어요(인앱 구매). itch.io는 무료 데모(레벨 8까지)예요.</span></p>
-          <ul class="tk-where" aria-label="플레이 환경"><li><span class="tk-where-k">컴퓨터</span><span>itch.io 데모 · <b>PC 권장</b></span></li><li><span class="tk-where-k">휴대폰</span><span>Google Play · App Store (준비 중)</span></li></ul>
-          <div class="tk-itch-slot" id="itch-demo">
+          <ul class="tk-where" aria-label="플레이 환경"><li><span class="tk-where-k">컴퓨터</span><span>itch.io 데모 · <b>PC 권장</b></span></li><li data-prelaunch><span class="tk-where-k">휴대폰</span><span>Google Play · App Store (준비 중)</span></li><li data-launch><span class="tk-where-k">휴대폰</span><span>Google Play · App Store</span></li></ul>
+          <div class="tk-itch-slot" id="itch-demo" data-prelaunch>
           <div class="tk-preview-row" data-itch-locked>
             <p class="tk-perk"><span class="tk-lock-icon" aria-hidden="true"></span><span><strong>사전예약 특전</strong> 사전예약을 마치면 itch.io에서 데모(레벨 8까지)를 플레이할 수 있는 링크가 바로 떠요. PC에서 플레이하는 걸 권장해요.</span></p>
           </div>
@@ -147,7 +156,7 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="facts-title">알아 두면 좋은 것</h2>
         <dl class="tk-sheet tk-reveal">
-          <div class="is-key"><dt>플랫폼</dt><dd>iOS · Android 출시 준비 중<span>5달러 이내의 유료 앱이에요(앱 내 구매 포함). 출시 초반에는 할인가로 훨씬 저렴하게 판매할 예정이에요. 출시 일정은 아직 정해지지 않았어요.</span></dd></div>
+          <div class="is-key" data-prelaunch><dt>플랫폼</dt><dd>iOS · Android 출시 준비 중<span>5달러 이내의 유료 앱이에요(앱 내 구매 포함). 출시 초반에는 할인가로 훨씬 저렴하게 판매할 예정이에요. 출시 일정은 아직 정해지지 않았어요.</span></dd></div><div class="is-key" data-launch><dt>플랫폼</dt><dd>iOS · Android 출시<span>유료 앱이에요(앱 내 구매 포함). 정가는 $4.99이고, 출시 기념으로 11월 27일까지 $2.99예요. 나라별 가격은 스토어에 표시돼요.</span></dd></div>
           <div><dt>데모 플레이</dt><dd>레벨 8까지<span>사전예약 특전이에요. 사전예약을 마치면 itch.io 링크가 떠요. PC 브라우저에서 플레이를 권장해요. 설치 없이 바로 시작되고 구매할 것도 없어요.</span></dd></div>
           <div><dt>광고</dt><dd>없음<span>광고를 덕지덕지 붙인 무료 게임으로 만들지 않았어요. 게임 중에 광고가 나오지 않아요.</span></dd></div>
           <div><dt>소리</dt><dd>진짜 키보드 타건음<span>실제로 녹음한 소리예요. 헤드폰을 끼고 해 보세요.</span></dd></div>
@@ -171,12 +180,12 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="faq-title">자주 묻는 질문</h2>
         <div class="tk-faq tk-reveal">
-          <details><summary>가격은 얼마인가요?</summary><p>광고를 덕지덕지 붙인 무료 게임 대신, 5달러 이내의 유료 게임으로 출시해요. 출시 초반에는 할인가로 훨씬 저렴하게 판매할 예정이에요. 정확한 가격은 출시할 때 스토어에서 확인할 수 있어요.</p></details>
-          <details><summary>출시 전에 해 볼 수 있나요?</summary><p>네, 사전예약 특전으로 데모(레벨 8까지)를 플레이할 수 있어요. 모듈은 정식판에서 만나요. 사전예약을 마치면 완료 화면에 itch.io 데모 링크가 떠요. itch.io 데모는 컴퓨터(PC)에서 플레이하는 걸 권장해요. 휴대폰용은 Google Play·App Store에서 출시 준비 중이에요. 이미 사전예약했다면 같은 이메일로 한 번 더 신청하면 링크가 다시 떠요. 메일은 다시 가지 않아요.</p></details>
+          <details data-launch><summary>가격은 얼마인가요?</summary><p>정가는 $4.99예요. 출시 기념으로 11월 20일부터 27일(독일 시간)까지 $2.99로 할인해요. 나라별 가격은 스토어에 표시돼요. 광고 덕지덕지 붙은 무료 게임이 아니라, 광고 없는 유료 게임이에요.</p></details><details data-prelaunch><summary>가격은 얼마인가요?</summary><p>광고를 덕지덕지 붙인 무료 게임 대신, 5달러 이내의 유료 게임으로 출시해요. 출시 초반에는 할인가로 훨씬 저렴하게 판매할 예정이에요. 정확한 가격은 출시할 때 스토어에서 확인할 수 있어요.</p></details>
+          <details data-launch><summary>컴퓨터에서도 할 수 있나요?</summary><p>네. itch.io에서 데모(레벨 8까지)를 브라우저로 바로 플레이할 수 있어요. 설치나 가입은 필요 없어요. Steam 버전은 준비 중이에요.</p></details><details data-prelaunch><summary>출시 전에 해 볼 수 있나요?</summary><p>네, 사전예약 특전으로 데모(레벨 8까지)를 플레이할 수 있어요. 모듈은 정식판에서 만나요. 사전예약을 마치면 완료 화면에 itch.io 데모 링크가 떠요. itch.io 데모는 컴퓨터(PC)에서 플레이하는 걸 권장해요. 휴대폰용은 Google Play·App Store에서 출시 준비 중이에요. 이미 사전예약했다면 같은 이메일로 한 번 더 신청하면 링크가 다시 떠요. 메일은 다시 가지 않아요.</p></details>
           <details><summary>브라우저 버전 진행 상황은 어디에 저장되나요?</summary><p>브라우저 버전은 게스트로 플레이하고, 진행 상황은 그 브라우저에만 저장돼요. 사이트 데이터를 지우면 사라지고 다른 기기로 옮겨지지 않아요. 랭킹 탭에서 온라인 순위는 볼 수 있지만 내 기록은 그 기기에만 남아요.</p></details>
-          <details><summary>사전예약하면 무엇을 받나요?</summary><p>출시되는 날 다운로드 링크가 담긴 메일을 한 번 받아요. 링크 하나로 아이폰은 App Store, 안드로이드는 Google Play가 열려요. 그 밖의 광고 메일은 보내지 않아요.</p></details>
-          <details><summary>완료 메일이 오지 않아요.</summary><p>사전예약은 사전예약하기를 누른 순간 끝나요. support@houseduck.in에서 보낸 완료 안내 메일이 안 보이면 스팸함을 확인해 주세요. 그 메일이 없어도 출시 알림은 그대로 보내 드려요.</p></details>
-          <details><summary>신청을 취소하고 싶어요.</summary><p>완료 안내 메일의 사전예약 취소 링크를 누르거나 support@houseduck.in으로 알려 주세요. 취소한 주소는 30일 안에 지워져요.</p></details>
+          <details data-prelaunch><summary>사전예약하면 무엇을 받나요?</summary><p>출시되는 날 다운로드 링크가 담긴 메일을 한 번 받아요. 링크 하나로 아이폰은 App Store, 안드로이드는 Google Play가 열려요. 그 밖의 광고 메일은 보내지 않아요.</p></details>
+          <details data-prelaunch><summary>완료 메일이 오지 않아요.</summary><p>사전예약은 사전예약하기를 누른 순간 끝나요. support@houseduck.in에서 보낸 완료 안내 메일이 안 보이면 스팸함을 확인해 주세요. 그 메일이 없어도 출시 알림은 그대로 보내 드려요.</p></details>
+          <details data-prelaunch><summary>신청을 취소하고 싶어요.</summary><p>완료 안내 메일의 사전예약 취소 링크를 누르거나 support@houseduck.in으로 알려 주세요. 취소한 주소는 30일 안에 지워져요.</p></details>
         </div>
       </div>
     </section>
@@ -184,8 +193,8 @@
     <section class="tk-section" aria-labelledby="final-title">
       <div class="tk-wrap tk-final">
         <div class="tk-reveal">
-          <h2 class="tk-h2" id="final-title">출시 날, 메일로 알려 드릴게요<small>이메일 주소 하나면 충분해요.</small></h2>
-          <div class="tk-final-links"><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">사전예약하러 가기</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="itch.io에서 데모 플레이하기">사전예약하고 itch.io에서 데모 플레이</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">개발 영상 보기 ↗</a></div>
+          <h2 class="tk-h2" id="final-title" data-prelaunch>출시 날, 메일로 알려 드릴게요<small>이메일 주소 하나면 충분해요.</small></h2><h2 class="tk-h2" id="final-title-launch" data-launch>지금 다운로드하세요<small>iPhone · iPad · Android</small></h2>
+          <div class="tk-final-links" data-launch><a class="tk-key" href="/10key/get/?src=site_ko_final&amp;lang=ko"><span class="tk-key-face">다운로드하기</span></a><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>itch.io에서 데모 플레이</a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">개발 영상 보기 ↗</a></div><div class="tk-final-links" data-prelaunch><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">사전예약하러 가기</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="itch.io에서 데모 플레이하기">사전예약하고 itch.io에서 데모 플레이</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">개발 영상 보기 ↗</a></div>
         </div>
         <figure class="tk-keyart tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/keyart-ko.webp" width="960" height="469" alt="딸깍 서바이벌 대표 이미지. 3D 키보드 위의 텐키와 마우스" loading="lazy" decoding="async"></figure>
       </div>

@@ -188,17 +188,17 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await expect(tenkey).toContainText("출시 준비 중");
   await expect(tenkey).toContainText("화려한 모험, 그리고 ASMR");
   await expect(tenkey).not.toContainText("Quirky");
-  await expect(tenkey.locator("a")).toHaveCount(4);
+  await expect(tenkey.locator("a:visible")).toHaveCount(4); // the launch version ([data-launch], tenkey-launch.js) stays hidden until 11-20
   // a paid app: the big gold key is the pre-registration, the itch.io build is the free preview under it
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveAttribute("href", "10key/#prereg");
   await expect(tenkey.locator("a.hd-tk-prereg")).toHaveText("사전예약하기");
   // itch.io play is a pre-registration perk (owner 11-03): the second button also goes to the form
-  await expect(tenkey.locator("a.hd-tk-preview")).toHaveAttribute("href", "10key/#itch-demo");
-  await expect(tenkey.locator("a.hd-tk-preview")).toHaveText("사전예약하고 itch.io에서 데모 플레이");
+  await expect(tenkey.locator("a.hd-tk-preview:visible")).toHaveAttribute("href", "10key/#itch-demo");
+  await expect(tenkey.locator("a.hd-tk-preview:visible")).toHaveText("사전예약하고 itch.io에서 데모 플레이");
   await expect(tenkey.locator(".hd-tk-paid-chip")).toHaveText("유료 · 인앱 구매 있음");
   await expect(tenkey.locator(".hd-tk-paid")).toContainText("무료 데모(레벨 8까지)");
   await expect(tenkey.locator("a.hd-tk-more")).toHaveAttribute("href", "10key/");
-  await expect(tenkey.locator(".hd-tk-fine a")).toHaveAttribute("href", "10key/odds/ko.html");
+  await expect(tenkey.locator(".hd-tk-fine a:visible")).toHaveAttribute("href", "10key/odds/ko.html");
   await expect(tenkey.locator("a[href*='play.google.com'], a[href*='apps.apple.com'], .google-play-badge, .app-store-badge")).toHaveCount(0);
   await expect(video).toBeVisible();
   await expect.poll(() => video.evaluate((node) => node.autoplay)).toBe(true); // home.js sets it when the video scrolls into view
@@ -364,10 +364,10 @@ test("10key Survival shows its real gameplay in its game frame and the quiet Com
     await expect(video).toBeVisible();
     await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
-    await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']")).toHaveCount(0);
+    await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']:visible")).toHaveCount(0);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}#prereg']`)).toHaveCount(1);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}#itch-demo']`)).toHaveCount(1);
-    await expect(zone.locator("a")).toHaveCount(4);
+    await expect(zone.locator("a:visible")).toHaveCount(4);
     // the itch.io theme: light text (#ECE6D6) on the dark page (#141318), the game's own pixel font
     await expect(zone.locator("#tenkey-title")).toHaveCSS("color", "rgb(236, 230, 214)");
     await expect(zone.locator("#tenkey-title")).toHaveCSS("font-family", /Galmuri11/);
@@ -729,7 +729,7 @@ test("localized homes keep the 10key Survival copy, game frame and sections read
       const phone = rect(".hd-tk-screen-frame");
       const bodyFonts = [".hd-lede", ".hd-quirky-copy .hd-lede"]
         .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
-      const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link, .store-button")]
+      const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link, .store-button")].filter((node) => node.getClientRects().length)
         .filter((node) => getComputedStyle(node).display !== "none")
         .map((node) => node.getBoundingClientRect().height);
       const support = rect("#player-support");
@@ -861,7 +861,7 @@ test("home keycaps sink while pressed and release without following their link",
   await expect(quirkyCta).toHaveAttribute("href", "quirky-ball/?lang=ko");
   await expect(quirkyCta).toHaveAttribute("data-pressable", "");
   await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText("자세히 보기");
-  const cta = page.locator("#games .hd-keycap-cta");
+  const cta = page.locator("#games .hd-keycap-cta:visible");
   await expect(cta).toHaveAttribute("href", "10key/#prereg");
   await expect(cta).toHaveAttribute("data-pressable", "");
   const ctaBox = await cta.boundingBox();

@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261106-neutral">
   <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261106-neutral">
+  <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261118-badge">
+  <script src="/assets/tenkey-launch.js?v=20261118-badge"></script>
   <script src="/assets/share-sheet.js?v=20261108-kakao" defer></script>
   <script src="/assets/tenkey-page.js?v=20261104-pc" defer></script>
   <script src="/assets/tenkey-ads.js?v=20261104-zh" defer></script>
@@ -34,7 +36,7 @@
       <a class="tk-nav-link" href="../index_en.html?lang=en#games">遊戲</a>
       <a class="tk-nav-link" href="#prereg" data-itch-gate>試玩</a>
       <a class="tk-nav-link" href="/support/#english">客服</a>
-      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump>事前預約</a>
+      <a class="tk-nav-link tk-nav-cta" href="#prereg" data-prereg-jump data-prelaunch>事前預約</a><a class="tk-nav-link tk-nav-cta" href="#download" data-launch>下載</a>
       <span class="tk-lang" role="group" aria-label="語言"><a href="index.html?lang=ko" lang="ko" hreflang="ko" data-lang-link="ko">KO</a><a href="index_en.html?lang=en" lang="en" hreflang="en" data-lang-link="en">EN</a><a href="index_de.html?lang=de" lang="de" hreflang="de" data-lang-link="de">DE</a><a href="index_ja.html?lang=ja" lang="ja" hreflang="ja" data-lang-link="ja">JA</a><a href="index_zh.html?lang=zh" lang="zh-Hant" hreflang="zh-Hant" data-lang-link="zh" aria-current="page">中文</a></span>
     </nav>
   </div></header>
@@ -47,7 +49,14 @@
           <h1 id="game-title"><span class="tk-title-main">10key Survival</span> <span class="tk-title-alt" lang="zh-Hant">咔噠求生</span></h1>
           <p class="tk-pitch">華麗的冒險，加上 ASMR</p>
           <p class="tk-lede">每敲碎一顆鍵，都會響起真實錄製的鍵盤聲：咔噠、喀啦、碎裂。化身活生生的數字鍵盤，挖穿無盡的 3D 鍵盤。</p>
-          <section class="tk-prereg" id="prereg" aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="zh" data-consent-version="2026-11-04b" data-msgs='{"sending": "傳送中…", "ok": "事前預約完成！上市當天會把下載連結寄到這個信箱。確認信已寄出，itch.io 試玩連結就在下方。", "invalid": "請確認電子郵件地址。", "consent": "請勾選同意方塊。", "busy": "目前預約人數過多，請稍後再試。", "mail": "確認信寄送失敗，請稍後再試。", "error": "連線失敗，請稍後再試。", "offline": "無法載入事前預約，請稍後重新整理頁面再試一次。"}'>
+          <section class="tk-dl" id="download" aria-labelledby="download-title" data-launch>
+            <h2 id="download-title">現已上市！</h2>
+            <p class="tk-dl-sale" data-sale><strong>上市優惠</strong><s>$4.99</s><span aria-hidden="true">→</span><b>$2.99</b><span>至 11 月 27 日</span></p>
+            <div class="tk-dl-stores"><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="ios" data-ct="site_zh" hidden><img src="/assets/store-badges/app-store-zh.svg" width="144" height="48" alt="在 App Store 下載"></a><span class="tk-badge-soon">App Store 版準備中</span></span><span class="tk-badge-item is-soon"><a class="tk-badge" data-launch-store="android" data-ct="site_zh" hidden><img class="is-padded" src="/assets/store-badges/google-play-zh.png" width="161" height="62" alt="立即前往 Google Play 下載"></a><span class="tk-badge-soon">Google Play 版準備中</span></span></div>
+            <p class="tk-dl-sub">iPhone、iPad 請到 App Store，Android 請到 Google Play 下載。</p>
+            <div class="tk-dl-pc"><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>電腦上：在 itch.io 試玩（最多到第 8 關）</a><a class="tk-text-link" href="/10key/get/?src=site_zh&amp;lang=zh">傳到手機（QR 碼）→</a></div>
+          </section>
+          <section class="tk-prereg" id="prereg" data-prelaunch aria-labelledby="prereg-title" data-prereg data-endpoint="https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg" data-locale="zh" data-consent-version="2026-11-04b" data-msgs='{"sending": "傳送中…", "ok": "事前預約完成！上市當天會把下載連結寄到這個信箱。確認信已寄出，itch.io 試玩連結就在下方。", "invalid": "請確認電子郵件地址。", "consent": "請勾選同意方塊。", "busy": "目前預約人數過多，請稍後再試。", "mail": "確認信寄送失敗，請稍後再試。", "error": "連線失敗，請稍後再試。", "offline": "無法載入事前預約，請稍後重新整理頁面再試一次。"}'>
             <h2 id="prereg-title">事前預約進行中</h2>
             <p class="tk-prereg-sub">留下電子郵件，上市當天只寄一封信給你，附上 iOS 與 Android 下載連結。</p>
             <form class="tk-form-body" method="post" novalidate data-prereg-form>
@@ -65,8 +74,8 @@
           </section>
           <div class="hd-share-row" role="group" aria-label="把這個頁面分享給朋友，或複製網址" data-share-row hidden><button class="hd-share-key" type="button" data-share-open>分享</button><button class="hd-share-key" type="button" data-share-copy>複製連結</button><span class="hd-share-note" role="status" aria-live="polite" data-share-status></span></div>
           <p class="tk-paid"><span class="tk-paid-chip">付費 App · 含 App 內購買</span><span class="tk-paid-text">正式版是 Google Play 與 App Store 上的付費 App，遊戲內可購買寶石（App 內購買）。itch.io 上是免費試玩版（最多到第 8 關）。</span></p>
-          <ul class="tk-where" aria-label="遊玩環境"><li><span class="tk-where-k">電腦</span><span>itch.io 試玩版・<b>建議用 PC 玩</b></span></li><li><span class="tk-where-k">手機</span><span>Google Play・App Store（準備中）</span></li></ul>
-          <div class="tk-itch-slot" id="itch-demo">
+          <ul class="tk-where" aria-label="遊玩環境"><li><span class="tk-where-k">電腦</span><span>itch.io 試玩版・<b>建議用 PC 玩</b></span></li><li data-prelaunch><span class="tk-where-k">手機</span><span>Google Play・App Store（準備中）</span></li><li data-launch><span class="tk-where-k">手機</span><span>Google Play・App Store</span></li></ul>
+          <div class="tk-itch-slot" id="itch-demo" data-prelaunch>
           <div class="tk-preview-row" data-itch-locked>
             <p class="tk-perk"><span class="tk-lock-icon" aria-hidden="true"></span><span><strong>事前預約特典</strong> 完成預約後，立刻出現 itch.io 試玩版（最多到第 8 關）的連結。建議用 PC 遊玩。</span></p>
           </div>
@@ -146,7 +155,7 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="facts-title">須知</h2>
         <dl class="tk-sheet tk-reveal">
-          <div class="is-key"><dt>平台</dt><dd>iOS · Android 即將推出<span>售價低於 5 美元的付費 App（含 App 內購買）。上市初期會以優惠價販售，便宜很多。發售日尚未確定。</span></dd></div>
+          <div class="is-key" data-prelaunch><dt>平台</dt><dd>iOS · Android 即將推出<span>售價低於 5 美元的付費 App（含 App 內購買）。上市初期會以優惠價販售，便宜很多。發售日尚未確定。</span></dd></div><div class="is-key" data-launch><dt>平台</dt><dd>iOS · Android 現已上市<span>付費 App（含 App 內購買）。原價 $4.99，上市優惠至 11 月 27 日為 $2.99。各地區價格以商店顯示為準。</span></dd></div>
           <div><dt>試玩</dt><dd>最多到第 8 關<span>事前預約特典：完成預約後會出現 itch.io 連結。建議用 PC 的瀏覽器遊玩，不用下載，也沒有東西要買。</span></dd></div>
           <div><dt>廣告</dt><dd>沒有<span>不是塞滿廣告的免費遊戲。遊玩時沒有廣告。</span></dd></div>
           <div><dt>音效</dt><dd>真實鍵盤聲<span>用真的鍵盤錄製。戴上耳機吧。</span></dd></div>
@@ -170,12 +179,12 @@
       <div class="tk-wrap">
         <h2 class="tk-h2 tk-reveal" id="faq-title">常見問題</h2>
         <div class="tk-faq tk-reveal">
-          <details><summary>售價多少？</summary><p>不做塞滿廣告的免費遊戲，而是以低於 5 美元的付費遊戲推出。上市初期會以優惠價販售，便宜很多。確切價格以上市時商店顯示為準。</p></details>
-          <details><summary>上市前可以玩嗎？</summary><p>可以，事前預約特典就是試玩版（最多到第 8 關）。完成預約後，頁面會顯示 itch.io 試玩連結，itch.io 試玩版建議用電腦（PC）遊玩。手機版正在準備上架 Google Play 與 App Store。已經預約過？再輸入一次同一個信箱，連結就會再出現，不會再寄第二封信。</p></details>
+          <details data-launch><summary>售價多少？</summary><p>原價 $4.99。上市優惠期間（德國時間 11 月 20 日至 27 日）為 $2.99。各地區價格以商店顯示為準。這是沒有廣告的付費遊戲，不是塞滿廣告的免費遊戲。</p></details><details data-prelaunch><summary>售價多少？</summary><p>不做塞滿廣告的免費遊戲，而是以低於 5 美元的付費遊戲推出。上市初期會以優惠價販售，便宜很多。確切價格以上市時商店顯示為準。</p></details>
+          <details data-launch><summary>可以在電腦上玩嗎？</summary><p>可以。在 itch.io 用瀏覽器就能直接試玩（最多到第 8 關），不用安裝也不用註冊。Steam 版正在準備中。</p></details><details data-prelaunch><summary>上市前可以玩嗎？</summary><p>可以，事前預約特典就是試玩版（最多到第 8 關）。完成預約後，頁面會顯示 itch.io 試玩連結，itch.io 試玩版建議用電腦（PC）遊玩。手機版正在準備上架 Google Play 與 App Store。已經預約過？再輸入一次同一個信箱，連結就會再出現，不會再寄第二封信。</p></details>
           <details><summary>瀏覽器版的進度存在哪裡？</summary><p>瀏覽器版以訪客身分遊玩，進度只會存在那個瀏覽器。清除網站資料就會消失，也無法轉移到其他裝置。排行榜分頁可以看到線上排名，但你自己的紀錄只留在那台裝置。</p></details>
-          <details><summary>事前預約可以得到什麼？</summary><p>上市當天會收到一封附下載連結的信。同一個連結在 iPhone 會開啟 App Store，在 Android 會開啟 Google Play。不會寄其他行銷信。</p></details>
-          <details><summary>沒有收到確認信。</summary><p>按下「立即預約」的那一刻就完成預約了。如果收件匣裡沒有 support@houseduck.in 寄來的確認信，請看看垃圾郵件匣。無論如何，上市通知信都會寄給你。</p></details>
-          <details><summary>如何取消？</summary><p>使用確認信裡的取消連結，或寫信到 support@houseduck.in。取消後的地址會在 30 天內刪除。</p></details>
+          <details data-prelaunch><summary>事前預約可以得到什麼？</summary><p>上市當天會收到一封附下載連結的信。同一個連結在 iPhone 會開啟 App Store，在 Android 會開啟 Google Play。不會寄其他行銷信。</p></details>
+          <details data-prelaunch><summary>沒有收到確認信。</summary><p>按下「立即預約」的那一刻就完成預約了。如果收件匣裡沒有 support@houseduck.in 寄來的確認信，請看看垃圾郵件匣。無論如何，上市通知信都會寄給你。</p></details>
+          <details data-prelaunch><summary>如何取消？</summary><p>使用確認信裡的取消連結，或寫信到 support@houseduck.in。取消後的地址會在 30 天內刪除。</p></details>
         </div>
       </div>
     </section>
@@ -183,8 +192,8 @@
     <section class="tk-section" aria-labelledby="final-title">
       <div class="tk-wrap tk-final">
         <div class="tk-reveal">
-          <h2 class="tk-h2" id="final-title">上市當天寄信通知你<small>只需要一個電子郵件地址。</small></h2>
-          <div class="tk-final-links"><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">前往事前預約</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="在 itch.io 試玩">完成預約即可在 itch.io 試玩</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">觀看開發影片 ↗</a></div>
+          <h2 class="tk-h2" id="final-title" data-prelaunch>上市當天寄信通知你<small>只需要一個電子郵件地址。</small></h2><h2 class="tk-h2" id="final-title-launch" data-launch>立即下載<small>iPhone・iPad・Android</small></h2>
+          <div class="tk-final-links" data-launch><a class="tk-key" href="/10key/get/?src=site_zh_final&amp;lang=zh"><span class="tk-key-face">下載</span></a><a class="tk-preview" href="https://houseduck.itch.io/10key-survival" target="_blank" rel="noopener"><span class="tk-play-icon" aria-hidden="true"></span>在 itch.io 試玩</a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">觀看開發影片 ↗</a></div><div class="tk-final-links" data-prelaunch><a class="tk-key" href="#prereg" data-prereg-jump><span class="tk-key-face">前往事前預約</span></a><a class="tk-preview" href="#prereg" data-itch-gate><span class="tk-lock-icon" aria-hidden="true"></span><span data-gate-label data-unlocked-label="在 itch.io 試玩">完成預約即可在 itch.io 試玩</span></a><a class="tk-text-link" href="https://www.youtube.com/@houseduck_in">觀看開發影片 ↗</a></div>
         </div>
         <figure class="tk-keyart tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/keyart-en.webp" width="960" height="469" alt="咔噠求生主視覺：3D 鍵盤上的數字鍵盤與滑鼠" loading="lazy" decoding="async"></figure>
       </div>
