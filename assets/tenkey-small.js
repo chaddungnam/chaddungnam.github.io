@@ -30,6 +30,7 @@
 
   var T = {
     ko: {
+      storeSoon: ["{store} 출시 준비 중이에요", "곧 출시돼요. 사전예약하면 출시되는 날 메일로 알려 드려요."],
       opening: ["{store} 여는 중…", "자동으로 안 열리면 아래 버튼을 눌러 주세요."],
       working: ["확인하는 중…", "잠시만 기다려 주세요."],
       confirmed: ["사전예약 완료!", "출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요."],
@@ -40,6 +41,7 @@
       pick: ["딸깍 서바이벌 받기", "내 기기의 스토어를 골라 주세요."]
     },
     en: {
+      storeSoon: ["{store} is coming soon", "It is almost ready. Pre-register and we will email you the day it is out."],
       opening: ["Opening {store}…", "If nothing happens, tap the button below."],
       working: ["Checking…", "One moment."],
       confirmed: ["You are pre-registered!", "We will send the download link to this address on launch day."],
@@ -50,6 +52,7 @@
       pick: ["Get 10key Survival", "Pick the store for your device."]
     },
     de: {
+      storeSoon: ["{store} kommt bald", "Es ist fast so weit. Registriere dich vor, dann schreiben wir dir am Starttag."],
       opening: ["{store} wird geöffnet…", "Falls nichts passiert, tippe unten auf den Button."],
       working: ["Wird geprüft…", "Einen Moment bitte."],
       confirmed: ["Sie sind vorregistriert!", "Am Starttag senden wir den Download-Link an diese Adresse."],
@@ -60,6 +63,7 @@
       pick: ["10key Survival holen", "Wählen Sie den Store für Ihr Gerät."]
     },
     ja: {
+      storeSoon: ["{store}版は準備中です", "もうすぐ配信です。事前登録すると、配信日にメールでお知らせします。"],
       opening: ["{store}を開いています…", "自動で開かない場合は、下のボタンを押してください。"],
       working: ["確認しています…", "少々お待ちください。"],
       confirmed: ["事前登録が完了しました！", "リリース日にこのアドレスへダウンロードリンクをお送りします。"],
@@ -70,6 +74,7 @@
       pick: ["10key Survivalを入手", "お使いの端末のストアを選んでください。"]
     },
     zh: {
+      storeSoon: ["{store} 版即將推出", "就快上市了。完成事前預約，上市當天會寄信通知你。"],
       opening: ["正在開啟 {store}…", "如果沒有自動開啟，請點下方按鈕。"],
       working: ["確認中…", "請稍候。"],
       confirmed: ["事前預約完成！", "上市當天會把下載連結寄到這個信箱。"],
@@ -111,7 +116,8 @@
   if (page === "get") {
     // One link for ads, the launch mail and the Shorts (owner 2026-11-09). Phones go straight to their store once it is
     // live; a computer gets the store choice (QR code, copy link) and the computer options (itch.io demo, Steam soon).
-    // ?preview=pc|ios|android shows the after-launch view without redirecting (local review only).
+    // ?preview=pc|ios|android shows the after-launch view without redirecting; ?preview=android-soon|ios-soon shows a phone
+    // whose store is not live yet while the other store is.
     var preview = params.get("preview");
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -119,7 +125,14 @@
     if (preview === "ios") { isIOS = true; isAndroid = false; }
     if (preview === "android") { isIOS = false; isAndroid = true; }
     if (preview === "pc") { isIOS = false; isAndroid = false; }
-    var isLive = function (key) { return STORES[key].live || !!preview; };
+    // ?preview=android-soon / ios-soon: only the other store is live (one store launches first).
+    if (preview === "android-soon") { isIOS = false; isAndroid = true; }
+    if (preview === "ios-soon") { isIOS = true; isAndroid = false; }
+    var isLive = function (key) {
+      if (preview === "android-soon") return key === "ios";
+      if (preview === "ios-soon") return key === "android";
+      return STORES[key].live || !!preview;
+    };
     // Store links carry where the visit came from (?src=, e.g. ads_kr, mail, shorts; default "get"), so App Store Connect
     // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.
     var src = String(params.get("src") || "get").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "get";
@@ -139,6 +152,16 @@
       return;
     }
     if (!isLive("ios") && !isLive("android")) { show(T.soon); reveal("[data-show-prereg]"); return; }
+    // A phone whose own store is not live yet while the other one is (e.g. iOS first): say so and offer pre-registration,
+    // instead of the computer page with only the other store's button (owner 2026-11-18).
+    if (mineKey) {
+      var soonName = mineKey === "ios" ? "App Store" : "Google Play";
+      title.textContent = T.storeSoon[0].replace("{store}", soonName);
+      text.textContent = T.storeSoon[1];
+      document.title = T.storeSoon[0].replace("{store}", soonName) + " | 10key Survival";
+      reveal("[data-show-prereg]");
+      return;
+    }
     // Computer (or a phone whose store is not live yet): the full choice page.
     document.querySelectorAll("[data-get-link='ios'], [data-get-link='android']").forEach(function (a) {
       var key = a.getAttribute("data-get-link");

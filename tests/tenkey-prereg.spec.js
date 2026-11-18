@@ -352,3 +352,13 @@ test("/10key/get/?preview=ios shows the App Store opening card without leaving",
   await expect(page.locator("[data-store=ios]")).toHaveAttribute("href", /pt=129265473&ct=get&mt=8$/);
   await expect(page).toHaveURL(/\/10key\/get\/\?preview=ios/);
 });
+
+// One store first (owner 2026-11-18): an Android phone while only the App Store is live gets "coming soon" + pre-register.
+test("/10key/get/ on a phone whose store is not live yet says coming soon and offers pre-registration", async ({ page }) => {
+  await page.goto("/10key/get/?preview=android-soon&lang=ko");
+  await expect(page.locator("[data-title]")).toHaveText("Google Play 출시 준비 중이에요");
+  await expect(page.locator("[data-show-prereg]")).toBeVisible();
+  await expect(page.locator("[data-get-pc]")).toBeHidden();
+  await page.goto("/10key/get/?preview=ios-soon&lang=en");
+  await expect(page.locator("[data-title]")).toHaveText("App Store is coming soon");
+});
