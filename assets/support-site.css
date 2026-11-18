@@ -69,3 +69,30 @@
 .support-draft[hidden], .support-locale[hidden], .support-form[hidden] { display:none; }
 .support-form > *, .support-form select, .support-form textarea { min-width:0; max-width:100%; }
 @media print { .support-actions,.support-languages,.support-quick-contact button,.support-stamp{display:none;} .support-contact{color:#000;background:#fff;box-shadow:none;} .support-contact h2,.support-form-notice,.support-response-note{color:#000;} }
+
+/* Which game first (owner 2026-11-18). Without JavaScript everything stays visible; with it, only the chosen game. */
+.support-games { display:none; margin-top:30px; }
+html.support-js .support-games { display:block; }
+.support-games h2 { margin:0 0 14px; font-family:"Do Hyeon","Montserrat",sans-serif; font-size:clamp(1.6rem,3vw,2.3rem); line-height:1.15; letter-spacing:-.03em; }
+.support-games-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.support-game { display:flex; min-height:96px; align-items:center; gap:16px; border:3px solid var(--support-ink); padding:12px 16px; background:var(--support-paper); color:var(--support-ink); box-shadow:6px 6px 0 rgba(29,26,22,.25); font:inherit; text-align:left; cursor:pointer; }
+.support-game:hover,.support-game[aria-pressed="true"] { background:var(--support-yellow); box-shadow:6px 6px 0 var(--support-ink); }
+.support-game img { width:88px; height:70px; flex:none; object-fit:contain; }
+.support-game span { display:flex; flex-direction:column; gap:3px; }
+.support-game b { font-size:1.2rem; font-weight:900; }
+.support-game small { font-size:.86rem; font-weight:700; opacity:.75; }
+html.support-js .support-main:not([data-game="quirky"]) [data-game-panel="quirky"],
+html.support-js .support-main:not([data-game="tenkey"]) [data-game-panel="tenkey"] { display:none; }
+.support-tenkey { margin-top:30px; scroll-margin-top:90px; border:3px solid var(--support-ink); padding:clamp(20px,4vw,36px); background:#141414; color:#ece6d6; box-shadow:9px 9px 0 var(--support-yellow); }
+.support-tenkey h2 { margin:0; color:#fff; font-family:"Do Hyeon","Montserrat",sans-serif; font-size:clamp(1.8rem,3.6vw,3rem); line-height:1.12; letter-spacing:-.03em; overflow-wrap:anywhere; }
+.support-tenkey > p { margin:10px 0 0; }
+.support-tenkey .support-eyebrow { color:var(--support-yellow); }
+.support-tenkey-options { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
+.support-tenkey-option { display:flex; flex-direction:column; gap:8px; min-height:44px; border:2px solid #ece6d6; padding:18px; color:#ece6d6; background:#1f1f1f; text-decoration:none; }
+.support-tenkey-option:hover,.support-tenkey-option:focus-visible { background:#2a2a2a; border-color:var(--support-yellow); }
+.support-tenkey-option b { color:#fff; font-size:1.25rem; font-weight:900; }
+.support-tenkey-option span { font-size:.93rem; line-height:1.6; }
+.support-tenkey-option em { margin-top:auto; color:var(--support-yellow); font-style:normal; font-weight:900; }
+.support-tenkey-docs { margin:18px 0 0; font-size:.9rem; }
+.support-tenkey-docs a { color:#ece6d6; }
+@media (max-width:700px) { .support-games-row,.support-tenkey-options { grid-template-columns:minmax(0,1fr); } }

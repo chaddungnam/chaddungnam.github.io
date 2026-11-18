@@ -108,6 +108,12 @@ for(const [lang,hash,title] of locales){
   await page.goto(`/support/?lang=${lang}`);
   await expect(page.locator('html')).toHaveAttribute('lang',lang);
   await expect(page.locator('h1')).toHaveText(title);
+  // which game first (owner 2026-11-18): nothing game-specific until a game is picked
+  await expect(page.locator('.support-locale:visible')).toHaveCount(0);
+  await expect(page.locator('.support-tenkey:visible')).toHaveCount(0);
+  await page.locator('[data-game-pick="quirky"]').click();
+  await expect(page.locator('[data-game-pick="quirky"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page).toHaveURL(/game=quirky/);
   await expect(page.locator('.support-locale:visible')).toHaveCount(1);
   await expect(page.locator('.support-locale:visible .support-card')).toHaveCount(6);
   await expect(page.locator('.support-locale:visible .support-quick-contact a')).toHaveAttribute('href','mailto:support@houseduck.in');
@@ -205,4 +211,24 @@ for(const [lang] of locales){
   const redirect=await page.goto(`/quirky-ball/privacy/${lang}.html`);expect(redirect.ok()).toBeTruthy();
   await expect(page).toHaveURL(new RegExp(`/privacy/${legalLang?lang:'en'}\\.html$`));
  });
+}
+
+// 10key Survival (owner 2026-11-18): a 1:1 inquiry by email and a public question on YouTube (the console's community_url)
+for (const [lang] of locales) {
+  test(`support ${lang}: 10key Survival offers the 1:1 inquiry and the public YouTube question`, async ({page,baseURL}) => {
+    const external=[];
+    page.on('request',r=>{if(!r.url().startsWith(new URL('/',baseURL).href))external.push(r.url());});
+    await page.goto(`/support/?game=tenkey&lang=${lang}`);
+    await expect(page.locator('[data-game-pick="tenkey"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('.support-locale:visible')).toHaveCount(0);
+    const panel = page.locator('.support-tenkey:visible');
+    await expect(panel).toHaveCount(1);
+    await expect(panel.locator('.support-tenkey-option')).toHaveCount(2);
+    await expect(panel.locator('.support-tenkey-option').first()).toHaveAttribute('href', /^mailto:support@houseduck\.in\?subject=/);
+    await expect(panel.locator('[data-community-link]')).toHaveAttribute('href', 'https://www.youtube.com/watch?v=yJj_1nWMpM4');
+    await page.locator('[data-game-pick="quirky"]').click();
+    await expect(page.locator('.support-tenkey:visible')).toHaveCount(0);
+    await expect(page.locator('.support-locale:visible .support-card')).toHaveCount(6);
+    expect(external).toEqual([]);
+  });
 }
