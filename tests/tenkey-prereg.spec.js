@@ -5,6 +5,11 @@
 const { test, expect } = require("@playwright/test");
 
 const FN = "https://frepunpqswciugwoyvxo.supabase.co/functions/v1/tenkey-prereg";
+// Since 2026-11-18 18:00 Berlin the pages show the launch version (pre-registration closed, owner 2026-11-18; switch in
+// assets/tenkey-launch.js). The pre-registration version is still in the pages for the time before that moment, so its
+// tests run with the clock pinned before the switch; launch tests set their own time.
+const BEFORE_SWITCH = new Date("2026-11-18T12:00:00+01:00");
+test.beforeEach(async ({ page }) => { await page.clock.setFixedTime(BEFORE_SWITCH); });
 
 for (const [url, words] of Object.entries({
   "/10key/?lang=ko": { preview: "itch.io에서 데모 플레이하기", perk: "사전예약 특전", gate: "사전예약하고 itch.io에서 데모 플레이", popup: "사전예약을 하면 itch.io에서 데모(레벨 8까지)를 플레이할 수 있어요", paid: "유료 · 인앱 구매 있음", go: "사전예약하러 가기", odds: "odds/ko.html", submit: "사전예약하기", ok: "사전예약 완료!", invalid: "이메일 주소를 다시 확인해 주세요", consent: "동의 항목에 체크해 주세요" },
@@ -138,11 +143,12 @@ test("confirm link page confirms through the function", async ({ page }) => {
   await expect(page.locator("h1")).toHaveText("사전예약 완료!");
 });
 
-test("download link page waits for launch and points to pre-registration", async ({ page }) => {
+test("download link page waits for launch and points to the game page (pre-registration closed)", async ({ page }) => {
   await page.goto("/10key/get/?lang=en");
   await expect(page.locator("h1")).toHaveText("Not out yet");
   await expect(page.locator("[data-store]:visible")).toHaveCount(0);
-  await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/index_en.html?lang=en#prereg");
+  await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/index_en.html?lang=en");
+  await expect(page.locator("[data-show-prereg]")).toHaveText("About the game");
 });
 
 // Mail language follows the House Duck page language (owner 2026-10-30): the de/ja home links carry ?lang=de|ja.
@@ -375,7 +381,7 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("#download")).toBeHidden();
     await expect(page.locator("#prereg")).toBeVisible();
     await page.goto(url + "&launch=preview");
-    await expect(page.locator("#download h2")).toHaveText(title);
+    await expect(page.locator("#download h2")).toHaveText(title, { useInnerText: true });
     await expect(page.locator("#prereg")).toBeHidden();
     await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", `https://apps.apple.com/app/apple-store/id6824972492?pt=129265473&ct=site_${lang}&mt=8`);
     await expect(page.locator("#download [data-launch-store=ios] img")).toHaveAttribute("src", `/assets/store-badges/app-store-${lang}.svg`);
@@ -388,17 +394,33 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
   });
 }
-test("the launch switches itself on at 2026-11-20 00:00 Berlin, stores not live yet show coming soon, the sale ends after 11-27", async ({ page }) => {
+test("the launch version is on from 2026-11-18 18:00 Berlin; with no store live it says coming soon; the sale shows 11-20 to 11-27", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
-  await page.clock.setFixedTime(new Date("2026-11-19T23:30:00+01:00"));
+  await page.clock.setFixedTime(new Date("2026-11-18T17:55:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#prereg")).toBeVisible();
-  await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
+  await page.clock.setFixedTime(new Date("2026-11-18T18:05:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download")).toBeVisible();
-  // a store whose flag is not live yet shows no badge, only "coming soon" text (official badge rules)
+  await expect(page.locator("#prereg")).toBeHidden();
+  // no store live yet: "coming soon" headings, no badge, only "coming soon" text (official badge rules), no sale line yet
+  await expect(page.locator("#download h2")).toHaveText("곧 출시!", { useInnerText: true });
+  await expect(page.locator("#final-title-launch [data-store-wait]")).toBeVisible();
+  await expect(page.locator("#final-title-launch [data-store-out]")).toBeHidden();
   await expect(page.locator("#download [data-launch-store=ios]")).toBeHidden();
-  await expect(page.locator("#download .tk-badge-item.is-soon .tk-badge-soon").first()).toBeVisible();
+  await expect(page.locator("#download .tk-badge-item.is-soon .tk-badge-soon")).toHaveCount(2);
+  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
+  for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await page.goto("/?lang=ko");
+  await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("곧 출시");
+  await expect(page.locator("#games a.hd-tk-get")).toBeVisible();
+  await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
+  await page.goto("/10key/get/?lang=ko");
+  await expect(page.locator("[data-title]")).toHaveText("아직 출시 전이에요");
+  await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/?lang=ko");
+  await expect(page.locator("[data-show-prereg]")).toHaveText("게임 소개 보기");
+  await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
+  await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
   await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
   await page.goto("/10key/?lang=ko");

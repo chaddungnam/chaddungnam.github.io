@@ -37,58 +37,58 @@
 
   var T = {
     ko: {
-      storeSoon: ["{store} 출시 준비 중이에요", "곧 출시돼요. 사전예약하면 출시되는 날 메일로 알려 드려요."],
+      storeSoon: ["{store} 출시 준비 중이에요", "곧 출시돼요. 조금 뒤에 이 링크를 다시 열어 주세요."],
       opening: ["{store} 여는 중…", "자동으로 안 열리면 아래 버튼을 눌러 주세요."],
       working: ["확인하는 중…", "잠시만 기다려 주세요."],
       confirmed: ["사전예약 완료!", "출시되는 날 이 주소로 다운로드 링크를 보내 드릴게요."],
       unsubscribed: ["수신 거부했어요", "이 주소로는 더 이상 사전예약 메일을 보내지 않아요. 남은 정보는 30일 안에 삭제돼요."],
       invalid: ["링크가 맞지 않아요", "이미 처리됐거나 만료된 링크예요. 다시 사전예약하려면 게임 페이지에서 신청해 주세요."],
       error: ["연결에 실패했어요", "잠시 뒤에 이 페이지를 새로고침해 주세요."],
-      soon: ["아직 출시 전이에요", "딸깍 서바이벌은 iOS·Android 출시를 준비하고 있어요. 사전예약하면 출시 날 메일로 알려 드려요."],
+      soon: ["아직 출시 전이에요", "딸깍 서바이벌은 곧 iOS·Android로 출시돼요. 출시되면 이 링크에서 바로 받을 수 있어요."],
       pick: ["딸깍 서바이벌 받기", "내 기기의 스토어를 골라 주세요."]
     },
     en: {
-      storeSoon: ["{store} is coming soon", "It is almost ready. Pre-register and we will email you the day it is out."],
+      storeSoon: ["{store} is coming soon", "It is almost ready. Please open this link again a little later."],
       opening: ["Opening {store}…", "If nothing happens, tap the button below."],
       working: ["Checking…", "One moment."],
       confirmed: ["You are pre-registered!", "We will send the download link to this address on launch day."],
       unsubscribed: ["You are unsubscribed", "We will not send pre-registration email to this address again. What is left is deleted within 30 days."],
       invalid: ["This link does not work", "It was already used or has expired. To pre-register again, use the game page."],
       error: ["Connection failed", "Please reload this page in a moment."],
-      soon: ["Not out yet", "10key Survival is getting ready for iOS and Android. Pre-register and we will email you on launch day."],
+      soon: ["Not out yet", "10key Survival is about to come out for iOS and Android. Once it is out, this link takes you straight to your store."],
       pick: ["Get 10key Survival", "Pick the store for your device."]
     },
     de: {
-      storeSoon: ["{store} kommt bald", "Es ist fast so weit. Registriere dich vor, dann schreiben wir dir am Starttag."],
+      storeSoon: ["{store} kommt bald", "Es ist fast so weit. Öffne diesen Link bitte etwas später noch einmal."],
       opening: ["{store} wird geöffnet…", "Falls nichts passiert, tippe unten auf den Button."],
       working: ["Wird geprüft…", "Einen Moment bitte."],
       confirmed: ["Sie sind vorregistriert!", "Am Starttag senden wir den Download-Link an diese Adresse."],
       unsubscribed: ["Vorregistrierung storniert", "Wir senden keine Vorregistrierungs-E-Mails mehr an diese Adresse. Die übrigen Daten werden innerhalb von 30 Tagen gelöscht."],
       invalid: ["Dieser Link funktioniert nicht", "Er wurde schon verwendet oder ist abgelaufen. Für eine neue Vorregistrierung nutzen Sie die Spielseite."],
       error: ["Verbindung fehlgeschlagen", "Bitte laden Sie diese Seite gleich neu."],
-      soon: ["Noch nicht erschienen", "10key Survival erscheint bald für iOS und Android. Mit einer Vorregistrierung erfahren Sie es am Starttag per E-Mail."],
+      soon: ["Noch nicht erschienen", "10key Survival erscheint gleich für iOS und Android. Danach bringt dich dieser Link direkt in deinen Store."],
       pick: ["10key Survival holen", "Wählen Sie den Store für Ihr Gerät."]
     },
     ja: {
-      storeSoon: ["{store}版は準備中です", "もうすぐ配信です。事前登録すると、配信日にメールでお知らせします。"],
+      storeSoon: ["{store}版は準備中です", "もうすぐ配信です。少し後で、このリンクをもう一度開いてください。"],
       opening: ["{store}を開いています…", "自動で開かない場合は、下のボタンを押してください。"],
       working: ["確認しています…", "少々お待ちください。"],
       confirmed: ["事前登録が完了しました！", "リリース日にこのアドレスへダウンロードリンクをお送りします。"],
       unsubscribed: ["事前登録を取り消しました", "このアドレスには事前登録のメールをお送りしません。残りの情報は30日以内に削除します。"],
       invalid: ["このリンクは使えません", "すでに使われたか、期限が切れています。もう一度事前登録するには、ゲームのページからお申し込みください。"],
       error: ["接続できませんでした", "少し待ってから、このページを再読み込みしてください。"],
-      soon: ["まだリリース前です", "10key SurvivalはiOS・Android向けに準備中です。事前登録すると、リリース日にメールでお知らせします。"],
+      soon: ["まだリリース前です", "10key SurvivalはまもなくiOS・Androidで配信されます。配信後は、このリンクからストアが開きます。"],
       pick: ["10key Survivalを入手", "お使いの端末のストアを選んでください。"]
     },
     zh: {
-      storeSoon: ["{store} 版即將推出", "就快上市了。完成事前預約，上市當天會寄信通知你。"],
+      storeSoon: ["{store} 版即將推出", "就快上市了。請稍後再打開這個連結。"],
       opening: ["正在開啟 {store}…", "如果沒有自動開啟，請點下方按鈕。"],
       working: ["確認中…", "請稍候。"],
       confirmed: ["事前預約完成！", "上市當天會把下載連結寄到這個信箱。"],
       unsubscribed: ["已取消事前預約", "之後不會再寄事前預約相關信件到這個信箱。其餘資料會在 30 天內刪除。"],
       invalid: ["這個連結無法使用", "連結已使用過或已過期。若要重新預約，請到遊戲頁面申請。"],
       error: ["連線失敗", "請稍後重新整理這個頁面。"],
-      soon: ["尚未上市", "咔噠求生正在準備 iOS 與 Android 版本。完成事前預約，上市當天就會寄信通知你。"],
+      soon: ["尚未上市", "咔噠求生即將在 iOS 與 Android 上市。上市後，這個連結會直接開啟商店。"],
       pick: ["取得咔噠求生", "請選擇你裝置的商店。"]
     }
   }[lang];
@@ -164,7 +164,8 @@
       return;
     }
     if (!isLive("ios") && !isLive("android")) { show(T.soon); reveal("[data-show-prereg]"); return; }
-    // A phone whose own store is not live yet while the other one is (e.g. iOS first): say so and offer pre-registration,
+    // A phone whose own store is not live yet while the other one is (e.g. iOS first): say so and link the game page
+    // (pre-registration closed 2026-11-18),
     // instead of the computer page with only the other store's button (owner 2026-11-18).
     if (mineKey) {
       var soonName = mineKey === "ios" ? "App Store" : "Google Play";

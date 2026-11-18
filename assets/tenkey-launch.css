@@ -3,6 +3,9 @@
 html:not(.tk-launch) [data-launch] { display: none !important; }
 html.tk-launch [data-prelaunch] { display: none !important; }
 html:not(.tk-sale) [data-sale] { display: none !important; }
+/* launch version published before the stores are live: "coming soon" instead of "out now" until a store is live */
+html:not(.tk-stores-wait) [data-store-wait] { display: none !important; }
+html.tk-stores-wait [data-store-out] { display: none !important; }
 
 /* ---------- 10key pages: the download block in the first screen (replaces the pre-registration card) ---------- */
 .tk-dl { position: relative; max-width: 34rem; margin: 26px 0 0; padding: clamp(20px, 3vw, 26px); border: 1px solid rgba(255, 210, 63, .45); border-radius: 16px; background: rgba(29, 29, 29, .9); box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }

@@ -242,10 +242,12 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   // --- 10key Survival (owner 10-28: the itch.io page's look; a paid app, so the big gold key is the pre-registration and the
   //     itch.io browser build is the outlined free preview under it; no store links yet) ---
   const lang = l.lang;
-  // Launch switch (owner 2026-11-18): the download version ([data-launch], assets/tenkey-launch.js) shows from 2026-11-20
-  // 00:00 Berlin. Check it here, then read the pre-launch page without it for the checks below.
+  // Launch switch (owner 2026-11-18): the download version ([data-launch], assets/tenkey-launch.js) shows from 2026-11-18
+  // 18:00 Berlin (published early, pre-registration closed). Check it here, then read the pre-launch page without it for the checks below.
   const launchBlocks = [...tenkey.matchAll(/<(span|div|li|p)\b[^>]*\sdata-launch\b[^>]*>[\s\S]*?<\/\1>/g)].map((match) => match[0]);
-  assert.equal(launchBlocks.length, 5, `${file} five launch blocks (chip, download key, phone stores line, itch.io demo, fine print)`);
+  // six: the "out now" chip and, while no store is live yet ([data-store-wait], owner 2026-11-18), the "coming soon" chip
+  assert.equal(launchBlocks.length, 6, `${file} six launch blocks (two chips, download key, phone stores line, itch.io demo, fine print)`);
+  assert.equal(launchBlocks.filter((block) => /\sdata-store-(out|wait)\b/.test(block)).length, 2, `${file} out-now and coming-soon chips`);
   assert.ok(launchBlocks.some((block) => block.includes(`class="hd-keycap-cta hd-tk-get" href="10key/get/?src=home_${lang}&amp;lang=${lang}"`)), `${file} the launch key opens /10key/get/`);
   assert.ok(launchBlocks.some((block) => block.includes('href="https://houseduck.itch.io/10key-survival"')), `${file} after launch the itch.io demo is open to everyone`);
   assert.ok(html.includes(`<script src="assets/tenkey-launch.js?v=`), `${file} loads the launch switch`);

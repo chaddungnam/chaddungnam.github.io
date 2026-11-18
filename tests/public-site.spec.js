@@ -147,6 +147,9 @@ test("all localized home pages fit a 320px viewport", async ({ page }) => {
 });
 
 test("home opens on the night pixel desk and leads to 10key Survival and its real gameplay loop", async ({ page, isMobile }) => {
+  // the pre-registration home (shown before the launch switch, 2026-11-18 18:00 Berlin; the launch home is covered in
+  // tests/tenkey-prereg.spec.js)
+  await page.clock.setFixedTime(new Date("2026-11-18T12:00:00+01:00"));
   await page.goto("/?lang=ko");
   const hero = page.locator("#studio");
   const tenkey = page.locator("#games");
@@ -355,6 +358,9 @@ test("Quirky Ball title is the game's own logo, cut into letters that land one b
 });
 
 test("10key Survival shows its real gameplay in its game frame and the quiet Comrade farewell sits right under Quirky Ball", async ({ page }) => {
+  // the pre-registration home (shown before the launch switch, 2026-11-18 18:00 Berlin; the launch home is covered in
+  // tests/tenkey-prereg.spec.js)
+  await page.clock.setFixedTime(new Date("2026-11-18T12:00:00+01:00"));
   for (const [route, copy] of Object.entries(homeCopy)) {
     const [name, line] = copy.comrade;
     await page.goto(route);
@@ -856,16 +862,17 @@ test("home keycaps sink while pressed and release without following their link",
   test.skip(isMobile, "pointer presses are covered by the desktop project");
   await page.goto("/?lang=ko");
   await page.locator("#games").scrollIntoViewIfNeeded();
-  // 10key Survival's pre-registration is the big gold keycap; the Quirky Ball link is the same keycap and sinks the same way.
+  // 10key Survival's download key (pre-registration before the launch switch) is the big gold keycap; the Quirky Ball link
+  // is the same keycap and sinks the same way.
   const quirkyCta = page.locator("#quirky .hd-keycap-cta");
   await expect(quirkyCta).toHaveAttribute("href", "quirky-ball/?lang=ko");
   await expect(quirkyCta).toHaveAttribute("data-pressable", "");
   await expect(quirkyCta.locator(".hd-keycap-face")).toHaveText("자세히 보기");
   const cta = page.locator("#games .hd-keycap-cta:visible");
-  await expect(cta).toHaveAttribute("href", "10key/#prereg");
+  await expect(cta).toHaveAttribute("href", "10key/get/?src=home_ko&lang=ko");
   await expect(cta).toHaveAttribute("data-pressable", "");
   const ctaBox = await cta.boundingBox();
-  expect(ctaBox.height, "pre-registration is a big button").toBeGreaterThanOrEqual(72);
+  expect(ctaBox.height, "the download key is a big button").toBeGreaterThanOrEqual(72);
   await page.mouse.move(ctaBox.x + ctaBox.width / 2, ctaBox.y + ctaBox.height / 2);
   await page.mouse.down();
   await expect(cta).toHaveClass(/is-down/);
