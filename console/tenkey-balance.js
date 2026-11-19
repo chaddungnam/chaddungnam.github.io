@@ -252,6 +252,37 @@
     }
   }
 
+  // ── 무적 테스트 판 (godlab1119, owner 2026-11-19: "무적모드일때는 밸런스 수집도 무적인거 감안하고 수집해야한다") ──
+  // tenkey-console-stats "balance.god" = tenkey.admin_god_runs_v1 (hexaworld 20261119150000): the god accounts' normal runs with
+  // their test setup (up / mod %, 0 = the real save) and the shadow life (die_* = the first place a mortal run would have died).
+  // Hidden while the server has no such read (unknown_action) and never mixed into the tables above.
+  const pctOr = (v) => (Number(v) ? `${Number(v)}%` : "저장 그대로");
+  const setup = (r) => (Number(r.up) === 0 && Number(r.mod) === 0 ? "내 저장 그대로" : `강화 ${pctOr(r.up)} · 모듈 ${pctOr(r.mod)}`);
+  const sec = (s) => (s === null || s === undefined ? "—" : duration(Number(s) * 1000));
+  const died = (d) => (Array.isArray(d) && d.length >= 2 && d[0] != null ? `Lv ${d[0]} · ${sec(d[1])}${d[2] ? ` · ${name(CAUSES, d[2])}` : ""}${d[3] ? ` · ${name(FORMS, d[3])}` : ""}` : "안 죽음");
+  function renderGod(g) {
+    const rows = Array.isArray(g?.rows) ? g.rows : [];
+    byId("tenkeyBalanceGod").hidden = !g;
+    byId("tenkeyBalanceGodEmpty").hidden = rows.length > 0;
+    byId("tenkeyBalanceGodBody").hidden = rows.length === 0;
+    byId("tenkeyBalanceGodPresets").innerHTML = rowsOf(g?.presets || [], ["테스트 설정", "판", "평균 도달 레벨", "최고 레벨", "죽었을 판", "죽었을 레벨 (가운데)", "죽었을 때 평균 시간"],
+      (p) => [[setup(p)], [num(p.runs), true], [avgLv(p.avg_level), true], [avgLv(p.max_level), true], [`${num(p.died)} · ${pct(p.died, p.runs)}`, true], [avgLv(p.die_level_p50), true], [sec(p.die_sec_avg), true]]);
+    byId("tenkeyBalanceGodRows").innerHTML = rowsOf(rows, ["시각", "플레이어", "테스트 설정", "도달 레벨", "판 길이", "죽었을 곳", "두 번째로 죽었을 곳", "로봇 에너지가 다 떨어진 곳", "무적이 채워 준 내구도"],
+      (r) => [[time(r.at)], [r.name || "—"], [setup(r)], [`Lv ${r.level}${r.clear ? " · 완주" : ""}`, true], [sec(r.sec), true],
+        [died([r.die_level, r.die_sec, r.die_cause, r.die_form])], [(r.deaths || []).length > 1 ? died(r.deaths[1]) : "—"],
+        [(r.rb || []).length ? `Lv ${r.rb[0][0]} · ${sec(r.rb[0][1])}` : "—"], [num(r.floor_pts), true]]);
+  }
+  async function loadGod() {
+    try {
+      renderGod(await T.stats("balance.god", { days: state.q.days }));
+      T.setMessage("tenkeyBalanceGodMessage", "");
+    } catch (error) {
+      if (error?.message === "unknown_action") { renderGod(null); return; }
+      byId("tenkeyBalanceGod").hidden = false;
+      T.report("tenkeyBalanceGodMessage", error);
+    }
+  }
+
   // ── 서버 밸런스 조정값 ──
   function fillKnobs(b) {
     const form = byId("tenkeyKnobForm");
@@ -312,10 +343,12 @@
         event.preventDefault();
         state.q = { days: Number(byId("tenkeyBalanceDays").value), build: byId("tenkeyBalanceBuild").value, mode: byId("tenkeyBalanceMode").value, platform: byId("tenkeyBalancePlatform").value };
         load();
+        loadGod();
       });
     }
     T.fillKeep(byId("tenkeyBalanceView"));
     load();
+    loadGod();
     loadKnobs();
   }
 

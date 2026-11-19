@@ -741,6 +741,17 @@
             <small id="tenkeyBalanceClamp"></small>
           </div>
         </section>
+        <section id="tenkeyBalanceGod" class="panel" hidden>
+          <p class="eyebrow">INVINCIBLE TEST RUNS</p><h2>무적 테스트 판</h2>
+          <small>콘솔에서 무적을 켠 테스트 계정이 한 노멀 모드 판만 따로 모읍니다. 위 표·랭킹·플레이어 기록에는 들어가지 않습니다. "테스트 설정" = 무적 칩을 눌러 고른 강화 레벨·모듈 수집 비율 (모듈은 모두 UR 등급), "내 저장 그대로" = 설정 없이 한 판. 무적이라 판은 끝나지 않으므로 "죽었을 곳" = 무적이 없었다면 내구도가 0이 된 곳입니다 (한 번은 부활한 셈으로 이어서 셈).</small>
+          <p id="tenkeyBalanceGodEmpty" class="empty-panel" hidden>이 기간에 받은 무적 판이 없습니다 · 1.0.1 앱부터 집계</p>
+          <div id="tenkeyBalanceGodBody" hidden>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>테스트 설정</th><th class="tk-num">판</th><th class="tk-num">평균 도달 레벨</th><th class="tk-num">최고 레벨</th><th class="tk-num">죽었을 판</th><th class="tk-num">죽었을 레벨 (가운데)</th><th class="tk-num">죽었을 때 평균 시간</th></tr></thead><tbody id="tenkeyBalanceGodPresets"></tbody></table></div>
+            <h2>판마다</h2>
+            <div class="table-scroll tk-stack"><table><thead><tr><th>시각</th><th>플레이어</th><th>테스트 설정</th><th class="tk-num">도달 레벨</th><th class="tk-num">판 길이</th><th>죽었을 곳</th><th>두 번째로 죽었을 곳</th><th>로봇 에너지가 다 떨어진 곳</th><th class="tk-num">무적이 채워 준 내구도</th></tr></thead><tbody id="tenkeyBalanceGodRows"></tbody></table></div>
+          </div>
+          <p id="tenkeyBalanceGodMessage" class="dashboard-message" role="status"></p>
+        </section>
         <form id="tenkeyKnobForm" class="panel admin-form impact-form impact-form-critical">
           <p class="eyebrow">BALANCE VALUES</p><h2>서버 밸런스 조정값</h2>
           <p class="impact-note">빌드 없이 바꾸는 게임 수치 4개입니다. 스토어 앱(Android·iOS)이 켤 때 한 번 받아 그다음 판부터 씁니다 (하던 판은 그대로). 1.00 = 게임에 들어 있는 값이고 0.70~1.30까지 고를 수 있습니다. 웹·PC 판은 늘 1.00입니다. 저장할 때마다 번호가 하나 올라가고 판 기록에 그 번호가 남아, 위 "밸런스 조정값별" 표에서 바꾸기 전후를 비교합니다.</p>

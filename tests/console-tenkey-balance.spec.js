@@ -261,3 +261,41 @@ test("밸런스 page: when the keep list cannot be read, each line says \"—\" 
   await expect(page.locator("#pageTitle")).toHaveText("데이터 보관");
   expect(errors).toEqual([]);
 });
+
+test("밸런스 page: 무적 테스트 판 lists the god accounts' runs apart, by test setup, with where a mortal run would have died (owner 11-19)", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  const god = page.locator("#tenkeyBalanceGod");
+  await expect(god).toBeVisible();
+  await expect.poll(async () => (await calls(page, "balance.god")).at(0)?.params).toEqual({ days: 7 });
+  await expect(page.locator("#tenkeyBalanceGodPresets tr")).toHaveCount(2);
+  const p70 = page.locator("#tenkeyBalanceGodPresets tr", { hasText: "강화 70% · 모듈 50%" });
+  await expect(p70.locator('td[data-label="죽었을 판"]')).toHaveText("2 · 100%");
+  await expect(p70.locator('td[data-label="죽었을 레벨 (가운데)"]')).toHaveText("Lv 9");
+  await expect(page.locator("#tenkeyBalanceGodPresets")).toContainText("내 저장 그대로");
+  const rows = page.locator("#tenkeyBalanceGodRows tr");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.first().locator('td[data-label="죽었을 곳"]')).toHaveText("Lv 9 · 3분 21초 · 마우스 포획 · DRIFT");
+  await expect(rows.first().locator('td[data-label="두 번째로 죽었을 곳"]')).toHaveText("Lv 12 · 5분 30초 · 텐키 파손 · 로봇");
+  await expect(rows.first().locator('td[data-label="로봇 에너지가 다 떨어진 곳"]')).toHaveText("Lv 13 · 6분 40초");
+  await expect(rows.nth(2).locator('td[data-label="죽었을 곳"]')).toHaveText("안 죽음");
+  await expect(rows.nth(2)).toContainText("Lv 21 · 완주");
+  await expect(page.locator("#tenkeyBalanceSummary [data-tk-summary=\"runs\"]")).toHaveText("240");  // the players' numbers are untouched
+  await shot(page, "balance_god", "#tenkeyBalanceGod");
+  await page.locator("#tenkeyBalanceDays").selectOption("30");
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect.poll(async () => (await calls(page, "balance.god")).at(-1)?.params).toEqual({ days: 30 });
+  await page.evaluate(() => { window.__mockGodEmpty = true; });
+  await page.locator("#tenkeyBalanceForm button[type=submit]").click();
+  await expect(page.locator("#tenkeyBalanceGodEmpty")).toBeVisible();
+  await expect(page.locator("#tenkeyBalanceGodBody")).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: a server without balance.god keeps the 무적 테스트 판 section hidden and the page renders", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance", "window.__mockNoGod = true;");
+  await expect(page.locator("#tenkeyBalanceSummary [data-tk-summary=\"runs\"]")).toHaveText("240");
+  await expect.poll(async () => (await calls(page, "balance.god")).length).toBe(1);
+  await expect(page.locator("#tenkeyBalanceGod")).toBeHidden();
+  await expect(page.locator("#tenkeyBalanceGodMessage")).toHaveText("");
+  expect(errors).toEqual([]);
+});

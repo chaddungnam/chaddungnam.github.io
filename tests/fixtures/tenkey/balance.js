@@ -56,5 +56,22 @@
       idle: { runs: 60, with_idle: 40, avg_n: 1.4, p50_longest_s: 14, p90_longest_s: 40, avg_total_s: 22, idle_share_pct: 12.5, long_idle_runs: 9 },
       counters: { keys_broken: 9000, numlock_caught: 66, life_hurt: 1200, mystery_x: 3 }, counter_runs: 60 };
   };
-  Object.assign(window.__tkPages = window.__tkPages || {}, { "balance.get": (p) => v3(p), "balance.v4": v4 });
+  // tenkey-console-stats "balance.god" = tenkey.admin_god_runs_v1 (hexaworld 20261119150000, godlab1119): the INVINCIBLE test runs.
+  //   __mockNoGod     the stats function has no balance.god yet (unknown_action): the section stays hidden
+  //   __mockGodEmpty  no god run in the period
+  const god = (p, body, fn) => {
+    if (fn !== "tenkey-console-stats" || window.__mockNoGod) throw Object.assign(new Error("unknown_action"), { status: 400 });
+    if (window.__mockGodEmpty) return { ok: true, days: p.days ?? 7, total: 0, presets: [], rows: [] };
+    return { ok: true, days: p.days ?? 7, total: 3,
+      presets: [{ up: 70, mod: 50, runs: 2, avg_level: 14.5, max_level: 17, died: 2, die_level_p50: 9, die_sec_avg: 215 },
+        { up: 0, mod: 0, runs: 1, avg_level: 21, max_level: 21, died: 0, die_level_p50: null, die_sec_avg: null }],
+      rows: [
+        { at: "2026-11-19T14:11:15+00:00", name: "이리오너라", platform: "ios", build: 25, up: 70, mod: 50, level: 17, st: 1, sec: 610, cause: "quit", clear: false, form: "robot",
+          die_level: 9, die_sec: 201, die_cause: "mouse", die_form: "drift", deaths: [[9, 201, "mouse", "drift"], [12, 330, "durability", "robot"]], ret: [[10, 240]], rb: [[13, 400]], floor_pts: 812, shadow_left: 0 },
+        { at: "2026-11-19T13:58:05+00:00", name: "이리오너라", platform: "ios", build: 25, up: 70, mod: 50, level: 12, st: 1, sec: 420, cause: "quit", clear: false, form: "drift",
+          die_level: 10, die_sec: 229, die_cause: "durability", die_form: "tenkey", deaths: [[10, 229, "durability", "tenkey"]], ret: [], rb: [], floor_pts: 120, shadow_left: 40 },
+        { at: "2026-11-19T13:40:00+00:00", name: "이리오너라", platform: "ios", build: 25, up: 0, mod: 0, level: 21, st: 1, sec: 900, cause: "clear", clear: true, form: "robot",
+          die_level: null, die_sec: null, die_cause: null, die_form: null, deaths: [], ret: [], rb: [], floor_pts: 0, shadow_left: 88 }] };
+  };
+  Object.assign(window.__tkPages = window.__tkPages || {}, { "balance.get": (p) => v3(p), "balance.v4": v4, "balance.god": god });
 })();
