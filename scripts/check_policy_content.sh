@@ -108,12 +108,18 @@ for locale in "${locales[@]}"; do
     printf 'Missing 10key Survival terms page: %s\n' "$tenkey_terms" >&2
     failed=1
   else
-    for token in 'support@houseduck\.in' 'Google Play' 'App Store' 'Steam' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-11-17"'; do
+    for token in 'support@houseduck\.in' 'Google Play' 'App Store' 'Nekoland' '327r' "/privacy/$tenkey_locale\.html#section-13" 'datetime="2026-11-19"'; do
       if ! rg -q "$token" "$tenkey_terms"; then
         printf '10key Survival terms page misses %s: %s\n' "$token" "$tenkey_terms" >&2
         failed=1
       fi
     done
+    # Steam is not a 10key Survival platform until the owner says so (docs/spec_platforms.md, 2026-11-19): only the revision
+    # history (section 16) may name it.
+    if sed -n '1,/id="section-16"/p' "$tenkey_terms" | grep -Fq 'Steam'; then
+      printf '10key Survival terms page names Steam outside the revision history: %s\n' "$tenkey_terms" >&2
+      failed=1
+    fi
     # CrazyGames is not a 10key Survival platform (2026-11-01): only the revision history (section 16) may still name it.
     if sed -n '1,/id="section-16"/p' "$tenkey_terms" | grep -Fq 'CrazyGames'; then
       printf '10key Survival terms page still names CrazyGames outside the revision history: %s\n' "$tenkey_terms" >&2
@@ -130,12 +136,16 @@ for locale in "${locales[@]}"; do
     failed=1
   fi
   tenkey_section="$(sed -n '/id="section-13">13\. /,/id="section-14"/p' "$privacy")"
-  for token in 'eu-west-1' 'Google Play' 'Steam' '12' '35' '90' '183' 'support@houseduck\.in'; do
+  for token in 'eu-west-1' 'Google Play' 'Nekoland' '12' '35' '90' '183' 'support@houseduck\.in'; do
     if ! grep -Eq "$token" <<<"$tenkey_section"; then
       printf 'Privacy 10key Survival section misses %s: %s\n' "$token" "$privacy" >&2
       failed=1
     fi
   done
+  if grep -Fq 'Steam' <<<"$tenkey_section"; then
+    printf 'Privacy 10key Survival section names Steam (not a platform until the owner says so, 2026-11-19): %s\n' "$privacy" >&2
+    failed=1
+  fi
   if grep -Fq 'CrazyGames' <<<"$tenkey_section"; then
     printf 'Privacy 10key Survival section still names CrazyGames (not a platform since 2026-11-01): %s\n' "$privacy" >&2
     failed=1
