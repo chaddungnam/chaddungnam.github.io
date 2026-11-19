@@ -1754,7 +1754,11 @@ a.tk-glance-note { color: #a93f34; text-decoration: underline; text-underline-of
 .tk-seg[data-state="off"][aria-pressed="true"] { background: #a93f34; }
 .tk-seg:disabled, .tk-upto:disabled { cursor: not-allowed; opacity: .5; }
 .tk-upto { min-height: 34px; padding: 0 10px; font-size: 11px; white-space: nowrap; }
-@media(max-width:700px) { .tk-unlock-row { grid-template-columns: 24px minmax(0, 1fr); } .tk-unlock-ctl { grid-column: 1 / -1; justify-content: flex-start; } }
+/* owner 2026-11-19: "기본 탭 (1~6)" as one row (its marker reads 1~6) and the checkpoint rows (no number) */
+.tk-unlock-no[data-wide] { width: auto; border-radius: 12px; font-size: 9px; letter-spacing: -.3px; }
+.tk-cp-row { grid-template-columns: minmax(0, 1fr) auto; }
+@media(max-width:700px) { .tk-unlock-row { grid-template-columns: 24px minmax(0, 1fr); } .tk-unlock-ctl { grid-column: 1 / -1; justify-content: flex-start; }
+  .tk-cp-row { grid-template-columns: minmax(0, 1fr); } .tk-cp-row .tk-seg { padding: 0 9px; } }
 
 /* 감시 (owner 2026-11-15): tags and the watch page */
 .tk-badge[data-tone="review"] { color: #4a3f9a; background: #e6e3fa; }
