@@ -97,7 +97,8 @@ test("player detail: the device block and the balance runs say why they are empt
   const errors = await open(page, "#/tenkey-players/a1111111-1111-4111-8111-111111111111", MOCK);
   const detail = page.locator("#tenkeyPlayerDetail");
   await expect(detail).toContainText("개인정보 방침에 이 항목이 올라가기 전");
-  await expect(detail).toContainText("플레이어에 연결하는 기능이 개인정보 방침 반영 전이라 꺼져 있어");
+  // 16aee43 (link1118) rewrote the empty-runs line: web runs link after the web link is on, app runs after the policy.
+  await expect(detail).toContainText("앱 판은 개인정보 방침에 오른 뒤부터 연결됩니다");
   await expect(detail).not.toContainText("아직 연결된 판 기록이 없습니다");
   await expect(detail).toContainText("이번 시즌 순위");
   await shot(page, "player_empty_reasons", "#tenkeyPlayerDetail");
