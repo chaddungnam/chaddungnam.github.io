@@ -143,7 +143,11 @@
       if (preview === "android-soon") return key === "ios";
       if (preview === "ios-soon") return key === "android";
       if (preview) return true;
-      return LAUNCH ? LAUNCH.live(key) : STORES[key].live;
+      // Owner 2026-11-19: this link was already handed out and posts go up ahead of the store release, so /10key/get/
+      // acts as launched now: a store counts as live here when its live flag is on, without waiting for stores.*.from
+      // (the 10key and home pages still switch their badges at from, 2026-11-20 00:00 Berlin).
+      if (LAUNCH) return !!(LAUNCH.on && LAUNCH.stores[key] && LAUNCH.stores[key].live);
+      return STORES[key].live;
     };
     // Store links carry where the visit came from (?src=, e.g. ads_kr, mail, shorts; default "get"), so App Store Connect
     // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.

@@ -415,10 +415,14 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until t
   await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("곧 출시");
   await expect(page.locator("#games a.hd-tk-get")).toBeVisible();
   await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
-  await page.goto("/10key/get/?lang=ko");
-  await expect(page.locator("[data-title]")).toHaveText("아직 출시 전이에요");
-  await expect(page.locator("[data-show-prereg]")).toHaveAttribute("href", "/10key/?lang=ko");
-  await expect(page.locator("[data-show-prereg]")).toHaveText("게임 소개 보기");
+  // /10key/get/ acts as launched already (owner 2026-11-19: link handed out, posts go up before the store release):
+  // phones go to their store, a computer gets the store choice.
+  if (!isMobile) {
+    await page.goto("/10key/get/?lang=ko&src=post");
+    await expect(page.locator("[data-get-pc]")).toBeVisible();
+    await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=post&mt=8");
+    await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
+  }
   // 11-20 00:00 Berlin: both stores on (owner 2026-11-18: App Store link final, Google Play = the package page), official
   // badges with the source, "out now" headings, the sale line
   await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
