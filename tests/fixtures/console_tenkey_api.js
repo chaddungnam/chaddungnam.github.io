@@ -62,7 +62,9 @@
   // best_hard_level; unlocks.set / unlocks.upto / god.set change them for the page's life (steps in the order of hard_mode.md section 1).
   const UNLOCK_STEPS = ["tab_research", "tab_ranking", "quests", "tab_shop", "tab_modules", "home_friends", "home_mailbox", "purchase", "discount", "upgrade_robot", "hard_card", "hard_play", "hard_upgrade", "hard_pack", "hard_ranking", "hard_sale", "shop_test"];
   const unlockState = {};  // player id -> { unlocks, god }
-  const unlockOf = (id) => (unlockState[id] = unlockState[id] || { unlocks: {}, god: false });
+  const unlockOf = (id) => (unlockState[id] = unlockState[id] || { unlocks: {}, god: false, checkpoint: {} });
+  // cpcon1119 (owner 11-19): players.get v2 + checkpoint {classic|hard: 1|8|15} (missing = auto) and checkpoint_best; checkpoint.set and
+  // unlocks.many change them. window.__mockNoCheckpoint = a server before 20261119160000 (no keys); __mockNoMany = a tenkey-admin without unlocks.many.
   const reviewState = { "a1111111-1111-4111-8111-111111111111": { on: true, granted: true }, "b2222222-2222-4222-8222-222222222222": { on: false, granted: true } };
   const reviewOf = (id) => (reviewState[id] = reviewState[id] || { on: false, granted: false });
   const detailFor = (id) => {
@@ -71,6 +73,7 @@
     return {
       ok: true,
       unlocks: { ...unlockOf(p.id).unlocks }, god_mode: unlockOf(p.id).god, hard_ready: !!p.best_level && p.best_level >= 14, best_hard_level: p.best_level >= 14 ? 3 : 0,
+      ...(window.__mockNoCheckpoint ? {} : { checkpoint: { ...unlockOf(p.id).checkpoint }, checkpoint_best: { classic: p.best_level || 0, hard: p.best_level >= 14 ? 3 : 0 } }),
       player: { id: p.id, name: p.name, avatar_url: "", created_at: p.created_at, last_seen_at: p.last_seen_at, banned: p.banned, bug_user: !!p.bug_user, cap_hits: p.cap_hits || [] },
       identities: [{ provider: p.provider, subject: mobile ? p.id.replace(/^./, "f") : "cg-user-77", login: mobile ? p.id.replace(/^./, "f") : null, created_at: p.created_at }],
       account: mobile ? { nickname: p.nickname, age_band: p.age_band, terms_version: "2026-10-20", consented_at: p.created_at, created_at: p.created_at, renamed_at: null, rename_count: 1 } : null,
@@ -164,6 +167,22 @@
         UNLOCK_STEPS.slice(0, at + 1).forEach((step) => { u[step] = "on"; });
         logAudit(action, p);
         return { ok: true, changed: true };
+      }
+      case "unlocks.many": {
+        if (window.__mockNoMany) throw new Error("unknown_action");
+        if (!Array.isArray(p.steps) || !p.steps.length || p.steps.some((s) => !UNLOCK_STEPS.includes(s)) || !["auto", "on", "off"].includes(p.state) || !p.reason) return { ok: false, error: "invalid_request" };
+        const u = unlockOf(p.player_id).unlocks;
+        p.steps.forEach((step) => { if (p.state === "auto") delete u[step]; else u[step] = p.state; });
+        logAudit(action, p);
+        return { ok: true, changed: true, count: p.steps.length, unlocks: { ...u } };
+      }
+      case "checkpoint.set": {
+        if (window.__mockNoCheckpoint) throw new Error("unknown_action");
+        if (!["classic", "hard"].includes(p.mode) || !(p.level === null || [1, 8, 15].includes(p.level)) || !p.reason) return { ok: false, error: "invalid_request" };
+        const c = unlockOf(p.player_id).checkpoint, before = c[p.mode] ?? null;
+        if (p.level === null) delete c[p.mode]; else c[p.mode] = p.level;
+        if (before !== p.level) logAudit(action, p);
+        return { ok: true, changed: before !== p.level, mode: p.mode, level: p.level, checkpoint: { ...c } };
       }
       case "god.set": { const g = unlockOf(p.player_id); const changed = g.god !== !!p.on; g.god = !!p.on; logAudit(action, p); return { ok: true, changed }; }
       // Watch round (2026-11-15): tagged accounts. 딸깍덕 = review ON, KeyMaster = review granted but off, god = whoever god.set turned on, TOP10 by rank.

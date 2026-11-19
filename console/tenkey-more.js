@@ -111,12 +111,14 @@
   }
 
   // ── 감사 기록 ──
-  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "god.set": "무적 모드 켜기 / 끄기", "review.set": "검수 모드 끄기 / 권한 회수", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경", "community.set": "유튜브 소통 링크 변경", "players.rename": "닉네임 변경", "mail.send": "메일 보내기", "mail.cancel": "미수령 메일 취소", "titles.grant": "칭호 부여", "titles.revoke": "칭호 회수", "issues.mark": "이슈 처리 상태 변경" };
+  const ACTION_NAMES = { "players.ban": "플레이어 정지 / 해제", "unlocks.set": "해금 단계 변경", "unlocks.upto": "해금 여기까지 켜기", "unlocks.many": "기본 탭 (1~6) 한 번에 변경", "checkpoint.set": "체크포인트 변경", "god.set": "무적 모드 켜기 / 끄기", "review.set": "검수 모드 끄기 / 권한 회수", "notices.save": "공지 저장", "notices.end": "공지 종료", "notices.delete": "공지 삭제", "config.set": "강제 업데이트 번호 변경", "knobs.set": "밸런스 조정값 변경", "community.set": "유튜브 소통 링크 변경", "players.rename": "닉네임 변경", "mail.send": "메일 보내기", "mail.cancel": "미수령 메일 취소", "titles.grant": "칭호 부여", "titles.revoke": "칭호 회수", "issues.mark": "이슈 처리 상태 변경" };
   function auditSummary(a) {
     const p = a.params || {};
     if (a.action === "notices.save") return p.notice?.title_en ? `${p.notice?.title_ko || ""} / ${p.notice.title_en}` : `${p.notice?.title_ko || ""}${p.notice?.translations ? " (자동 번역 포함)" : ""}`;
     if (a.action === "players.ban") return `${p.banned ? "정지" : "정지 해제"} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "unlocks.set") return `${p.step} → ${{ auto: "자동", on: "켜짐", off: "꺼짐" }[p.state] || p.state} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "unlocks.many") return `${(p.steps || []).length}개 → ${{ auto: "자동", on: "켜짐", off: "꺼짐" }[p.state] || p.state} · ${String(p.player_id || "").slice(0, 8)}`;
+    if (a.action === "checkpoint.set") return `${p.mode === "hard" ? "하드" : "일반"} → ${p.level == null ? "자동" : `레벨 ${p.level}부터`} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "unlocks.upto") return `1~${p.step} 켜짐 · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "god.set") return `무적 ${p.on ? "켜짐" : "꺼짐"} · ${String(p.player_id || "").slice(0, 8)}`;
     if (a.action === "review.set") return `검수 ${p.on ? "켜짐" : "꺼짐 · 권한 회수"} · ${String(p.player_id || "").slice(0, 8)}`;
