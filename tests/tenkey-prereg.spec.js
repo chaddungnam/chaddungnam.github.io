@@ -394,7 +394,7 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
   });
 }
-test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until the stores go on at 11-20 00:00; the sale shows 11-20 to 11-27", async ({ page, isMobile }) => {
+test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until the owner flips released by hand (no time switch); the sale line ends after 11-27", async ({ page, isMobile }) => {
   await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
   await page.clock.setFixedTime(new Date("2026-11-18T17:55:00+01:00"));
   await page.goto("/10key/?lang=ko");
@@ -423,9 +423,19 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until t
     await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=post&mt=8");
     await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
   }
-  // 11-20 00:00 Berlin: both stores on (owner 2026-11-18: App Store link final, Google Play = the package page), official
-  // badges with the source, "out now" headings, the sale line
+  // no time switch any more (owner 2026-11-19): on 11-20 the pages still say coming soon, no badge, no sale line
   await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
+  await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#download h2")).toHaveText("곧 출시!", { useInnerText: true });
+  await expect(page.locator("#download [data-launch-store=ios]")).toBeHidden();
+  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
+  // the owner's manual switch: released:true in assets/tenkey-launch.js (served here with it flipped)
+  await page.route("**/assets/tenkey-launch.js*", async (route) => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace("released: false,", "released: true,");
+    expect(body).toContain("released: true,");
+    await route.fulfill({ response, body });
+  });
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download h2")).toHaveText("지금 출시!", { useInnerText: true });
   await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=site_ko&mt=8");
@@ -442,9 +452,11 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until t
     await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=mail&mt=8");
     await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
   }
+  // the sale line ends with the sale (11-27 Berlin) even when released
   await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download")).toBeVisible();
+  await expect(page.locator("#download [data-launch-store=ios]")).toBeVisible();
   await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
 });
 test("home 10key section: pre-registration before launch, download key to /10key/get/ after", async ({ page }) => {

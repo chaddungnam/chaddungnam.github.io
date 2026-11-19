@@ -3,24 +3,24 @@
 //   version right away (18:00 Berlin, = 17:00 UTC) because pre-registration is closed. From then on the pages show the
 //   download version ([data-launch]) instead of the pre-registration version ([data-prelaunch]), and the itch.io demo
 //   is open to everyone (no pre-registration gate).
-// - stores: a store shows its badge (and /10key/get/ sends phones to it) when live:true and from has passed. Owner
-//   2026-11-18: the App Store link is final (https://apps.apple.com/app/10key-survival/id6824972492) and Google Play is
-//   the package's page; both go on at the launch moment, 2026-11-20 00:00 Berlin. A routine checks on 11-19 23:30 and
-//   after that the stores' public pages and turns a store off (live:false) while its page is not public yet, back on once
-//   it is. A store that is not on shows "coming soon". While no store is live yet, html gets
-//   tk-stores-wait: [data-store-wait] ("coming soon" headings) replaces [data-store-out] ("out now").
-// - saleFrom/saleTo: the launch sale ($4.99 -> $2.99, 11-20 to 11-27 Berlin); [data-sale] shows only inside it.
+// - released: the owner's manual switch (owner 2026-11-19: no automatic switch; the homepage changes only when he says
+//   so). false = the 10key pages and the home say "coming soon" (html.tk-stores-wait: [data-store-wait] replaces
+//   [data-store-out]) with "coming soon" text instead of store badges, and no sale line. true = official store badges
+//   for each store with live:true, "out now", and the sale line until saleTo.
+// - stores: App Store link final (owner 2026-11-18), Google Play = the package page. /10key/get/ already acts as
+//   launched with stores.*.live (owner 2026-11-19, assets/tenkey-small.js), independent of released.
+// - saleTo: the launch sale ($4.99 -> $2.99) ends 11-27 Berlin (Play sale 11-20..11-27); after it the line never shows.
 // ?launch=preview shows the launch version now, with both stores and the sale, for review. Loaded without defer in
 // <head> so the classes are set before the page draws and before tenkey-page.js checks the itch.io gate.
 (function () {
   "use strict";
   var C = window.TENKEY_LAUNCH = {
     at: Date.UTC(2026, 10, 18, 17, 0, 0),
-    saleFrom: Date.UTC(2026, 10, 19, 23, 0, 0),
+    released: false,
     saleTo: Date.UTC(2026, 10, 27, 23, 0, 0),
     stores: {
-      ios: { live: true, from: Date.UTC(2026, 10, 19, 23, 0, 0), url: "https://apps.apple.com/app/10key-survival/id6824972492" },
-      android: { live: true, from: Date.UTC(2026, 10, 19, 23, 0, 0), url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
+      ios: { live: true, url: "https://apps.apple.com/app/10key-survival/id6824972492" },
+      android: { live: true, url: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival" }
     },
     itch: "https://houseduck.itch.io/10key-survival"
   };
@@ -29,8 +29,8 @@
   var now = Date.now();
   C.preview = mode === "preview";
   C.on = C.preview || now >= C.at;
-  C.sale = C.preview || (now >= C.saleFrom && now < C.saleTo);
-  C.live = function (key) { var st = C.stores[key]; return !!st && (C.preview || (C.on && st.live && now >= (st.from || 0))); };
+  C.sale = C.preview || (C.released && now < C.saleTo);
+  C.live = function (key) { var st = C.stores[key]; return !!st && (C.preview || (C.on && C.released && st.live)); };
   C.wait = C.on && !C.live("ios") && !C.live("android");
   // Store links say where the visit came from: an App Store campaign link (pt = House Duck provider id, ct = source)
   // and a Google Play utm referrer, so App Store Connect and Play Console can count downloads per source.
