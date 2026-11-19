@@ -66,7 +66,10 @@
     if (browserLanguage) break;
   }
 
-  var targetLanguage = requestedLanguage || savedLanguage || browserLanguage || "en";
+  // Search crawlers (Googlebot renders JS with an English browser language) stay on the URL they asked for,
+  // so the ko/de/ja pages are not reported as "page with redirect" and can be indexed. ?lang= still applies.
+  var isCrawler = /bot|crawl|spider|slurp|inspectiontool|lighthouse|yeti|facebookexternalhit/i.test(navigator.userAgent || "");
+  var targetLanguage = requestedLanguage || (isCrawler ? locale : savedLanguage || browserLanguage || "en");
   if (targetLanguage !== locale) {
     window.location.replace(languageFile(targetLanguage));
   }
