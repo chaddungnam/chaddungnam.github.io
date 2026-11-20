@@ -647,7 +647,7 @@
           <label>기간<select id="tenkeyBalanceDays"><option value="1">오늘</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="60">최근 60일</option></select></label>
           <label>빌드<select id="tenkeyBalanceBuild"><option value="">전체</option></select></label>
           <label>모드<select id="tenkeyBalanceMode"><option value="">전체</option><option value="classic">노멀 모드</option><option value="hard">하드 모드</option></select></label>
-          <label>기기<select id="tenkeyBalancePlatform"><option value="app" selected>앱 (Android·iOS)</option><option value="">전체 (앱 + 웹 체험판)</option><option value="web">웹 체험판 (itch)</option></select></label>
+          <label>기기<select id="tenkeyBalancePlatform"><option value="app" selected>앱 (Android·iOS)</option><option value="">전체 (앱 + 웹 체험판)</option><option value="web">웹 체험판 (itch·네코랜드)</option></select></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
         <p class="impact-note">스토어 앱(Android·iOS)과 웹 체험판(itch)이 판이 끝날 때마다 보내는 짧은 기록입니다: 끝난 레벨·시간·이유, DRIFT·로봇까지 간 레벨, 고른 카드, 만난 적. 기기마다 무작위 번호로만 묶이고 계정·닉네임은 없으며 판 기록은 <span data-tk-keep="run_stats">—</span>, 판 흐름 기록은 <span data-tk-keep="run_trace">—</span> 뒤 지워집니다. 랭킹(최고 기록만 올라감)과 달리 모든 판이 들어갑니다. 웹 체험판은 Lv 8에서 끝나므로 "기기"는 처음부터 앱으로 좁혀 두었고, 체험판 판은 아래 "어느 기기에서 한 판인가"에 따로 나옵니다. 내 컴퓨터(에디터·PC)에서 한 판은 보내지 않습니다.</p>
@@ -690,7 +690,7 @@
           </section>
           <section id="tenkeyBalanceTrace" class="panel tk-balance-pair" hidden>
             <div><p class="eyebrow">CRISES</p><h2>만난 위기</h2><small id="tenkeyBalanceTraceNote">—</small><div id="tenkeyBalanceCrises"></div></div>
-            <div><p class="eyebrow">CHANCE CARDS</p><h2>골든 피버 · DRIFT · 로봇 변신 카드</h2><small>나온 횟수 중 룰렛에 성공한 횟수 (카드는 50% 확률)</small>
+            <div><p class="eyebrow">CHANCE CARDS</p><h2>골든 피버 · DRIFT · 로봇 변신 카드</h2><small>나온 횟수 중 룰렛에 성공한 횟수 · 성공 확률은 빌드마다 다름 · 1.0.0: 골든 피버 50~75% · DRIFT 30~60% · 로봇 50% / 1.0.1부터: 골든 피버 50~75% · DRIFT 30~50% · 로봇 40~60% · 팩 보유자 로봇 100%</small>
               <div class="table-scroll tk-stack"><table><thead><tr><th>카드</th><th class="tk-num">나온 횟수</th><th class="tk-num">성공 횟수</th><th class="tk-num">성공 비율</th><th class="tk-num">고를 때 평균 레벨</th></tr></thead><tbody id="tenkeyBalanceChance"></tbody></table></div>
               <small id="tenkeyBalanceFormTime"></small></div>
           </section>

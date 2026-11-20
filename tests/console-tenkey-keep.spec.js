@@ -22,7 +22,8 @@ test("데이터 보관: every dataset in plain words with who sends it, days kep
   await expect(row("crash_reports").locator('td[data-label="보관"]')).toHaveText("60일");
   await expect(row("log_tail").locator('td[data-label="보관"]')).toHaveText("7일");   // the server's name: tenkey.crash_reports.log_tail
   await expect(row("crash_reports").locator('td[data-label="데이터"] strong')).toHaveText("크래시 보고");
-  await expect(row("crash_reports").locator('td[data-label="보내는 곳"]')).toContainText("GamePix·네코랜드·에디터·디버그 빌드는 보내지 않음");
+  await expect(row("crash_reports").locator('td[data-label="보내는 곳"]')).toContainText("GamePix·에디터·디버그 빌드는 보내지 않음");
+  await expect(row("crash_reports").locator('td[data-label="보내는 곳"]')).toContainText("itch·네코랜드");
   await expect(row("issue_reports").locator('td[data-label="보내는 곳"]')).toContainText("14세 미만");
   await expect(row("telemetry").locator('td[data-label="데이터"] code')).toHaveText("tenkey_private.telemetry");
   // A dataset whose oldest row is older than its days (+2) was not cleaned up: only that one is marked.
