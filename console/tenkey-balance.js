@@ -29,7 +29,7 @@
   const FORMS = { tenkey: "텐키 그대로", drift: "DRIFT", robot: "로봇" };
   const MOBS = { mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바", cat_paw: "고양이 앞발" };
   const CARDS = {
-    dash: "돌진", overclock: "오버클럭", recharge: "충전", shock: "충격파", laser: "레이저", turbo: "터보", eco: "절전", bomb: "폭탄", goldrush: "골드 러시",
+    dash: "돌진", overclock: "오버클럭 (1.0.1부터 카드 없음)", recharge: "충전", shock: "충격파", laser: "레이저", turbo: "터보", eco: "절전", bomb: "폭탄", goldrush: "골드 러시",
     nitro: "니트로", drift_blast: "드리프트 폭발", grip: "그립", chain: "연속 드리프트", rainbow_trail: "무지개 자국",
     rocket_punch: "로켓 펀치", robo_laser: "로봇 레이저", robo_dash: "로봇 돌진", stomp: "쿵 밟기", barrier: "배리어",
     drift: "DRIFT 카드", transform: "로봇 변신 카드", fever: "골든 피버 카드",
@@ -39,7 +39,8 @@
   // DigBalCount names (scripts/dig/dig_bal_count.gd callers); a name not listed shows as the game wrote it.
   const COUNTERS = { keys_broken: "부순 키", numlock_seen: "NUM LOCK 철창이 나온 횟수", numlock_caught: "NUM LOCK 철창에 갇힌 횟수", numlock_caught_in_drift: "DRIFT 중 철창에 갇힌 횟수",
     drift_time: "DRIFT로 보낸 시간(초)", robot_time: "로봇으로 보낸 시간(초)", drift_break_turn: "DRIFT 회전으로 부순 키", robot_break: "로봇이 부순 키", xp_robot: "로봇이 얻은 경험치",
-    life_drain: "생명줄: 시간이 지나 닳음", life_hurt: "생명줄: 맞아서 닳음", life_grab: "생명줄: 집게에 잡혀 닳음", life_cage: "생명줄: NUM LOCK 철창에서 닳음" };
+    life_drain: "생명줄: 시간이 지나 닳음", life_hurt: "생명줄: 맞아서 닳음", life_grab: "생명줄: 집게에 잡혀 닳음", life_cage: "생명줄: NUM LOCK 철창에서 닳음",
+    ovc_pick: "오버클럭 키를 먹은 횟수", ovc_ssr: "SSR 카드 보너스로 받은 오버클럭 횟수" };
   // One line under each panel: what it is built from and how long the server keeps that (keep.get; never a number written here).
   const KEEP_LINES = [["tenkeyBalanceWhere", "판 기록 (앱·웹 체험판이 판마다 보냄)", "run_stats"], ["tenkeyBalanceLevels", "판 기록의 끝난 레벨·이유", "run_stats"],
     ["tenkeyBalanceForms", "판 기록의 끝날 때 모습, DRIFT·로봇이 된 레벨", "run_stats"], ["tenkeyBalanceCards", "판 기록의 고른 카드 (한 판 24장까지)", "run_stats"],
