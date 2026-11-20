@@ -20,7 +20,7 @@
   // A ux_fail's own facts (repro1118, owner TK-498): the server asks before the line, and how long after the last ask it showed.
   const EXTRA = { answer: "서버 요청 → 응답 (오래된 것부터, > 로 구분)", press_ms: "마지막 요청부터 문구까지 (ms)" };
   const ENDS = { death: "게임 오버", quit: "스스로 그만둠", app_closed: "앱을 닫음", demo_end: "체험판 끝", clear: "노멀 모드 완주" };  // the 밸런스 page's words
-  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임" };
+  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음" };
   const SOURCES = { crash: "크래시", app: "앱 이상", ask: "1대1 문의", trace: "판 흐름", telemetry: "성능 보고" };
   const MODES = { classic: "노멀 모드", normal: "노멀 모드", hard: "하드 모드" };
   const FORMS = { tenkey: "텐키 그대로", drift: "DRIFT", robot: "로봇" };

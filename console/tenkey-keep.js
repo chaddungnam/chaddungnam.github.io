@@ -9,17 +9,19 @@
   const { esc, num, time, bytes } = T.fmt;
   const byId = (id) => document.getElementById(id);
   // Who sends what, from the client code (CrashWatch / IssueReport.wanted, TenkeyOps, TenkeyWebStats, RunTrace, Telemetry):
-  // never GamePix, Nekoland, the editor or a debug build; INVINCIBLE and 관리자 실험 모드 runs are left out.
-  const APP_ITCH = "스토어 앱(Android·iOS)과 웹 체험판(itch)의 정식 빌드. GamePix·네코랜드·에디터·디버그 빌드는 보내지 않음";
+  // never GamePix, the editor or a debug build; INVINCIBLE and 관리자 실험 모드 runs are left out. Nekoland sends what itch
+  // sends since 11-18 (owner TK-502, 10key WebSignalsData.LISTED; a signed-in web player's rows carry the account).
+  const APP_ITCH = "스토어 앱(Android·iOS)과 웹 체험판(itch·네코랜드)의 정식 빌드. GamePix·에디터·디버그 빌드는 보내지 않음";
   const SETS = {
     crash_reports: ["크래시 보고", "앱이 켜진 채 꺼졌거나 5초 넘게 멈췄거나 스크립트 오류가 났을 때의 보고: 오류 줄, 앱 버전, 기기, 앱이 남긴 순서", APP_ITCH],
     crash_log_tail: ["크래시 로그", "크래시 보고에 붙는 Godot 로그 끝부분 (보고보다 먼저 지움)", APP_ITCH],
     app_issues: ["앱 이상 보고", "버벅임·멈춤·스크립트 오류를 같은 곳끼리 묶은 보고: 어디서, 몇 번, 그때의 판 번호", APP_ITCH],
-    issue_reports: ["1대1 문의", "플레이어가 게임 설정 「1대1 문의하기」로 보낸 글과 답장 이메일, 보낼 때의 앱 순서", "로그인한 앱·itch 계정만. GamePix·네코랜드 웹, 14세 미만, 약관에 동의하지 않은 플레이어는 보내지 않음"],
+    issue_reports: ["1대1 문의", "플레이어가 게임 설정 「1대1 문의하기」로 보낸 글과 답장 이메일, 보낼 때의 앱 순서", "로그인한 앱·itch·네코랜드 계정만. GamePix 웹, 14세 미만, 약관에 동의하지 않은 플레이어는 보내지 않음"],
     telemetry: ["성능 보고", "한 번 켤 때의 첫 화면까지 시간, 가장 느린 프레임, 버벅인 곳, 메모리", "스토어 앱(Android·iOS) 정식 빌드, 테스트 기간 동안만. 웹·GamePix·네코랜드는 보내지 않음"],
-    run_stats: ["판 기록", "판이 끝날 때마다의 짧은 기록: 끝난 레벨·시간·이유, 고른 카드, 만난 적. 기기마다 무작위 번호, 계정·닉네임 없음", "스토어 앱과 웹 체험판(itch). 무적 모드·관리자 실험 모드 판은 빼고 받음"],
-    run_trace: ["판 흐름 기록", "한 판의 시간 흐름: 레벨업 시각, 위기, 나온 카드와 고른 카드, 레벨 구간별 시간", "스토어 앱과 웹 체험판(itch). 무적 계정의 판은 서버가 버림"],
-    funnel: ["첫 플레이 단계", "처음 하는 사람이 어느 단계까지 갔는지", "스토어 앱과 웹 체험판(itch)"],
+    run_stats: ["판 기록", "판이 끝날 때마다의 짧은 기록: 끝난 레벨·시간·이유, 고른 카드, 만난 적. 앱은 기기마다 무작위 번호뿐 · 웹 체험판은 로그인한 플레이어의 판에 계정이 붙음", "스토어 앱과 웹 체험판(itch·네코랜드). 무적 모드·관리자 실험 모드 판은 빼고 받음"],
+    run_trace: ["판 흐름 기록", "한 판의 시간 흐름: 레벨업 시각, 위기, 나온 카드와 고른 카드, 레벨 구간별 시간", "스토어 앱과 웹 체험판(itch·네코랜드). 무적 계정의 판은 서버가 버림"],
+    funnel: ["첫 플레이 단계", "처음 하는 사람이 어느 단계까지 갔는지", "스토어 앱과 웹 체험판(itch·네코랜드)"],
+    god_runs: ["무적 테스트 판", "무적 계정이 노멀 모드에서 한 판의 밸런스 기록", "무적 계정만 (플레이어 기록과 따로 보관)"],
     report_trash: ["옮겨 둔 옛 보고", "11월 이전 크래시 보고와 판 기록을 옆으로 옮겨 둔 것", "새로 들어오지 않음"],
     rank_trash: ["옮겨 둔 옛 랭킹", "11월 이전 랭킹 기록을 옆으로 옮겨 둔 것", "새로 들어오지 않음"],
   };

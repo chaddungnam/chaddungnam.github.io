@@ -117,7 +117,7 @@ test("밸런스 page: hard mode says \"하드모드 판 없음\" when there is n
   await expect(boss.locator('td[data-label="이긴 비율"]')).toHaveText("33.3%");
   await expect(boss.locator('td[data-label="한 번에 걸린 시간"]')).toHaveText("1분 20초");
   await expect(page.locator("#tenkeyBalanceLostBat")).toContainText("시간 소모");
-  await expect(page.locator("#tenkeyBalanceLostDur")).toContainText("키보드 내려치기");
+  await expect(page.locator("#tenkeyBalanceLostDur")).toContainText("키보드 / 스페이스바 내려치기");
   await expect(page.locator("#tenkeyBalanceRefillDur")).toContainText("수리 키트");
   await expect(page.locator("#tenkeyBalanceDealt")).toContainText("레이저");
   await expect(page.locator("#tenkeyBalanceClamp")).toContainText("4번 중 3번 스스로 빠져나옴");

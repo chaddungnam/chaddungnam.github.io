@@ -16,18 +16,18 @@
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
-  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
+  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
   // owner 2026-11-12: "드리프트가 된적이있는데 기록되지 않았고": the web demo's runs are counted too now, and every row says where it was played.
-  const PLATFORMS = { android: "Android", ios: "iOS", web_itch: "웹 체험판 (itch)", web_gamepix: "웹 (GamePix)", windows: "PC (Windows)", macos: "PC (Mac)", linux: "PC (Linux)" };
-  const CRISES = { numlock: "NUM LOCK 철창", mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바" };
+  const PLATFORMS = { android: "Android", ios: "iOS", web_itch: "웹 체험판 (itch)", web_nekoland: "웹 체험판 (네코랜드)", web_gamepix: "웹 (GamePix)", windows: "PC (Windows)", macos: "PC (Mac)", linux: "PC (Linux)" };
+  const CRISES = { numlock: "NUM LOCK 철창", mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바", cat_paw: "고양이 앞발" };
   const CHANCE = { f: "골든 피버", d: "DRIFT", t: "로봇 변신" };
   const NOT_YET = "아직 받은 기록 없음 · 앱 다음 빌드부터 집계";
   // Hard mode meter slots, in the order of scripts/data/hard_meter_data.gd (SRC_NAMES / REF_NAMES / DMG_NAMES).
-  const LOST = ["시간 소모", "칸 이동", "집게 조임", "키보드 내려치기", "보스 충격파", "거인 주먹", "DEL 다이너마이트", "트랜지스터", "로봇 텐키 던지기", "고양이 앞발", "NUM LOCK 철창 시간 초과", "임플란트 대가", "기타"];
+  const LOST = ["시간 소모", "칸 이동", "집게 조임", "키보드 / 스페이스바 내려치기", "보스 충격파", "거인 주먹", "DEL 다이너마이트", "트랜지스터", "로봇 텐키 던지기", "고양이 앞발", "NUM LOCK 철창 시간 초과", "임플란트 대가", "기타"];
   const REFILL = ["건전지", "상자", "카드", "탈출 보상", "클립", "수리 키트", "완충", "저장", "부활", "기타"];
   const DEALT = ["클릭", "스크롤", "레이저", "더블클릭", "커서 자국", "우클릭 메뉴", "로봇 펀치", "로봇 쿵 밟기", "폭발", "기타"];
   const FORMS = { tenkey: "텐키 그대로", drift: "DRIFT", robot: "로봇" };
-  const MOBS = { mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바" };
+  const MOBS = { mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바", cat_paw: "고양이 앞발" };
   const CARDS = {
     dash: "돌진", overclock: "오버클럭", recharge: "충전", shock: "충격파", laser: "레이저", turbo: "터보", eco: "절전", bomb: "폭탄", goldrush: "골드 러시",
     nitro: "니트로", drift_blast: "드리프트 폭발", grip: "그립", chain: "연속 드리프트", rainbow_trail: "무지개 자국",
