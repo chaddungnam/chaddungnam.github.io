@@ -179,6 +179,10 @@
       reveal("[data-show-prereg]");
       return;
     }
+    // Launch sale price (owner 2026-11-21): $4.99 struck through and $2.99 until TENKEY_LAUNCH.saleTo (end of 11-27
+    // German time). Independent of TENKEY_LAUNCH.released, like the store flags above.
+    var saleTo = LAUNCH && LAUNCH.saleTo ? LAUNCH.saleTo : Date.UTC(2026, 10, 27, 23, 0, 0);
+    if ((Date.now() < saleTo && params.get("sale") !== "off") || params.get("sale") === "on") document.documentElement.classList.add("tk-get-sale");
     // Computer (or a phone whose store is not live yet): the full choice page.
     document.querySelectorAll("[data-get-link='ios'], [data-get-link='android']").forEach(function (a) {
       var key = a.getAttribute("data-get-link");

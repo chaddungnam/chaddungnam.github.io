@@ -475,3 +475,21 @@ test("/10key/get/?launch=preview shows the after-launch page without leaving for
   else await expect(page.locator("[data-get-pc]")).toBeVisible();
   await expect(page).toHaveURL(/launch=preview/);
 });
+// Price on /10key/get/ (owner 2026-11-21): US dollars in every language; $4.99 struck through and $2.99 until the end of
+// 11-27 German time, then the regular $4.99 alone.
+test("/10key/get/ shows the price in USD: launch sale until 11-27 German time, then the regular $4.99", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-11-27T23:55:00+01:00"));
+  await page.goto("/10key/get/?preview=pc&lang=ko");
+  const price = page.locator("[data-get-price]");
+  await expect(price.locator(".tk-get-price-regular")).toHaveText("$4.99");
+  await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "line-through");
+  await expect(price.locator(".tk-get-price-sale")).toContainText("$2.99");
+  await expect(price.locator(".tk-get-price-tag")).toHaveText("출시 기념 할인 · 11월 27일까지 (독일 시간)");
+  await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
+  await page.goto("/10key/get/?preview=pc&lang=de");
+  await expect(price.locator(".tk-get-price-regular")).toHaveText("$4.99");
+  await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "none");
+  await expect(price.locator(".tk-get-price-sale")).toBeHidden();
+  await expect(price.locator(".tk-get-price-tag")).toBeHidden();
+  await expect(price.locator(".tk-get-price-label")).toHaveText("Regulärer Preis");
+});
