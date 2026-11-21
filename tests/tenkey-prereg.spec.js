@@ -493,3 +493,14 @@ test("/10key/get/ shows the price in USD: launch sale until 11-27 German time, t
   await expect(price.locator(".tk-get-price-tag")).toBeHidden();
   await expect(price.locator(".tk-get-price-label")).toHaveText("Regulärer Preis");
 });
+// Owner 2026-11-21: Steam shown as coming in 2027 under the itch.io button; YouTube and Threads next to "About the game".
+test("/10key/get/ computer page shows Steam 2027 and the YouTube and Threads links", async ({ page }) => {
+  await page.goto("/10key/get/?preview=pc&lang=ko");
+  const pc = page.locator("[data-get-pc]");
+  await expect(pc.locator(".tk-steam-soon")).toBeVisible();
+  await expect(pc.locator(".tk-steam-soon")).toContainText("2027 출시 예정");
+  const more = pc.locator(".tk-get-more");
+  await expect(more.locator("a[href='https://www.youtube.com/@houseduck_in']")).toContainText("유튜브에서 영상 보기");
+  await expect(more.locator("a[href='https://www.threads.com/@sergeant_houseduck']")).toContainText("Threads에서 소식 받기");
+  await expect(more.locator("a[href='/10key/?lang=ko']")).toHaveText("게임 소개 보기");
+});

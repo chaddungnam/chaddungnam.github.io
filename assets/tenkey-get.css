@@ -36,7 +36,9 @@ html.tk-get-sale .tk-get-price-regular { color: var(--tk-text-3); font-size: cla
 .tk-get-qr img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .tk-get-qr-note { margin: 10px 0 0; color: var(--tk-text-3); font-size: .78rem; line-height: 1.5; word-break: keep-all; max-width: 156px; }
 .tk-get-stores { display: grid; justify-items: start; gap: 14px; }
-.tk-steam-soon { display: inline-block; justify-self: start; }
+/* Steam badge under the itch.io button: always shown (tk-badge-soon hides by default in tenkey-launch.css), owner 11-21 */
+.tk-get-pc .tk-steam-soon { display: inline-flex; align-items: center; gap: 8px; justify-self: start; margin-top: 8px; }
+.tk-steam-name { padding: 2px 8px; border-radius: 6px; color: #fff; background: #1b2838; font-weight: 800; }
 
 
 .tk-get-copy { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--tk-edge); }
@@ -48,7 +50,11 @@ html.tk-get-sale .tk-get-price-regular { color: var(--tk-text-3); font-size: cla
 .tk-get-pc .tk-key { width: 100%; }
 .tk-get-pc .tk-play-icon { border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
 .tk-get-pc-note { margin: 4px 0 0; color: var(--tk-text-3); font-size: .82rem; line-height: 1.55; word-break: keep-all; }
-.tk-get-back { margin-top: 26px; text-align: center; }
+/* More: about the game, YouTube, Threads (owner 11-21: bring visitors to the channels too) */
+.tk-get-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin-top: 26px; }
+.tk-get-more-link { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border: 1px solid var(--tk-edge-2); border-radius: 999px; color: var(--tk-text-2); background: rgba(29, 29, 29, .9); font-size: .9rem; font-weight: 700; text-decoration: none; }
+.tk-get-more-link:hover { color: #fff; border-color: rgba(236, 230, 214, .5); }
+.tk-get-more-icon { width: 20px; height: 20px; flex: none; }
 
 /* phone, store opening: the small card keeps the official badge as a manual button in case the jump is blocked */
 .tk-card .tk-actions .tk-badge { margin-top: 4px; }
