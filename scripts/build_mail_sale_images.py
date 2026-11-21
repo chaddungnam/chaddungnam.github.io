@@ -1,7 +1,7 @@
 # Sale banner for the 10key launch mail (owner 2026-11-21): the get page's price block as one image, in the game's pixel
-# Run: python3 scripts/build_mail_sale_images.py ../10key/assets/fonts/src assets/media/mail
 # fonts (Galmuri11 Bold for ko/en/de and every number, PixelMplus12 Bold for ja, Fusion Pixel 12px zh_hant for zh).
 # Drawn at 2x (1176 px wide, shown at 588), anti-aliasing off so the pixels stay sharp.
+# Run: python3 scripts/build_mail_sale_images.py ../10key/assets/fonts/src assets/media/mail
 import sys
 from PIL import Image, ImageDraw, ImageFont
 S = sys.argv[1]; OUT = sys.argv[2]
