@@ -18,10 +18,10 @@
   <link rel="icon" type="image/png" href="/assets/house-duck-logo.png">
   <link rel="preload" href="/assets/fonts/Lato-Regular-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121b">
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261121-keys">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-phone">
   <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261119-manual">
   <script src="/assets/tenkey-launch.js?v=20261119-manual"></script>
   <script src="/assets/share-sheet.js?v=20261121-keys" defer></script>
@@ -89,7 +89,7 @@
         </div>
 
         <figure class="tk-screen">
-          <span class="tk-screen-frame"><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="딸깍 서바이벌 실제 플레이 영상"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video></span>
+          <span class="tk-phone"><span class="tk-phone-shell"><span class="tk-phone-island" aria-hidden="true"></span><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="딸깍 서바이벌 실제 플레이 영상"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video><span class="tk-phone-home" aria-hidden="true"></span></span><span class="tk-phone-btn tk-phone-btn-a" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-b" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-c" aria-hidden="true"></span></span>
           <figcaption><span>실제 플레이 화면</span><button class="tk-video-toggle" type="button" data-tk-video-toggle data-pause-label="영상 일시정지" data-play-label="영상 재생" aria-label="영상 일시정지"><span aria-hidden="true"></span></button></figcaption>
         </figure>
       </div>
@@ -120,8 +120,8 @@
         <h2 class="tk-h2 tk-reveal" id="evolve-title">버티고, 진화하기<small>깊이 갈수록 키보드 밑에서 무언가 올라와요. 대신 텐키도 진화해요.</small></h2>
         <h3 class="tk-h3 tk-reveal">이런 게 쫓아와요</h3>
         <div class="tk-threats">
-          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-ko.webp" width="480" height="600" alt="빨간 길로 돌진하는 마우스" loading="lazy" decoding="async"><div><p class="tk-tag">LV 7</p><h4>마우스</h4><p>레벨 7부터 마우스가 사냥을 시작해요. 빨간 돌진 길을 피하고, 잡히면 좌우로 연타!</p></div></article>
-          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-ko.webp" width="480" height="600" alt="내려찍기 직전의 스페이스바" loading="lazy" decoding="async"><div><p class="tk-tag">LV 14 · 정식판</p><h4>스페이스바</h4><p>레벨 14부터 스페이스바가 십자 모양으로 내려찍어요. 떨어질 자리를 보고 대각선으로 피하세요.</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-ko.webp" width="480" height="600" alt="빨간 길로 돌진하는 마우스" loading="lazy" decoding="async"><div><h4>마우스</h4><p>빨간 길이 보이면 마우스가 돌진해요. 피하고, 잡히면 좌우로 연타!</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-ko.webp" width="480" height="600" alt="내려찍기 직전의 스페이스바" loading="lazy" decoding="async"><div><h4>스페이스바</h4><p>스페이스바가 위에서 쾅 내려찍어요. 경고가 뜨면 떨어질 자리를 보고 피하세요.</p></div></article>
         </div>
         <h3 class="tk-h3 tk-reveal">텐키의 진화</h3>
         <ol class="tk-evo">
@@ -143,7 +143,6 @@
             <tr><th scope="row">레벨</th><td>1 – 8</td><td class="is-full">레벨 30 클리어 후에도 계속</td></tr>
             <tr><th scope="row">드리프트 <small>Lv 7</small></th><td><span class="tk-yes"><span class="tk-sr">있음</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">있음</span></span></td></tr>
             <tr><th scope="row">로봇 변신 <small>Lv 14</small></th><td><span class="tk-no"><span class="tk-sr">없음</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">있음</span></span></td></tr>
-            <tr><th scope="row">스페이스바 내려찍기</th><td><span class="tk-no"><span class="tk-sr">없음</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">있음</span></span></td></tr>
             <tr><th scope="row">모듈 수집</th><td><span class="tk-no"><span class="tk-sr">없음</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">있음</span></span></td></tr>
             <tr><th scope="row">고양이의 샷건 · 하드모드</th><td><span class="tk-no"><span class="tk-sr">없음</span></span></td><td class="is-full"><span class="tk-soon">업데이트 예정</span></td></tr>
             <tr><th scope="row">어디서</th><td>itch.io <small>브라우저</small></td><td class="is-full">Google&nbsp;Play · App&nbsp;Store<small><span data-store-wait>곧 출시 · </span>Steam 2027</small></td></tr>

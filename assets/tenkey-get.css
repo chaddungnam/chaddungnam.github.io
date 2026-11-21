@@ -74,3 +74,8 @@ html.tk-get-sale .tk-get-price-regular { color: var(--tk-text-3); font-size: cla
 .tk-get-copy .hd-share-row { margin: 0; }
 .tk-get-more-duck { width: 22px; height: 22px; flex: none; }
 .tk-small ~ .tk-get .tk-get-copy code, .tk-get-copy code { white-space: normal; overflow-wrap: anywhere; }
+/* prices in the game's pixel font Galmuri (owner 2026-11-21), not plain text */
+.tk-get-price .tk-get-price-tag, .tk-get-price-label, .tk-get-price-regular, .tk-get-price-sale { font-family: "Galmuri11", "PixelMplus12", var(--tk-font); font-weight: 700; letter-spacing: 0; }
+.tk-get-price-regular { font-size: clamp(2rem, 4.6vw, 2.8rem); }
+.tk-get-price-sale { font-size: clamp(2.3rem, 5.4vw, 3.3rem); }
+html.tk-get-sale .tk-get-price-regular { font-size: clamp(1.4rem, 3.2vw, 1.9rem); }

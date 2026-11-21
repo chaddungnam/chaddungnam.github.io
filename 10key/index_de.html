@@ -17,10 +17,10 @@
   <link rel="icon" type="image/png" href="/assets/house-duck-logo.png">
   <link rel="preload" href="/assets/fonts/Lato-Regular-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121b">
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261121-keys">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-phone">
   <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261119-manual">
   <script src="/assets/tenkey-launch.js?v=20261119-manual"></script>
   <script src="/assets/share-sheet.js?v=20261121-keys" defer></script>
@@ -88,7 +88,7 @@
         </div>
 
         <figure class="tk-screen">
-          <span class="tk-screen-frame"><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="Echtes Gameplay von 10key Survival"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video></span>
+          <span class="tk-phone"><span class="tk-phone-shell"><span class="tk-phone-island" aria-hidden="true"></span><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="Echtes Gameplay von 10key Survival"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video><span class="tk-phone-home" aria-hidden="true"></span></span><span class="tk-phone-btn tk-phone-btn-a" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-b" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-c" aria-hidden="true"></span></span>
           <figcaption><span>Echtes Gameplay</span><button class="tk-video-toggle" type="button" data-tk-video-toggle data-pause-label="Video anhalten" data-play-label="Video abspielen" aria-label="Video anhalten"><span aria-hidden="true"></span></button></figcaption>
         </figure>
       </div>
@@ -119,8 +119,8 @@
         <h2 class="tk-h2 tk-reveal" id="evolve-title">Überleben, dann weiterentwickeln<small>Je tiefer du gräbst, desto mehr kommt unter den Tasten hervor. Dafür entwickelt sich auch dein Tenkey weiter.</small></h2>
         <h3 class="tk-h3 tk-reveal">Wer dich jagt</h3>
         <div class="tk-threats">
-          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-en.webp" width="480" height="600" alt="Die Maus rast ihre rote Bahn entlang" loading="lazy" decoding="async"><div><p class="tk-tag">LV 7</p><h4>Die Maus</h4><p>Ab Level 7 jagt dich die Maus. Weich ihrer roten Angriffsbahn aus; packt sie dich, hämmere links und rechts.</p></div></article>
-          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-en.webp" width="480" height="600" alt="Die Leertaste kurz vor dem Aufprall" loading="lazy" decoding="async"><div><p class="tk-tag">LV 14 · VOLLSPIEL</p><h4>Die Leertaste</h4><p>Ab Level 14 kracht die Leertaste kreuzförmig herunter. Achte auf die Landestelle und weich diagonal aus.</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-en.webp" width="480" height="600" alt="Die Maus rast ihre rote Bahn entlang" loading="lazy" decoding="async"><div><h4>Die Maus</h4><p>Leuchtet eine rote Bahn auf, prescht die Maus los. Weich aus; packt sie dich, hämmere links und rechts.</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-en.webp" width="480" height="600" alt="Die Leertaste kurz vor dem Aufprall" loading="lazy" decoding="async"><div><h4>Die Leertaste</h4><p>Die Leertaste kracht von oben herunter. Kommt die Warnung, achte auf die Landestelle und weich aus.</p></div></article>
         </div>
         <h3 class="tk-h3 tk-reveal">So entwickelt sich dein Tenkey</h3>
         <ol class="tk-evo">
@@ -142,7 +142,6 @@
             <tr><th scope="row">Level</th><td>1 – 8</td><td class="is-full">Level 30 schaffen, dann weitergraben</td></tr>
             <tr><th scope="row">DRIFT <small>Lv 7</small></th><td><span class="tk-yes"><span class="tk-sr">Ja</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">Ja</span></span></td></tr>
             <tr><th scope="row">ROBOTER-TRANSFORM <small>Lv 14</small></th><td><span class="tk-no"><span class="tk-sr">Nein</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">Ja</span></span></td></tr>
-            <tr><th scope="row">Leertasten-Schlag</th><td><span class="tk-no"><span class="tk-sr">Nein</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">Ja</span></span></td></tr>
             <tr><th scope="row">MODULE sammeln</th><td><span class="tk-no"><span class="tk-sr">Nein</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">Ja</span></span></td></tr>
             <tr><th scope="row">PFOTENHIEB · HARDMODUS</th><td><span class="tk-no"><span class="tk-sr">Nein</span></span></td><td class="is-full"><span class="tk-soon">kommt per Update</span></td></tr>
             <tr><th scope="row">Wo</th><td>itch.io <small>Browser</small></td><td class="is-full">Google&nbsp;Play · App&nbsp;Store<small><span data-store-wait>bald · </span>Steam 2027</small></td></tr>

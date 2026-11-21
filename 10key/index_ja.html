@@ -17,10 +17,10 @@
   <link rel="icon" type="image/png" href="/assets/house-duck-logo.png">
   <link rel="preload" href="/assets/fonts/Lato-Regular-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/media/tenkey-gameplay-poster.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/site-fonts.css?v=20261121b">
   <link rel="stylesheet" href="/assets/brand-site.css">
   <link rel="stylesheet" href="/assets/share-sheet.css?v=20261121-keys">
-  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-itch">
+  <link rel="stylesheet" href="/assets/tenkey-page.css?v=20261121-phone">
   <link rel="stylesheet" href="/assets/tenkey-launch.css?v=20261119-manual">
   <script src="/assets/tenkey-launch.js?v=20261119-manual"></script>
   <script src="/assets/share-sheet.js?v=20261121-keys" defer></script>
@@ -88,7 +88,7 @@
         </div>
 
         <figure class="tk-screen">
-          <span class="tk-screen-frame"><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="ポチサバイバーの実際のプレイ映像"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video></span>
+          <span class="tk-phone"><span class="tk-phone-shell"><span class="tk-phone-island" aria-hidden="true"></span><video class="tk-screen-video" data-tk-video autoplay muted loop playsinline preload="metadata" poster="/assets/media/tenkey-gameplay-poster.webp" width="540" height="960" aria-label="ポチサバイバーの実際のプレイ映像"><source src="/assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="/assets/media/tenkey-gameplay.webm" type="video/webm"></video><span class="tk-phone-home" aria-hidden="true"></span></span><span class="tk-phone-btn tk-phone-btn-a" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-b" aria-hidden="true"></span><span class="tk-phone-btn tk-phone-btn-c" aria-hidden="true"></span></span>
           <figcaption><span>実際のプレイ映像</span><button class="tk-video-toggle" type="button" data-tk-video-toggle data-pause-label="動画を一時停止" data-play-label="動画を再生" aria-label="動画を一時停止"><span aria-hidden="true"></span></button></figcaption>
         </figure>
       </div>
@@ -119,8 +119,8 @@
         <h2 class="tk-h2 tk-reveal" id="evolve-title">生き延びて、進化する<small>深く掘るほど、キーボードの下から何かが現れる。そのかわり、テンキーも進化する。</small></h2>
         <h3 class="tk-h3 tk-reveal">追ってくるもの</h3>
         <div class="tk-threats">
-          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-en.webp" width="480" height="600" alt="赤いラインを突進するマウス" loading="lazy" decoding="async"><div><p class="tk-tag">LV 7</p><h4>マウス</h4><p>レベル7からマウスが狩りを始める。赤い突進ラインをよけて、つかまったら左右連打！</p></div></article>
-          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-en.webp" width="480" height="600" alt="叩きつける直前のスペースキー" loading="lazy" decoding="async"><div><p class="tk-tag">LV 14 · 製品版</p><h4>スペースキー</h4><p>レベル14からスペースキーが十字に叩きつけてくる。落ちる場所を見て、斜めによけよう。</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:0"><img src="/assets/media/tenkey-page/v2/threat-mouse-en.webp" width="480" height="600" alt="赤いラインを突進するマウス" loading="lazy" decoding="async"><div><h4>マウス</h4><p>赤いラインが出たらマウスが突進してくる。よけて、つかまったら左右連打！</p></div></article>
+          <article class="tk-threat tk-reveal" style="--i:1"><img src="/assets/media/tenkey-page/v2/threat-spacebar-en.webp" width="480" height="600" alt="叩きつける直前のスペースキー" loading="lazy" decoding="async"><div><h4>スペースキー</h4><p>スペースキーが上からドーン！警告が出たら落ちる場所を見てよけよう。</p></div></article>
         </div>
         <h3 class="tk-h3 tk-reveal">テンキーの進化</h3>
         <ol class="tk-evo">
@@ -142,7 +142,6 @@
             <tr><th scope="row">レベル</th><td>1 – 8</td><td class="is-full">レベル30クリア後も続く</td></tr>
             <tr><th scope="row">DRIFT <small>Lv 7</small></th><td><span class="tk-yes"><span class="tk-sr">あり</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">あり</span></span></td></tr>
             <tr><th scope="row">ロボット変形 <small>Lv 14</small></th><td><span class="tk-no"><span class="tk-sr">なし</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">あり</span></span></td></tr>
-            <tr><th scope="row">スペースキー落下</th><td><span class="tk-no"><span class="tk-sr">なし</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">あり</span></span></td></tr>
             <tr><th scope="row">モジュール収集</th><td><span class="tk-no"><span class="tk-sr">なし</span></span></td><td class="is-full"><span class="tk-yes"><span class="tk-sr">あり</span></span></td></tr>
             <tr><th scope="row">猫パンチ・ハードモード</th><td><span class="tk-no"><span class="tk-sr">なし</span></span></td><td class="is-full"><span class="tk-soon">アップデートで追加予定</span></td></tr>
             <tr><th scope="row">どこで</th><td>itch.io <small>ブラウザ</small></td><td class="is-full">Google&nbsp;Play · App&nbsp;Store<small><span data-store-wait>近日配信・</span>Steam 2027</small></td></tr>

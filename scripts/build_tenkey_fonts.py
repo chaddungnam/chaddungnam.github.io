@@ -32,6 +32,11 @@ def page_text():
         page = path.read_text(encoding="utf-8")
         main = page[page.index("<main"):page.index("</main>")]
         chars |= set(html.unescape(re.sub(r"<[^>]+>", " ", main)))
+    # /10key/get/ (owner 2026-11-21: the price in Galmuri): its words sit in data-<lang> attributes, filled in by tenkey-small.js
+    get = (ROOT / "10key/get/index.html").read_text(encoding="utf-8")
+    for value in re.findall(r'data-(?:ko|en|de|ja|zh)="([^"]*)"', get):
+        chars |= set(html.unescape(value))
+    chars |= set(html.unescape(re.sub(r"<[^>]+>", " ", get[get.index("<body"):])))
     return "".join(sorted(c for c in chars if c.strip()))
 
 

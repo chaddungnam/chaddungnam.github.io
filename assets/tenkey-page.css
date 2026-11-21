@@ -588,3 +588,22 @@ html:lang(ko) .tk-chips li, html:lang(ko) .tk-tag, html:lang(ko) .tk-sheet dt, h
 }
 /* tenkey-launch.css loads after this file and makes .tk-dl-pc a flex row; the PC block stacks its rows */
 .tk-dl .tk-dl-pc { display: grid; justify-items: start; gap: 10px; }
+
+/* the gameplay loop on a phone mockup (owner 2026-11-21), the same phone as the home's game sections */
+.tk-phone { position: relative; display: block; width: min(100%, 320px); }
+.tk-phone-shell {
+  position: relative; display: block; aspect-ratio: 9 / 18; padding: 10px; box-sizing: border-box; overflow: hidden; border-radius: 48px;
+  background: #0e0e10;
+  box-shadow: inset 0 0 0 1.5px #3a3a40, inset 0 0 0 5px #0a0a0a, 0 2px 2px rgba(255, 255, 255, .25), 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 210, 63, .12);
+}
+.tk-phone .tk-screen-video { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 38px; background: #000; object-fit: contain; }
+.tk-phone-island { position: absolute; top: 17px; left: 50%; z-index: 3; width: 30%; height: 22px; border-radius: 999px; background: #050505; transform: translateX(-50%); }
+.tk-phone-home { position: absolute; bottom: 17px; left: 50%; z-index: 3; width: 34%; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, .75); transform: translateX(-50%); }
+.tk-phone-btn { position: absolute; width: 3px; border-radius: 2px; background: #34343a; }
+.tk-phone-btn-a { top: 20%; left: -3px; height: 28px; }
+.tk-phone-btn-b { top: 28%; left: -3px; height: 46px; }
+.tk-phone-btn-c { top: 24%; right: -3px; height: 64px; }
+@media (max-width: 860px) { .tk-phone { width: min(68vw, 300px); } }
+
+/* prices in Galmuri (owner 2026-11-21) */
+.tk-dl-sale, .tk-dl-sale strong, .tk-dl-sale b { font-family: "Galmuri11", "PixelMplus12", var(--tk-font); font-weight: 700; }
