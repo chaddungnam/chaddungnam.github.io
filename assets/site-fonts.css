@@ -37,7 +37,7 @@
    PixelMplus: M+ FONT LICENSE). PixelMplus covers the Japanese text Galmuri has no glyphs for. */
 @font-face {
   font-family: "Galmuri11";
-  src: url("/assets/fonts/Galmuri11-Bold-10key.woff2") format("woff2");
+  src: url("/assets/fonts/Galmuri11-Bold-10key.woff2?v=20261121") format("woff2");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -45,8 +45,38 @@
 
 @font-face {
   font-family: "PixelMplus12";
-  src: url("/assets/fonts/PixelMplus12-Bold-10key.woff2") format("woff2");
+  src: url("/assets/fonts/PixelMplus12-Bold-10key.woff2?v=20261121") format("woff2");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
+}
+
+/* The itch.io page's type for the 10key pages (owner 2026-11-21): Press Start 2P (headings, labels) and Lato (text), both
+   SIL OFL 1.1 (assets/fonts/PRESSSTART2P_LICENSE.txt, LATO_LICENSE.txt), Latin subsets. Press Start 2P has one weight; the
+   range keeps bold headings from being faux-bolded. */
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("/assets/fonts/PressStart2P-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2010-2027, U+2190-2193;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/assets/fonts/Lato-Regular-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 500;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2027, U+2030-2044, U+20AC, U+2122, U+2190-2193, U+2212;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/assets/fonts/Lato-Bold-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2010-2027, U+2030-2044, U+20AC, U+2122, U+2190-2193, U+2212;
 }

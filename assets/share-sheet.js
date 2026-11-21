@@ -29,11 +29,11 @@
   var IMAGE = {};
   ["ko", "en", "de", "ja", "zh"].forEach(function (l) { IMAGE[l] = "/assets/media/share/tenkey-share-" + l + ".png"; });
   var STR = {
-    ko: { title: "공유하기", intro: "딸깍 서바이벌을 친구에게 알려 주세요.", phone: "휴대폰 공유창", x: "X에 올리기", threads: "Threads에 올리기", copyAll: "글과 링크 복사", copyLink: "링크 복사", save: "그림 저장", hint: "그림을 길게 눌러 저장하세요.", inapp: "이 앱 안에서는 복사가 가장 확실해요. 복사한 뒤 카카오톡이나 인스타그램에 붙여 넣으세요.", copied: "복사됨", copiedMsg: "복사했어요.", fail: "복사하지 못했어요. 위 주소를 길게 눌러 복사해 주세요.", close: "닫기", kakao: "카카오톡으로 공유", kakaoMore: "자세히 보기", imgAlt: "딸깍 서바이벌 공유 그림: 3D 키보드 위의 텐키와 마우스", text: "딸깍 서바이벌: 살아 있는 텐키가 되어 끝없는 키보드를 파고 내려가는 게임이에요. 지금 사전예약 중!" },
-    en: { title: "Share", intro: "Tell a friend about 10key Survival.", phone: "Phone share sheet", x: "Post on X", threads: "Post on Threads", copyAll: "Copy text and link", copyLink: "Copy link", save: "Save picture", hint: "Press and hold the picture to save it.", inapp: "Copying works best inside this app. Copy, then paste it into KakaoTalk or Instagram.", copied: "Copied", copiedMsg: "Copied.", fail: "Could not copy. Press and hold the address above to copy it.", close: "Close", imgAlt: "10key Survival share picture: the numpad and the mouse on a 3D keyboard", text: "10key Survival: a game where you dig down an endless keyboard as a living numpad. Pre-registration is open!" },
-    de: { title: "Teilen", intro: "Erzähl einem Freund von 10key Survival.", phone: "Teilen-Menü des Handys", x: "Auf X posten", threads: "Auf Threads posten", copyAll: "Text und Link kopieren", copyLink: "Link kopieren", save: "Bild speichern", hint: "Bild lange drücken, um es zu speichern.", inapp: "In dieser App klappt Kopieren am besten. Kopieren und dann in KakaoTalk oder Instagram einfügen.", copied: "Kopiert", copiedMsg: "Kopiert.", fail: "Kopieren hat nicht geklappt. Die Adresse oben lange drücken und kopieren.", close: "Schließen", imgAlt: "10key-Survival-Teilen-Bild: der Ziffernblock und die Maus auf einer 3D-Tastatur", text: "10key Survival: Du gräbst dich als lebendiger Ziffernblock durch eine endlose Tastatur. Die Vorregistrierung läuft!" },
-    ja: { title: "シェア", intro: "10key Survivalを友だちに教えよう。", phone: "スマホの共有メニュー", x: "Xに投稿", threads: "Threadsに投稿", copyAll: "文とリンクをコピー", copyLink: "リンクをコピー", save: "画像を保存", hint: "画像を長押しして保存してください。", inapp: "このアプリ内ではコピーが確実です。コピーして、KakaoTalkやInstagramに貼り付けてください。", copied: "コピーしました", copiedMsg: "コピーしました。", fail: "コピーできませんでした。上のアドレスを長押ししてコピーしてください。", close: "閉じる", imgAlt: "10key Survivalのシェア画像：3Dキーボードの上のテンキとマウス", text: "10key Survival：生きたテンキになって、終わりのないキーボードを掘り進むゲーム。事前登録受付中！" },
-    zh: { title: "分享", intro: "把《咔噠求生》介紹給朋友。", phone: "手機分享選單", x: "發佈到 X", threads: "發佈到 Threads", copyAll: "複製文字與連結", copyLink: "複製連結", save: "儲存圖片", hint: "長按圖片即可儲存。", inapp: "在這個 App 內複製最穩。複製後貼到 KakaoTalk 或 Instagram。", copied: "已複製", copiedMsg: "已複製。", fail: "複製失敗。請長按上方網址手動複製。", close: "關閉", imgAlt: "《咔噠求生》分享圖片：3D 鍵盤上的數字鍵與滑鼠", text: "《咔噠求生》（10key Survival）：化身活生生的數字鍵盤，挖穿無盡的鍵盤。現正事前預約中！" }
+    ko: { title: "공유하기", intro: "딸깍 서바이벌을 친구에게 알려 주세요.", phone: "휴대폰 공유창", x: "X에 올리기", threads: "Threads에 올리기", copyAll: "글과 링크 복사", copyLink: "링크 복사", save: "그림 저장", hint: "그림을 길게 눌러 저장하세요.", inapp: "이 앱 안에서는 복사가 가장 확실해요. 복사한 뒤 카카오톡이나 인스타그램에 붙여 넣으세요.", copied: "복사됨", copiedMsg: "복사했어요.", fail: "복사하지 못했어요. 위 주소를 길게 눌러 복사해 주세요.", close: "닫기", kakao: "카카오톡으로 공유", kakaoMore: "자세히 보기", imgAlt: "딸깍 서바이벌 공유 그림: 3D 키보드 위의 텐키와 마우스", text: "딸깍 서바이벌: 살아 있는 텐키가 되어 끝없는 키보드를 파고 내려가는 게임이에요. 컴퓨터에서는 무료 데모를 바로 해 볼 수 있어요!" },
+    en: { title: "Share", intro: "Tell a friend about 10key Survival.", phone: "Phone share sheet", x: "Post on X", threads: "Post on Threads", copyAll: "Copy text and link", copyLink: "Copy link", save: "Save picture", hint: "Press and hold the picture to save it.", inapp: "Copying works best inside this app. Copy, then paste it into KakaoTalk or Instagram.", copied: "Copied", copiedMsg: "Copied.", fail: "Could not copy. Press and hold the address above to copy it.", close: "Close", imgAlt: "10key Survival share picture: the numpad and the mouse on a 3D keyboard", text: "10key Survival: a game where you dig down an endless keyboard as a living numpad. Play the free demo on a PC right now!" },
+    de: { title: "Teilen", intro: "Erzähl einem Freund von 10key Survival.", phone: "Teilen-Menü des Handys", x: "Auf X posten", threads: "Auf Threads posten", copyAll: "Text und Link kopieren", copyLink: "Link kopieren", save: "Bild speichern", hint: "Bild lange drücken, um es zu speichern.", inapp: "In dieser App klappt Kopieren am besten. Kopieren und dann in KakaoTalk oder Instagram einfügen.", copied: "Kopiert", copiedMsg: "Kopiert.", fail: "Kopieren hat nicht geklappt. Die Adresse oben lange drücken und kopieren.", close: "Schließen", imgAlt: "10key-Survival-Teilen-Bild: der Ziffernblock und die Maus auf einer 3D-Tastatur", text: "10key Survival: Du gräbst dich als lebendiger Ziffernblock durch eine endlose Tastatur. Die Gratis-Demo läuft sofort am PC!" },
+    ja: { title: "シェア", intro: "10key Survivalを友だちに教えよう。", phone: "スマホの共有メニュー", x: "Xに投稿", threads: "Threadsに投稿", copyAll: "文とリンクをコピー", copyLink: "リンクをコピー", save: "画像を保存", hint: "画像を長押しして保存してください。", inapp: "このアプリ内ではコピーが確実です。コピーして、KakaoTalkやInstagramに貼り付けてください。", copied: "コピーしました", copiedMsg: "コピーしました。", fail: "コピーできませんでした。上のアドレスを長押ししてコピーしてください。", close: "閉じる", imgAlt: "10key Survivalのシェア画像：3Dキーボードの上のテンキとマウス", text: "10key Survival：生きたテンキになって、終わりのないキーボードを掘り進むゲーム。PCなら無料デモをすぐに遊べます！" },
+    zh: { title: "分享", intro: "把《咔噠求生》介紹給朋友。", phone: "手機分享選單", x: "發佈到 X", threads: "發佈到 Threads", copyAll: "複製文字與連結", copyLink: "複製連結", save: "儲存圖片", hint: "長按圖片即可儲存。", inapp: "在這個 App 內複製最穩。複製後貼到 KakaoTalk 或 Instagram。", copied: "已複製", copiedMsg: "已複製。", fail: "複製失敗。請長按上方網址手動複製。", close: "關閉", imgAlt: "《咔噠求生》分享圖片：3D 鍵盤上的數字鍵與滑鼠", text: "《咔噠求生》（10key Survival）：化身活生生的數字鍵盤，挖穿無盡的鍵盤。電腦上馬上就能免費試玩！" }
   };
   var T = STR[LANG] || STR.en;
   var UA = navigator.userAgent || "";
@@ -42,6 +42,18 @@
   var URL_ = ORIGIN + (PATH[LANG] || PATH.en);
   var IMG_URL = IMAGE[LANG] || IMAGE.en;
   var dlg = null, opener = null, fileP = null, copyTimer = 0;
+  /* the page a share sends: this 10key page, or the address a row names (data-share-url, /10key/get/, owner 2026-11-21) */
+  var SHARE_URL = URL_;
+  function rowUrl(node) {
+    if (!node || !node.closest) return URL_;
+    if (node.closest("dialog.hd-share")) return SHARE_URL;           // a key in the sheet shares what its row opened
+    var row = node.closest("[data-share-row]");
+    return (row && row.getAttribute("data-share-url")) || URL_;
+  }
+  /* KakaoTalk's own share symbol (Kakao Developers design resources: kakaotalk_sharing_btn), unmodified, owner 2026-11-21 */
+  var KAKAO_ICON = "/assets/media/share/kakaotalk-share.png";
+  /* the share key's icon (three linked dots), added by this script so every share row looks the same */
+  var SHARE_SVG = '<svg class="hd-share-ico-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
 
   function el(tag, attrs, text) {
     var n = document.createElement(tag);
@@ -84,7 +96,7 @@
     btn._t = setTimeout(function () { btn.textContent = label; btn.removeAttribute("data-state"); if (statusEl) statusEl.textContent = ""; }, 2000);
   }
 
-  function payload() { return { title: document.title, text: T.text, url: URL_ }; }
+  function payload() { return { title: document.title, text: T.text, url: SHARE_URL }; }
 
   function nativeShare() {
     var p = payload();
@@ -123,7 +135,7 @@
     document.querySelectorAll("[data-share-kakao]").forEach(function (b) { (b.closest("li") || b).remove(); });
   }
   function kakaoSend() {
-    var link = { webUrl: URL_, mobileWebUrl: URL_ };
+    var link = { webUrl: SHARE_URL, mobileWebUrl: SHARE_URL };
     var cut = T.text.indexOf(": ");          // "딸깍 서바이벌: ..." -> title + description
     window.Kakao.Share.sendDefault({
       objectType: "feed",
@@ -132,6 +144,7 @@
     });
   }
   function shareKakao(btn) {
+    SHARE_URL = rowUrl(btn);
     var go = function () { try { kakaoSend(); } catch (e) { kakaoOff(); opener = btn; openSheet(); } };
     if (kakaoReady()) go();                  // already warm: straight from the click
     else loadKakao().then(go, function () { opener = btn; openSheet(); });
@@ -140,7 +153,9 @@
     ["pointerenter", "touchstart", "focus"].forEach(function (t) { node.addEventListener(t, function () { loadKakao().catch(function () {}); }, { once: true, passive: true }); });
   }
   function kakaoKey(cls) {
-    var b = el("button", { type: "button", class: cls, "data-share-kakao": "" }, T.kakao);
+    var b = el("button", { type: "button", class: cls + " is-kakao", "data-share-kakao": "" });
+    b.appendChild(el("img", { class: "hd-share-kakao-ico", src: KAKAO_ICON, width: "24", height: "24", alt: "" }));
+    b.appendChild(document.createTextNode(T.kakao));
     b.addEventListener("click", function () { shareKakao(b); });
     warmKakao(b);
     return b;
@@ -148,6 +163,7 @@
 
   function openFrom(btn) {
     opener = btn;
+    SHARE_URL = rowUrl(btn);
     if (!IN_APP && navigator.share) {
       nativeShare().catch(function (err) {
         if (err && err.name === "AbortError") return;      // the person closed the phone's share sheet
@@ -231,7 +247,8 @@
         open.addEventListener("click", function () { openFrom(open); });
         ["pointerenter", "touchstart", "focus"].forEach(function (t) { open.addEventListener(t, function () { if (navigator.share && !IN_APP) loadFile(); }, { once: true, passive: true }); });
       }
-      if (copy) copy.addEventListener("click", function () { copyText(URL_).then(function (ok) { flash(copy, status, ok); }); });
+      if (open && !open.querySelector("svg")) open.insertAdjacentHTML("afterbegin", SHARE_SVG);
+      if (copy) copy.addEventListener("click", function () { copyText(rowUrl(copy)).then(function (ok) { flash(copy, status, ok); }); });
       if (KAKAO_ON && (copy || open)) (copy || open).insertAdjacentElement("afterend", kakaoKey("hd-share-key"));
       row.hidden = false;
     });

@@ -196,7 +196,7 @@ for (const [where, url, canon] of [["10key", TENKEY.ko.url, TENKEY.ko.canon], ["
     const o = await page.evaluate(() => window.__kakao.sent[0]);
     expect(o.objectType).toBe("feed");
     expect(o.content.title).toBe("딸깍 서바이벌");
-    expect(o.content.description).toContain("사전예약");
+    expect(o.content.description).toContain("무료 데모");
     expect(o.content.imageUrl).toBe("https://houseduck.in/assets/media/share/tenkey-share-ko.png");
     expect([o.content.imageWidth, o.content.imageHeight]).toEqual([1200, 630]);
     expect(o.content.link).toEqual({ webUrl: canon, mobileWebUrl: canon });

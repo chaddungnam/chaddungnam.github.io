@@ -402,3 +402,189 @@ html:lang(en) .tk-title-alt { margin: 10px 0 0; letter-spacing: .02em; }
   .tk-page .tk-nav-cta { padding: 0 8px; }
   .tk-lang a { min-width: 30px; font-size: .74rem; }
 }
+
+/* =====================================================================================================================
+   itch.io look (owner 2026-11-21: "itch에 맞춰서 폰트나 그런거 다시 멋져보이게"): the itch.io page's type, Press Start 2P for
+   headings and labels and Lato for text (OFL, assets/fonts), with the game's own pixel fonts for Hangul and kana; itch-style
+   chips, the DEMO ON PC block with the yellow itch.io keycap and Steam 2027, trailer chips, how-to-play steps, survive &
+   evolve, the full game (demo vs full game, coming in updates). Everything below overrides the rules above.
+   ===================================================================================================================== */
+:root {
+  --tk-font: "Lato", -apple-system, "Apple SD Gothic Neo", "Hiragino Sans", "Noto Sans KR", "Noto Sans JP", sans-serif;
+  --tk-8bit: "Press Start 2P", "Galmuri11", "PixelMplus12", monospace;
+  --tk-chip: #232323;
+  --tk-chip-edge: #4a4a4a;
+  --tk-evo-gap: clamp(30px, 3.6vw, 48px);
+}
+/* English and German headings in Press Start 2P like itch.io; Korean, Japanese and Chinese keep the game's pixel fonts */
+html:lang(en), html:lang(de) { --tk-pixel: "Press Start 2P", "Galmuri11", "PixelMplus12", -apple-system, sans-serif; }
+body.tk-page { font-size: 17px; }
+
+.tk-kicker { margin: 0 0 14px; color: var(--tk-duck); font-family: var(--tk-8bit); font-size: 12px; font-weight: 400; letter-spacing: .08em; line-height: 1.6; text-transform: uppercase; }
+.tk-section { padding: clamp(56px, 7vw, 92px) 0; }
+.tk-h2 { font-size: clamp(26px, 3.4vw, 36px); }
+html:lang(en) .tk-h2, html:lang(de) .tk-h2 { font-size: clamp(17px, 2.3vw, 26px); font-weight: 400; line-height: 1.6; }
+.tk-h2 small { font-weight: 400; }
+.tk-h3 { margin: clamp(30px, 4vw, 44px) 0 16px; color: var(--tk-cream); font-family: var(--tk-pixel); font-size: 20px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
+html:lang(en) .tk-h3, html:lang(de) .tk-h3 { font-size: 13px; font-weight: 400; line-height: 1.7; }
+
+/* hero type */
+html:lang(en) .tk-title-main, html:lang(de) .tk-title-main { font-size: clamp(24px, 3.6vw, 40px); font-weight: 400; line-height: 1.4; }
+html:lang(ja) .tk-title-main, html:lang(zh-Hant) .tk-title-main { font-family: var(--tk-8bit); font-size: clamp(24px, 3.6vw, 40px); font-weight: 400; line-height: 1.4; }
+.tk-title-alt:lang(en) { font-family: var(--tk-8bit); font-size: 12px; font-weight: 400; letter-spacing: .06em; }
+html:lang(en) .tk-pitch, html:lang(de) .tk-pitch { font-size: clamp(13px, 1.5vw, 16px); font-weight: 400; line-height: 1.8; }
+.tk-lede { font-size: clamp(1.02rem, 1.3vw, 1.12rem); }
+
+/* itch.io chips under the lede */
+.tk-chips { display: flex; flex-wrap: wrap; gap: 8px; max-width: 36rem; margin: 18px 0 0; padding: 0; list-style: none; }
+.tk-chips li, .tk-tag {
+  display: inline-flex; align-items: center; box-sizing: border-box; border: 2px solid var(--tk-chip-edge); border-radius: 999px;
+  color: var(--tk-cream); background: var(--tk-chip); font-family: var(--tk-8bit); font-weight: 400; letter-spacing: .04em; white-space: nowrap;
+}
+.tk-chips li { min-height: 30px; padding: 0 12px; font-size: 10px; line-height: 1.3; }
+.tk-chips li.is-gold { border-color: var(--tk-duck); color: var(--tk-duck); }
+.tk-tag { margin: 0; padding: 4px 9px; font-size: 10px; line-height: 1.4; justify-self: start; }
+.tk-tag.is-full { border-color: var(--tk-duck); color: #141414; background: var(--tk-duck); }
+.tk-tag.is-soon { border-color: var(--tk-ok); color: var(--tk-ok); background: #141414; }
+html:lang(ko) .tk-chips li, html:lang(ko) .tk-tag, html:lang(ja) .tk-chips li, html:lang(ja) .tk-tag,
+html:lang(zh-Hant) .tk-chips li, html:lang(zh-Hant) .tk-tag { font-size: 12px; }
+
+/* download block: DEMO ON PC, the yellow itch.io keycap, Steam 2027 */
+.tk-dl { max-width: 36rem; border-color: rgba(255, 210, 63, .55); }
+html:lang(en) .tk-dl h2, html:lang(de) .tk-dl h2 { font-size: clamp(17px, 2.2vw, 22px); font-weight: 400; line-height: 1.5; }
+.tk-dl-pc { display: grid; justify-items: start; gap: 10px; }
+.tk-dl-label { margin: 0; color: var(--tk-duck); font-family: var(--tk-8bit); font-size: 11px; letter-spacing: .12em; line-height: 1.5; }
+.tk-dl-pc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
+.tk-page a.tk-dl-itch {
+  --btn: var(--tk-key-gold); --btn-side: var(--tk-key-side); --btn-ink: #141414; --depth: 6px;
+  position: relative; display: inline-flex; min-height: 54px; margin: 0 0 var(--depth); border-radius: 14px;
+  color: var(--btn-ink); font-size: 1rem; font-weight: 800; text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+.tk-dl-itch .tk-key-face { padding: 0 24px; }
+.tk-dl-itch:hover .tk-key-face { filter: brightness(1.05); }
+.tk-dl-itch:active .tk-key-face { transform: translateY(5px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 var(--btn-side), 0 2px 4px rgba(0, 0, 0, .25); }
+.tk-page .tk-steam-soon { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 8px 12px; border: 1px dashed rgba(236, 230, 214, .32); border-radius: 10px; color: rgba(236, 230, 214, .72); font-size: .86rem; font-weight: 700; white-space: nowrap; }
+.tk-steam-name { padding: 2px 8px; border-radius: 6px; color: #fff; background: #1b2838; font-weight: 800; }
+.tk-dl-note { margin: 0; color: var(--tk-text-3); font-size: .84rem; line-height: 1.55; }
+.tk-dl .hd-share-row { margin-top: 18px; }
+
+/* trailer chips */
+.tk-trailer { padding: 22px 0; background: #1a1a1a; box-shadow: inset 0 1px 0 var(--tk-edge), inset 0 -1px 0 var(--tk-edge); }
+.tk-trailer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
+.tk-trailer-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0; color: var(--tk-text-2); font-size: .95rem; font-weight: 700; line-height: 1.5; }
+.tk-trailer-title .tk-kicker { margin: 0; }
+.tk-trailer-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tk-page a.tk-trailer-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; box-sizing: border-box;
+  border: 2px solid var(--tk-chip-edge); border-radius: 999px; color: var(--tk-cream); background: var(--tk-chip);
+  font-size: .9rem; font-weight: 700; text-decoration: none; transition: border-color 160ms var(--tk-ease), transform 160ms var(--tk-ease);
+}
+.tk-page a.tk-trailer-chip:hover, .tk-page a.tk-trailer-chip:focus-visible { border-color: var(--tk-cream); transform: translateY(-2px); }
+.tk-page a.tk-trailer-chip.is-mine { border-color: var(--tk-duck); color: var(--tk-duck); }
+.tk-yt { position: relative; flex: none; width: 22px; height: 15px; border-radius: 4px; background: #ff0033; }
+.tk-yt::after { position: absolute; top: 3.5px; left: 8px; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 7px solid #fff; content: ""; }
+
+/* how to play: four steps on the store screenshots, numbered keycaps */
+.tk-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); margin: 0; padding: 0; list-style: none; }
+.tk-step { display: grid; align-content: start; gap: 8px; min-width: 0; }
+.tk-step figure { position: relative; margin: 0 0 6px; }
+.tk-step img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px var(--tk-edge), 0 18px 40px rgba(0, 0, 0, .4); }
+.tk-step-num {
+  position: absolute; top: -10px; left: -8px; display: grid; width: 40px; height: 40px; place-items: center; border-radius: 9px;
+  color: #141414; background: linear-gradient(180deg, #fffaf0, #ece6d6); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12), 0 4px 0 #a39d8d, 0 8px 14px rgba(0, 0, 0, .4);
+  font-family: var(--tk-8bit); font-size: 16px; line-height: 1;
+}
+.tk-step h3 { margin: 0; color: var(--tk-duck); font-family: var(--tk-pixel); font-size: 18px; font-weight: 700; line-height: 1.4; word-break: keep-all; }
+html:lang(en) .tk-step h3, html:lang(de) .tk-step h3 { font-size: 12px; font-weight: 400; line-height: 1.7; }
+.tk-step p { margin: 0; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; }
+
+/* survive & evolve */
+.tk-threats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2vw, 22px); }
+.tk-threat, .tk-update { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); align-items: center; overflow: hidden; border: 1px solid var(--tk-edge); border-radius: 16px; background: var(--tk-night-2); }
+.tk-threat img { display: block; width: 100%; height: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.tk-update img { display: block; width: 100%; height: 100%; aspect-ratio: 6 / 5; object-fit: cover; }
+.tk-threat > div, .tk-update > div { display: grid; justify-items: start; gap: 8px; min-width: 0; padding: 18px 22px; }
+.tk-threat h4, .tk-evo-step h4, .tk-update h4 { margin: 0; color: #fff; font-family: var(--tk-pixel); font-size: 20px; font-weight: 700; line-height: 1.35; word-break: keep-all; }
+html:lang(en) .tk-threat h4, html:lang(en) .tk-evo-step h4, html:lang(en) .tk-update h4,
+html:lang(de) .tk-threat h4, html:lang(de) .tk-evo-step h4, html:lang(de) .tk-update h4 { font-size: 14px; font-weight: 400; line-height: 1.6; }
+.tk-threat p:not(.tk-tag), .tk-evo-step p:not(.tk-tag), .tk-update p:not(.tk-tag) { margin: 0; color: var(--tk-text-2); font-size: .95rem; line-height: 1.6; word-break: keep-all; text-wrap: pretty; }
+.tk-evo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--tk-evo-gap); margin: 0; padding: 0; list-style: none; }
+.tk-evo-step { position: relative; display: grid; align-content: start; justify-items: start; gap: 8px; min-width: 0; container-type: inline-size; }
+.tk-evo-step img { display: block; width: 100%; height: auto; aspect-ratio: 6 / 5; margin-bottom: 4px; border-radius: 14px; object-fit: cover; box-shadow: 0 0 0 1px var(--tk-edge), 0 18px 40px rgba(0, 0, 0, .4); }
+.tk-evo-step + .tk-evo-step::before {
+  position: absolute; top: 30%; top: calc(100cqw * 5 / 12); left: calc(var(--tk-evo-gap) / -2); z-index: 1; color: var(--tk-duck);
+  content: "\25B6"; font-family: var(--tk-8bit); font-size: 18px; line-height: 1; text-shadow: 0 2px 0 #a9820f; transform: translate(-50%, -50%);
+}
+.tk-evo-note { margin: 26px 0 0; padding: 14px 18px; border-left: 4px solid var(--tk-duck); border-radius: 4px; color: var(--tk-text); background: rgba(255, 210, 63, .06); font-weight: 700; line-height: 1.6; word-break: keep-all; }
+
+/* the full game: demo vs full game, coming in updates */
+.tk-full-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; gap: clamp(24px, 4vw, 48px); }
+.tk-compare { width: 100%; table-layout: fixed; border: 2px solid #3a3a3a; border-collapse: separate; border-spacing: 0; border-radius: 14px; overflow: hidden; background: #232323; font-size: .95rem; }
+.tk-compare thead th, .tk-compare thead td { padding: 14px 8px; background: #2a2a2a; }
+.tk-compare thead td { width: 40%; }
+.tk-compare thead th { color: var(--tk-cream); font-family: var(--tk-8bit); font-size: 11px; font-weight: 400; letter-spacing: .04em; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+.tk-compare thead th.is-full { color: #141414; background: var(--tk-duck); }
+.tk-compare tbody th { padding: 12px 14px; color: var(--tk-cream); font-weight: 700; line-height: 1.35; text-align: left; overflow-wrap: anywhere; word-break: keep-all; }
+.tk-compare tbody th small { display: block; color: var(--tk-text-3); font-size: .8rem; font-weight: 400; }
+.tk-compare td { padding: 12px 8px; color: var(--tk-cream); line-height: 1.35; text-align: center; overflow-wrap: anywhere; word-break: keep-all; }
+.tk-compare td small { display: block; margin-top: 3px; color: var(--tk-text-3); font-size: .78rem; }
+.tk-compare tbody tr + tr > * { border-top: 1px solid #343434; }
+.tk-compare td.is-full { background: rgba(255, 210, 63, .07); }
+.tk-yes::before { display: inline-block; width: 7px; height: 13px; border-right: 3px solid var(--tk-ok); border-bottom: 3px solid var(--tk-ok); content: ""; transform: rotate(40deg) translate(-1px, -2px); }
+.tk-no::before { display: inline-block; width: 12px; height: 3px; border-radius: 2px; content: ""; background: #5a5a5a; vertical-align: middle; }
+.tk-soon { color: var(--tk-ok); font-size: .88rem; font-weight: 700; }
+.tk-updates { display: grid; gap: 14px; }
+.tk-updates .tk-h3 { margin-top: 0; }
+
+/* facts, controls, final */
+.tk-sheet dt, .tk-controls dt { color: var(--tk-duck); font-family: var(--tk-8bit); font-size: 10px; font-weight: 400; letter-spacing: .06em; line-height: 1.6; }
+html:lang(ko) .tk-sheet dt, html:lang(ko) .tk-controls dt, html:lang(ja) .tk-sheet dt, html:lang(ja) .tk-controls dt,
+html:lang(zh-Hant) .tk-sheet dt, html:lang(zh-Hant) .tk-controls dt { font-size: 13px; }
+.tk-sheet dd .tk-state { display: inline; margin: 0; color: inherit; font-size: inherit; font-weight: inherit; }
+.tk-final-links { gap: 14px 16px; }
+.tk-page a.tk-pill { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; padding: 0 16px; box-sizing: border-box; border: 1px solid var(--tk-edge-2); border-radius: 999px; color: var(--tk-text-2); background: rgba(29, 29, 29, .9); font-size: .9rem; font-weight: 700; text-decoration: none; }
+.tk-page a.tk-pill:hover, .tk-page a.tk-pill:focus-visible { border-color: rgba(236, 230, 214, .5); color: #fff; }
+.tk-pill-ico { width: 20px; height: 20px; flex: none; }
+
+/* /10key/get/ in English and German: Press Start 2P runs wide, so the title is smaller */
+html:lang(en) .tk-get-head .tk-get-title, html:lang(de) .tk-get-head .tk-get-title { font-size: clamp(1.05rem, 2.8vw, 1.6rem); font-weight: 400; line-height: 1.6; }
+
+@media (max-width: 960px) {
+  .tk-full-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .tk-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 30px; }
+  .tk-threats { grid-template-columns: minmax(0, 1fr); }
+  .tk-evo { grid-template-columns: minmax(0, 1fr); }
+  .tk-evo-step { grid-template-columns: minmax(0, 44%) minmax(0, 1fr); align-items: center; column-gap: 16px; row-gap: 6px; container-type: normal; }
+  .tk-evo-step img { grid-row: 1 / span 3; margin: 0; }
+  .tk-evo-step + .tk-evo-step::before { top: calc(var(--tk-evo-gap) / -2); left: 22%; content: "\25BC"; }
+}
+@media (max-width: 520px) {
+  body.tk-page { font-size: 16px; }
+  .tk-threat, .tk-update { grid-template-columns: minmax(0, 38%) minmax(0, 1fr); }
+  .tk-threat > div, .tk-update > div { padding: 14px 14px; }
+  .tk-threat h4, .tk-evo-step h4, .tk-update h4 { font-size: 17px; }
+  .tk-compare { font-size: .86rem; }
+  .tk-compare thead th { font-size: 9px; }
+  .tk-compare tbody th { padding: 10px 10px; }
+  .tk-trailer-inner { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tk-page a.tk-trailer-chip:hover { transform: none; }
+}
+/* labels in English (kickers, DEMO ON PC, step numbers, the Latin title) stay Press Start 2P on every page; Hangul and
+   kana chips and tags use the game's pixel fonts first (Press Start 2P's wide space split "무료 데모") */
+:root { --tk-press: "Press Start 2P", "Galmuri11", "PixelMplus12", monospace; }
+html:lang(ko), html:lang(ja), html:lang(zh-Hant) { --tk-8bit: "Galmuri11", "PixelMplus12", "Press Start 2P", monospace; }
+.tk-kicker, .tk-dl-label, .tk-step-num, .tk-title-alt:lang(en) { font-family: var(--tk-press); }
+html:lang(ja) .tk-title-main, html:lang(zh-Hant) .tk-title-main { font-family: var(--tk-press); }
+.tk-evo-step + .tk-evo-step::before { font-family: inherit; font-size: 24px; }
+#odds-info { padding: clamp(40px, 5vw, 64px) 0; }
+html:lang(ko) .tk-chips li, html:lang(ko) .tk-tag, html:lang(ko) .tk-sheet dt, html:lang(ko) .tk-controls dt, html:lang(ko) .tk-compare thead th { letter-spacing: 0; word-spacing: -.15em; }
+@media (max-width: 520px) {
+  .tk-update { grid-template-columns: minmax(0, 1fr); }
+  .tk-update img { height: auto; }
+}
+/* tenkey-launch.css loads after this file and makes .tk-dl-pc a flex row; the PC block stacks its rows */
+.tk-dl .tk-dl-pc { display: grid; justify-items: start; gap: 10px; }

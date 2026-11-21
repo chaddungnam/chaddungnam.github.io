@@ -67,3 +67,10 @@ html.tk-get-sale .tk-get-price-regular { color: var(--tk-text-3); font-size: cla
 }
 :lang(ja) .tk-get-head .tk-get-title, :lang(ja) .tk-get-box h2, :lang(ja) .tk-get-head p, :lang(ja) .tk-get-pc-note,
 :lang(zh-Hant) .tk-get-head .tk-get-title, :lang(zh-Hant) .tk-get-head p { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
+
+/* Owner 2026-11-21: the address, then the share keys of the 10key page (gold share that moves, cream copy, KakaoTalk on
+   Korean); the duck on "About the game" (a House Duck page); the language switcher in the header. */
+.tk-get-copy { display: grid; gap: 12px; align-items: stretch; }
+.tk-get-copy .hd-share-row { margin: 0; }
+.tk-get-more-duck { width: 22px; height: 22px; flex: none; }
+.tk-small ~ .tk-get .tk-get-copy code, .tk-get-copy code { white-space: normal; overflow-wrap: anywhere; }

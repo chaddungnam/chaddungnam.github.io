@@ -46,3 +46,40 @@
   .hd-share-row { margin-top: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .hd-share[open] { animation: none; } .hd-share-key:active { transform: none; } }
+
+/* Keycap share keys (owner 2026-11-21): the same three keys on the 10key pages, the home's 10key section and /10key/get/.
+   Share = a gold keycap that nudges and shines now and then to invite a tap; copy = the cream keycap of /10key/get/;
+   KakaoTalk = Kakao's own yellow with its share symbol (assets/media/share/kakaotalk-share.png, unmodified). */
+.hd-share-row .hd-share-key {
+  --k: #ece6d6; --k-side: #a39d8d; --k-ink: #141414;
+  position: relative; min-height: 48px; margin: 0 0 5px; padding: 0 20px; overflow: hidden;
+  border: 0; border-radius: 12px; color: var(--k-ink);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .06) 40%, rgba(0, 0, 0, .04)), var(--k);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 5px 0 var(--k-side), 0 7px 8px rgba(0, 0, 0, .28);
+  transition: transform 110ms ease-out, box-shadow 110ms ease-out, filter 160ms ease-out;
+}
+.hd-share-row .hd-share-key:hover, .hd-share-row .hd-share-key:focus-visible {
+  border: 0; filter: brightness(1.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .06) 40%, rgba(0, 0, 0, .04)), var(--k);
+}
+.hd-share-row .hd-share-key:active { transform: translateY(4px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 var(--k-side), 0 2px 4px rgba(0, 0, 0, .25); }
+.hd-share-row .hd-share-key[data-state="copied"] { --k: #7ee2a8; --k-side: #3f9a69; border: 0; }
+.hd-share-row [data-share-open] { --k: #ffd23f; --k-side: #a9820f; animation: hd-share-nudge 4s ease-in-out 1.2s infinite; }
+.hd-share-row [data-share-open]:hover, .hd-share-row [data-share-open]:active, .hd-share-row [data-share-open]:focus-visible { animation: none; }
+.hd-share-row [data-share-open]::after {
+  position: absolute; inset: 0; content: ""; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .6) 50%, transparent 70%);
+  transform: translateX(-130%); animation: hd-share-shine 4s ease-in-out 1.2s infinite;
+}
+.hd-share-ico-svg { flex: none; width: 18px; height: 18px; fill: currentColor; animation: hd-share-pop 4s ease-in-out 1.2s infinite; }
+.hd-share-row .is-kakao { --k: #fee500; --k-side: #b8a300; --k-ink: rgba(0, 0, 0, .85); }
+.hd-share-kakao-ico { flex: none; width: 24px; height: 24px; border-radius: 6px; }
+.hd-share-item .hd-share-kakao-ico { margin-right: 8px; }
+@keyframes hd-share-nudge { 0%, 72%, 100% { transform: none; } 77% { transform: translateY(-4px) rotate(-2deg); } 83% { transform: translateY(0) rotate(1.5deg); } 89% { transform: translateY(-2px); } 94% { transform: none; } }
+@keyframes hd-share-shine { 0%, 66% { transform: translateX(-130%); } 90%, 100% { transform: translateX(130%); } }
+@keyframes hd-share-pop { 0%, 72%, 100% { transform: none; } 79% { transform: scale(1.3) rotate(-14deg); } 86% { transform: scale(.95); } }
+@media (prefers-reduced-motion: reduce) {
+  .hd-share-row [data-share-open], .hd-share-ico-svg { animation: none; }
+  .hd-share-row [data-share-open]::after { display: none; }
+  .hd-share-row .hd-share-key:active { transform: none; }
+}

@@ -20,6 +20,15 @@
     lang = nav === "ko" || nav === "de" || nav === "ja" ? nav : /^zh-(tw|hk|mo|hant)/.test(navFull) ? "zh" : "en";
   }
   document.documentElement.lang = lang === "zh" ? "zh-Hant" : lang;
+  // Language switcher in the header (/10key/get/, owner 2026-11-21): the same page in another language; ?src and the other
+  // parameters stay, so a shared or ad link keeps counting where the visit came from.
+  document.querySelectorAll("[data-lang-link]").forEach(function (a) {
+    var code = a.getAttribute("data-lang-link");
+    var q = new URLSearchParams(location.search);
+    q.set("lang", code);
+    a.setAttribute("href", location.pathname + "?" + q.toString());
+    if (code === lang) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
   var ui = lang === "ko" ? "ko" : "en";
   document.querySelectorAll("[data-ko]").forEach(function (node) {
     node.textContent = node.getAttribute("data-" + lang) || node.getAttribute("data-" + ui);
