@@ -121,6 +121,9 @@ async function main() {
   await Promise.resolve(); await Promise.resolve();
   assert.equal(denied.nodes['[data-mail-draft]'].selected, true);
   assert.match(denied.nodes['[data-mail-status]'].textContent, /kopiere/);
+  // TK-529: tests/site-refinement.spec.js (browser QA, CI only) pins the same legal dates; a date bump must change both, caught here before the push.
+  const dateTable = (file, slash) => [...read(file).matchAll(new RegExp(`\\[\`${slash}([^\`]+)\`, *'(\\d{4}-\\d\\d-\\d\\d)'\\]`, 'g'))].map(m => `${m[1]} ${m[2]}`);
+  assert.deepEqual(dateTable('tests/site-refinement.spec.js', '\\/'), dateTable('scripts/test_site_refinement.js', ''), 'browser spec legal dates match this test');
   console.log('PASS: live community markup contract, 16 document dates, legacy anchors, 4 languages, safe previews, mailto encoding, long-message and denied-clipboard fallbacks.');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
