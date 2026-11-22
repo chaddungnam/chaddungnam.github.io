@@ -144,7 +144,7 @@ test("10KEY has its own en/ko Terms in the Quirky Ball structure", () => {
   const required = {
     en: [/guest account only for the online rankings/, /no cash or real-world value and cannot be sold or exchanged for money/, /legitimate refund request/,
       /may show ads \(for example GamePix\)/, /remove or refuse records and exclude the player from the rankings/, /Section 327r/,
-      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /These measures do not stop you from playing the game/,
+      /laws of Germany/, /remaining provisions remain in effect/, /remains playable without them/, /these measures do not stop you from playing the game/i,
       /creates a House Duck guest account for you, without an email address or password/, /Players under 14 play without an account/,
       /Google Play Billing on Android and the App Store on iOS/, /Restore purchases/, /Gems are consumable/,
       /cannot be transferred to another account or player/, /the gems from that purchase are taken back from your gem balance/, /The Android and iOS apps show no ads/,
@@ -489,5 +489,43 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
     const html = read(`10key/terms/${locale}.html`);
     for (const w of list) assert.ok(html.includes(w), `${locale} terms: ${w}`);
     assert.doesNotMatch(text(html.slice(0, html.indexOf('<h2 id="section-16">'))), /Weekly boards|주간 순위표/, `${locale} terms: no weekly board any more (only the revision history may name it)`);
+  }
+});
+
+// Owner 2026-11-22: a highlighted warning at the start of terms section 8 (copying / imitating House Duck games, signs of
+// reverse engineering -> legal action and public reference), a red bold sentence on sanctions for signs of illegal copies, data or
+// currency manipulation, cheating tools or automation (with the "to the extent permitted by applicable law" savings phrase), and
+// ranking eligibility: a minimum game version, currency / data anomalies held for a human review, the input-rhythm summary
+// (counts only) tagging likely automation for review; privacy section 13 describes the summary, the review notes and their retention.
+test("terms carry the 11-22 copy warning, the red sanction sentence and the ranking eligibility rules", () => {
+  const want = {
+    en: [/closely imitates 10key Survival or another House Duck game/, /signs of reverse engineering, may lead to legal action/,
+      /identify, reference and compare such a product publicly/, /waive any objection to it, to the extent permitted by applicable law/,
+      /minimum version that the Operator sets/, /already started before the minimum was raised still counts/,
+      /held from the boards until a person has reviewed it/, /no information about which keys were pressed, no text and no touch paths/,
+      /a tag alone never removes a record or a player from the boards/],
+    ko: [/House Duck 게임을 베끼거나 매우 비슷하게 흉내 낸/, /리버스 엔지니어링의 정황이 보이는 제품/, /공개적으로 지목하고 언급하며 비교할 수 있습니다/,
+      /관련 법률이 허용하는 범위에서 이에 대해 어떠한 이의도 제기하지 않습니다/, /최소 버전\(빌드\) 이상의 게임으로 플레이한 판만/,
+      /이미 시작한 판은 그대로 반영됩니다/, /사람이 검토할 때까지 순위표에서 보류됩니다/, /어떤 키를 눌렀는지, 입력한 글자, 터치 경로는 담기지 않습니다/,
+      /표시만으로 기록이나 플레이어가 순위표에서 빠지지는 않습니다/],
+  };
+  for (const locale of locales) {
+    const html = read(`10key/terms/${locale}.html`);
+    const s8 = html.slice(html.indexOf('<h2 id="section-8">'), html.indexOf('<h2 id="section-9">'));
+    assert.match(s8, /<div class="legal-warning"[^>]*>[\s\S]*<p class="legal-red">[\s\S]*?<\/div>/, `${locale} terms: warning block with the red sentence in section 8`);
+    assert.ok(s8.indexOf("legal-warning") < s8.indexOf("<ul>"), `${locale} terms: the warning comes before the list of prohibited conduct`);
+    for (const fact of want[locale]) assert.match(text(html), fact, `${locale} terms: ${fact}`);
+  }
+  const css = read("assets/legal-site.css");
+  assert.match(css, /\.legal-red\s*\{[^}]*color:\s*#c62828[^}]*font-weight:\s*700/, "legal CSS: red bold class");
+  const privacy = {
+    en: [/Input-rhythm summary \(newer versions\)/, /Review notes/, /including their input-rhythm summary/, /at most until the account is deleted or its data is removed for inactivity/],
+    ko: [/입력 리듬 요약\(새 버전\)/, /검토 메모/, /입력 리듬 요약 포함/, /길어도 계정이 삭제되거나 미접속으로 계정의 데이터가 정리될 때까지/],
+    de: [/Eingaberhythmus-Zusammenfassung \(neuere Versionen\)/, /Prüfvermerke/, /einschließlich ihrer Eingaberhythmus-Zusammenfassung/, /höchstens bis das Konto gelöscht wird oder seine Daten wegen Inaktivität entfernt werden/],
+  };
+  for (const [locale, facts] of Object.entries(privacy)) {
+    const html = read(`privacy/${locale}.html`);
+    const s13 = text(html.slice(html.indexOf('<h2 id="section-13">'), html.indexOf('<h2 id="section-14">')));
+    for (const fact of facts) assert.match(s13, fact, `privacy ${locale} section 13: ${fact}`);
   }
 });

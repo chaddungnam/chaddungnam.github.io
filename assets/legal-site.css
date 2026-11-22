@@ -872,3 +872,11 @@ body > .legal-hero { display: block; padding: 0; }
 .legal-fold-body > :first-child { margin-top: 0; }
 .legal-history > summary { font-size: .9rem; color: var(--legal-muted); }
 @media print { .legal-fold > summary::before { display: none; } }
+
+/* Warnings in the terms (owner 2026-11-22: copying House Duck games, illegal copies and cheating, in red bold) */
+.legal-warning { margin: 0 0 22px; padding: 16px 20px; background: #fdf2f1; border: 1px solid rgba(198, 40, 40, .28); border-left: 4px solid #c62828; border-radius: 10px; }
+.legal-warning-title { margin: 0 0 8px; font-weight: 800; color: #c62828; }
+.legal-warning p { margin: 8px 0; }
+.legal-warning p:last-child { margin-bottom: 0; }
+.legal-red { color: #c62828; font-weight: 700; }
+@media print { .legal-warning { background: #fff; } }
