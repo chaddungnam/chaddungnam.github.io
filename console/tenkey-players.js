@@ -12,7 +12,25 @@
   const AUTO_MS = 20000;
   let autoTimer = 0;
 
-  const FLAG_NAMES = { banned: "정지 상태" };  // only a manual ban holds a run back (2026-10-24)
+  // Why a stored run is not ranked: the owner's ban, or the rank guard (owner 2026-11-22, migration 20261122170000_tenkey_rank_guard):
+  // an app build under the store minimum (runs started before the minimum went up still rank), a [버그유저] scrap mark, an
+  // impossible gem grant. The last two hold until 랭킹 허용 / 정지 풀기. Macro = a tag only, never a hold.
+  const FLAG_NAMES = { banned: "정지 상태", old_build: "구버전 앱 (최소 빌드 미만)", bug_user: "부품 이상 · 랭킹 보류", gem: "젬 이상 · 랭킹 보류" };
+  const TAG_NAMES = {
+    macro: ["매크로 의심", "누르는 간격이나 터치 자리가 기계처럼 똑같은 판이 있음 (표시만, 랭킹은 그대로)"],
+    gem: ["젬 이상", "앱이 줄 수 없는 젬 지급이 있음 (랭킹 허용 전까지 새 기록이 랭킹에 안 오름)"],
+  };
+  const tagBadges = (tags) => [...new Set(tags || [])].map((k) => (TAG_NAMES[k] ? ` <span class="tk-badge" data-tone="risk" title="${esc(TAG_NAMES[k][1])}">${esc(TAG_NAMES[k][0])}</span>` : "")).join("");
+  const HOLD_WHY = { bug_user: "[버그유저] 부품 기록 때문에", gem: "젬 이상 기록 때문에" };
+  const pct = (permille) => `${Math.round(Number(permille || 0) / 10)}%`;
+  const suspectWhy = (s) => {
+    const x = s.detail || {};
+    if (s.kind === "macro") return [x.n ? `누름 ${num(x.n)}번 중 간격이 똑같은 비율 ${pct(x.gap)}` : "", x.nt ? `터치 ${num(x.nt)}번 중 같은 자리 비율 ${pct(x.spot)}` : "",
+      `점수 ${num(x.score)} · Lv ${x.level ?? "—"}`].filter(Boolean).join(" · ");
+    if (x.why === "one_grant") return `앱 보고 한 번에 젬 ${num(x.amount)}개 (${x.reason || "이유 없음"}, 정상 최대 80개)`;
+    if (x.why === "day_sum") return `24시간 동안 앱 보고 젬 ${num(x.sum_24h)}개 (기준 1,000개)`;
+    return "—";
+  };
   const flagName = (flag) => (flag ? FLAG_NAMES[flag] || flag : "정상");
   const ageName = (band) => (band ? `${band}세 이상` : "미확인");
   // Three plain states (owner 2026-11-12: "미지원스펙인건지 혹은 미등록한건지"): the band given / this build asks and nothing is stored /
@@ -39,7 +57,7 @@
   function rowMarkup(row) {
     const name = row.name || row.nickname || "(이름 없음)";
     return `<tr${row.banned ? ' class="is-dim"' : ""}>
-      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a>${row.bug_user ? ' <span class="tk-badge" data-tone="risk" title="하루 부품 상한에 닿았는데 그날 플레이 시간과 맞지 않음 (표시만, 제재 아님)">[버그유저]</span>' : ""}${T.watch.tagsFor(row.id, row)}<span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
+      <td data-label="플레이어"><a class="player-identity-link" href="#/tenkey-players/${esc(row.id)}"><span class="player-identity-name">${esc(name)}</span></a>${row.bug_user ? ' <span class="tk-badge" data-tone="risk" title="하루 부품 상한에 닿았는데 그날 플레이 시간과 맞지 않음 (표시만, 제재 아님)">[버그유저]</span>' : ""}${tagBadges(row.tags)}${T.watch.tagsFor(row.id, row)}<span class="tk-sub">${esc(String(row.id).slice(0, 8))} · ${esc(row.provider === "crazygames" ? "CrazyGames 로그인" : "게스트 계정")}</span></td>
       <td data-label="플랫폼">${platformCell(row)}</td>
       <td data-label="스토어 국가">${esc(countryName(row.store_country))}</td>
       <td data-label="가입">${esc(time(row.created_at))}</td>
@@ -199,7 +217,7 @@
     const ledger = ((d.wallet || {}).ledger || []).map((g) => `<tr><td>${esc(time(g.at))}</td><td>${esc(g.kind === "grant" ? "받음" : "씀")}</td><td class="tk-num">${esc(num(g.amount))}</td><td>${esc(g.reason || "—")}</td><td>${esc(g.source === "server" ? "서버(구매)" : "앱 보고")}</td></tr>`);
     const ids = (d.identities || []).map((i) => `<tr><td>${esc(i.provider === "crazygames" ? "CrazyGames" : "게스트 로그인")}</td><td><code>${esc(i.subject)}</code></td><td><code>${esc(i.login || "—")}</code></td><td>${esc(time(i.created_at))}</td></tr>`);
     return `<section class="panel">
-      <div class="player-detail-head"><div><p class="eyebrow">PLAYER</p><h2>${esc(p.name || "(이름 없음)")} <span class="tk-badge" data-tone="${p.banned ? "risk" : "good"}">${p.banned ? "정지" : "정상"}</span>${p.bug_user ? ' <span class="tk-badge" data-tone="risk">[버그유저]</span>' : ""}${T.watch.tagsFor(p.id, { god_mode: d.god_mode ?? p.god_mode })}</h2><code>${esc(p.id)}</code></div></div>
+      <div class="player-detail-head"><div><p class="eyebrow">PLAYER</p><h2>${esc(p.name || "(이름 없음)")} <span class="tk-badge" data-tone="${p.banned ? "risk" : "good"}">${p.banned ? "정지" : "정상"}</span>${p.bug_user ? ' <span class="tk-badge" data-tone="risk">[버그유저]</span>' : ""}${tagBadges((d.suspects || []).filter((s) => !s.released).map((s) => s.kind))}${T.watch.tagsFor(p.id, { god_mode: d.god_mode ?? p.god_mode })}</h2><code>${esc(p.id)}</code></div></div>
       ${(p.cap_hits || []).length ? `<div class="tk-section"><h3>하루 부품 상한 도달</h3><p class="tk-sub">24시간 판 부품이 상한(정상 플레이로는 거의 못 닿는 값)에 닿은 날입니다. 정상 최고 속도(초당 733)보다 빠르거나 24시간 중 16시간 넘게 플레이한 것으로 나오면 [버그유저]로 표시합니다. 표시만 하며 제재는 하지 않습니다.</p>${table(["날짜", "24시간 부품", "판 수", "플레이 시간", "판정"], p.cap_hits.map((h) => `<tr><td>${esc(h.day)}</td><td class="tk-num">${esc(num(h.scrap))}</td><td class="tk-num">${esc(num(h.runs))}</td><td>${esc(`${num(h.play_min)}분`)}</td><td><span class="tk-badge" data-tone="${h.odd ? "risk" : "quiet"}">${h.odd ? "말이 안 됨" : "가능"}</span></td></tr>`))}</div>` : ""}
       ${facts([
         ["가입", time(p.created_at)], ["마지막 접속", time(p.last_seen_at)],
@@ -236,14 +254,31 @@
         <p id="tenkeyRenameMessage" class="dashboard-message" role="status" aria-live="polite"></p>
         <div class="tk-actions"><button class="warning-button" type="submit">닉네임 바꾸기</button></div>
       </form>` : ""}
+      ${guardMarkup(d, p)}
       <form id="tenkeyBanForm" class="admin-form tk-section impact-form impact-form-critical">
         <p class="eyebrow">RANKING MODERATION</p>
-        <p class="impact-note">${p.banned ? "정지를 풀면 이 플레이어의 기록이 다시 랭킹에 보입니다." : "정지하면 이 플레이어는 모든 랭킹 보드에서 숨고 새 기록도 순위에 오르지 않습니다. 계정과 기록은 지워지지 않고, 언제든 풀 수 있습니다. 랭킹 순위는 몇 분 안에 새로 계산됩니다."}</p>
+        <p class="impact-note">${p.banned ? "정지를 풀면 이 플레이어의 기록이 다시 랭킹에 보이고, 자동 랭킹 보류(부품 · 젬 이상)도 함께 풀립니다." : "정지하면 이 플레이어는 모든 랭킹 보드에서 숨고 새 기록도 순위에 오르지 않습니다. 계정과 기록은 지워지지 않고, 언제든 풀 수 있습니다. 랭킹 순위는 몇 분 안에 새로 계산됩니다."}</p>
         <label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 점수 조작 확인 (직접 확인 후 정지)"></label>
         <p id="tenkeyBanMessage" class="dashboard-message" role="status" aria-live="polite"></p>
         <div class="tk-actions"><button class="${p.banned ? "warning-button" : "danger-button"}" type="submit">${p.banned ? "정지 풀기" : "랭킹에서 정지"}</button></div>
       </form>
     </section>`;
+  }
+
+  // Rank guard panel: the current hold (bug_user / gem) with its release, and the marks behind it. 랭킹 허용 = players.ban
+  // banned:false, which also stamps tenkey_private.rank_pass: marks made before it stop holding and tagging.
+  function guardMarkup(d, p) {
+    const hold = p.banned ? "" : d.rank_hold || "";
+    const rows = (d.suspects || []).map((s) => `<tr${s.released ? ' class="is-dim"' : ""}><td>${esc(time(s.at))}</td><td>${esc((TAG_NAMES[s.kind] || [s.kind])[0])}</td><td>${esc(suspectWhy(s))}</td><td>${s.released ? "풀어 줌" : s.kind === "macro" ? "표시만" : "랭킹 보류"}</td></tr>`);
+    if (!hold && !rows.length) return "";
+    return `<form id="tenkeyPassForm" class="admin-form tk-section impact-form">
+        <p class="eyebrow">RANKING HOLD</p><h3>랭킹 보류 · 의심 기록</h3>
+        <p class="impact-note">${hold ? `이 플레이어의 새 기록은 ${esc(HOLD_WHY[hold] || hold)} 랭킹에 오르지 않습니다. 판은 그대로 저장되고 플레이어에게는 알리지 않습니다. 직접 확인해 문제가 없으면 랭킹 허용을 누릅니다.` : "지금 걸린 랭킹 보류는 없습니다. 매크로 의심은 표시만 하며 랭킹은 그대로입니다."}</p>
+        ${table(["시각", "종류", "내용", "처리"], rows, "의심 기록이 없습니다.")}
+        ${hold ? `<label>사유 (감사 기록용)<input name="reason" maxlength="300" required placeholder="예: 젬 지급 기록 확인, 정상 플레이"></label>
+        <p id="tenkeyPassMessage" class="dashboard-message" role="status" aria-live="polite"></p>
+        <div class="tk-actions"><button class="warning-button" type="submit">랭킹 허용</button></div>` : ""}
+      </form>`;
   }
 
   async function submitBan(event) {
@@ -254,15 +289,18 @@
     try {
       if (!form.reportValidity()) return;
       const player = state.detail.player;
-      const banned = !player.banned;
+      const pass = form.id === "tenkeyPassForm";  // 랭킹 허용: the same unban call on a player who is not banned
+      const banned = pass ? false : !player.banned;
+      const msg = pass ? "tenkeyPassMessage" : "tenkeyBanMessage";
       const reason = form.elements.reason.value.trim();
-      if (!await root.ConsoleApp.confirmChange(banned ? "랭킹에서 정지" : "정지 풀기", `${player.name || player.id}\n${banned ? "모든 랭킹 보드에서 숨깁니다 (기록은 보관)." : "랭킹에 다시 보입니다."}\n사유: ${reason}`)) return;
-      T.setMessage("tenkeyBanMessage", "처리하는 중입니다...");
+      const title = pass ? "랭킹 허용" : banned ? "랭킹에서 정지" : "정지 풀기";
+      if (!await root.ConsoleApp.confirmChange(title, `${player.name || player.id}\n${banned ? "모든 랭킹 보드에서 숨깁니다 (기록은 보관)." : "새 기록이 다시 랭킹에 오릅니다."}\n사유: ${reason}`)) return;
+      T.setMessage(msg, "처리하는 중입니다...");
       await T.call("players.ban", { player_id: player.id, banned, reason }, form);
       await loadDetail(player.id);
-      T.setMessage("tenkeyPlayerMessage", banned ? "정지했습니다." : "정지를 풀었습니다.");
+      T.setMessage("tenkeyPlayerMessage", pass ? "랭킹을 허용했습니다." : banned ? "정지했습니다." : "정지를 풀었습니다.");
     } catch (error) {
-      T.report("tenkeyBanMessage", error);
+      T.report(form.id === "tenkeyPassForm" ? "tenkeyPassMessage" : "tenkeyBanMessage", error);
     } finally {
       finish();
     }
@@ -301,6 +339,7 @@
       state.detail = { ...result.data, ...extra.data };
       byId("tenkeyPlayerDetail").innerHTML = detailMarkup(state.detail);
       byId("tenkeyBanForm").addEventListener("submit", submitBan);
+      if (byId("tenkeyPassForm")?.querySelector("button")) byId("tenkeyPassForm").addEventListener("submit", submitBan);
       byId("tenkeyRenameForm")?.addEventListener("submit", submitRename);
       if (byId("tenkeyPlayerUnlocks")) T.unlocks.bind({ player: state.detail.player, data: () => state.detail, reload: reloadKeepScroll });
       await Promise.all([loadPlayerTitles(state.detail.player), T.signals?.load(state.detail.player)]);

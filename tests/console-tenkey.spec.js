@@ -186,6 +186,28 @@ test("players: [버그유저] label only on an account whose day-cap hit does no
   expect(errors).toEqual([]);
 });
 
+test("players: rank guard marks + 랭킹 허용 releases the hold (owner 11-22)", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-players");
+  const row = page.locator("#tenkeyPlayersTable tr", { hasText: "KeyMaster" });
+  await expect(row).toContainText("젬 이상");
+  await expect(row).toContainText("매크로 의심");
+  await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "매크로 의심" })).toHaveCount(1);
+  await row.locator("a.player-identity-link").click();
+  const guard = page.locator("#tenkeyPassForm");
+  await expect(guard).toContainText("젬 이상 기록 때문에 랭킹에 오르지 않습니다");
+  await expect(guard).toContainText("한 번에 젬 500개");
+  await expect(guard).toContainText("간격이 똑같은 비율 91%");
+  await shot(page, "player_rank_hold", "#tenkeyPassForm");
+  await guard.locator("[name=reason]").fill("젬 기록 확인, 정상");
+  await guard.locator("button[type=submit]").click();
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyPassForm")).toContainText("지금 걸린 랭킹 보류는 없습니다");
+  await expect(page.locator("#tenkeyPassForm button")).toHaveCount(0);
+  await expect(page.locator("#tenkeyPassForm")).toContainText("풀어 줌");
+  expect((await calls(page, "players.ban"))[0].params).toMatchObject({ banned: false, reason: "젬 기록 확인, 정상" });
+  expect(errors).toEqual([]);
+});
+
 test("players: search, open one, ban with a reason through the confirm dialog", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players");
   await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);

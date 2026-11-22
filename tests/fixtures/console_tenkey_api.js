@@ -49,6 +49,13 @@
     };
   };
 
+  // Rank guard (owner 11-22): KeyMaster carries a gem mark (holds the ranking) and a macro tag; 랭킹 허용 (players.ban false) releases both.
+  const GUARD = { "b2222222-2222-4222-8222-222222222222": [
+    { kind: "gem", at: "2026-11-22T10:00:00+00:00", detail: { why: "one_grant", reason: "daily_set", amount: 500 } },
+    { kind: "macro", at: "2026-11-22T09:00:00+00:00", detail: { n: 640, gap: 912, nt: 0, spot: 0, score: 96100, level: 11, platform: "ios" } },
+  ] };
+  const passed = new Set();
+  const guardOf = (id) => (GUARD[id] || []).map((s) => ({ ...s, released: passed.has(id) }));
   const PLAYERS = [
     { id: "a1111111-1111-4111-8111-111111111111", name: "딸깍덕", nickname: "딸깍덕", provider: "supabase", platform: "android", created_at: "2026-10-12T09:10:00+00:00", last_seen_at: "2026-10-23T11:02:00+00:00", best_score: 184200, best_level: 14, banned: false, age_band: 18, runs_stored: 11 },
     { id: "b2222222-2222-4222-8222-222222222222", name: "KeyMaster", nickname: "KeyMaster", provider: "supabase", platform: "ios", created_at: "2026-10-15T15:44:00+00:00", last_seen_at: "2026-10-23T08:30:00+00:00", best_score: 96100, best_level: 11, banned: false, age_band: 14, runs_stored: 6 },
@@ -74,6 +81,7 @@
       ok: true,
       unlocks: { ...unlockOf(p.id).unlocks }, god_mode: unlockOf(p.id).god, hard_ready: !!p.best_level && p.best_level >= 14, best_hard_level: p.best_level >= 14 ? 3 : 0,
       ...(window.__mockNoCheckpoint ? {} : { checkpoint: { ...unlockOf(p.id).checkpoint }, checkpoint_best: { classic: p.best_level || 0, hard: p.best_level >= 14 ? 3 : 0 } }),
+      suspects: guardOf(p.id), rank_hold: !p.banned && guardOf(p.id).some((s) => s.kind === "gem" && !s.released) ? "gem" : "",
       player: { id: p.id, name: p.name, avatar_url: "", created_at: p.created_at, last_seen_at: p.last_seen_at, banned: p.banned, bug_user: !!p.bug_user, cap_hits: p.cap_hits || [] },
       identities: [{ provider: p.provider, subject: mobile ? p.id.replace(/^./, "f") : "cg-user-77", login: mobile ? p.id.replace(/^./, "f") : null, created_at: p.created_at }],
       account: mobile ? { nickname: p.nickname, age_band: p.age_band, terms_version: "2026-10-20", consented_at: p.created_at, created_at: p.created_at, renamed_at: null, rename_count: 1 } : null,
@@ -147,12 +155,12 @@
       case "players.list": {
         const q = String(p.query || "").toLowerCase();
         const rows = PLAYERS.filter((x) => (!q || x.name.toLowerCase().includes(q) || x.id.startsWith(q)) && (!p.platform || x.platform === p.platform || (p.platform === "web" && x.provider === "crazygames")));
-        return { ok: true, total: rows.length, rows: rows.map((x) => ({ ...x, god_mode: unlockOf(x.id).god })) };
+        return { ok: true, total: rows.length, rows: rows.map((x) => ({ ...x, god_mode: unlockOf(x.id).god, tags: [...new Set(guardOf(x.id).filter((g) => !g.released).map((g) => g.kind))].sort() })) };
       }
       case "players.get": return detailFor(p.player_id);
       // the player page also asks for the latest device facts and the last 10 balance runs (console 11-04, 8ddf341)
       case "players.facts": return { client_info: { platform: "android", app_version: "1.0.0", build: 2, device_model: "SM-S918N", os_version: "14", store_country: "KR", device_region: "KR", first_seen_at: "2026-10-20T10:00:00+00:00", last_seen_at: "2026-10-23T10:00:00+00:00" }, retention: { current_streak: 2, first_day: "2026-10-20", milestones: [] }, balance_runs: [] };
-      case "players.ban": { const x = PLAYERS.find((r) => r.id === p.player_id); if (x) x.banned = p.banned; audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action: action, params: p, result: { ok: true } }); return { ok: true, banned: p.banned }; }
+      case "players.ban": { const x = PLAYERS.find((r) => r.id === p.player_id); if (x) x.banned = p.banned; if (!p.banned) passed.add(p.player_id); audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action: action, params: p, result: { ok: true } }); return { ok: true, banned: p.banned }; }
       case "unlocks.set": {
         if (!UNLOCK_STEPS.includes(p.step) || !["auto", "on", "off"].includes(p.state) || !p.reason) return { ok: false, error: "invalid_request" };
         const u = unlockOf(p.player_id).unlocks, before = u[p.step] || "auto";
