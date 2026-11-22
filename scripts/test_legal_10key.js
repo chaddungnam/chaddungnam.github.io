@@ -91,7 +91,7 @@ test("the shared policy scopes sections 2 to 12 to Quirky Ball and the website",
   for (const locale of locales) {
     const html = read(`privacy/${locale}.html`);
     for (const phrase of scope[locale]) assert.ok(html.includes(phrase), `${locale}: ${phrase}`);
-    assert.match(html, /datetime="2026-11-19"/, `${locale}: last updated 2026-11-19`);
+    assert.match(html, /datetime="2026-11-22"/, `${locale}: last updated 2026-11-22`);
     assert.equal((html.match(/id="section-15"/g) || []).length, 1, `${locale}: Changes is section 15`);
   }
 });
@@ -125,7 +125,7 @@ test("the German shared policy has the same section 13 and Quirky Ball scoping",
     "Ein Gastkonto wird angelegt, wenn Quirky Ball erstmals verwendet wird.", "sind erforderlich, um Quirky Ball bereitzustellen."]) {
     assert.ok(html.includes(phrase), `de: ${phrase}`);
   }
-  assert.match(html, /datetime="2026-11-19"/, "de: last updated 2026-11-19");
+  assert.match(html, /datetime="2026-11-22"/, "de: last updated 2026-11-22");
   const ids = (file) => (read(file).match(/id="section-\d+"/g) || []).join(",");
   assert.equal(ids("privacy/de.html"), ids("privacy/en.html"), "de and en have the same section anchors");
   assert.equal((html.match(/<h3>/g) || []).length, (read("privacy/en.html").match(/<h3>/g) || []).length, "same subsections as en");
@@ -231,9 +231,9 @@ test("public pages use the store names; the old name 10KEY appears only in the d
 // 2026-10-25: section 13 lists the run record (every finished run, store apps, install ID) in every language; kept 60 days since
 // 2026-11-17 (was 90; server run_stats_retention + the tenkey_data_keep list).
 test("section 13 covers the 10key Survival run records in every language", () => {
-  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 60 days", "Desktop versions and test builds send none of them"],
-    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 60일 후 삭제됩니다", "데스크톱 버전과 테스트 빌드는 이 신호를 하나도 보내지 않습니다"],
-    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 60 Tagen gelöscht", "Desktop-Versionen und Testversionen senden keines davon"] })) {
+  for (const [locale, words] of Object.entries({ en: ["<td>Run records</td>", "at most 24 per run", "Run records: deleted after 30 days", "Desktop versions and test builds send none of them"],
+    ko: ["<td>판 기록</td>", "한 판에 최대 24장", "판 기록: 30일 후 삭제됩니다", "데스크톱 버전과 테스트 빌드는 이 신호를 하나도 보내지 않습니다"],
+    de: ["<td>Run-Protokolle</td>", "höchstens 24 pro Run", "Run-Protokolle: werden nach 30 Tagen gelöscht", "Desktop-Versionen und Testversionen senden keines davon"] })) {
     const html = fs.readFileSync(path.join(repoDir, "privacy", `${locale}.html`), "utf8");
     const s13 = html.slice(html.indexOf('id="section-13"'), html.indexOf('id="section-14"'));
     for (const w of words) assert.ok(s13.includes(w), `${locale}: ${w}`);
@@ -283,17 +283,17 @@ test("section 13 covers Nekoland, the live GamePix version, app issue reports an
     en: ["<h3>Web version on Nekoland</h3>", "On GamePix, the full game is free on the web, with ads shown by GamePix", "older Nekoland versions send House Duck nothing",
       "the GamePix version sends House Duck nothing", "Nekoland’s own platform keeps a cloud save of the game", "<td>App issue reports (Android and iOS apps, itch.io, newer versions on Nekoland)</td>",
       "added only for players with a guest account who have accepted the Terms and have not answered the age question as under 14", "App issue reports: deleted after 30 days.",
-      "<td>Run timelines and first-time steps (Android and iOS apps with a guest account, itch.io, newer versions on Nekoland)</td>", "Run timelines and first-time steps: deleted after 60 days.",
+      "<td>Run timelines and first-time steps (Android and iOS apps with a guest account, itch.io, newer versions on Nekoland)</td>", "Run timelines and first-time steps: deleted after 30 days.",
       "only the basic crash report and the app issue reports described under"],
     ko: ["<h3>Nekoland 웹 버전</h3>", "GamePix에서는 전체 게임을 웹에서 무료로 플레이할 수 있으며", "Nekoland 버전은 House Duck에 아무것도 보내지 않습니다",
       "GamePix 버전은 House Duck에 아무것도 보내지 않습니다", "Nekoland 자체 플랫폼은 게임의 클라우드 저장 데이터를 보관하고", "<td>앱 이상 보고(Android 및 iOS 앱, itch.io, 새 버전의 Nekoland)</td>",
       "연령 질문에 만 14세 미만으로 답하지 않은 플레이어에게만 설치 ID(아래 참조)를 붙이고", "앱 이상 보고: 30일 후 삭제됩니다.",
-      "<td>판 진행 기록과 첫 이용 단계(게스트 계정이 있는 Android 및 iOS 앱, itch.io, 새 버전의 Nekoland)</td>", "판 진행 기록과 첫 이용 단계: 60일 후 삭제됩니다.",
+      "<td>판 진행 기록과 첫 이용 단계(게스트 계정이 있는 Android 및 iOS 앱, itch.io, 새 버전의 Nekoland)</td>", "판 진행 기록과 첫 이용 단계: 30일 후 삭제됩니다.",
       "기본 충돌 보고서와 앱 이상 보고(\"충돌 보고서, 일일 이용 횟수와 판 기록\" 참조)만 식별자 없이 계속 보냅니다"],
     de: ["<h3>Webversion auf Nekoland</h3>", "Auf GamePix ist das vollständige Spiel im Web kostenlos", "senden ältere Nekoland-Versionen House Duck nichts",
       "sendet die GamePix-Version House Duck nichts", "Die Plattform von Nekoland selbst bewahrt einen Cloud-Spielstand", "<td>App-Störungsberichte (Android- und iOS-Apps, itch.io, neuere Versionen auf Nekoland)</td>",
       "nur bei Spielern mit Gastkonto angefügt, die die Nutzungsbedingungen akzeptiert und die Altersfrage nicht mit unter 14 beantwortet haben", "App-Störungsberichte: werden nach 30 Tagen gelöscht.",
-      "<td>Run-Verläufe und erste Schritte (Android- und iOS-Apps mit Gastkonto, itch.io, neuere Versionen auf Nekoland)</td>", "Run-Verläufe und erste Schritte: werden nach 60 Tagen gelöscht.",
+      "<td>Run-Verläufe und erste Schritte (Android- und iOS-Apps mit Gastkonto, itch.io, neuere Versionen auf Nekoland)</td>", "Run-Verläufe und erste Schritte: werden nach 30 Tagen gelöscht.",
       "nur der einfache Absturzbericht und die App-Störungsberichte"],
   };
   for (const [locale, list] of Object.entries(words)) {
@@ -425,7 +425,9 @@ test("CrazyGames is no platform of 10key Survival any more", () => {
   for (const locale of ["en", "ko", "de"]) {
     const s13 = section13(locale);
     assert.doesNotMatch(s13, /CrazyGames|crazygames/, `${locale} section 13 names no CrazyGames`);
-    assert.doesNotMatch(text(s13), /avatar|아바타|Profilbild/i, `${locale} section 13: platform avatars are gone`);
+    // 2026-11-22: the friends feature shows the player's own profile picture (avatar) to friends, so the bare word is allowed now;
+    // this still guards the dropped CrazyGames *platform* avatar.
+    assert.doesNotMatch(text(s13), /platform avatar|플랫폼 아바타|Plattform-Avatar/i, `${locale} section 13: platform avatars are gone`);
   }
   for (const locale of ["en", "ko"]) {
     const html = read(`10key/terms/${locale}.html`);
