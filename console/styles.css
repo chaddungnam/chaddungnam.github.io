@@ -433,6 +433,8 @@ textarea:focus-visible {
   .console-entry { width: min(100% - 24px, 560px); padding: 12px 0 24px; }
   .login-panel, .project-picker { margin-top: 3vh; padding: 28px 22px; border-radius: 22px; }
   .console-shell { display: block; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+  /* the fixed bottom menu must not cover what scrollIntoView brings up (triage form on phones: CI clicks landed on the menu) */
+  html { scroll-padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
   .console-sidebar { position: fixed; inset: auto 0 0; z-index: 30; display: grid; grid-template-columns: 1fr; width: 100%; height: auto; padding: 7px 8px calc(7px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.14); }
   .console-brand, .project-switch, .sidebar-logout { display: none; }
   .console-sidebar nav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
