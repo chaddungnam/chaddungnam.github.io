@@ -499,15 +499,15 @@ test("section 13 covers season rankings, web ranking accounts, quests, the remin
 // (counts only) tagging likely automation for review; privacy section 13 describes the summary, the review notes and their retention.
 test("terms carry the 11-22 copy warning, the red sanction sentence and the ranking eligibility rules", () => {
   const want = {
-    en: [/closely imitates 10key Survival or another House Duck game/, /signs of reverse engineering, may lead to legal action/,
-      /identify, reference and compare such a product publicly/, /waive any objection to it, to the extent permitted by applicable law/,
+    en: [/closely imitates 10key Survival or another House Duck game/, /signs of reverse engineering not permitted by law, may lead to legal action/,
+      /identify, reference and compare such a product publicly/, /To the extent permitted by applicable law: if there are signs/, /and you waive any objection to it/,
       /minimum version that the Operator sets/, /already started before the minimum was raised still counts/,
       /held from the boards until a person has reviewed it/, /no information about which keys were pressed, no text and no touch paths/,
       /a tag alone never removes a record or a player from the boards/],
-    ko: [/House Duck 게임을 베끼거나 매우 비슷하게 흉내 낸/, /리버스 엔지니어링의 정황이 보이는 제품/, /공개적으로 지목하고 언급하며 비교할 수 있습니다/,
-      /관련 법률이 허용하는 범위에서 이에 대해 어떠한 이의도 제기하지 않습니다/, /최소 버전\(빌드\) 이상의 게임으로 플레이한 판만/,
+    ko: [/을 베끼거나 매우 비슷하게 흉내 낸 게임이나 그 밖의 제품/, /리버스 엔지니어링의 정황이 보이는 제품/, /공개적으로 지목하고 언급하며 비교할 수 있습니다/,
+      /관련 법률이 허용하는 범위에서, 게임의 불법 복제본/, /이에 대해 어떠한 이의도 제기하지 않습니다/, /최소 버전\(빌드\) 이상의 게임으로 플레이한 판만/,
       /이미 시작한 판은 그대로 반영됩니다/, /사람이 검토할 때까지 순위표에서 보류됩니다/, /어떤 키를 눌렀는지, 입력한 글자, 터치 경로는 담기지 않습니다/,
-      /표시만으로 기록이나 플레이어가 순위표에서 빠지지는 않습니다/],
+      /태그만으로 기록이나 플레이어가 순위표에서 빠지지는 않습니다/],
   };
   for (const locale of locales) {
     const html = read(`10key/terms/${locale}.html`);
