@@ -154,12 +154,14 @@ function createFakeWindow(document) {
   assert.equal(audioNode.currentTime, 12, "Resume does not restart the track");
   audioNode.dispatch("play");
   const previousPlayCalls = audioNode.playCalls;
+  // the track that ends here is mad_0 (next is a no-op on the last track, previous steps back), not vip: compare with it, not a fixed name
+  const endedSrc = audioNode.src;
   audioNode.ended = true;
   audioNode.paused = true;
   audioNode.dispatch("pause");
   audioNode.dispatch("ended");
   assert.equal(audioNode.playCalls > previousPlayCalls, true, "natural completion advances after pause-before-ended");
-  assert.notEqual(audioNode.src, "assets/music/vip.mp3", "shuffle repeat does not immediately repeat the same track");
+  assert.notEqual(audioNode.src, endedSrc, "shuffle repeat does not immediately repeat the same track");
   audioNode.ended = false;
   audioNode.paused = false;
   audioNode.dispatch("error");

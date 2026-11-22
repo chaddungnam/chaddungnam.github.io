@@ -326,9 +326,11 @@ test("every public page has its own preview: og title / description / url / imag
 test("no stale demo limit: nothing on the site says the demo goes up to level 15", async () => {
   const bad = [];
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).forEach((e) => {
-    if (["node_modules", "test-results", ".git"].includes(e.name)) return;
+    if (["node_modules", "test-results", ".git", ".claude"].includes(e.name)) return; // .claude = local agent worktrees, never committed
     // the operator console (noindex, sign-in) names the Lv 8 / Lv 15 checkpoint starts on its balance page; players never see it
     if (d === ROOT && e.name === "console") return;
+    // the same goes for the console's own Playwright specs (tests/console-*.spec.js, e.g. the Lv 15 checkpoint row)
+    if (d === path.join(ROOT, "tests") && /^console-.*\.spec\.js$/.test(e.name)) return;
     const p = path.join(d, e.name);
     if (e.isDirectory()) walk(p);
     else if (/\.(html|js|txt|json|md|py|css)$/.test(e.name) && !/^share-sheet\.spec/.test(e.name) && fs.readFileSync(p, "utf8").match(/level 15|레벨 ?15|Lv ?15|stufe 15|レベル15|第 15 關/i)) bad.push(path.relative(ROOT, p));
