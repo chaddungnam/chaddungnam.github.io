@@ -468,6 +468,23 @@ test("home 10key section: pre-registration before launch, download key to /10key
   await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
   await expect(page.locator("#games .hd-tk-preview:visible")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
 });
+// Shared pre-registration link (owner 2026-11-23): /10key/prereg/ without a mail token opens the game page in the
+// pre-registration version (?launch=prereg) after the launch switch too; mail links with a token still confirm/unsubscribe.
+test("/10key/prereg/ without a token opens the pre-registration version (?launch=prereg) after the switch", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
+  await page.clock.setFixedTime(new Date("2026-11-23T14:00:00+01:00"));
+  await page.goto("/10key/?lang=ko");
+  await expect(page.locator("#prereg")).toBeHidden();
+  await page.goto("/10key/prereg/?lang=ko");
+  await expect(page).toHaveURL(/\/10key\/\?lang=ko&launch=prereg$/);
+  await expect(page.locator("#prereg")).toBeVisible();
+  await expect(page.locator("#prereg button[type=submit]")).toBeEnabled();
+  await expect(page.locator("#download")).toBeHidden();
+  await expect(page.locator("[data-lang-link=en]")).toHaveAttribute("href", "index_en.html?lang=en&launch=prereg");
+  await page.goto("/10key/prereg/?lang=ja");
+  await expect(page).toHaveURL(/\/10key\/index_ja\.html\?lang=ja&launch=prereg$/);
+  await expect(page.locator("#prereg")).toBeVisible();
+});
 test("/10key/get/?launch=preview shows the after-launch page without leaving for a store", async ({ page }) => {
   await page.goto("/10key/get/?launch=preview&lang=en");
   const android = await page.evaluate(() => /Android/i.test(navigator.userAgent));

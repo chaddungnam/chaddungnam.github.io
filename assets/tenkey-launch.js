@@ -28,8 +28,12 @@
   try { mode = new URLSearchParams(location.search).get("launch") || ""; } catch (_error) { mode = ""; }
   var now = Date.now();
   C.preview = mode === "preview";
-  C.on = C.preview || now >= C.at;
-  C.sale = C.preview || (C.released && now < C.saleTo);
+  // ?launch=prereg (owner 2026-11-23): the pre-registration version as it was before the switch (form, itch.io gate, no
+  // store badges or sale), for a shared link. houseduck.in/10key/prereg/ without a mail token lands here. Not linked
+  // from the site; the server still takes sign-ups.
+  C.prereg = mode === "prereg";
+  C.on = !C.prereg && (C.preview || now >= C.at);
+  C.sale = !C.prereg && (C.preview || (C.released && now < C.saleTo));
   C.live = function (key) { var st = C.stores[key]; return !!st && (C.preview || (C.on && C.released && st.live)); };
   C.wait = C.on && !C.live("ios") && !C.live("android");
   // Store links say where the visit came from: an App Store campaign link (pt = House Duck provider id, ct = source)
@@ -42,6 +46,15 @@
 
   var root = document.documentElement;
   if (C.sale) root.classList.add("tk-sale");
+  if (C.prereg) {
+    // The language switch keeps the visitor on the pre-registration version.
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll("[data-lang-link]").forEach(function (a) {
+        var href = a.getAttribute("href") || "";
+        if (href && !/[?&]launch=/.test(href)) a.setAttribute("href", href + (href.indexOf("?") < 0 ? "?" : "&") + "launch=prereg");
+      });
+    });
+  }
   if (!C.on) return;
   root.classList.add("tk-launch", "tk-itch-open");
   if (C.wait) root.classList.add("tk-stores-wait");
