@@ -77,7 +77,7 @@ assert.match(analyticsSource, /renderExecutiveVisuals\(pulseModel\)/, "donut cha
 assert.match(analyticsSource, /state\.payload\?\.versionMonitor/, "version adoption must render from the secured dashboard response");
 assert.match(analyticsSource, /gate\?\.effectiveDay[\s\S]*row\.day >= gate\.effectiveDay/, "version trend must begin at the matching forced-update audit date");
 // 2026-11-24 (owner: "itch나 내 웹사이트처럼 깔끔하게"): the console moved to the site's dark itch theme; the light-surface rule is retired.
-assert.match(fs.readFileSync(path.join(root, "console", "theme.css"), "utf8"), /--hd-bg: #141414;[\s\S]*--hd-duck: #ffd23f;/, "the console uses the House Duck dark theme");
+assert.match(fs.readFileSync(path.join(root, "console", "theme.css"), "utf8"), /--hd-bg: #121212;[\s\S]*--hd-text: #e4e2dd;[\s\S]*--hd-accent: #f1c95a;/, "the console uses the dark theme built on Material / HIG dark rules (round 2, 2026-11-24)");
 assert.match(consoleHtml, /href="theme\.css\?v=\d{8}-[a-z0-9]+"/, "the theme loads last with a cache version");
 assert.match(consoleStyles, /grid-template-columns:\s*repeat\(7, minmax\(0, 1fr\)\)/, "mobile navigation must fit all seven console routes");
 assert.match(consoleHtml, /pulse-model\.js\?v=\d{8}-[A-Za-z0-9]+/, "the Console must cache-bust conservative return scoring");

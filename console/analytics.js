@@ -1086,7 +1086,7 @@ function renderDailyChart() {
   const groupWidth = (width - left - right) / Math.max(1, rows.length);
   const barWidth = Math.max(2, Math.min(12, groupWidth * .28));
 
-  context.strokeStyle = "#2c2b28";
+  context.strokeStyle = "rgba(255,255,255,.07)";
   context.lineWidth = 1;
   for (let line = 0; line <= 4; line += 1) {
     const y = top + chartHeight - (chartHeight * line / 4);
@@ -1169,7 +1169,7 @@ function drawVersionTrend(rows) {
   const chartHeight = height - top - bottom;
   const chartWidth = width - left - right;
   const max = Math.max(1, ...rows.flatMap((row) => [Number(row.activePeople ?? 0), Number(row.completedPeople ?? 0)]));
-  context.strokeStyle = "#2c2b28";
+  context.strokeStyle = "rgba(255,255,255,.07)";
   context.fillStyle = "#8994a3";
   context.textAlign = "right";
   for (let line = 0; line <= 4; line += 1) {
@@ -1191,7 +1191,7 @@ function drawVersionTrend(rows) {
     });
     context.stroke();
     rows.forEach((row, index) => {
-      context.fillStyle = "#1d1d1d"; context.strokeStyle = color; context.lineWidth = 2;
+      context.fillStyle = "#1e1e1e"; context.strokeStyle = color; context.lineWidth = 2;
       context.beginPath(); context.arc(xAt(index), yAt(row[key]), 3.2, 0, Math.PI * 2); context.fill(); context.stroke();
     });
   };

@@ -162,7 +162,7 @@ test("overview: today and 7-day numbers first in plain words, one chart, the res
 
 test("players: [버그유저] label only on an account whose day-cap hit does not fit its play time (owner 11-02)", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players");
-  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
+  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(6);  // the app list: the CrazyGames player is on the web list (11-24)
   await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toHaveCount(1);
   await expect(page.locator("#tenkeyPlayersTable tr", { hasText: "[버그유저]" })).toContainText("의심스러운덕");
   await shot(page, "players_bug_user");
@@ -198,10 +198,10 @@ test("players: rank guard marks + 랭킹 허용 releases the hold (owner 11-22)"
 
 test("players: search, open one, ban with a reason through the confirm dialog", async ({ page }) => {
   const errors = await open(page, "#/tenkey-players");
-  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(7);
-  await expect(page.locator("#tenkeyPlayerTotal")).toHaveText("7명");
+  await expect(page.locator("#tenkeyPlayersTable tr")).toHaveCount(6);
+  await expect(page.locator("#tenkeyPlayerTotal")).toHaveText("6명");
   const platforms = await page.locator('#tenkeyPlayersTable td[data-label="플랫폼"]').allTextContents();
-  expect(platforms).toEqual(["Android", "iOS", "웹 · CrazyGames", "Android", "모름", "Windows", "Mac"]);
+  expect(platforms).toEqual(["Android", "iOS", "Android", "모름", "Windows", "Mac"]);  // the web demo players have their own list (11-24)
   await shot(page, "players");
   await page.locator("#tenkeyPlayerSearch").fill("딸깍");
   await page.locator("#tenkeyPlayerSearchForm button[type=submit]").click();
@@ -545,7 +545,8 @@ test("the long 10KEY menu scrolls when the window is short: desktop sidebar up a
 // con-audit 2026-11-12: the shapes below are what the live server answers (admin_retention_v2 / admin_players_list_v2 /
 // admin_player_data_v2, drafts 20261112190000). The old page showed "아직 기록된 첫 행동이 없습니다" and an empty churn list
 // because the app-sent tables are empty until the privacy-gated collection is switched on.
-const stub = (fn) => `\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn==="tenkey-admin"){const r=(${fn})(b);if(r!==undefined)return {ok:true,data:r};}return real(pj,fn,b);};})();`;
+// tenkey-console-stats too: the player list reads from there since 2026-11-24 (players.list, admin_players_list_v3)
+const stub = (fn) => `\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn==="tenkey-admin"||(fn==="tenkey-console-stats"&&b&&b.action==="players.list")){const r=(${fn})(b);if(r!==undefined)return {ok:true,data:r};}return real(pj,fn,b);};})();`;
 
 test("재방문 page: first actions and resting accounts come from the server's own records; steps only the app can report say so", async ({ page }) => {
   const MOCK = stub(`(b)=>{
@@ -606,6 +607,26 @@ test("플레이어 page: platform says where it was read from, 모름 only when 
   await expect(rows.nth(4).locator('td[data-label="나이대"]')).toContainText("플랫폼을 몰라 구분 못 함");
   await expect(page.locator("#tenkeyPlayerPlatform option[value=unknown]")).toHaveText("모름");
   await shot(page, "players_platform_age");
+  expect(errors).toEqual([]);
+});
+
+test("플레이어 page (owner 2026-11-24): app players first, the web demo players as their own list; both open the same player page", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-players");
+  const rows = page.locator("#tenkeyPlayersTable tr");
+  await expect(page.locator('[data-tk-plist="app"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#tenkeyPlayerListTitle")).toHaveText("앱 플레이어");
+  await expect.poll(async () => (await calls(page, "players.list")).at(-1)?.params.platform).toBe("app");
+  await expect(rows.first()).toBeVisible();
+  await expect(page.locator('#tenkeyPlayersTable td[data-label="플랫폼"]', { hasText: "웹" })).toHaveCount(0);
+  await expect(page.locator("#tenkeyPlayerPlatform option[value=web]")).toHaveCount(0);
+  await page.locator('[data-tk-plist="web"]').click();
+  await expect.poll(async () => (await calls(page, "players.list")).at(-1)?.params.platform).toBe("web");
+  await expect(page.locator("#tenkeyPlayerListTitle")).toHaveText("웹 데모 플레이어");
+  await expect(page.locator("#tenkeyPlayerListNote")).toContainText("데모 플레이어");
+  await expect(page.locator("#tenkeyPlayerPlatformField")).toBeHidden();
+  await expect(rows.first().locator('td[data-label="플랫폼"]')).toContainText("웹");
+  await page.locator('[data-tk-plist="app"]').click();
+  await expect(page.locator("#tenkeyPlayerPlatformField")).toBeVisible();
   expect(errors).toEqual([]);
 });
 

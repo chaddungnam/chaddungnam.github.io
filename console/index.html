@@ -4,16 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#141414">
+  <meta name="theme-color" content="#121212">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
   <link rel="preconnect" href="https://frepunpqswciugwoyvxo.supabase.co" crossorigin>
   <link rel="preconnect" href="https://bbgwvpwzkyudbtcgrbtm.supabase.co" crossorigin>
-  <link rel="preload" href="/assets/fonts/Lato-Regular-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="base.css?v=20261124-dark">
-  <link rel="stylesheet" href="styles.css?v=20261124-dark">
+  <link rel="stylesheet" href="base.css?v=20261124-ui2">
+  <link rel="stylesheet" href="styles.css?v=20261124-ui2">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
-  <link rel="stylesheet" href="theme.css?v=20261124-dark">
+  <link rel="stylesheet" href="theme.css?v=20261124-ui2">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -490,16 +489,17 @@
       </section>
 
       <section id="tenkeyPlayersView" class="route-view" data-route="tenkey-players" hidden>
+        <div class="tk-retention-tabs tk-player-lists" role="group" aria-label="플레이어 목록"><button type="button" data-tk-plist="app" aria-pressed="true">앱 플레이어</button><button type="button" data-tk-plist="web" aria-pressed="false">웹 데모 플레이어</button></div>
         <form id="tenkeyPlayerSearchForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>플레이어 검색<input id="tenkeyPlayerSearch" type="search" maxlength="100" placeholder="닉네임 · 플레이어 ID · 로그인 ID"></label>
-          <label>플랫폼<select id="tenkeyPlayerPlatform"><option value="">전체</option><option value="web">웹 (itch · CrazyGames 등)</option><option value="android">Android</option><option value="ios">iOS</option><option value="unknown">모름</option></select></label>
+          <label id="tenkeyPlayerPlatformField">플랫폼<select id="tenkeyPlayerPlatform"><option value="">앱 전체</option><option value="android">Android</option><option value="ios">iOS</option><option value="unknown">모름</option></select></label>
           <label>스토어 국가<input id="tenkeyPlayerCountry" type="text" maxlength="2" placeholder="전체 · KR · XX 미기록" autocomplete="off" spellcheck="false"></label>
           <label>정렬<select id="tenkeyPlayerSort"><option value="last_seen_at">마지막 접속</option><option value="created_at">가입</option><option value="best">최고 점수</option><option value="name">이름</option><option value="store_country">스토어 국가</option></select></label>
           <label>방향<select id="tenkeyPlayerDirection"><option value="desc">내림차순</option><option value="asc">오름차순</option></select></label>
           <button class="primary-button" type="submit">검색</button>
         </form>
         <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2>플레이어</h2><small>랭킹 서버에 기록된 플레이어입니다. 스토어 국가는 앱 계정에 연결된 최신 기록이며, XX는 아직 받은 국가 코드가 없는 계정입니다. 플랫폼은 판 기록, 로그인 기록, 결제 기록 순으로 찾아 아래에 근거를 적습니다. 나이대는 입력한 나이 / 미등록(앱이 상점에서 묻는데 답이 없음) / 수집 안 함(웹은 묻지 않음)으로 나눕니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
+          <div class="panel-heading"><div><p class="eyebrow">PLAYER POOL</p><h2 id="tenkeyPlayerListTitle">앱 플레이어</h2><small id="tenkeyPlayerListNote">랭킹 서버에 기록된 플레이어입니다. 스토어 국가는 앱 계정에 연결된 최신 기록이며, XX는 아직 받은 국가 코드가 없는 계정입니다. 플랫폼은 판 기록, 로그인 기록, 결제 기록 순으로 찾아 아래에 근거를 적습니다. 나이대는 입력한 나이 / 미등록(앱이 상점에서 묻는데 답이 없음) / 수집 안 함(웹은 묻지 않음)으로 나눕니다.</small></div><span id="tenkeyPlayerTotal" class="panel-total">—</span></div>
           <div class="table-scroll"><table><thead><tr><th>플레이어</th><th>플랫폼</th><th>스토어 국가</th><th>가입</th><th>마지막 접속</th><th class="tk-num">최고 점수</th><th>나이대</th><th>상태</th><th>처리</th></tr></thead><tbody id="tenkeyPlayersTable"></tbody></table></div>
           <div class="pagination"><button id="tenkeyPlayersPrevious" type="button">이전</button><span id="tenkeyPlayersPage">1 / 1</span><button id="tenkeyPlayersNext" type="button">다음</button></div>
         </section>
@@ -1008,18 +1008,18 @@
   <script src="ui-state.js?v=20260904-1" defer></script>
   <script src="auth.js?v=20261103-7d" defer></script>
   <script src="api.js?v=20261007-hx" defer></script>
-  <script src="analytics.js?v=20261124-dark" defer></script>
+  <script src="analytics.js?v=20261124-ui2" defer></script>
   <script src="analytics-exclusions.js?v=20260829-1" defer></script>
   <script src="players.js?v=20260927-2x" defer></script>
   <script src="../assets/notice-links.js?v=20261007-hx" defer></script>
   <script src="announcement-editor.js?v=20261028-caret" defer></script>
   <script src="operations.js?v=20260909-1" defer></script>
   <script src="tenkey.js?v=20261117-triage" defer></script>
-  <script src="tenkey-overview.js?v=20261124-dark" defer></script>
+  <script src="tenkey-overview.js?v=20261124-ui2" defer></script>
   <script src="tenkey-unlocks.js?v=20261119-cpcon" defer></script>
   <script src="tenkey-watch.js?v=20261115-watch" defer></script>
   <script src="tenkey-signals.js?v=20261118-link" defer></script>
-  <script src="tenkey-players.js?v=20261118-link" defer></script>
+  <script src="tenkey-players.js?v=20261124-ui2" defer></script>
   <script src="tenkey-retention.js?v=20261112-audit" defer></script>
   <script src="tenkey-titles.js?v=20261104-title" defer></script>
   <script src="tenkey-crashes.js?v=20261117-keep" defer></script>

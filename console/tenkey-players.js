@@ -7,7 +7,14 @@
   const T = root.ConsoleTenkey;
   const { esc, num, time, duration, platformName } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, query: "", platform: "", country: "", sort: "last_seen_at", direction: "desc", detail: null };
+  // Owner 2026-11-24 ("플레이어쪽도 웹빌드 목록을 별도로 ... 데모라서 파악은 선택적으로, 앱 플레이 위주로 추적"): two lists. `list` app
+  // (default: Android, iOS, not yet known) or web (the demo builds: itch.io, Nekoland, GamePix, CrazyGames). Both open the same
+  // player page with its runs. Read through tenkey-console-stats players.list (admin_players_list_v3 knows 'app').
+  const state = { bound: false, list: "app", query: "", platform: "", country: "", sort: "last_seen_at", direction: "desc", detail: null };
+  const LIST_NOTE = {
+    app: null,
+    web: "웹 빌드(itch.io · Nekoland · GamePix · CrazyGames)에서 들어온 데모 플레이어입니다. 참고용으로 따로 둡니다. 판 기록은 상세에서 앱 플레이어와 똑같이 볼 수 있습니다. 웹은 나이를 묻지 않습니다.",
+  };
   let pager = null;
   const AUTO_MS = 20000;
   let autoTimer = 0;
@@ -71,8 +78,8 @@
   async function loadList(page = 1, quiet = false) {
     if (!quiet) T.setMessage("tenkeyPlayersMessage", "플레이어를 불러오는 중입니다...");
     try {
-      const result = await T.call("players.list", { query: state.query, platform: state.platform || undefined, country: state.country || undefined, sort: state.sort, direction: state.direction, page });
-      const data = result.data;
+      const platform = state.list === "web" ? "web" : (state.platform || "app");
+      const data = await T.stats("players.list", { query: state.query, platform, country: state.country || undefined, sort: state.sort, direction: state.direction, page });
       await T.watch.load();
       pager.st.page = page;
       pager.st.total = Number(data.total || 0);
@@ -92,6 +99,15 @@
     if (!state.bound) {
       state.bound = true;
       pager = T.pager({ prev: "tenkeyPlayersPrevious", next: "tenkeyPlayersNext", label: "tenkeyPlayersPage" }, 50, loadList);
+      LIST_NOTE.app = byId("tenkeyPlayerListNote").textContent;
+      document.querySelectorAll("[data-tk-plist]").forEach((button) => button.addEventListener("click", () => {
+        state.list = button.dataset.tkPlist;
+        document.querySelectorAll("[data-tk-plist]").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+        byId("tenkeyPlayerPlatformField").hidden = state.list === "web";
+        byId("tenkeyPlayerListTitle").textContent = state.list === "web" ? "웹 데모 플레이어" : "앱 플레이어";
+        byId("tenkeyPlayerListNote").textContent = LIST_NOTE[state.list];
+        loadList(1);
+      }));
       byId("tenkeyPlayerSearchForm").addEventListener("submit", (event) => {
         event.preventDefault();
         state.query = byId("tenkeyPlayerSearch").value.trim();

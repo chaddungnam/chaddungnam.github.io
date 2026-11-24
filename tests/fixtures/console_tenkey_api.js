@@ -171,7 +171,10 @@
       }
       case "players.list": {
         const q = String(p.query || "").toLowerCase();
-        const rows = PLAYERS.filter((x) => (!q || x.name.toLowerCase().includes(q) || x.id.startsWith(q)) && (!p.platform || x.platform === p.platform || (p.platform === "web" && x.provider === "crazygames")));
+        // 'app' (2026-11-24, tenkey-console-stats / admin_players_list_v3) = every player that is not a web build
+        const isWeb = (x) => String(x.platform || "").startsWith("web") || x.provider === "crazygames";
+        const rows = PLAYERS.filter((x) => (!q || x.name.toLowerCase().includes(q) || x.id.startsWith(q)) && (!p.platform || x.platform === p.platform
+          || (p.platform === "web" && isWeb(x)) || (p.platform === "app" && !isWeb(x))));
         return { ok: true, total: rows.length, rows: rows.map((x) => ({ ...x, god_mode: unlockOf(x.id).god, tags: [...new Set(guardOf(x.id).filter((g) => !g.released).map((g) => g.kind))].sort() })) };
       }
       case "players.get": return detailFor(p.player_id);

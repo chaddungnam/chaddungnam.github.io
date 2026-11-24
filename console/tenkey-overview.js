@@ -118,8 +118,9 @@
     return { max, plot: `${yTicks(max)}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${GRID}</svg><div class="ov-cols">${cols}</div></div>` };
   }
   const swatch = (color, text) => `<span class="ov-legend-item"><span class="ov-key" data-kind="bar" style="background:${color}" aria-hidden="true"></span>${esc(text)}</span>`;
-  // Dark console theme (owner 2026-11-24): duck yellow for the main line, green / blue for the two stores.
-  const COLOR = { app: "#ffd23f", web: "#ff9d6e", pre: "#5fd3b8", ko: "#9fb0ff", en: "#7ee2a8", ja: "#ffb36b", de: "#8c96aa", zh: "#e58fb0" };
+  // Dark console theme, round 2 (owner 2026-11-24): Google's dark palette tones (desaturated for a dark page). Blue = mobile DAU
+  // and Android, purple = iOS / App Store, green = installs / Google Play.
+  const COLOR = { app: "#8ab4f8", web: "#fcad70", pre: "#81c995", ko: "#c58af9", en: "#81c995", ja: "#fcad70", de: "#9aa0a6", zh: "#ff8bcb" };
   const LANG = { ko: "한국어", en: "영어", ja: "일본어", zh: "중국어(번체)", de: "독일어" };
 
   const card = (title, legend, body, rows, wide, wait) => `<article class="ov-card${wide ? " is-wide" : ""}">
