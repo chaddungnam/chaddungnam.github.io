@@ -79,3 +79,14 @@ html.tk-get-sale .tk-get-price-regular { color: var(--tk-text-3); font-size: cla
 .tk-get-price-regular { font-size: clamp(2rem, 4.6vw, 2.8rem); }
 .tk-get-price-sale { font-size: clamp(2.3rem, 5.4vw, 3.3rem); }
 html.tk-get-sale .tk-get-price-regular { font-size: clamp(1.4rem, 3.2vw, 1.9rem); }
+
+/* Phone opening its store (owner 2026-11-24): the free demo note, the itch.io key, the share keys and the channels under
+   the store button, for the visitor who comes back from the store. */
+.tk-card-more { display: grid; justify-items: center; gap: 12px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--tk-edge); }
+.tk-card-more[hidden] { display: none; }
+.tk-card .tk-card-demo { margin: 0; color: var(--tk-text-2); font-size: .92rem; line-height: 1.65; }
+.tk-card-more .tk-key { width: min(320px, 100%); }
+.tk-card-more .tk-play-icon { border-top-width: 7px; border-bottom-width: 7px; border-left-width: 11px; }
+.tk-card-more .hd-share-row { justify-content: center; margin: 4px 0 0; }
+.tk-card-more .tk-get-more { margin-top: 4px; }
+:lang(ja) .tk-card .tk-card-demo, :lang(zh-Hant) .tk-card .tk-card-demo { word-break: normal; line-break: strict; overflow-wrap: anywhere; }

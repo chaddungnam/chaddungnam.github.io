@@ -180,7 +180,33 @@
       document.title = name + " | 10key Survival";
       var btn = document.querySelector("[data-store='" + mineKey + "']");
       if (btn) { btn.href = storeUrl(mineKey); btn.hidden = false; }
-      if (!preview) location.replace(storeUrl(mineKey));
+      // Owner 2026-11-24: for the visitor who comes back from the store, the free demo note, the share keys and the
+      // YouTube / Threads links under the store button.
+      reveal("[data-get-extra]");
+      // Owner 2026-11-24 (iPhone Safari): jumping to the store at once cancelled the card's image loads (the key and the
+      // official badge came back as broken pictures). Wait until the card's images are in (at most 1.5 s), then jump; when
+      // the visitor comes back to this tab, load any picture that still broke again.
+      var cardImgs = Array.prototype.slice.call(document.querySelectorAll("[data-get-card] img"));
+      var retry = function () {
+        cardImgs.forEach(function (img) {
+          if (img.complete && img.naturalWidth === 0 && img.getAttribute("src")) { var u = img.getAttribute("src"); img.removeAttribute("src"); img.setAttribute("src", u); }
+        });
+      };
+      window.addEventListener("pageshow", retry);
+      document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") retry(); });
+      if (!preview) {
+        var jumped = false;
+        var jump = function () { if (jumped) return; jumped = true; location.replace(storeUrl(mineKey)); };
+        var left = cardImgs.filter(function (img) { return !img.complete; }).length;
+        if (!left) window.setTimeout(jump, 150);
+        cardImgs.forEach(function (img) {
+          if (img.complete) return;
+          var done = function () { left -= 1; if (left <= 0) window.setTimeout(jump, 150); };
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+        });
+        window.setTimeout(jump, 1500);
+      }
       return;
     }
     if (!isLive("ios") && !isLive("android")) { show(T.soon); reveal("[data-show-prereg]"); return; }

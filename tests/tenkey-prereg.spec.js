@@ -360,6 +360,49 @@ test("/10key/get/?preview=ios shows the App Store opening card without leaving",
   await expect(page).toHaveURL(/\/10key\/get\/\?preview=ios/);
 });
 
+// Phone opening its store (owner 2026-11-24): under the store button, the free demo note, the itch.io key, the share keys
+// and the YouTube / Threads links, in the page language; the card's pictures load.
+test("/10key/get/ phone card shows the free demo note, the share keys and the channels under the store button", async ({ page }) => {
+  await page.goto("/10key/get/?preview=ios&lang=ko");
+  const more = page.locator("[data-get-card] [data-get-extra]");
+  await expect(more).toBeVisible();
+  await expect(more.locator(".tk-card-demo")).toHaveText("구매를 망설이고 있다면, 컴퓨터에서 itch.io 무료 데모(레벨 8까지)를 먼저 플레이해 보고 결정해 주세요.");
+  await expect(more.locator("[data-card-itch]")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
+  await expect(more.locator("[data-card-itch]")).toContainText("itch.io에서 데모 플레이");
+  await expect(more.locator("[data-share-row]")).toBeVisible();
+  await expect(more.locator("[data-share-open]")).toContainText("공유하기");
+  await expect(more.locator("a[href='https://www.youtube.com/@houseduck_in']")).toBeVisible();
+  await expect(more.locator("a[href='https://www.threads.com/@sergeant_houseduck']")).toBeVisible();
+  await expect.poll(() => page.locator("[data-get-card] img").evaluateAll((imgs) => imgs.every((i) => i.complete && i.naturalWidth > 0))).toBe(true);
+  for (const [lang, words] of [["en", "Still deciding?"], ["de", "Noch unsicher?"], ["ja", "購入を迷っている方は"], ["zh", "還在猶豫嗎？"]]) {
+    await page.goto(`/10key/get/?preview=android&lang=${lang}`);
+    await expect(page.locator("[data-get-extra] .tk-card-demo")).toContainText(words);
+    await expect(page.locator("[data-get-extra] [data-share-row]")).toBeVisible();
+  }
+  // not on a computer: the full page has its own keys
+  await page.goto("/10key/get/?preview=pc&lang=ko");
+  await expect(page.locator("[data-get-extra]")).toBeHidden();
+});
+// iPhone Safari (owner 2026-11-24): jumping to the store at once cancelled the card's picture loads (broken key and badge).
+// The phone now waits for the card's pictures (at most 1.5 s) before it jumps.
+for (const [os, ua, store, badge] of [
+  ["an iPhone", "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", /^https:\/\/apps\.apple\.com\/app\/10key-survival\/id6824972492\?pt=129265473&ct=test&mt=8$/, "app-store-ko.svg"],
+  ["an Android phone", "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36", /^https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.houseduck\.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dget%26utm_campaign%3Dtest$/, "google-play-ko.svg"],
+]) {
+  test.describe(`${os} on /10key/get/`, () => {
+    test.use({ userAgent: ua });
+    test(`${os} waits for the card's pictures, then jumps to its store`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date("2026-11-24T12:00:00+01:00"));
+      const events = [];
+      await page.route(`**/assets/store-badges/${badge}`, async (route) => { await new Promise((r) => setTimeout(r, 500)); events.push("badge"); await route.continue(); });
+      await page.route(/^https:\/\/(apps\.apple\.com|play\.google\.com)\//, (route) => { events.push("store"); return route.fulfill({ status: 200, contentType: "text/html", body: "<title>store</title>" }); });
+      await page.goto("/10key/get/?lang=ko&src=test");
+      await expect(page).toHaveURL(store);
+      expect(events).toEqual(["badge", "store"]);
+    });
+  });
+}
+
 // One store first (owner 2026-11-18): an Android phone while only the App Store is live gets "coming soon" + pre-register.
 test("/10key/get/ on a phone whose store is not live yet says coming soon and offers pre-registration", async ({ page }) => {
   await page.goto("/10key/get/?preview=android-soon&lang=ko");
