@@ -484,32 +484,34 @@ test("제보 page: the players' 1:1 inquiry texts with their reply email, newest
   expect(errors).toEqual([]);
 });
 
-test("제보 page: the YouTube link form shows the current value, refuses a non-YouTube link, saves a Short with a reason, and '' resets", async ({ page }) => {
+// Owner 2026-11-24: five links in one panel; CONTACT's YouTube row now uses links.set with id=community.
+test("제보 page: the common links panel saves a CONTACT Short with a reason and resets it", async ({ page }) => {
   const MOCK = "\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn===\"tenkey-console-stats\"&&b.action===\"reports.list\")return {ok:true,data:{total:0,rows:[]}};return real(pj,fn,b);};})();";
   const errors = await open(page, "#/tenkey-reports", MOCK);
   const form = page.locator("#tenkeyCommunityForm");
   await expect(form).toBeVisible();
+  await expect(page.locator("[data-outside-link]")).toHaveCount(5);
   await expect(page.locator("#tenkeyCommunityCurrent")).toHaveText("https://www.youtube.com/@Sergeant_Houseduck");
   await expect(page.locator("#tenkeyCommunityNote")).toContainText("기본값");
   await form.locator("[name=url]").fill("https://evil.example/watch?v=1");
   await form.locator("[name=reason]").fill("test");
-  await form.locator("button[type=submit]").click();
-  await expect(page.locator("#tenkeyCommunityFormMessage")).toContainText("유튜브 주소");
-  expect(await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "community.set").length)).toBe(0);
+  await form.locator('button[value="save"]').click();
+  await expect(page.locator("#tenkeyCommunityFormMessage")).toContainText("허용된 https 주소");
+  expect(await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "links.set").length)).toBe(0);
   await form.locator("[name=url]").fill("https://www.youtube.com/shorts/abc123");
   await form.locator("[name=reason]").fill("출시 쇼츠");
-  await form.locator("button[type=submit]").click();
+  await form.locator('button[value="save"]').click();
   await expect(page.locator("#confirmDialog")).toContainText("https://www.youtube.com/shorts/abc123");
   await expect(page.locator("#confirmDialog")).toContainText("출시 쇼츠");
   await page.locator("#confirmDialog button[value=confirm]").click();
   await expect(page.locator("#tenkeyCommunityCurrent")).toHaveText("https://www.youtube.com/shorts/abc123");
-  const saved = await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "community.set"));
+  const saved = await page.evaluate(() => window.__mockCalls.filter((c) => c.action === "links.set"));
   expect(saved.length).toBe(1);
-  expect(saved[0].params).toEqual({ url: "https://www.youtube.com/shorts/abc123", reason: "출시 쇼츠" });
+  expect(saved[0].params).toEqual({ id: "community", url: "https://www.youtube.com/shorts/abc123", reason: "출시 쇼츠" });
   expect(saved[0].request_id).toMatch(/^[0-9a-f-]{36}$/);
   await form.locator("[name=url]").fill("");
   await form.locator("[name=reason]").fill("기본으로");
-  await form.locator("button[type=submit]").click();
+  await form.locator('button[value="reset"]').click();
   await page.locator("#confirmDialog button[value=confirm]").click();
   await expect(page.locator("#tenkeyCommunityNote")).toContainText("기본값");
   await shot(page, "reports_youtube");

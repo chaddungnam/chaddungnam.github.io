@@ -252,6 +252,12 @@
         { id: "f2", created_at: "2026-10-21T09:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 120000, level: 30, time_ms: 9000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "level" }] };
       case "audit.list": return audit.slice(0, p.limit || 50);
       case "config.get": return config;
+      // Owner 2026-11-24: shared social-link setter; config.links remains the store-link object.
+      case "links.set": {
+        const next = { ...(config.outside_links || {}), [p.id]: p.url };
+        config = { ...config, outside_links: next, ...(p.id === "community" ? { community_url: p.url } : {}) };
+        return { ok: true, changed: true, links: next };
+      }
       case "knobs.set": {
         const k = p.knobs || {};
         if (Object.values(k).some((v) => typeof v !== "number" || v < 0.7 || v > 1.3)) return { ok: false, error: "invalid_knob_value" };

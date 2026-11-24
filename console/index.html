@@ -786,15 +786,11 @@
           <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>내용</th><th>답장 이메일</th><th>앱 · 기기</th><th>언어</th><th>접수 번호</th></tr></thead><tbody id="tenkeyReportTable"></tbody></table></div>
         </section>
         <p id="tenkeyReportMessage" class="dashboard-message" role="status"></p>
-        <form id="tenkeyCommunityForm" class="panel admin-form impact-form">
-          <p class="eyebrow">10KEY CONTACT</p><h2>유튜브 소통 링크</h2>
-          <p class="impact-note">게임 설정 「문의하기」 팝업의 [유튜브에서 공개 소통하기] 버튼이 여는 주소입니다. 폰에서는 유튜브 앱이 깔려 있으면 앱이 열립니다. 채널·영상(롱폼)·쇼츠 링크 모두 됩니다. 비우고 저장하면 기본값(하우스덕 채널)으로 돌아갑니다. 스토어 앱(Android·iOS)은 켤 때 받아 갑니다.</p>
-          <p class="tk-update-link">지금 값: <a id="tenkeyCommunityCurrent" target="_blank" rel="noopener noreferrer">—</a><small id="tenkeyCommunityNote"></small></p>
-          <label>유튜브 주소<input name="url" type="url" maxlength="300" placeholder="https://www.youtube.com/shorts/…" autocomplete="off"><small>https://youtube.com · www.youtube.com · m.youtube.com · youtu.be 주소만 됩니다 (그 밖의 주소는 서버가 거절합니다)</small></label>
-          <label>변경 이유<input name="reason" maxlength="300" required></label>
-          <p id="tenkeyCommunityFormMessage" class="dashboard-message" role="status" aria-live="polite"></p>
-          <button class="primary-button" type="submit">유튜브 소통 링크 저장</button>
-        </form>
+        <section class="panel" aria-labelledby="tenkeyOutsideLinksTitle">
+          <h2 id="tenkeyOutsideLinksTitle">외부 링크</h2>
+          <p>개발자 SNS와 유튜브 소통 페이지 주소입니다. 저장한 주소는 스토어 앱을 다음에 켤 때 적용됩니다. 웹·PC는 기본 주소를 사용합니다. 약관·개인정보·홈페이지·문의 메일은 여기서 바뀌지 않습니다.</p>
+          <div id="tenkeyOutsideLinks"></div>
+        </section>
       </section>
 
       <section id="tenkeyIssuesView" class="route-view tk-page" data-route="tenkey-issues" hidden>
@@ -1027,7 +1023,7 @@
   <script src="tenkey-retention.js?v=20261112-audit" defer></script>
   <script src="tenkey-titles.js?v=20261104-title" defer></script>
   <script src="tenkey-crashes.js?v=20261117-keep" defer></script>
-  <script src="tenkey-reports.js?v=20261117-keep" defer></script>
+  <script src="tenkey-reports.js?v=20261124-links" defer></script>
   <script src="tenkey-mail.js?v=20261104-mail" defer></script>
   <script src="tenkey-notices.js?v=20261025-tr2" defer></script>
   <script src="tenkey-more.js?v=20261119-cpcon" defer></script>
