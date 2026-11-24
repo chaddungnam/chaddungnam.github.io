@@ -144,7 +144,9 @@
       case "overview.get": return overview(p.platform);
       // tenkey-console-stats (separate function): pre-registration counts by Berlin day and page language.
       case "overview.web": return overview("web_itch");
-      case "dau.get": return { days: overview().series.map((r, i) => ({ day: r.day, all: 20 + i, web_itch: 12 + i, android: 5, ios: 2, other: 1, u7: 50 + i, u3: 30 + i, new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 })) };
+      // admin_dau_v3 (2026-11-24): + mobile (android + ios), u3_/u7_mobile, u3_/u7_itch, players_mobile / players_itch, unknown.
+      case "dau.get": return { version: 3, days: overview().series.map((r, i) => ({ day: r.day, all: 20 + i, web_itch: 12 + i, android: 5, ios: 2, other: 1, unknown: 0, mobile: 7, u7: 50 + i, u3: 30 + i,
+        u7_mobile: 20 + i, u3_mobile: 12 + i, u7_itch: 30 + i, u3_itch: 18 + i, players_mobile: 40 + i, players_itch: 300 + i, new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 })) };
       case "prereg.get": {
         const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, zh: i % 3 === 0 ? 1 : 0, de: 0 }));
         days.forEach((d) => { d.n = d.ko + d.en + d.zh; });

@@ -64,7 +64,7 @@ test("overview: the itch.io web filter shows its own visits and runs, the return
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
-  await expect(today).toHaveCount(5);
+  await expect(today).toHaveCount(4);
   await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveText("웹(itch)");
   await page.locator('[data-tk-platform="web_itch"]').click();
   await expect.poll(async () => (await calls(page, "overview.web")).length).toBeGreaterThan(1);
@@ -398,45 +398,57 @@ test("a server error is shown in Korean without breaking the page", async ({ pag
 });
 
 
-test("overview: 전체 counts players by account (itch + app), keeps anonymous itch web visits apart and shows pre-registrations by day and language", async ({ page }) => {
+test("overview (owner 2026-11-24 launch): the default view counts DAU on the mobile app (Android + iOS), shows itch only as a reference chart and no pre-registration", async ({ page }) => {
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
   const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
-  await expect(today).toHaveCount(5);
-  await expect(week).toHaveCount(5);
-  await expect(today.nth(0).locator(".tk-glance-label")).toHaveText("플레이어 (DAU)");
-  await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("웹 방문 (itch)");
-  await expect(today.nth(3).locator(".tk-glance-label")).toHaveText("사전예약");
+  await expect(page.locator('[data-tk-platform=""]')).toHaveText("모바일");
+  await expect(today).toHaveCount(4);
+  await expect(week).toHaveCount(4);
+  await expect(today.nth(0).locator(".tk-glance-label")).toHaveText("모바일 DAU");
+  await expect(today.nth(1).locator(".tk-glance-label")).toHaveText("새로 설치 (앱)");
+  await expect(today.nth(2).locator(".tk-glance-label")).toHaveText("플레이 (앱)");
   const want = await page.evaluate(async () => {
     const all = (await window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: {} })).data;
     const web = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } })).data;
-    const pre = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "prereg.get", params: { days: 90 } })).data;
-    return { app: all.server.seen.d1, visits: web.active.d1, pre: pre.d1, total: pre.total };
+    const dau = (await window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } })).data;
+    const a = all.series.at(-1), w = web.series.find((r) => r.day === a.day) || {};
+    return { days: dau.days.slice(-7), installs: Math.max(0, a.new_installs - (w.new_installs || 0)), runs: Math.max(0, a.runs - (w.runs || 0)) };
   });
-  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want.app}명`);
-  await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${want.visits}회`);
-  await expect(today.nth(3).locator(".tk-glance-value")).toHaveText(`${want.pre}명`);
-  await expect(today.nth(3)).toContainText(`총 ${want.total}명`);
+  const last = want.days.at(-1);
+  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${last.mobile}명`);
+  await expect(today.nth(0)).toContainText(`Android ${last.android} · iOS ${last.ios}`);
+  await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${want.installs}명`);
+  await expect(today.nth(2).locator(".tk-glance-value")).toHaveText(`${want.runs}판`);
+  // 최근 7일 DAU: mobile accounts that day over the mobile accounts so far
   await expect(page.locator("#tenkeyDauTitle")).toHaveText("최근 7일 DAU");
-  await expect(page.locator("#tenkeyOverviewCharts .ov-card")).toHaveCount(3);
-  await expect(page.locator("#tenkeyOverviewCharts")).toContainText("플레이어 (DAU) 플랫폼별");
-  await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(3);
-  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card")).toContainText("총 사전예약");
-  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card .ov-legend")).toContainText("중국어(번체)"); // zh page since 11-04 (owner 11-05)
-  await expect(page.locator("#tenkeyOverviewCharts .tk-prereg-card .overview-drill-body")).toContainText("중국어(번체)");
-  // 1일 / 3일 / 7일: each window exactly (today included) against the N days before; next-day return split itch / app.
+  await expect(page.locator("#tenkeyDauTitle + small")).toContainText("Android + iOS");
+  const cells = await page.locator("#tenkeyDauWeek .tk-dau-day").evaluateAll((els) => els.map((c) => `${c.querySelector("strong").textContent}|${c.querySelector("span").textContent}`));
+  expect(cells).toEqual(want.days.map((d) => `${Math.round(Math.min(d.mobile, d.players_mobile) / d.players_mobile * 100)}%|${d.mobile} / ${d.players_mobile}명`));
+  // charts: mobile (DAU + app installs), Android · iOS, itch reference; nothing about pre-registration on the page
+  await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(3);
+  await expect(page.locator("#tenkeyOverviewCharts")).toContainText("모바일 DAU Android · iOS");
+  await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref h3")).toContainText("참고: itch");
+  await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref")).toContainText("참고용으로만 따로 둡니다");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(4);
+  await expect(page.locator("#tenkeyOverview")).not.toContainText("사전예약");
+  expect((await calls(page, "prereg.get")).length).toBe(0);
+  // 1일 / 3일 / 7일: unique mobile accounts in exactly that window against the N days before; next-day return on mobile accounts.
   await expect(page.locator('[data-tk-compare="d1"]')).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 1일");
-  await expect(week.nth(0).locator(".tk-glance-label")).toHaveText("플레이어 (1일)");
-  await expect(week.nth(0)).toContainText("앞 1일보다 1명 많음");
-  await expect(week.nth(4).locator(".tk-glance-value")).toHaveText("40%");
-  await expect(week.nth(4)).toContainText("itch 33.3% (1/3) · 앱 50% (1/2)");
+  await expect(week.nth(0).locator(".tk-glance-label")).toHaveText("모바일 플레이어 (1일)");
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${last.mobile}명`);
+  await expect(week.nth(0)).toContainText("앞 1일과 같음");
+  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("50%");
+  await expect(week.nth(3)).toContainText("모바일 1/2명");
   await page.locator('[data-tk-compare="d3"]').click();
   await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 3일");
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${last.u3_mobile}명`);
   await expect(week.nth(0)).toContainText("앞 3일보다 3명 많음");
-  await expect(week.nth(4)).toContainText("itch 33.3% (3/9)");
+  await expect(week.nth(3)).toContainText("모바일 3/6명");
   await page.locator('[data-tk-compare="w"]').click();
   await expect(page.locator("#tenkeyGlanceWeekTitle")).toHaveText("최근 7일");
+  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${last.u7_mobile}명`);
   await expect(week.nth(0)).toContainText("앞 7일보다 7명 많음");
   await page.locator('[data-tk-compare="d1"]').click();
   await shot(page, "overview_split");
