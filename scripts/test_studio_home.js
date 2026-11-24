@@ -197,10 +197,10 @@ const expectedCopy = {
 };
 
 const expectedOpenGraph = {
-  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android 출시 준비 중이에요. 지금 사전예약하면 itch.io에서 데모(레벨 8까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "House Duck: 밤의 PC 책상과 노란 오리의 뒷모습"],
-  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is coming to iOS and Android: pre-register now and play the demo (up to level 8) on itch.io. Quirky Ball is out on iOS and Android.", "House Duck: a night desk with a PC and the back of a yellow duck"],
-  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival kommt für iOS und Android: jetzt vorregistrieren und die Demo (bis Level 8) auf itch.io spielen. Quirky Ball gibt es auf iOS und Android.", "House Duck: ein nächtlicher PC-Schreibtisch und ein gelber Entenrücken"],
-  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信予定。今すぐ事前登録して、itch.ioでデモ（レベル8まで）をプレイ。Quirky BallはiOSとAndroidで遊べます。", "House Duck：夜のPCデスクと黄色いアヒルの後ろ姿"],
+  "index.html": ["House Duck — 독일의 1인 인디 게임 스튜디오", "신작 딸깍 서바이벌(10key Survival)은 iOS·Android에서 받을 수 있어요. 컴퓨터에서는 itch.io에서 데모(레벨 8까지)를 플레이할 수 있어요. Quirky Ball은 iOS와 Android에서 만나보세요.", "House Duck: 밤의 PC 책상과 노란 오리의 뒷모습"],
+  "index_en.html": ["House Duck — Independent Game Studio", "10key Survival is out on iOS and Android; on a computer, play the demo (up to level 8) on itch.io. Quirky Ball is out on iOS and Android.", "House Duck: a night desk with a PC and the back of a yellow duck"],
+  "index_de.html": ["House Duck — Unabhängiges Spielestudio in Deutschland", "10key Survival gibt es jetzt für iOS und Android; am Computer spielst du die Demo (bis Level 8) auf itch.io. Quirky Ball gibt es auf iOS und Android.", "House Duck: ein nächtlicher PC-Schreibtisch und ein gelber Entenrücken"],
+  "index_ja.html": ["House Duck — ドイツのインディーゲームスタジオ", "10key SurvivalはiOS・Androidで配信中。パソコンではitch.ioでデモ（レベル8まで）をプレイできます。Quirky BallはiOSとAndroidで遊べます。", "House Duck：夜のPCデスクと黄色いアヒルの後ろ姿"],
 };
 
 const expectedDescriptions = {
