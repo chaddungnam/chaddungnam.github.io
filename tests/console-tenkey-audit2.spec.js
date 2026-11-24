@@ -7,16 +7,12 @@ const { open, shot } = require("./fixtures/tenkey_console.cjs");
 test.describe.configure({ retries: 2 });
 const stub = (fn) => `\n(()=>{const real=window.ConsoleAPI.postProject;window.ConsoleAPI.postProject=async(pj,fn,b)=>{if(fn==="tenkey-admin"){const r=(${fn})(b);if(r!==undefined)return {ok:true,data:r};}return real(pj,fn,b);};})();`;
 
-test("overview: 다음 날 다시 온 비율 on the itch filter counts accounts (no more 0 % / '—'); the Android filter says it is the app total until the server splits it", async ({ page }) => {
+test("overview: the Android filter's 다음 날 다시 온 비율 says it is the app total until the server splits it (the web filter is gone, owner 11-24)", async ({ page }) => {
   const errors = await open(page);
-  await page.locator('[data-tk-platform="web_itch"]').click();
   const card = page.locator("#tenkeyGlanceWeek .tk-glance-card").nth(3);
-  await expect(card).toContainText("다음 날 다시 온 비율");
-  await expect(card.locator(".tk-glance-value")).toHaveText("33.3%");  // fixture: 7 days x (3 new, 1 back) itch accounts
-  await expect(card).toContainText("새 계정 21명 중 7명");
-  await expect(card).not.toContainText("셀 수 없음");
-  await shot(page, "overview_return_itch", "#tenkeyGlanceWeek");
   await page.locator('[data-tk-platform="android"]').click();
+  await expect(card).toContainText("다음 날 다시 온 비율");
+  await expect(card).not.toContainText("셀 수 없음");
   await expect(card.locator(".tk-glance-value")).toHaveText("50%");  // app cohort 2 new, 1 back, no android split in the old server answer
   await expect(card).toContainText("Android+iOS 합계");
   expect(errors).toEqual([]);

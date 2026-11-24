@@ -118,7 +118,8 @@
     return { max, plot: `${yTicks(max)}<div class="ov-plot-inner"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${GRID}</svg><div class="ov-cols">${cols}</div></div>` };
   }
   const swatch = (color, text) => `<span class="ov-legend-item"><span class="ov-key" data-kind="bar" style="background:${color}" aria-hidden="true"></span>${esc(text)}</span>`;
-  const COLOR = { app: "#5b6b8c", web: "#e0864a", pre: "#21aa9b", ko: "#4c5fd5", en: "#21aa9b", ja: "#e0864a", de: "#9aa3b5", zh: "#c94f7c" };
+  // Dark console theme (owner 2026-11-24): duck yellow for the main line, green / blue for the two stores.
+  const COLOR = { app: "#ffd23f", web: "#ff9d6e", pre: "#5fd3b8", ko: "#9fb0ff", en: "#7ee2a8", ja: "#ffb36b", de: "#8c96aa", zh: "#e58fb0" };
   const LANG = { ko: "한국어", en: "영어", ja: "일본어", zh: "중국어(번체)", de: "독일어" };
 
   const card = (title, legend, body, rows, wide, wait) => `<article class="ov-card${wide ? " is-wide" : ""}">
@@ -177,7 +178,7 @@
           ? "권한 부여됨 (11-24), Google 쪽 반영 대기 중 · 반영되면 자동으로 채워짐" : STORE_WHY(x?.note);
       return `<div><dt>${esc(STORE_NAME[k])}</dt><dd>${esc(v)}</dd></div>`;
     }).join("");
-    const any = (S.sync || []).some((x) => x.ok);
+    const any = rows.some((r) => r.google + r.apple + r.iap > 0);  // an all-zero chart says nothing: the two lines above do
     return `<article class="ov-card is-wide tk-store-card">
       <header class="ov-card-head"><h3>앱 판매 (스토어 보고서, ${period}일)</h3><span class="ov-legend">${parts.map((p) => swatch(p.color, p.label)).join("")}</span></header>
       <div class="lab-facts tk-more-facts">${status}</div>
@@ -241,7 +242,7 @@
       : noSignal ? "지금 테스트 빌드는 하루 접속 신호를 보내지 않아요. 그래서 사람 수는 게임 서버 기록(로그인·진행 저장·기록 전송)으로 셉니다. 설치 수와 판 수는 신호를 보내는 새 빌드가 나가면 채워집니다." : "";
     const todayRow = daily.at(-1) || {};
     const yRow = daily.at(-2) || {};
-    const MOBILE_HELP = "모바일 앱(Android·iOS)에서 게임 서버가 본 계정 수 (로그인·진행 저장·기록 전송, 한 사람 한 번). 플랫폼은 그날 보낸 판, 없으면 평소 판, 그것도 없으면 로그인한 기기(앱인지 브라우저인지)로 정합니다. itch 계정과 방문은 아래 ‘참고: itch’ 그래프에 따로 있습니다.";
+    const MOBILE_HELP = "모바일 앱(Android·iOS)에서 게임 서버가 본 계정 수 (로그인·진행 저장·기록 전송, 한 사람 한 번). 플랫폼은 그날 보낸 판, 없으면 평소 판, 그것도 없으면 로그인한 기기(앱인지 브라우저인지)로 정합니다. 웹(itch.io·Nekoland·GamePix)은 아래 ‘웹’ 칸에 따로 있습니다.";
     // 다음 날 다시 온 비율 without a "전체" frame (a platform filter, or the itch numbers failed to load). Owner 2026-11-12: the install
     // ping's id is new on every itch page load, so it read 0 %. The accounts the game server saw are used instead: of the accounts first
     // seen in the 7 days up to yesterday, how many came back the next day (server admin_dau: new_* / back_*; android / ios split from v2).
@@ -335,7 +336,7 @@
         glance("인앱 결제", num(buys), "건", bc.note, { noteTone: bc.noteTone, help: `최근 ${N}일 게임 서버가 스토어에서 확인한 인앱 구매 (환불·테스트 결제 제외). 앱 자체 판매(유료 다운로드)는 게임 서버가 볼 수 없어 ‘앱 판매 (스토어 보고서)’에 따로 있습니다. 앞 ${N}일: ${num(buysPrev)}건.` }),
         glance("다음 날 다시 온 비율", rate(grp.app) === null ? "—" : String(rate(grp.app)), rate(grp.app) === null ? "" : "%",
           split ? `${part("Android", grp.android)} · ${part("iOS", grp.ios)}` : `모바일 ${grp.app.n > 0 ? `${num(grp.app.k)}/${num(grp.app.n)}명` : "—"}`,
-          { help: `${span} 모바일 앱에서 처음 들어온 계정 가운데 다음 날 다시 들어온 비율. 모바일 ${num(grp.app.k)}/${num(grp.app.n)}명. 앞 ${N}일: ${rate(prevApp) === null ? "—" : `${rate(prevApp)}%`}. 참고: itch ${rate(grp.itch) === null ? "—" : `${rate(grp.itch)}% (${num(grp.itch.k)}/${num(grp.itch.n)})`}. 오늘 다시 온 사람은 하루가 끝날 때까지 늘어납니다.` }),
+          { help: `${span} 모바일 앱에서 처음 들어온 계정 가운데 다음 날 다시 들어온 비율. 모바일 ${num(grp.app.k)}/${num(grp.app.n)}명. 앞 ${N}일: ${rate(prevApp) === null ? "—" : `${rate(prevApp)}%`}. 오늘 다시 온 사람은 하루가 끝날 때까지 늘어납니다.` }),
       ].join("");
     } else {
     byId("tenkeyGlanceWeekTitle").textContent = "최근 7일";
@@ -410,19 +411,20 @@
       const dauCols = stacked(dailyRows, DP, dailyRows.map((r) => tip(dayLabel(r.day), [["모바일 DAU", `${num(r.people)}명`], ...DP.map((d) => [d.label, `${num(r[d.key])}명`])])));
       dauHtml = `<article class="ov-card is-wide"><header class="ov-card-head"><h3>모바일 DAU Android · iOS (${state.period}일)</h3><span class="ov-legend">${DP.map((d) => swatch(d.color, d.label)).join("")}</span></header>
         <figure class="ov-figure" tabindex="0" aria-label="모바일 DAU Android, iOS"><div class="ov-plot has-y">${dauCols.plot}</div>${xAxis(dailyRows)}</figure></article>`;
-      // Reference only (owner 2026-11-24): itch accounts and anonymous itch visits, never part of the mobile numbers above.
-      const IS = [{ key: "dau_itch", color: COLOR.web, label: "itch 플레이어 (계정)" }, { key: "visits", color: COLOR.de, label: "itch 웹 방문 (사람 수 아님)" }];
-      const itchLine = multiLine(dailyRows, IS, dailyRows.map((r) => tip(dayLabel(r.day), [["itch 플레이어 (계정)", `${num(r.dau_itch)}명`], ["itch 웹 방문", `${num(r.visits)}회`], ["itch 판", `${num(r.web_runs)}판`],
-        ["기타 웹·플랫폼 모름", `${num(r.dau_other)}명`]], "참고용 · 모바일 숫자에는 들어가지 않음")));
-      const last = state.dau?.days?.at(-1) || {};
-      const itchFacts = [["오늘 itch 계정", `${num(todayRow.dau_itch)}명`], ["최근 7일 itch 계정", Object.hasOwn(last, "u7_itch") ? `${num(last.u7_itch)}명` : "—"],
-        ["최근 7일 웹 방문", `${num(webActive("d7"))}회`], ["최근 7일 itch 판", `${num(sum(daily, "web_runs", 7))}판`]]
-        .map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
-      itchHtml = `<article class="ov-card is-wide tk-itch-ref">
-        <header class="ov-card-head"><h3>참고: itch (웹) (${state.period}일)</h3><span class="ov-legend">${IS.map((d) => swatch(d.color, d.label)).join("")}</span></header>
-        <div class="lab-facts tk-more-facts">${itchFacts}</div>
-        <figure class="ov-figure" tabindex="0" aria-label="참고 itch 플레이어와 웹 방문"><div class="ov-plot has-y">${itchLine.plot}</div>${xAxis(dailyRows)}</figure>
-        <p class="overview-drill-note">itch.io 브라우저 데모는 참고용으로만 따로 둡니다. 위의 모바일 DAU·설치·플레이·다시 온 비율에는 들어가지 않습니다. ‘웹 방문’은 페이지를 열 때마다 새 익명 번호라 사람 수가 아닙니다.</p></article>`;
+      // Web (owner 2026-11-24 evening: "웹은 itch뿐만 아니라 네코랜드도 있고, gamepix도 ... dau가 의미가 없어서 계산안하고 그냥 오늘
+      // 몇명들어왔는지 정도만"): per portal, today's signed-in players and page opens, yesterday beside it. No rate, no chart.
+      const dRows = state.dau?.days || [];
+      const dToday = dRows.at(-1) || {}, dYest = dRows.at(-2) || {};
+      const PORTALS = [["itch.io", "web_itch", "visits_itch"], ["Nekoland", "web_nekoland", "visits_nekoland"], ["GamePix", "web_gamepix", "visits_gamepix"]];
+      const tiles = PORTALS.map(([name, acc, vis]) => {
+        const opens = Number(dToday[vis] || 0);
+        return `<div class="tk-web-tile"><dt>${esc(name)}</dt><dd><strong>${esc(num(dToday[acc] || 0))}</strong><span>명</span></dd>
+          <p>${opens > 0 ? `페이지 열림 ${esc(num(opens))}회 · ` : ""}어제 ${esc(num(dYest[acc] || 0))}명</p></div>`;
+      }).join("");
+      itchHtml = `<article class="ov-card is-wide tk-web-card">
+        <header class="ov-card-head"><h3>웹 · 오늘 들어온 사람</h3><span class="ov-legend">참고용 · 모바일 숫자와 따로</span></header>
+        <dl class="tk-web-tiles">${tiles}</dl>
+        <p class="overview-drill-note">로그인한 계정 수입니다 (베를린 날짜). 웹은 페이지를 열 때마다 새 익명 번호라 DAU나 비율은 내지 않습니다. GamePix는 접속 신호를 보내지 않아 계정만 셉니다.</p></article>`;
     }
     const storeHtml = W ? storeCard(state.store, dailyRows.length) : "";
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
@@ -450,7 +452,7 @@
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
       "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 날마다 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·기록을 올린 사람을 보여 줍니다. 서버의 날짜별 기록은 10월 22일(테스트 시작)부터 있습니다.",
       "최근 7일 DAU의 %는 출시일(서버 launch_day) 뒤 처음 들어온 모바일 계정(스토어로 받은 사람) 가운데 그날 플레이한 비율입니다. 출시 전 비공개 테스트·TestFlight 계정은 모바일 DAU 숫자에는 들어가지만(테스터로 따로 표시) 비율에서는 빠집니다. 한 사람이 다른 기기에서 로그인 없이 새로 시작하면 계정이 하나 더 생깁니다.",
-      "‘모바일’ 화면(기본)의 DAU는 그날 게임 서버가 본 계정 가운데 Android·iOS 앱 계정 수입니다 (한 사람 한 번, 2026-11-24 출시부터 이 기준). 계정의 플랫폼은 그날 보낸 판 → 그날 웹 신호 → 평소 판 → 로그인한 기기(앱/브라우저)·기기 슬롯·스토어 결제 순으로 정합니다. itch 계정과 익명 itch 방문은 ‘참고: itch’ 그래프에만 있습니다. GamePix·Nekoland 같은 다른 웹 판 계정은 어느 쪽에도 넣지 않습니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
+      "‘모바일’ 화면(기본)의 DAU는 그날 게임 서버가 본 계정 가운데 Android·iOS 앱 계정 수입니다 (한 사람 한 번, 2026-11-24 출시부터 이 기준). 계정의 플랫폼은 그날 보낸 판 → 그날 웹 신호 → 평소 판 → 로그인한 기기(앱/브라우저)·기기 슬롯·스토어 결제 순으로 정합니다. 웹(itch.io·Nekoland·GamePix)은 ‘웹’ 칸에 그날 들어온 계정 수만 보여 줍니다 (DAU·비율은 내지 않음). 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
       "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어갑니다. ‘다시 온 비율’은 익명 번호로는 셀 수 없어 로그인한 계정 기준으로 셉니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",

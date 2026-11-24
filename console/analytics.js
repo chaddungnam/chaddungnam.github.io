@@ -1086,7 +1086,7 @@ function renderDailyChart() {
   const groupWidth = (width - left - right) / Math.max(1, rows.length);
   const barWidth = Math.max(2, Math.min(12, groupWidth * .28));
 
-  context.strokeStyle = "#eee9df";
+  context.strokeStyle = "#2c2b28";
   context.lineWidth = 1;
   for (let line = 0; line <= 4; line += 1) {
     const y = top + chartHeight - (chartHeight * line / 4);
@@ -1157,7 +1157,7 @@ function drawVersionTrend(rows) {
   context.clearRect(0, 0, width, height);
   context.font = "10px system-ui, sans-serif";
   if (!rows.length) {
-    context.fillStyle = "#758194";
+    context.fillStyle = "#8c96aa";
     context.textAlign = "center";
     context.fillText("선택 버전의 업데이트 이후 활동 데이터가 없습니다.", width / 2, height / 2);
     return;
@@ -1169,7 +1169,7 @@ function drawVersionTrend(rows) {
   const chartHeight = height - top - bottom;
   const chartWidth = width - left - right;
   const max = Math.max(1, ...rows.flatMap((row) => [Number(row.activePeople ?? 0), Number(row.completedPeople ?? 0)]));
-  context.strokeStyle = "#e2e7ea";
+  context.strokeStyle = "#2c2b28";
   context.fillStyle = "#8994a3";
   context.textAlign = "right";
   for (let line = 0; line <= 4; line += 1) {
@@ -1191,7 +1191,7 @@ function drawVersionTrend(rows) {
     });
     context.stroke();
     rows.forEach((row, index) => {
-      context.fillStyle = "#fff"; context.strokeStyle = color; context.lineWidth = 2;
+      context.fillStyle = "#1d1d1d"; context.strokeStyle = color; context.lineWidth = 2;
       context.beginPath(); context.arc(xAt(index), yAt(row[key]), 3.2, 0, Math.PI * 2); context.fill(); context.stroke();
     });
   };

@@ -60,31 +60,19 @@ test("every 10KEY page opens straight from its link when the project is picked, 
   expect(errors).toEqual([]);
 });
 
-test("overview: the itch.io web filter shows its own visits and runs, the return rate by itch account, never the game server's people", async ({ page }) => {
+test("overview (owner 2026-11-24 evening): no web filter and no web DAU; the web card shows today's signed-in players per portal (itch.io, Nekoland, GamePix)", async ({ page }) => {
   const errors = await open(page);
-  const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
-  const week = page.locator("#tenkeyGlanceWeek .tk-glance-card");
-  await expect(today).toHaveCount(4);
-  await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveText("웹(itch)");
-  await page.locator('[data-tk-platform="web_itch"]').click();
-  await expect.poll(async () => (await calls(page, "overview.web")).length).toBeGreaterThan(1);
-  await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveAttribute("aria-pressed", "true");
-  const want = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-admin", { action: "overview.get", params: { platform: "web_itch" } })
-    .then((r) => [r.data.active.d1, r.data.active.d7, r.data.runs.d1]));
-  // people = the web pings only (the game server's accounts are app players, 31 / 260 in the fixture would win the max)
-  await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${want[0]}명`);
-  await expect(week.nth(0).locator(".tk-glance-value")).toHaveText(`${want[1]}명`);
-  await expect(today.nth(2).locator(".tk-glance-value")).toHaveText(`${want[2]}판`);
-  // 2026-11-12: the anonymous itch id cannot be followed, so the rate is counted over the itch ACCOUNTS the game server saw
-  await expect(week.nth(3).locator(".tk-glance-value")).toHaveText("33.3%");
-  await expect(week.nth(3)).toContainText("새 계정");
-  await expect(page.locator("#tenkeyOverviewNotice")).toBeVisible();
-  await expect(page.locator("#tenkeyOverviewNotice")).toContainText("방문 수");
-  await page.locator("#tenkeyOverviewMore summary").click();
-  await expect(page.locator("#tenkeyOverviewMoreCharts")).toContainText("웹 · itch.io");
-  await shot(page, "overview_web_itch");
-  await page.locator('[data-tk-platform=""]').click();
-  await expect(page.locator("#tenkeyOverviewNotice")).toBeHidden();
+  await expect(page.locator("#tenkeyGlanceToday .tk-glance-card")).toHaveCount(4);
+  await expect(page.locator('[data-tk-platform="web_itch"]')).toHaveCount(0);
+  await expect(page.locator("[data-tk-platform]")).toHaveCount(3);
+  const web = page.locator("#tenkeyOverviewCharts .tk-web-card");
+  await expect(web.locator("h3")).toHaveText("웹 · 오늘 들어온 사람");
+  await expect(web.locator(".tk-web-tile dt")).toHaveText(["itch.io", "Nekoland", "GamePix"]);
+  const want = await page.evaluate(() => window.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).then((r) => r.data.days.slice(-2)));
+  await expect(web.locator(".tk-web-tile").nth(0).locator("strong")).toHaveText(String(want[1].web_itch));
+  await expect(web.locator(".tk-web-tile").nth(0)).toContainText(`페이지 열림 ${want[1].visits_itch}회 · 어제 ${want[0].web_itch}명`);
+  await expect(web.locator(".tk-web-tile").nth(2)).not.toContainText("페이지 열림");  // GamePix sends no ping
+  await expect(web).not.toContainText("%");
   expect(errors).toEqual([]);
 });
 
@@ -441,9 +429,8 @@ test("overview (owner 2026-11-24 launch): the default view counts DAU on the mob
   await expect(week.nth(2).locator(".tk-glance-label")).toHaveText("인앱 결제");
   await expect(today.nth(1)).toContainText("판매 수 아님");
   await expect(page.locator("#tenkeyOverviewCharts")).toContainText("모바일 DAU Android · iOS");
-  await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref h3")).toContainText("참고: itch");
-  await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref")).toContainText("참고용으로만 따로 둡니다");
-  await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(4);
+  await expect(page.locator("#tenkeyOverviewCharts .tk-web-card")).toContainText("참고용");
+  await expect(page.locator("#tenkeyOverviewCharts .ov-line")).toHaveCount(2);
   await expect(page.locator("#tenkeyOverview")).not.toContainText("사전예약");
   expect((await calls(page, "prereg.get")).length).toBe(0);
   // 1일 / 3일 / 7일: unique mobile accounts in exactly that window against the N days before; next-day return on mobile accounts.

@@ -1,0 +1,202 @@
+/* House Duck Console theme (owner 2026-11-24: "콘솔사이트 디자인에 대해서 너무 슬롭같으니, itch나 내 웹사이트처럼 깔끔하게 개편").
+   The site's itch.io theme: page #141414, panels #1d1d1d, text #ece6d6, links and the one main action #ffd23f, Lato.
+   Flat panels with a hairline edge, 4px corners, no glow, no gradients, no shadows, one accent. Loaded last: base.css and
+   styles.css were turned dark colour by colour (tools: the darkify pass, 2026-11-24); this file sets the shell and the
+   shared controls. No hero art here (owner: the home page's duck-at-the-monitor scene stays on the home page). */
+
+@font-face { font-family: "Lato"; src: url("/assets/fonts/Lato-Regular-latin.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122, U+2190-21FF; }
+@font-face { font-family: "Lato"; src: url("/assets/fonts/Lato-Bold-latin.woff2") format("woff2"); font-weight: 600 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+2000-206F, U+20AC, U+2122, U+2190-21FF; }
+
+:root {
+  --hd-bg: #141414;
+  --hd-panel: #1d1d1d;
+  --hd-raised: #262626;
+  --hd-edge: #302e2b;
+  --hd-edge-2: #45423d;
+  --hd-text: #ece6d6;
+  --hd-text-2: #b8b2a4;
+  --hd-text-3: #8c877c;
+  --hd-duck: #ffd23f;
+  --hd-duck-ink: #141414;
+  --hd-good: #7ee2a8;
+  --hd-bad: #ff9d8a;
+  --hd-font: "Lato", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", "Hiragino Sans", "Segoe UI", sans-serif;
+  color-scheme: dark;
+  font-family: var(--hd-font);
+}
+
+html, body { background: var(--hd-bg); }
+body { color: var(--hd-text); font-family: var(--hd-font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font-family: inherit; }
+a { color: var(--hd-duck); }
+::selection { color: var(--hd-duck-ink); background: var(--hd-duck); }
+* { scrollbar-color: #3d3a35 transparent; }
+
+/* no motion for decoration: buttons do not jump, cards do not lift */
+.console-main button:not(:disabled):hover, .player-open-link:hover, .player-identity-link:hover,
+.console-sidebar nav a:hover { transform: none !important; }
+
+/* ── entry: login, second check, project picker ── */
+.console-entry { width: min(460px, calc(100% - 32px)); padding: 12vh 0 40px; }
+.login-panel, .project-picker { padding: 28px; background: var(--hd-panel); border: 1px solid var(--hd-edge); border-radius: 4px; box-shadow: none; }
+.login-panel h1, .project-picker h1 { margin: 6px 0 8px; font-size: 22px; line-height: 1.25; letter-spacing: 0; }
+.login-panel h1 em { color: var(--hd-duck); font-style: normal; }
+.login-copy, .picker-copy, .auth-form-copy { color: var(--hd-text-2); font-size: 13px; }
+.brand-mark, .console-brand > span { color: transparent !important; background: url("/assets/house-duck-logo-96.webp") center / contain no-repeat !important; border-radius: 0 !important; box-shadow: none !important; }
+.brand-mark { width: 40px; height: 40px; margin-bottom: 14px; transform: none !important; }
+.brand-mark span { visibility: hidden; }
+.eyebrow { color: var(--hd-text-3); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.project-grid { gap: 8px; margin-top: 18px; }
+.project-card { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 12px; padding: 14px; color: var(--hd-text); background: var(--hd-bg); border: 1px solid var(--hd-edge); border-radius: 4px; box-shadow: none; text-align: left; }
+.project-card:hover { border-color: var(--hd-duck); }
+.project-card-mark { display: grid; place-items: center; width: 36px; height: 36px; color: var(--hd-duck-ink); background: var(--hd-duck); border-radius: 3px; font-weight: 800; }
+.project-card-copy strong { display: block; font-size: 15px; }
+.project-card-copy small { color: var(--hd-text-3); font-size: 12px; }
+.project-card-arrow { color: var(--hd-text-3); }
+
+/* ── shell ── */
+.console-shell { grid-template-columns: 216px minmax(0, 1fr); background: var(--hd-bg); }
+.console-sidebar { padding: 18px 12px 14px; color: var(--hd-text); background: #101010 !important; border-right: 1px solid var(--hd-edge); box-shadow: none !important; }
+.console-brand { grid-template-columns: 28px 1fr; column-gap: 9px; margin: 0 6px 18px; }
+.console-brand > span { width: 28px !important; height: 28px !important; }
+.console-brand strong { color: var(--hd-text); font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.console-brand small { color: var(--hd-text-3); font-size: 10px; letter-spacing: .14em; }
+.project-switch { margin: 0 0 14px; padding: 10px; color: var(--hd-text); background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 4px !important; box-shadow: none !important; text-align: left; }
+.project-switch:hover { border-color: var(--hd-edge-2) !important; }
+.project-switch span { font-size: 13px; font-weight: 700; }
+.project-switch small { color: var(--hd-text-3); font-size: 11px; }
+.console-sidebar nav { gap: 1px; align-content: start; grid-auto-rows: max-content; }
+.console-sidebar nav a { grid-template-columns: 1fr; min-height: 0; padding: 7px 10px; color: var(--hd-text-2); background: transparent; border-radius: 3px; font-size: 13px; font-weight: 400; }
+.console-sidebar nav a::after { inset: 6px auto 6px 0; width: 2px; border-radius: 0; background: var(--hd-duck); }
+.console-sidebar nav a:hover { color: var(--hd-text); background: #191919; }
+.console-sidebar nav a[aria-current="page"] { color: var(--hd-duck); background: #1a1a1a; font-weight: 700; }
+.nav-index { display: none !important; }
+.nav-copy small { display: none; }
+.console-environment { display: none !important; }
+.sidebar-logout { margin-top: 12px; padding: 8px 10px; color: var(--hd-text-3); font-size: 12px; border-radius: 3px; }
+.sidebar-logout:hover { color: var(--hd-text); background: #191919; }
+
+.console-main { max-width: 1400px; padding: 0 clamp(18px, 3vw, 40px) 48px; }
+.console-topbar { margin: 0 0 18px; padding: 16px 0 12px; background: var(--hd-bg) !important; border-bottom: 1px solid var(--hd-edge); backdrop-filter: none; }
+.console-topbar .eyebrow { display: none; }
+.console-topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: 0; }
+.page-description { margin-top: 2px; color: var(--hd-text-3); font-size: 12px; }
+.refresh-button, .user-pill { min-height: 32px; padding: 6px 10px; color: var(--hd-text-2); background: transparent !important; border: 1px solid var(--hd-edge); border-radius: 3px; font-size: 12px; font-weight: 700; box-shadow: none; }
+.refresh-button:hover { color: var(--hd-text); border-color: var(--hd-edge-2); }
+.refresh-button::before { color: var(--hd-duck); }
+.user-pill { font-weight: 400; }
+
+/* ── panels and cards: one flat panel style ── */
+.panel, .ov-card, .tk-glance-card, .lab-card, .overview-drill, .ov-details, .ov-summary, .ov-bar, .cs-kanban-column, .executive-card {
+  background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 4px !important; box-shadow: none !important; }
+.ov-bar { padding: 8px 10px; }
+.panel-heading h2, .ov-card-head h3, .ov-card h3 { font-size: 15px; font-weight: 700; letter-spacing: 0; }
+.panel-total { color: var(--hd-text-2); background: var(--hd-raised); border-radius: 3px; }
+
+/* ── controls ── */
+.primary-button, .warning-button { color: var(--hd-duck-ink) !important; background: var(--hd-duck) !important; border: 0; border-radius: 3px !important; font-weight: 800; box-shadow: none; }
+.primary-button:hover, .warning-button:hover { background: #ffe07a !important; }
+.danger-button { color: #fff !important; background: #c2473a !important; border-radius: 3px !important; }
+.secondary-button, .ghost-button, .text-button, .overview-refresh, .ov-info { border-radius: 3px; box-shadow: none; }
+.secondary-button, .ghost-button, .overview-refresh { color: var(--hd-text) !important; background: var(--hd-raised) !important; border: 1px solid var(--hd-edge-2) !important; }
+.secondary-button:hover, .ghost-button:hover, .overview-refresh:hover { border-color: var(--hd-text-3) !important; }
+.text-button { color: var(--hd-duck); }
+.overview-segment { padding: 2px; gap: 2px; background: var(--hd-bg) !important; border: 1px solid var(--hd-edge) !important; border-radius: 3px !important; }
+.overview-switch { min-height: 28px; padding: 4px 10px; color: var(--hd-text-2) !important; background: transparent !important; border: 0 !important; border-radius: 2px !important; font-size: 12px; font-weight: 700; box-shadow: none !important; }
+.overview-switch:hover { color: var(--hd-text) !important; }
+.overview-switch.active, .overview-switch[aria-pressed="true"] { color: var(--hd-duck-ink) !important; background: var(--hd-duck) !important; }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
+  color: var(--hd-text); background-color: var(--hd-bg); border: 1px solid var(--hd-edge-2); border-radius: 3px; box-shadow: none; }
+input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus { border-color: var(--hd-duck); outline: none; }
+input::placeholder, textarea::placeholder { color: var(--hd-text-3); }
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--hd-duck); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--hd-duck) !important; outline-offset: 2px; }
+
+/* ── tables ── */
+.console-main table { color: var(--hd-text); }
+.console-main th { color: var(--hd-text-3); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.console-main td { color: var(--hd-text-2); }
+.console-main .table-scroll { background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 4px !important; }
+.console-main .table-scroll thead th { color: var(--hd-text-3) !important; background: #191919 !important; box-shadow: 0 1px 0 var(--hd-edge) !important; font-size: 11px; }
+.console-main .table-scroll td { color: var(--hd-text-2) !important; border-color: var(--hd-edge) !important; }
+.console-main .table-scroll tbody tr:nth-child(even) td { background: transparent !important; }
+.console-main .table-scroll tbody tr:hover td { background: #222 !important; }
+
+/* ── overview (10key 한눈 요약 and Quirky Ball 분석) ── */
+.tk-glance-head h3, .tk-glance-head h3 + small { letter-spacing: 0; }
+.tk-glance-head h3 { font-size: 15px; font-weight: 700; }
+.tk-glance-head small { color: var(--hd-text-3); }
+.tk-glance-card { padding: 14px 16px !important; }
+.tk-glance-card[data-tone] { border-top: 2px solid var(--hd-edge-2) !important; }
+.tk-glance-card[data-tone="good"] { border-top-color: #3c7a58 !important; }
+.tk-glance-card[data-tone="risk"] { border-top-color: var(--hd-bad) !important; background: #221a18 !important; }
+.tk-glance-label { color: var(--hd-text-2) !important; font-size: 12px !important; font-weight: 700 !important; letter-spacing: 0 !important; }
+.tk-glance-value strong { color: var(--hd-text); font-size: 30px !important; font-weight: 800; letter-spacing: -.01em; }
+.tk-glance-value span { color: var(--hd-text-3); }
+.tk-glance-note { color: var(--hd-text-3) !important; font-size: 12px !important; }
+.tk-glance-note[data-tone="good"] { color: var(--hd-good) !important; }
+.tk-glance-note[data-tone="bad"] { color: var(--hd-bad) !important; }
+a.tk-glance-note { color: var(--hd-bad) !important; }
+.tk-dau-day { background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 4px !important; box-shadow: none !important; }
+.tk-dau-day strong { color: var(--hd-text); }
+.tk-dau-day span, .tk-dau-day small { color: var(--hd-text-3); }
+.tk-dau-day.is-empty strong { color: var(--hd-text-3); font-size: 15px; }
+.tk-dau-day.is-today { border-color: var(--hd-edge-2) !important; }
+.ov-tip { color: var(--hd-text) !important; background: #262626 !important; border: 1px solid var(--hd-edge-2) !important; border-radius: 3px !important; box-shadow: none !important; }
+.ov-tip-row span, .ov-tip-note { color: var(--hd-text-3) !important; }
+.ov-legend, .ov-ytick, .ov-xaxis span { color: var(--hd-text-3) !important; }
+.lab-facts > div, .tk-more-facts > div { background: var(--hd-bg) !important; border: 1px solid var(--hd-edge) !important; border-radius: 3px !important; }
+.lab-facts dt { color: var(--hd-text-3) !important; }
+.lab-facts dd { color: var(--hd-text) !important; }
+.overview-drill-note, .ov-wait { color: var(--hd-text-3) !important; }
+.ov-details > summary small { color: var(--hd-text-3); }
+.bar-track { background: var(--hd-raised) !important; }
+.bar-fill { background: #8f9bb8 !important; }
+
+/* web portals today (owner 2026-11-24) */
+.tk-web-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 8px; }
+.tk-web-tile { padding: 10px 12px; background: var(--hd-bg); border: 1px solid var(--hd-edge); border-radius: 3px; }
+.tk-web-tile dt { color: var(--hd-text-2); font-size: 12px; font-weight: 700; }
+.tk-web-tile dd { margin: 2px 0 0; }
+.tk-web-tile dd strong { font-size: 24px; font-weight: 800; }
+.tk-web-tile dd span { margin-left: 2px; color: var(--hd-text-3); font-size: 12px; }
+.tk-web-tile p { margin: 2px 0 0; color: var(--hd-text-3); font-size: 12px; }
+
+/* status words and chips stay flat */
+.status-chip, .badge, .pill, .tag, .player-badge, .tk-badge { border-radius: 3px !important; box-shadow: none !important; }
+
+/* ── phones: the menu stays a bottom bar ── */
+@media (max-width: 760px) {
+  .console-entry { padding-top: 8vh; }
+  .console-sidebar { border-right: 0; border-top: 1px solid var(--hd-edge); }
+  .console-sidebar nav a { padding: 6px 4px; font-size: 11px; }
+  .console-sidebar nav a::after { inset: auto 8px 0; width: auto; height: 2px; }
+  .console-topbar { padding-top: 12px; }
+  .tk-web-tiles { grid-template-columns: 1fr; }
+}
+
+/* ── less decoration inside panels ── */
+.panel .eyebrow, .panel-heading .eyebrow, .ov-card .eyebrow, .executive-heading .eyebrow { display: none; }
+.panel-total, #analyticsView .panel-total { padding: 0; color: var(--hd-text-3) !important; background: transparent !important; border: 0; border-radius: 0; font-size: 13px; font-weight: 700; }
+.purchase-summary article, .operations-summary article { padding: 12px 14px !important; background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 4px !important; }
+.purchase-summary article::before, .operations-summary article::before { inset: 0 0 auto 0 !important; width: auto !important; height: 2px; opacity: .8; }
+.purchase-summary span, .operations-summary span { color: var(--hd-text-3) !important; font-size: 12px !important; font-weight: 700; }
+.purchase-summary strong, .operations-summary strong { color: var(--hd-text) !important; font-size: 22px; }
+.tk-retention-tabs button { color: var(--hd-text-2) !important; background: var(--hd-panel) !important; border: 1px solid var(--hd-edge) !important; border-radius: 3px !important; font-size: 12px !important; font-weight: 700; }
+.tk-retention-tabs button[aria-pressed="true"], .tk-retention-tabs button[aria-selected="true"], .tk-retention-tabs button.active, .tk-retention-tabs button.is-active {
+  color: var(--hd-duck-ink) !important; background: var(--hd-duck) !important; border-color: var(--hd-duck) !important; }
+.scroll-to-top { color: var(--hd-text) !important; background: var(--hd-raised) !important; border: 1px solid var(--hd-edge-2) !important; border-radius: 3px !important; font-size: 12px; }
+.scroll-to-top:hover { border-color: var(--hd-duck) !important; }
+.lab-facts dd { font-size: 15px; }
+@media (max-width: 760px) {
+  .refresh-button { width: 36px; min-width: 36px; padding: 6px; overflow: hidden; font-size: 0 !important; white-space: nowrap; }
+  .refresh-button::before { margin: 0; font-size: 15px; }
+  .console-topbar .user-pill { display: none; }
+}
+
+/* 최근 7일 DAU: the share as a thin bar along the bottom of each day (no water line through the numbers) */
+.tk-dau-day { background: var(--hd-panel) !important; }
+.tk-dau-day::after { inset: auto auto 0 0 !important; width: var(--share, 0%); height: 3px !important; background: var(--hd-duck) !important; }
+.tk-dau-day.is-today { border-style: solid !important; border-color: var(--hd-edge-2) !important; }

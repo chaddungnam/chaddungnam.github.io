@@ -3,12 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#141414">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>House Duck Console</title>
-  <link rel="stylesheet" href="../analytics/styles.css?v=20261104-mail">
-  <link rel="stylesheet" href="styles.css?v=20261119-cpcon">
+  <link rel="preconnect" href="https://frepunpqswciugwoyvxo.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://bbgwvpwzkyudbtcgrbtm.supabase.co" crossorigin>
+  <link rel="preload" href="/assets/fonts/Lato-Regular-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="base.css?v=20261124-dark">
+  <link rel="stylesheet" href="styles.css?v=20261124-dark">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
+  <link rel="stylesheet" href="theme.css?v=20261124-dark">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -451,7 +456,7 @@
         <section id="tenkeyOverview" class="overview" aria-labelledby="tenkeyOverviewTitle" aria-busy="false">
           <h2 id="tenkeyOverviewTitle" class="sr-only">10key Survival 한눈 요약</h2>
           <div class="ov-bar" role="group" aria-label="한눈 요약 필터">
-            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-tk-platform="" aria-pressed="true" title="Android + iOS 앱 기준 (2026-11-24 출시). itch.io 웹은 아래 참고 그래프에 따로">모바일</button><button class="overview-switch" type="button" data-tk-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-tk-platform="ios" aria-pressed="false">iOS</button><button class="overview-switch" type="button" data-tk-platform="web_itch" aria-pressed="false" title="itch.io 브라우저 판 (약관 동의 뒤 익명 신호)">웹(itch)</button></div>
+            <div class="overview-segment" role="group" aria-label="플랫폼"><button class="overview-switch" type="button" data-tk-platform="" aria-pressed="true" title="Android + iOS 앱 기준 (2026-11-24 출시). itch.io 웹은 아래 참고 그래프에 따로">모바일</button><button class="overview-switch" type="button" data-tk-platform="android" aria-pressed="false">Android</button><button class="overview-switch" type="button" data-tk-platform="ios" aria-pressed="false">iOS</button></div>
             <div class="ov-bar-end">
               <p id="tenkeyOverviewStatus" class="ov-status" role="status">불러오는 중</p>
               <button id="tenkeyOverviewRefresh" class="overview-refresh" type="button">새로 집계</button>
@@ -1002,45 +1007,45 @@
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261117-keep"></script>
-  <script src="ui-state.js?v=20260904-1"></script>
-  <script src="auth.js?v=20261103-7d"></script>
-  <script src="api.js?v=20261007-hx"></script>
-  <script src="analytics.js?v=20261009-web"></script>
-  <script src="analytics-exclusions.js?v=20260829-1"></script>
-  <script src="players.js?v=20260927-2x"></script>
-  <script src="../assets/notice-links.js?v=20261007-hx"></script>
-  <script src="announcement-editor.js?v=20261028-caret"></script>
-  <script src="operations.js?v=20260909-1"></script>
-  <script src="tenkey.js?v=20261117-triage"></script>
-  <script src="tenkey-overview.js?v=20261124-store"></script>
-  <script src="tenkey-unlocks.js?v=20261119-cpcon"></script>
-  <script src="tenkey-watch.js?v=20261115-watch"></script>
-  <script src="tenkey-signals.js?v=20261118-link"></script>
-  <script src="tenkey-players.js?v=20261118-link"></script>
-  <script src="tenkey-retention.js?v=20261112-audit"></script>
-  <script src="tenkey-titles.js?v=20261104-title"></script>
-  <script src="tenkey-crashes.js?v=20261117-keep"></script>
-  <script src="tenkey-reports.js?v=20261117-keep"></script>
-  <script src="tenkey-mail.js?v=20261104-mail"></script>
-  <script src="tenkey-notices.js?v=20261025-tr2"></script>
-  <script src="tenkey-more.js?v=20261119-cpcon"></script>
-  <script src="tenkey-balance.js?v=20261124-flip"></script>
-  <script src="tenkey-keep.js?v=20261120-cqa"></script>
-  <script src="tenkey-issues.js?v=20261124-flip"></script>
-  <script src="tenkey-perf.js?v=20261117-stall2"></script>
-  <script src="purchases-model.js?v=20260927-2x"></script>
-  <script src="purchases.js?v=20260927-2x"></script>
-  <script src="audit.js?v=20260907-2"></script>
-  <script src="notes.js?v=20261006-r25"></script>
-  <script src="gmail-model.js?v=20260904-1"></script>
-  <script src="gmail-api.js?v=20260907-2"></script>
-  <script src="cs-intelligence.js?v=20260904-1"></script>
-  <script src="cs-templates.js?v=20260904-1"></script>
-  <script src="cs.js?v=20261020-noai"></script>
-  <script src="lab.js?v=20261005-reports"></script>
-  <script src="liveops.js"></script>
+  <script src="../analytics/pulse-model.js?v=20260831-1" defer></script>
+  <script src="model.js?v=20261117-keep" defer></script>
+  <script src="ui-state.js?v=20260904-1" defer></script>
+  <script src="auth.js?v=20261103-7d" defer></script>
+  <script src="api.js?v=20261007-hx" defer></script>
+  <script src="analytics.js?v=20261124-dark" defer></script>
+  <script src="analytics-exclusions.js?v=20260829-1" defer></script>
+  <script src="players.js?v=20260927-2x" defer></script>
+  <script src="../assets/notice-links.js?v=20261007-hx" defer></script>
+  <script src="announcement-editor.js?v=20261028-caret" defer></script>
+  <script src="operations.js?v=20260909-1" defer></script>
+  <script src="tenkey.js?v=20261117-triage" defer></script>
+  <script src="tenkey-overview.js?v=20261124-dark" defer></script>
+  <script src="tenkey-unlocks.js?v=20261119-cpcon" defer></script>
+  <script src="tenkey-watch.js?v=20261115-watch" defer></script>
+  <script src="tenkey-signals.js?v=20261118-link" defer></script>
+  <script src="tenkey-players.js?v=20261118-link" defer></script>
+  <script src="tenkey-retention.js?v=20261112-audit" defer></script>
+  <script src="tenkey-titles.js?v=20261104-title" defer></script>
+  <script src="tenkey-crashes.js?v=20261117-keep" defer></script>
+  <script src="tenkey-reports.js?v=20261117-keep" defer></script>
+  <script src="tenkey-mail.js?v=20261104-mail" defer></script>
+  <script src="tenkey-notices.js?v=20261025-tr2" defer></script>
+  <script src="tenkey-more.js?v=20261119-cpcon" defer></script>
+  <script src="tenkey-balance.js?v=20261124-flip" defer></script>
+  <script src="tenkey-keep.js?v=20261120-cqa" defer></script>
+  <script src="tenkey-issues.js?v=20261124-flip" defer></script>
+  <script src="tenkey-perf.js?v=20261117-stall2" defer></script>
+  <script src="purchases-model.js?v=20260927-2x" defer></script>
+  <script src="purchases.js?v=20260927-2x" defer></script>
+  <script src="audit.js?v=20260907-2" defer></script>
+  <script src="notes.js?v=20261006-r25" defer></script>
+  <script src="gmail-model.js?v=20260904-1" defer></script>
+  <script src="gmail-api.js?v=20260907-2" defer></script>
+  <script src="cs-intelligence.js?v=20260904-1" defer></script>
+  <script src="cs-templates.js?v=20260904-1" defer></script>
+  <script src="cs.js?v=20261020-noai" defer></script>
+  <script src="lab.js?v=20261005-reports" defer></script>
+  <script src="liveops.js" defer></script>
   <script src="app.js?v=20261117-keep" defer></script>
 </body>
 </html>
