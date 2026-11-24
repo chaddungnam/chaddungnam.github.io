@@ -18,7 +18,7 @@ if (fs.existsSync(sql)) {
   assert.equal(JSON.stringify(Object.keys(server).sort()), JSON.stringify(Object.keys(ranges).sort()));
   for (const [name, row] of Object.entries(server)) assert.equal(JSON.stringify(row), JSON.stringify(ranges[name]), name + " SQL bounds differ");
 }
-console.log("PASS: all 33 console + SQL bounds match client table");
+console.log("PASS: all console + SQL bounds match client table");
 const pressure = read(path.join(client, "scripts/data/level_pressure.gd"));
 const atClear = vm.runInNewContext("(" + pressure.match(/const AT_CLEAR := (\{[\s\S]*?\n\})/)[1] + ")");
 const files = cp.execFileSync("rg", ["-l", "-F", "LevelPressure.tune(", path.join(client, "scripts")], {encoding:"utf8"}).trim().split("\n");
@@ -41,4 +41,4 @@ for (const file of files) {
 const gaps = [];
 for (const [name, row] of Object.entries(tunes)) if (found[name] !== row[1]) gaps.push(name + ": code=" + found[name] + ", console=" + row[1]);
 if (gaps.length) { console.error("NOT READY: merge driftxp1124 / reconcile actual defaults:\n" + gaps.join("\n")); process.exitCode = 1; }
-else console.log("PASS: all 33 console defaults match actual client callers");
+else console.log("PASS: all console defaults match actual client callers");
