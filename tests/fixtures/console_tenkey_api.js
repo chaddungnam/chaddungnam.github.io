@@ -276,9 +276,10 @@
       }
       case "knobs.set": {
         const k = p.knobs || {};
-        if (Object.values(k).some((v) => typeof v !== "number" || v < 0.7 || v > 1.3)) return { ok: false, error: "invalid_knob_value" };
+        if (Object.entries(k).some(([name, v]) => name !== "tune" && (typeof v !== "number" || v < 0.7 || v > 1.3))) return { ok: false, error: "invalid_knob_value" };
         const next = { ...config.balance, ...k };
-        if (["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"].every((n) => next[n] === config.balance[n])) return { ok: true, unchanged: true, balance: config.balance };
+        if (["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"].every((n) => next[n] === config.balance[n])
+          && JSON.stringify(next.tune || {}) === JSON.stringify(config.balance.tune || {})) return { ok: true, unchanged: true, balance: config.balance };
         config.balance = { ...next, ver: config.balance.ver + 1, updated_by: "qa@houseduck.in", updated_at: new Date().toISOString() };
         audit.unshift({ id: audit.length + 1, at: new Date().toISOString(), admin_email: "qa@houseduck.in", action, params: p, result: { ok: true } });
         return { ok: true, balance: config.balance };

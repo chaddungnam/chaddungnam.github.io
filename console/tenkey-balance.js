@@ -14,6 +14,27 @@
   const state = { bound: false, q: { days: 7, build: "", mode: "", platform: "app" } };
   const KNOBS = ["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"];
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
+  // 1.0.1 normal-mode table; checked against the client's bounds and call-site constants before landing.
+  // name: [plain Korean label, code default, minimum, maximum, integer?]. Blank input = no override.
+  const TUNES = {
+    drift_speed_base: ["드리프트 기본 속도", 1.2, 1, 1.3], drift_speed_top: ["드리프트 최고 속도", 1.5, 1.2, 1.7],
+    drift_straight_x: ["드리프트 직진 타격 배율", 1.35, 1, 1.6], drift_wear_x: ["드리프트 내구도 소모", 1.5, 1, 2.5],
+    drift_drain_share: ["드리프트 소모 비율", 0.5, 0.3, 1], drift_refill: ["드리프트 당첨 시 회복 비율", 1, 0, 1],
+    drift_exit_spd: ["코너 탈출 가속 비율", 1, 0, 1], drift_turn_xp: ["코너 타격 경험치 비율", 1, 0.3, 1],
+    drift_nitro_k: ["니트로 효과 배율", 1, 0, 1.5], drift_trail_k: ["무지개 자국 효과 배율", 1, 0, 1],
+    drift_blast_k: ["드리프트 폭발 효과 배율", 1, 0, 1.4], drift_blast_combo: ["폭발에 필요한 파괴 수", 5, 3, 8, true],
+    drift_chain_max: ["코너 연속 점수 상한", 5, 3, 10, true], drift_bomb: ["드리프트 중 폭탄 피해 비율", 0, 0, 1],
+    robot_xp_base: ["로봇 기본 경험치 배율", 1, 0.8, 1.6], robot_xp_part: ["로봇 강화당 경험치 증가", 0.033, 0, 0.19],
+    robot_xp_max: ["로봇 경험치 배율 상한", 2, 1, 3.5], robot_wear_share: ["로봇 내구도 소모 비율", 0.8, 0.5, 1.2],
+    from: ["난이도 상승 시작 레벨", 8, 8, 14, true], wear: ["마지막 레벨 내구도 소모", 1.8, 1.26, 2.52],
+    drain: ["마지막 레벨 에너지 소모", 2, 1.4, 2.8], spare: ["마지막 레벨 수리 키 비율", 0.5, 0.35, 0.7],
+    mouse_rest: ["마지막 레벨 마우스 휴식", 0.35, 0.245, 0.49], mouse_pace: ["마지막 레벨 마우스 속도", 1.9, 1.33, 2.66],
+    grab_drain: ["마지막 레벨 집게 소모", 3.3, 2.31, 4.62], grab_need: ["마지막 레벨 탈출 요구량", 1.6, 1.12, 2.24],
+    trap: ["마지막 레벨 철창 실패 배율", 1.5, 1, 1.6], cp15_surge_sec: ["레벨 15 압박 시간 (초)", 0, 0, 120],
+    cp_pace_sec: ["체크포인트 진행 시간 (초)", 300, 0, 600], xp_late: ["후반 레벨 경험치 요구 증가", 1.01, 1, 1.03],
+    ol_drain: ["에너지 소모의 내구도 환산", 0.42, 0.294, 0.546], ol_hurt: ["피해의 내구도 환산", 1, 0.7, 1.3],
+    ol_gain: ["회복의 내구도 환산", 0.53, 0.371, 0.689],
+  };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", flip: "과속 점프로 뒤집힘", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
@@ -288,6 +309,8 @@
   function fillKnobs(b) {
     const form = byId("tenkeyKnobForm");
     for (const k of KNOBS) form.elements[k].value = Number(b?.[k] ?? 1).toFixed(2);
+    state.hadTune = Boolean(b?.tune && Object.keys(b.tune).length);
+    for (const k of Object.keys(TUNES)) form.elements[`tune_${k}`].value = Number(b?.ver) > 0 && b?.tune?.[k] != null ? b.tune[k] : "";
     const ver = Number(b?.ver || 0);
     byId("tenkeyKnobVersion").textContent = ver > 0
       ? `지금 조정값 ${ver}번 · ${time(b.updated_at)}${b.updated_by ? ` · ${b.updated_by}` : ""}`
@@ -317,6 +340,20 @@
       }
       const reason = form.elements.reason.value.trim();
       const lines = KNOBS.map((k) => `${KNOB_NAMES[k]} ${knobs[k].toFixed(2)}`);
+      const tune = {};
+      for (const [k, [label, , min, max, integer]] of Object.entries(TUNES)) {
+        const raw = form.elements[`tune_${k}`].value.trim();
+        if (!raw) continue;
+        const value = Number(raw);
+        if (!Number.isFinite(value) || value < min || value > max || (integer && !Number.isInteger(value))) {
+          T.setMessage("tenkeyKnobMessage", `${label}: ${min}~${max}${integer ? " 정수" : ""}만 입력하세요.`, true);
+          return;
+        }
+        tune[k] = value;
+        lines.push(`${label} ${value}`);
+      }
+      if (Object.keys(tune).length || state.hadTune) knobs.tune = tune;
+      if (state.hadTune && !Object.keys(tune).length) lines.push("세부 조정값 모두 해제: 코드 기본값 사용");
       if (!await root.ConsoleApp.confirmChange("10KEY 밸런스 조정값 변경", [...lines, "스토어 앱이 다음에 켤 때 받아 그다음 판부터 씁니다.", `변경 이유: ${reason}`].join("\n"))) return;
       T.setMessage("tenkeyKnobMessage", "저장하는 중입니다...");
       const result = await T.call("knobs.set", { knobs, reason }, form);
@@ -334,12 +371,17 @@
   function mountBalance() {
     if (!state.bound) {
       state.bound = true;
+      const form = byId("tenkeyKnobForm");
+      form.elements.reason.closest("label").insertAdjacentHTML("beforebegin", `<details id="tenkeyTunePanel"><summary>1.0.1부터 · 드리프트·로봇·구간별 난이도 (${Object.keys(TUNES).length}개)</summary><p>스토어 앱의 노멀 모드만 적용됩니다. 빌드 22·23, 하드모드, 웹·PC에는 적용되지 않습니다. 빈칸은 코드 기본값을 씁니다. 서버·콘솔 배포와 1.0.1 앱 설치 후 사용할 수 있습니다.</p><div class="form-pair">${Object.entries(TUNES).map(([k, [label, def, min, max, integer]]) => `<label>${esc(label)}<input name="tune_${k}" type="number" min="${min}" max="${max}" step="${integer ? 1 : "any"}" placeholder="${def}"><small>${k} · 코드 기본 ${def} · 범위 ${min}~${max}${integer ? " (정수)" : ""} · 빈칸 = 기본값</small></label>`).join("")}</div></details>`);
       for (const [id, what, tbl] of KEEP_LINES) {
         const box = byId(id)?.closest(".panel");
         if (box && !box.querySelector(":scope > .tk-keep-line")) box.insertAdjacentHTML("beforeend", `<p class="tk-keep-line">모으는 것: ${esc(what)} · 서버 보관 <span data-tk-keep="${tbl}">—</span></p>`);
       }
       byId("tenkeyKnobForm").addEventListener("submit", submitKnobs);
-      byId("tenkeyKnobDefaults").addEventListener("click", () => { for (const k of KNOBS) byId("tenkeyKnobForm").elements[k].value = "1.00"; });
+      byId("tenkeyKnobDefaults").addEventListener("click", () => {
+        for (const k of KNOBS) form.elements[k].value = "1.00";
+        for (const k of Object.keys(TUNES)) form.elements[`tune_${k}`].value = "";
+      });
       byId("tenkeyBalanceForm").addEventListener("submit", (event) => {
         event.preventDefault();
         state.q = { days: Number(byId("tenkeyBalanceDays").value), build: byId("tenkeyBalanceBuild").value, mode: byId("tenkeyBalanceMode").value, platform: byId("tenkeyBalancePlatform").value };
