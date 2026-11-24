@@ -16,7 +16,7 @@
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
-  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
+  const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", flip: "과속 점프로 뒤집힘", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
   // owner 2026-11-12: "드리프트가 된적이있는데 기록되지 않았고": the web demo's runs are counted too now, and every row says where it was played.
   const PLATFORMS = { android: "Android", ios: "iOS", web_itch: "웹 체험판 (itch)", web_nekoland: "웹 체험판 (네코랜드)", web_gamepix: "웹 (GamePix)", windows: "PC (Windows)", macos: "PC (Mac)", linux: "PC (Linux)" };
   const CRISES = { numlock: "NUM LOCK 철창", mouse: "마우스", wheel_mouse: "휠 마우스", spacebar: "스페이스바", cat_paw: "고양이 앞발" };
