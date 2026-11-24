@@ -273,3 +273,13 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; }
   /* QA (2026-11-24): fold-out rows were 22 px tall on phones; HIG asks 44 pt for a touch target */
   .console-main summary { min-height: 44px; padding-top: 11px !important; padding-bottom: 11px !important; }
 }
+
+/* store reviews (2026-11-24) */
+.tk-review-list { display: grid; gap: 8px; margin: 12px 0 6px; padding: 0; list-style: none; }
+.tk-review { padding: 12px 14px; background: var(--hd-s2); border-radius: var(--hd-radius-s); }
+.tk-review-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 4px; }
+.tk-review-stars { color: var(--hd-yellow); font-size: 14px; letter-spacing: 1px; }
+.tk-review-stars[data-low="true"] { color: var(--hd-red); }
+.tk-review strong { display: block; margin-bottom: 2px; font-size: 14px; font-weight: 600; }
+.tk-review p { margin: 0; color: var(--hd-text); font-size: 13.5px; line-height: 1.55; overflow-wrap: anywhere; }
+a.tk-badge { text-decoration: none; }

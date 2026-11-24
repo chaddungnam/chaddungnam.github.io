@@ -223,6 +223,34 @@ test("players: search, open one, ban with a reason through the confirm dialog", 
   expect(errors).toEqual([]);
 });
 
+test("crashes page (owner 2026-11-24, client work): build health per app build, newest marked, problems per 100 devices", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-crashes");
+  const rows = page.locator("#tenkeyBuildHealthTable tr");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("Android 빌드 23");
+  await expect(rows.nth(0)).toContainText("최신");
+  await expect(rows.nth(0).locator('td[data-label="100대당 문제"]')).toHaveText("0");
+  await expect(rows.nth(1).locator('td[data-label="100대당 문제"] .tk-badge')).toHaveAttribute("data-tone", "risk");
+  await expect(rows.nth(1).locator('td[data-label="100대당 문제"]')).toHaveText("66.7");
+  await expect(rows.nth(1)).not.toContainText("최신");
+  await expect(page.locator("#tenkeyBuildHealthTotal")).toHaveText("3개 빌드");
+  expect(errors).toEqual([]);
+});
+
+test("overview (owner 2026-11-24): store ratings and reviews, the unanswered one links to the store to answer", async ({ page }) => {
+  const errors = await open(page);
+  const card = page.locator("#tenkeyOverviewCharts .tk-reviews-card");
+  await expect(card.locator("h3")).toHaveText("스토어 평점 · 리뷰");
+  await expect(card).toContainText("4.38 · 16개 (어제보다 +2)");
+  await expect(card).toContainText("KR 4.5 (12)");
+  await expect(card.locator(".tk-review")).toHaveCount(2);
+  await expect(card.locator(".tk-review").first()).toContainText("튜토리얼이 너무 빨라요");
+  await expect(card.locator(".tk-review").first().locator("a.tk-badge")).toHaveAttribute("href", /appstoreconnect\.apple\.com/);
+  await expect(card.locator(".tk-review").nth(1)).toContainText("답함");
+  await expect(card).toContainText("답 안 한 리뷰");
+  expect(errors).toEqual([]);
+});
+
 test("crashes: groups, a group narrows the list, one report shows its trail and Godot log", async ({ page }) => {
   const errors = await open(page, "#/tenkey-crashes");
   await expect(page.locator("#tenkeyCrashGroups tr")).toHaveCount(3);
@@ -418,7 +446,7 @@ test("overview (owner 2026-11-24 launch): the default view counts DAU on the mob
     : `출시 전|테스터 ${d.mobile_tester}명`)));
   expect(cells.filter((c) => c.startsWith("출시 전")).length).toBe(4);
   // charts: mobile (DAU + app installs), Android · iOS, itch reference; nothing about pre-registration on the page
-  await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(4);
+  await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(5);  // + 스토어 평점 · 리뷰
   // 앱 판매 (스토어 보고서): a paid download is a sale the game server never sees; each store says if it is connected
   const store = page.locator("#tenkeyOverviewCharts .tk-store-card");
   await expect(store.locator("h3")).toContainText("앱 판매 (스토어 보고서");

@@ -25,7 +25,7 @@
   // (mobile accounts first seen on / after the launch day, server launch_day), never the closed-test / TestFlight accounts;
   // and ("게임 설치가 곧 결제일텐데, 그거 안잡히는거도 이상하고"): the stores' own sales reports sit beside the in-app 결제
   // (tenkey-console-stats store.get), because the game server never sees a paid download.
-  const state = { bound: false, period: 7, platform: "", data: null, web: null, dau: null, store: null, compare: "d1", busy: false };
+  const state = { bound: false, period: 7, platform: "", data: null, web: null, dau: null, store: null, reviews: null, compare: "d1", busy: false };
   const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
 
   const dayLabel = (iso) => {
@@ -185,6 +185,40 @@
       <div class="lab-facts tk-more-facts">${status}</div>
       ${any ? `<figure class="ov-figure" tabindex="0" aria-label="날마다 앱 판매"><div class="ov-plot has-y">${cols.plot}</div>${xAxis(rows)}</figure>` : ""}
       <p class="overview-drill-note">유료 앱이라 스토어 다운로드 1건이 곧 판매 1건입니다. 게임 서버는 인앱 결제만 확인하므로 앱 판매는 스토어 보고서로만 셉니다. 보고서는 하루쯤 늦고(미국 태평양 날짜), 테스트 주문은 들어가지 않습니다. 실시간 확인은 Play Console 주문 관리 · App Store Connect 판매 및 추세.</p></article>`;
+  }
+
+  // 스토어 평점·리뷰 (owner 2026-11-24 night, long-term operation): App Store stars per storefront (every rating, from the public
+  // lookup), the written reviews of both stores (Play keeps about a week), which ones have no reply yet, and where to answer.
+  const STAR = (n) => "★★★★★".slice(0, Math.max(0, Math.min(5, n))) + "☆☆☆☆☆".slice(0, 5 - Math.max(0, Math.min(5, n)));
+  const REPLY_URL = { apple: "https://appstoreconnect.apple.com/apps/6824972492/distribution/activity/ios/ratingsResponses",
+    google: "https://play.google.com/console/u/0/developers/6859298164484039460/app/4975178648682924098/user-feedback/reviews" };
+  function reviewsCard(R) {
+    if (!R) return "";
+    const ratings = (R.ratings || []).filter((r) => r.store === "apple");
+    const n = ratings.reduce((t, r) => t + Number(r.count || 0), 0);
+    const avg = n > 0 ? ratings.reduce((t, r) => t + Number(r.average || 0) * Number(r.count || 0), 0) / n : null;
+    const grew = ratings.reduce((t, r) => t + Math.max(0, Number(r.count || 0) - Number(r.prev_count ?? r.count ?? 0)), 0);
+    const stat = (store) => (R.stats || []).find((x) => x.store === store) || null;
+    const g = stat("google"), a = stat("apple");
+    const top = ratings.filter((r) => Number(r.count) > 0).slice(0, 4).map((r) => `${r.country} ${Number(r.average).toFixed(1)} (${num(r.count)})`).join(" · ");
+    const facts = [
+      ["App Store 평점", avg === null ? "아직 평점 없음" : `${avg.toFixed(2)} · ${num(n)}개${grew ? ` (어제보다 +${num(grew)})` : ""}`],
+      ["App Store 나라별", top || "—"],
+      ["리뷰 (글)", `App Store ${num(a?.reviews || 0)} · Google Play ${num(g?.reviews || 0)}`],
+      ["답 안 한 리뷰", `${num(Number(a?.unanswered || 0) + Number(g?.unanswered || 0))}개`],
+    ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    const list = (R.reviews || []).slice(0, 6).map((r) => {
+      const where = [r.store === "apple" ? "App Store" : "Google Play", r.territory || r.lang, r.app_version, new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })].filter(Boolean).join(" · ");
+      return `<li class="tk-review"><div class="tk-review-head"><span class="tk-review-stars" aria-label="별 ${esc(r.rating)}개" data-low="${Number(r.rating) <= 2}">${esc(STAR(Number(r.rating)))}</span>
+        <span class="tk-sub">${esc(where)}</span>${r.reply ? '<span class="tk-badge" data-tone="good">답함</span>' : `<a class="tk-badge" data-tone="watch" href="${esc(REPLY_URL[r.store])}" target="_blank" rel="noopener">답하기</a>`}</div>
+        ${r.title ? `<strong>${esc(r.title)}</strong>` : ""}<p>${esc(r.body || "(내용 없음)")}</p></li>`;
+    }).join("");
+    const sync = (R.sync || []).filter((x) => !x.ok).map((x) => `${x.store.startsWith("apple") ? "App Store" : "Google Play"} 리뷰를 불러오지 못함 (${x.note || "—"})`).join(" · ");
+    return `<article class="ov-card is-wide tk-reviews-card">
+      <header class="ov-card-head"><h3>스토어 평점 · 리뷰</h3><span class="ov-legend"><a href="${REPLY_URL.apple}" target="_blank" rel="noopener">App Store Connect</a> · <a href="${REPLY_URL.google}" target="_blank" rel="noopener">Play Console</a></span></header>
+      <div class="lab-facts tk-more-facts">${facts}</div>
+      ${list ? `<ul class="tk-review-list">${list}</ul>` : '<p class="overview-drill-note">아직 글로 쓴 리뷰가 없습니다.</p>'}
+      <p class="overview-drill-note">App Store 평점은 별점만 준 것까지 포함한 나라별 공개 값입니다 (주요 10개 나라). 리뷰는 글이 있는 것만 오며, Google Play는 최근 약 1주일 것만 API로 받습니다. 스토어 판매와 함께 3시간마다 새로 읽습니다.${sync ? ` ${esc(sync)}.` : ""}</p></article>`;
   }
 
   function render(data) {
@@ -427,7 +461,7 @@
         <dl class="tk-web-tiles">${tiles}</dl>
         <p class="overview-drill-note">로그인한 계정 수입니다 (베를린 날짜). 웹은 페이지를 열 때마다 새 익명 번호라 DAU나 비율은 내지 않습니다. GamePix는 접속 신호를 보내지 않아 계정만 셉니다.</p></article>`;
     }
-    const storeHtml = W ? storeCard(state.store, dailyRows.length) : "";
+    const storeHtml = W ? storeCard(state.store, dailyRows.length) + reviewsCard(state.reviews) : "";
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
       <header class="ov-card-head"><h3>날마다 한눈에</h3><span class="ov-legend">${mainSeries.map((sr) => swatch(sr.color, sr.label)).join("")}</span><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
       <figure class="ov-figure" tabindex="0" aria-label="${esc(`날마다 ${mainSeries.map((sr) => sr.label).join(", ")}`)}"><div class="ov-plot has-y">${mainLine.plot}</div>${xAxis(dailyRows)}</figure></article>${storeHtml}${dauHtml}${itchHtml}`;
@@ -473,12 +507,14 @@
       // The itch web numbers come from tenkey-console-stats ("overview.web"): the deployed tenkey-admin refuses platform
       // web_itch (found 2026-11-03), which also left the 웹(itch) filter empty.
       const webCall = () => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } });
-      const [result, webResult, dauResult, storeResult] = await Promise.all([
+      const [result, webResult, dauResult, storeResult, reviewsResult] = await Promise.all([
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
         state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "store.get", params: { days: 120 } }).catch(() => null),
+        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "reviews.get", params: { limit: 30 } }).catch(() => null),
       ]);
+      state.reviews = reviewsResult?.data || null;
       state.store = storeResult?.data || null;
       state.dau = dauResult?.data || null;
       state.data = result.data;

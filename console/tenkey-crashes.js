@@ -79,8 +79,40 @@
     pager.draw();
   }
 
+  // 빌드별 상태 (owner 2026-11-24 night, for client work): per app build over 7 days, from tenkey-console-stats builds.get
+  // (admin_build_health_v1). The newest build of each platform is marked; a build at 5+ problems per 100 devices is red.
+  async function loadBuilds() {
+    const box = byId("tenkeyBuildHealthTable");
+    if (!box) return;
+    try {
+      const data = await T.stats("builds.get", { days: 7 });
+      const rows = (data.builds || []).filter((b) => Number(b.build) > 0 || Number(b.devices) > 0);
+      const newest = {};
+      for (const b of rows) newest[b.platform] = Math.max(newest[b.platform] || 0, Number(b.build) || 0);
+      byId("tenkeyBuildHealthTotal").textContent = `${num(rows.length)}개 빌드`;
+      box.innerHTML = rows.length ? rows.map((b) => {
+        const dev = Number(b.devices) || 0;
+        const bad = Number(b.exits || 0) + Number(b.anrs || 0);
+        const rate = dev > 0 ? Math.round(bad / dev * 1000) / 10 : null;
+        const tone = rate === null ? "" : rate >= 5 ? "risk" : rate > 0 ? "watch" : "good";
+        const name = `${b.platform === "ios" ? "iOS" : "Android"} ${b.build ? `빌드 ${b.build}` : "빌드 모름"}`;
+        const tag = Number(b.build) === newest[b.platform] && Number(b.build) > 0 ? ' <span class="tk-badge" data-tone="good">최신</span>' : "";
+        return `<tr><td data-label="빌드">${esc(name)}${tag}<span class="tk-sub">${esc(b.app_version || "—")}</span></td>
+          <td data-label="기기 (7일)" class="tk-num">${esc(num(dev))}</td><td data-label="오늘" class="tk-num">${esc(num(b.devices_today))}</td>
+          <td data-label="꺼짐" class="tk-num">${esc(num(b.exits))}</td><td data-label="멈춤" class="tk-num">${esc(num(b.anrs))}</td>
+          <td data-label="100대당 문제" class="tk-num">${rate === null ? "—" : `<span class="tk-badge" data-tone="${tone}">${esc(String(rate))}</span>`}</td>
+          <td data-label="스크립트 오류" class="tk-num">${esc(num(b.script_errors))}</td><td data-label="버벅임" class="tk-num">${esc(num(b.hitches))} (${esc(num(b.hitch_devices))})</td>
+          <td data-label="메모리 경고" class="tk-num">${esc(num(b.memory_warnings))}</td><td data-label="서버 오류" class="tk-num">${esc(num(b.server_errors))}</td>
+          <td data-label="처음 · 마지막">${esc(b.first_day || "—")} · ${esc(b.last_day || "—")}</td></tr>`;
+      }).join("") : '<tr><td colspan="11" class="empty-panel">최근 7일 앱 기록이 없습니다.</td></tr>';
+    } catch (error) {
+      box.innerHTML = `<tr><td colspan="11" class="empty-panel">빌드별 상태를 불러오지 못했습니다 (${esc(T.errorText ? T.errorText(error) : String(error?.message || error))}).</td></tr>`;
+    }
+  }
+
   async function loadAll() {
     T.setMessage("tenkeyCrashMessage", "크래시를 불러오는 중입니다...");
+    loadBuilds();
     byId("tenkeyCrashDetail").hidden = true;
     try {
       await loadGroups();

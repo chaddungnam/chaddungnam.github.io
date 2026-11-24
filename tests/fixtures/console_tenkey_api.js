@@ -155,6 +155,17 @@
             mobile_launch: on ? 4 : 0, mobile_tester: on ? 3 : 7, players_launch: on ? 5 + (2 - k) * 3 : 0, u3_launch: on ? 4 : 0, u7_launch: on ? 4 : 0,
             web_gamepix: 1, web_nekoland: 2, visits_itch: 15 + i, visits_gamepix: 0, visits_nekoland: 3,
             new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 }; }) }; }
+      // per app build health (2026-11-24): Android 23 newest and clean, Android 22 with problems, iOS 22
+      case "builds.get": return { days: 7, today: overview().series.at(-1).day, builds: [
+        { platform: "android", build: 23, app_version: "1.0.0 a23 i24 w55", devices: 8, devices_today: 6, first_day: "2026-10-19", last_day: "2026-10-23", exits: 0, exit_devices: 0, anrs: 0, script_errors: 0, hitches: 11, hitch_devices: 4, memory_warnings: 0, server_errors: 0 },
+        { platform: "android", build: 22, app_version: "1.0.0 a22 i23 w54", devices: 3, devices_today: 2, first_day: "2026-10-18", last_day: "2026-10-23", exits: 1, exit_devices: 1, anrs: 1, script_errors: 2, hitches: 1, hitch_devices: 1, memory_warnings: 0, server_errors: 1 },
+        { platform: "ios", build: 22, app_version: "1.0.0 a20 i22 w50", devices: 7, devices_today: 6, first_day: "2026-10-18", last_day: "2026-10-23", exits: 0, exit_devices: 0, anrs: 0, script_errors: 0, hitches: 6, hitch_devices: 4, memory_warnings: 1, server_errors: 0 }] };
+      // store reviews and ratings (2026-11-24): one App Store review without a reply, one Play review answered
+      case "reviews.get": return { sync: [{ store: "google_reviews", ok: true, note: "reviews 1" }, { store: "apple_reviews", ok: true, note: "reviews 1, storefronts 10" }],
+        stats: [{ store: "apple", reviews: 1, average: 2, unanswered: 1, last_7d: 1, stars: { 1: 0, 2: 1, 3: 0, 4: 0, 5: 0 } }, { store: "google", reviews: 1, average: 5, unanswered: 0, last_7d: 1, stars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 } }],
+        ratings: [{ store: "apple", country: "KR", average: 4.5, count: 12, prev_count: 10, day: "2026-11-24" }, { store: "apple", country: "JP", average: 4, count: 4, prev_count: 4, day: "2026-11-24" }],
+        reviews: [{ store: "apple", review_id: "r1", rating: 2, title: "어려워요", body: "튜토리얼이 너무 빨라요", territory: "KOR", lang: "", author: "a", created_at: "2026-11-24T10:00:00Z", app_version: "", reply: "", replied_at: null },
+          { store: "google", review_id: "g1", rating: 5, title: "", body: "딸깍 소리 최고", territory: "", lang: "ko", author: "b", created_at: "2026-11-23T10:00:00Z", app_version: "1.0.0", reply: "감사합니다", replied_at: "2026-11-23T12:00:00Z" }] };
       // the stores' reports (2026-11-24): Play connected with two days of sales, App Store waiting for its API key
       case "store.get": return { sync: [{ store: "apple", ok: false, note: "apple_not_configured", tried_at: new Date().toISOString(), synced_at: null },
           { store: "google", ok: true, note: "files: sales/salesreport_202610.zip", tried_at: new Date().toISOString(), synced_at: new Date().toISOString() }],

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="base.css?v=20261124-ui2">
   <link rel="stylesheet" href="styles.css?v=20261124-ui2">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
-  <link rel="stylesheet" href="theme.css?v=20261124-ui2b">
+  <link rel="stylesheet" href="theme.css?v=20261124-ops">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -557,6 +557,10 @@
           <label>검색<input id="tenkeyCrashQuery" type="search" maxlength="100" placeholder="오류 내용 · 기기 · 버전"></label>
           <button class="primary-button" type="submit">조회</button>
         </form>
+        <section class="panel" id="tenkeyBuildHealth" aria-labelledby="tenkeyBuildHealthTitle">
+          <div class="panel-heading"><div><h2 id="tenkeyBuildHealthTitle">빌드별 상태 (최근 7일, 앱)</h2><small>빌드마다 접속 신호를 보낸 기기 수와 그 빌드에서 온 문제 보고입니다. 새 빌드를 낸 뒤 이전 빌드보다 나아졌는지, 아직 옛 빌드를 쓰는 기기가 얼마나 되는지 봅니다. ‘100대당 문제’는 (꺼짐 + 멈춤) ÷ 기기 수 × 100입니다. 테스트 기기 보고는 뺍니다.</small></div><span id="tenkeyBuildHealthTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>플랫폼 · 빌드</th><th class="tk-num">기기 (7일)</th><th class="tk-num">오늘</th><th class="tk-num">꺼짐</th><th class="tk-num">멈춤 (5초+)</th><th class="tk-num">100대당 문제</th><th class="tk-num">스크립트 오류</th><th class="tk-num">버벅임 (기기)</th><th class="tk-num">메모리 경고</th><th class="tk-num">서버 오류</th><th>처음 · 마지막</th></tr></thead><tbody id="tenkeyBuildHealthTable"></tbody></table></div>
+        </section>
         <section class="purchase-summary tenkey-summary" id="tenkeyCrashSummary" aria-label="크래시 요약">
           <article data-tone="neutral"><span>기간 내 보고</span><strong data-crash-summary="rows">—</strong></article>
           <article data-tone="risk"><span>발생 횟수 (같은 오류 합산)</span><strong data-crash-summary="times">—</strong></article>
@@ -1015,14 +1019,14 @@
   <script src="announcement-editor.js?v=20261028-caret" defer></script>
   <script src="operations.js?v=20260909-1" defer></script>
   <script src="tenkey.js?v=20261117-triage" defer></script>
-  <script src="tenkey-overview.js?v=20261124-ui2" defer></script>
+  <script src="tenkey-overview.js?v=20261124-reviews" defer></script>
   <script src="tenkey-unlocks.js?v=20261119-cpcon" defer></script>
   <script src="tenkey-watch.js?v=20261115-watch" defer></script>
   <script src="tenkey-signals.js?v=20261118-link" defer></script>
   <script src="tenkey-players.js?v=20261124-ui2" defer></script>
   <script src="tenkey-retention.js?v=20261112-audit" defer></script>
   <script src="tenkey-titles.js?v=20261104-title" defer></script>
-  <script src="tenkey-crashes.js?v=20261117-keep" defer></script>
+  <script src="tenkey-crashes.js?v=20261124-build" defer></script>
   <script src="tenkey-reports.js?v=20261124-links2" defer></script>
   <script src="tenkey-mail.js?v=20261104-mail" defer></script>
   <script src="tenkey-notices.js?v=20261025-tr2" defer></script>
