@@ -394,58 +394,30 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("dialog[data-itch-popup]")).toHaveCount(0);
   });
 }
-test("the launch version is on from 2026-11-18 18:00 Berlin; coming soon until the owner flips released by hand (no time switch); the sale line ends after 11-27", async ({ page, isMobile }) => {
+test("the launch version is on from 2026-11-18 18:00 Berlin; released (owner 2026-11-24): store badges and \"out now\"; the sale line ends after 11-27", async ({ page, isMobile }) => {
   await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
   await page.clock.setFixedTime(new Date("2026-11-18T17:55:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#prereg")).toBeVisible();
-  await page.clock.setFixedTime(new Date("2026-11-18T18:05:00+01:00"));
+  // released:true in assets/tenkey-launch.js (owner 2026-11-24, both stores released): official badges, "out now", sale line
+  await page.clock.setFixedTime(new Date("2026-11-24T10:00:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download")).toBeVisible();
   await expect(page.locator("#prereg")).toBeHidden();
-  // no store live yet: "coming soon" headings, no badge, only "coming soon" text (official badge rules), no sale line yet
-  await expect(page.locator("#download h2")).toHaveText("곧 출시!", { useInnerText: true });
-  await expect(page.locator("#final-title-launch [data-store-wait]")).toBeVisible();
-  await expect(page.locator("#final-title-launch [data-store-out]")).toBeHidden();
-  await expect(page.locator("#download [data-launch-store=ios]")).toBeHidden();
-  await expect(page.locator("#download .tk-badge-item.is-soon .tk-badge-soon")).toHaveCount(2);
-  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
-  for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
-  await page.goto("/?lang=ko");
-  await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("곧 출시");
-  await expect(page.locator("#games a.hd-tk-get")).toBeVisible();
-  await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
-  // /10key/get/ acts as launched already (owner 2026-11-19: link handed out, posts go up before the store release):
-  // phones go to their store, a computer gets the store choice.
-  if (!isMobile) {
-    await page.goto("/10key/get/?lang=ko&src=post");
-    await expect(page.locator("[data-get-pc]")).toBeVisible();
-    await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=post&mt=8");
-    await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
-  }
-  // no time switch any more (owner 2026-11-19): on 11-20 the pages still say coming soon, no badge, no sale line
-  await page.clock.setFixedTime(new Date("2026-11-20T00:05:00+01:00"));
-  await page.goto("/10key/?lang=ko");
-  await expect(page.locator("#download h2")).toHaveText("곧 출시!", { useInnerText: true });
-  await expect(page.locator("#download [data-launch-store=ios]")).toBeHidden();
-  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
-  // the owner's manual switch: released:true in assets/tenkey-launch.js (served here with it flipped)
-  await page.route("**/assets/tenkey-launch.js*", async (route) => {
-    const response = await route.fetch();
-    const body = (await response.text()).replace("released: false,", "released: true,");
-    expect(body).toContain("released: true,");
-    await route.fulfill({ response, body });
-  });
-  await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download h2")).toHaveText("지금 출시!", { useInnerText: true });
+  await expect(page.locator("#final-title-launch [data-store-out]")).toBeVisible();
+  await expect(page.locator("#final-title-launch [data-store-wait]")).toBeHidden();
   await expect(page.locator("#download [data-launch-store=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=site_ko&mt=8");
   await expect(page.locator("#download [data-launch-store=android]")).toHaveAttribute("href", "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival&referrer=utm_source%3Dhouseduck%26utm_medium%3Dsite%26utm_campaign%3Dsite_ko");
   await expect(page.locator("#download [data-launch-store=ios]")).toBeVisible();
   await expect(page.locator("#download [data-launch-store=android]")).toBeVisible();
   await expect(page.locator("#download .tk-badge-soon:visible")).toHaveCount(0);
   await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+  for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
   await page.goto("/?lang=ko");
   await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("지금 출시");
+  await expect(page.locator("#games a.hd-tk-get")).toBeVisible();
+  await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
   if (!isMobile) {
     await page.goto("/10key/get/?lang=en&src=mail");
     await expect(page.locator("[data-get-pc]")).toBeVisible();
@@ -468,22 +440,22 @@ test("home 10key section: pre-registration before launch, download key to /10key
   await expect(page.locator("#games a.hd-tk-prereg")).toBeHidden();
   await expect(page.locator("#games .hd-tk-preview:visible")).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
 });
-// Shared pre-registration link (owner 2026-11-23): /10key/prereg/ without a mail token opens the game page in the
-// pre-registration version (?launch=prereg) after the launch switch too; mail links with a token still confirm/unsubscribe.
-test("/10key/prereg/ without a token opens the pre-registration version (?launch=prereg) after the switch", async ({ page }) => {
+// Shared pre-registration link (owner 2026-11-23) closed on 2026-11-24 (owner): /10key/prereg/ without a mail token opens
+// the normal game page; an old ?launch=prereg link shows the launch version; mail links with a token still work.
+test("/10key/prereg/ without a token opens the normal game page (pre-registration link closed 2026-11-24)", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.setItem("hd_ads_consent", "denied"));
-  await page.clock.setFixedTime(new Date("2026-11-23T14:00:00+01:00"));
-  await page.goto("/10key/?lang=ko");
-  await expect(page.locator("#prereg")).toBeHidden();
+  await page.clock.setFixedTime(new Date("2026-11-24T10:00:00+01:00"));
   await page.goto("/10key/prereg/?lang=ko");
-  await expect(page).toHaveURL(/\/10key\/\?lang=ko&launch=prereg$/);
-  await expect(page.locator("#prereg")).toBeVisible();
-  await expect(page.locator("#prereg button[type=submit]")).toBeEnabled();
-  await expect(page.locator("#download")).toBeHidden();
-  await expect(page.locator("[data-lang-link=en]")).toHaveAttribute("href", "index_en.html?lang=en&launch=prereg");
+  await expect(page).toHaveURL(/\/10key\/\?lang=ko$/);
+  await expect(page.locator("#prereg")).toBeHidden();
+  await expect(page.locator("#download")).toBeVisible();
+  await expect(page.locator("[data-lang-link=en]")).not.toHaveAttribute("href", /launch=prereg/);
   await page.goto("/10key/prereg/?lang=ja");
-  await expect(page).toHaveURL(/\/10key\/index_ja\.html\?lang=ja&launch=prereg$/);
-  await expect(page.locator("#prereg")).toBeVisible();
+  await expect(page).toHaveURL(/\/10key\/index_ja\.html\?lang=ja$/);
+  await expect(page.locator("#prereg")).toBeHidden();
+  await page.goto("/10key/?lang=ko&launch=prereg");
+  await expect(page.locator("#prereg")).toBeHidden();
+  await expect(page.locator("#download [data-launch-store=android]")).toBeVisible();
 });
 test("/10key/get/?launch=preview shows the after-launch page without leaving for a store", async ({ page }) => {
   await page.goto("/10key/get/?launch=preview&lang=en");

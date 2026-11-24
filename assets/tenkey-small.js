@@ -112,12 +112,11 @@
   if (page === "prereg") {
     var action = params.get("a");
     var token = params.get("t") || "";
-    // No mail token at all (owner 2026-11-23): the shared pre-registration link. Go to the game page in this language,
-    // shown as the pre-registration version (assets/tenkey-launch.js ?launch=prereg).
+    // No mail token at all: the shared pre-registration link of 2026-11-23, closed on 2026-11-24 (owner). Go to the game
+    // page in this language (the normal launch version with the store badges).
     if (!params.has("a") && !params.has("t")) {
       var game = document.querySelector("[data-show-game] a");
-      var href = (game && game.getAttribute("href")) || "/10key/";
-      location.replace(href + (href.indexOf("?") < 0 ? "?" : "&") + "launch=prereg");
+      location.replace((game && game.getAttribute("href")) || "/10key/");
       return;
     }
     if ((action !== "confirm" && action !== "unsub") || !/^[0-9a-f-]{36}$/i.test(token)) { show(T.invalid); reveal("[data-show-game]"); return; }

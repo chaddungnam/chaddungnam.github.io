@@ -7,6 +7,7 @@
 //   so). false = the 10key pages and the home say "coming soon" (html.tk-stores-wait: [data-store-wait] replaces
 //   [data-store-out]) with "coming soon" text instead of store badges, and no sale line. true = official store badges
 //   for each store with live:true, "out now", and the sale line until saleTo.
+//   Flipped to true on 2026-11-24 (owner: both stores released that morning).
 // - stores: App Store link final (owner 2026-11-18), Google Play = the package page. /10key/get/ already acts as
 //   launched with stores.*.live (owner 2026-11-19, assets/tenkey-small.js), independent of released.
 // - saleTo: the launch sale ($4.99 -> $2.99) ends 11-27 Berlin (Play sale 11-20..11-27); after it the line never shows.
@@ -16,7 +17,7 @@
   "use strict";
   var C = window.TENKEY_LAUNCH = {
     at: Date.UTC(2026, 10, 18, 17, 0, 0),
-    released: false,
+    released: true,
     saleTo: Date.UTC(2026, 10, 27, 23, 0, 0),
     stores: {
       ios: { live: true, url: "https://apps.apple.com/app/10key-survival/id6824972492" },
@@ -28,10 +29,9 @@
   try { mode = new URLSearchParams(location.search).get("launch") || ""; } catch (_error) { mode = ""; }
   var now = Date.now();
   C.preview = mode === "preview";
-  // ?launch=prereg (owner 2026-11-23): the pre-registration version as it was before the switch (form, itch.io gate, no
-  // store badges or sale), for a shared link. houseduck.in/10key/prereg/ without a mail token lands here. Not linked
-  // from the site; the server still takes sign-ups.
-  C.prereg = mode === "prereg";
+  // ?launch=prereg (the shared pre-registration link of 2026-11-23) was closed on 2026-11-24 (owner): the parameter is
+  // ignored, so an old link shows the normal launch version.
+  C.prereg = false;
   C.on = !C.prereg && (C.preview || now >= C.at);
   C.sale = !C.prereg && (C.preview || (C.released && now < C.saleTo));
   C.live = function (key) { var st = C.stores[key]; return !!st && (C.preview || (C.on && C.released && st.live)); };
@@ -46,15 +46,6 @@
 
   var root = document.documentElement;
   if (C.sale) root.classList.add("tk-sale");
-  if (C.prereg) {
-    // The language switch keeps the visitor on the pre-registration version.
-    document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll("[data-lang-link]").forEach(function (a) {
-        var href = a.getAttribute("href") || "";
-        if (href && !/[?&]launch=/.test(href)) a.setAttribute("href", href + (href.indexOf("?") < 0 ? "?" : "&") + "launch=prereg");
-      });
-    });
-  }
   if (!C.on) return;
   root.classList.add("tk-launch", "tk-itch-open");
   if (C.wait) root.classList.add("tk-stores-wait");
