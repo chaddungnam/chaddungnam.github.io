@@ -269,3 +269,7 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; }
   #notesFilterForm { grid-template-columns: 1fr !important; }
 }
 .ov-kpi, .ov-kpis > article, .ov-kpis > div { background: var(--hd-s1) !important; border: 0 !important; border-radius: var(--hd-radius) !important; box-shadow: none !important; }
+@media (max-width: 760px) {
+  /* QA (2026-11-24): fold-out rows were 22 px tall on phones; HIG asks 44 pt for a touch target */
+  .console-main summary { min-height: 44px; padding-top: 11px !important; padding-bottom: 11px !important; }
+}
