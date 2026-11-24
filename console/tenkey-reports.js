@@ -105,10 +105,18 @@
   }
 
   async function loadCommunity() {
+    for (const id of Object.keys(LINKS)) byId(formId(id)).querySelectorAll("button").forEach((button) => { button.disabled = true; });
     try {
       const result = await T.call("config.get", {});
-      if (!result?.data || typeof result.data !== "object") throw new Error("console_invalid_response");
-      showLinks({ community: result.data.community_url, ...(result.data.outside_links || {}) });
+      const data = result?.data, values = data?.outside_links;
+      const legacyValid = data && typeof data === "object" && !Array.isArray(data)
+        && typeof data.community_url === "string" && (!data.community_url || validLink("community", data.community_url));
+      const mapValid = values === undefined || (values && typeof values === "object" && !Array.isArray(values)
+        && Object.keys(LINKS).every((id) => Object.prototype.hasOwnProperty.call(values, id)
+          && typeof values[id] === "string" && (!values[id] || validLink(id, values[id])))
+        && values.community === data.community_url);
+      if (!legacyValid || !mapValid) throw new Error("console_invalid_response");
+      showLinks({ community: data.community_url, ...(values || {}) });
     } catch (error) {
       T.report(messageId("community"), error);
     }
@@ -132,11 +140,15 @@
       if (!await root.ConsoleApp.confirmChange(`10KEY ${LINKS[id].label} 변경`, [`새 주소: ${url || `(기본값) ${LINKS[id].url}`}`, `변경 이유: ${reason}`].join("\n"))) return;
       T.setMessage(messageId(id), "저장하는 중입니다...");
       const result = await T.call("links.set", { id, url, reason }, form);
-      if (result?.data?.ok !== true || !result.data.links) throw new Error(result?.data?.error || "console_invalid_response");
+      const values = result?.data?.links;
+      if (result?.data?.ok !== true || !values || typeof values !== "object" || Array.isArray(values)
+          || !Object.prototype.hasOwnProperty.call(values, id) || typeof values[id] !== "string") {
+        throw new Error(result?.data?.error || "console_invalid_response");
+      }
       // Only update this row: another row may have an unsaved edit or an in-flight request.
       const current = byId(currentId(id));
-      const value = result.data.links[id] || LINKS[id].url;
-      if (!validLink(id, value)) throw new Error("console_invalid_response");
+      const value = values[id] || LINKS[id].url;
+      if (!validLink(id, value) || value !== (url || LINKS[id].url)) throw new Error("console_invalid_response");
       current.textContent = value; current.href = value;
       byId(noteId(id)).textContent = value === LINKS[id].url ? " (기본값)" : "";
       form.elements.url.value = value === LINKS[id].url ? "" : value;

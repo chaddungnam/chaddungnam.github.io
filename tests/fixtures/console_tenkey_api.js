@@ -127,6 +127,8 @@
     { id: 1, at: "2026-10-22T09:00:00+00:00", admin_email: "ops@houseduck.in", action: "config.set", params: { reason: "1.0.0 배포", config: { min_version_code: 1, latest_version_code: 2 } }, result: { ok: true } },
   ];
   let config = { min_version_code: 1, latest_version_code: 2, min_build_ios: 0, latest_build_ios: 0, store_url_android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", store_url_ios: "https://testflight.apple.com/join/RqNJg7Dp", updated_at: "2026-10-22T09:00:00+00:00", community_url: "",
+    outside_links: { youtube: "https://www.youtube.com/@Sergeant_Houseduck", instagram: "https://www.instagram.com/sergeant_houseduck/",
+      x: "https://x.com/houseduckin", threads: "https://www.threads.com/@sergeant_houseduck", community: "" },
     links: { android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", ios: "https://testflight.apple.com/join/RqNJg7Dp", ios_official: false, ios_checked_at: "2026-10-25T17:58:00+00:00" },
     builds: [{ platform: "android", build: 3, players: 0, installs: 4 }, { platform: "android", build: 2, players: 8, installs: 0 }, { platform: "ios", build: 3, players: 0, installs: 2 }, { platform: "ios", build: 2, players: 1, installs: 0 }],
     balance: { ver: 0, xp_scale: 1, mouse_pace: 1, battery_drain_scale: 1, robot_power_scale: 1, updated_at: "2026-10-25T15:34:00+00:00", updated_by: "" } };

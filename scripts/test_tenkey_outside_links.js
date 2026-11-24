@@ -14,6 +14,8 @@ const currentId = (id) => id === "community" ? "tenkeyCommunityCurrent" : `${for
 test("five rows read config, validate per host, save/reset one id, preserve unsaved siblings, and surface failures", async () => {
   const nodes = new Map(), calls = [];
   let fail = false;
+  let saveAnswer;
+  let configAnswer;
   function node(id) {
     if (!nodes.has(id)) {
       const buttons = [{ disabled: true }, { disabled: true }];
@@ -37,7 +39,11 @@ test("five rows read config, validate per host, save/reset one id, preserve unsa
       call: async (action, params) => {
         calls.push({ action, params: plain(params) });
         if (fail) throw new Error("offline");
-        if (action === "config.get") return { data: { community_url: "https://youtu.be/legacy", outside_links: { x: "https://twitter.com/current" } } };
+        if (action === "config.get") return { data: configAnswer === undefined ? { community_url: "https://youtu.be/legacy", outside_links: {
+          youtube: "https://www.youtube.com/@Sergeant_Houseduck", instagram: "https://www.instagram.com/sergeant_houseduck/",
+          x: "https://twitter.com/current", threads: "https://www.threads.com/@sergeant_houseduck", community: "https://youtu.be/legacy",
+        } } : configAnswer };
+        if (saveAnswer !== undefined) return { data: saveAnswer };
         return { data: { ok: true, links: { [params.id]: params.url } } };
       },
     },
@@ -76,4 +82,25 @@ test("five rows read config, validate per host, save/reset one id, preserve unsa
   await submit("x", "https://x.com/failure");
   assert.equal(node(`${formId("x")}Message`).textContent, "offline");
   assert.notEqual(node(currentId("x")).href, "https://x.com/failure");
+  fail = false;
+  // Empty/malformed answers must not masquerade as a saved default (review 2026-11-24).
+  const oldHref = node(currentId("x")).href;
+  for (const bad of [{ ok: true, links: {} }, { ok: true, links: [] }, { ok: true, links: { x: 42 } },
+    { ok: true, links: { x: "https://evil.example/qa" } }, { ok: true, links: { x: "https://x.com/wrong" } }]) {
+    saveAnswer = bad;
+    await submit("x", "https://x.com/keep-input");
+    assert.equal(node(currentId("x")).href, oldHref, "bad save answer must preserve current URL");
+    assert.equal(node(formId("x")).elements.url.value, "https://x.com/keep-input", "bad save answer must preserve input");
+    assert.equal(node(formId("x")).elements.reason.value, "주소 변경");
+    assert.equal(node(`${formId("x")}Message`).textContent, "console_invalid_response");
+  }
+  for (const bad of [{}, [], { community_url: "junk" }, { community_url: "", outside_links: [] }, { community_url: "", outside_links: {} }]) {
+    configAnswer = bad;
+    window.ConsoleTenkey.mountReports(); await tick();
+    assert.equal(node("tenkeyCommunityFormMessage").textContent, "console_invalid_response");
+    for (const id of IDS) assert.ok(node(formId(id)).querySelectorAll("button").every((b) => b.disabled), "bad config locks writes");
+  }
+  configAnswer = { community_url: "https://youtu.be/old-server" };
+  window.ConsoleTenkey.mountReports(); await tick();
+  assert.equal(node(currentId("community")).href, "https://youtu.be/old-server", "valid legacy config still works");
 });
