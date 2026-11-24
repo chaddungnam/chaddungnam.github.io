@@ -171,7 +171,10 @@
     const status = ["google", "apple"].map((k) => {
       const x = sync.get(k);
       const total = Number(S.totals?.[`${k}_app`] || 0);
-      const v = x?.ok ? `${num(total)}건 (보고서 ${last(k) ? shortDay(last(k)) : "—"}까지)` : STORE_WHY(x?.note);
+      const at = x?.synced_at ? new Date(x.synced_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+      const v = x?.ok ? `누적 ${num(total)}건 · ${at} 확인${last(k) ? ` (판매 있는 마지막 날 ${shortDay(last(k))})` : " (아직 판매 기록 없음)"}`
+        : String(x?.note || "").startsWith("store_permission") && k === "google"
+          ? "권한 부여됨 (11-24), Google 쪽 반영 대기 중 · 반영되면 자동으로 채워짐" : STORE_WHY(x?.note);
       return `<div><dt>${esc(STORE_NAME[k])}</dt><dd>${esc(v)}</dd></div>`;
     }).join("");
     const any = (S.sync || []).some((x) => x.ok);

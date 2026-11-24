@@ -435,7 +435,7 @@ test("overview (owner 2026-11-24 launch): the default view counts DAU on the mob
   const store = page.locator("#tenkeyOverviewCharts .tk-store-card");
   await expect(store.locator("h3")).toContainText("앱 판매 (스토어 보고서");
   await expect(store).toContainText("Google Play");
-  await expect(store).toContainText("5건");
+  await expect(store).toContainText("누적 5건");
   await expect(store).toContainText("App Store Connect API 키");
   await expect(store.locator(".ov-col")).toHaveCount(7);
   await expect(week.nth(2).locator(".tk-glance-label")).toHaveText("인앱 결제");
