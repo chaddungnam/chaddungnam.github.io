@@ -145,8 +145,18 @@
       // tenkey-console-stats (separate function): pre-registration counts by Berlin day and page language.
       case "overview.web": return overview("web_itch");
       // admin_dau_v3 (2026-11-24): + mobile (android + ios), u3_/u7_mobile, u3_/u7_itch, players_mobile / players_itch, unknown.
-      case "dau.get": return { version: 3, days: overview().series.map((r, i) => ({ day: r.day, all: 20 + i, web_itch: 12 + i, android: 5, ios: 2, other: 1, unknown: 0, mobile: 7, u7: 50 + i, u3: 30 + i,
-        u7_mobile: 20 + i, u3_mobile: 12 + i, u7_itch: 30 + i, u3_itch: 18 + i, players_mobile: 40 + i, players_itch: 300 + i, new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 })) };
+      // + the launch cohort (2026-11-24): launch_day = the fixture's 3rd-last day; mobile 7 = 4 store players + 3 testers from it.
+      case "dau.get": { const series = overview().series; const launch = series.at(-3).day;
+        return { version: 3, launch_day: launch, days: series.map((r, i) => { const on = r.day >= launch; const k = on ? series.length - 1 - i : 0;
+          return { day: r.day, all: 20 + i, web_itch: 12 + i, android: 5, ios: 2, other: 1, unknown: 0, mobile: 7, u7: 50 + i, u3: 30 + i,
+            u7_mobile: 20 + i, u3_mobile: 12 + i, u7_itch: 30 + i, u3_itch: 18 + i, players_mobile: 40 + i, players_itch: 300 + i,
+            mobile_launch: on ? 4 : 0, mobile_tester: on ? 3 : 7, players_launch: on ? 5 + (2 - k) * 3 : 0, u3_launch: on ? 4 : 0, u7_launch: on ? 4 : 0,
+            new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 }; }) }; }
+      // the stores' reports (2026-11-24): Play connected with two days of sales, App Store waiting for its API key
+      case "store.get": return { sync: [{ store: "apple", ok: false, note: "apple_not_configured", tried_at: new Date().toISOString(), synced_at: null },
+          { store: "google", ok: true, note: "files: sales/salesreport_202610.zip", tried_at: new Date().toISOString(), synced_at: new Date().toISOString() }],
+        days: [{ day: overview().series.at(-2).day, store: "google", app_units: 3, app_refunds: 0, iap_units: 1 }, { day: overview().series.at(-3).day, store: "google", app_units: 2, app_refunds: 0, iap_units: 0 }],
+        totals: { google_app: 5, apple_app: 0 }, money: [], installs: [], countries: [{ country: "KR", units: 5 }] };
       case "prereg.get": {
         const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, zh: i % 3 === 0 ? 1 : 0, de: 0 }));
         days.forEach((d) => { d.n = d.ko + d.en + d.zh; });

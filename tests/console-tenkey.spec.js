@@ -417,16 +417,29 @@ test("overview (owner 2026-11-24 launch): the default view counts DAU on the mob
   });
   const last = want.days.at(-1);
   await expect(today.nth(0).locator(".tk-glance-value")).toHaveText(`${last.mobile}명`);
-  await expect(today.nth(0)).toContainText(`Android ${last.android} · iOS ${last.ios}`);
+  await expect(today.nth(0)).toContainText(`출시 후 ${last.mobile_launch} · 테스터 ${last.mobile_tester}`);
   await expect(today.nth(1).locator(".tk-glance-value")).toHaveText(`${want.installs}명`);
   await expect(today.nth(2).locator(".tk-glance-value")).toHaveText(`${want.runs}판`);
-  // 최근 7일 DAU: mobile accounts that day over the mobile accounts so far
+  // 최근 7일 DAU (owner 11-24 afternoon): store players only. Before the launch day "출시 전" with the testers; from it, the
+  // launch cohort that played over the launch cohort so far (testers never in the base).
   await expect(page.locator("#tenkeyDauTitle")).toHaveText("최근 7일 DAU");
-  await expect(page.locator("#tenkeyDauTitle + small")).toContainText("Android + iOS");
+  await expect(page.locator("#tenkeyDauTitle + small")).toContainText("테스터 계정은 빼고");
   const cells = await page.locator("#tenkeyDauWeek .tk-dau-day").evaluateAll((els) => els.map((c) => `${c.querySelector("strong").textContent}|${c.querySelector("span").textContent}`));
-  expect(cells).toEqual(want.days.map((d) => `${Math.round(Math.min(d.mobile, d.players_mobile) / d.players_mobile * 100)}%|${d.mobile} / ${d.players_mobile}명`));
+  expect(cells).toEqual(want.days.map((d) => (d.players_launch > 0
+    ? `${Math.round(d.mobile_launch / d.players_launch * 100)}%|${d.mobile_launch} / ${d.players_launch}명`
+    : `출시 전|테스터 ${d.mobile_tester}명`)));
+  expect(cells.filter((c) => c.startsWith("출시 전")).length).toBe(4);
   // charts: mobile (DAU + app installs), Android · iOS, itch reference; nothing about pre-registration on the page
-  await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(3);
+  await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(4);
+  // 앱 판매 (스토어 보고서): a paid download is a sale the game server never sees; each store says if it is connected
+  const store = page.locator("#tenkeyOverviewCharts .tk-store-card");
+  await expect(store.locator("h3")).toContainText("앱 판매 (스토어 보고서");
+  await expect(store).toContainText("Google Play");
+  await expect(store).toContainText("5건");
+  await expect(store).toContainText("App Store Connect API 키");
+  await expect(store.locator(".ov-col")).toHaveCount(7);
+  await expect(week.nth(2).locator(".tk-glance-label")).toHaveText("인앱 결제");
+  await expect(today.nth(1)).toContainText("판매 수 아님");
   await expect(page.locator("#tenkeyOverviewCharts")).toContainText("모바일 DAU Android · iOS");
   await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref h3")).toContainText("참고: itch");
   await expect(page.locator("#tenkeyOverviewCharts .tk-itch-ref")).toContainText("참고용으로만 따로 둡니다");

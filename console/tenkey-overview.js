@@ -21,7 +21,11 @@
   // the N-day players and the next-day return count Android + iOS accounts only (server tenkey.admin_dau_v3: mobile, u3_mobile /
   // u7_mobile, players_mobile); itch accounts and anonymous itch visits sit in their own reference chart. Pre-registration is gone
   // from the page (closed at launch).
-  const state = { bound: false, period: 7, platform: "", data: null, web: null, dau: null, compare: "d1", busy: false };
+  // Owner 2026-11-24 afternoon ("48명의 유저 근거가 궁금함 ... 논리적으로 전체맥락을 따져서"): the DAU % counts store players only
+  // (mobile accounts first seen on / after the launch day, server launch_day), never the closed-test / TestFlight accounts;
+  // and ("게임 설치가 곧 결제일텐데, 그거 안잡히는거도 이상하고"): the stores' own sales reports sit beside the in-app 결제
+  // (tenkey-console-stats store.get), because the game server never sees a paid download.
+  const state = { bound: false, period: 7, platform: "", data: null, web: null, dau: null, store: null, compare: "d1", busy: false };
   const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
 
   const dayLabel = (iso) => {
@@ -144,6 +148,40 @@
     return `<h4>${esc(title)}</h4><ul class="overview-bars">${rows.map((r) => `<li><span class="bar-label">${esc(nameOf(r.key))}</span><span class="bar-track"><span class="bar-fill" style="width:${(r.n / max * 100).toFixed(1)}%"></span></span><span class="bar-value">${esc(num(r.n))}${total ? ` · ${esc(pct(r.n, total))}` : ""}</span></li>`).join("")}</ul>`;
   }
 
+  // 앱 판매 (스토어 보고서): paid downloads per store day from the stores' own reports, beside the in-app 결제. Until a store
+  // can be read it says what is missing (Play: the service account's report access; App Store: an API key).
+  const STORE_NAME = { google: "Google Play", apple: "App Store" };
+  const STORE_WHY = (note) => {
+    const n = String(note || "");
+    if (n.startsWith("store_permission")) return `연결 대기: Play Console에서 서비스 계정(${n.split(": ")[1] || "play-purchase-verify"})에 보고서 권한 필요`;
+    if (n.startsWith("apple_not_configured")) return "연결 대기: App Store Connect API 키(판매 권한) 필요";
+    if (n.startsWith("apple_permission")) return "연결 대기: API 키에 판매(Sales) 권한 필요";
+    return n ? `불러오지 못함 (${n})` : "아직 불러오지 않음";
+  };
+  function storeCard(S, period) {
+    if (!S) return `<article class="ov-card is-wide tk-store-card"><header class="ov-card-head"><h3>앱 판매 (스토어 보고서)</h3></header><p class="overview-drill-note">스토어 보고서를 불러오지 못했습니다.</p></article>`;
+    const sync = new Map((S.sync || []).map((x) => [x.store, x]));
+    const pdays = (() => { const out = []; const end = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })); for (let i = period - 1; i >= 0; i--) { const d = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate() - i)); out.push(d.toISOString().slice(0, 10)); } return out; })();
+    const byDay = new Map();
+    for (const r of S.days || []) { const e = byDay.get(r.day) || { day: r.day, google: 0, apple: 0, iap: 0 }; e[r.store] += Number(r.app_units || 0); e.iap += Number(r.iap_units || 0); byDay.set(r.day, e); }
+    const rows = pdays.map((d) => byDay.get(d) || { day: d, google: 0, apple: 0, iap: 0 });
+    const parts = [{ key: "google", color: COLOR.en, label: "Google Play" }, { key: "apple", color: COLOR.ko, label: "App Store" }];
+    const cols = stacked(rows, parts, rows.map((r) => tip(dayLabel(r.day), [["앱 판매", `${num(r.google + r.apple)}건`], ["Google Play", `${num(r.google)}건`], ["App Store", `${num(r.apple)}건`], ["인앱 (스토어 보고서)", `${num(r.iap)}건`]], "스토어 날짜 (미국 태평양 시간)")));
+    const last = (store) => (S.days || []).filter((r) => r.store === store).map((r) => r.day).sort().at(-1);
+    const status = ["google", "apple"].map((k) => {
+      const x = sync.get(k);
+      const total = Number(S.totals?.[`${k}_app`] || 0);
+      const v = x?.ok ? `${num(total)}건 (보고서 ${last(k) ? shortDay(last(k)) : "—"}까지)` : STORE_WHY(x?.note);
+      return `<div><dt>${esc(STORE_NAME[k])}</dt><dd>${esc(v)}</dd></div>`;
+    }).join("");
+    const any = (S.sync || []).some((x) => x.ok);
+    return `<article class="ov-card is-wide tk-store-card">
+      <header class="ov-card-head"><h3>앱 판매 (스토어 보고서, ${period}일)</h3><span class="ov-legend">${parts.map((p) => swatch(p.color, p.label)).join("")}</span></header>
+      <div class="lab-facts tk-more-facts">${status}</div>
+      ${any ? `<figure class="ov-figure" tabindex="0" aria-label="날마다 앱 판매"><div class="ov-plot has-y">${cols.plot}</div>${xAxis(rows)}</figure>` : ""}
+      <p class="overview-drill-note">유료 앱이라 스토어 다운로드 1건이 곧 판매 1건입니다. 게임 서버는 인앱 결제만 확인하므로 앱 판매는 스토어 보고서로만 셉니다. 보고서는 하루쯤 늦고(미국 태평양 날짜), 테스트 주문은 들어가지 않습니다. 실시간 확인은 Play Console 주문 관리 · App Store Connect 판매 및 추세.</p></article>`;
+  }
+
   function render(data) {
     const all = data.series || [];
     const rows = all.slice(-state.period);
@@ -186,9 +224,14 @@
         players: W ? Number(dp.players_mobile || 0) : Number(srv.players || 0),
         dau_itch: Number(dp.web_itch || 0), dau_android: Number(dp.android || 0), dau_ios: Number(dp.ios || 0), dau_other: Number(dp.other || 0),
         new_mobile: Number(dp.new_app || 0), players_itch: Number(dp.players_itch || 0),
+        launch: Number(dp.mobile_launch || 0), tester: Number(dp.mobile_tester || 0), players_launch: Number(dp.players_launch || 0),
         visits: Number(w.dau || 0), app_new: Math.max(0, Number(r.new_installs || 0) - Number(w.new_installs || 0)), web_runs: Number(w.runs || 0), app_runs: Math.max(0, Number(r.runs || 0) - Number(w.runs || 0)) };
     });
     const share = (r) => (r.players > 0 ? Math.round(Math.min(r.people, r.players) / r.players * 100) : null);
+    // Launch view: before the launch day there were only testers; from it, store players over store players so far.
+    const launchDay = String(state.dau?.launch_day || "");
+    const launched = (r) => W && launchDay && String(r.day) >= launchDay;
+    const launchShare = (r) => (r.players_launch > 0 ? Math.round(Math.min(r.launch, r.players_launch) / r.players_launch * 100) : null);
 
     byId("tenkeyOverviewNotice").hidden = !noSignal && !web;
     byId("tenkeyOverviewNotice").textContent = web ? "웹(itch)은 게임 페이지를 열 때마다 새 익명 번호를 씁니다. 그래서 ‘앱을 연 사람’은 방문 수, ‘새로 설치’는 새 방문 수입니다. ‘다음 날 다시 온 비율’만은 게임 서버에 로그인한 itch 계정으로 셉니다. 판 수는 판마다 오는 기록으로 셉니다."
@@ -217,10 +260,10 @@
     if (W) {
       byId("tenkeyGlanceToday").classList.remove("is-5");
       byId("tenkeyGlanceToday").innerHTML = [
-        glance("모바일 DAU", num(todayRow.people), "명", `Android ${num(todayRow.dau_android)} · iOS ${num(todayRow.dau_ios)} (어제 ${num(yRow.people)})`,
-          { help: `오늘 ${MOBILE_HELP}` }),
-        glance("새로 설치 (앱)", num(todayRow.app_new), "명", `어제 하루 ${num(yRow.app_new)}명`,
-          { help: "Android·iOS 앱이 그 기기에서 처음 접속 신호를 보낸 날 기준 (itch 방문 제외). 앱을 지우고 다시 깔면 새 설치로 셉니다." }),
+        glance("모바일 DAU", num(todayRow.people), "명", launchDay ? `출시 후 ${num(todayRow.launch)} · 테스터 ${num(todayRow.tester)} (어제 ${num(yRow.people)})` : `Android ${num(todayRow.dau_android)} · iOS ${num(todayRow.dau_ios)} (어제 ${num(yRow.people)})`,
+          { help: `오늘 ${MOBILE_HELP} 출시 후 = ${launchDay || "출시일"}부터 처음 들어온 계정(스토어로 받은 사람), 테스터 = 그 전부터 있던 비공개 테스트·TestFlight 계정. Android ${num(todayRow.dau_android)} · iOS ${num(todayRow.dau_ios)}.` }),
+        glance("새로 설치 (앱)", num(todayRow.app_new), "명", `어제 하루 ${num(yRow.app_new)}명 · 판매 수 아님`,
+          { help: "Android·iOS 앱이 그 기기에서 처음 접속 신호를 보낸 날 기준 (itch 방문 제외). 지우고 다시 깔거나, 테스터가 깔아도 새 설치로 셉니다. 실제 판매(유료 다운로드)는 아래 ‘앱 판매 (스토어 보고서)’입니다." }),
         glance("플레이 (앱)", num(todayRow.app_runs), "판", `어제 하루 ${num(yRow.app_runs)}판`,
           { help: "Android·iOS 앱의 판 수: 기기·날마다 앱이 알려준 판 수의 증가분과 판마다 오는 기록 중 큰 쪽. itch 판은 빠집니다." }),
         crashes > 0
@@ -286,7 +329,7 @@
       byId("tenkeyGlanceWeek").innerHTML = [
         glance(`모바일 플레이어 (${N}일)`, num(players), "명", pc.note, { noteTone: pc.noteTone, help: `최근 ${N}일(오늘 포함) 동안 ${MOBILE_HELP} 앞 ${N}일: ${num(playersPrev)}명.` }),
         glance("새로 설치 (앱)", num(installs), "명", ic.note, { noteTone: ic.noteTone, help: `최근 ${N}일(오늘 포함) Android·iOS 앱이 처음 접속 신호를 보낸 기기 수 (itch 방문 제외). 앞 ${N}일: ${num(installsPrev)}명.` }),
-        glance("결제", num(buys), "건", bc.note, { noteTone: bc.noteTone, help: `최근 ${N}일 스토어가 확인한 구매 (환불·테스트 결제 제외). 앞 ${N}일: ${num(buysPrev)}건.` }),
+        glance("인앱 결제", num(buys), "건", bc.note, { noteTone: bc.noteTone, help: `최근 ${N}일 게임 서버가 스토어에서 확인한 인앱 구매 (환불·테스트 결제 제외). 앱 자체 판매(유료 다운로드)는 게임 서버가 볼 수 없어 ‘앱 판매 (스토어 보고서)’에 따로 있습니다. 앞 ${N}일: ${num(buysPrev)}건.` }),
         glance("다음 날 다시 온 비율", rate(grp.app) === null ? "—" : String(rate(grp.app)), rate(grp.app) === null ? "" : "%",
           split ? `${part("Android", grp.android)} · ${part("iOS", grp.ios)}` : `모바일 ${grp.app.n > 0 ? `${num(grp.app.k)}/${num(grp.app.n)}명` : "—"}`,
           { help: `${span} 모바일 앱에서 처음 들어온 계정 가운데 다음 날 다시 들어온 비율. 모바일 ${num(grp.app.k)}/${num(grp.app.n)}명. 앞 ${N}일: ${rate(prevApp) === null ? "—" : `${rate(prevApp)}%`}. 참고: itch ${rate(grp.itch) === null ? "—" : `${rate(grp.itch)}% (${num(grp.itch.k)}/${num(grp.itch.n)})`}. 오늘 다시 온 사람은 하루가 끝날 때까지 늘어납니다.` }),
@@ -310,14 +353,26 @@
 
     const today = String(data.today || all.at(-1)?.day || "");
     const dauSub = byId("tenkeyDauTitle")?.nextElementSibling;
-    if (dauSub) dauSub.textContent = W ? "그날 모바일 플레이어(계정, Android + iOS) ÷ 그날까지 모바일 앱에서 들어온 계정" : "그날 플레이어(계정) ÷ 그날까지 가입한 플레이어";
+    if (dauSub) dauSub.textContent = W && launchDay
+      ? `출시(${shortDay(launchDay)}) 후 들어온 모바일 계정 중 그날 플레이한 비율 · 출시 전 테스터 계정은 빼고 셈`
+      : W ? "그날 모바일 플레이어(계정, Android + iOS) ÷ 그날까지 모바일 앱에서 들어온 계정" : "그날 플레이어(계정) ÷ 그날까지 가입한 플레이어";
     byId("tenkeyDauWeek").innerHTML = daily.slice(-7).map((r) => {
-      const p = share(r);
       const isToday = String(r.day) === today;
+      if (W && launchDay && !launched(r)) {
+        return `<li class="tk-dau-day is-empty${isToday ? " is-today" : ""}" tabindex="0" style="--share:0%" aria-label="${esc(`${dayLabel(r.day)} 출시 전, 테스터 ${num(r.tester)}명`)}"
+          data-tip="${tip(dayLabel(r.day), [["출시 전 (테스트 기간)", ""], ["플레이한 테스터 계정", `${num(r.tester)}명`]], "출시 전 날은 비율을 내지 않습니다")}">
+          <strong>출시 전</strong><span>테스터 ${esc(num(r.tester))}명</span><small>${isToday ? "오늘" : esc(dayLabel(r.day))}</small></li>`;
+      }
+      const L = W && launchDay;
+      const p = L ? launchShare(r) : share(r);
+      const n = L ? r.launch : r.people, d = L ? r.players_launch : r.players;
       const text = p === null ? "—" : `${p}%`;
-      return `<li class="tk-dau-day${isToday ? " is-today" : ""}${p === null ? " is-empty" : ""}" tabindex="0" style="--share:${p ?? 0}%" aria-label="${esc(`${dayLabel(r.day)} ${num(r.people)}명, 그날까지 가입한 ${num(r.players)}명 중 ${text}`)}"
-        data-tip="${tip(dayLabel(r.day), [[W ? "모바일 플레이어" : "앱을 연 사람", `${num(r.people)}명`], W ? ["  Android / iOS", `${num(r.dau_android)} / ${num(r.dau_ios)}명`] : null, [W ? "그날까지 모바일 계정" : "그날까지 가입한 플레이어", `${num(r.players)}명`], ["비율", text]], isToday ? "오늘은 아직 끝나지 않은 날" : "")}">
-        <strong>${esc(text)}</strong><span>${r.players > 0 ? `${esc(num(r.people))} / ${esc(num(r.players))}명` : "가입자 없음"}</span><small>${isToday ? "오늘" : esc(dayLabel(r.day))}</small></li>`;
+      return `<li class="tk-dau-day${isToday ? " is-today" : ""}${p === null ? " is-empty" : ""}" tabindex="0" style="--share:${p ?? 0}%" aria-label="${esc(`${dayLabel(r.day)} ${num(n)}명, ${L ? "출시 후 들어온" : "그날까지 가입한"} ${num(d)}명 중 ${text}`)}"
+        data-tip="${tip(dayLabel(r.day), L
+          ? [["플레이한 출시 후 계정", `${num(r.launch)}명`], ["출시 후 들어온 계정 (그날까지)", `${num(r.players_launch)}명`], ["비율", text], ["참고: 테스터", `${num(r.tester)}명`], ["  Android / iOS (전체)", `${num(r.dau_android)} / ${num(r.dau_ios)}명`]]
+          : [[W ? "모바일 플레이어" : "앱을 연 사람", `${num(r.people)}명`], [W ? "그날까지 모바일 계정" : "그날까지 가입한 플레이어", `${num(r.players)}명`], ["비율", text]],
+          L && String(r.day) === launchDay ? "출시 첫날은 들어온 사람이 모두 그날 플레이해서 100%에 가깝습니다. 다음 날부터 의미가 있습니다." : isToday ? "오늘은 아직 끝나지 않은 날" : "")}">
+        <strong>${esc(text)}</strong><span>${d > 0 ? `${esc(num(n))} / ${esc(num(d))}명` : "가입자 없음"}</span><small>${isToday ? "오늘" : esc(dayLabel(r.day))}</small></li>`;
     }).join("");
 
     const dailyRows = daily.slice(-state.period);
@@ -340,8 +395,8 @@
       ? [{ key: "people", color: COLOR.app, label: "모바일 DAU" }, { key: "app_new", color: COLOR.pre, label: "새로 설치 (앱)" }]
       : [{ key: "people", color: COLOR.app, label: "앱을 연 사람" }];
     const mainTips = dailyRows.map((r) => tip(dayLabel(r.day), W
-      ? [["모바일 DAU", `${num(r.people)}명`], ["  Android / iOS", `${num(r.dau_android)} / ${num(r.dau_ios)}명`], ["새로 설치 (앱)", `${num(r.app_new)}명`],
-        ["새 모바일 계정", `${num(r.new_mobile)}명`], ["플레이 (앱)", `${num(r.app_runs)}판`], share(r) === null ? null : ["모바일 계정 중", `${share(r)}%`]]
+      ? [["모바일 DAU", `${num(r.people)}명`], launchDay ? ["  출시 후 / 테스터", `${num(r.launch)} / ${num(r.tester)}명`] : null, ["  Android / iOS", `${num(r.dau_android)} / ${num(r.dau_ios)}명`], ["새로 설치 (앱)", `${num(r.app_new)}명`],
+        ["새 모바일 계정", `${num(r.new_mobile)}명`], ["플레이 (앱)", `${num(r.app_runs)}판`]]
       : [["앱을 연 사람", `${num(r.people)}명`], ["플레이", `${num(r.runs)}판`], ["새 플레이어", `${num(r.new_accounts)}명`]],
       String(r.day) === today ? "오늘은 아직 끝나지 않은 날" : ""));
     const mainLine = multiLine(dailyRows, mainSeries, mainTips);
@@ -366,9 +421,10 @@
         <figure class="ov-figure" tabindex="0" aria-label="참고 itch 플레이어와 웹 방문"><div class="ov-plot has-y">${itchLine.plot}</div>${xAxis(dailyRows)}</figure>
         <p class="overview-drill-note">itch.io 브라우저 데모는 참고용으로만 따로 둡니다. 위의 모바일 DAU·설치·플레이·다시 온 비율에는 들어가지 않습니다. ‘웹 방문’은 페이지를 열 때마다 새 익명 번호라 사람 수가 아닙니다.</p></article>`;
     }
+    const storeHtml = W ? storeCard(state.store, dailyRows.length) : "";
     byId("tenkeyOverviewCharts").innerHTML = `<article class="ov-card is-wide">
       <header class="ov-card-head"><h3>날마다 한눈에</h3><span class="ov-legend">${mainSeries.map((sr) => swatch(sr.color, sr.label)).join("")}</span><div class="overview-segment" role="group" aria-label="그래프 기간">${periods}</div></header>
-      <figure class="ov-figure" tabindex="0" aria-label="${esc(`날마다 ${mainSeries.map((sr) => sr.label).join(", ")}`)}"><div class="ov-plot has-y">${mainLine.plot}</div>${xAxis(dailyRows)}</figure></article>${dauHtml}${itchHtml}`;
+      <figure class="ov-figure" tabindex="0" aria-label="${esc(`날마다 ${mainSeries.map((sr) => sr.label).join(", ")}`)}"><div class="ov-plot has-y">${mainLine.plot}</div>${xAxis(dailyRows)}</figure></article>${storeHtml}${dauHtml}${itchHtml}`;
     const facts = [
       W ? ["모바일 계정 (지금까지)", `${num(todayRow.players)}명`] : ["30일 동안 앱을 연 사람", `${num(opened("d30"))}명`], ["지금까지 설치", W ? `${num(Math.max(0, Number(fresh.all || 0) - Number(state.web?.new_installs?.all || 0)))}명 (앱)` : `${num(fresh.all)}명`], ["전체 계정", `${num(totals.accounts)}개`],
       noSignal ? ["7일 동안 기록을 올린 사람", `${num(played.d7)}명`] : W ? ["7일 동안 플레이 (앱)", `${num(sum(daily, "app_runs", 7))}판`] : ["7일 동안 플레이", `${num(runs.d7)}판`], ["7일 뒤 다시 온 비율", retRow(ret.d7)], ["30일 뒤 다시 온 비율", retRow(ret.d30)],
@@ -390,7 +446,8 @@
     byId("tenkeyOverviewNotes").innerHTML = [
       "접속자는 Android·iOS 앱에서 게스트 계정을 만든 플레이어가 하루 한 번 보내는 신호(무작위 설치 번호, 플랫폼, 버전, 언어)로 셉니다. 계정 번호나 기기 이름은 받지 않습니다.",
       "이 신호는 10월 23일 이후 빌드부터 보냅니다 (테스트 빌드 1.0.0은 보내지 않음). 그래서 ‘앱을 연 사람’은 게임 서버가 날마다 본 사람(로그인·진행 저장·기록 전송, 앱·웹 합산)과 신호 중 큰 쪽을 보여 주고, 신호가 하나도 없는 동안은 설치·판 수 대신 새 플레이어·기록을 올린 사람을 보여 줍니다. 서버의 날짜별 기록은 10월 22일(테스트 시작)부터 있습니다.",
-      "‘모바일’ 화면(기본)의 DAU는 그날 게임 서버가 본 계정 가운데 Android·iOS 앱 계정 수입니다 (한 사람 한 번, 2026-11-24 출시부터 이 기준). 계정의 플랫폼은 그날 보낸 판 → 그날 웹 신호 → 평소 판 → 로그인한 기기(앱/브라우저)·기기 슬롯·스토어 결제 순으로 정합니다. 최근 7일 DAU의 %는 그날 모바일 플레이어 ÷ 그날까지 모바일 앱에서 들어온 계정 수입니다 (출시 전 테스터 포함). itch 계정과 익명 itch 방문은 ‘참고: itch’ 그래프에만 있습니다. GamePix·Nekoland 같은 다른 웹 판 계정은 어느 쪽에도 넣지 않습니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
+      "최근 7일 DAU의 %는 출시일(서버 launch_day) 뒤 처음 들어온 모바일 계정(스토어로 받은 사람) 가운데 그날 플레이한 비율입니다. 출시 전 비공개 테스트·TestFlight 계정은 모바일 DAU 숫자에는 들어가지만(테스터로 따로 표시) 비율에서는 빠집니다. 한 사람이 다른 기기에서 로그인 없이 새로 시작하면 계정이 하나 더 생깁니다.",
+      "‘모바일’ 화면(기본)의 DAU는 그날 게임 서버가 본 계정 가운데 Android·iOS 앱 계정 수입니다 (한 사람 한 번, 2026-11-24 출시부터 이 기준). 계정의 플랫폼은 그날 보낸 판 → 그날 웹 신호 → 평소 판 → 로그인한 기기(앱/브라우저)·기기 슬롯·스토어 결제 순으로 정합니다. itch 계정과 익명 itch 방문은 ‘참고: itch’ 그래프에만 있습니다. GamePix·Nekoland 같은 다른 웹 판 계정은 어느 쪽에도 넣지 않습니다. 게임은 이번 주 최고 기록을 넘긴 판만 서버에 보내므로, ‘기록을 올린 사람’은 플레이한 사람 전체보다 적습니다.",
       "웹(itch.io)은 첫 화면에서 이용약관·개인정보 처리방침에 동의한 뒤에만 신호(페이지를 열 때마다 새로 만드는 익명 번호, 버전)와 판마다의 기록을 보냅니다. 계정·닉네임은 없습니다. 전체 숫자에도 들어갑니다. ‘다시 온 비율’은 익명 번호로는 셀 수 없어 로그인한 계정 기준으로 셉니다.",
       "웹(CrazyGames)은 로그인하지 않은 사람에게 식별 번호를 만들지 않는 규칙이라 접속자 집계에서 빠집니다. 웹 플레이어는 랭킹 서버에 올라온 사람만 '플레이어'에서 보입니다.",
       "날짜는 베를린 시간 기준(Quirky Ball 한눈 요약과 같음). 14세 미만이나 계정을 만들기 전 사용자는 신호를 보내지 않습니다.",
@@ -410,11 +467,13 @@
       // The itch web numbers come from tenkey-console-stats ("overview.web"): the deployed tenkey-admin refuses platform
       // web_itch (found 2026-11-03), which also left the 웹(itch) filter empty.
       const webCall = () => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } });
-      const [result, webResult, dauResult] = await Promise.all([
+      const [result, webResult, dauResult, storeResult] = await Promise.all([
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
         root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
+        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "store.get", params: { days: 120 } }).catch(() => null),
       ]);
+      state.store = storeResult?.data || null;
       state.dau = dauResult?.data || null;
       state.data = result.data;
       state.web = webResult?.data || null;
