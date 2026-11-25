@@ -36,7 +36,7 @@ for (const file of fs.readdirSync(migrations).filter((f) => /_tenkey_.*\.sql$/.t
 if (!Object.keys(server).length) fails.push("no balance_tune_bounds rows in " + migrations);
 
 // 2. The client's clamp table.
-const ranges = vm.runInNewContext("(" + read(path.join(client, "scripts/data/balance_tune_data.gd")).match(/const RANGES := (\{[\s\S]*?\n\})/)[1] + ")");
+const ranges = vm.runInNewContext("(" + read(path.join(client, "scripts/data/balance_tune_data.gd")).match(/const RANGES := (\{[\s\S]*?\n\})/)[1].replace(/^\s*#.*$/gm, "") + ")");
 for (const name of Object.keys(server)) if (!(name in ranges)) fails.push(name + ": on the server, missing in balance_tune_data.gd RANGES (the client drops it)");
 for (const name of Object.keys(ranges)) if (!(name in server)) fails.push(name + ": in RANGES, missing on the server (the console cannot set it)");
 for (const [name, row] of Object.entries(ranges)) {
