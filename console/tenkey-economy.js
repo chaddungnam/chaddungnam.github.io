@@ -71,7 +71,8 @@
     try {
       state.data = await T.stats("economy.get", { days: state.days });
       render();
-      T.setMessage("tenkeyEconMessage", `베를린 날짜 ${state.data.first_day} ~ ${state.data.today} · 장부 기준이라 앱이 아직 못 보낸 기록은 빠질 수 있습니다.`);
+      const older = state.data.live_from && state.data.first_day < state.data.live_from ? ` · ${state.data.live_from} 이전은 하루 요약으로 셉니다 (장부는 30일만 보관, 그날 사람 수는 하루 최대값).` : "";
+      T.setMessage("tenkeyEconMessage", `베를린 날짜 ${state.data.first_day} ~ ${state.data.today} · 장부 기준이라 앱이 아직 못 보낸 기록은 빠질 수 있습니다.${older}`);
     } catch (error) {
       T.report("tenkeyEconMessage", error);
     }
