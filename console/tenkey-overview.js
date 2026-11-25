@@ -247,6 +247,11 @@
   const STAR = (n) => "★★★★★".slice(0, Math.max(0, Math.min(5, n))) + "☆☆☆☆☆".slice(0, 5 - Math.max(0, Math.min(5, n)));
   const REPLY_URL = { apple: "https://appstoreconnect.apple.com/apps/6824972492/distribution/activity/ios/ratingsResponses",
     google: "https://play.google.com/console/u/0/developers/6859298164484039460/app/4975178648682924098/user-feedback/reviews" };
+  // Every review opens its store page, answered or not (owner 2026-11-25: "이미 답했더라도, 스토어 리뷰 페이지 진입가능하게"):
+  // Play Console opens the review itself (review-details?reviewId=, checked 11-25), App Store Connect its 평가 및 리뷰 list.
+  const reviewUrl = (r) => (r.store === "google" && r.review_id
+    ? `${REPLY_URL.google.replace(/\/reviews$/, "/review-details")}?reviewId=${encodeURIComponent(r.review_id)}&corpus=PUBLIC_REVIEWS`
+    : REPLY_URL[r.store] || REPLY_URL.google);
   // 나라별 (owner 2026-11-24 night: "스토어 별점리뷰 출시국가별로 모아서"): App Store stars per storefront (every storefront in turn,
   // about a day per round), Google Play's country average once its report is readable, and the written reviews per country.
   const REGION = (() => { try { return new Intl.DisplayNames(["ko"], { type: "region" }); } catch (_e) { return null; } })();
@@ -292,7 +297,7 @@
     const list = (R.reviews || []).slice(0, 6).map((r) => {
       const where = [r.store === "apple" ? "App Store" : "Google Play", r.territory ? placeName(r.territory) : r.lang ? placeName(`lang:${String(r.lang).split("_")[0]}`) : "", r.app_version, new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })].filter(Boolean).join(" · ");
       return `<li class="tk-review"><div class="tk-review-head"><span class="tk-review-stars" aria-label="별 ${esc(r.rating)}개" data-low="${Number(r.rating) <= 2}">${esc(STAR(Number(r.rating)))}</span>
-        <span class="tk-sub">${esc(where)}</span>${r.reply ? '<span class="tk-badge" data-tone="good">답함</span>' : `<a class="tk-badge" data-tone="watch" href="${esc(REPLY_URL[r.store])}" target="_blank" rel="noopener">답하기</a>`}</div>
+        <span class="tk-sub">${esc(where)}</span>${r.reply ? '<span class="tk-badge" data-tone="good">답함</span>' : ""}<a class="tk-badge" data-tone="${r.reply ? "quiet" : "watch"}" href="${esc(reviewUrl(r))}" target="_blank" rel="noopener">${r.reply ? "스토어에서 보기" : "답하기"}</a></div>
         ${r.title ? `<strong>${esc(r.title)}</strong>` : ""}<p>${esc(r.body || "(내용 없음)")}</p></li>`;
     }).join("");
     const sync = (R.sync || []).filter((x) => !x.ok).map((x) => `${x.store.startsWith("apple") ? "App Store" : "Google Play"} 리뷰를 불러오지 못함 (${x.note || "—"})`).join(" · ");

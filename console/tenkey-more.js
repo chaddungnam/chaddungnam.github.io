@@ -136,11 +136,32 @@
   // ── 랭킹 ──
   const boardLabel = boardName;
 
+  // 칭호 · 플랫폼 · 빌드 (owner 2026-11-25: "랭킹보드에 있는 유저에 대해서 칭호장착 여부나 aos인지 ios인지 빌드가 뭔지"), from
+  // admin_board_v2: the equipped title (none = 장착 안 함) with how many it holds; the platform and build of the run behind this
+  // record, and the newest run's when that is another platform or build. A v1 answer (no such fields) shows "—".
+  function boardTitle(r) {
+    if (!("title_id" in r)) return "—";
+    const owned = Number(r.titles_owned || 0);
+    return r.title_id
+      ? `<span class="tk-badge" data-tone="good">${esc(T.titleInfo ? T.titleInfo(r.title_id).name : r.title_id)}</span><span class="tk-sub">장착 중 · 보유 ${esc(num(owned))}개</span>`
+      : `<span class="tk-sub">장착 안 함${owned ? ` · 보유 ${esc(num(owned))}개` : ""}</span>`;
+  }
+  const buildText = (platform, version, build) => [platformName(platform), [version, build !== null && build !== undefined ? `(${build})` : ""].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+  function boardBuild(r) {
+    if (!("rec_platform" in r) && !("now_platform" in r)) return "—";
+    const rec = r.rec_platform ? buildText(r.rec_platform, r.rec_version, r.rec_build) : "";
+    const now = r.now_platform ? buildText(r.now_platform, r.now_version, r.now_build) : "";
+    if (!rec && !now) return "—";
+    const moved = now && rec && (r.now_platform !== r.rec_platform || String(r.now_build) !== String(r.rec_build));
+    return `${esc(rec || now)}<span class="tk-sub">${moved ? `최근 판 ${esc(now)}${r.now_at ? ` · ${esc(time(r.now_at))}` : ""}` : rec ? "이 기록의 판 기준" : "최근 판 기준"}</span>`;
+  }
+
   function boardRow(r) {
     const hidden = !r.eligible;
     const status = r.banned ? ["정지", "risk"] : hidden ? ["옛 점수 규칙", "quiet"] : ["순위 반영", "good"];
     return `<tr${hidden ? ' class="is-dim"' : ""}><td class="tk-num" data-label="순위"><strong>${r.rank ? esc(num(r.rank)) : "—"}</strong></td>
       <td data-label="플레이어">${playerLink(r.player_id, r.name)}<span class="tk-sub">${esc(r.provider === "crazygames" ? "CrazyGames 로그인" : "앱 게스트 계정")}</span></td>
+      <td data-label="칭호">${boardTitle(r)}</td><td data-label="플랫폼 · 빌드">${boardBuild(r)}</td>
       <td class="tk-num" data-label="점수">${esc(num(r.score))}</td><td class="tk-num" data-label="레벨">${esc(r.level)}</td>
       <td data-label="시간">${esc(duration(r.time_ms))}</td><td data-label="기록 시각">${esc(time(r.achieved_at))}</td>
       <td data-label="상태"><span class="tk-badge" data-tone="${status[1]}">${esc(status[0])}</span></td></tr>`;
@@ -160,7 +181,7 @@
       byId("tenkeyBoardTitle").textContent = `랭킹 보드 · ${boardLabel(board === "week" && d.board ? d.board : board)}`;
       byId("tenkeyBoardTotal").textContent = `순위 반영 ${num(d.total)}명`;
       byId("tenkeyBoardMeta").textContent = `보드 ${d.board} · 점수 규칙 ${d.current_rules}${d.ends ? ` · 시즌 끝 ${time(d.ends)}` : ""}. 앱에 보이는 순위 그대로입니다. 정지된 플레이어와 옛 점수 규칙의 기록은 순위 없이 흐리게 보입니다.`;
-      byId("tenkeyBoardTable").innerHTML = (d.rows || []).length ? d.rows.map(boardRow).join("") : '<tr><td colspan="7" class="empty-panel">이 보드에는 아직 기록이 없습니다.</td></tr>';
+      byId("tenkeyBoardTable").innerHTML = (d.rows || []).length ? d.rows.map(boardRow).join("") : '<tr><td colspan="9" class="empty-panel">이 보드에는 아직 기록이 없습니다.</td></tr>';
       T.setMessage("tenkeyBoardMessage", "");
     } catch (error) {
       T.report("tenkeyBoardMessage", error);

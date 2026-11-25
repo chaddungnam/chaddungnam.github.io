@@ -118,7 +118,10 @@
   ];
 
   const boardRows = Array.from({ length: 12 }, (_, i) => ({ rank: i + 1, player_id: PLAYERS[i % 3].id, name: ["딸깍덕", "KeyMaster", "cg_player_77"][i % 3] + (i > 2 ? ` ${i}` : ""), provider: i % 3 === 2 ? "crazygames" : "supabase",
-    score: 184200 - i * 11300, level: 14 - Math.floor(i / 2), time_ms: 612000 - i * 21000, achieved_at: `2026-10-${22 - (i % 5)}T10:00:00+00:00`, rules: 1, banned: false, eligible: true }))
+    score: 184200 - i * 11300, level: 14 - Math.floor(i / 2), time_ms: 612000 - i * 21000, achieved_at: `2026-10-${22 - (i % 5)}T10:00:00+00:00`, rules: 1, banned: false, eligible: true,
+    // admin_board_v2 (11-25): equipped title, titles owned, record run and newest run platform / build
+    title_id: i === 0 ? "robot_pilot" : null, titles_owned: i === 0 ? 2 : 1, rec_platform: i % 2 ? "ios" : "android", rec_version: "1.0.0", rec_build: i % 2 ? 22 : 23,
+    now_platform: i === 0 ? "android" : i % 2 ? "ios" : "android", now_version: i === 0 ? "1.0.1" : "1.0.0", now_build: i === 0 ? 24 : i % 2 ? 22 : 23, now_at: "2026-11-25T10:00:00+00:00" }))
     .concat([{ rank: null, player_id: PLAYERS[3].id, name: "의심스러운덕", provider: "supabase", score: 9990000, level: 40, time_ms: 4000, achieved_at: "2026-10-21T10:00:00+00:00", rules: 1, banned: true, eligible: false }]);
 
   let audit = [

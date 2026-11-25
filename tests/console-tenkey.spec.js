@@ -252,6 +252,9 @@ test("overview (owner 2026-11-24): store ratings and reviews, the unanswered one
   await expect(card.locator(".tk-review").first()).toContainText("튜토리얼이 너무 빨라요");
   await expect(card.locator(".tk-review").first().locator("a.tk-badge")).toHaveAttribute("href", /appstoreconnect\.apple\.com/);
   await expect(card.locator(".tk-review").nth(1)).toContainText("답함");
+  // answered too: the store link stays (owner 2026-11-25), Play opens the review itself
+  await expect(card.locator(".tk-review").nth(1).locator("a.tk-badge")).toHaveText("스토어에서 보기");
+  await expect(card.locator(".tk-review").nth(1).locator("a.tk-badge")).toHaveAttribute("href", /user-feedback\/review-details\?reviewId=g1&corpus=PUBLIC_REVIEWS$/);
   await expect(card).toContainText("답 안 한 리뷰");
   expect(errors).toEqual([]);
 });
@@ -416,6 +419,17 @@ test("purchases, ranking and audit pages render from the server shapes", async (
   await page.evaluate(() => { window.location.hash = "#/tenkey-ranking"; });
   await expect(page.locator("#tenkeyBoardTable tr")).toHaveCount(13);
   await expect(page.locator("#tenkeyBoardTable tr.is-dim")).toHaveCount(1);
+  // 칭호 · 플랫폼 · 빌드 (owner 2026-11-25, admin_board_v2)
+  const first = page.locator("#tenkeyBoardTable tr").first();
+  await expect(first.locator('td[data-label="칭호"]')).toContainText("로봇 파일럿");
+  await expect(first.locator('td[data-label="칭호"]')).toContainText("장착 중 · 보유 2개");
+  await expect(first.locator('td[data-label="플랫폼 · 빌드"]')).toContainText("Android · 1.0.0 (23)");
+  await expect(first.locator('td[data-label="플랫폼 · 빌드"]')).toContainText("최근 판 Android · 1.0.1 (24)");
+  const second = page.locator("#tenkeyBoardTable tr").nth(1);
+  await expect(second.locator('td[data-label="칭호"]')).toContainText("장착 안 함 · 보유 1개");
+  await expect(second.locator('td[data-label="플랫폼 · 빌드"]')).toContainText("iOS · 1.0.0 (22)");
+  await expect(second.locator('td[data-label="플랫폼 · 빌드"]')).toContainText("이 기록의 판 기준");
+  await expect(page.locator("#tenkeyBoardTable tr.is-dim td").nth(2)).toHaveText("—");  // a v1-shaped row
   await expect(page.locator("#tenkeyFlaggedTable")).toHaveCount(0);  // no suspicious-runs panel since 2026-10-24
   await shot(page, "ranking");
   await page.locator("#tenkeyBoardSelect").selectOption("all");
