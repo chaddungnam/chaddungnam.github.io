@@ -487,10 +487,22 @@ test("overview (owner 2026-11-24 launch): the default view counts DAU on the mob
   await expect(page.locator("#tenkeyOverviewCharts > .ov-card")).toHaveCount(5);  // + 스토어 평점 · 리뷰
   // 앱 판매 (스토어 보고서): a paid download is a sale the game server never sees; each store says if it is connected
   const store = page.locator("#tenkeyOverviewCharts .tk-store-card");
-  await expect(store.locator("h3")).toContainText("앱 판매 (스토어 보고서");
-  await expect(store).toContainText("Google Play");
-  await expect(store).toContainText("누적 5건");
-  await expect(store).toContainText("App Store Connect API 키");
+  await expect(store.locator("h3")).toContainText("앱 판매 (스토어 보고서 + 예상");
+  // owner 2026-11-25: 확정 = the store reports only; 예상 = settled days' sales + new nicknames on the days not settled yet.
+  // Play: settled 5..3 days back (2 sold), 2 days back pending (3 sold so far, 4 new Android) -> 4, yesterday 1 new -> 1: 7
+  const g = store.locator('[data-store="google"]');
+  await expect(g.locator(".tk-store-est")).toHaveText("7건");
+  await expect(g).toContainText("확정 5건 · ");
+  await expect(g).toContainText("까지 보고서");
+  await expect(g).toContainText("보고서 대기 · 그동안 새 Android 유저 5명");
+  await expect(g).toContainText("출시 후 새 Android 유저 7명 (닉네임 기준)");
+  // App Store: no key, nothing settled: the estimate is the new iOS nicknames (1 + 2 + 3)
+  const a = store.locator('[data-store="apple"]');
+  await expect(a.locator(".tk-store-est")).toHaveText("6건");
+  await expect(a).toContainText("App Store Connect API 키");
+  await expect(store.locator('[data-store="all"] .tk-store-est')).toHaveText("13건");
+  await expect(store.locator('[data-store="all"]')).toContainText("확정 5건 · 새 유저 13명");
+  await expect(store).toContainText("예상 (보고서 대기)");
   await expect(store.locator(".ov-col")).toHaveCount(7);
   await expect(week.nth(2).locator(".tk-glance-label")).toHaveText("인앱 결제");
   await expect(today.nth(1)).toContainText("판매 수 아님");

@@ -160,31 +160,86 @@
     if (n.startsWith("apple_permission")) return "연결 대기: API 키에 판매(Sales) 권한 필요";
     return n ? `불러오지 못함 (${n})` : "아직 불러오지 않음";
   };
+  // Owner 2026-11-25 ("애플 신규유저는 그 판매데이터에 기반하지 말고, 신규 ios 유저 닉네임이 생성되면 그걸로 통계잡으면 되잖아 (aos도
+  // 마찬가지고) 실제 구매 기록만 보여주고, 아직 갱신되지 않았지만 신규유저가 잡힘으로써 예상치도 추정해볼 수 있고"): 확정 = the stores' own
+  // reports only; 새 유저 = accounts that made their nickname from the launch day (store.get v2 new_accounts, per Pacific day);
+  // 예상 = a settled day's confirmed sales, else the larger of what the report has so far and that day's new users. A day is
+  // settled per report_days (App Store: noon PT the next day, Google Play: three Pacific days later; hexaworld 20261125160000).
+  const STORE_PLAT = { apple: "ios", google: "android" };
+  const STORE_USER = { apple: "iOS", google: "Android" };
+  function storeEstimate(S) {
+    const launch = String(S.launch_pt || "");
+    const pToday = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    const todayPt = new Date(Date.UTC(pToday.getFullYear(), pToday.getMonth(), pToday.getDate())).toISOString().slice(0, 10);
+    const final = new Set((S.report_days || []).filter((r) => r.final).map((r) => `${r.store}|${r.day}`));
+    const conf = new Map(), fresh = new Map();
+    for (const r of S.days || []) if (r.day >= launch) conf.set(`${r.store}|${r.day}`, (conf.get(`${r.store}|${r.day}`) || 0) + Number(r.app_units || 0));
+    for (const r of S.new_accounts || []) for (const k of ["apple", "google"]) fresh.set(`${k}|${r.day}`, Number(r[STORE_PLAT[k]] || 0));
+    const days = [];
+    if (launch) for (let d = new Date(`${launch}T00:00:00Z`); d.toISOString().slice(0, 10) <= todayPt; d.setUTCDate(d.getUTCDate() + 1)) days.push(d.toISOString().slice(0, 10));
+    const per = {};
+    for (const k of ["apple", "google"]) {
+      const e = { confirmed: 0, fresh: 0, estimate: 0, pendingFresh: 0, through: "", firstPending: "", byDay: new Map() };
+      for (const d of days) {
+        const c = conf.get(`${k}|${d}`) || 0, f = fresh.get(`${k}|${d}`) || 0, done = final.has(`${k}|${d}`);
+        const est = done ? c : Math.max(c, f);
+        e.confirmed += c; e.fresh += f; e.estimate += est;
+        if (!done) { e.pendingFresh += f; if (!e.firstPending) e.firstPending = d; } else if (!e.firstPending) e.through = d;
+        e.byDay.set(d, { c, f, done, extra: est - c });
+      }
+      per[k] = e;
+    }
+    return { launch, days, per };
+  }
   function storeCard(S, period) {
     if (!S) return `<article class="ov-card is-wide tk-store-card"><header class="ov-card-head"><h3>앱 판매 (스토어 보고서)</h3></header><p class="overview-drill-note">스토어 보고서를 불러오지 못했습니다.</p></article>`;
     const sync = new Map((S.sync || []).map((x) => [x.store, x]));
+    const E = S.launch_pt ? storeEstimate(S) : null;
     const pdays = (() => { const out = []; const end = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })); for (let i = period - 1; i >= 0; i--) { const d = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate() - i)); out.push(d.toISOString().slice(0, 10)); } return out; })();
     const byDay = new Map();
     for (const r of S.days || []) { const e = byDay.get(r.day) || { day: r.day, google: 0, apple: 0, iap: 0 }; e[r.store] += Number(r.app_units || 0); e.iap += Number(r.iap_units || 0); byDay.set(r.day, e); }
-    const rows = pdays.map((d) => byDay.get(d) || { day: d, google: 0, apple: 0, iap: 0 });
-    const parts = [{ key: "google", color: COLOR.en, label: "Google Play" }, { key: "apple", color: COLOR.ko, label: "App Store" }];
-    const cols = stacked(rows, parts, rows.map((r) => tip(dayLabel(r.day), [["앱 판매", `${num(r.google + r.apple)}건`], ["Google Play", `${num(r.google)}건`], ["App Store", `${num(r.apple)}건`], ["인앱 (스토어 보고서)", `${num(r.iap)}건`]], "스토어 날짜 (미국 태평양 시간)")));
-    const last = (store) => (S.days || []).filter((r) => r.store === store).map((r) => r.day).sort().at(-1);
-    const status = ["google", "apple"].map((k) => {
+    const rows = pdays.map((d) => {
+      const r = { ...(byDay.get(d) || { day: d, google: 0, apple: 0, iap: 0 }) };
+      const a = E?.per.apple.byDay.get(d), g = E?.per.google.byDay.get(d);
+      r.extra = (a?.extra || 0) + (g?.extra || 0); r.ios = a?.f || 0; r.android = g?.f || 0; r.wait = Boolean(E && ((a && !a.done) || (g && !g.done)));
+      return r;
+    });
+    const parts = [{ key: "google", color: COLOR.en, label: "Google Play (확정)" }, { key: "apple", color: COLOR.ko, label: "App Store (확정)" }];
+    if (E) parts.push({ key: "extra", color: COLOR.de, label: "예상 (보고서 대기)" });
+    const cols = stacked(rows, parts, rows.map((r) => tip(dayLabel(r.day), [["확정 판매", `${num(r.google + r.apple)}건`], ["Google Play", `${num(r.google)}건`], ["App Store", `${num(r.apple)}건`],
+      E ? ["새 유저 (닉네임)", `Android ${num(r.android)} · iOS ${num(r.ios)}`] : null, E && r.extra ? ["예상 추가 (보고서 대기)", `${num(r.extra)}건`] : null,
+      ["인앱 (스토어 보고서)", `${num(r.iap)}건`]], `스토어 날짜 (미국 태평양 시간)${r.wait ? " · 아직 확정 안 된 날" : ""}`)));
+    const at = (x) => (x?.synced_at ? new Date(x.synced_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "");
+    const why = (k) => {
       const x = sync.get(k);
-      const total = Number(S.totals?.[`${k}_app`] || 0);
-      const at = x?.synced_at ? new Date(x.synced_at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
-      const v = x?.ok ? `누적 ${num(total)}건 · ${at} 확인${last(k) ? ` (판매 있는 마지막 날 ${shortDay(last(k))})` : " (아직 판매 기록 없음)"}`
-        : String(x?.note || "").startsWith("store_permission") && k === "google"
-          ? "권한 부여됨 (11-24), Google 쪽 반영 대기 중 · 반영되면 자동으로 채워짐" : STORE_WHY(x?.note);
-      return `<div><dt>${esc(STORE_NAME[k])}</dt><dd>${esc(v)}</dd></div>`;
-    }).join("");
-    const any = rows.some((r) => r.google + r.apple + r.iap > 0);  // an all-zero chart says nothing: the two lines above do
+      if (x?.ok) return "";
+      return String(x?.note || "").startsWith("store_permission") && k === "google" ? "보고서 연결 대기 (권한 부여됨 11-24, Google 쪽 반영 대기)" : STORE_WHY(x?.note);
+    };
+    let status;
+    if (E) {
+      const tile = (k) => {
+        const e = E.per[k], x = sync.get(k), w = why(k);
+        const conf = w ? `확정 — · ${w}` : `확정 ${num(e.confirmed)}건${e.through ? ` · ${shortDay(e.through)}까지 보고서` : " · 아직 확정된 날 없음"}${at(x) ? ` · ${at(x)} 확인` : ""}`;
+        const wait = e.firstPending ? `${shortDay(e.firstPending)}부터 보고서 대기 · 그동안 새 ${STORE_USER[k]} 유저 ${num(e.pendingFresh)}명` : "보고서 모두 확정";
+        return `<div data-store="${k}"><dt>${esc(STORE_NAME[k])} 예상</dt><dd><span class="tk-store-est">${esc(num(e.estimate))}건</span><span class="tk-sub">${esc(conf)}</span><span class="tk-sub">${esc(wait)}</span><span class="tk-sub">출시 후 새 ${esc(STORE_USER[k])} 유저 ${esc(num(e.fresh))}명 (닉네임 기준)</span></dd></div>`;
+      };
+      const A = E.per.apple, G = E.per.google;
+      status = tile("apple") + tile("google") + `<div data-store="all"><dt>합계 예상</dt><dd><span class="tk-store-est">${esc(num(A.estimate + G.estimate))}건</span><span class="tk-sub">${esc(`확정 ${num(A.confirmed + G.confirmed)}건 · 새 유저 ${num(A.fresh + G.fresh)}명`)}</span><span class="tk-sub">${esc(`출시 ${shortDay(E.launch)}(태평양)부터`)}</span></dd></div>`;
+    } else {
+      const last = (store) => (S.days || []).filter((r) => r.store === store).map((r) => r.day).sort().at(-1);
+      status = ["google", "apple"].map((k) => {
+        const x = sync.get(k);
+        const total = Number(S.totals?.[`${k}_app`] || 0);
+        const v = x?.ok ? `누적 ${num(total)}건 · ${at(x)} 확인${last(k) ? ` (판매 있는 마지막 날 ${shortDay(last(k))})` : " (아직 판매 기록 없음)"}` : why(k);
+        return `<div><dt>${esc(STORE_NAME[k])}</dt><dd>${esc(v)}</dd></div>`;
+      }).join("");
+    }
+    const any = rows.some((r) => r.google + r.apple + r.iap + (r.extra || 0) > 0);  // an all-zero chart says nothing: the tiles above do
     return `<article class="ov-card is-wide tk-store-card">
-      <header class="ov-card-head"><h3>앱 판매 (스토어 보고서, ${period}일)</h3><span class="ov-legend">${parts.map((p) => swatch(p.color, p.label)).join("")}</span></header>
+      <header class="ov-card-head"><h3>앱 판매 (스토어 보고서 + 예상, ${period}일)</h3><span class="ov-legend">${parts.map((p) => swatch(p.color, p.label)).join("")}</span></header>
       <div class="lab-facts tk-more-facts">${status}</div>
       ${any ? `<figure class="ov-figure" tabindex="0" aria-label="날마다 앱 판매"><div class="ov-plot has-y">${cols.plot}</div>${xAxis(rows)}</figure>` : ""}
-      <p class="overview-drill-note">유료 앱이라 스토어 다운로드 1건이 곧 판매 1건입니다. 게임 서버는 인앱 결제만 확인하므로 앱 판매는 스토어 보고서로만 셉니다. 보고서는 하루쯤 늦고(미국 태평양 날짜), 테스트 주문은 들어가지 않습니다. 실시간 확인은 Play Console 주문 관리 · App Store Connect 판매 및 추세.</p></article>`;
+      <p class="overview-drill-note">${E ? "확정은 스토어 보고서에 잡힌 판매만 셉니다. 새 유저는 출시 뒤 Android·iOS 앱에서 닉네임을 새로 만든 계정입니다 (테스트·심사 계정 제외). 예상은 확정된 날은 확정 판매, 보고서가 아직 확정되지 않은 날은 그날 새 유저 수(보고서에 이미 잡힌 게 더 많으면 그 수)로 셉니다. App Store는 다음 날 정오(태평양, 베를린 21시)부터, Google Play는 3일 뒤부터 확정으로 봅니다. 사고 나서 닉네임을 안 만들었거나, 한 사람이 기기를 바꿔 새로 만든 경우는 어긋나므로 추정치입니다. " : ""}유료 앱이라 스토어 다운로드 1건이 곧 판매 1건이고, 날짜는 미국 태평양 날짜입니다. 실시간 확인은 Play Console 주문 관리 · App Store Connect 판매 및 추세.</p></article>`;
   }
 
   // 스토어 평점·리뷰 (owner 2026-11-24 night, long-term operation): App Store stars per storefront (every rating, from the public

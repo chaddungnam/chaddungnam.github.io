@@ -1681,6 +1681,7 @@ a.tk-glance-note { color: #e8aca6; text-decoration: underline; text-underline-of
 .tk-main-chart { grid-template-columns: 1fr; margin-top: 14px; }
 .tk-main-chart .ov-card-head h3 { font-size: 15px; }
 .tk-more-facts { grid-column: 1 / -1; }
+.tk-store-card .tk-store-est { display: block; font-size: 24px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
 @media (max-width: 900px) {
   .tk-glance-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tk-glance-value strong { font-size: 36px; }

@@ -202,7 +202,12 @@
         // store days are the stores' own (Pacific) days counted back from the real today, like the page's chart
         days: [{ day: new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10), store: "google", app_units: 3, app_refunds: 0, iap_units: 1 },
           { day: new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10), store: "google", app_units: 2, app_refunds: 0, iap_units: 0 }],
-        totals: { google_app: 5, apple_app: 0 }, money: [], installs: [], countries: [{ country: "KR", units: 5 }] };
+        totals: { google_app: 5, apple_app: 0 }, money: [], installs: [], countries: [{ country: "KR", units: 5 }],
+        // store.get v2 (2026-11-25): launch 5 days back, Play settled up to 3 days back, new nicknames per day (Android / iOS)
+        launch_pt: new Date(Date.now() - 5 * 86400000).toISOString().slice(0, 10),
+        report_days: [5, 4, 3].map((n) => ({ store: "google", day: new Date(Date.now() - n * 86400000).toISOString().slice(0, 10), final: true }))
+          .concat([{ store: "google", day: new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10), final: false }]),
+        new_accounts: [[3, 2, 1], [2, 4, 2], [1, 1, 3]].map(([n, android, ios]) => ({ day: new Date(Date.now() - n * 86400000).toISOString().slice(0, 10), android, ios })) };
       case "prereg.get": {
         const days = overview().series.map((r, i) => ({ day: r.day, n: i % 5, ko: i % 2, en: i % 5 - (i % 2) > 0 ? i % 5 - (i % 2) : 0, ja: 0, zh: i % 3 === 0 ? 1 : 0, de: 0 }));
         days.forEach((d) => { d.n = d.ko + d.en + d.zh; });
