@@ -309,3 +309,5 @@ a.tk-badge { text-decoration: none; }
 .tk-country-table table { min-width: 640px; }
 #tenkeyMoney .panel-heading { align-items: flex-start; gap: 12px; }
 @media (max-width: 900px) { .tk-econ-reasons { grid-template-columns: 1fr; } .tk-econ-cols { height: 180px; } }
+#tenkeyMoney .panel-heading { flex-wrap: wrap; }
+#tenkeyMoney .panel-heading > div:first-child { flex: 1 1 280px; min-width: 0; }
