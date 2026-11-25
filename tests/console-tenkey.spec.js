@@ -22,7 +22,7 @@ async function fakeGoogle(page, how) {
   });
 }
 
-test("the project picker has no Comrade card; 10key Survival opens on the overview with its seventeen pages", async ({ page }) => {
+test("the project picker has no Comrade card; 10key Survival opens on the overview with its eighteen pages", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
@@ -36,7 +36,7 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   await page.locator("#projectTenkey").click();
   await expect(page.locator("#currentProject")).toHaveText("10key Survival");
   await expect(page).toHaveURL(/#\/tenkey-overview$/);
-  await expect(page.locator("#tenkeyNav a")).toHaveCount(17);
+  await expect(page.locator("#tenkeyNav a")).toHaveCount(18);  // + 경제 흐름 (2026-11-25)
   await expect(page.locator("#hexaworldNav")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -242,12 +242,48 @@ test("overview (owner 2026-11-24): store ratings and reviews, the unanswered one
   const card = page.locator("#tenkeyOverviewCharts .tk-reviews-card");
   await expect(card.locator("h3")).toHaveText("스토어 평점 · 리뷰");
   await expect(card).toContainText("4.38 · 16개 (어제보다 +2)");
-  await expect(card).toContainText("KR 4.5 (12)");
+  await expect(card).toContainText("대한민국 4.5 (12)");
+  const countries = card.locator(".tk-country-table tbody tr");
+  await expect(countries.first()).toContainText("대한민국");
+  await expect(countries.first().locator('td[data-label="App Store 평점"]')).toContainText("★ 4.50");
+  await expect(countries.first().locator('td[data-label="App Store 평점"]')).toContainText("+2");
+  await expect(card.locator(".tk-country-table")).toContainText("한국어 (언어)");
   await expect(card.locator(".tk-review")).toHaveCount(2);
   await expect(card.locator(".tk-review").first()).toContainText("튜토리얼이 너무 빨라요");
   await expect(card.locator(".tk-review").first().locator("a.tk-badge")).toHaveAttribute("href", /appstoreconnect\.apple\.com/);
   await expect(card.locator(".tk-review").nth(1)).toContainText("답함");
   await expect(card).toContainText("답 안 한 리뷰");
+  expect(errors).toEqual([]);
+});
+
+test("구매·젬 (owner 2026-11-24 night): country store, amount, expected net per purchase; totals by day / week / month", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-purchases");
+  const first = page.locator("#tenkeyPurchasesTable tr").first();
+  await expect(first.locator('td[data-label="스토어 · 나라"]')).toContainText("대한민국");
+  await expect(first.locator('td[data-label="결제 금액"]')).toContainText("4,400 KRW");
+  await expect(first.locator('td[data-label="예상 순수익"]')).toContainText("€2.31");
+  await expect(first.locator('td[data-label="예상 순수익"]')).toContainText("스토어 값");
+  await expect(page.locator("#tenkeyPurchasesTable tr").nth(1).locator('td[data-label="예상 순수익"]')).toContainText("예상 (부가세 10%, 수수료 15%)");
+  await expect(page.locator("#tenkeyMoneyTable tr")).toHaveCount(2);
+  await expect(page.locator("#tenkeyMoneyTable tr").first().locator('td[data-label="순수익 합계"]')).toHaveText("€10.91");
+  await expect(page.locator("#tenkeyMoneyFacts")).toContainText("오늘 순수익");
+  await page.locator('[data-tk-money-unit="week"]').click();
+  await expect.poll(async () => (await calls(page, "money.get")).at(-1)?.params.unit).toBe("week");
+  await expect(page.locator("#tenkeyMoneyFacts")).toContainText("이번 주 순수익");
+  expect(errors).toEqual([]);
+});
+
+test("경제 흐름 (owner 2026-11-24 night): gems / scrap / parts in and out per day and reason, balances", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-economy");
+  await expect(page.locator("#pageTitle")).toHaveText("경제 흐름");
+  await expect(page.locator("#tenkeyEconSummary article").first()).toContainText("800");
+  await expect(page.locator("#tenkeyEconSummary")).toContainText("+400");
+  await expect(page.locator("#tenkeyEconChart .tk-econ-col")).toHaveCount(2);
+  await expect(page.locator("#tenkeyEconReasons")).toContainText("스토어 구매");
+  await expect(page.locator("#tenkeyEconReasons")).toContainText("부활");
+  await expect(page.locator("#tenkeyEconBalances")).toContainText("평균 140");
+  await page.locator('[data-tk-econ-days="30"]').click();
+  await expect.poll(async () => (await calls(page, "economy.get")).at(-1)?.params.days).toBe(30);
   expect(errors).toEqual([]);
 });
 

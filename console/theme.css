@@ -283,3 +283,29 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; }
 .tk-review strong { display: block; margin-bottom: 2px; font-size: 14px; font-weight: 600; }
 .tk-review p { margin: 0; color: var(--hd-text); font-size: 13.5px; line-height: 1.55; overflow-wrap: anywhere; }
 a.tk-badge { text-decoration: none; }
+
+/* 경제 흐름 (2026-11-25) */
+.tk-econ-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 10px; color: var(--hd-text-2); font-size: 12.5px; }
+.tk-econ-legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; vertical-align: -1px; }
+.tk-econ-legend .is-in { background: var(--hd-blue); } .tk-econ-legend .is-bought { background: var(--hd-yellow); } .tk-econ-legend .is-out { background: var(--hd-red); }
+.tk-econ-cols { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; height: 220px; align-items: stretch; }
+.tk-econ-col { display: grid; grid-template-rows: 1fr 1fr auto; min-width: 0; border-radius: 4px; }
+.tk-econ-col:hover, .tk-econ-col:focus-visible { background: rgba(255, 255, 255, .04); }
+.tk-econ-up { align-self: end; position: relative; display: flex; flex-direction: column-reverse; background: var(--hd-blue); border-radius: 3px 3px 0 0; min-height: 1px; }
+.tk-econ-bought { display: block; width: 100%; background: var(--hd-yellow); border-radius: 0; }
+.tk-econ-down { align-self: start; background: var(--hd-red); opacity: .85; border-radius: 0 0 3px 3px; min-height: 1px; }
+.tk-econ-col small { padding-top: 4px; color: var(--hd-text-3); font-size: 11.5px !important; text-align: center; white-space: nowrap; overflow: hidden; }
+.tk-econ-reasons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tk-econ-cur { padding: 14px; background: var(--hd-s2); border-radius: var(--hd-radius-s); }
+.tk-econ-cur h3 { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+.tk-econ-pair { display: grid; gap: 12px; }
+.tk-econ-side h4 { display: flex; justify-content: space-between; margin: 0 0 6px; color: var(--hd-text-2); font-size: 13px; font-weight: 500; }
+.tk-econ-side h4 span { color: var(--hd-text); font-weight: 600; }
+.tk-econ-side ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.tk-econ-side li { display: grid; grid-template-columns: 1fr auto; column-gap: 8px; font-size: 13px; }
+.tk-econ-side li b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.tk-econ-side li small { grid-column: 1 / -1; color: var(--hd-text-3); font-size: 12px !important; }
+.tk-card-sub { margin: 16px 0 6px; color: var(--hd-text-2); font-size: 13px; font-weight: 600; }
+.tk-country-table table { min-width: 640px; }
+#tenkeyMoney .panel-heading { align-items: flex-start; gap: 12px; }
+@media (max-width: 900px) { .tk-econ-reasons { grid-template-columns: 1fr; } .tk-econ-cols { height: 180px; } }

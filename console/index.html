@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="base.css?v=20261124-ui2">
   <link rel="stylesheet" href="styles.css?v=20261124-ui2">
   <link rel="stylesheet" href="../assets/notice-links.css?v=20260909-1">
-  <link rel="stylesheet" href="theme.css?v=20261124-ops">
+  <link rel="stylesheet" href="theme.css?v=20261125-money">
 </head>
 <body>
   <a id="skipLink" class="skip-link" href="#loginPanel">본문으로 건너뛰기</a>
@@ -90,12 +90,13 @@
         <a href="#/tenkey-purchases" data-page="tenkey-purchases"><span class="nav-index">09</span><span class="nav-copy">구매·젬<small>결제·환불</small></span></a>
         <a href="#/tenkey-ranking" data-page="tenkey-ranking"><span class="nav-index">10</span><span class="nav-copy">랭킹<small>보드</small></span></a>
         <a href="#/tenkey-balance" data-page="tenkey-balance"><span class="nav-index">11</span><span class="nav-copy">밸런스<small>판이 끝난 곳·고른 카드</small></span></a>
-        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">12</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
-        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">13</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
-        <a href="#/tenkey-watch" data-page="tenkey-watch"><span class="nav-index">14</span><span class="nav-copy">감시<small>검수·무적·TOP10</small></span></a>
-        <a href="#/tenkey-issues" data-page="tenkey-issues"><span class="nav-index">15</span><span class="nav-copy">이슈함<small>크래시·앱 이상·문의의 순서</small></span></a>
-        <a href="#/tenkey-keep" data-page="tenkey-keep"><span class="nav-index">16</span><span class="nav-copy">데이터 보관<small>받는 것·보관 기간·정리</small></span></a>
-        <a href="#/tenkey-perf" data-page="tenkey-perf"><span class="nav-index">17</span><span class="nav-copy">성능<small>첫 화면·버벅임·메모리</small></span></a>
+        <a href="#/tenkey-economy" data-page="tenkey-economy"><span class="nav-index">12</span><span class="nav-copy">경제 흐름<small>젬·스크랩·부품 획득·소비</small></span></a>
+        <a href="#/tenkey-config" data-page="tenkey-config"><span class="nav-index">13</span><span class="nav-copy">업데이트<small>강제 업데이트 번호</small></span></a>
+        <a href="#/tenkey-audit" data-page="tenkey-audit"><span class="nav-index">14</span><span class="nav-copy">감사 기록<small>변경 이력</small></span></a>
+        <a href="#/tenkey-watch" data-page="tenkey-watch"><span class="nav-index">15</span><span class="nav-copy">감시<small>검수·무적·TOP10</small></span></a>
+        <a href="#/tenkey-issues" data-page="tenkey-issues"><span class="nav-index">16</span><span class="nav-copy">이슈함<small>크래시·앱 이상·문의의 순서</small></span></a>
+        <a href="#/tenkey-keep" data-page="tenkey-keep"><span class="nav-index">17</span><span class="nav-copy">데이터 보관<small>받는 것·보관 기간·정리</small></span></a>
+        <a href="#/tenkey-perf" data-page="tenkey-perf"><span class="nav-index">18</span><span class="nav-copy">성능<small>첫 화면·버벅임·메모리</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -626,13 +627,18 @@
           <article data-tone="risk"><span>환불</span><strong data-tk-summary="refunded">—</strong></article>
           <article data-tone="watch"><span>환불 비율</span><strong data-tk-summary="refundRate">—</strong></article>
         </section>
+        <section class="panel" id="tenkeyMoney" aria-labelledby="tenkeyMoneyTitle">
+          <div class="panel-heading"><div><h2 id="tenkeyMoneyTitle">매출 · 예상 순수익 (EUR)</h2><small>인앱 결제와 앱 판매(스토어 보고서)를 유로로 바꿔 합칩니다. Google Play 인앱은 구글이 알려 준 개발자 수익 그대로, App Store 인앱은 결제 금액에서 그 나라 부가세를 빼고 수수료 15%를 뺀 예상값입니다. 환율은 결제일 유럽중앙은행 기준. 소득세는 빼지 않았습니다.</small></div><div class="overview-segment" role="group" aria-label="묶는 단위"><button class="overview-switch active" type="button" data-tk-money-unit="day" aria-pressed="true">일</button><button class="overview-switch" type="button" data-tk-money-unit="week" aria-pressed="false">주</button><button class="overview-switch" type="button" data-tk-money-unit="month" aria-pressed="false">월</button></div></div>
+          <div id="tenkeyMoneyFacts" class="lab-facts"></div>
+          <div class="table-scroll"><table><thead><tr><th>기간</th><th class="tk-num">인앱 건수</th><th class="tk-num">인앱 결제액</th><th class="tk-num">인앱 순수익</th><th class="tk-num">앱 판매</th><th class="tk-num">앱 판매 순수익</th><th class="tk-num">순수익 합계</th></tr></thead><tbody id="tenkeyMoneyTable"></tbody></table></div>
+        </section>
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">GEMS</p><h2>젬 · 리바이브 패스</h2><small>젬은 앱 저장에 있고, 서버는 구매로 받은 것과 앱이 알려준 쓴 기록만 장부로 가집니다 (잔액의 정본이 아닙니다).</small></div></div>
           <div id="tenkeyGemFacts" class="lab-facts" aria-live="polite"></div>
         </section>
         <section class="panel">
-          <div class="panel-heading"><div><p class="eyebrow">STORE RECORDS</p><h2>구매 기록</h2><small>서버가 스토어에서 확인해 기록한 것만 보입니다. 금액은 스토어 정산 화면에서 확인하세요.</small></div><span id="tenkeyPurchaseTotal" class="panel-total">—</span></div>
-          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>상품</th><th>스토어</th><th>상태</th><th>주문 번호 끝</th><th>환불</th></tr></thead><tbody id="tenkeyPurchasesTable"></tbody></table></div>
+          <div class="panel-heading"><div><p class="eyebrow">STORE RECORDS</p><h2>구매 기록</h2><small>서버가 스토어에서 확인해 기록한 것만 보입니다. 나라와 결제 금액은 스토어가 알려 준 값이고, 순수익은 아래 ‘매출’의 기준으로 셉니다.</small></div><span id="tenkeyPurchaseTotal" class="panel-total">—</span></div>
+          <div class="table-scroll"><table><thead><tr><th>시각</th><th>플레이어</th><th>상품</th><th>스토어 · 나라</th><th class="tk-num">결제 금액</th><th class="tk-num">예상 순수익</th><th>상태</th><th>주문 번호 끝</th><th>환불</th></tr></thead><tbody id="tenkeyPurchasesTable"></tbody></table></div>
           <div class="pagination"><button id="tenkeyPurchasesPrevious" type="button">이전</button><span id="tenkeyPurchasesPage">1 / 1</span><button id="tenkeyPurchasesNext" type="button">다음</button></div>
         </section>
         <p id="tenkeyPurchasesMessage" class="dashboard-message" role="status"></p>
@@ -815,6 +821,15 @@
         </section>
         <section id="tenkeyIssueDetail" class="panel" hidden></section>
         <p id="tenkeyIssueMessage" class="dashboard-message" role="status"></p>
+      </section>
+
+      <section id="tenkeyEconomyView" class="route-view tk-page" data-route="tenkey-economy" hidden>
+        <div class="panel admin-toolbar tenkey-toolbar"><div class="overview-segment" role="group" aria-label="기간"><button class="overview-switch" type="button" data-tk-econ-days="7" aria-pressed="false">7일</button><button class="overview-switch active" type="button" data-tk-econ-days="14" aria-pressed="true">14일</button><button class="overview-switch" type="button" data-tk-econ-days="30" aria-pressed="false">30일</button><button class="overview-switch" type="button" data-tk-econ-days="90" aria-pressed="false">90일</button></div></div>
+        <section class="purchase-summary tenkey-summary" id="tenkeyEconSummary" aria-label="경제 요약"></section>
+        <section class="panel"><div class="panel-heading"><div><h2>젬 · 날마다 생긴 것과 쓴 것</h2><small>막대 위쪽은 생긴 젬(구매 포함), 아래쪽은 쓴 젬입니다. 생긴 것이 계속 쓴 것보다 많으면 젬이 쌓여 값어치가 떨어집니다 (인플레이션).</small></div></div><div id="tenkeyEconChart" class="tk-econ-chart"></div></section>
+        <section class="panel"><div class="panel-heading"><div><h2>어디서 생기고 어디에 쓰나</h2><small>기간 안의 사유별 합계. 사람 수는 그 사유가 한 번이라도 있었던 계정 수입니다.</small></div></div><div id="tenkeyEconReasons" class="tk-econ-reasons"></div></section>
+        <section class="panel"><div class="panel-heading"><div><h2>지금 쥐고 있는 양</h2><small>기간 안에 움직임이 있었던 계정의 장부 잔액 (서버가 경제를 맡는 앱 계정, 테스트 계정 제외).</small></div></div><div id="tenkeyEconBalances" class="lab-facts"></div></section>
+        <p id="tenkeyEconMessage" class="dashboard-message" role="status"></p>
       </section>
 
       <section id="tenkeyKeepView" class="route-view tk-page" data-route="tenkey-keep" hidden>
@@ -1007,8 +1022,8 @@
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="../analytics/pulse-model.js?v=20260831-1" defer></script>
-  <script src="model.js?v=20261117-keep" defer></script>
+  <script src="../analytics/pulse-model.js?v=20261125-econ" defer></script>
+  <script src="model.js?v=20261125-econ" defer></script>
   <script src="ui-state.js?v=20260904-1" defer></script>
   <script src="auth.js?v=20261103-7d" defer></script>
   <script src="api.js?v=20261007-hx" defer></script>
@@ -1019,7 +1034,7 @@
   <script src="announcement-editor.js?v=20261028-caret" defer></script>
   <script src="operations.js?v=20260909-1" defer></script>
   <script src="tenkey.js?v=20261117-triage" defer></script>
-  <script src="tenkey-overview.js?v=20261124-reviews" defer></script>
+  <script src="tenkey-overview.js?v=20261125-country" defer></script>
   <script src="tenkey-unlocks.js?v=20261119-cpcon" defer></script>
   <script src="tenkey-watch.js?v=20261115-watch" defer></script>
   <script src="tenkey-signals.js?v=20261118-link" defer></script>
@@ -1030,22 +1045,23 @@
   <script src="tenkey-reports.js?v=20261124-links2" defer></script>
   <script src="tenkey-mail.js?v=20261104-mail" defer></script>
   <script src="tenkey-notices.js?v=20261025-tr2" defer></script>
-  <script src="tenkey-more.js?v=20261119-cpcon" defer></script>
+  <script src="tenkey-more.js?v=20261125-money" defer></script>
   <script src="tenkey-balance.js?v=20261124-tune" defer></script>
   <script src="tenkey-keep.js?v=20261120-cqa" defer></script>
   <script src="tenkey-issues.js?v=20261124-flip" defer></script>
+  <script src="tenkey-economy.js?v=20261125-econ" defer></script>
   <script src="tenkey-perf.js?v=20261117-stall2" defer></script>
-  <script src="purchases-model.js?v=20260927-2x" defer></script>
+  <script src="purchases-model.js?v=20261125-econ" defer></script>
   <script src="purchases.js?v=20260927-2x" defer></script>
   <script src="audit.js?v=20260907-2" defer></script>
   <script src="notes.js?v=20261006-r25" defer></script>
-  <script src="gmail-model.js?v=20260904-1" defer></script>
+  <script src="gmail-model.js?v=20261125-econ" defer></script>
   <script src="gmail-api.js?v=20260907-2" defer></script>
   <script src="cs-intelligence.js?v=20260904-1" defer></script>
   <script src="cs-templates.js?v=20260904-1" defer></script>
   <script src="cs.js?v=20261020-noai" defer></script>
   <script src="lab.js?v=20261005-reports" defer></script>
   <script src="liveops.js" defer></script>
-  <script src="app.js?v=20261117-keep" defer></script>
+  <script src="app.js?v=20261125-econ" defer></script>
 </body>
 </html>

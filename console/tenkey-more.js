@@ -6,7 +6,12 @@
   const T = root.ConsoleTenkey;
   const { esc, num, time, duration, pct, platformName, productName, boardName } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { purchases: { bound: false, q: {} }, ranking: { bound: false }, audit: { bound: false } };
+  const state = { purchases: { bound: false, q: {}, unit: "day", money: null }, ranking: { bound: false }, audit: { bound: false } };
+  // Money per purchase (owner 2026-11-24 night: country store, amount, expected net, totals by day / week / month): tenkey-console-stats
+  // money.get (it also fills the store numbers of new purchases). Country names in Korean from the browser.
+  const regionName = (() => { try { const d = new Intl.DisplayNames(["ko"], { type: "region" }); return (c) => (c ? `${d.of(c) || c}` : "—"); } catch (_e) { return (c) => c || "—"; } })();
+  const cur = (v, c) => (v === null || v === undefined || v === "" ? "—" : `${Number(v).toLocaleString("ko-KR", { maximumFractionDigits: ["KRW", "JPY", "TWD", "HUF", "CLP", "IDR", "VND"].includes(c) ? 0 : 2 })} ${c || ""}`.trim());
+  const eur = (v) => (v === null || v === undefined ? "—" : `€${Number(v).toLocaleString("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
   let purchasePager = null;
 
   const STATE_NAMES = { granted: ["결제 완료", "good"], sandbox: ["테스트 결제", "quiet"], refunded: ["환불", "risk"] };
@@ -18,17 +23,67 @@
     const [label, tone] = STATE_NAMES[p.state] || [p.state, "quiet"];
     return `<tr><td data-label="시각">${esc(time(p.created_at))}</td>
       <td data-label="플레이어">${p.player_id ? playerLink(p.player_id, p.name) : `<span class="tk-sub">탈퇴한 계정 · ${esc(p.login_short || "—")}</span>`}</td>
-      <td data-label="상품">${esc(productName(p.product_id))}<span class="tk-sub">${esc(p.product_id)}</span>${p.platform === "nekoland" && p.price_cents != null ? `<span class="tk-sub">${esc(num(p.price_cents))} 큐브 (${esc(cubesUsd(p.price_cents))})</span>` : ""}</td><td data-label="스토어">${esc(platformName(p.platform))}</td>
+      <td data-label="상품">${esc(productName(p.product_id))}<span class="tk-sub">${esc(p.product_id)}</span>${p.platform === "nekoland" && p.price_cents != null ? `<span class="tk-sub">${esc(num(p.price_cents))} 큐브 (${esc(cubesUsd(p.price_cents))})</span>` : ""}</td>
+      ${moneyCells(p)}
       <td data-label="상태"><span class="tk-badge" data-tone="${tone}">${esc(label)}</span></td>
       <td data-label="주문 번호 끝"><code>${esc(p.order_tail || "—")}</code></td>
       <td data-label="환불">${esc(p.refunded_at ? `${time(p.refunded_at)}${p.refund_reason_category ? ` · ${p.refund_reason_category}` : ""}` : "—")}</td></tr>`;
+  }
+
+  function moneyCells(p) {
+    const m = state.purchases.money?.items?.[p.id];
+    const where = `${esc(platformName(p.platform))}<span class="tk-sub">${esc(m ? regionName(m.country) : p.platform === "nekoland" ? "—" : "확인 중")}</span>`;
+    if (!m) return `<td data-label="스토어 · 나라">${where}</td><td data-label="결제 금액" class="tk-num">—</td><td data-label="예상 순수익" class="tk-num">—</td>`;
+    const src = m.net_source === "store" ? "스토어 값" : m.net_source === "estimate" ? `예상 (부가세 ${Math.round(Number(m.vat_rate || 0) * 1000) / 10}%, 수수료 15%)` : (m.note || "금액 못 받음");
+    return `<td data-label="스토어 · 나라">${where}</td>
+      <td data-label="결제 금액" class="tk-num">${esc(cur(m.price, m.currency))}<span class="tk-sub">${esc(eur(m.price_eur))}</span></td>
+      <td data-label="예상 순수익" class="tk-num">${esc(eur(m.net_eur))}<span class="tk-sub">${esc(src)}</span></td>`;
+  }
+
+  function periodLabel(day, unit) {
+    const d = new Date(`${day}T00:00:00Z`);
+    if (unit === "month") return `${d.getUTCFullYear()}년 ${d.getUTCMonth() + 1}월`;
+    if (unit === "week") { const e = new Date(d.getTime() + 6 * 86400000); return `${d.getUTCMonth() + 1}. ${d.getUTCDate()}. ~ ${e.getUTCMonth() + 1}. ${e.getUTCDate()}.`; }
+    return `${d.getUTCMonth() + 1}. ${d.getUTCDate()}. (${"일월화수목금토"[d.getUTCDay()]})`;
+  }
+
+  function renderMoney() {
+    const m = state.purchases.money;
+    if (!m) { byId("tenkeyMoneyTable").innerHTML = '<tr><td colspan="7" class="empty-panel">매출을 불러오지 못했습니다.</td></tr>'; return; }
+    const rows = m.periods || [];
+    const total = (r) => Number(r.iap_net_eur || 0) + Number(r.app_net_eur || 0);
+    const label = { day: "오늘", week: "이번 주", month: "이번 달" }[m.unit] || "이번";
+    const now = rows[0] || {}, prev = rows[1] || {};
+    const sumAll = rows.reduce((t, r) => t + total(r), 0);
+    byId("tenkeyMoneyFacts").innerHTML = [
+      [`${label} 순수익`, eur(total(now))], [`${label} 결제액 (인앱 + 앱)`, eur(Number(now.iap_gross_eur || 0) + Number(now.app_gross_eur || 0))],
+      [`앞 ${{ day: "날", week: "주", month: "달" }[m.unit] || "기간"} 순수익`, eur(total(prev))], [`표의 ${rows.length}${{ day: "일", week: "주", month: "개월" }[m.unit]} 합계`, eur(sumAll)],
+    ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    byId("tenkeyMoneyTable").innerHTML = rows.map((r) => `<tr>
+      <td data-label="기간">${esc(periodLabel(r.period, m.unit))}</td>
+      <td data-label="인앱 건수" class="tk-num">${esc(num(r.iap_count))}${r.iap_unpriced ? `<span class="tk-sub">금액 확인 중 ${esc(num(r.iap_unpriced))}</span>` : ""}</td>
+      <td data-label="인앱 결제액" class="tk-num">${esc(eur(r.iap_gross_eur))}</td><td data-label="인앱 순수익" class="tk-num">${esc(eur(r.iap_net_eur))}</td>
+      <td data-label="앱 판매" class="tk-num">${esc(num(r.app_units))}</td><td data-label="앱 판매 순수익" class="tk-num">${esc(eur(r.app_net_eur))}</td>
+      <td data-label="순수익 합계" class="tk-num"><strong>${esc(eur(total(r)))}</strong></td></tr>`).join("");
+  }
+
+  async function loadMoney() {
+    try {
+      state.purchases.money = await T.stats("money.get", { unit: state.purchases.unit, periods: state.purchases.unit === "day" ? 14 : state.purchases.unit === "week" ? 12 : 12 });
+    } catch (_e) {
+      state.purchases.money = null;
+    }
+    renderMoney();
   }
 
   async function loadPurchases(page = 1) {
     T.setMessage("tenkeyPurchasesMessage", "구매 기록을 불러오는 중입니다...");
     try {
       const q = state.purchases.q;
-      const result = await T.call("purchases.list", { range_days: q.range ?? 30, platform: q.platform || undefined, state: q.state || undefined, query: q.query || "", page });
+      const [result] = await Promise.all([
+        T.call("purchases.list", { range_days: q.range ?? 30, platform: q.platform || undefined, state: q.state || undefined, query: q.query || "", page }),
+        loadMoney(),
+      ]);
       const d = result.data;
       purchasePager.st.page = page;
       purchasePager.st.total = Number(d.total || 0);
@@ -46,7 +101,7 @@
         ["네코랜드 결제 (1 큐브 = 1 센트)", `${num(s.nekoland)}건 · ${num(s.nekoland_cubes)} 큐브 (${cubesUsd(s.nekoland_cubes)})`],
       ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
       byId("tenkeyPurchaseTotal").textContent = `${num(d.total)}건`;
-      byId("tenkeyPurchasesTable").innerHTML = (d.rows || []).length ? d.rows.map(purchaseRow).join("") : '<tr><td colspan="7" class="empty-panel">조건에 맞는 구매 기록이 없습니다. 아직 스토어 결제가 없을 수 있습니다.</td></tr>';
+      byId("tenkeyPurchasesTable").innerHTML = (d.rows || []).length ? d.rows.map(purchaseRow).join("") : '<tr><td colspan="9" class="empty-panel">조건에 맞는 구매 기록이 없습니다. 아직 스토어 결제가 없을 수 있습니다.</td></tr>';
       purchasePager.draw();
       T.setMessage("tenkeyPurchasesMessage", "환불은 스토어에서 환불 알림을 받거나 확인한 뒤에만 표시됩니다 (자동 알림 연결 전에는 늦을 수 있음).");
     } catch (error) {
@@ -59,6 +114,13 @@
     if (!st.bound) {
       st.bound = true;
       purchasePager = T.pager({ prev: "tenkeyPurchasesPrevious", next: "tenkeyPurchasesNext", label: "tenkeyPurchasesPage" }, 50, loadPurchases);
+      byId("tenkeyMoney").addEventListener("click", (event) => {
+        const b = event.target.closest("[data-tk-money-unit]");
+        if (!b) return;
+        st.unit = b.dataset.tkMoneyUnit;
+        document.querySelectorAll("[data-tk-money-unit]").forEach((x) => { const on = x === b; x.classList.toggle("active", on); x.setAttribute("aria-pressed", String(on)); });
+        loadMoney();
+      });
       byId("tenkeyPurchaseFilterForm").addEventListener("submit", (event) => {
         event.preventDefault();
         st.q = { range: Number(byId("tenkeyPurchaseRange").value), platform: byId("tenkeyPurchasePlatform").value, state: byId("tenkeyPurchaseState").value, query: byId("tenkeyPurchaseQuery").value.trim() };

@@ -192,6 +192,33 @@
   const STAR = (n) => "★★★★★".slice(0, Math.max(0, Math.min(5, n))) + "☆☆☆☆☆".slice(0, 5 - Math.max(0, Math.min(5, n)));
   const REPLY_URL = { apple: "https://appstoreconnect.apple.com/apps/6824972492/distribution/activity/ios/ratingsResponses",
     google: "https://play.google.com/console/u/0/developers/6859298164484039460/app/4975178648682924098/user-feedback/reviews" };
+  // 나라별 (owner 2026-11-24 night: "스토어 별점리뷰 출시국가별로 모아서"): App Store stars per storefront (every storefront in turn,
+  // about a day per round), Google Play's country average once its report is readable, and the written reviews per country.
+  const REGION = (() => { try { return new Intl.DisplayNames(["ko"], { type: "region" }); } catch (_e) { return null; } })();
+  const LANGN = (() => { try { return new Intl.DisplayNames(["ko"], { type: "language" }); } catch (_e) { return null; } })();
+  const placeName = (code) => {
+    const c = String(code || "");
+    if (c.startsWith("lang:")) return `${(LANGN && c.slice(5) !== "?" ? LANGN.of(c.slice(5)) : c.slice(5)) || c.slice(5)} (언어)`;
+    try { return (REGION && /^[A-Z]{2}$/.test(c) ? REGION.of(c) : c) || c; } catch (_e) { return c; }
+  };
+  function countryTable(R) {
+    const byC = new Map();
+    const row = (c) => { if (!byC.has(c)) byC.set(c, { c }); return byC.get(c); };
+    for (const r of R.ratings || []) Object.assign(row(r.country), r.store === "apple" ? { a: r } : { g: r });
+    for (const x of R.countries || []) row(x.country).rv = x;
+    const rows = [...byC.values()].sort((x, y) => (Number(y.a?.count || 0) - Number(x.a?.count || 0)) || (Number(y.rv?.reviews || 0) - Number(x.rv?.reviews || 0)) || x.c.localeCompare(y.c));
+    if (!rows.length) return `<p class="overview-drill-note">나라별 평점이 아직 없습니다. App Store는 나라마다 차례로 확인 중입니다 (지금까지 ${esc(num(R.checked || 0))}개 나라 확인).</p>`;
+    const star = (x) => (x && Number(x.average) > 0 ? `★ ${Number(x.average).toFixed(2)}` : "—");
+    return `<div class="table-scroll tk-country-table"><table><thead><tr><th>나라</th><th class="tk-num">App Store 평점</th><th class="tk-num">Google Play 평점</th><th class="tk-num">글 리뷰</th><th class="tk-num">답 안 함</th><th>마지막 리뷰</th></tr></thead><tbody>${rows.map((x) => `<tr>
+      <td data-label="나라">${esc(placeName(x.c))}<span class="tk-sub">${esc(x.c.replace("lang:", ""))}</span></td>
+      <td data-label="App Store 평점" class="tk-num">${esc(star(x.a))}${x.a ? `<span class="tk-sub">${esc(num(x.a.count))}개${Number(x.a.prev_count ?? x.a.count) < Number(x.a.count) ? ` · +${esc(num(Number(x.a.count) - Number(x.a.prev_count)))}` : ""}</span>` : ""}</td>
+      <td data-label="Google Play 평점" class="tk-num">${esc(star(x.g))}</td>
+      <td data-label="글 리뷰" class="tk-num">${x.rv ? `${esc(num(x.rv.reviews))}<span class="tk-sub">★ ${esc(Number(x.rv.average).toFixed(1))}</span>` : "—"}</td>
+      <td data-label="답 안 함" class="tk-num">${x.rv ? esc(num(x.rv.unanswered)) : "—"}</td>
+      <td data-label="마지막 리뷰">${x.rv?.last_at ? esc(new Date(x.rv.last_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })) : "—"}</td></tr>`).join("")}</tbody></table></div>
+      <p class="overview-drill-note">App Store는 별점만 준 것까지 포함한 나라별 공개 값이고, 나라마다 차례로 확인합니다 (지금까지 ${esc(num(R.checked || 0))}개 나라 확인, 하루쯤에 한 바퀴). Google Play 나라별 평점은 Play 보고서 권한이 반영되면 채워집니다. 글 리뷰는 App Store는 리뷰를 쓴 나라, Google Play는 리뷰 언어(지역이 붙어 있으면 그 지역)로 묶습니다.</p>`;
+  }
+
   function reviewsCard(R) {
     if (!R) return "";
     const ratings = (R.ratings || []).filter((r) => r.store === "apple");
@@ -200,15 +227,15 @@
     const grew = ratings.reduce((t, r) => t + Math.max(0, Number(r.count || 0) - Number(r.prev_count ?? r.count ?? 0)), 0);
     const stat = (store) => (R.stats || []).find((x) => x.store === store) || null;
     const g = stat("google"), a = stat("apple");
-    const top = ratings.filter((r) => Number(r.count) > 0).slice(0, 4).map((r) => `${r.country} ${Number(r.average).toFixed(1)} (${num(r.count)})`).join(" · ");
+    const top = ratings.filter((r) => Number(r.count) > 0).slice(0, 3).map((r) => `${placeName(r.country)} ${Number(r.average).toFixed(1)} (${num(r.count)})`).join(" · ");
     const facts = [
       ["App Store 평점", avg === null ? "아직 평점 없음" : `${avg.toFixed(2)} · ${num(n)}개${grew ? ` (어제보다 +${num(grew)})` : ""}`],
-      ["App Store 나라별", top || "—"],
+      ["평점 있는 나라", top ? `${num(ratings.filter((r) => Number(r.count) > 0).length)}개 · ${top}` : "아직 없음"],
       ["리뷰 (글)", `App Store ${num(a?.reviews || 0)} · Google Play ${num(g?.reviews || 0)}`],
       ["답 안 한 리뷰", `${num(Number(a?.unanswered || 0) + Number(g?.unanswered || 0))}개`],
     ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
     const list = (R.reviews || []).slice(0, 6).map((r) => {
-      const where = [r.store === "apple" ? "App Store" : "Google Play", r.territory || r.lang, r.app_version, new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })].filter(Boolean).join(" · ");
+      const where = [r.store === "apple" ? "App Store" : "Google Play", r.territory ? placeName(r.territory) : r.lang ? placeName(`lang:${String(r.lang).split("_")[0]}`) : "", r.app_version, new Date(r.created_at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })].filter(Boolean).join(" · ");
       return `<li class="tk-review"><div class="tk-review-head"><span class="tk-review-stars" aria-label="별 ${esc(r.rating)}개" data-low="${Number(r.rating) <= 2}">${esc(STAR(Number(r.rating)))}</span>
         <span class="tk-sub">${esc(where)}</span>${r.reply ? '<span class="tk-badge" data-tone="good">답함</span>' : `<a class="tk-badge" data-tone="watch" href="${esc(REPLY_URL[r.store])}" target="_blank" rel="noopener">답하기</a>`}</div>
         ${r.title ? `<strong>${esc(r.title)}</strong>` : ""}<p>${esc(r.body || "(내용 없음)")}</p></li>`;
@@ -217,6 +244,9 @@
     return `<article class="ov-card is-wide tk-reviews-card">
       <header class="ov-card-head"><h3>스토어 평점 · 리뷰</h3><span class="ov-legend"><a href="${REPLY_URL.apple}" target="_blank" rel="noopener">App Store Connect</a> · <a href="${REPLY_URL.google}" target="_blank" rel="noopener">Play Console</a></span></header>
       <div class="lab-facts tk-more-facts">${facts}</div>
+      <h4 class="tk-card-sub">나라별</h4>
+      ${countryTable(R)}
+      <h4 class="tk-card-sub">최근 리뷰</h4>
       ${list ? `<ul class="tk-review-list">${list}</ul>` : '<p class="overview-drill-note">아직 글로 쓴 리뷰가 없습니다.</p>'}
       <p class="overview-drill-note">App Store 평점은 별점만 준 것까지 포함한 나라별 공개 값입니다 (주요 10개 나라). 리뷰는 글이 있는 것만 오며, Google Play는 최근 약 1주일 것만 API로 받습니다. 스토어 판매와 함께 3시간마다 새로 읽습니다.${sync ? ` ${esc(sync)}.` : ""}</p></article>`;
   }

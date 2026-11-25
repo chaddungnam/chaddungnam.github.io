@@ -254,7 +254,7 @@ test("every page in model.tenkeyPages has a menu link, a view, a title, a descri
   const at = html.indexOf('id="tenkeyNav"');
   const nav = html.slice(at, html.indexOf("</nav>", at));
   const scripts = fs.readdirSync(path.join(__dirname, "../console")).filter((f) => /^tenkey.*\.js$/.test(f)).map(source).join("\n");
-  assert.equal(model.tenkeyPages.length, 17);
+  assert.equal(model.tenkeyPages.length, 18);  // + tenkey-economy (2026-11-25)
   for (const page of model.tenkeyPages) {
     assert.match(nav, new RegExp(`data-page="${page}"`), `${page}: menu link`);
     assert.match(html, new RegExp(`data-route="${page}"`), `${page}: view`);

@@ -155,6 +155,22 @@
             mobile_launch: on ? 4 : 0, mobile_tester: on ? 3 : 7, players_launch: on ? 5 + (2 - k) * 3 : 0, u3_launch: on ? 4 : 0, u7_launch: on ? 4 : 0,
             web_gamepix: 1, web_nekoland: 2, visits_itch: 15 + i, visits_gamepix: 0, visits_nekoland: 3,
             new_itch: 3, back_itch: 1, new_app: 2, back_app: 1, new_other: 0, back_other: 0 }; }) }; }
+      // money per purchase and totals (2026-11-25): the first fixture purchase has Google's own revenue, the second an estimate
+      case "money.get": { const unit = p.unit || "day";
+        const items = {}; const firstIds = ["p1", "p2"];
+        if (firstIds[0]) items[firstIds[0]] = { store: "android", country: "KR", currency: "KRW", price: 4400, tax: 400, dev_revenue: 3400, fx_eur: 0.000678, price_eur: 2.9832, net_eur: 2.3052, net_source: "store", vat_rate: null, fee_rate: null };
+        if (firstIds[1]) items[firstIds[1]] = { store: "ios", country: "JP", currency: "JPY", price: 500, fx_eur: 0.0057, price_eur: 2.85, net_eur: 2.2023, net_source: "estimate", vat_rate: 0.1, fee_rate: 0.15 };
+        return { unit, fee_rate: 0.15, items, periods: [
+          { period: "2026-10-23", iap_count: 2, iap_gross_eur: 5.83, iap_net_eur: 4.51, iap_unpriced: 0, app_units: 3, app_gross_eur: 8.97, app_net_eur: 6.4, by_store: null },
+          { period: "2026-10-22", iap_count: 0, iap_gross_eur: 0, iap_net_eur: 0, iap_unpriced: 0, app_units: 1, app_gross_eur: 2.99, app_net_eur: 2.1, by_store: null }] }; }
+      // economy flow (2026-11-25): two days, gems grow faster than they go
+      case "economy.get": return { first_day: "2026-10-22", today: "2026-10-23", days: [
+          { day: "2026-10-22", gems_in: 500, gems_out: 120, gems_bought: 260, scrap_in: 9000, scrap_out: 7000, parts_in: 20, parts_out: 10, accounts: 6 },
+          { day: "2026-10-23", gems_in: 300, gems_out: 280, gems_bought: 0, scrap_in: 8000, scrap_out: 9000, parts_in: 12, parts_out: 15, accounts: 8 }],
+        reasons: [{ currency: "gems", kind: "grant", reason: "purchase", amount: 260, events: 1, accounts: 1 }, { currency: "gems", kind: "grant", reason: "play", amount: 540, events: 40, accounts: 8 },
+          { currency: "gems", kind: "spend", reason: "revive", amount: 400, events: 40, accounts: 6 }, { currency: "scrap", kind: "grant", reason: "run", amount: 17000, events: 30, accounts: 8 },
+          { currency: "scrap", kind: "spend", reason: "upgrade", amount: 16000, events: 20, accounts: 7 }],
+        balances: [{ currency: "gems", accounts: 8, avg: 140, median: 120, p90: 300, max: 520 }] };
       // per app build health (2026-11-24): Android 23 newest and clean, Android 22 with problems, iOS 22
       case "builds.get": return { days: 7, today: overview().series.at(-1).day, builds: [
         { platform: "android", build: 23, app_version: "1.0.0 a23 i24 w55", devices: 8, devices_today: 6, first_day: "2026-10-19", last_day: "2026-10-23", exits: 0, exit_devices: 0, anrs: 0, script_errors: 0, hitches: 11, hitch_devices: 4, memory_warnings: 0, server_errors: 0 },
@@ -164,6 +180,7 @@
       case "reviews.get": return { sync: [{ store: "google_reviews", ok: true, note: "reviews 1" }, { store: "apple_reviews", ok: true, note: "reviews 1, storefronts 10" }],
         stats: [{ store: "apple", reviews: 1, average: 2, unanswered: 1, last_7d: 1, stars: { 1: 0, 2: 1, 3: 0, 4: 0, 5: 0 } }, { store: "google", reviews: 1, average: 5, unanswered: 0, last_7d: 1, stars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 } }],
         ratings: [{ store: "apple", country: "KR", average: 4.5, count: 12, prev_count: 10, day: "2026-11-24" }, { store: "apple", country: "JP", average: 4, count: 4, prev_count: 4, day: "2026-11-24" }],
+        checked: 120, countries: [{ country: "KR", reviews: 1, average: 2, unanswered: 1, last_at: "2026-11-24T10:00:00Z", stores: ["apple"] }, { country: "lang:ko", reviews: 1, average: 5, unanswered: 0, last_at: "2026-11-23T10:00:00Z", stores: ["google"] }],
         reviews: [{ store: "apple", review_id: "r1", rating: 2, title: "어려워요", body: "튜토리얼이 너무 빨라요", territory: "KOR", lang: "", author: "a", created_at: "2026-11-24T10:00:00Z", app_version: "", reply: "", replied_at: null },
           { store: "google", review_id: "g1", rating: 5, title: "", body: "딸깍 소리 최고", territory: "", lang: "ko", author: "b", created_at: "2026-11-23T10:00:00Z", app_version: "1.0.0", reply: "감사합니다", replied_at: "2026-11-23T12:00:00Z" }] };
       // the stores' reports (2026-11-24): Play connected with two days of sales, App Store waiting for its API key
