@@ -169,6 +169,55 @@ test("밸런스 page: the four server balance values load, save with a reason th
   expect(errors).toEqual([]);
 });
 
+// Owner 11-25: "콘솔에도 반영수치 보여줄 수 있도록". The dials come from the server table (config.get "balance_bounds"), grouped,
+// each with the value the apps get now; the old page fails here (its own hard-coded list, no "적용 중").
+test("밸런스 page: the detailed dials come from the server table, show the applied value, range and builds; a save lists only what changes", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance");
+  const panel = page.locator("#tenkeyTunePanel");
+  await expect(panel.locator("summary")).toContainText("4개 · 서버 값 0개");
+  await panel.locator("summary").click();
+  await expect(panel).toContainText("1.0.0(빌드 22·23)은 위 전역 배율 4개만");
+  for (const g of ["DRIFT", "로봇", "압박", "오버클럭"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
+  await expect(panel.locator('[data-tune-applied="drift_power_x"]')).toContainText("적용 중 기본값 1.2 · 범위 1.1~1.35");
+  await expect(panel.locator('[data-tune-applied="robot_bite_deep"]')).toContainText("범위 0~2 (정수)");
+  const form = page.locator("#tenkeyKnobForm");
+  await form.locator('[name="tune_drift_power_x"]').fill("1.3");
+  await form.locator('[name="tune_ovc_band_1"]').fill("0.9");
+  await form.locator('[name="reason"]').fill("drift too slow");
+  await form.locator("button[type=submit]").click();
+  await expect(page.locator("#confirmDialog")).toContainText("드리프트 직진 힘 기본값 1.2 → 1.3");
+  await expect(page.locator("#confirmDialog")).toContainText("오버클럭 키 비율 · Lv 2~6 기본값 0.8 → 0.9");
+  await expect(page.locator("#confirmDialog")).not.toContainText("Lv 30 내구도 소모 배율");
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyKnobMessage")).toContainText("조정값 1번으로 저장했습니다");
+  expect((await calls(page, "knobs.set")).at(-1).params.knobs.tune).toEqual({ drift_power_x: 1.3, ovc_band_1: 0.9 });
+  await expect(panel.locator("summary")).toContainText("서버 값 2개");
+  await expect(panel.locator('[data-tune-applied="drift_power_x"]')).toContainText("적용 중 1.3 (서버 값) · 기본값 1.2");
+  await expect(panel.locator('[data-tune-applied="wear"]')).toContainText("적용 중 기본값 1.8");
+  await shot(page, "balance_dials", "#tenkeyKnobForm");
+  await form.locator('[name="tune_robot_bite_deep"]').fill("1.5");
+  await form.locator('[name="reason"]').fill("bite");
+  await form.locator("button[type=submit]").click();
+  await expect(form.locator('[name="tune_robot_bite_deep"]:invalid')).toHaveCount(1);  // the table's step 1 / range: the browser refuses
+  await expect(page.locator("#confirmDialog")).toBeHidden();
+  expect((await calls(page, "knobs.set")).length).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test("밸런스 page: a server without the dial table hides the dials and a save sends the four values only", async ({ page }) => {
+  const errors = await open(page, "#/tenkey-balance", "window.__mockNoBounds=true;");
+  await expect(page.locator("#tenkeyTunePanel summary")).toContainText("서버 표 없음");
+  const form = page.locator("#tenkeyKnobForm");
+  await expect(form.locator('[name^="tune_"]')).toHaveCount(0);
+  await form.locator('[name="xp_scale"]').fill("1.1");
+  await form.locator('[name="reason"]').fill("older server");
+  await form.locator("button[type=submit]").click();
+  await page.locator("#confirmDialog button[value=confirm]").click();
+  await expect(page.locator("#tenkeyKnobMessage")).toContainText("조정값 1번으로 저장했습니다");
+  expect((await calls(page, "knobs.set")).at(-1).params.knobs).toEqual({ xp_scale: 1.1, mouse_pace: 1, battery_drain_scale: 1, robot_power_scale: 1 });
+  expect(errors).toEqual([]);
+});
+
 test("밸런스 page (v4): account growth, level bands, offered vs picked cards, idle time and the run counters; \"여기 보기\" only where the reading guide says", async ({ page }) => {
   const errors = await open(page, "#/tenkey-balance");
   const acct = page.locator("#tenkeyBalanceAcctRows tr");

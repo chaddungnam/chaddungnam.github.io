@@ -7,37 +7,20 @@
 // the web demo ends at Lv 8, so its runs never steer the main curve; they are listed apart). Keyed by a random install id.
 // Below it the four server balance values (tenkey-admin config.get "balance" / knobs.set): store apps take them at launch
 // and use them from the next run; each save is a new version the runs above are split by.
+// The detailed dials (owner 11-25: "콘솔에도 반영수치 보여줄 수 있도록") come from the server's one table
+// (tenkey_private.balance_tune_bounds via config.get "balance_bounds"): label, group, range, integer, the 1.0.1 code default.
+// Each dial shows the value the apps get now: the server's, or "기본값 X" when unset. A new dial = one server row, no edit here.
 (function attachConsoleTenkeyBalance(root) {
   const T = root.ConsoleTenkey;
   const { esc, num, duration, pct, time } = T.fmt;
   const byId = (id) => document.getElementById(id);
-  const state = { bound: false, q: { days: 7, build: "", mode: "", platform: "app" } };
+  // bounds: undefined = not read yet, null = a server without the table (dials hidden, a save never sends tune).
+  const state = { bound: false, q: { days: 7, build: "", mode: "", platform: "app" }, bounds: undefined, tune: {} };
   const KNOBS = ["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"];
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
-  // 1.0.1 normal-mode table; checked against the client's bounds and call-site constants before landing.
-  // name: [plain Korean label, code default, minimum, maximum, integer?]. Blank input = no override.
-  const TUNES = {
-    drift_speed_base: ["드리프트 기본 속도", 1.2, 1, 1.3], drift_speed_top: ["드리프트 최고 속도", 1.5, 1.2, 1.7],
-    drift_power_x: ["드리프트 직진 힘", 1.2, 1.1, 1.35], drift_wear_x: ["드리프트 내구도 소모", 1.5, 1, 2.5],
-    drift_drain_share: ["드리프트 소모 비율", 0.5, 0.3, 1], drift_refill: ["드리프트 당첨 시 회복 비율", 1, 0, 1],
-    drift_exit_spd: ["코너 탈출 가속 비율", 1, 0, 1], drift_turn_power: ["드리프트 코너 힘", 1.6, 1.25, 2], drift_xp_x: ["드리프트로 깬 키 경험치 비율", 0.92, 0.6, 1],
-    drift_nitro_k: ["니트로 효과 배율", 1, 0, 1.5], drift_trail_k: ["무지개 자국 효과 배율", 1, 0, 1],
-    drift_blast_k: ["드리프트 폭발 효과 배율", 1, 0, 1.4], drift_blast_combo: ["폭발에 필요한 파괴 수", 5, 3, 8, true],
-    drift_chain_max: ["코너 연속 점수 상한", 5, 3, 10, true], drift_bomb: ["드리프트 중 폭탄 피해 비율", 0, 0, 1],
-    robot_xp_base: ["로봇 기본 경험치 배율", 1.2, 0.8, 1.6], robot_xp_part: ["로봇 강화당 경험치 증가", 0.024, 0, 0.19],
-    robot_xp_max: ["로봇 경험치 배율 상한", 3.5, 1, 3.5], robot_wear_share: ["로봇 내구도 소모 비율", 0.8, 0.5, 1.2],
-    robot_body_power: ["로봇 몸통 힘", 1.5, 1.25, 1.8], robot_bite_side: ["로봇 옆으로 금 가는 칸", 0, 0, 1, true],
-    robot_bite_deep: ["로봇 앞으로 금 가는 줄", 1, 0, 2, true], robot_armor_floor: ["로봇 최소 피해 비율", 0.5, 0.3, 0.7],
-    robot_speed_max: ["로봇 최고 속도", 1.3, 1.15, 1.4],
-    from: ["난이도 상승 시작 레벨", 8, 8, 14, true], wear: ["마지막 레벨 내구도 소모", 1.8, 1.26, 2.52],
-    drain: ["마지막 레벨 에너지 소모", 2, 1.4, 2.8], spare: ["마지막 레벨 수리 키 비율", 0.5, 0.35, 0.7],
-    mouse_rest: ["마지막 레벨 마우스 휴식", 0.35, 0.245, 0.49], mouse_pace: ["마지막 레벨 마우스 속도", 1.9, 1.33, 2.66],
-    grab_drain: ["마지막 레벨 집게 소모", 3.3, 2.31, 4.62], grab_need: ["마지막 레벨 탈출 요구량", 1.6, 1.12, 2.24],
-    trap: ["마지막 레벨 철창 실패 배율", 1.5, 1, 1.6],
-    cp_pace_sec: ["체크포인트 진행 시간 (초)", 300, 0, 600], xp_late: ["후반 레벨 경험치 요구 증가", 1.01, 1, 1.03],
-    ol_drain: ["에너지 소모의 내구도 환산", 0.42, 0.294, 0.546], ol_hurt: ["피해의 내구도 환산", 1, 0.7, 1.3],
-    ol_gain: ["회복의 내구도 환산", 0.53, 0.371, 0.689],
-  };
+  // Which builds read the dials (one line for the panel); groups read outside a run say so in their heading.
+  const TUNE_BUILDS = "읽는 빌드: 스토어 앱 1.0.1부터 (하드모드 제외) · 1.0.0(빌드 22·23)은 위 전역 배율 4개만 · 웹·PC·체험판은 코드 값";
+  const TUNE_SCOPE = { "강화 비용": "판 밖 · 앱을 켤 때 받은 값", "보상": "판 밖 · 앱을 켤 때 받은 값" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", flip: "과속 점프로 뒤집힘", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
@@ -309,20 +292,55 @@
   }
 
   // ── 서버 밸런스 조정값 ──
-  function fillKnobs(b) {
+  // b = the server's "balance" ({ver, the four, tune?}); bounds = config.get "balance_bounds" (undefined = keep the last read).
+  function fillKnobs(b, bounds) {
     const form = byId("tenkeyKnobForm");
+    if (bounds !== undefined) state.bounds = Array.isArray(bounds) && bounds.length ? bounds : null;
     for (const k of KNOBS) form.elements[k].value = Number(b?.[k] ?? 1).toFixed(2);
-    state.hadTune = Boolean(b?.tune && Object.keys(b.tune).length);
-    for (const k of Object.keys(TUNES)) form.elements[`tune_${k}`].value = Number(b?.ver) > 0 && b?.tune?.[k] != null ? b.tune[k] : "";
+    state.tune = Number(b?.ver) > 0 && b?.tune && typeof b.tune === "object" ? b.tune : {};
+    state.hadTune = Object.keys(state.tune).length > 0;
+    renderTune();
     const ver = Number(b?.ver || 0);
     byId("tenkeyKnobVersion").textContent = ver > 0
       ? `지금 조정값 ${ver}번 · ${time(b.updated_at)}${b.updated_by ? ` · ${b.updated_by}` : ""}`
       : "아직 바꾼 적 없음: 모두 게임에 들어 있는 값 (1.00)";
   }
 
+  // The dials by group, each with the value the apps get now (the server's, else the table default) and its range.
+  function renderTune() {
+    const panel = byId("tenkeyTunePanel");
+    const rows = state.bounds;
+    if (rows === undefined) { panel.innerHTML = "<summary>세부 조정값 · 1.0.1부터 (불러오는 중)</summary>"; return; }
+    if (!rows) {
+      panel.innerHTML = "<summary>세부 조정값 · 1.0.1부터 (서버 표 없음)</summary><p class=\"impact-note\">서버에 조정값 표가 아직 없어 세부 조정값을 보여 주지 않고, 저장할 때도 보내지 않습니다. 전역 배율 4개는 그대로 바꿀 수 있습니다.</p>";
+      return;
+    }
+    const groups = [];
+    for (const r of rows) {
+      let g = groups.find((x) => x.name === r.group);
+      if (!g) groups.push(g = { name: r.group, rows: [] });
+      g.rows.push(r);
+    }
+    const onServer = rows.filter((r) => state.tune[r.name] != null).length;
+    panel.innerHTML = `<summary>세부 조정값 · 1.0.1부터 (${rows.length}개 · 서버 값 ${onServer}개)</summary>`
+      + `<p class="impact-note">${esc(TUNE_BUILDS)}. 빈칸 = 기본값(게임 코드의 값)을 씁니다.</p>`
+      + groups.map((g) => `<h3 class="tk-tune-group">${esc(g.name)} <small>${esc(TUNE_SCOPE[g.name] || "노멀 판만 · 판 시작 때 고정")}</small></h3>`
+        + `<div class="form-pair">${g.rows.map(dial).join("")}</div>`).join("");
+  }
+
+  function dial(r) {
+    const v = state.tune[r.name];
+    const def = esc(String(r.default));
+    const applied = v != null ? `적용 중 <strong>${esc(String(v))}</strong> (서버 값) · 기본값 ${def}` : `적용 중 기본값 <strong>${def}</strong>`;
+    const since = r.since && r.since !== "1.0.1" ? ` · ${esc(r.since)}부터` : "";
+    return `<label>${esc(r.label)}<input name="tune_${esc(r.name)}" type="number" min="${Number(r.min)}" max="${Number(r.max)}" step="${r.int ? 1 : "any"}" placeholder="${def}" value="${v != null ? esc(String(v)) : ""}">`
+      + `<small data-tune-applied="${esc(r.name)}">${applied} · 범위 ${Number(r.min)}~${Number(r.max)}${r.int ? " (정수)" : ""} · ${esc(r.name)}${since}</small></label>`;
+  }
+
   async function loadKnobs() {
     try {
-      fillKnobs((await T.call("config.get", {})).data?.balance);
+      const data = (await T.call("config.get", {})).data;
+      fillKnobs(data?.balance, data?.balance_bounds ?? null);
       T.setMessage("tenkeyKnobMessage", "");
     } catch (error) {
       T.report("tenkeyKnobMessage", error);
@@ -344,18 +362,24 @@
       const reason = form.elements.reason.value.trim();
       const lines = KNOBS.map((k) => `${KNOB_NAMES[k]} ${knobs[k].toFixed(2)}`);
       const tune = {};
-      for (const [k, [label, , min, max, integer]] of Object.entries(TUNES)) {
-        const raw = form.elements[`tune_${k}`].value.trim();
-        if (!raw) continue;
-        const value = Number(raw);
-        if (!Number.isFinite(value) || value < min || value > max || (integer && !Number.isInteger(value))) {
-          T.setMessage("tenkeyKnobMessage", `${label}: ${min}~${max}${integer ? " 정수" : ""}만 입력하세요.`, true);
-          return;
+      for (const r of state.bounds || []) {
+        const raw = (form.elements[`tune_${r.name}`]?.value || "").trim();
+        const was = state.tune[r.name];
+        if (raw) {
+          const value = Number(raw);
+          if (!Number.isFinite(value) || value < r.min || value > r.max || (r.int && !Number.isInteger(value))) {
+            T.setMessage("tenkeyKnobMessage", `${r.label}: ${r.min}~${r.max}${r.int ? " 정수" : ""}만 입력하세요.`, true);
+            return;
+          }
+          tune[r.name] = value;
         }
-        tune[k] = value;
-        lines.push(`${label} ${value}`);
+        // The confirm lists only the dials this save changes: before -> after, "기본값 X" for an unset one.
+        if (tune[r.name] !== (was ?? undefined)) {
+          const word = (x) => (x != null ? String(x) : `기본값 ${r.default}`);
+          lines.push(`${r.label} ${word(was)} → ${word(tune[r.name])}`);
+        }
       }
-      if (Object.keys(tune).length || state.hadTune) knobs.tune = tune;
+      if (state.bounds && (Object.keys(tune).length || state.hadTune)) knobs.tune = tune;
       if (state.hadTune && !Object.keys(tune).length) lines.push("세부 조정값 모두 해제: 코드 기본값 사용");
       if (!await root.ConsoleApp.confirmChange("10KEY 밸런스 조정값 변경", [...lines, "스토어 앱이 다음에 켤 때 받아 그다음 판부터 씁니다.", `변경 이유: ${reason}`].join("\n"))) return;
       T.setMessage("tenkeyKnobMessage", "저장하는 중입니다...");
@@ -375,7 +399,8 @@
     if (!state.bound) {
       state.bound = true;
       const form = byId("tenkeyKnobForm");
-      form.elements.reason.closest("label").insertAdjacentHTML("beforebegin", `<details id="tenkeyTunePanel"><summary>1.0.1부터 · 드리프트·로봇·구간별 난이도 (${Object.keys(TUNES).length}개)</summary><p>스토어 앱의 노멀 모드만 적용됩니다. 빌드 22·23, 하드모드, 웹·PC에는 적용되지 않습니다. 빈칸은 코드 기본값을 씁니다. 서버·콘솔 배포와 1.0.1 앱 설치 후 사용할 수 있습니다.</p><div class="form-pair">${Object.entries(TUNES).map(([k, [label, def, min, max, integer]]) => `<label>${esc(label)}<input name="tune_${k}" type="number" min="${min}" max="${max}" step="${integer ? 1 : "any"}" placeholder="${def}"><small>${k} · 코드 기본 ${def} · 범위 ${min}~${max}${integer ? " (정수)" : ""} · 빈칸 = 기본값</small></label>`).join("")}</div></details>`);
+      form.elements.reason.closest("label").insertAdjacentHTML("beforebegin", '<details id="tenkeyTunePanel"></details>');
+      renderTune();
       for (const [id, what, tbl] of KEEP_LINES) {
         const box = byId(id)?.closest(".panel");
         if (box && !box.querySelector(":scope > .tk-keep-line")) box.insertAdjacentHTML("beforeend", `<p class="tk-keep-line">모으는 것: ${esc(what)} · 서버 보관 <span data-tk-keep="${tbl}">—</span></p>`);
@@ -383,7 +408,7 @@
       byId("tenkeyKnobForm").addEventListener("submit", submitKnobs);
       byId("tenkeyKnobDefaults").addEventListener("click", () => {
         for (const k of KNOBS) form.elements[k].value = "1.00";
-        for (const k of Object.keys(TUNES)) form.elements[`tune_${k}`].value = "";
+        for (const r of state.bounds || []) form.elements[`tune_${r.name}`].value = "";
       });
       byId("tenkeyBalanceForm").addEventListener("submit", (event) => {
         event.preventDefault();

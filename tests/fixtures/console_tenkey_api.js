@@ -132,6 +132,14 @@
     links: { android: "https://play.google.com/store/apps/details?id=com.houseduck.tenkeysurvival", ios: "https://testflight.apple.com/join/RqNJg7Dp", ios_official: false, ios_checked_at: "2026-10-25T17:58:00+00:00" },
     builds: [{ platform: "android", build: 3, players: 0, installs: 4 }, { platform: "android", build: 2, players: 8, installs: 0 }, { platform: "ios", build: 3, players: 0, installs: 2 }, { platform: "ios", build: 2, players: 1, installs: 0 }],
     balance: { ver: 0, xp_scale: 1, mouse_pace: 1, battery_drain_scale: 1, robot_power_scale: 1, updated_at: "2026-10-25T15:34:00+00:00", updated_by: "" } };
+  // A few rows of the server's dial table (tenkey_private.balance_tune_bounds, 20261125120000), one per group, same values.
+  // window.__mockNoBounds = a server before that migration (no balance_bounds in config.get).
+  config.balance_bounds = [
+    { name: "drift_power_x", min: 1.1, max: 1.35, int: false, default: 1.2, label: "드리프트 직진 힘", group: "DRIFT", since: "1.0.1" },
+    { name: "robot_bite_deep", min: 0, max: 2, int: true, default: 1, label: "로봇 앞으로 금 가는 줄", group: "로봇", since: "1.0.1" },
+    { name: "wear", min: 1.26, max: 2.52, int: false, default: 1.8, label: "Lv 30 내구도 소모 배율", group: "압박", since: "1.0.1" },
+    { name: "ovc_band_1", min: 0.5, max: 1.3, int: false, default: 0.8, label: "오버클럭 키 비율 · Lv 2~6", group: "오버클럭", since: "1.0.1" },
+  ];
 
   window.__mockCalls = [];
   window.__mockFailures = {};
@@ -284,7 +292,12 @@
         { id: "f1", created_at: "2026-10-21T10:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 9990000, level: 40, time_ms: 4000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "score" },
         { id: "f2", created_at: "2026-10-21T09:00:00+00:00", player_id: PLAYERS[3].id, name: "의심스러운덕", score: 120000, level: 30, time_ms: 9000, depth: 4, scrap: 12, combo: 2, skills: 0, cause: "battery", build: "1.0.0 (2)", platform: "android", flag: "level" }] };
       case "audit.list": return audit.slice(0, p.limit || 50);
-      case "config.get": return config;
+      case "config.get": {
+        if (window.__mockBounds) config.balance_bounds = window.__mockBounds;  // a capture with the whole server table
+        if (!window.__mockNoBounds) return config;
+        const { balance_bounds, ...older } = config;
+        return older;
+      }
       // Owner 2026-11-24: shared social-link setter; config.links remains the store-link object.
       case "links.set": {
         const next = { ...(config.outside_links || {}), [p.id]: p.url };
@@ -294,6 +307,11 @@
       case "knobs.set": {
         const k = p.knobs || {};
         if (Object.entries(k).some(([name, v]) => name !== "tune" && (typeof v !== "number" || v < 0.7 || v > 1.3))) return { ok: false, error: "invalid_knob_value" };
+        // The server's tune rule (tenkey_private.balance_tune_ok): a known row, a number inside its range, whole for int rows.
+        if (k.tune && Object.entries(k.tune).some(([name, v]) => {
+          const r = (config.balance_bounds || []).find((b) => b.name === name);
+          return !r || typeof v !== "number" || v < r.min || v > r.max || (r.int && !Number.isInteger(v));
+        })) return { ok: false, error: "invalid_knob_value" };
         const next = { ...config.balance, ...k };
         if (["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"].every((n) => next[n] === config.balance[n])
           && JSON.stringify(next.tune || {}) === JSON.stringify(config.balance.tune || {})) return { ok: true, unchanged: true, balance: config.balance };
