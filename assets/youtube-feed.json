@@ -1,21 +1,21 @@
 {
   "channel": "https://www.youtube.com/@houseduck_in",
-  "updated": "2026-11-12T14:01:24.000Z",
+  "updated": "2026-11-25T11:55:34.000Z",
   "videos": [
+    {
+      "videoId": "xykTrd4p85c",
+      "title": "'딸깍 서바이벌' 모바일게임 트레일러",
+      "published": "2026-11-25T11:55:34.000Z"
+    },
+    {
+      "videoId": "GbGAshfmA8s",
+      "title": "온갖 음해에 시달렸습니다.. [1인 게임 개발 현실]",
+      "published": "2026-11-25T08:35:00.000Z"
+    },
     {
       "videoId": "yJj_1nWMpM4",
       "title": "'딸깍 서바이벌' 게임 개발과정, 그리고...",
       "published": "2026-11-12T14:01:24.000Z"
-    },
-    {
-      "videoId": "Yir1vAvPL94",
-      "title": "[BGM] ターミナル追撃戦(Terminal Pursuit)_10key Survival",
-      "published": "2026-11-04T08:53:53.000Z"
-    },
-    {
-      "videoId": "rwdTvKur46Y",
-      "title": "[BGM] めちゃくちゃロボット変身(메차쿠차 로봇 변신)_10key Survival",
-      "published": "2026-11-04T08:53:45.000Z"
     }
   ]
 }
