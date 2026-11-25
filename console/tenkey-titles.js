@@ -4,7 +4,7 @@
   const { esc, num } = T.fmt;
   const byId = (id) => document.getElementById(id);
   const INFO = Object.freeze({
-    beta_tester: { name: "베타 테스터", rule: "스토어 출시 전에 만든 계정" },
+    beta_tester: { name: "키보드 워리어", rule: "계정을 만들면 지급 (옛 이름: 베타 테스터)" },
     first_clear: { name: "첫 클리어", rule: "일반 모드에서 Lv 30을 넘겨 클리어" },
     season_top_10: { name: "시즌 TOP 10", rule: "분기 시즌 종료 때 상위 10위" },
     season_champion: { name: "시즌 1위", rule: "분기 시즌 종료 때 1위" },
