@@ -25,9 +25,10 @@ const locales = ["en", "ko"];
 const platforms = ["itch.io", "Nekoland", "GamePix", "Google Play", "App Store"];
 // 2026-11-19 (legal1119): 10key Survival is not on Steam, so no current text may name it (the revision history may).
 const noSteam = (plain, where) => assert.ok(!plain.includes("Steam"), `${where} does not name Steam`);
+// (Firebase left this list on 2026-11-25: the Android/iOS apps of 10key use it, section 13.)
 // Quirky-Ball-only features that must not leak into the 10KEY documents. Gems (gem keycaps / 보석 키캡), the age
 // question and the age band became 10KEY features on 2026-10-20 (mobile guest account and shop), so they left this list.
-const quirkyOnly = /AdMob|AppLovin|Firebase|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|연령대|출생 연도/i;
+const quirkyOnly = /AdMob|AppLovin|Starter|yakwon|약원|Remove Ads|광고 제거|Sign in with Apple|Apple로 로그인|젬|\bUMP\b|\bATT\b|Quick Report|간단하게 제보|연령대|출생 연도/i;
 
 // Store names (owner 2026-10-20, before release): 10key Survival in English and German, 딸깍 서바이벌 in Korean.
 // 10KEY was only the project name; URLs, file names and anchors (/10key/, #10key, #section-13) stay as they are.
