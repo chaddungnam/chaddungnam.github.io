@@ -19,8 +19,8 @@
   const KNOBS = ["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"];
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
   // Which builds read the dials (one line for the panel); groups read outside a run say so in their heading.
-  const TUNE_BUILDS = "읽는 빌드: 스토어 앱 1.0.1부터 (하드모드 제외) · 1.0.0(빌드 22·23)은 위 전역 배율 4개만 · 웹·PC·체험판은 코드 값";
-  const TUNE_SCOPE = { "강화 비용": "판 밖 · 앱을 켤 때 받은 값", "보상": "판 밖 · 앱을 켤 때 받은 값" };
+  const TUNE_BUILDS = "읽는 빌드: 스토어 앱 1.0.1부터 · 1.0.0(빌드 22·23)은 위 전역 배율 4개만 · 웹·PC·체험판은 코드 값";
+  const TUNE_SCOPE = { "강화 비용": "강화 화면 가격 = 서버 청구 가격 · 앱을 켤 때 받은 값 · 하드모드 포함", "보상": "판 밖 · 앱을 켤 때 받은 값" };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", flip: "과속 점프로 뒤집힘", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
@@ -333,8 +333,9 @@
     const def = esc(String(r.default));
     const applied = v != null ? `적용 중 <strong>${esc(String(v))}</strong> (서버 값) · 기본값 ${def}` : `적용 중 기본값 <strong>${def}</strong>`;
     const since = r.since && r.since !== "1.0.1" ? ` · ${esc(r.since)}부터` : "";
-    return `<label>${esc(r.label)}<input name="tune_${esc(r.name)}" type="number" min="${Number(r.min)}" max="${Number(r.max)}" step="${r.int ? 1 : "any"}" placeholder="${def}" value="${v != null ? esc(String(v)) : ""}">`
-      + `<small data-tune-applied="${esc(r.name)}">${applied} · 범위 ${Number(r.min)}~${Number(r.max)}${r.int ? " (정수)" : ""} · ${esc(r.name)}${since}</small></label>`;
+    const step = r.int ? 1 : Number(r.step) > 0 ? Number(r.step) : "any";
+    return `<label>${esc(r.label)}<input name="tune_${esc(r.name)}" type="number" min="${Number(r.min)}" max="${Number(r.max)}" step="${step}" placeholder="${def}" value="${v != null ? esc(String(v)) : ""}">`
+      + `<small data-tune-applied="${esc(r.name)}">${applied} · 범위 ${Number(r.min)}~${Number(r.max)}${r.int ? " (정수)" : step !== "any" ? ` (${step} 단위)` : ""} · ${esc(r.name)}${since}</small></label>`;
   }
 
   async function loadKnobs() {
@@ -367,8 +368,9 @@
         const was = state.tune[r.name];
         if (raw) {
           const value = Number(raw);
-          if (!Number.isFinite(value) || value < r.min || value > r.max || (r.int && !Number.isInteger(value))) {
-            T.setMessage("tenkeyKnobMessage", `${r.label}: ${r.min}~${r.max}${r.int ? " 정수" : ""}만 입력하세요.`, true);
+          const off = Number(r.step) > 0 && Math.abs(value / r.step - Math.round(value / r.step)) > 1e-9;
+          if (!Number.isFinite(value) || value < r.min || value > r.max || (r.int && !Number.isInteger(value)) || off) {
+            T.setMessage("tenkeyKnobMessage", `${r.label}: ${r.min}~${r.max}${r.int ? " 정수" : off ? ` ${r.step} 단위` : ""}만 입력하세요.`, true);
             return;
           }
           tune[r.name] = value;

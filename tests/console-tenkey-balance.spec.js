@@ -174,10 +174,12 @@ test("밸런스 page: the four server balance values load, save with a reason th
 test("밸런스 page: the detailed dials come from the server table, show the applied value, range and builds; a save lists only what changes", async ({ page }) => {
   const errors = await open(page, "#/tenkey-balance");
   const panel = page.locator("#tenkeyTunePanel");
-  await expect(panel.locator("summary")).toContainText("4개 · 서버 값 0개");
+  await expect(panel.locator("summary")).toContainText("5개 · 서버 값 0개");
   await panel.locator("summary").click();
   await expect(panel).toContainText("1.0.0(빌드 22·23)은 위 전역 배율 4개만");
-  for (const g of ["DRIFT", "로봇", "압박", "오버클럭"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
+  for (const g of ["DRIFT", "로봇", "압박", "오버클럭", "강화 비용"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
+  await expect(panel.locator("h3.tk-tune-group", { hasText: "강화 비용" })).toContainText("하드모드 포함");
+  await expect(panel.locator('[data-tune-applied="upg_cost_x"]')).toContainText("범위 0.5~2 (0.01 단위)");
   await expect(panel.locator('[data-tune-applied="drift_power_x"]')).toContainText("적용 중 기본값 1.2 · 범위 1.1~1.35");
   await expect(panel.locator('[data-tune-applied="robot_bite_deep"]')).toContainText("범위 0~2 (정수)");
   const form = page.locator("#tenkeyKnobForm");

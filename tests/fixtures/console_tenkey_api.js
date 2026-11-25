@@ -139,6 +139,7 @@
     { name: "robot_bite_deep", min: 0, max: 2, int: true, default: 1, label: "로봇 앞으로 금 가는 줄", group: "로봇", since: "1.0.1" },
     { name: "wear", min: 1.26, max: 2.52, int: false, default: 1.8, label: "Lv 30 내구도 소모 배율", group: "압박", since: "1.0.1" },
     { name: "ovc_band_1", min: 0.5, max: 1.3, int: false, default: 0.8, label: "오버클럭 키 비율 · Lv 2~6", group: "오버클럭", since: "1.0.1" },
+    { name: "upg_cost_x", min: 0.5, max: 2, int: false, step: 0.01, default: 1, label: "텐키 부품 강화 비용 배수 (해금 키 Lv 1 포함, 수수료 제외)", group: "강화 비용", since: "1.0.1" },
   ];
 
   window.__mockCalls = [];
@@ -310,7 +311,8 @@
         // The server's tune rule (tenkey_private.balance_tune_ok): a known row, a number inside its range, whole for int rows.
         if (k.tune && Object.entries(k.tune).some(([name, v]) => {
           const r = (config.balance_bounds || []).find((b) => b.name === name);
-          return !r || typeof v !== "number" || v < r.min || v > r.max || (r.int && !Number.isInteger(v));
+          return !r || typeof v !== "number" || v < r.min || v > r.max || (r.int && !Number.isInteger(v))
+            || (r.step && Math.abs(v / r.step - Math.round(v / r.step)) > 1e-9);
         })) return { ok: false, error: "invalid_knob_value" };
         const next = { ...config.balance, ...k };
         if (["xp_scale", "mouse_pace", "battery_drain_scale", "robot_power_scale"].every((n) => next[n] === config.balance[n])
