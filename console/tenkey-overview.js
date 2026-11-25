@@ -224,7 +224,7 @@
         return `<div data-store="${k}"><dt>${esc(STORE_NAME[k])} 예상</dt><dd><span class="tk-store-est">${esc(num(e.estimate))}건</span><span class="tk-sub">${esc(conf)}</span><span class="tk-sub">${esc(wait)}</span><span class="tk-sub">출시 후 새 ${esc(STORE_USER[k])} 유저 ${esc(num(e.fresh))}명 (닉네임 기준)</span></dd></div>`;
       };
       const A = E.per.apple, G = E.per.google;
-      status = tile("apple") + tile("google") + `<div data-store="all"><dt>합계 예상</dt><dd><span class="tk-store-est">${esc(num(A.estimate + G.estimate))}건</span><span class="tk-sub">${esc(`확정 ${num(A.confirmed + G.confirmed)}건 · 새 유저 ${num(A.fresh + G.fresh)}명`)}</span><span class="tk-sub">${esc(`출시 ${shortDay(E.launch)}(태평양)부터`)}</span></dd></div>`;
+      status = tile("apple") + tile("google") + `<div data-store="all"><dt>합계 예상</dt><dd><span class="tk-store-est">${esc(num(A.estimate + G.estimate))}건</span><span class="tk-sub">${esc(`확정 ${num(A.confirmed + G.confirmed)}건 · 새 유저 ${num(A.fresh + G.fresh)}명`)}</span><span class="tk-sub">${esc(`출시(베를린 ${shortDay(new Date(Date.parse(`${E.launch}T00:00:00Z`) + 86400000).toISOString().slice(0, 10))}) 이후`)}</span></dd></div>`;
     } else {
       const last = (store) => (S.days || []).filter((r) => r.store === store).map((r) => r.day).sort().at(-1);
       status = ["google", "apple"].map((k) => {
