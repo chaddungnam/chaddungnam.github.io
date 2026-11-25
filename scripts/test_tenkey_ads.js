@@ -38,6 +38,9 @@ test("summary groups campaign/platform, escapes campaign text, requests 7/30/90 
     { utm_campaign: "(none)", platform: "ios", rows: 2, buyers: 1, with_gclid: 0 }]);
   f.T.mountAds(); await tick();
   assert.deepEqual(f.calls[0], ["ads.summary", { days: 30 }]);
+  const handler = f.byId("tenkeyAdsUploadForm").events.submit;
+  f.T.mountAds(); await tick();
+  assert.equal(f.byId("tenkeyAdsUploadForm").events.submit, handler);
   assert.match(f.byId("tenkeyAdsTable").innerHTML, /&lt;img/);
   assert.doesNotMatch(f.byId("tenkeyAdsTable").innerHTML, /<img/);
   assert.match(f.byId("tenkeyAdsTable").innerHTML, />8<.*>5<.*>3</s);
@@ -62,15 +65,32 @@ test("download sends the chosen UTC day, creates UTF-8 CSV, reports braid omissi
   const f = fixture(async (action) => action === "ads.summary" ? [] : { csv: "header\r\n", rows: 1, omitted: 2 });
   f.T.mountAds(); await tick();
   f.byId("tenkeyAdsSince").value = "2026-11-24";
-  await f.submit("tenkeyAdsUploadForm", { value: "legacy" });
+  await f.submit("tenkeyAdsUploadForm");
   assert.deepEqual(f.calls.at(-1), ["ads.upload", { since: "2026-11-24T00:00:00Z", format: "legacy" }]);
   assert.equal(await f.blobs[0].text(), "header\r\n");
   assert.match(f.blobs[0].type, /text\/csv/);
   assert.match(f.links[0], /2026-11-24.*legacy.*\.csv$/);
   assert.match(f.byId("tenkeyAdsUploadMessage").textContent, /2/);
+  await f.submit("tenkeyAdsUploadForm", { value: "data_manager" });
+  assert.deepEqual(f.calls.at(-1), ["ads.upload", { since: "2026-11-24T00:00:00Z", format: "data_manager" }]);
+  assert.match(f.links[1], /data_manager.*\.csv$/);
   f.T.stats = async () => { throw new Error("down"); };
   await f.submit("tenkeyAdsUploadForm", { value: "data_manager" });
-  assert.equal(f.blobs.length, 1);
+  assert.equal(f.blobs.length, 2);
   assert.equal(f.byId("tenkeyAdsDownload").disabled, false);
-  assert.equal(f.byId("tenkeyAdsLegacy").disabled, false);
+  assert.equal(f.byId("tenkeyAdsAllClicks").disabled, false);
+});
+
+test("invalid download dates make no request and unsafe CSV errors stay visible in Korean", async () => {
+  const f = fixture(async () => []);
+  f.T.mountAds(); await tick();
+  f.byId("tenkeyAdsSince").value = "2026-02-30";
+  await f.submit("tenkeyAdsUploadForm");
+  assert.equal(f.calls.length, 1);
+  assert.match(f.byId("tenkeyAdsUploadMessage").textContent, /날짜/);
+  f.byId("tenkeyAdsSince").value = "2026-11-25";
+  f.T.stats = async () => { throw new Error("unsafe_click_id"); };
+  await f.submit("tenkeyAdsUploadForm");
+  assert.match(f.byId("tenkeyAdsUploadMessage").textContent, /원본 기록/);
+  assert.equal(f.blobs.length, 0);
 });

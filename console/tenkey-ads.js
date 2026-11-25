@@ -16,7 +16,7 @@
       if (request !== generation) return;
       if (!Array.isArray(rows)) throw new Error("집계 응답 형식을 확인해 주세요.");
       byId("tenkeyAdsTable").innerHTML = rows.map((r) => `<tr>
-        <td data-label="캠페인">${esc(r.utm_campaign === "(none)" ? "캠페인 표시 없음" : r.utm_campaign)}</td>
+        <td class="tk-wrap" data-label="캠페인">${esc(r.utm_campaign === "(none)" ? "캠페인 표시 없음" : r.utm_campaign)}</td>
         <td data-label="플랫폼">${esc(({ android: "Android", ios: "iOS" })[r.platform] || r.platform)}</td>
         <td class="tk-num" data-label="기록">${esc(num(r.rows))}</td>
         <td class="tk-num" data-label="구매자(닉네임 완료)">${esc(num(r.buyers))}</td>
@@ -40,8 +40,8 @@
       T.setMessage("tenkeyAdsUploadMessage", "시작 날짜를 확인해 주세요.", true);
       return;
     }
-    const format = event.submitter?.value === "legacy" ? "legacy" : "data_manager";
-    byId("tenkeyAdsDownload").disabled = byId("tenkeyAdsLegacy").disabled = true;
+    const format = event.submitter?.value === "data_manager" ? "data_manager" : "legacy";
+    byId("tenkeyAdsDownload").disabled = byId("tenkeyAdsAllClicks").disabled = true;
     T.setMessage("tenkeyAdsUploadMessage", "업로드 파일을 만드는 중입니다.");
     try {
       const data = await T.stats("ads.upload", { since: `${day}T00:00:00Z`, format });
@@ -57,9 +57,10 @@
       T.setMessage("tenkeyAdsUploadMessage", `${num(data.rows)}건 다운로드함 · Google에 아직 전송하지 않았습니다.`
         + (data.omitted ? ` GBRAID/WBRAID ${num(data.omitted)}건은 전체 클릭용 파일에서 받으세요.` : ""));
     } catch (error) {
-      T.report("tenkeyAdsUploadMessage", error);
+      T.report("tenkeyAdsUploadMessage", error.message === "unsafe_click_id"
+        ? new Error("광고 클릭 ID에 파일로 내보낼 수 없는 문자가 있습니다. 원본 기록을 확인해 주세요.") : error);
     } finally {
-      byId("tenkeyAdsDownload").disabled = byId("tenkeyAdsLegacy").disabled = false;
+      byId("tenkeyAdsDownload").disabled = byId("tenkeyAdsAllClicks").disabled = false;
     }
   }
 

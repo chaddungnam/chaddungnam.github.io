@@ -884,10 +884,10 @@
           <div class="panel-heading"><div><h2 id="tenkeyAdsUploadTitle">Google Ads 업로드</h2><small>선택한 날짜의 UTC 0시 이후 닉네임을 만든 기록 중 광고 클릭 ID가 있는 건만 포함함</small></div></div>
           <form id="tenkeyAdsUploadForm" class="admin-toolbar tenkey-toolbar">
             <label>시작 날짜(UTC)<input id="tenkeyAdsSince" type="date" required></label>
-            <button id="tenkeyAdsDownload" class="primary-button" type="submit" value="data_manager">구글애즈 업로드 파일 받기</button>
-            <button id="tenkeyAdsLegacy" class="primary-button" type="submit" value="legacy">기존 GCLID 양식 받기</button>
+            <button id="tenkeyAdsDownload" class="primary-button" type="submit" value="legacy">구글애즈 업로드 파일 받기</button>
+            <button id="tenkeyAdsAllClicks" class="primary-button" type="submit" value="data_manager">전체 클릭용 Data Manager 파일 받기</button>
           </form>
-          <p class="impact-note">기본 파일: Data Manager에서 GCLID·GBRAID·WBRAID와 전환 이름·시각 열을 연결함. 기존 양식은 GCLID만 포함함. 전환 이름은 ‘10key buyer’, 가격·통화는 비워 둠. Google로 자동 전송하지 않음.</p>
+          <p class="impact-note">기본 파일은 Google 공식 GCLID 양식임. 전체 클릭용 파일은 Data Manager에서 GCLID·GBRAID·WBRAID와 전환 이름·시각 열을 연결해야 함. 전환 이름은 ‘10key buyer’, 가격·통화는 비워 둠. Google로 자동 전송하지 않음.</p>
           <p id="tenkeyAdsUploadMessage" class="form-message" role="status" aria-live="polite"></p>
         </section>
       </section>
@@ -1026,7 +1026,7 @@
 
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="../analytics/pulse-model.js?v=20260831-1"></script>
-  <script src="model.js?v=20261117-keep"></script>
+  <script src="model.js?v=20261125-ads"></script>
   <script src="ui-state.js?v=20260904-1"></script>
   <script src="auth.js?v=20261103-7d"></script>
   <script src="api.js?v=20261007-hx"></script>
@@ -1065,6 +1065,6 @@
   <script src="cs.js?v=20261020-noai"></script>
   <script src="lab.js?v=20261005-reports"></script>
   <script src="liveops.js"></script>
-  <script src="app.js?v=20261117-keep" defer></script>
+  <script src="app.js?v=20261125-ads" defer></script>
 </body>
 </html>
