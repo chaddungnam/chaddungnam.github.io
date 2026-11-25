@@ -2,7 +2,9 @@
 // The server table tenkey_private.balance_tune_bounds (rows inserted by the hexaworld 1984 migrations, later files win) must equal
 // the client's clamp table scripts/data/balance_tune_data.gd RANGES (names, min, max, integer); the console must read that table
 // (config.get "balance_bounds") and keep no copy of its own; each server default must equal the constant at every client call
-// site (LevelPressure.tune / BalanceKnobs.tune / LevelPressure.AT_CLEAR / FROM_LV). Read-only, no network.
+// site (LevelPressure.tune / BalanceKnobs.tune / LevelPressure.AT_CLEAR / FROM_LV, numbered names tune("x_%d" % (i + 1), LIST[i])
+// and helpers that hand a name on to tune: BalanceKnobs.price(base, "upg_cost_x") = x1.0, the board's _x("numlock_gap", lo, hi,
+// BAND_GAP) and _x(String(row[0]), ..) over ROLL_ROWS). Read-only, no network.
 // Usage: node tests/balance-tune-contract.cjs <10key checkout> [<hexaworld 1984>/supabase/migrations]
 // Exit 1 on any difference. On the console before 11-25 it fails at "console keeps its own TUNES copy".
 const fs = require("node:fs");
@@ -63,19 +65,87 @@ const add = (name, value, where) => (sites[name] ||= []).push({ value, where });
 for (const [k, v] of Object.entries(atClear)) add(k, v, "level_pressure.gd AT_CLEAR");
 add("from", Number(pressure.match(/const FROM_LV := (\d+)/)[1]), "level_pressure.gd FROM_LV");
 const rg = (args) => { try { return cp.execFileSync("rg", args, { encoding: "utf8" }).trim(); } catch { return ""; } };
+const scripts = path.join(client, "scripts");
+// A class_name or a preload alias (const D := preload("res://...")) seen from `file` -> that script.
+function script(file, cls) {
+  const pre = read(file).match(new RegExp("^const " + cls + "\\s*:?=\\s*preload\\(\"res://([^\"]+)\"\\)", "m"));
+  return pre ? path.join(client, pre[1]) : rg(["-l", "^class_name " + cls + "$", scripts]).split("\n")[0] || undefined;
+}
 function constant(file, token) {
   if (/^-?[0-9.]+$/.test(token)) return Number(token);
   if (token.includes(".")) {
     const [cls, name] = token.split(".");
-    const target = rg(["-l", "^class_name " + cls + "$", path.join(client, "scripts")]).split("\n")[0];
+    const target = script(file, cls);
     return target ? constant(target, name) : undefined;
   }
   const m = read(file).match(new RegExp("^const " + token + "\\b[^=\\n]*=\\s*(-?[0-9.]+)", "m"));
   return m ? Number(m[1]) : undefined;
 }
-for (const file of rg(["-l", "(LevelPressure|BalanceKnobs)\\.tune\\(", path.join(client, "scripts")]).split("\n").filter(Boolean)) {
-  for (const m of read(file).matchAll(/(?:LevelPressure|BalanceKnobs)\.tune\("([^"]+)",\s*([\w.]+)\)/g)) {
-    add(m[1], constant(file, m[2]), path.relative(client, file) + " " + m[2]);
+// A one-line array constant (const BANDS: Array[float] = [0.80, 1.00, 1.05], const ROLL_ROWS := [["bomb_x", ..], ..]).
+function list(file, token) {
+  if (token.includes(".")) {
+    const [cls, name] = token.split(".");
+    const target = script(file, cls);
+    return target ? list(target, name) : undefined;
+  }
+  const m = read(file).match(new RegExp("^const " + token + "\\b[^=\\n]*=\\s*(\\[[^\\n]*\\])", "m"));
+  return m ? vm.runInNewContext("(" + m[1] + ")") : undefined;
+}
+// Top-level comma split of an argument list.
+function split(s) {
+  const out = [];
+  let depth = 0, cur = "";
+  for (const ch of s) {
+    if (ch === "," && depth === 0) { out.push(cur.trim()); cur = ""; continue; }
+    if ("([{".includes(ch)) depth++;
+    if (")]}".includes(ch)) depth--;
+    cur += ch;
+  }
+  return cur.trim() ? out.concat(cur.trim()) : out;
+}
+// The argument lists of every call `head(...)` in src (not its definition, not a longer name).
+function calls(src, head) {
+  const out = [];
+  for (const m of src.matchAll(new RegExp("(?<![\\w.])(?<!func )" + head.replace(/\./g, "\\.") + "\\(", "g"))) {
+    let depth = 1, i = m.index + m[0].length;
+    const from = i;
+    while (i < src.length && depth > 0) depth += src[i] === "(" ? 1 : src[i] === ")" ? -1 : 0, i++;
+    out.push(split(src.slice(from, i - 1)));
+  }
+  return out;
+}
+// The names a call's name argument stands for: "literal", or row[0] / String(row[0]) inside `for row in TABLE:`.
+function names(file, arg) {
+  const lit = arg.match(/^"(\w+)"$/);
+  if (lit) return [lit[1]];
+  const row = arg.match(/^(?:String\()?(\w+)\[0\]\)?$/);
+  const loop = row && read(file).match(new RegExp("for " + row[1] + "(?::\\s*\\w+)? in (\\w+):"));
+  return loop ? (list(file, loop[1]) || []).map((r) => r[0]) : [];
+}
+for (const file of rg(["-l", "tune\\(", scripts]).split("\n").filter(Boolean)) {
+  const src = read(file);
+  const rel = path.relative(client, file);
+  for (const m of src.matchAll(/(?:LevelPressure|BalanceKnobs)\.tune\("([^"%]+)",\s*([\w.]+)\)/g)) add(m[1], constant(file, m[2]), rel + " " + m[2]);
+  for (const m of src.matchAll(/(?:LevelPressure|BalanceKnobs)\.tune\("(\w+)%d" % \((\w+) \+ 1\),\s*([\w.]+)\[\2\]\)/g)) {
+    (list(file, m[3]) || []).forEach((v, i) => add(m[1] + (i + 1), v, rel + " " + m[3] + "[" + i + "]"));
+  }
+  // A helper that hands its String argument on to tune: every caller's name and default (its own argument or the helper's).
+  const cls = (src.match(/^class_name (\w+)/m) || [])[1];
+  for (const w of src.matchAll(/^static func (\w+)\(([^)]*)\)[^\n]*:\n((?:[ \t]+.*\n|[ \t]*\n)*)/gm)) {
+    const t = w[1] !== "tune" && w[3].match(/(?:LevelPressure\.|BalanceKnobs\.|\b)tune\((\w+),\s*([\w.]+)\)/);
+    const params = split(w[2]).map((p) => ({ name: p.match(/^\w+/)[0], def: (p.match(/=\s*(.+)$/) || [])[1] }));
+    const ni = t ? params.findIndex((p) => p.name === t[1]) : -1;
+    if (ni < 0) continue;
+    const di = params.findIndex((p) => p.name === t[2]);
+    const callers = [[file, w[1]]];
+    if (cls) for (const f of rg(["-l", "-F", cls + "." + w[1] + "(", scripts]).split("\n").filter(Boolean)) callers.push([f, cls + "." + w[1]]);
+    for (const [f, head] of callers) {
+      for (const a of calls(read(f), head)) {
+        const token = di < 0 ? t[2] : a[di] ?? params[di].def;
+        const value = constant(di < 0 || di >= a.length ? file : f, token);
+        for (const n of names(f, a[ni] || "")) add(n, value, path.relative(client, f) + " " + head + "(.., " + token + ")");
+      }
+    }
   }
 }
 for (const [name, s] of Object.entries(server)) {

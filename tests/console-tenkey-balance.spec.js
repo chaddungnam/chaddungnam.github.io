@@ -174,11 +174,13 @@ test("밸런스 page: the four server balance values load, save with a reason th
 test("밸런스 page: the detailed dials come from the server table, show the applied value, range and builds; a save lists only what changes", async ({ page }) => {
   const errors = await open(page, "#/tenkey-balance");
   const panel = page.locator("#tenkeyTunePanel");
-  await expect(panel.locator("summary")).toContainText("5개 · 서버 값 0개");
+  await expect(panel.locator("summary")).toContainText("6개 · 서버 값 0개");
   await panel.locator("summary").click();
   await expect(panel).toContainText("1.0.0(빌드 22·23)은 위 전역 배율 4개만");
-  for (const g of ["DRIFT", "로봇", "압박", "오버클럭", "강화 비용"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
+  for (const g of ["DRIFT", "로봇", "압박", "기판", "오버클럭", "강화 비용"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
   await expect(panel.locator("h3.tk-tune-group", { hasText: "강화 비용" })).toContainText("하드모드 포함");
+  await expect(panel.locator("h3.tk-tune-group", { hasText: "기판" })).toContainText("노멀 판만 · 판 시작 때 고정");
+  await expect(panel.locator('[data-tune-applied="numlock_gap"]')).toContainText("적용 중 기본값 8 · 범위 6~16 (정수)");
   await expect(panel.locator('[data-tune-applied="upg_cost_x"]')).toContainText("범위 0.5~2 (0.01 단위)");
   await expect(panel.locator('[data-tune-applied="drift_power_x"]')).toContainText("적용 중 기본값 1.2 · 범위 1.1~1.35");
   await expect(panel.locator('[data-tune-applied="robot_bite_deep"]')).toContainText("범위 0~2 (정수)");
@@ -188,7 +190,7 @@ test("밸런스 page: the detailed dials come from the server table, show the ap
   await form.locator('[name="reason"]').fill("drift too slow");
   await form.locator("button[type=submit]").click();
   await expect(page.locator("#confirmDialog")).toContainText("드리프트 직진 힘 기본값 1.2 → 1.3");
-  await expect(page.locator("#confirmDialog")).toContainText("오버클럭 키 비율 · Lv 2~6 기본값 0.8 → 0.9");
+  await expect(page.locator("#confirmDialog")).toContainText("오버클럭 빈도 배율 Lv 2-6 기본값 0.8 → 0.9");
   await expect(page.locator("#confirmDialog")).not.toContainText("Lv 30 내구도 소모 배율");
   await page.locator("#confirmDialog button[value=confirm]").click();
   await expect(page.locator("#tenkeyKnobMessage")).toContainText("조정값 1번으로 저장했습니다");
