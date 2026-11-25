@@ -8,7 +8,7 @@
   const tenkeyPages = Object.freeze([
     "tenkey-overview", "tenkey-players", "tenkey-crashes", "tenkey-notices", "tenkey-mail", "tenkey-purchases", "tenkey-ranking",
     "tenkey-balance", "tenkey-config", "tenkey-audit", "tenkey-titles", "tenkey-retention", "tenkey-reports", "tenkey-watch",
-    "tenkey-issues", "tenkey-keep", "tenkey-perf", "tenkey-economy", "tenkey-quests",
+    "tenkey-issues", "tenkey-keep", "tenkey-perf", "tenkey-economy", "tenkey-quests", "tenkey-ads",
   ]);
   const pages = new Set(["analytics", "analytics-exclusions", "players", "operations", "purchases", "cs", "audit", "notes", ...tenkeyPages]);
 

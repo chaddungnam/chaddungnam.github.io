@@ -98,6 +98,7 @@
         <a href="#/tenkey-keep" data-page="tenkey-keep"><span class="nav-index">17</span><span class="nav-copy">데이터 보관<small>받는 것·보관 기간·정리</small></span></a>
         <a href="#/tenkey-perf" data-page="tenkey-perf"><span class="nav-index">18</span><span class="nav-copy">성능<small>첫 화면·버벅임·메모리</small></span></a>
         <a href="#/tenkey-quests" data-page="tenkey-quests"><span class="nav-index">19</span><span class="nav-copy">퀘스트 밸런스<small>제공·완료·수령·젬</small></span></a>
+        <a href="#/tenkey-ads" data-page="tenkey-ads"><span class="nav-index">20</span><span class="nav-copy">광고 성과<small>캠페인·구매자·업로드</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -914,6 +915,28 @@
           <div class="table-scroll tk-stack"><table><thead><tr><th>날</th><th class="tk-num">젬</th><th>감시</th></tr></thead><tbody id="tenkeyQuestGems"></tbody></table></div>
         </section>
         <p id="tenkeyQuestMessage" class="dashboard-message" role="status"></p>
+
+      <section id="tenkeyAdsView" class="route-view tk-page" data-route="tenkey-ads" hidden>
+        <form id="tenkeyAdsForm" class="panel admin-toolbar tenkey-toolbar">
+          <label>조회 기간<select id="tenkeyAdsDays"><option value="7">최근 7일</option><option value="30" selected>최근 30일</option><option value="90">최근 90일</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <p id="tenkeyAdsMessage" class="form-message" role="status" aria-live="polite"></p>
+        <section class="panel" aria-labelledby="tenkeyAdsTitle">
+          <div class="panel-heading"><div><h2 id="tenkeyAdsTitle">캠페인별 광고 성과</h2><small>기록은 설치별로 집계함 · 구매자는 첫 닉네임 생성 완료 기준이며 스토어 확정 매출과 다를 수 있음</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>캠페인</th><th>플랫폼</th><th>기록</th><th>구매자(닉네임 완료)</th><th>광고 클릭 있음</th></tr></thead><tbody id="tenkeyAdsTable"></tbody></table></div>
+          <p class="impact-note">애플은 광고 클릭 정보를 앱에 넘기지 않음 — 캠페인별 합계는 App Store Connect 캠페인 보고서</p>
+        </section>
+        <section class="panel" aria-labelledby="tenkeyAdsUploadTitle">
+          <div class="panel-heading"><div><h2 id="tenkeyAdsUploadTitle">Google Ads 업로드</h2><small>선택한 날짜의 UTC 0시 이후 닉네임을 만든 기록 중 광고 클릭 ID가 있는 건만 포함함</small></div></div>
+          <form id="tenkeyAdsUploadForm" class="admin-toolbar tenkey-toolbar">
+            <label>시작 날짜(UTC)<input id="tenkeyAdsSince" type="date" required></label>
+            <button id="tenkeyAdsDownload" class="primary-button" type="submit" value="legacy">구글애즈 업로드 파일 받기</button>
+            <button id="tenkeyAdsAllClicks" class="primary-button" type="submit" value="data_manager">전체 클릭용 Data Manager 파일 받기</button>
+          </form>
+          <p class="impact-note">기본 파일은 Google 공식 GCLID 양식임. 전체 클릭용 파일은 Data Manager에서 GCLID·GBRAID·WBRAID와 전환 이름·시각 열을 연결해야 함. 전환 이름은 ‘10key buyer’, 가격·통화는 비워 둠. Google로 자동 전송하지 않음.</p>
+          <p id="tenkeyAdsUploadMessage" class="form-message" role="status" aria-live="polite"></p>
+        </section>
       </section>
 
       <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
@@ -1050,8 +1073,8 @@
   </dialog>
 
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="../analytics/pulse-model.js?v=20261125-econ" defer></script>
-  <script src="model.js?v=20261125-econ" defer></script>
+  <script src="../analytics/pulse-model.js?v=20261125-econ-ads" defer></script>
+  <script src="model.js?v=20261125-econ-ads" defer></script>
   <script src="ui-state.js?v=20260904-1" defer></script>
   <script src="auth.js?v=20261103-7d" defer></script>
   <script src="api.js?v=20261007-hx" defer></script>
@@ -1080,17 +1103,18 @@
   <script src="tenkey-economy.js?v=20261125-econ3" defer></script>
   <script src="tenkey-perf.js?v=20261117-stall2" defer></script>
   <script src="tenkey-quests.js?v=20261125-quest" defer></script>
-  <script src="purchases-model.js?v=20261125-econ" defer></script>
+  <script src="tenkey-ads.js?v=20261125-ads" defer></script>
+  <script src="purchases-model.js?v=20261125-econ-ads" defer></script>
   <script src="purchases.js?v=20260927-2x" defer></script>
   <script src="audit.js?v=20260907-2" defer></script>
   <script src="notes.js?v=20261006-r25" defer></script>
-  <script src="gmail-model.js?v=20261125-econ" defer></script>
+  <script src="gmail-model.js?v=20261125-econ-ads" defer></script>
   <script src="gmail-api.js?v=20260907-2" defer></script>
   <script src="cs-intelligence.js?v=20260904-1" defer></script>
   <script src="cs-templates.js?v=20260904-1" defer></script>
   <script src="cs.js?v=20261020-noai" defer></script>
   <script src="lab.js?v=20261005-reports" defer></script>
   <script src="liveops.js" defer></script>
-  <script src="app.js?v=20261125-econ2" defer></script>
+  <script src="app.js?v=20261125-econ-ads" defer></script>
 </body>
 </html>
