@@ -1766,3 +1766,8 @@ a.tk-glance-note { color: #e8aca6; text-decoration: underline; text-underline-of
 .tk-mini { min-height: 30px; padding: 5px 9px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .tk-mini.is-danger { color: #e8aca6; border-color: rgba(169,63,52,0.4); }
 .tk-watch-runs > td { background: var(--paper); }
+
+.tk-qbars { display: inline-flex; align-items: flex-end; gap: 1px; height: 18px; }
+.tk-qbars i { display: block; width: 3px; background: #3a3835; border-radius: 1px 1px 0 0; }
+.tk-qbars i.is-on { background: #dec07d; }
+

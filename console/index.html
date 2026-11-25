@@ -96,6 +96,7 @@
         <a href="#/tenkey-issues" data-page="tenkey-issues"><span class="nav-index">15</span><span class="nav-copy">이슈함<small>크래시·앱 이상·문의의 순서</small></span></a>
         <a href="#/tenkey-keep" data-page="tenkey-keep"><span class="nav-index">16</span><span class="nav-copy">데이터 보관<small>받는 것·보관 기간·정리</small></span></a>
         <a href="#/tenkey-perf" data-page="tenkey-perf"><span class="nav-index">17</span><span class="nav-copy">성능<small>첫 화면·버벅임·메모리</small></span></a>
+        <a href="#/tenkey-quests" data-page="tenkey-quests"><span class="nav-index">18</span><span class="nav-copy">퀘스트 밸런스<small>제공·완료·수령·젬</small></span></a>
       </nav>
       <div class="console-environment" aria-label="운영 환경"><i aria-hidden="true"></i><span>Production</span><small>Live operations</small></div>
       <button id="logoutButton" class="sidebar-logout" type="button">로그아웃</button>
@@ -873,6 +874,33 @@
         <p id="tenkeyPerfMessage" class="dashboard-message" role="status"></p>
       </section>
 
+
+      <section id="tenkeyQuestsView" class="route-view tk-page" data-route="tenkey-quests" hidden>
+        <form id="tenkeyQuestForm" class="panel admin-toolbar tenkey-toolbar" role="search">
+          <label>기간<select id="tenkeyQuestDays"><option value="7">최근 7일</option><option value="14" selected>최근 14일</option><option value="35">최근 35일</option></select></label>
+          <button class="primary-button" type="submit">조회</button>
+        </form>
+        <p class="impact-note">수령 수는 지금 서버의 수령 기록이고, 제공·완료 수는 퀘스트 하루·한 주가 바뀔 때 앱이 보내는 횟수입니다. 그 기록은 다음 빌드부터 쌓입니다. 계정은 보이지 않습니다. 수령률은 제공 대비 수령이고, 제공 기록이 없으면 —입니다. 날마다 나간 젬이 이 기간 양수인 날의 가운데 값의 2배 이상이면 감시로 표시합니다.</p>
+        <section id="tenkeyQuestSummary" class="purchase-summary tenkey-summary" aria-label="퀘스트 밸런스 요약">
+          <article data-tone="neutral"><span>퀘스트</span><strong data-quest-summary="quests">—</strong></article>
+          <article data-tone="neutral"><span>제공</span><strong data-quest-summary="offered">—</strong></article>
+          <article data-tone="neutral"><span>완료</span><strong data-quest-summary="finished">—</strong></article>
+          <article data-tone="neutral"><span>수령</span><strong data-quest-summary="claimed">—</strong></article>
+          <article data-tone="neutral"><span>나간 젬</span><strong data-quest-summary="gems">—</strong></article>
+          <article data-tone="watch"><span>완료 0</span><strong data-quest-summary="never">—</strong></article>
+        </section>
+        <section id="tenkeyQuestNever" class="panel" hidden></section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">PER QUEST</p><h2>퀘스트별</h2><small>제공·완료는 롤오버 기록, 수령·젬은 수령 기록. 추세는 날마다 수령 수입니다.</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>퀘스트</th><th>종류</th><th class="tk-num">제공</th><th class="tk-num">완료</th><th class="tk-num">수령</th><th class="tk-num">수령률</th><th class="tk-num">젬</th><th>추세</th></tr></thead><tbody id="tenkeyQuestTable"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">GEMS BY DAY</p><h2>날마다 나간 젬</h2><small>UTC 날짜. 감시 = 이 기간에 젬이 나간 날의 가운데 값의 2배 이상.</small></div></div>
+          <div class="table-scroll tk-stack"><table><thead><tr><th>날</th><th class="tk-num">젬</th><th>감시</th></tr></thead><tbody id="tenkeyQuestGems"></tbody></table></div>
+        </section>
+        <p id="tenkeyQuestMessage" class="dashboard-message" role="status"></p>
+      </section>
+
       <section id="tenkeyAuditView" class="route-view" data-route="tenkey-audit" hidden>
         <form id="tenkeyAuditFilterForm" class="panel admin-toolbar tenkey-toolbar" role="search">
           <label>표시 개수<select id="tenkeyAuditLimit"><option value="20">20건</option><option value="50" selected>50건</option><option value="100">100건</option><option value="200">200건</option></select></label>
@@ -1035,6 +1063,7 @@
   <script src="tenkey-keep.js?v=20261120-cqa" defer></script>
   <script src="tenkey-issues.js?v=20261124-flip" defer></script>
   <script src="tenkey-perf.js?v=20261117-stall2" defer></script>
+  <script src="tenkey-quests.js?v=20261125-quest" defer></script>
   <script src="purchases-model.js?v=20260927-2x" defer></script>
   <script src="purchases.js?v=20260927-2x" defer></script>
   <script src="audit.js?v=20260907-2" defer></script>
