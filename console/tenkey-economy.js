@@ -15,7 +15,7 @@
     mail: "메일 보상", best: "최고 기록", escape: "탈출", open: "상자", run: "판 보상", rune_dupe: "겹친 모듈 분해", revive: "부활",
     module_box: "모듈 상자", unlock: "해금", upgrade: "강화", scrap_pack: "스크랩 팩", shop: "상점", rune_box: "모듈 상자",
     runes_parts: "모듈 조각", rune_bought: "모듈 구매", rune_free: "무료 모듈", quest_rare_box: "퀘스트 희귀 상자", hard: "하드 모드",
-    gift: "친구 선물", friend: "친구", refund: "환불 회수", ad: "광고", season: "시즌 보상", title: "칭호",
+    daily_x2: "오늘의 찬스 (2·3번째 판 부품)", robot: "로봇 강화", gift: "친구 선물", friend: "친구", refund: "환불 회수", ad: "광고", season: "시즌 보상", title: "칭호",
   };
   const reasonName = (r) => REASON[r] || r;
 
@@ -54,8 +54,8 @@
       card(`생긴 젬 (${state.days}일)`, num(gIn), `구매 ${num(bought)} · 플레이 등 ${num(gIn - bought)}`, "good"),
       card(`쓴 젬 (${state.days}일)`, num(gOut), gIn ? `생긴 것의 ${Math.round(gOut / gIn * 100)}%` : "—", "watch"),
       card("젬 순증", `${gIn - gOut >= 0 ? "+" : ""}${num(gIn - gOut)}`, gIn - gOut > 0 ? "쌓이는 중" : "줄어드는 중", gIn - gOut > 0 ? "risk" : "good"),
-      card(`스크랩 생김 / 씀`, `${num(sum("scrap_in"))} / ${num(sum("scrap_out"))}`, `순증 ${num(sum("scrap_in") - sum("scrap_out"))}`),
-      card(`부품 생김 / 씀`, `${num(sum("parts_in"))} / ${num(sum("parts_out"))}`, `순증 ${num(sum("parts_in") - sum("parts_out"))}`),
+      card("스크랩 순증", `${sum("scrap_in") - sum("scrap_out") >= 0 ? "+" : ""}${num(sum("scrap_in") - sum("scrap_out"))}`, `생김 ${num(sum("scrap_in"))} · 씀 ${num(sum("scrap_out"))}`),
+      card("부품 순증", `${sum("parts_in") - sum("parts_out") >= 0 ? "+" : ""}${num(sum("parts_in") - sum("parts_out"))}`, `생김 ${num(sum("parts_in"))} · 씀 ${num(sum("parts_out"))}`),
     ].join("");
     byId("tenkeyEconChart").innerHTML = days.length ? chart(days) : '<p class="empty-panel">기록이 없습니다.</p>';
     byId("tenkeyEconReasons").innerHTML = reasons(d.reasons || []);

@@ -270,6 +270,7 @@ test("구매·젬 (owner 2026-11-24 night): country store, amount, expected net 
   await page.locator('[data-tk-money-unit="week"]').click();
   await expect.poll(async () => (await calls(page, "money.get")).at(-1)?.params.unit).toBe("week");
   await expect(page.locator("#tenkeyMoneyFacts")).toContainText("이번 주 순수익");
+  await expect(page.locator("#tenkeyMoneyFacts")).toContainText("지난주 순수익");
   expect(errors).toEqual([]);
 });
 
@@ -278,6 +279,7 @@ test("경제 흐름 (owner 2026-11-24 night): gems / scrap / parts in and out pe
   await expect(page.locator("#pageTitle")).toHaveText("경제 흐름");
   await expect(page.locator("#tenkeyEconSummary article").first()).toContainText("800");
   await expect(page.locator("#tenkeyEconSummary")).toContainText("+400");
+  await expect(page.locator("#tenkeyEconSummary")).toContainText("스크랩 순증");
   await expect(page.locator("#tenkeyEconChart .tk-econ-col")).toHaveCount(2);
   await expect(page.locator("#tenkeyEconReasons")).toContainText("스토어 구매");
   await expect(page.locator("#tenkeyEconReasons")).toContainText("부활");

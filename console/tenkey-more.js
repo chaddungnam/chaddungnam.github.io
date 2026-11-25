@@ -57,7 +57,7 @@
     const sumAll = rows.reduce((t, r) => t + total(r), 0);
     byId("tenkeyMoneyFacts").innerHTML = [
       [`${label} 순수익`, eur(total(now))], [`${label} 결제액 (인앱 + 앱)`, eur(Number(now.iap_gross_eur || 0) + Number(now.app_gross_eur || 0))],
-      [`앞 ${{ day: "날", week: "주", month: "달" }[m.unit] || "기간"} 순수익`, eur(total(prev))], [`표의 ${rows.length}${{ day: "일", week: "주", month: "개월" }[m.unit]} 합계`, eur(sumAll)],
+      [`${{ day: "어제", week: "지난주", month: "지난달" }[m.unit] || "앞 기간"} 순수익`, eur(total(prev))], [`표의 ${rows.length}${{ day: "일", week: "주", month: "개월" }[m.unit]} 합계`, eur(sumAll)],
     ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
     byId("tenkeyMoneyTable").innerHTML = rows.map((r) => `<tr>
       <td data-label="기간">${esc(periodLabel(r.period, m.unit))}</td>

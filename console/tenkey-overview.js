@@ -248,7 +248,7 @@
       ${countryTable(R)}
       <h4 class="tk-card-sub">최근 리뷰</h4>
       ${list ? `<ul class="tk-review-list">${list}</ul>` : '<p class="overview-drill-note">아직 글로 쓴 리뷰가 없습니다.</p>'}
-      <p class="overview-drill-note">App Store 평점은 별점만 준 것까지 포함한 나라별 공개 값입니다 (주요 10개 나라). 리뷰는 글이 있는 것만 오며, Google Play는 최근 약 1주일 것만 API로 받습니다. 스토어 판매와 함께 3시간마다 새로 읽습니다.${sync ? ` ${esc(sync)}.` : ""}</p></article>`;
+      <p class="overview-drill-note">리뷰는 글이 있는 것만 오며, Google Play는 최근 약 1주일 것만 API로 받습니다. 스토어 판매와 함께 3시간마다 새로 읽습니다.${sync ? ` ${esc(sync)}.` : ""}</p></article>`;
   }
 
   function render(data) {
