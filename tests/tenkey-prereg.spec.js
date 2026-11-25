@@ -353,6 +353,18 @@ test("/10key/get/?preview=pc shows phone stores with QR and copy link, the itch.
   if ((page.viewportSize() || { width: 1440 }).width > 760) await expect(pc.locator(".tk-get-qr img")).toBeVisible();
   else await expect(pc.locator(".tk-get-qr img")).toBeHidden();
 });
+test("/10key/get/ carries the ad click id through to Google Play (App Store keeps ct=)", async ({ page }) => {
+  await page.goto("/10key/get/?preview=pc&lang=en&src=ads_kr&gclid=TESTgclid123.abc_-");
+  const android = await page.evaluate(() => document.querySelector("[data-get-pc] [data-get-link=android]").href);
+  const referrer = decodeURIComponent(new URL(android).searchParams.get("referrer"));
+  expect(referrer).toBe("utm_source=houseduck&utm_medium=get&utm_campaign=ads_kr&gclid=TESTgclid123.abc_-");
+  // the click id must not leak into the App Store link, and a junk value is dropped
+  expect(await page.evaluate(() => document.querySelector("[data-get-pc] [data-get-link=ios]").href))
+    .toBe("https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=ads_kr&mt=8");
+  await page.goto("/10key/get/?preview=pc&lang=en&src=ads_kr&gclid=%3Cscript%3E");
+  const referrer2 = decodeURIComponent(new URL(await page.evaluate(() => document.querySelector("[data-get-pc] [data-get-link=android]").href)).searchParams.get("referrer"));
+  expect(referrer2).toBe("utm_source=houseduck&utm_medium=get&utm_campaign=ads_kr&gclid=script");
+});
 test("/10key/get/?preview=ios shows the App Store opening card without leaving", async ({ page }) => {
   await page.goto("/10key/get/?preview=ios&lang=ja");
   await expect(page.locator("[data-title]")).toHaveText("App Storeを開いています…");

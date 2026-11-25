@@ -168,9 +168,18 @@
     // Store links carry where the visit came from (?src=, e.g. ads_kr, mail, shorts; default "get"), so App Store Connect
     // (campaign links, pt = House Duck provider id) and Play Console (utm referrer) can count downloads per source.
     var src = String(params.get("src") || "get").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "get";
+    // Click identifiers from the ad click (Google Ads auto-tagging) are carried through to Google Play, so the app's
+    // Play install referrer can hand them to our server later (owner 2026-11-25; iOS has no such identifier, Apple only
+    // takes ct= for App Store campaign reports). gclid = web click, gbraid/wbraid = app-to-web clicks.
+    var clickId = function (name) {
+      var v = String(params.get(name) || "").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 200);
+      return v ? name + "=" + v : "";
+    };
     var storeUrl = function (key) {
       if (key === "ios") return "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=" + src + "&mt=8";
-      return STORES.android.url + "&referrer=" + encodeURIComponent("utm_source=houseduck&utm_medium=get&utm_campaign=" + src);
+      var referrer = ["utm_source=houseduck", "utm_medium=get", "utm_campaign=" + src, clickId("gclid"), clickId("gbraid"), clickId("wbraid")]
+        .filter(Boolean).join("&");
+      return STORES.android.url + "&referrer=" + encodeURIComponent(referrer);
     };
     var mineKey = isIOS ? "ios" : (isAndroid ? "android" : null);
     if (mineKey && isLive(mineKey)) {
