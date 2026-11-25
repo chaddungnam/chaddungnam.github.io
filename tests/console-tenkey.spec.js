@@ -22,7 +22,7 @@ async function fakeGoogle(page, how) {
   });
 }
 
-test("the project picker has no Comrade card; 10key Survival opens on the overview with its eighteen pages", async ({ page }) => {
+test("the project picker has no Comrade card; 10key Survival opens on the overview with its twenty pages", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("https://accounts.google.com/**", (route) => route.abort());
@@ -36,7 +36,7 @@ test("the project picker has no Comrade card; 10key Survival opens on the overvi
   await page.locator("#projectTenkey").click();
   await expect(page.locator("#currentProject")).toHaveText("10key Survival");
   await expect(page).toHaveURL(/#\/tenkey-overview$/);
-  await expect(page.locator("#tenkeyNav a")).toHaveCount(18);  // + 경제 흐름 (2026-11-25)
+  await expect(page.locator("#tenkeyNav a")).toHaveCount(20);  // + 경제 흐름, 퀘스트 밸런스, 광고 성과 (2026-11-25)
   await expect(page.locator("#hexaworldNav")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
