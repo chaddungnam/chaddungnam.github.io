@@ -4,7 +4,8 @@
 // (config.get "balance_bounds") and keep no copy of its own; each server default must equal the constant at every client call
 // site (LevelPressure.tune / BalanceKnobs.tune / LevelPressure.AT_CLEAR / FROM_LV, numbered names tune("x_%d" % (i + 1), LIST[i])
 // and helpers that hand a name on to tune: BalanceKnobs.price(base, "upg_cost_x") = x1.0, the board's _x("numlock_gap", lo, hi,
-// BAND_GAP) and _x(String(row[0]), ..) over ROLL_ROWS). Read-only, no network.
+// BAND_GAP) and _x(String(row[0]), ..) over ROLL_ROWS; QuestDefs.paid's quest classes: every quest of a class pays the default).
+// Read-only, no network.
 // Usage: node tests/balance-tune-contract.cjs <10key checkout> [<hexaworld 1984>/supabase/migrations]
 // Exit 1 on any difference. On the console before 11-25 it fails at "console keeps its own TUNES copy".
 const fs = require("node:fs");
@@ -146,6 +147,21 @@ for (const file of rg(["-l", "tune\\(", scripts]).split("\n").filter(Boolean)) {
         for (const n of names(f, a[ni] || "")) add(n, value, path.relative(client, f) + " " + head + "(.., " + token + ")");
       }
     }
+  }
+}
+// gemecon1125's quest rewards: QuestDefs.paid swaps a quest's "amt" for the tune of its class (tune_name: q_<d|w>_<scrap|gems|box>,
+// the all-clears q_d_bonus / q_w_bonus), so the server default must equal the amount of EVERY quest of that class (else the
+// plant changes a payout).
+const questFile = rg(["-l", "^class_name QuestDefs$", scripts]).split("\n")[0];
+const quests = questFile ? read(questFile) : "";
+if (/static func tune_name\(/.test(quests)) {
+  const rel = path.relative(client, questFile);
+  for (const m of quests.matchAll(/\{"id": "([\w.]+)"[^}]*"item": "(\w+)", "amt": (\d+)\}/g)) {
+    add((m[1].startsWith("w.") ? "q_w_" : "q_d_") + (m[2] === "rare_box" ? "box" : m[2]), Number(m[3]), rel + " " + m[1]);
+  }
+  for (const [c, n] of [["BONUS", "q_d_bonus"], ["WEEK_BONUS", "q_w_bonus"]]) {
+    const b = quests.match(new RegExp("^const " + c + " := \\{\"item\": \"\\w+\", \"n\": (\\d+)\\}", "m"));
+    add(n, b ? Number(b[1]) : undefined, rel + " " + c);
   }
 }
 for (const [name, s] of Object.entries(server)) {

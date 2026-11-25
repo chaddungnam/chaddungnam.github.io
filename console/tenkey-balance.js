@@ -20,7 +20,10 @@
   const KNOB_NAMES = { xp_scale: "경험치 배율", mouse_pace: "마우스 속도", battery_drain_scale: "배터리 소모 배율", robot_power_scale: "로봇 공격력" };
   // Which builds read the dials (one line for the panel); groups read outside a run say so in their heading.
   const TUNE_BUILDS = "읽는 빌드: 스토어 앱 1.0.1부터 · 1.0.0(빌드 22·23)은 위 전역 배율 4개만 · 웹·PC·체험판은 코드 값";
-  const TUNE_SCOPE = { "강화 비용": "강화 화면 가격 = 서버 청구 가격 · 앱을 켤 때 받은 값 · 하드모드 포함", "보상": "판 밖 · 앱을 켤 때 받은 값" };
+  const TUNE_SCOPE = { "강화 비용": "강화 화면 가격 = 서버 청구 가격 · 앱을 켤 때 받은 값 · 하드모드 포함", "보상": "판 밖 · 퀘스트 보상 = 서버 지급액 · 목록은 앱을 켤 때 받은 값 · 1.0.0은 기본 보상" };
+  // Dials a later server change adds to a group (gemecon1125's next round: run gems and the daily free gems); each name drops
+  // out of the line by itself once its server row exists.
+  const TUNE_SLOTS = { "보상": [["gem_run_cap", "판당 젬 상한"], ["gem_run_cap_open", "하드 해금 뒤 판당 젬 상한"], ["gem_best", "최고 기록 젬"], ["gem_day_cap", "하루 판 젬 상한"], ["gem_daily", "일일 무료 젬"]] };
 
   // The game's own Korean words (scripts/i18n: shell.result.cause.*, dig.sk.*, dig.dperk.*, dig.rsk.*, shop.tf.*).
   const CAUSES = { battery: "배터리 방전", mouse: "마우스 포획", durability: "텐키 파손", spacebar: "스페이스바에 깔림", wheel_mouse: "휠 마우스에 치임", cat_paw: "고양이의 샷건에 맞음", flip: "과속 점프로 뒤집힘", clear: "노멀 모드 완주", quit: "스스로 그만둠", demo_end: "체험판 끝", app_closed: "앱을 닫음" };
@@ -325,7 +328,12 @@
     panel.innerHTML = `<summary>세부 조정값 · 1.0.1부터 (${rows.length}개 · 서버 값 ${onServer}개)</summary>`
       + `<p class="impact-note">${esc(TUNE_BUILDS)}. 빈칸 = 기본값(게임 코드의 값)을 씁니다.</p>`
       + groups.map((g) => `<h3 class="tk-tune-group">${esc(g.name)} <small>${esc(TUNE_SCOPE[g.name] || "노멀 판만 · 판 시작 때 고정")}</small></h3>`
-        + `<div class="form-pair">${g.rows.map(dial).join("")}</div>`).join("");
+        + `<div class="form-pair">${g.rows.map(dial).join("")}</div>` + slot(g.name, rows)).join("");
+  }
+
+  function slot(group, rows) {
+    const left = (TUNE_SLOTS[group] || []).filter(([name]) => !rows.some((r) => r.name === name));
+    return left.length ? `<p class="impact-note" data-tune-slot="${esc(group)}">다음 서버 작업 뒤 이 자리에 추가: ${left.map(([, label]) => esc(label)).join(" · ")}</p>` : "";
   }
 
   function dial(r) {

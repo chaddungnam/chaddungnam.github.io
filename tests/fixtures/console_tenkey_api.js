@@ -141,6 +141,8 @@
     { name: "numlock_gap", min: 6, max: 16, int: true, default: 8, label: "NUM LOCK 띠 간격 (몇 줄마다, 클수록 적음)", group: "기판", since: "1.0.1" },
     { name: "ovc_band_1", min: 0.5, max: 1.3, int: false, default: 0.8, label: "오버클럭 빈도 배율 Lv 2-6", group: "오버클럭", since: "1.0.1" },
     { name: "upg_cost_x", min: 0.5, max: 2, int: false, step: 0.01, default: 1, label: "텐키 부품 강화 비용 배수 (해금 키 Lv 1 포함, 수수료 제외)", group: "강화 비용", since: "1.0.1" },
+    { name: "q_d_scrap", min: 500, max: 3000, int: true, default: 1000, label: "일일 퀘스트 부품 보상", group: "보상", since: "1.0.1" },
+    { name: "q_w_bonus", min: 30, max: 150, int: true, default: 100, label: "주간 올클 보너스 젬", group: "보상", since: "1.0.1" },
   ];
 
   window.__mockCalls = [];

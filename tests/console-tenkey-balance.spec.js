@@ -174,11 +174,16 @@ test("밸런스 page: the four server balance values load, save with a reason th
 test("밸런스 page: the detailed dials come from the server table, show the applied value, range and builds; a save lists only what changes", async ({ page }) => {
   const errors = await open(page, "#/tenkey-balance");
   const panel = page.locator("#tenkeyTunePanel");
-  await expect(panel.locator("summary")).toContainText("6개 · 서버 값 0개");
+  await expect(panel.locator("summary")).toContainText("8개 · 서버 값 0개");
   await panel.locator("summary").click();
   await expect(panel).toContainText("1.0.0(빌드 22·23)은 위 전역 배율 4개만");
-  for (const g of ["DRIFT", "로봇", "압박", "기판", "오버클럭", "강화 비용"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
+  for (const g of ["DRIFT", "로봇", "압박", "기판", "오버클럭", "강화 비용", "보상"]) await expect(panel.locator("h3.tk-tune-group", { hasText: g })).toHaveCount(1);
   await expect(panel.locator("h3.tk-tune-group", { hasText: "강화 비용" })).toContainText("하드모드 포함");
+  // gemecon1125's quest rewards (lead 11-25 follow-up 1e): paid by the server; the run-gem dials of its next round have a slot.
+  await expect(panel.locator("h3.tk-tune-group", { hasText: "보상" })).toContainText("퀘스트 보상 = 서버 지급액");
+  await expect(panel.locator('[data-tune-applied="q_w_bonus"]')).toContainText("적용 중 기본값 100 · 범위 30~150 (정수)");
+  await expect(panel.locator('[data-tune-slot="보상"]')).toContainText("판당 젬 상한 · 하드 해금 뒤 판당 젬 상한 · 최고 기록 젬 · 하루 판 젬 상한 · 일일 무료 젬");
+  await expect(panel.locator("[data-tune-slot]")).toHaveCount(1);
   await expect(panel.locator("h3.tk-tune-group", { hasText: "기판" })).toContainText("노멀 판만 · 판 시작 때 고정");
   await expect(panel.locator('[data-tune-applied="numlock_gap"]')).toContainText("적용 중 기본값 8 · 범위 6~16 (정수)");
   await expect(panel.locator('[data-tune-applied="upg_cost_x"]')).toContainText("범위 0.5~2 (0.01 단위)");
