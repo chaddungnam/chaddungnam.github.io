@@ -10,7 +10,7 @@ if ! command -v rg >/dev/null 2>&1; then
   }
 fi
 
-for path in index.html styles.css model.js auth.js api.js app.js tenkey.js tenkey-overview.js tenkey-players.js tenkey-unlocks.js tenkey-crashes.js tenkey-notices.js tenkey-more.js tenkey-balance.js tenkey-reports.js tenkey-keep.js tenkey-issues.js tenkey-perf.js tenkey-economy.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
+for path in index.html styles.css model.js auth.js api.js app.js tenkey.js tenkey-overview.js tenkey-players.js tenkey-unlocks.js tenkey-crashes.js tenkey-notices.js tenkey-more.js tenkey-balance.js tenkey-reports.js tenkey-keep.js tenkey-issues.js tenkey-perf.js tenkey-economy.js tenkey-quests.js players.js analytics-exclusions.js announcement-editor.js operations.js purchases-model.js purchases.js audit.js gmail-model.js gmail-api.js cs-intelligence.js cs-templates.js cs.js; do
   test -f "$console_dir/$path"
 done
 rg -F -q 'https://www.googleapis.com/auth/gmail.modify' "$console_dir/gmail-api.js"
@@ -47,10 +47,12 @@ rg -F -q 'postProject("houseduck", "tenkey-admin"' "$console_dir/tenkey.js"
 rg -q 'data-route="tenkey-issues"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-keep"' "$console_dir/index.html"
 rg -q 'data-route="tenkey-perf"' "$console_dir/index.html"
+rg -q 'data-route="tenkey-quests"' "$console_dir/index.html"
 rg -F -q '"tenkey-console-stats", { action, params }' "$console_dir/tenkey.js"
 rg -F -q '"keep.get"' "$console_dir/tenkey-keep.js"
 rg -F -q '"issues.list"' "$console_dir/tenkey-issues.js"
 rg -F -q '"telemetry.get"' "$console_dir/tenkey-perf.js"
+rg -F -q '"quest.balance"' "$console_dir/tenkey-quests.js"
 rg -F -q '"balance.v4"' "$console_dir/tenkey-balance.js"
 rg -F -q 'QA_WORLD_SEED' "$console_dir/tenkey-issues.js"
 rg -q 'data-tk-keep="issue_reports"' "$console_dir/index.html"

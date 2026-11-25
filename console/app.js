@@ -43,6 +43,7 @@ const pageTitles = {
   "tenkey-keep": "데이터 보관",
   "tenkey-perf": "성능",
   "tenkey-economy": "경제 흐름",
+  "tenkey-quests": "퀘스트 밸런스",
 };
 const pageDescriptions = {
   analytics: "유입부터 플레이·유지율·수익까지 현재 상태와 다음 판단 근거를 봅니다.",
@@ -73,6 +74,7 @@ const pageDescriptions = {
   "tenkey-keep": "서버가 받는 데이터마다 무엇이 들어 있는지, 어느 빌드가 보내는지, 며칠 두는지, 지금 몇 줄인지, 마지막 정리에서 몇 줄을 지웠는지 봅니다.",
   "tenkey-economy": "젬·스크랩·부품이 날마다 어디서 얼마나 생기고 어디에 얼마나 쓰이는지, 플레이어가 얼마나 쥐고 있는지 봅니다 (서버 장부 기준, 통계 제외 계정 빼고).",
   "tenkey-perf": "폰 앱이 보낸 성능 보고(첫 화면까지 시간, 가장 느린 프레임, 메모리)를 기기·빌드별로, 웹 체험판의 버벅임 보고를 장소별로 봅니다.",
+  "tenkey-quests": "일일·주간 퀘스트가 몇 번 제공되고, 완료되고, 수령됐는지와 날마다 나간 젬을 봅니다. 계정은 보이지 않습니다.",
 };
 
 let currentProjectKey = "";
@@ -128,6 +130,7 @@ const TENKEY_MOUNTS = {
   "tenkey-ranking": ["mountRanking"], "tenkey-balance": ["mountBalance"], "tenkey-audit": ["mountAudit"], "tenkey-config": ["mountConfig", "mountReviewCode"],
   "tenkey-watch": ["mountWatch"], "tenkey-titles": ["mountTitles"], "tenkey-issues": ["mountIssues"], "tenkey-keep": ["mountKeep"], "tenkey-perf": ["mountPerf"],
   "tenkey-economy": ["mountEconomy"],
+  "tenkey-quests": ["mountQuests"],
 };
 
 // One row per game: title in the sidebar, its <nav>, the hash routes it owns and its landing page.
