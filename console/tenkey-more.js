@@ -50,14 +50,17 @@
   function renderMoney() {
     const m = state.purchases.money;
     if (!m) { byId("tenkeyMoneyTable").innerHTML = '<tr><td colspan="7" class="empty-panel">매출을 불러오지 못했습니다.</td></tr>'; return; }
-    const rows = m.periods || [];
+    // Periods that ended before the launch (2026-11-24) hold only zeros (test purchases were voided): left out.
+    const LAUNCH = "2026-11-24";
+    const ends = (p) => { const d = new Date(`${p}T00:00:00Z`); if (m.unit === "week") d.setUTCDate(d.getUTCDate() + 6); if (m.unit === "month") { d.setUTCMonth(d.getUTCMonth() + 1); d.setUTCDate(0); } return d.toISOString().slice(0, 10); };
+    const rows = (m.periods || []).filter((r) => ends(r.period) >= LAUNCH);
     const total = (r) => Number(r.iap_net_eur || 0) + Number(r.app_net_eur || 0);
     const label = { day: "오늘", week: "이번 주", month: "이번 달" }[m.unit] || "이번";
     const now = rows[0] || {}, prev = rows[1] || {};
     const sumAll = rows.reduce((t, r) => t + total(r), 0);
     byId("tenkeyMoneyFacts").innerHTML = [
       [`${label} 순수익`, eur(total(now))], [`${label} 결제액 (인앱 + 앱)`, eur(Number(now.iap_gross_eur || 0) + Number(now.app_gross_eur || 0))],
-      [`${{ day: "어제", week: "지난주", month: "지난달" }[m.unit] || "앞 기간"} 순수익`, eur(total(prev))], [`표의 ${rows.length}${{ day: "일", week: "주", month: "개월" }[m.unit]} 합계`, eur(sumAll)],
+      [`${{ day: "어제", week: "지난주", month: "지난달" }[m.unit] || "앞 기간"} 순수익`, eur(total(prev))], [`출시 후 합계 (${rows.length}${{ day: "일", week: "주", month: "개월" }[m.unit]})`, eur(sumAll)],
     ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
     byId("tenkeyMoneyTable").innerHTML = rows.map((r) => `<tr>
       <td data-label="기간">${esc(periodLabel(r.period, m.unit))}</td>

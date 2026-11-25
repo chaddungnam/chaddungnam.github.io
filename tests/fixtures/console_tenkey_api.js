@@ -161,8 +161,9 @@
         if (firstIds[0]) items[firstIds[0]] = { store: "android", country: "KR", currency: "KRW", price: 4400, tax: 400, dev_revenue: 3400, fx_eur: 0.000678, price_eur: 2.9832, net_eur: 2.3052, net_source: "store", vat_rate: null, fee_rate: null };
         if (firstIds[1]) items[firstIds[1]] = { store: "ios", country: "JP", currency: "JPY", price: 500, fx_eur: 0.0057, price_eur: 2.85, net_eur: 2.2023, net_source: "estimate", vat_rate: 0.1, fee_rate: 0.15 };
         return { unit, fee_rate: 0.15, items, periods: [
-          { period: "2026-10-23", iap_count: 2, iap_gross_eur: 5.83, iap_net_eur: 4.51, iap_unpriced: 0, app_units: 3, app_gross_eur: 8.97, app_net_eur: 6.4, by_store: null },
-          { period: "2026-10-22", iap_count: 0, iap_gross_eur: 0, iap_net_eur: 0, iap_unpriced: 0, app_units: 1, app_gross_eur: 2.99, app_net_eur: 2.1, by_store: null }] }; }
+          { period: "2026-11-25", iap_count: 2, iap_gross_eur: 5.83, iap_net_eur: 4.51, iap_unpriced: 0, app_units: 3, app_gross_eur: 8.97, app_net_eur: 6.4, by_store: null },
+          { period: "2026-11-24", iap_count: 0, iap_gross_eur: 0, iap_net_eur: 0, iap_unpriced: 0, app_units: 1, app_gross_eur: 2.99, app_net_eur: 2.1, by_store: null },
+          { period: "2026-11-23", iap_count: 0, iap_gross_eur: 0, iap_net_eur: 0, iap_unpriced: 0, app_units: 0, app_gross_eur: 0, app_net_eur: 0, by_store: null }] }; }
       // economy flow (2026-11-25): two days, gems grow faster than they go
       case "economy.get": return { first_day: "2026-10-22", today: "2026-10-23", days: [
           { day: "2026-10-22", gems_in: 500, gems_out: 120, gems_bought: 260, scrap_in: 9000, scrap_out: 7000, parts_in: 20, parts_out: 10, accounts: 6 },
