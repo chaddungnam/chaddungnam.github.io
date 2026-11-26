@@ -155,7 +155,7 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
   await page.goto("/?lang=ko");
   const hero = page.locator("#studio");
   const tenkey = page.locator("#games");
-  const video = tenkey.locator("[data-hero-gameplay]");
+  const video = tenkey.locator("[data-hero-gameplay]").first(); // the trailer, first of the three clips (owner 2026-11-26)
 
   // The hero is the scene only: one canvas, no overlay copy; the h1 is there for search and screen readers.
   await expect(hero).toBeVisible();
@@ -214,8 +214,10 @@ test("home opens on the night pixel desk and leads to 10key Survival and its rea
     playsInline: node.playsInline,
     preload: node.preload,
   }))).toEqual({ autoplay: true, muted: true, loop: true, playsInline: true, preload: "none" });
-  const box = await video.boundingBox();
-  expect(box.width).toBeGreaterThan(isMobile ? 200 : 250);
+  // three clips side by side (owner 2026-11-26): the row is wide, each clip about a third of it
+  const box = await tenkey.locator(".hd-tk-trio").boundingBox();
+  expect(box.width).toBeGreaterThan(isMobile ? 300 : 440);
+  expect((await video.boundingBox()).width).toBeGreaterThan(isMobile ? 95 : 140);
   await expect.poll(() => video.evaluate((node) => node.paused)).toBe(false);
   await expect.poll(() => video.evaluate((node) => node.currentTime)).toBeGreaterThan(0);
 });
@@ -241,9 +243,10 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
   await expect(page.locator(".hd-phone-button")).toHaveCount(6);
   await expect(page.locator(".hd-phone-island")).toHaveCount(2);
   await expect(page.locator(".hd-phone-home")).toHaveCount(2);
-  await expect(page.locator("#games .hd-tk-screen-frame")).toHaveCount(1);
-  await expect(page.locator("[data-hero-gameplay]")).toHaveCount(3);
-  await expect(page.locator("#games [data-hero-gameplay]")).toHaveCount(1);
+  // 10key Survival: three clips side by side (owner 2026-11-26): trailer, OVERCLOCK speeding flip, OVERCLOCK race.
+  await expect(page.locator("#games .hd-tk-screen-frame")).toHaveCount(3);
+  await expect(page.locator("[data-hero-gameplay]")).toHaveCount(5);
+  await expect(page.locator("#games [data-hero-gameplay]")).toHaveCount(3);
   await expect(page.locator("#quirky [data-hero-gameplay]")).toHaveCount(1);
   await expect(page.locator("#comrade [data-hero-gameplay]")).toHaveCount(1);
   await expect(page.locator("[data-shot], [data-stack], .hd-ghost")).toHaveCount(0);
@@ -259,7 +262,7 @@ test("home reads as a game studio: 10key Survival first, Quirky Ball second, pho
 
   // Every phone and the 10key game frame is never cut: it sits whole inside every ancestor that clips (the 10key section
   // clips its background art, the Quirky Ball and farewell sections clip their glows).
-  for (const index of [0, 1, 2]) {
+  for (const index of [0, 1, 2, 3, 4]) {
     const phone = page.locator("#games .hd-tk-screen-frame, .hd-phone").nth(index);
     await phone.scrollIntoViewIfNeeded();
     const clippedBy = await phone.evaluate((node) => {
@@ -368,9 +371,11 @@ test("10key Survival shows its real gameplay in its game frame and the quiet Com
     await page.goto(route);
     const zone = page.locator("#games");
     await zone.scrollIntoViewIfNeeded();
-    const video = zone.locator(".hd-tk-screen video");
-    await expect(video).toBeVisible();
-    await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
+    await expect(zone.locator(".hd-tk-screen video")).toHaveCount(3);
+    for (const video of await zone.locator(".hd-tk-screen video").all()) {
+      await expect(video).toBeVisible();
+      await expect.poll(() => video.evaluate((node) => node.readyState >= 2 && node.videoWidth > 0), { message: `${route} gameplay loads` }).toBe(true);
+    }
     await expect(zone.locator(`a[href='${copy.tenkeyHref}']`)).toHaveCount(1);
     await expect(zone.locator("a[href='https://houseduck.itch.io/10key-survival']:visible")).toHaveCount(0);
     await expect(zone.locator(`a[href='${copy.tenkeyHref}#prereg']`)).toHaveCount(1);
@@ -706,7 +711,7 @@ test("home reduced motion keeps a still desk, a finished logo, no hero glide and
 
   // None of the three phone videos starts by itself.
   for (const selector of ["#games", "#quirky", "#comrade"]) {
-    const video = page.locator(`${selector} [data-hero-gameplay]`);
+    const video = page.locator(`${selector} [data-hero-gameplay]`).first(); // 10key Survival has three clips in a row; they share one observer path
     await video.scrollIntoViewIfNeeded();
     await page.waitForTimeout(250);
     await expect.poll(() => video.evaluate((node) => ({ autoplay: node.autoplay, paused: node.paused })), { message: `${selector} loop stays still` }).toEqual({ autoplay: false, paused: true });
@@ -734,7 +739,7 @@ test("localized homes keep the 10key Survival copy, game frame and sections read
       const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
       const title = rect("#tenkey-title");
       const glass = rect(".hd-tk-copy");
-      const phone = rect(".hd-tk-screen-frame");
+      const phone = rect(".hd-tk-trio");
       const bodyFonts = [".hd-lede", ".hd-quirky-copy .hd-lede"]
         .flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => parseFloat(getComputedStyle(node).fontSize)));
       const controlHeights = [...document.querySelectorAll(".hd-keycap-cta, .hd-btn, .hd-arrow-link, .store-button")].filter((node) => node.getClientRects().length)
@@ -845,7 +850,7 @@ test("home carries no Quirky Ball playable demo and requests no game files", asy
 test("home plays each phone video (10key Survival, Quirky Ball, Comrade farewell) only while it is on screen", async ({ page }) => {
   await page.goto("/?lang=ko");
   for (const selector of ["#games", "#quirky", "#comrade"]) {
-    const video = page.locator(`${selector} [data-hero-gameplay]`);
+    const video = page.locator(`${selector} [data-hero-gameplay]`).first(); // 10key Survival has three clips in a row; they share one observer path
     await expect(video).toHaveJSProperty("paused", true);
 
     await video.scrollIntoViewIfNeeded();

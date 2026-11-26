@@ -147,7 +147,7 @@ test("first screen is light: no gameplay video or other-orientation art before t
   page.on("request", (r) => urls.push(r.url()));
   await page.goto("/?lang=ko");
   await page.waitForTimeout(2500);
-  expect(urls.filter((u) => /comrade-gameplay\.mp4|quirky-ball\/v2\/loop\.mp4|assets\/media\/tenkey-gameplay\.mp4|desk-quirky\.mp4/.test(u))).toEqual([]);
+  expect(urls.filter((u) => /comrade-gameplay\.mp4|quirky-ball\/v2\/loop\.mp4|assets\/media\/tenkey-gameplay\.mp4|tenkey-clips\/[a-z]+\.mp4|desk-quirky\.mp4/.test(u))).toEqual([]);
   expect(urls.some((u) => /desk-tenkey\.mp4/.test(u))).toBe(true);
   expect(urls.some((u) => /desk-(landscape|portrait)\.webp/.test(u))).toBe(true);
   expect(urls.filter((u) => /desk-[a-z]+\.png/.test(u))).toEqual([]);

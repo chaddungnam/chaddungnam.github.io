@@ -105,8 +105,8 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'assets/media/share/house-duck-share.png'
   require_token "$page" 'data-theme="light"'
   reject_token "$page" 'data-theme-toggle'
-  require_token "$page" "assets/media/tenkey-gameplay.mp4"
-  require_token "$page" "assets/media/tenkey-gameplay-poster.webp"
+  require_token "$page" "assets/media/tenkey-clips/trailer.mp4"
+  require_token "$page" "assets/media/tenkey-clips/trailer-poster.webp"
   require_token "$page" "quirky-ball/v2/loop.mp4"
   require_token "$page" "quirky-ball/v2/loop-poster.webp"
   require_token "$page" 'data-qb-logo'

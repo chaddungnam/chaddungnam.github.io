@@ -157,10 +157,10 @@ for (const [file, locale] of marketingPages.filter(([name]) => /^index(?:_[a-z]{
   assert.ok(html.indexOf("data-tenkey") < html.indexOf('data-project="quirky-ball"'), `${file} 10key Survival comes first`);
   assert.ok(html.indexOf('data-project="quirky-ball"') < html.indexOf("data-community-stats"), `${file} Quirky community stats follow the Quirky Ball heading`);
   assert.ok(html.indexOf("data-community-stats") < html.indexOf('id="lab-notes"'), `${file} Quirky community stats stay inside the Quirky Ball section`);
-  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 3, `${file} three phone loops: 10key Survival, Quirky Ball, Comrade farewell`);
-  assert.equal((html.match(/<video\b/g) || []).length, 3, `${file} the only <video> elements are the three phone loops`);
+  assert.equal((html.match(/data-hero-gameplay/g) || []).length, 5, `${file} five phone loops: three 10key Survival clips, Quirky Ball, Comrade farewell`);
+  assert.equal((html.match(/<video\b/g) || []).length, 5, `${file} the only <video> elements are the phone loops`);
   assert.match(html, /data-desk-quirky="assets\/media\/home\/desk-quirky\.mp4"/, `${file} Quirky Ball gameplay video plays on the desk CRT`);
-  assert.match(html, /assets\/media\/tenkey-gameplay\.mp4/, `${file} 10key Survival hero loop`);
+  assert.match(html, /assets\/media\/tenkey-clips\/trailer\.mp4[\s\S]*tenkey-clips\/speeding\.mp4[\s\S]*tenkey-clips\/overclock\.mp4/, `${file} 10key Survival clips: trailer, speeding flip, OVERCLOCK race`);
   assert.match(quirkyBlock, /<video\b[^>]*data-hero-gameplay[^>]*poster="quirky-ball\/v2\/loop-poster\.webp"[^>]*><source src="quirky-ball\/v2\/loop\.mp4" type="video\/mp4"><source src="quirky-ball\/v2\/loop\.webm" type="video\/webm">/, `${file} Quirky Ball section plays its own 2.0 loop in a phone`);
   assert.match(farewellBlock, /<video\b[^>]*data-hero-gameplay[^>]*poster="assets\/media\/comrade-gameplay-poster\.jpg"[^>]*><source src="assets\/media\/comrade-gameplay\.mp4" type="video\/mp4">/, `${file} the farewell phone plays the old Comrade loop`);
   assert.equal((html.match(/comrade-gameplay\.mp4/g) || []).length, 1, `${file} Comrade footage appears only in the farewell block`);

@@ -113,7 +113,7 @@ body.tk-page :focus-visible { outline: 3px solid var(--tk-cream); outline-offset
   overflow: clip;
   background: url("media/tenkey-itch/bg-n.webp") center top / max(1920px, 100%) auto no-repeat, var(--tk-night);
 }
-.tk-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); align-items: center; gap: clamp(32px, 6vw, 96px); }
+.tk-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 520px); align-items: center; gap: clamp(28px, 4vw, 64px); }
 .tk-hero-copy { min-width: 0; }
 .tk-logo { display: block; margin: 0 0 clamp(22px, 2.6vw, 30px); }
 .tk-logo img { display: block; width: 100%; max-width: 480px; height: auto; border-radius: 10px; box-shadow: 0 0 0 1px var(--tk-edge), 0 24px 60px rgba(0, 0, 0, .45); }
@@ -604,6 +604,18 @@ html:lang(ko) .tk-chips li, html:lang(ko) .tk-tag, html:lang(ko) .tk-sheet dt, h
 .tk-phone-btn-b { top: 28%; left: -3px; height: 46px; }
 .tk-phone-btn-c { top: 24%; right: -3px; height: 64px; }
 @media (max-width: 860px) { .tk-phone { width: min(68vw, 300px); } }
+
+/* three clips side by side (owner 2026-11-26): trailer, OVERCLOCK speeding flip, OVERCLOCK race; slim phones, no island */
+.tk-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: clamp(8px, 1.1vw, 14px); width: 100%; }
+.tk-trio .tk-phone { width: 100%; }
+.tk-trio .tk-phone-shell { aspect-ratio: auto; padding: 5px; border-radius: 22px; }
+.tk-trio .tk-phone .tk-screen-video { height: auto; aspect-ratio: 9 / 16; border-radius: 17px; object-fit: cover; }
+@media (max-width: 860px) {
+  .tk-trio { width: min(100%, 560px); }
+  .tk-trio .tk-phone { width: 100%; }
+  .tk-trio .tk-phone-shell { padding: 4px; border-radius: 16px; }
+  .tk-trio .tk-phone .tk-screen-video { border-radius: 12px; }
+}
 
 /* prices in Galmuri (owner 2026-11-21) */
 .tk-dl-sale, .tk-dl-sale strong, .tk-dl-sale b { font-family: "Galmuri11", "PixelMplus12", var(--tk-font); font-weight: 700; }

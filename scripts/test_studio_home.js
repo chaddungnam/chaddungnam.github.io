@@ -81,19 +81,22 @@ const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const sectionOf = (html, id) => (html.match(new RegExp(`<section\\b[^>]*\\bid="${id}"[\\s\\S]*?</section>`)) || [""])[0];
 
 const homeLocales = {
-  "index.html": { lang: "ko", tenkeyHref: "10key/", more: "자세히 보기", self: "./?lang=ko", about: "about/", support: "support/", videoLabel: "딸깍 서바이벌 실제 플레이", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계", smallFirst: false, qbGroup: "Quirky Ball 실제 플레이 영상", qbVideo: "Quirky Ball 2.0 실제 플레이", comradeGroup: "동무와 멋진신세계 실제 플레이 영상", comradeVideo: "동무와 멋진신세계 실제 플레이" },
-  "index_en.html": { lang: "en", tenkeyHref: "10key/index_en.html", more: "Learn more", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoLabel: "10key Survival gameplay", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: true, qbGroup: "Quirky Ball gameplay video", qbVideo: "Quirky Ball 2.0 gameplay", comradeGroup: "Comrade and the Brave New World gameplay video", comradeVideo: "Comrade and the Brave New World gameplay" },
-  "index_de.html": { lang: "de", tenkeyHref: "10key/index_de.html?lang=de", more: "Mehr erfahren", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoLabel: "10key Survival Gameplay", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt", smallFirst: true, qbGroup: "Quirky Ball Gameplay-Video", qbVideo: "Quirky Ball 2.0 Gameplay", comradeGroup: "Genosse und die schöne neue Welt – Gameplay-Video", comradeVideo: "Genosse und die schöne neue Welt – Gameplay" },
-  "index_ja.html": { lang: "ja", tenkeyHref: "10key/index_ja.html?lang=ja", more: "詳しく見る", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoLabel: "10key Survivalのプレイ", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: false, qbGroup: "Quirky Ballのプレイ映像", qbVideo: "Quirky Ball 2.0のプレイ", comradeGroup: "Comrade and the Brave New Worldのプレイ映像", comradeVideo: "Comrade and the Brave New Worldのプレイ" },
+  "index.html": { lang: "ko", tenkeyHref: "10key/", more: "자세히 보기", self: "./?lang=ko", about: "about/", support: "support/", videoLabel: "딸깍 서바이벌 트레일러", tenkeyTitle: '딸깍 서바이벌<span class="hd-title-alt" lang="en">10key Survival</span>', farewellName: "동무와 멋진신세계", smallFirst: false, qbGroup: "Quirky Ball 실제 플레이 영상", qbVideo: "Quirky Ball 2.0 실제 플레이", comradeGroup: "동무와 멋진신세계 실제 플레이 영상", comradeVideo: "동무와 멋진신세계 실제 플레이" },
+  "index_en.html": { lang: "en", tenkeyHref: "10key/index_en.html", more: "Learn more", self: "index_en.html?lang=en", about: "about/index_en.html?lang=en", support: "support/#english", videoLabel: "10key Survival trailer", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: true, qbGroup: "Quirky Ball gameplay video", qbVideo: "Quirky Ball 2.0 gameplay", comradeGroup: "Comrade and the Brave New World gameplay video", comradeVideo: "Comrade and the Brave New World gameplay" },
+  "index_de.html": { lang: "de", tenkeyHref: "10key/index_de.html?lang=de", more: "Mehr erfahren", self: "index_de.html?lang=de", about: "about/index_de.html?lang=de", support: "support/#german", videoLabel: "10key Survival Trailer", tenkeyTitle: "10key Survival", farewellName: "Genosse und die schöne neue Welt", smallFirst: true, qbGroup: "Quirky Ball Gameplay-Video", qbVideo: "Quirky Ball 2.0 Gameplay", comradeGroup: "Genosse und die schöne neue Welt – Gameplay-Video", comradeVideo: "Genosse und die schöne neue Welt – Gameplay" },
+  "index_ja.html": { lang: "ja", tenkeyHref: "10key/index_ja.html?lang=ja", more: "詳しく見る", self: "index_ja.html?lang=ja", about: "about/index_ja.html?lang=ja", support: "support/#japanese", videoLabel: "10key Survival トレーラー", tenkeyTitle: "10key Survival", farewellName: "Comrade and the Brave New World", smallFirst: false, qbGroup: "Quirky Ballのプレイ映像", qbVideo: "Quirky Ball 2.0のプレイ", comradeGroup: "Comrade and the Brave New Worldのプレイ映像", comradeVideo: "Comrade and the Brave New Worldのプレイ" },
 };
 // The Quirky Ball logo is cut into these pieces (assets/media/home/qb-logo/<piece>.webp); home.js lands them one by one.
 const QB_PIECES = ["q", "u", "i", "r", "k", "y", "b", "a", "l1", "l2", "dot", "hex", "ball"];
 
 // Home media: the desk scene layers drawn on the hero canvas, the 10key loop and the social image.
 const homeMedia = {
-  "assets/media/tenkey-gameplay.mp4": 2_500_000,
-  "assets/media/tenkey-gameplay.webm": 2_500_000,
-  "assets/media/tenkey-gameplay-poster.webp": 150_000,
+  "assets/media/tenkey-clips/trailer.mp4": 2_000_000,
+  "assets/media/tenkey-clips/speeding.mp4": 2_000_000,
+  "assets/media/tenkey-clips/overclock.mp4": 2_000_000,
+  "assets/media/tenkey-clips/trailer-poster.webp": 80_000,
+  "assets/media/tenkey-clips/speeding-poster.webp": 80_000,
+  "assets/media/tenkey-clips/overclock-poster.webp": 80_000,
   "assets/media/tenkey-og.jpg": 300_000,
   "assets/media/comrade-gameplay-poster.jpg": 100_000,
   "assets/media/comrade-gameplay.mp4": 3_500_000,
@@ -269,11 +272,16 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
   assert.equal((tenkey.match(/<p class="hd-tk-note">[^<]+<\/p>/g) || []).length, 2, `${file} a short note under each button`);
   assert.match(tenkey, /<p class="hd-tk-fine">[^<]*<a href="10key\/odds\/[a-z]{2}\.html">/, `${file} links the module odds page (no copied odds, owner 11-04)`);
   assert.doesNotMatch(tenkey, /8[.,]333|1\/12/, `${file} no legacy odds numbers`);
-  assert.equal((tenkey.match(/<video\b/g) || []).length, 1, `${file} one gameplay loop`);
-  const video = tenkey.match(/<video\b[^>]*>/)[0];
-  for (const attribute of ["data-hero-gameplay", " muted", " loop", " playsinline", 'preload="none"', 'poster="assets/media/tenkey-gameplay-poster.webp"', `aria-label="${l.videoLabel}"`]) assert.ok(video.includes(attribute), `${file} gameplay video needs ${attribute.trim()}`);
-  assert.ok(!/\sautoplay[\s>=]/.test(video), `${file} the gameplay video has no autoplay attribute (it forces the download before it scrolls into view; home.js starts it)`);
-  assert.ok(tenkey.includes('<source src="assets/media/tenkey-gameplay.mp4" type="video/mp4"><source src="assets/media/tenkey-gameplay.webm" type="video/webm">'), `${file} gameplay video has mp4 and webm sources`);
+  assert.equal((tenkey.match(/<video\b/g) || []).length, 3, `${file} three clips side by side (owner 11-26): trailer, OVERCLOCK speeding flip, OVERCLOCK race`);
+  assert.match(tenkey, /<span class="hd-tk-trio">/, `${file} the three clips sit in one row`);
+  const clipVideos = tenkey.match(/<video\b[^>]*>/g);
+  ["trailer", "speeding", "overclock"].forEach((clip, i) => {
+    const video = clipVideos[i];
+    for (const attribute of ["data-hero-gameplay", " muted", " loop", " playsinline", 'preload="none"', `poster="assets/media/tenkey-clips/${clip}-poster.webp"`]) assert.ok(video.includes(attribute), `${file} ${clip} clip needs ${attribute.trim()}`);
+    assert.ok(!/\sautoplay[\s>=]/.test(video), `${file} the ${clip} clip has no autoplay attribute (it forces the download before it scrolls into view; home.js starts it)`);
+    assert.ok(tenkey.includes(`<source src="assets/media/tenkey-clips/${clip}.mp4" type="video/mp4">`), `${file} ${clip} clip has its mp4 source`);
+  });
+  assert.ok(clipVideos[0].includes(`aria-label="${l.videoLabel}"`), `${file} the first clip is the trailer`);
   assert.match(tenkey, /<figcaption class="hd-micro">[^<]+<\/figcaption>/, `${file} captions the footage`);
   assert.ok(tenkey.includes('<source media="(max-width: 600px)" srcset="assets/media/tenkey-itch/cover.webp" width="630" height="500"><img src="assets/media/tenkey-itch/banner.webp" width="960" height="300"'), `${file} itch.io banner (cover on phones)`);
   assert.deepEqual([...tenkey.matchAll(/src="assets\/media\/tenkey-itch\/(desc-[a-z]+)\.webp"[^>]*loading="lazy"/g)].map((match) => match[1]), ["desc-dig", "desc-survive", "desc-evolve"], `${file} the three itch.io description images, lazy`);

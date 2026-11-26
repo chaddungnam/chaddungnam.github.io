@@ -429,7 +429,7 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 
 .hd-tenkey-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
   align-items: center;
   gap: clamp(32px, 6vw, 96px);
 }
@@ -480,6 +480,10 @@ body[data-page="studio"] .menu-button[aria-expanded="true"] .menu-button-lines {
 .hd-tk-screen { display: grid; justify-items: center; gap: 14px; margin: 0; }
 .hd-tk-screen-frame { display: block; width: 100%; padding: 8px; border: 1px solid var(--tk-line); border-radius: 14px; background: var(--tk-bg-2); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
 .hd-tk-video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 8px; background: #000; object-fit: cover; }
+/* three clips side by side (owner 2026-11-26): trailer, OVERCLOCK speeding flip, OVERCLOCK race */
+.hd-tk-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: clamp(8px, 1.1vw, 14px); width: 100%; }
+.hd-tk-trio .hd-tk-screen-frame { padding: 5px; border-radius: 12px; }
+.hd-tk-trio .hd-tk-video { border-radius: 7px; }
 .hd-tenkey .hd-micro { color: var(--tk-ink-3); }
 
 .hd-tk-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); margin: clamp(72px, 9vw, 112px) 0 0; padding: 0; list-style: none; }
@@ -717,7 +721,7 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
 
 /* ---------- responsive ---------- */
 @media (max-width: 1040px) {
-  .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 40px; }
+  .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); gap: 32px; }
   .hd-phone { width: clamp(220px, 21vw, 280px); }
 }
 
@@ -726,6 +730,8 @@ body[data-page="studio"] .footer-links a:focus-visible { color: #fff; background
   .hd-tenkey::before { top: 120px; height: 540px; background-image: url("media/tenkey-itch/bg-n-960.webp"); background-size: 960px auto; }
   .hd-tenkey-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
   .hd-tk-screen-frame { width: min(72vw, 320px); }
+  .hd-tk-trio { width: min(100%, 560px); }
+  .hd-tk-trio .hd-tk-screen-frame { width: 100%; padding: 4px; }
   .hd-tk-features { grid-template-columns: minmax(0, 1fr); }
   /* five screenshots side by side would be thumbnails on a phone: they scroll sideways instead */
   .hd-tk-shots { display: flex; gap: 12px; margin-right: calc(-1 * var(--hd-gutter)); margin-left: calc(-1 * var(--hd-gutter)); padding: 0 var(--hd-gutter) 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-padding: 0 var(--hd-gutter); scroll-snap-type: x mandatory; scrollbar-width: none; }

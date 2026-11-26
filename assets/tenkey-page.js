@@ -18,52 +18,61 @@
     });
   });
 
-  // Gameplay loop: plays while it is on screen, pauses off screen, stays a poster for reduced motion, and has a pause button.
-  var video = document.querySelector("[data-tk-video]");
+  // Gameplay loops (three side by side since 2026-11-26): play while on screen, pause off screen, stay posters for reduced
+  // motion, and one pause button drives all of them.
+  var videos = Array.prototype.slice.call(document.querySelectorAll("[data-tk-video]"));
+  var video = videos[0];
   var toggle = document.querySelector("[data-tk-video-toggle]");
   var userPaused = reduceMotion;
   var onScreen = true;
 
   function setToggle() {
     if (!toggle || !video) return;
-    var paused = video.paused;
+    var paused = videos.every(function (v) { return v.paused; });
     toggle.setAttribute("data-state", paused ? "paused" : "playing");
     var label = toggle.getAttribute(paused ? "data-play-label" : "data-pause-label");
     if (label) toggle.setAttribute("aria-label", label);
   }
 
-  function play() {
-    var attempt = video.play();
-    if (attempt && typeof attempt.catch === "function") attempt.catch(function () { setToggle(); });
+  function playAll() {
+    videos.forEach(function (v) {
+      var attempt = v.play();
+      if (attempt && typeof attempt.catch === "function") attempt.catch(function () { setToggle(); });
+    });
   }
+
+  function pauseAll() { videos.forEach(function (v) { v.pause(); }); }
 
   if (video) {
     if (reduceMotion) {
-      video.removeAttribute("autoplay");
-      video.pause();
+      videos.forEach(function (v) { v.removeAttribute("autoplay"); });
+      pauseAll();
     }
 
-    video.addEventListener("play", setToggle);
-    video.addEventListener("pause", setToggle);
+    videos.forEach(function (v) {
+      v.addEventListener("play", setToggle);
+      v.addEventListener("pause", setToggle);
+    });
 
     if (toggle) {
       toggle.addEventListener("click", function () {
-        if (video.paused) {
+        if (videos.every(function (v) { return v.paused; })) {
           userPaused = false;
-          play();
+          playAll();
         } else {
           userPaused = true;
-          video.pause();
+          pauseAll();
         }
       });
     }
 
     if ("IntersectionObserver" in window) {
+      var host = video.closest(".tk-trio") || video;
       new IntersectionObserver(function (entries) {
         onScreen = entries[entries.length - 1].isIntersecting;
-        if (!onScreen) video.pause();
-        else if (!userPaused) play();
-      }, { threshold: 0.15 }).observe(video);
+        if (!onScreen) pauseAll();
+        else if (!userPaused) playAll();
+      }, { threshold: 0.15 }).observe(host);
     }
 
     setToggle();
