@@ -597,12 +597,16 @@
       // The itch web numbers come from tenkey-console-stats ("overview.web"): the deployed tenkey-admin refuses platform
       // web_itch (found 2026-11-03), which also left the 웹(itch) filter empty.
       const webCall = () => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "overview.web", params: { days: 90 } });
+      // reviews.get waits for store.get: store.get is what fetches new store reviews / stars (every 3 hours), and read in
+      // parallel the card showed the list from before that fetch (owner 2026-11-26: a Japanese Play review was missing).
+      const stats = (action, params) => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action, params });
+      const storeCall = state.platform ? Promise.resolve(null) : stats("store.get", { days: 120 }).catch(() => null);
       const [result, webResult, dauResult, storeResult, reviewsResult] = await Promise.all([
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
-        root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "dau.get", params: { days: 90 } }).catch(() => null),
-        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "store.get", params: { days: 120 } }).catch(() => null),
-        state.platform ? Promise.resolve(null) : root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action: "reviews.get", params: { limit: 30 } }).catch(() => null),
+        stats("dau.get", { days: 90 }).catch(() => null),
+        storeCall,
+        state.platform ? Promise.resolve(null) : storeCall.then(() => stats("reviews.get", { limit: 30 })).catch(() => null),
       ]);
       state.reviews = reviewsResult?.data || null;
       state.store = storeResult?.data || null;

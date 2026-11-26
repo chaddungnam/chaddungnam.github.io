@@ -349,9 +349,13 @@
     initialize: () => {}, initializeProject: () => {},
     post: async () => ({ summary: {}, daily: [], players: [], retention: [], rows: [], total: 0 }),
     postProject: async (project, fn, body) => {
-      window.__mockCalls.push({ project, fn, ...JSON.parse(JSON.stringify(body)) });
+      window.__mockDone = window.__mockDone || [];
+      window.__mockCalls.push({ project, fn, ...JSON.parse(JSON.stringify(body)), doneBefore: window.__mockDone.slice() });
+      const wait = (window.__mockDelay || {})[body.action];
+      if (wait) await new Promise((r) => setTimeout(r, wait));
       if (window.__mockFailures[body.action]) throw Object.assign(new Error(window.__mockFailures[body.action]), { status: 400 });
       const data = respond(body.action, body.params || {}, body, fn);
+      window.__mockDone.push(body.action);
       return { ok: true, data: JSON.parse(JSON.stringify(data)), auth_mode: "console_ticket" };
     },
   };

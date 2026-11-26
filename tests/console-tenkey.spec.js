@@ -466,6 +466,16 @@ test("a server error is shown in Korean without breaking the page", async ({ pag
 });
 
 
+test("overview (owner 2026-11-26): the review card is read only after store.get, which is what fetches new store reviews", async ({ page }) => {
+  const errors = await open(page);
+  await page.evaluate(() => { window.__mockDelay = { "store.get": 300 }; window.__mockCalls.length = 0; window.__mockDone = []; });
+  await page.locator("#tenkeyOverviewRefresh").click();
+  await expect.poll(() => page.evaluate(() => window.__mockCalls.filter((c) => c.action === "reviews.get").length)).toBeGreaterThan(0);
+  const call = await page.evaluate(() => window.__mockCalls.find((c) => c.action === "reviews.get"));
+  expect(call.doneBefore).toContain("store.get");
+  expect(errors).toEqual([]);
+});
+
 test("overview (owner 2026-11-24 launch): the default view counts DAU on the mobile app (Android + iOS), shows itch only as a reference chart and no pre-registration", async ({ page }) => {
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");
