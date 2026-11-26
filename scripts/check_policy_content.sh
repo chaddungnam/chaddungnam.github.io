@@ -150,7 +150,9 @@ for locale in "${locales[@]}"; do
     printf 'Privacy 10key Survival section still names CrazyGames (not a platform since 2026-11-01): %s\n' "$privacy" >&2
     failed=1
   fi
-  if grep -Eiq 'AdMob|Firebase|AppLovin|Sign in with Apple|Apple로 로그인' <<<"$tenkey_section"; then
+  # Firebase Analytics is a 10key Android/iOS SDK since the 2026-11-25 privacy revision (owner: required agreement), so only
+  # the ad SDKs and Apple sign-in stay Quirky-Ball-only.
+  if grep -Eiq 'AdMob|AppLovin|Sign in with Apple|Apple로 로그인' <<<"$tenkey_section"; then
     printf 'Privacy 10key Survival section names a Quirky-Ball-only SDK or sign-in: %s\n' "$privacy" >&2
     failed=1
   fi
