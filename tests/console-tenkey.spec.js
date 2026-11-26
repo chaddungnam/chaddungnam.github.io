@@ -476,6 +476,18 @@ test("overview (owner 2026-11-26): the review card is read only after store.get,
   expect(errors).toEqual([]);
 });
 
+test("overview (owner 2026-11-26): 새로 집계 asks store.get to read the stores' reviews and replies now; the timed reload does not", async ({ page }) => {
+  const errors = await open(page);
+  const first = await page.evaluate(() => window.__mockCalls.find((c) => c.action === "store.get"));
+  expect(first.params.reviews).toBeUndefined();
+  await page.evaluate(() => { window.__mockCalls.length = 0; });
+  await page.locator("#tenkeyOverviewRefresh").click();
+  await expect.poll(() => page.evaluate(() => window.__mockCalls.filter((c) => c.action === "store.get").length)).toBeGreaterThan(0);
+  const call = await page.evaluate(() => window.__mockCalls.find((c) => c.action === "store.get"));
+  expect(call.params).toEqual({ days: 120, reviews: true });
+  expect(errors).toEqual([]);
+});
+
 test("overview (owner 2026-11-24 launch): the default view counts DAU on the mobile app (Android + iOS), shows itch only as a reference chart and no pre-registration", async ({ page }) => {
   const errors = await open(page);
   const today = page.locator("#tenkeyGlanceToday .tk-glance-card");

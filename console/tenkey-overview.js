@@ -586,7 +586,9 @@
     byId("tenkeyOverviewStatus").textContent = `집계 ${new Date(data.as_of).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} · 베를린 ${data.today}`;
   }
 
-  async function load() {
+  // opts.reviews (the card's 새로 집계): read the stores' written reviews and replies now instead of on the 15-minute turn
+  // (owner 2026-11-26: a review he had answered by hand in Play Console still showed 답하기).
+  async function load(opts) {
     if (state.busy) return;
     state.busy = true;
     const section = byId("tenkeyOverview");
@@ -600,7 +602,7 @@
       // reviews.get waits for store.get: store.get is what fetches new store reviews / stars (every 3 hours), and read in
       // parallel the card showed the list from before that fetch (owner 2026-11-26: a Japanese Play review was missing).
       const stats = (action, params) => root.ConsoleAPI.postProject("houseduck", "tenkey-console-stats", { action, params });
-      const storeCall = state.platform ? Promise.resolve(null) : stats("store.get", { days: 120 }).catch(() => null);
+      const storeCall = state.platform ? Promise.resolve(null) : stats("store.get", opts?.reviews ? { days: 120, reviews: true } : { days: 120 }).catch(() => null);
       const [result, webResult, dauResult, storeResult, reviewsResult] = await Promise.all([
         state.platform === "web_itch" ? webCall() : T.call("overview.get", { days: 90, platform: state.platform || undefined }),
         state.platform ? Promise.resolve(null) : webCall().catch(() => null),
@@ -654,7 +656,7 @@
           load();
         }
       });
-      byId("tenkeyOverviewRefresh").addEventListener("click", load);
+      byId("tenkeyOverviewRefresh").addEventListener("click", () => load({ reviews: true }));
       setPressed("[data-tk-period]", "data-tk-period", state.period);
       setPressed("[data-tk-platform]", "data-tk-platform", state.platform);
       setPressed("[data-tk-compare]", "data-tk-compare", state.compare);
