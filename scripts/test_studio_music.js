@@ -69,9 +69,24 @@ function createFakeWindow(document) {
 
 (async () => {
   assert.ok(Array.isArray(music.TRACKS), "native player exports the playlist tracks");
-  assert.equal(music.TRACKS.length, 19);
-  assert.deepEqual(music.TRACKS.slice(0, 3).map((track) => track.role), ["home_1", "home_2", "outgame_sub"]);
-  assert.equal(music.TRACKS.at(-1).src, "assets/music/vip.mp3");
+  // built-in fallback = assets/music/playlist.json (YouTube BGM playlist order, every track has a real MP3)
+  const playlistJson = JSON.parse(fs.readFileSync(path.join(root, "assets", "music", "playlist.json"), "utf8"));
+  assert.equal(playlistJson.playlist, music.PLAYLIST_URL);
+  assert.equal(music.TRACKS.length, 26);
+  assert.deepEqual(music.TRACKS.map((track) => [track.videoId, track.src, track.title]), playlistJson.tracks.map((track) => [track.videoId, track.src, track.title]), "built-in fallback matches playlist.json");
+  for (const track of music.TRACKS) assert.ok(fs.statSync(path.join(root, track.src)).size > 500000, `${track.src} exists`);
+  assert.deepEqual(music.TRACKS.slice(0, 3).map((track) => track.role), ["tenkey_terminal_pursuit", "tenkey_iron_throttle", "tenkey_against_the_horizon"]);
+  assert.equal(music.TRACKS.at(-1).src, "assets/music/home_2.mp3");
+  assert.equal(music.normalizePlaylist({ tracks: [{ videoId: "abcdefghijk", title: "x", src: "https://evil.example/a.mp3" }] }), null, "only local assets/music MP3s play");
+  const sync = await import(path.join(root, "scripts", "music-playlist-sync.mjs"));
+  assert.equal(sync.cleanTitle("[BGM] Schönwald_Quiry Ball"), "Schönwald");
+  assert.equal(sync.cleanTitle("[BGM] 地平線を背景に (Against the Horizon)_10key Survival"), "地平線を背景に (Against the Horizon)");
+  const fixtureHtml = `<script>var ytInitialData = ${JSON.stringify({ contents: { list: [
+    { lockupViewModel: { contentType: "LOCKUP_CONTENT_TYPE_VIDEO", contentId: "NEWVIDEO001", metadata: { lockupMetadataViewModel: { title: { content: "[BGM] New Song_10key Survival" } } } } },
+    { playlistVideoRenderer: { videoId: "Yir1vAvPL94", title: { runs: [{ text: "[BGM] ターミナル追撃戦(Terminal Pursuit)_10key Survival" }] } } },
+  ] } })};</script>`;
+  const merged = sync.mergePlaylist(playlistJson, sync.parsePlaylistPage(fixtureHtml), "2026-11-26T00:00:00.000Z");
+  assert.deepEqual(merged.tracks.map((track) => [track.videoId, track.title, track.src]), [["NEWVIDEO001", "New Song", null], ["Yir1vAvPL94", "ターミナル追撃戦(Terminal Pursuit)", "assets/music/tenkey_terminal_pursuit.mp3"]], "sync keeps known MP3s and marks new videos YouTube-only");
   assert.equal(music.PLAYLIST_URL, "https://www.youtube.com/playlist?list=PLK7jSNsuc6Po");
   assert.doesNotMatch(source, /youtube-nocookie|iframe_api|<iframe|new YT|YT\.Player/i);
   assert.match(source, /new Audio|createElement\(["']audio["']\)/);
@@ -110,7 +125,7 @@ function createFakeWindow(document) {
   assert.equal(fakeDocument.audioCount, 1, "Play reuses the native audio element");
   assert.equal(launcherPlay.getAttribute("aria-label"), "Stop", "launcher becomes Stop immediately");
   assert.match(launcherPlay.innerHTML, /data-icon="stop"/);
-  assert.equal(audioNode.src, "assets/music/home_1.mp3");
+  assert.equal(audioNode.src, "assets/music/tenkey_terminal_pursuit.mp3");
 
   launcherPlay.dispatch("click");
   assert.equal(audioNode.pauseCalls, 1, "Stop pauses the native audio");
@@ -182,6 +197,23 @@ function createFakeWindow(document) {
   assert.equal(launcherPlay.getAttribute("aria-label"), "Play", "playable pause never auto-resumes");
   assert.equal(fakeDocument.listeners.has("visibilitychange"), false, "background visibility does not pause BGM");
   widget.destroy();
+
+  // playlist.json from the sync replaces the list: new videos without audio show as disabled YouTube-only options
+  const syncedDocument = new FakeDocument();
+  const syncedWindow = createFakeWindow(syncedDocument);
+  syncedWindow.fetch = async () => ({ ok: true, json: async () => merged });
+  const synced = music.createWidget(syncedDocument, syncedWindow);
+  assert.equal(await synced.ready, true, "widget applies playlist.json");
+  const syncedSelect = byClass(syncedDocument.body.children.at(-1), "studio-music-track-select");
+  assert.deepEqual(synced.tracks().map((track) => track.videoId), ["Yir1vAvPL94"]);
+  assert.deepEqual(syncedSelect.children.map((option) => [option.textContent, option.disabled]), [["ターミナル追撃戦(Terminal Pursuit)", false], ["New Song (YouTube only)", true]]);
+  synced.destroy();
+  const offlineWindow = createFakeWindow(new FakeDocument());
+  offlineWindow.fetch = async () => { throw new Error("offline"); };
+  const offline = music.createWidget(offlineWindow.document, offlineWindow);
+  assert.equal(await offline.ready, false);
+  assert.equal(offline.tracks().length, 26, "fetch failure keeps the built-in playlist");
+  offline.destroy();
 
   const mobileDocument = new FakeDocument();
   const mobileWindow = createFakeWindow(mobileDocument);

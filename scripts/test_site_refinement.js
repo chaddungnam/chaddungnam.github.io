@@ -49,7 +49,7 @@ async function main() {
     assert.doesNotMatch(html, /studio-home\.css/, `${file} no longer loads the quirky-ball/ stylesheet`);
     assert.match(html, /studio-music\.css\?v=20260907/);
     assert.match(html, /community-stats\.js\?v=20261006/);
-    assert.match(html, /studio-music\.js\?v=20260907/);
+    assert.match(html, /studio-music\.js\?v=20261126/);
     assert.doesNotMatch(html, /data-stats-as-of|community-date/);
     assert.doesNotMatch(html, /community-window[^>]*>[^<]*28/);
     const method = html.match(/<details class="hd-research-method community-method">[\s\S]*?<\/details>/)?.[0];

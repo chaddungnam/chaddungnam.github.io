@@ -31,14 +31,22 @@ jobs:
           curl --fail --silent --show-error --location "https://www.youtube.com/feeds/videos.xml?channel_id=UCVeNEKtmPXkSUuTslQKUKbw" --output .tmp/youtube.xml
           node scripts/youtube-sync.mjs --rss .tmp/youtube.xml --out .tmp/youtube-feed.json
           mv .tmp/youtube-feed.json assets/youtube-feed.json
+      - name: Sync SOUND LAB playlist
+        # A failed playlist read keeps the last good assets/music/playlist.json; the video feed still publishes.
+        continue-on-error: true
+        run: |
+          curl --fail --silent --show-error --location --header "Accept-Language: en-US,en;q=0.9" --header "Cookie: SOCS=CAI" "https://www.youtube.com/playlist?list=PLK7jSNsuc6Po" --output .tmp/bgm-playlist.html
+          node scripts/music-playlist-sync.mjs --html .tmp/bgm-playlist.html --out assets/music/playlist.json
       - name: Verify feed
-        run: node scripts/test_youtube_sync.mjs
+        run: |
+          node scripts/test_youtube_sync.mjs
+          node scripts/test_studio_music.js
       - name: Publish feed
         id: publish
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/youtube-feed.json
+          git add assets/youtube-feed.json assets/music/playlist.json
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
