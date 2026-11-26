@@ -42,7 +42,7 @@ if (isMain) {
   const output = option("--out");
   if (!input || !output) throw new Error("Usage: node scripts/youtube-sync.mjs --rss feed.xml --out assets/youtube-feed.json");
   const videos = parseYouTubeFeed(fs.readFileSync(input, "utf8"));
-  const payload = JSON.stringify({ channel: "https://www.youtube.com/@houseduck_in", updated: videos[0].published, videos }, null, 2) + "\n";
+  const payload = JSON.stringify({ channel: "https://www.youtube.com/@Sergeant_Houseduck", updated: videos[0].published, videos }, null, 2) + "\n";
   fs.mkdirSync(path.dirname(output), { recursive: true });
   const temporary = `${output}.tmp`;
   fs.writeFileSync(temporary, payload, "utf8");

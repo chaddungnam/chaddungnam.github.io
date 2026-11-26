@@ -29,7 +29,7 @@ for locale in "${locales[@]}"; do
   # Section 14 (2026-10-20, after Google's OAuth brand review): support email, the staff-only console and its Gmail
   # access with the Limited Use statement; Changes is section 15.
   ops_section="$(sed -n '/id="section-14"/,/id="section-15"/p' "$privacy")"
-  for token in 'Google Workspace' 'houseduck\.in/console/' 'https://www\.googleapis\.com/auth/gmail\.modify' \
+  for token in 'Google Workspace' 'https://www\.googleapis\.com/auth/gmail\.modify' \
     'https://developers\.google\.com/terms/api-services-user-data-policy' 'Limited Use' '72' 'business@houseduck\.in'; do
     if ! grep -Eq "$token" <<<"$ops_section"; then
       printf 'Privacy section 14 (support and operations tools) misses %s: %s\n' "$token" "$privacy" >&2

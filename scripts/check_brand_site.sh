@@ -125,7 +125,7 @@ for page in index.html index_en.html index_de.html index_ja.html; do
   for retired in 'data-studio-hero' 'data-release-chamber' 'class="section-rail"' 'hero-background-word' 'data-motion-toggle' 'data-game-preview' 'class="project-zone' 'class="community-section' 'data-quirky-mechanic' 'data-playable-phone' 'data-quirky-canvas' 'scroll-quirky' 'data-project="tenkey-survival"' 'data-project="hexaworld1984"' 'data-stack' 'class="hd-shot"' 'quirky-ball/v2/shot-' 'data-ghost' 'assets/store-badges/google-play-'; do
     if grep -Fq "$retired" "$repo_dir/$page"; then fail "$page still contains retired home element $retired"; fi
   done
-  require_token "$page" "https://www.youtube.com/@houseduck_in"
+  require_token "$page" "https://www.youtube.com/@Sergeant_Houseduck"
   reject_token "$page" 'history-section'
   reject_token "$page" 'journal-section'
   reject_token "$page" '작게 만들더라도 오래 기억되는 게임'
@@ -165,7 +165,7 @@ require_token "assets/studio-home.js" "shotsPerSecond: 8"
 test -s "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2" || fail "Chilgok subset font is missing"
 test "$(wc -c < "$repo_dir/assets/fonts/Chilgok_Kaj-subset.woff2")" -lt 300000 || fail "Chilgok subset font is too large"
 require_token "llms.txt" "https://houseduck.in/assets/youtube-feed.json"
-require_token "llms.txt" "https://www.youtube.com/@houseduck_in"
+require_token "llms.txt" "https://www.youtube.com/@Sergeant_Houseduck"
 
 for page in index.html index_en.html index_de.html index_ja.html; do
   require_token "$page" 'application/ld+json'

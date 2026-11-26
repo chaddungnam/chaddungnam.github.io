@@ -163,11 +163,15 @@ assert.match(read("console/purchases.js"), /ConsoleModel\.playerIdentityMarkup/,
 assert.match(read("console/audit.js"), /ConsoleModel\.playerIdentityMarkup/, "audit player identities must deep-link to player detail");
 assert.match(consoleStyles, /\.player-note-badge/, "global player note badges must have shared styling");
 
+// Owner 2026-11-26: robots.txt must not advertise the private paths. The console and the analytics redirect stay out of
+// search through their own noindex meta tag (crawlers can read it because robots.txt no longer blocks them).
 const robots = read("robots.txt");
+assert.ok(!/console|analytics/i.test(robots), "robots.txt must not name the private console or analytics paths");
 for (const agent of ["Google-adstxt", "Mediapartners-Google", "Googlebot", "*"]) {
-  const rules = rulesFor(robots, agent);
-  assert.ok(rules.includes("Disallow: /console/"), `${agent} must not crawl the private console`);
-  assert.ok(rules.includes("Disallow: /analytics/"), `${agent} must not crawl the legacy analytics redirect`);
+  assert.ok(rulesFor(robots, agent).includes("Allow: /"), `${agent} may crawl the public site`);
+}
+for (const file of ["console/index.html", "analytics/index.html"]) {
+  assert.match(read(file), /<meta name="robots" content="noindex, nofollow, noarchive">/, `${file} stays out of search`);
 }
 
 const uiStatePath = path.join(root, "console", "ui-state.js");

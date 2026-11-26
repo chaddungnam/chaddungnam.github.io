@@ -346,7 +346,7 @@ for (const [file, copy] of Object.entries(expectedCopy)) {
 
   // --- lab notes: three equal YouTube cards with the channel link ---
   assert.match(lab, /^<section class="hd-lab" id="lab-notes" data-theme="paper" aria-labelledby="lab-title">/, `${file} lab notes section`);
-  assert.ok(lab.includes('<a class="hd-arrow-link" href="https://www.youtube.com/@houseduck_in">'), `${file} links the YouTube channel`);
+  assert.ok(lab.includes('<a class="hd-arrow-link" href="https://www.youtube.com/@Sergeant_Houseduck">'), `${file} links the YouTube channel`);
   assert.ok(lab.includes('<div class="hd-lab-grid" data-youtube-feed>'), `${file} feed container`);
   const cards = [...lab.matchAll(/<a class="youtube-card" data-youtube-card href="https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})"><span class="hd-thumb"><img src="https:\/\/i\.ytimg\.com\/vi\/([A-Za-z0-9_-]{11})\/hqdefault\.jpg" width="480" height="360" alt="" loading="lazy"><\/span><span><strong>([^<]+)<\/strong><\/span><\/a>/g)];
   assert.equal(cards.length, 3, `${file} needs three equal video cards`);

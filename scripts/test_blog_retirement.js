@@ -23,7 +23,7 @@ for (const dir of ["blog", "story"]) {
 }
 for (const file of pages.slice(0, 4)) {
   const html = fs.readFileSync(path.join(root, file), "utf8");
-  assert.match(html, /youtube\.com\/@houseduck_in/);
+  assert.match(html, /youtube\.com\/@Sergeant_Houseduck/);
   assert.match(html, /data-youtube-feed/);
   assert.match(html, /community-stats\.js/);
   assert.match(html, /studio-music\.js/);

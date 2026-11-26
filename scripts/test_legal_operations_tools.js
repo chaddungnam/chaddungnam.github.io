@@ -35,9 +35,11 @@ for (const locale of ["en", "ko", "de"]) {
   else assert.match(section, LIMITED_USE[locale], `${locale}: Limited Use sentence`);
   assert.ok(section.includes(`href="${POLICY_URL}"`), `${locale}: links the Google API Services User Data Policy`);
   for (const fact of ["<code>https://www.googleapis.com/auth/gmail.modify</code>", "support@houseduck.in", "business@houseduck.in",
-    "<code>houseduck.in/console/</code>", "Google Workspace", "Gmail", "72", "Supabase"]) {
+    "Google Workspace", "Gmail", "72", "Supabase"]) {
     assert.ok(section.includes(fact), `${locale}: section 14 names ${fact}`);
   }
+  // Owner 2026-11-26: the console path is not published on public pages; section 14 describes the tool without its URL.
+  assert.ok(!section.includes("/console/"), `${locale}: section 14 does not publish the console path`);
   // The console's AI summary is off (the only Gemini key is on the free tier, which may use content to improve Google's
   // products): section 14 must say mail text goes to no AI service, and never name Gemini as a mail recipient.
   assert.ok(section.includes({ en: "mail text is not sent to any AI service", ko: "메일 본문은 어떤 AI 서비스로도 전송되지 않습니다", de: "E-Mail-Texte werden an keinen KI-Dienst gesendet" }[locale]), `${locale}: no mail text to AI`);
@@ -60,8 +62,11 @@ assert.equal(ids.de, ids.en, "de and en have the same section anchors");
 for (const file of ["privacy/index.html", "quirky-ball/privacy/index.html", "10key/privacy/index.html"]) {
   assert.ok(read(file).includes(LIMITED_USE.en), `${file}: entry page carries section 14`);
 }
-for (const file of ["index.html", "index_en.html"]) {
-  assert.match(read(file), /<a href="privacy\/en\.html#section-14"[^>]*>House Duck Console \(staff only\)<\/a>/, `${file}: footer explains the console`);
+// Owner 2026-11-26 (critical): public pages never show the staff console link or path.
+for (const file of ["index.html", "index_en.html", "index_de.html", "index_ja.html", "privacy/index.html", "quirky-ball/privacy/index.html", "10key/privacy/index.html", "robots.txt", "llms.txt", "sitemap.xml"]) {
+  const text = read(file);
+  assert.ok(!/staff only/i.test(text), `${file}: no staff-only console link`);
+  assert.ok(!text.includes("/console/"), `${file}: no console path`);
 }
 const cs = read("console/cs.js");
 assert.match(cs, /const AI_SUMMARY = false;/, "console: the AI summary stays off");

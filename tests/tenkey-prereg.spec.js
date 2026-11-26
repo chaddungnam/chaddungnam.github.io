@@ -383,7 +383,7 @@ test("/10key/get/ phone card shows the free demo note, the share keys and the ch
   await expect(more.locator("[data-card-itch]")).toContainText("itch.io에서 데모 플레이");
   await expect(more.locator("[data-share-row]")).toBeVisible();
   await expect(more.locator("[data-share-open]")).toContainText("공유하기");
-  await expect(more.locator("a[href='https://www.youtube.com/@houseduck_in']")).toBeVisible();
+  await expect(more.locator("a[href='https://www.youtube.com/@Sergeant_Houseduck']")).toBeVisible();
   await expect(more.locator("a[href='https://www.threads.com/@sergeant_houseduck']")).toBeVisible();
   await expect.poll(() => page.locator("[data-get-card] img").evaluateAll((imgs) => imgs.every((i) => i.complete && i.naturalWidth > 0))).toBe(true);
   for (const [lang, words] of [["en", "Still deciding?"], ["de", "Noch unsicher?"], ["ja", "購入を迷っている方は"], ["zh", "還在猶豫嗎？"]]) {
@@ -544,7 +544,7 @@ test("/10key/get/ computer page shows Steam 2027 and the YouTube and Threads lin
   await expect(pc.locator(".tk-steam-soon")).toBeVisible();
   await expect(pc.locator(".tk-steam-soon")).toContainText("2027 출시 예정");
   const more = pc.locator(".tk-get-more");
-  await expect(more.locator("a[href='https://www.youtube.com/@houseduck_in']")).toContainText("유튜브에서 영상 보기");
+  await expect(more.locator("a[href='https://www.youtube.com/@Sergeant_Houseduck']")).toContainText("유튜브에서 영상 보기");
   await expect(more.locator("a[href='https://www.threads.com/@sergeant_houseduck']")).toContainText("Threads에서 소식 받기");
   await expect(more.locator("a[href='/10key/?lang=ko']")).toHaveText("게임 소개 보기");
 });
