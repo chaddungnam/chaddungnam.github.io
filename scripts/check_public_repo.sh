@@ -20,6 +20,15 @@ while IFS= read -r path; do
     scripts/check_public_repo.sh|.github/*|SECURITY.md) continue ;;
   esac
 
+  # Internal notes never go in the public site (GitHub Pages serves every file, 2026-11-26): they live in the private repo.
+  case "$path" in
+    docs/*|.superpowers/*|answer.md|*/answer.md|next.md|*/next.md|handoff/*)
+      printf '차단: 내부 문서는 공개 사이트 저장소에 넣지 않습니다(비공개 저장소로): %s\n' "$path" >&2
+      failed=1
+      continue
+      ;;
+  esac
+
   if [[ "$path" == *.zip ]]; then
     case "$path" in
       play/quirky-ball/index.pck.zip) expected_hash='c67501f533d1b83be8530b1c93a588971c212d90c5aaaf623a54141df75357e7' ;;
