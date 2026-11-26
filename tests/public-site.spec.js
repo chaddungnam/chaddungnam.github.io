@@ -18,7 +18,9 @@ for (const route of routes) {
   test(`${route} renders without broken media or horizontal overflow`, async ({ page }) => {
     const errors = [];
     page.on("console", (message) => {
-      if (message.type() === "error") errors.push(message.text());
+      // Supabase hosts are offline in browser tests (playwright.config.cjs host-resolver-rules); the pages already treat a
+      // failed live read as "no data", so only that refused connection is ignored here.
+      if (message.type() === "error" && !/\.supabase\.co\//.test(message.location().url || "")) errors.push(message.text());
     });
     page.on("pageerror", (error) => errors.push(error.message));
 
