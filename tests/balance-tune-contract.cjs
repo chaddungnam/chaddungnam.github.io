@@ -23,11 +23,15 @@ const notes = [];
 // 1. The server table, as the migrations leave it.
 const server = {};
 for (const file of fs.readdirSync(migrations).filter((f) => /_tenkey_.*\.sql$/.test(f)).sort()) {
-  const sql = read(path.join(migrations, file));
+  const sql = read(path.join(migrations, file)).replace(/^\s*--.*$/gm, "");  // rollback notes are comments, not rows
   for (const block of sql.matchAll(/insert into tenkey_private\.balance_tune_bounds\b[\s\S]*?\n(?:on conflict|;)/g)) {
-    for (const m of block[0].matchAll(/\('(\w+)', (-?[\d.]+), (-?[\d.]+), (true|false), (-?[\d.]+), '((?:[^']|'')*)', '([^']*)', (-?\d+), '((?:[^']|'')*)'\)/g)) {
+    for (const m of block[0].matchAll(/\('(\w+)', (-?[\d.]+), (-?[\d.]+), (true|false), (-?[\d.]+), '((?:[^']|'')*)', '([^']*)', (-?\d+)(?:, '[^']*')?, '((?:[^']|'')*)'\)/g)) {  // 11-26: rows may carry a since column before src
       server[m[1]] = { min: Number(m[2]), max: Number(m[3]), int: m[4] === "true", def: Number(m[5]), label: m[6], group: m[7], file };
     }
+  }
+  // 11-26: a later file may move one bound or default in place (20261126120000 wear max 6.5)
+  for (const m of sql.matchAll(/update tenkey_private\.balance_tune_bounds set (min_value|max_value|default_value) = (-?[\d.]+) where name = '(\w+)'/gi)) {
+    if (server[m[3]]) server[m[3]][{ min_value: "min", max_value: "max", default_value: "def" }[m[1].toLowerCase()]] = Number(m[2]);
   }
   for (const m of sql.matchAll(/delete from tenkey_private\.balance_tune_bounds where name (?:= '(\w+)'|in \(([^)]*)\))/g)) {
     for (const name of m[1] ? [m[1]] : m[2].match(/\w+/g) || []) delete server[name];
