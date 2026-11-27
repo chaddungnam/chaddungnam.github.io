@@ -43,6 +43,7 @@
     { id: "hard_ranking", name: "하드 랭킹", opens: "RANKING 위에 [NORMAL] [HARD] 줄이 생겨 하드 순위를 봄", rule: "하드 플레이가 열린 계정이면 열림 (앱만)" },
     { id: "hard_sale", name: "하드 구매 카드", opens: "SHOP에 하드 모드 해금 카드가 보임 (누르면 소개 화면과 보석 299 / 결제 키)", rule: "서버 하드 판매 스위치가 켜지면 보임 (지금 꺼짐). 이미 산 계정은 늘 보임" },
     { id: "shop_test", name: "상점 테스트", opens: "판매 중인 팩 카드가 레벨과 상관없이 다 보이고, 할인이 있는 팩은 정가 키와 할인가 키가 둘 다 보임 (정가 구매 테스트용, 앱만)", rule: "기본 꺼짐. 심사 중인 빌드(서버 review_build_ios / _android)와 관리자 실험 모드 계정은 저절로 켜짐" },
+    { id: "race", name: "레이싱 모드 (테스트)", opens: "앱 홈에 레이싱 입구가 보임. 플레이하려면 레이싱 해금 조건을 별도로 충족해야 함", rule: "기본 꺼짐. 켜짐은 이 계정만 표시, 꺼짐은 정식 공개 뒤에도 숨김. 보유한 해금 권한은 유지됨" },
   ];
   // Steps 1-6 as one row (the server keeps one row per step; one call sets all six).
   const BASIC = STEPS.slice(0, 6).map((s) => s.id);

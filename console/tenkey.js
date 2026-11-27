@@ -223,6 +223,7 @@
       config: {
         min_version_code: n.minVersionCode, latest_version_code: n.minVersionCode,
         min_build_ios: n.minBuildIos, latest_build_ios: n.minBuildIos,
+        offline_open: values.offlineOpen === "on",
       },
     };
   }
@@ -239,6 +240,7 @@
       `Android 최소 빌드 ${config.min_version_code}${config.min_version_code ? "" : " (끔)"}`,
       `iOS 최소 빌드 ${config.min_build_ios}${config.min_build_ios ? "" : " (끔)"}`,
       `막히는 빌드: ${hit.length ? hit.join(", ") : "없음 (지금 쓰는 빌드 기준)"}`,
+      `오프라인 보상: ${config.offline_open ? "켬" : "끔"}`,
       `변경 이유: ${reason}`,
     ].join("\n");
   }
@@ -279,6 +281,7 @@
     const fields = byId("tenkeyConfigForm").elements;
     fields.minVersionCode.value = config.min_version_code ?? 0;
     fields.minBuildIos.value = config.min_build_ios ?? 0;
+    fields.offlineOpen.checked = config.offline_open === true;
     renderLinks(config);
     renderBuilds();
   }
@@ -309,14 +312,14 @@
         return;
       }
       const { config, reason } = checked;
-      if (!await root.ConsoleApp.confirmChange("10KEY 강제 업데이트 변경", summary(config, reason))) return;
+      if (!await root.ConsoleApp.confirmChange("10KEY 앱 설정 변경", summary(config, reason))) return;
       setMessage(FORM_MESSAGE, "저장하는 중입니다...");
       const result = await call("config.set", { config, reason }, form);
       state.config = result.data?.config || { ...state.config, ...config };
       fillForm(state.config);
       form.elements.reason.value = "";
       setMessage(FORM_MESSAGE, "");
-      setMessage(PAGE_MESSAGE, "강제 업데이트 번호를 저장했습니다. 다음에 앱을 켤 때부터 적용됩니다.");
+      setMessage(PAGE_MESSAGE, "앱 설정을 저장했습니다. 다음에 앱을 켤 때부터 적용됩니다.");
     } catch (error) {
       report(FORM_MESSAGE, error);
     } finally {
