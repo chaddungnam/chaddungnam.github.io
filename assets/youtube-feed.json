@@ -1,7 +1,12 @@
 {
   "channel": "https://www.youtube.com/@Sergeant_Houseduck",
-  "updated": "2026-11-27T08:30:17.000Z",
+  "updated": "2026-11-28T08:30:17.000Z",
   "videos": [
+    {
+      "videoId": "-WGFp9PlVF4",
+      "title": "AI로 혼자만든 게임 현실...",
+      "published": "2026-11-28T08:30:17.000Z"
+    },
     {
       "videoId": "j0U48NidlSs",
       "title": "'딸깍' 하는 게임 ㄹㅇ 만들어버림 ㅋㅋ [1인 게임 조이스틱 개발일지]",
@@ -11,11 +16,6 @@
       "videoId": "xykTrd4p85c",
       "title": "'딸깍 서바이벌' 모바일게임 트레일러",
       "published": "2026-11-25T11:55:34.000Z"
-    },
-    {
-      "videoId": "GbGAshfmA8s",
-      "title": "온갖 음해에 시달렸습니다.. [1인 게임 개발 현실]",
-      "published": "2026-11-25T08:35:00.000Z"
     }
   ]
 }
