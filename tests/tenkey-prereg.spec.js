@@ -442,7 +442,7 @@ for (const [url, lang, title] of LAUNCH_PAGES) {
     await expect(page.locator("#download [data-launch-store=ios] img")).toHaveAttribute("src", `/assets/store-badges/app-store-${lang}.svg`);
     await expect(page.locator("#download [data-launch-store=android] img")).toHaveAttribute("src", lang === "zh" ? "/assets/store-badges/google-play-zh.png" : `/assets/store-badges/google-play-${lang}.svg`);
     await expect(page.locator("#download [data-launch-store=android]")).toHaveAttribute("href", new RegExp(`utm_campaign%3Dsite_${lang}$`));
-    await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+    await expect(page.locator("#download .tk-dl-sale")).toHaveCount(0);
     await expect(page.locator("#faq details:visible")).toHaveCount(3);
     await expect(page.locator(".tk-nav-cta:visible")).toHaveAttribute("href", "#download");
     for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
@@ -467,7 +467,7 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; released (owner 202
   await expect(page.locator("#download [data-launch-store=ios]")).toBeVisible();
   await expect(page.locator("#download [data-launch-store=android]")).toBeVisible();
   await expect(page.locator("#download .tk-badge-soon:visible")).toHaveCount(0);
-  await expect(page.locator("#download .tk-dl-sale")).toBeVisible();
+  await expect(page.locator("#download .tk-dl-sale")).toHaveCount(0);
   for (const a of await page.locator("[data-itch-gate]").all()) await expect(a).toHaveAttribute("href", "https://houseduck.itch.io/10key-survival");
   await page.goto("/?lang=ko");
   await expect(page.locator("#games .hd-chip-status:visible")).toHaveText("지금 출시");
@@ -479,12 +479,12 @@ test("the launch version is on from 2026-11-18 18:00 Berlin; released (owner 202
     await expect(page.locator("[data-get-pc] [data-get-link=ios]")).toHaveAttribute("href", "https://apps.apple.com/app/10key-survival/id6824972492?pt=129265473&ct=mail&mt=8");
     await expect(page.locator("[data-get-pc] [data-get-link=android]")).toBeVisible();
   }
-  // the sale line ends with the sale (11-27 Berlin) even when released
+  // the old launch-sale line is gone: prices and dates change, so the page keeps no fixed price text (owner 2026-11-28)
   await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
   await page.goto("/10key/?lang=ko");
   await expect(page.locator("#download")).toBeVisible();
   await expect(page.locator("#download [data-launch-store=ios]")).toBeVisible();
-  await expect(page.locator("#download .tk-dl-sale")).toBeHidden();
+  await expect(page.locator("#download .tk-dl-sale")).toHaveCount(0);
 });
 test("home 10key section: pre-registration before launch, download key to /10key/get/ after", async ({ page }) => {
   await page.goto("/?lang=ko");
@@ -520,15 +520,16 @@ test("/10key/get/?launch=preview shows the after-launch page without leaving for
   await expect(page).toHaveURL(/launch=preview/);
 });
 // Price on /10key/get/ (owner 2026-11-28): one local price per page language, matching the regional store prices set that
-// day, with the note that the standard is US$4.99 and local, Steam and promotion prices can differ. The launch sale ended 11-27.
+// day, and a note without a fixed price: the store price counts and local living costs, a Steam price or promotions can
+// change it. The launch-sale line ended 11-27 and was removed, so no sale tag or struck-through price is left.
 test("/10key/get/ shows the local price for each page language and the price note", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-28T12:00:00+01:00"));
   const want = {
-    ko: ["가격", "₩4,900", "정가는 미국 달러 기준 $4.99"],
-    en: ["Price", "$4.99", "The standard price is US$4.99."],
-    de: ["Preis", "4,99 €", "Der Standardpreis beträgt 4,99 US-Dollar."],
-    ja: ["価格", "¥590", "標準価格は4.99米ドルです。"],
-    zh: ["售價", "NT$120", "標準售價為 4.99 美元。"],
+    ko: ["가격", "₩4,900", "가격은 나라별 통화로 스토어에 표시되고"],
+    en: ["Price", "$4.99", "The price is shown in your local currency in the store"],
+    de: ["Preis", "4,99 €", "Den Preis zeigt der Store in deiner Währung"],
+    ja: ["価格", "¥590", "価格はストアに現地通貨で表示され"],
+    zh: ["售價", "NT$120", "價格會在商店以當地貨幣顯示"],
   };
   for (const [lang, [label, value, note]] of Object.entries(want)) {
     await page.goto(`/10key/get/?preview=pc&lang=${lang}`);
@@ -536,9 +537,10 @@ test("/10key/get/ shows the local price for each page language and the price not
     await expect(price.locator(".tk-get-price-label")).toHaveText(label);
     await expect(price.locator(".tk-get-price-regular")).toHaveText(value);
     await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "none");
-    await expect(price.locator(".tk-get-price-sale")).toBeHidden();
-    await expect(price.locator(".tk-get-price-tag")).toBeHidden();
+    await expect(price.locator(".tk-get-price-sale")).toHaveCount(0);
+    await expect(price.locator(".tk-get-price-tag")).toHaveCount(0);
     await expect(price.locator(".tk-get-price-note")).toContainText(note);
+    await expect(price).not.toContainText("$2.99");
   }
 });
 // Owner 2026-11-21: Steam shown as coming in 2027 under the itch.io button; YouTube and Threads next to "About the game".
