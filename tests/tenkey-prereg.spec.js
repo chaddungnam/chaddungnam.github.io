@@ -519,23 +519,27 @@ test("/10key/get/?launch=preview shows the after-launch page without leaving for
   else await expect(page.locator("[data-get-pc]")).toBeVisible();
   await expect(page).toHaveURL(/launch=preview/);
 });
-// Price on /10key/get/ (owner 2026-11-21): US dollars in every language; $4.99 struck through and $2.99 until the end of
-// 11-27 German time, then the regular $4.99 alone.
-test("/10key/get/ shows the price in USD: launch sale until 11-27 German time, then the regular $4.99", async ({ page }) => {
-  await page.clock.setFixedTime(new Date("2026-11-27T23:55:00+01:00"));
-  await page.goto("/10key/get/?preview=pc&lang=ko");
-  const price = page.locator("[data-get-price]");
-  await expect(price.locator(".tk-get-price-regular")).toHaveText("$4.99");
-  await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "line-through");
-  await expect(price.locator(".tk-get-price-sale")).toContainText("$2.99");
-  await expect(price.locator(".tk-get-price-tag")).toHaveText("출시 기념 할인 · 11월 27일까지 (독일 시간)");
-  await page.clock.setFixedTime(new Date("2026-11-28T00:05:00+01:00"));
-  await page.goto("/10key/get/?preview=pc&lang=de");
-  await expect(price.locator(".tk-get-price-regular")).toHaveText("$4.99");
-  await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "none");
-  await expect(price.locator(".tk-get-price-sale")).toBeHidden();
-  await expect(price.locator(".tk-get-price-tag")).toBeHidden();
-  await expect(price.locator(".tk-get-price-label")).toHaveText("Regulärer Preis");
+// Price on /10key/get/ (owner 2026-11-28): one local price per page language, matching the regional store prices set that
+// day, with the note that the standard is US$4.99 and local, Steam and promotion prices can differ. The launch sale ended 11-27.
+test("/10key/get/ shows the local price for each page language and the price note", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-11-28T12:00:00+01:00"));
+  const want = {
+    ko: ["가격", "₩4,900", "정가는 미국 달러 기준 $4.99"],
+    en: ["Price", "$4.99", "The standard price is US$4.99."],
+    de: ["Preis", "4,99 €", "Der Standardpreis beträgt 4,99 US-Dollar."],
+    ja: ["価格", "¥590", "標準価格は4.99米ドルです。"],
+    zh: ["售價", "NT$120", "標準售價為 4.99 美元。"],
+  };
+  for (const [lang, [label, value, note]] of Object.entries(want)) {
+    await page.goto(`/10key/get/?preview=pc&lang=${lang}`);
+    const price = page.locator("[data-get-price]");
+    await expect(price.locator(".tk-get-price-label")).toHaveText(label);
+    await expect(price.locator(".tk-get-price-regular")).toHaveText(value);
+    await expect(price.locator(".tk-get-price-regular")).toHaveCSS("text-decoration-line", "none");
+    await expect(price.locator(".tk-get-price-sale")).toBeHidden();
+    await expect(price.locator(".tk-get-price-tag")).toBeHidden();
+    await expect(price.locator(".tk-get-price-note")).toContainText(note);
+  }
 });
 // Owner 2026-11-21: Steam shown as coming in 2027 under the itch.io button; YouTube and Threads next to "About the game".
 test("/10key/get/ computer page shows Steam 2027 and the YouTube and Threads links", async ({ page }) => {
