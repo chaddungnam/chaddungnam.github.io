@@ -519,15 +519,15 @@ test("/10key/get/?launch=preview shows the after-launch page without leaving for
   else await expect(page.locator("[data-get-pc]")).toBeVisible();
   await expect(page).toHaveURL(/launch=preview/);
 });
-// App Store discount event (owner 2026-11-28): a duck-yellow pill above the price says an event is running, in the page
-// language. The percentage and end date stay out of the text, and the pill shows only while TENKEY_LAUNCH.iosSale is true.
-test("/10key/get/ shows the App Store discount event badge in the page language", async ({ page }) => {
+// Discount event badge (owner 2026-11-28): a duck-yellow pill above the price says an event is running, in the page
+// language and for the stores in general (App Store sale, Google Play at the same price). No percentage, no end date.
+test("/10key/get/ shows the discount event badge in the page language", async ({ page }) => {
   const want = {
-    ko: "지금 App Store 할인 이벤트 진행 중",
-    en: "App Store discount event on now",
-    de: "App-Store-Aktion läuft",
-    ja: "App Store 割引キャンペーン実施中",
-    zh: "App Store 折扣活動進行中",
+    ko: "할인 이벤트 진행 중!",
+    en: "Discount event on now!",
+    de: "Aktion läuft!",
+    ja: "割引キャンペーン実施中！",
+    zh: "折扣活動進行中！",
   };
   for (const [lang, text] of Object.entries(want)) {
     await page.goto(`/10key/get/?preview=pc&lang=${lang}`);
@@ -544,11 +544,11 @@ test("/10key/get/ shows the App Store discount event badge in the page language"
 test("/10key/get/ shows the local price for each page language and the price note", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-28T12:00:00+01:00"));
   const want = {
-    ko: ["가격", "₩4,900", "가격은 나라별 통화로 스토어에 표시되고"],
-    en: ["Price", "$4.99", "The price is shown in your local currency in the store"],
-    de: ["Preis", "4,99 €", "Den Preis zeigt der Store in deiner Währung"],
-    ja: ["価格", "¥590", "価格はストアに現地通貨で表示され"],
-    zh: ["售價", "NT$120", "價格會在商店以當地貨幣顯示"],
+    ko: ["가격", "₩2,400", "가격은 나라별 통화로 스토어에 표시되고"],
+    en: ["Price", "$2.49", "The price is shown in your local currency in the store"],
+    de: ["Preis", "2,49 €", "Den Preis zeigt der Store in deiner Währung"],
+    ja: ["価格", "¥290", "価格はストアに現地通貨で表示され"],
+    zh: ["售價", "NT$60", "價格會在商店以當地貨幣顯示"],
   };
   for (const [lang, [label, value, note]] of Object.entries(want)) {
     await page.goto(`/10key/get/?preview=pc&lang=${lang}`);

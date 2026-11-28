@@ -18,10 +18,10 @@
   var C = window.TENKEY_LAUNCH = {
     at: Date.UTC(2026, 10, 18, 17, 0, 0),
     released: true,
-    // iosSale: an App Store discount event is running (owner 2026-11-28, 50% off until 12-31 via the price schedule).
-    // Its end date and percentage stay out of the page text on purpose: the badge only says an event is on and the store
-    // shows the price. Flip to false when the event ends.
-    iosSale: true,
+    // saleEvent: a discount event is running on the stores (owner 2026-11-28: App Store 50% off until 12-31, Google Play
+    // now sells at that same price permanently). The page only says an event is on; the percentage and the dates stay out
+    // of the text on purpose (concepts/pricing-policy.md). Flip to false when the event ends.
+    saleEvent: true,
     saleTo: Date.UTC(2026, 10, 27, 23, 0, 0),
     stores: {
       ios: { live: true, url: "https://apps.apple.com/app/10key-survival/id6824972492" },
@@ -50,7 +50,7 @@
 
   var root = document.documentElement;
   if (C.sale) root.classList.add("tk-sale");
-  if (C.iosSale) root.classList.add("tk-ios-sale");
+  if (C.saleEvent) root.classList.add("tk-sale-event");
   if (!C.on) return;
   root.classList.add("tk-launch", "tk-itch-open");
   if (C.wait) root.classList.add("tk-stores-wait");

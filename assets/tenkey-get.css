@@ -91,7 +91,7 @@ html.tk-get-sale .tk-get-price-regular { font-size: clamp(1.4rem, 3.2vw, 1.9rem)
 .tk-card-more .tk-get-more { margin-top: 4px; }
 :lang(ja) .tk-card .tk-card-demo, :lang(zh-Hant) .tk-card .tk-card-demo { word-break: normal; line-break: strict; overflow-wrap: anywhere; }
 
-/* App Store discount event (owner 2026-11-28): a duck-yellow pill above the price. Shown only while
-   TENKEY_LAUNCH.iosSale is true (html.tk-ios-sale, tenkey-launch.js); no percentage, no end date in the text. */
+/* Discount event (owner 2026-11-28): a duck-yellow pill above the price. Shown only while TENKEY_LAUNCH.saleEvent is
+   true (html.tk-sale-event, tenkey-launch.js); no percentage, no end date in the text. */
 .tk-get-price-event { display: none; }
-html.tk-ios-sale .tk-get-price-event { display: inline-block; padding: 5px 13px; border-radius: 999px; background: var(--tk-duck); color: #141414; font-family: "Galmuri11", "PixelMplus12", var(--tk-font); font-size: .82rem; font-weight: 700; letter-spacing: 0; line-height: 1.45; }
+html.tk-sale-event .tk-get-price-event { display: inline-block; padding: 5px 13px; border-radius: 999px; background: var(--tk-duck); color: #141414; font-family: "Galmuri11", "PixelMplus12", var(--tk-font); font-size: .82rem; font-weight: 700; letter-spacing: 0; line-height: 1.45; }
