@@ -519,6 +519,25 @@ test("/10key/get/?launch=preview shows the after-launch page without leaving for
   else await expect(page.locator("[data-get-pc]")).toBeVisible();
   await expect(page).toHaveURL(/launch=preview/);
 });
+// App Store discount event (owner 2026-11-28): a duck-yellow pill above the price says an event is running, in the page
+// language. The percentage and end date stay out of the text, and the pill shows only while TENKEY_LAUNCH.iosSale is true.
+test("/10key/get/ shows the App Store discount event badge in the page language", async ({ page }) => {
+  const want = {
+    ko: "지금 App Store 할인 이벤트 진행 중",
+    en: "App Store discount event on now",
+    de: "App-Store-Aktion läuft",
+    ja: "App Store 割引キャンペーン実施中",
+    zh: "App Store 折扣活動進行中",
+  };
+  for (const [lang, text] of Object.entries(want)) {
+    await page.goto(`/10key/get/?preview=pc&lang=${lang}`);
+    const badge = page.locator("[data-get-price] .tk-get-price-event");
+    await expect(badge).toBeVisible();
+    await expect(badge).toContainText(text);
+    await expect(badge).not.toContainText("%");
+    await expect(badge).not.toContainText("12월");
+  }
+});
 // Price on /10key/get/ (owner 2026-11-28): one local price per page language, matching the regional store prices set that
 // day, and a note without a fixed price: the store price counts and local living costs, a Steam price or promotions can
 // change it. The launch-sale line ended 11-27 and was removed, so no sale tag or struck-through price is left.
